@@ -24,6 +24,6 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 - Label-free Quantification (Spectral Count and MS1 intensities)
 
-- Isotope lable quantification (TMT)
+- Isotope label quantification (TMT)
 
 - Detailed protein reports with optional protein annotation.
