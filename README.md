@@ -22,6 +22,8 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
   - Two-dimensional filtering for simultaneous control of PSM and Protein FDR levels.
   - Sequential FDR estimantion using filtered PSM and proteins lists.
 
-- MS1 Quantification
+- Label-free Quantification (Spectral Count and MS1 intensities)
+
+- Isotope lable quantification (TMT)
 
 - Detailed protein reports with optional protein annotation.
