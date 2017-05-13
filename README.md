@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.8.0-blue.svg) ![Version](https://img.shields.io/badge/version-rc5-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.8.1-blue.svg) ![Version](https://img.shields.io/badge/version-rc6-blue.svg)
 
 
 ## Features
@@ -35,26 +35,4 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 - Detailed multi-level reports with optional funtional annotation.
 
 
-## How to Download
-Download the latest version [here](https://github.com/prvst/philosopher/releases/latest)
-
-
-## How to Use
-A simple [tutorial](tutorial.md) is also provided with an extensive example on how to use Philosopher.
-
-
-## Documentation
-Check the [documentation](documentation.md) for more details about the available commands.
-
-
-## Questions, requests and bug reports
-If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/prvst/philosopher/issues).
-
-## How to cite
-Still in progress!
-
-## About the developers
-Another great work from Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
-
-## License
-GPL 3
+Access [Philosopher website](https://prvst.github.io/philosopher/) for more information on how to use and download the program.
