@@ -1,0 +1,256 @@
+## [1.0] - 2017-02-06
+
+- shipping first stable
+
+## [rc7] - 2017-20-05
+
+- Added new Prophets with native modifications
+- Added modification reports
+
+## [rc6] - 2017-17-04
+
+- Preparing release candidate 6
+- Fixed TPP 5.0.0 with parameters
+
+## [rc5] - 2017-27-03
+
+- Preparing release candidate 5
+- added TMT quantification
+- Added Prophets 5.0
+
+## [rc4] - 2017-27-03
+
+- Preparing release candidate 4
+
+## [rc3] - 2017-15-03
+
+- Preparing release candidate 3
+
+## [rc2] - 2017-13-03
+
+- Preparing release candidate 2
+
+## [rc1] - 2017-27-02
+
+- Preparing release candidate 1
+
+## [3.2b] - 2017-23-02
+### Added
+- label quantification for TMT
+- protein quantification report based on labels
+- clean command for removing the workspace
+
+### Changed
+- Repository renamed to beta for future release candidate
+
+## [3.1b] - 2017-17-02
+### Added
+- init command is now used to create a workspace
+
+### Changed
+- A major refactoring was made in order to reduce the memory footprint and processing time.
+
+## [3.0b] - 2017-26-01
+### Added
+- Filtering options added to abacus
+- Added custom option to database
+- Final databases now are sorted
+- Peptide top probability added as a filter option
+- noTopPep option added to the filter command
+
+### Fixed
+- When using a custom database, the final file was empty
+
+### Changed
+- Swapped the Apache license for GNPL v3.
+
+## [2.9b] - 2017-25-01
+### Fixed
+- A bug on the FDR scoring that caused all filters to use the same FDR level.
+
+## [2.8b] - 2017-25-01
+### Added
+- Abacus function is stable.
+
+### Changed
+- Extensive code refactoring.
+
+### Fixed
+- A bug on the database report was causing double entries to appear.
+
+## [2.7b] - 2017-18-01
+### Changed
+- major rework on the log output.
+- Extensive code refactoring, moved all filtering up level commands to phi.
+
+## [2.6b] - 2017-16-01
+### Added
+- New abacus command added, report does not do combined anymore.
+- Database override added to filter.
+
+### Changed
+- Combined report from report command.
+- ProteinProphet now can run individual or combined analysis.
+
+## [2.5b] - 2017-14-01
+### Changed
+- Database parser was improved. Now the database is parsed from the pepXML files.
+
+### Added
+- New database option allows to include proteins isoforms.
+
+### Fixed
+- Several minor issue with the database parsing
+
+## [2.4b] - 2017-01-03
+### Changed
+- Spectral readers were optimized, now using much less memory.
+- Updates added to the Wiki
+
+## [2.3b] - 2016-12-29
+### Added
+-Picked FDR option for protein FDR scoring
+
+## [2.2b] - 2016-12-20
+### Added
+- Added peptide ions to report
+- Added razor peptides to report
+
+### Changed
+- Total and shared peptides are now Unique stripped peptides.
+
+## [2.1b] - 2016-12-15
+### Added
+- Modification lists to reports
+- Peptide ion report
+
+### Changed
+- Major code revision, all classes and modules were refactored.
+
+### Fixed
+- Minor bugs were corrected
+
+## [2.0b] - 2016-12-09
+### Changed
+- Several methods and functions were ported to the cmsl lib
+- Major code revision, all classes and modules were refactored.
+
+## [1.9b] - 2016-12-06
+### Added
+- MS1 quantification for PSM and Proteins
+
+### Changed
+- PSM and Protein report are now under the report command.
+
+## [1.8b] - 2016-08-22
+### Added
+- Spectral Counting added to protein report.
+- Report comparison added for fold change calculation.
+- Protein probability parameter added to filter option.
+- Added NSAF values to quantification.
+
+### Fixed
+- Unintentional rounding to FDR threshold in all calculations were underestimating filtered lists.
+- Repeated values from quantify command.
+
+### Changed
+- Fixed FDR scoring with under represented scores.
+//
+
+## [1.7b] - 2016-08-11
+### Added
+- Red Hat based support for the prophets.
+//
+
+## [1.6b] - 2016-08-09
+### Added
+- Error code when trying to process different XML files.
+- Files without peptide validation are ignored with a warning message.
+
+### Changed
+- All FDR scoring were updated, making sure that entries are scored in blocks.
+- PSM report is now written in TSV.
+- Database contaminants now will substitute their equivalents, if they are present in the FASTA file.
+- Minor adjustments to FDR scoring.
+//
+
+## [1.5b] - 2016-07-24
+### Added
+- EMBL Protein Data API parser.
+
+### Changed
+- XML processing now supports other ISO encoding, allowing to process MSGFp results.
+
+### Fixed
+- bug on protein reporting, now protein description is shorter.
+- wrong number of proteins was been assigned to filtered protein lists after two-d filtering.
+- protein group score filtering was missing from traditional protein FDR estimation.
+//
+
+## [1.4b] - 2016-07-18
+
+### Added
+- protein identifications represented by decoys but indistinguishable to other targets will now be promoted as targets.
+- trying to print models using iProphet files now returns error message instead of printing empty images.
+- started adding unit tests to libraries
+- added shippable automated tests
+
+### Changed
+- database command now fetches FASTA files from UniProt instead of formatting existing ones.
+- filter parameter --report_proteins now is called report_pts.
+- the filter parameter --report_pts now accepts a FASTA files instead of reading pepXML hardcoded tag.
+- temp working path no more invisible.
+
+### Fixed
+- a file path mis interpretation was causing plot files to have full qualified names after path setting.
+- removed path from model printing functions
+- FASTA file timestamp was in wrong place.
+- CD-Hit now runs on Windows machines.
+- major windows issues were resolves, program now is 100% windows friendly.
+//
+
+## [1.3b] - 2016-07-14
+### Added
+- concurrency points added to plotting.
+- new filter --razor option applies razor peptide logic to protein inference analysis.
+- major reorganization of protein data structures allowing them to be represented as protein groups.
+- added logrus package for logging handling.
+
+### Changed
+- minor adjustment to report command text.
+- log reporting.
+- error handling now is localized to the package and function levels.
+
+### Removed
+- the profile command was completely removed.
+//
+
+## [1.2b] - 2016-07-07
+### Added
+- philosopher now has the ability to print the fitting models (FVAL) for all charge states.
+  The new function was added to the filter command, parameter --models
+- improved log information with filtered protein list content (target, decoy, contaminants).
+
+### Changed
+- major log formating.
+- improved two-dimensional algorithm by adding original target sequences back to the mirror list.
+
+### Fixed
+- the number of shared peptides, in the protein report, was overestimated.
+//
+
+## [1.1b] - 2016-07-06
+### Added
+- parameter --sequential in filter command, for sequential FDR estimation using filtered PSM and Protein lists.
+
+### Changed
+- when iProphet scores are available, philosopher will use them instead of PeptideProphet.
+- parameter --2d in filter command no longer exists, two-dimensional filtering is now the default method for FDR filtering.
+
+### Fixed
+- bug that caused protein clusters to be reported without protein description
+//
+
+## [1.0b] - 2016-07-06
+- first version
+//
