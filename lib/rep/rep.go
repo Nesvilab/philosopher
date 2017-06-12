@@ -203,12 +203,17 @@ type CombinedEvidenceList []CombinedEvidence
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
-	MassBins           []MassBin
-	MappedMasses       map[float64]PSMEvidenceList
-	MappedModNames     map[string]PSMEvidenceList
-	MonoIsotopicMasses map[string]float64
-	AverageMasses      map[string]float64
-	Composition        map[string]string
+	MassBins     []MassBin
+	AssignedBins []AssignedBin
+	// MapModNamesToAverageMasses   map[string]float64
+	// MapModMassToAverageMasses    map[float64]float64
+	// MapModNamesToPSMs            map[string]PSMEvidenceList
+	// MapModMassesToPSMs           map[float64]PSMEvidenceList
+	// MapModMassToModNames         map[float64][]string
+	// MapModNameToModMass          map[string]float64
+	// MapModNameToMonoisotopicMass map[string]float64
+	// MapModNameToComposition      map[string]string
+	// UnModObservations            int
 }
 
 // MassBin represents each bin from the mass distribution
@@ -222,6 +227,20 @@ type MassBin struct {
 	Elements      PSMEvidenceList
 	Spectra       map[string]int
 }
+
+// AssignedBin contains the bin data after collapsing entries into apex peaks
+type AssignedBin struct {
+	Mass                float64
+	MappedModifications []string
+	Elements            PSMEvidenceList
+}
+
+// AssignedBins is a list of assignedbins
+type AssignedBins []AssignedBin
+
+func (a AssignedBins) Len() int           { return len(a) }
+func (a AssignedBins) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a AssignedBins) Less(i, j int) bool { return a[i].Mass < a[j].Mass }
 
 // New constructor
 func New() Evidence {
@@ -353,9 +372,9 @@ func (e *Evidence) ModifiedPSMReport() {
 
 	// get the list of modifications for each psm spectrum
 	var uniqModPSM = make(map[string][]string)
-	for k, i := range e.Modifications.MappedModNames {
-		for _, j := range i {
-			uniqModPSM[j.Spectrum] = append(uniqModPSM[j.Spectrum], k)
+	for _, i := range e.Modifications.AssignedBins {
+		for _, j := range i.Elements {
+			uniqModPSM[j.Spectrum] = append(uniqModPSM[j.Spectrum], i.MappedModifications...)
 		}
 	}
 
@@ -509,11 +528,17 @@ func (e *Evidence) UpdateIonModCount() {
 		_, ok := AllIons[psmIon]
 		if ok {
 
-			if i.Massdiff >= 0.99 && i.Massdiff <= 1.99 {
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
 				UnModIons[psmIon]++
 			} else {
 				ModIons[psmIon]++
 			}
+
+			// if i.Massdiff >= 0.99 && i.Massdiff <= 1.99 {
+			// 	UnModIons[psmIon]++
+			// } else {
+			// 	ModIons[psmIon]++
+			// }
 
 		}
 	}
@@ -753,16 +778,25 @@ func (e *Evidence) PeptideIonReport() {
 func (e *Evidence) ModifiedPeptideIonReport() {
 
 	// get the list of modifications for each psm spectrum
-	var uniqModIon = make(map[string][]string)
-	for k, i := range e.Modifications.MappedModNames {
-		for _, j := range i {
+	//var uniqModIon = make(map[string][]string)
+	var uniqModIon = make(map[string]map[string]uint8)
+
+	for _, i := range e.Modifications.AssignedBins {
+		for _, j := range i.Elements {
 			var ion string
 			if len(j.ModMasses) > 0 {
 				ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
 			} else {
 				ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
 			}
-			uniqModIon[ion] = append(uniqModIon[ion], k)
+
+			mods := make(map[string]uint8)
+			for _, k := range i.MappedModifications {
+				mods[k] = 0
+			}
+			uniqModIon[ion] = mods
+			//uniqModIon[ion] = append(uniqModIon[ion], i.MappedModifications...)
+
 		}
 	}
 
@@ -800,6 +834,11 @@ func (e *Evidence) ModifiedPeptideIonReport() {
 
 				if len(e.Proteins) > 1 {
 
+					var mods []string
+					for k := range v {
+						mods = append(mods, k)
+					}
+
 					line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\n",
 						i.Sequence,
 						i.MZ,
@@ -810,7 +849,7 @@ func (e *Evidence) ModifiedPeptideIonReport() {
 						i.Spc,
 						i.UnModifiedObservations,
 						i.ModifiedObservations,
-						strings.Join(v, ", "),
+						strings.Join(mods, ", "),
 					)
 					_, err = io.WriteString(file, line)
 					if err != nil {
@@ -1517,62 +1556,107 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	}
 
-	var mappedMasses = make(map[float64]PSMEvidenceList)
-	var mappedModNames = make(map[string]PSMEvidenceList)
-	var averageMasses = make(map[string]float64)
-	var monoIsotopicMasses = make(map[string]float64)
-	var composition = make(map[string]string)
+	// var name2AvgMasses = make(map[string]float64)
+	// var mass2AvgMasses = make(map[float64]float64)
+	// var name2Psms = make(map[string]PSMEvidenceList)
+	// var mass2Psms = make(map[float64]PSMEvidenceList)
+	// var mass2Names = make(map[float64][]string)
+	// var names2Mass = make(map[string]float64)
+	// var names2MonoisoMass = make(map[string]float64)
+	// var names2Composition = make(map[string]string)
 
 	// starting unimod parsing
 	u := uni.New()
 	u.ProcessUniMOD()
 
 	// assign each modification to a certain bin based on a mass window
+	var abins AssignedBins
 	for k, v := range selectedBins {
-		mass := utils.Round(k, 5, 2)
+
+		var ab AssignedBin
+		ab.Mass = utils.Round(k, 5, 2)
+		ab.Elements = v
 
 		for _, j := range u.Modifications {
 			mod := utils.Round(j.MonoMass, 5, 2)
 
-			if mass == mod {
-				mappedMasses[k] = v
-				mappedModNames[j.FullName] = v
-				averageMasses[j.FullName] = j.AvgMass
-				monoIsotopicMasses[j.FullName] = j.MonoMass
-				composition[j.FullName] = j.Composition
-			}
-
-			if mass >= (mod-0.2) && mass <= (mod+0.2) {
-				mappedMasses[k] = v
-				mappedModNames[j.FullName] = v
-				averageMasses[j.FullName] = j.AvgMass
-				monoIsotopicMasses[j.FullName] = j.MonoMass
-				composition[j.FullName] = j.Composition
+			if ab.Mass >= (mod-0.2) && ab.Mass <= (mod+0.2) {
+				ab.MappedModifications = append(ab.MappedModifications, j.FullName)
 			}
 
 		}
+
+		// set all bins without unimod mappings to unknown
+		if len(ab.MappedModifications) == 0 {
+			ab.MappedModifications = append(ab.MappedModifications, "Unknown")
+		}
+
+		// reset the 0 bin to no modifications
+		if ab.Mass == 0 {
+			ab.MappedModifications = nil
+			ab.MappedModifications = append(ab.MappedModifications, "None")
+		}
+
+		abins = append(abins, ab)
 	}
 
-	// for i := range e.PSM {
-	// 	for _, j := range mappedModNames {
-	// 		for _, k := range j {
+	// for k, v := range selectedBins {
+	// 	mass := utils.Round(k, 5, 2)
 	//
-	// 			if e.PSM[i].Spectrum == k.Spectrum {
-	// 				e.PSm[i]
-	// 			}
+	// 	for _, j := range u.Modifications {
+	// 		mod := utils.Round(j.MonoMass, 5, 2)
 	//
+	// 		// if mass >= (0-0.2) && mass <= (0+0.2) {
+	// 		// 	mass2Psms[k] = v
+	// 		// 	name2AvgMasses[j.FullName] = j.AvgMass
+	// 		// 	mass2AvgMasses[k] = j.AvgMass
+	// 		// 	mass2Names[k] = append(mass2Names[k], j.FullName)
+	// 		// 	names2Mass[j.FullName] = k
+	// 		// 	name2Psms["none"] = v
+	// 		// 	names2MonoisoMass[j.FullName] = j.MonoMass
+	// 		// 	names2Composition["none"] = "none"
+	// 		// 	unmodbins++
+	// 		//
+	// 		// } else
+	// 		if mass == mod {
+	// 			mass2Psms[k] = v
+	// 			name2AvgMasses[j.FullName] = j.AvgMass
+	// 			mass2AvgMasses[k] = j.AvgMass
+	// 			mass2Names[k] = append(mass2Names[k], j.FullName)
+	// 			names2Mass[j.FullName] = k
+	// 			name2Psms[j.FullName] = v
+	// 			names2MonoisoMass[j.FullName] = j.MonoMass
+	// 			names2Composition[j.FullName] = j.Composition
+	//
+	// 		} else if mass >= (mod-0.2) && mass <= (mod+0.2) {
+	// 			mass2Psms[k] = v
+	// 			name2AvgMasses[j.FullName] = j.AvgMass
+	// 			mass2AvgMasses[k] = j.AvgMass
+	// 			mass2Names[k] = append(mass2Names[k], j.FullName)
+	// 			names2Mass[j.FullName] = k
+	// 			name2Psms[j.FullName] = v
+	// 			names2MonoisoMass[j.FullName] = j.MonoMass
+	// 			names2Composition[j.FullName] = j.Composition
 	// 		}
+	//
 	// 	}
 	// }
 
-	modEvi.AverageMasses = averageMasses
-	modEvi.MappedMasses = mappedMasses
-	modEvi.MappedModNames = mappedModNames
-	modEvi.MonoIsotopicMasses = monoIsotopicMasses
-	modEvi.Composition = composition
+	// modEvi.MapModNamesToAverageMasses = name2AvgMasses
+	// modEvi.MapModMassToAverageMasses = mass2AvgMasses
+	// modEvi.MapModNamesToPSMs = name2Psms
+	// modEvi.MapModMassesToPSMs = mass2Psms
+	// modEvi.MapModMassToModNames = mass2Names
+	// modEvi.MapModNameToModMass = names2Mass
+	// modEvi.MapModNameToMonoisotopicMass = names2MonoisoMass
+	// modEvi.MapModNameToComposition = names2Composition
+	//modEvi.UnModObservations = unmodbins
 
 	e.Modifications = modEvi
 	e.Modifications.MassBins = bins
+
+	sort.Sort(abins)
+	e.Modifications.AssignedBins = abins
 
 	return nil
 }
@@ -1590,21 +1674,26 @@ func (e *Evidence) ModificationReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Modification\tMonoisotopic Mass\tAverage Mass\tComposition\tNumber of PSMs\n")
+	line := fmt.Sprintf("Mass Bin\tNumber of PSMs\tModification\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
 		logrus.Fatal(n, err)
 	}
 
-	for k, v := range e.Modifications.MappedModNames {
+	for _, i := range e.Modifications.AssignedBins {
 
-		line = fmt.Sprintf("%s\t%.4f\t%.4f\t%s\t%d\t",
-			k,
-			e.Modifications.MonoIsotopicMasses[k],
-			e.Modifications.AverageMasses[k],
-			e.Modifications.Composition[k],
-			len(v))
+		line = fmt.Sprintf("%.4f\t%d\t%s\t",
+			i.Mass,          // mass bins
+			len(i.Elements), // number of psms
+			strings.Join(i.MappedModifications, ", "))
+
+		// line = fmt.Sprintf("%s\t%.4f\t%.4f\t%s\t%d\t",
+		// 	k,
+		// 	e.Modifications.MonoIsotopicMasses[k],
+		// 	e.Modifications.AverageMasses[k],
+		// 	e.Modifications.Composition[k],
+		// 	len(v))
 
 		line += "\n"
 		n, err := io.WriteString(file, line)
