@@ -4,9 +4,10 @@ import (
 	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/ext/comet"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher-source/lib/ext/comet"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/sys"
+
 	"github.com/spf13/cobra"
 )
 

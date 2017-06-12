@@ -7,10 +7,10 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
-	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/sys"
+	ucomet "github.com/prvst/philosopher-source/lib/ext/comet/unix"
+	wcomet "github.com/prvst/philosopher-source/lib/ext/comet/win"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // Comet represents the tool configuration

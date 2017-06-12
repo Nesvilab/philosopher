@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
-	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/sys"
+	unix "github.com/prvst/philosopher-source/lib/ext/peptideprophet/unix"
+	wPeP "github.com/prvst/philosopher-source/lib/ext/peptideprophet/win"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // PeptideProphet is the tool configuration

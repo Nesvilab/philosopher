@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/utils"
-	"github.com/prvst/philosopher/lib/clas"
-	"github.com/prvst/philosopher/lib/data"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/quan"
-	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/xml"
+	"github.com/prvst/cmsl-source/utils"
+	"github.com/prvst/philosopher-source/lib/clas"
+	"github.com/prvst/philosopher-source/lib/data"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/quan"
+	"github.com/prvst/philosopher-source/lib/rep"
+	"github.com/prvst/philosopher-source/lib/sys"
+	"github.com/prvst/philosopher-source/lib/xml"
 )
 
 // Filter object

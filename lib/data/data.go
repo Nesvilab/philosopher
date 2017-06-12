@@ -15,11 +15,11 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/bio"
-	"github.com/prvst/cmsl/data/fas"
-	"github.com/prvst/cmsl/db"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/cmsl-source/bio"
+	"github.com/prvst/cmsl-source/data/fas"
+	"github.com/prvst/cmsl-source/db"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // Base main structure

@@ -6,7 +6,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	colorable "github.com/mattn/go-colorable"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher-source/lib/sys"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

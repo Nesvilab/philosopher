@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/data/mz/mzml"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/cmsl-source/data/mz/mzml"
+	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // Raw struct

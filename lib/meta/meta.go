@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher-source/lib/sys"
 	uuid "github.com/satori/go.uuid"
 )
 

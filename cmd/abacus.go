@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/aba"
+	"github.com/prvst/philosopher-source/lib/aba"
 	"github.com/spf13/cobra"
 )
 

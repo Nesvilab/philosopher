@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/data/mod"
-	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/cmsl-source/data/mod"
+	"github.com/prvst/philosopher-source/lib/meta"
+	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // MOD main structure
