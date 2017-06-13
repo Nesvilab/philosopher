@@ -698,16 +698,17 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		}
 	}
 
-	for _, i := range e.PSM {
-		_, ok := pepSeqMap[i.Peptide]
-		if ok {
-			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
-			pepSpc[i.Peptide]++
-			if i.Intensity > pepInt[i.Peptide] {
-				pepInt[i.Peptide] = i.Intensity
-			}
-		}
-	}
+	// for _, i := range e.PSM {
+	// 	_, ok := pepSeqMap[i.Peptide]
+	// 	if ok {
+	// 		pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
+	// 		pepSpc[i.Peptide]++
+	// 		fmt.Println(i.Intensity)
+	// 		if i.Intensity > pepInt[i.Peptide] {
+	// 			pepInt[i.Peptide] = i.Intensity
+	// 		}
+	// 	}
+	// }
 
 	for k := range pepSeqMap {
 
@@ -720,6 +721,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		}
 		pep.Spc = pepSpc[k]
 		pep.Intensity = pepInt[k]
+
 		list = append(list, pep)
 	}
 
@@ -740,7 +742,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tIntensity\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -752,13 +754,13 @@ func (e *Evidence) PeptideReport() {
 			cs = append(cs, strconv.Itoa(int(j)))
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
-			i.Intensity,
+			//i.Intensity,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {

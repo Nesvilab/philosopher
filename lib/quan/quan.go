@@ -20,7 +20,6 @@ import (
 	"github.com/prvst/philosopher-source/lib/rep"
 	"github.com/prvst/philosopher-source/lib/sys"
 	"github.com/prvst/philosopher-source/lib/tmt"
-	"github.com/prvst/philosopher-source/lib/xml"
 )
 
 // Quantify ...
@@ -77,12 +76,6 @@ func New() Quantify {
 func (p *Quantify) RunLabelFreeQuantification() error {
 
 	var err error
-
-	var ion xml.PepIDList
-	ion.Restore("ion")
-
-	var pro xml.ProtIDList
-	pro.Restore()
 
 	var evi rep.Evidence
 	evi.Restore()
@@ -2123,31 +2116,50 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, error) {
 
 	var intMap = make(map[string]float64)
 	var intRefMap = make(map[string]float64)
+	var intPepMap = make(map[string]float64)
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
 		return e, errors.New("No peptide identification found")
 	}
 
-	for _, i := range e.PSM {
+	for i := range e.PSM {
 
 		var key string
-		if len(i.ModifiedPeptide) > 0 {
-			key = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
+		if len(e.PSM[i].ModifiedPeptide) > 0 {
+			key = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
 		} else {
-			key = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
+			key = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
 		}
 
 		_, ok := intMap[key]
 		if ok {
-			if i.Intensity > intMap[key] {
-				intMap[key] = i.Intensity
+			if e.PSM[i].Intensity > intMap[key] {
+				intMap[key] = e.PSM[i].Intensity
 			}
 		} else {
-			intMap[key] = i.Intensity
+			intMap[key] = e.PSM[i].Intensity
+		}
+
+		_, okPep := intPepMap[e.PSM[i].Peptide]
+		if okPep {
+			if e.PSM[i].Intensity > intPepMap[e.PSM[i].Peptide] {
+				intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
+			}
+		} else {
+			intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
 		}
 
 	}
 
+	// peptides get the higest intense from the matching sequences
+	for i := range e.Peptides {
+		v, ok := intMap[e.Peptides[i].Sequence]
+		if ok {
+			e.Peptides[i].Intensity = v
+		}
+	}
+
+	// ions get the higest intense from the matching sequences
 	for i := range e.Ions {
 
 		var key string
