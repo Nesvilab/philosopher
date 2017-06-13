@@ -179,8 +179,15 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 
 		logrus.Info("Plotting mass distribution")
 		e.PlotMassHist()
+
+		// call again to update structures and reports with mod information
+		var psm xml.PepIDList
+		psm.Restore("psm")
+		e.AssemblePSMReport(psm, f.Tag)
+		psm = nil
 	}
 
+	logrus.Info("Processing Protein Inference")
 	pro.Restore()
 	err = e.AssembleProteinReport(pro, f.Tag)
 	if err != nil {
