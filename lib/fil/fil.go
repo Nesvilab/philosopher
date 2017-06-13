@@ -174,17 +174,25 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	if mapmod == true {
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
-		e.UpdateIonModCount()
-		e.UpdatePeptideModCount()
 
 		logrus.Info("Plotting mass distribution")
 		e.PlotMassHist()
 
-		// call again to update structures and reports with mod information
+		// call again to update structures and reports with observed modification information
 		var psm xml.PepIDList
 		psm.Restore("psm")
 		e.AssemblePSMReport(psm, f.Tag)
 		psm = nil
+
+		// call again to update structures and reports with observed modification information
+		var ion xml.PepIDList
+		ion.Restore("ion")
+		e.AssembleIonReport(ion, f.Tag)
+		ion = nil
+
+		e.UpdateIonModCount()
+		e.UpdatePeptideModCount()
+		e.UpdateIonAssignedAndObservedMods()
 	}
 
 	logrus.Info("Processing Protein Inference")

@@ -86,7 +86,8 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 type IonEvidence struct {
 	Sequence                string
 	ModifiedSequence        string
-	Modifications           string
+	AssignedModifications   map[string]uint8
+	ObservedModifications   map[string]uint8
 	RetentionTime           string
 	Spectra                 map[string]int
 	MappedProteins          map[string]uint8
@@ -345,74 +346,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 }
 
 // PSMReport report all psms from study that passed the FDR filter
-
-// func (e *Evidence) PSMReport() {
-//
-// 	output := fmt.Sprintf("%s%spsms.tsv", e.Temp, string(filepath.Separator))
-//
-// 	file, err := os.Create(output)
-// 	if err != nil {
-// 		logrus.Fatal("Could not create peptide output file")
-// 	}
-// 	defer file.Close()
-//
-// 	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tVariable Modifications\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\n")
-// 	if err != nil {
-// 		logrus.Fatal("Cannot print PSM to file")
-// 	}
-//
-// 	for _, i := range e.PSM {
-//
-// 		var defMods string
-// 		if len(i.ModMasses) > 0 {
-// 			var mods []string
-// 			for j := range i.ModMasses {
-// 				mod := e.Mods.DefinedModMassDiff[i.ModMasses[j]]
-// 				aa := e.Mods.DefinedModAminoAcid[i.ModMasses[j]]
-// 				ma := fmt.Sprintf("%s%d:%.4f", aa, i.ModPositions[j], mod)
-// 				mods = append(mods, ma)
-// 			}
-// 			defMods = strings.Join(mods, ", ")
-// 		}
-//
-// 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
-// 			i.Spectrum,
-// 			i.Peptide,
-// 			i.ModifiedPeptide,
-// 			defMods,
-// 			i.AssumedCharge,
-// 			i.RetentionTime,
-// 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
-// 			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
-// 			i.RawMassdiff,
-// 			i.Massdiff,
-// 			i.PrecursorNeutralMass,
-// 			i.CalcNeutralPepMass,
-// 			i.Probability,
-// 			i.Expectation,
-// 		)
-// 		_, err = io.WriteString(file, line)
-// 		if err != nil {
-// 			logrus.Fatal("Cannot print PSM to file")
-// 		}
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(output, filepath.Base(output))
-//
-// 	return
-// }
-
-// PSMReport report all psms from study that passed the FDR filter
 func (e *Evidence) PSMReport() {
-
-	// // get the list of modifications for each psm spectrum
-	// var uniqModPSM = make(map[string][]string)
-	// for _, i := range e.Modifications.AssignedBins {
-	// 	for _, j := range i.Elements {
-	// 		uniqModPSM[j.Spectrum] = append(uniqModPSM[j.Spectrum], i.MappedModifications...)
-	// 	}
-	// }
 
 	output := fmt.Sprintf("%s%spsm.tsv", e.Temp, string(filepath.Separator))
 
@@ -429,14 +363,6 @@ func (e *Evidence) PSMReport() {
 	}
 
 	for _, i := range e.PSM {
-
-		// var mods string
-		// v, ok := uniqModPSM[i.Spectrum]
-		// if ok {
-		// 	mods = strings.Join(v, ", ")
-		// } else {
-		// 	mods = ""
-		// }
 
 		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\n",
 			i.Spectrum,
@@ -466,63 +392,6 @@ func (e *Evidence) PSMReport() {
 	return
 }
 
-// func (e *Evidence) ModifiedPSMReport() {
-//
-// 	// get the list of modifications for each psm spectrum
-// 	var uniqModPSM = make(map[string][]string)
-// 	for _, i := range e.Modifications.AssignedBins {
-// 		for _, j := range i.Elements {
-// 			uniqModPSM[j.Spectrum] = append(uniqModPSM[j.Spectrum], i.MappedModifications...)
-// 		}
-// 	}
-//
-// 	output := fmt.Sprintf("%s%smod-psms.tsv", e.Temp, string(filepath.Separator))
-//
-// 	// create result file
-// 	file, err := os.Create(output)
-// 	if err != nil {
-// 		logrus.Fatal("Cannot create report file:", err)
-// 	}
-// 	defer file.Close()
-//
-// 	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\tModifications\n")
-// 	if err != nil {
-// 		logrus.Fatal("Cannot print PSM to file")
-// 	}
-//
-// 	for _, i := range e.PSM {
-// 		v, ok := uniqModPSM[i.Spectrum]
-// 		if ok {
-// 			mods := strings.Join(v, ", ")
-// 			line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
-// 				i.Spectrum,
-// 				i.Peptide,
-// 				i.ModifiedPeptide,
-// 				i.AssumedCharge,
-// 				i.RetentionTime,
-// 				((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
-// 				((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
-// 				i.RawMassdiff,
-// 				i.Massdiff,
-// 				i.PrecursorNeutralMass,
-// 				i.CalcNeutralPepMass,
-// 				i.Probability,
-// 				i.Expectation,
-// 				mods,
-// 			)
-// 			_, err = io.WriteString(file, line)
-// 			if err != nil {
-// 				logrus.Fatal("Cannot print PSM to file")
-// 			}
-// 		}
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(output, filepath.Base(output))
-//
-// 	return
-// }
-
 // AssembleIonReport reports consist on ion reporting
 func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 
@@ -544,11 +413,9 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			pr.Spectra = make(map[string]int)
 			pr.MappedProteins = make(map[string]uint8)
 			pr.IndiMappedProteins = make(map[string]uint8)
+			pr.ObservedModifications = make(map[string]uint8)
+			pr.AssignedModifications = make(map[string]uint8)
 
-			// remove charge state from spectrum name
-			// split := strings.Split(i.Spectrum, ".")
-			// name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-			//pr.Spectra[name] = 0
 			pr.Spectra[i.Spectrum]++
 
 			pr.Sequence = i.Peptide
@@ -558,20 +425,6 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			pr.PeptideMass = i.CalcNeutralPepMass
 			pr.Probability = i.Probability
 			pr.Expectation = i.Expectation
-			pr.Intensity = 0
-
-			// if len(i.ModMasses) > 0 {
-			// 	var mods []string
-			// 	for j := range i.ModMasses {
-			// 		if e.Mods.DefinedModMassDiff[i.ModMasses[j]] > 0 {
-			// 			mod := e.Mods.DefinedModMassDiff[i.ModMasses[j]]
-			// 			aa := e.Mods.DefinedModAminoAcid[i.ModMasses[j]]
-			// 			ma := fmt.Sprintf("%s%d:%.4f", aa, i.ModPositions[j], mod)
-			// 			mods = append(mods, ma)
-			// 		}
-			// 	}
-			// 	pr.Modifications = strings.Join(mods, ", ")
-			// }
 
 			// get he list of indi proteins from pepXML data
 			v, ok := psmPtMap[i.Spectrum]
@@ -592,73 +445,48 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 	return err
 }
 
-// func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
-//
-// 	var list IonEvidenceList
-// 	var psmPtMap = make(map[string][]string)
-// 	var err error
-//
-// 	// collapse all psm to protein based on Peptide-level identifications
-// 	for _, i := range e.PSM {
-// 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
-// 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.AlternativeProteins...)
-// 	}
-//
-// 	for _, i := range ion {
-// 		if !clas.IsDecoyPSM(i, decoyTag) {
-//
-// 			var pr IonEvidence
-//
-// 			pr.Spectra = make(map[string]int)
-// 			pr.MappedProteins = make(map[string]uint8)
-// 			pr.IndiMappedProteins = make(map[string]uint8)
-//
-// 			// remove charge state from spectrum name
-// 			// split := strings.Split(i.Spectrum, ".")
-// 			// name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-// 			//pr.Spectra[name] = 0
-// 			pr.Spectra[i.Spectrum]++
-//
-// 			pr.Sequence = i.Peptide
-// 			pr.ModifiedSequence = i.ModifiedPeptide
-// 			pr.MZ = utils.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
-// 			pr.ChargeState = i.AssumedCharge
-// 			pr.PeptideMass = i.CalcNeutralPepMass
-// 			pr.Probability = i.Probability
-// 			pr.Expectation = i.Expectation
-// 			pr.Intensity = 0
-//
-// 			// if len(i.ModMasses) > 0 {
-// 			// 	var mods []string
-// 			// 	for j := range i.ModMasses {
-// 			// 		if e.Mods.DefinedModMassDiff[i.ModMasses[j]] > 0 {
-// 			// 			mod := e.Mods.DefinedModMassDiff[i.ModMasses[j]]
-// 			// 			aa := e.Mods.DefinedModAminoAcid[i.ModMasses[j]]
-// 			// 			ma := fmt.Sprintf("%s%d:%.4f", aa, i.ModPositions[j], mod)
-// 			// 			mods = append(mods, ma)
-// 			// 		}
-// 			// 	}
-// 			// 	pr.Modifications = strings.Join(mods, ", ")
-// 			// }
-//
-// 			// get he list of indi proteins from pepXML data
-// 			v, ok := psmPtMap[i.Spectrum]
-// 			if ok {
-// 				for _, i := range v {
-// 					pr.MappedProteins[i] = 0
-// 					pr.IndiMappedProteins[i]++
-// 				}
-// 			}
-//
-// 			list = append(list, pr)
-// 		}
-// 	}
-//
-// 	sort.Sort(list)
-// 	e.Ions = list
-//
-// 	return err
-// }
+// UpdateIonAssignedAndObservedMods collects all Assigned and Observed modifications from
+// individual PSM and assign them to ions
+func (e *Evidence) UpdateIonAssignedAndObservedMods() {
+
+	//var list IonEvidenceList
+
+	for i := range e.Ions {
+		var ion string
+		if len(e.Ions[i].ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
+		}
+
+		for _, j := range e.PSM {
+			var psmIon string
+			if len(j.ModifiedPeptide) > 0 {
+				psmIon = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
+			} else {
+				psmIon = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
+			}
+
+			if ion == psmIon {
+				for _, k := range j.AssignedModifications {
+					e.Ions[i].AssignedModifications[k]++
+				}
+				for _, k := range j.ObservedModifications {
+					e.Ions[i].ObservedModifications[k]++
+				}
+
+				break
+			}
+
+		}
+
+		//list = append(list, e.Ions[i])
+	}
+
+	//e.Ions = list
+
+	return
+}
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
 func (e *Evidence) UpdateIonModCount() {
@@ -690,7 +518,7 @@ func (e *Evidence) UpdateIonModCount() {
 			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
 		}
 
-		// check any map
+		// check the map
 		_, ok := AllIons[psmIon]
 		if ok {
 
@@ -699,12 +527,6 @@ func (e *Evidence) UpdateIonModCount() {
 			} else {
 				ModIons[psmIon]++
 			}
-
-			// if i.Massdiff >= 0.99 && i.Massdiff <= 1.99 {
-			// 	UnModIons[psmIon]++
-			// } else {
-			// 	ModIons[psmIon]++
-			// }
 
 		}
 	}
@@ -753,7 +575,7 @@ func (e *Evidence) UpdatePeptideModCount() {
 		_, ok := all[i.Peptide]
 		if ok {
 
-			if i.Massdiff >= 0.99 && i.Massdiff <= 1.99 {
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
 				unmod[i.Peptide]++
 			} else {
 				mod[i.Peptide]++
@@ -780,73 +602,6 @@ func (e *Evidence) UpdatePeptideModCount() {
 }
 
 // PeptideIonReport reports consist on ion reporting
-func (e *Evidence) PeptideIonReport() {
-
-	output := fmt.Sprintf("%s%sions.tsv", e.Temp, string(filepath.Separator))
-
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Could not create peptide output file")
-	}
-	defer file.Close()
-
-	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tModifications\tCalculated M/Z\tCharge\tCalculated Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tMapped Proteins\tProtein IDs\n")
-	if err != nil {
-		logrus.Fatal("Cannot create peptide ion report header")
-	}
-
-	// peptides with no mapped poteins are related to contaminants
-	// and reverse sequences. They are dificult to clean because
-	// in some cases they are shared between a match decoy and a target,
-	// so they stay on the lists but cannot be mapped back to the
-	// original proteins. These cases should be rare to find.
-	for _, i := range e.Ions {
-
-		var pts []string
-		var ipts []string
-
-		if len(i.MappedProteins) > 0 {
-
-			if len(e.Proteins) > 1 {
-
-				for k := range i.MappedProteins {
-					pts = append(pts, k)
-				}
-
-				for k := range i.IndiMappedProteins {
-					ipts = append(ipts, k)
-				}
-
-				line := fmt.Sprintf("%s\t%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%d\t%s\n",
-					i.Sequence,
-					i.ModifiedSequence,
-					i.Modifications,
-					i.MZ,
-					i.ChargeState,
-					i.PeptideMass,
-					i.Probability,
-					i.Expectation,
-					i.Spc,
-					i.Intensity,
-					len(i.MappedProteins),
-					strings.Join(pts, ", "),
-				)
-				_, err = io.WriteString(file, line)
-				if err != nil {
-					logrus.Fatal("Cannot print PSM to file")
-				}
-			}
-		}
-
-	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
-}
-
-// PeptideIonReport reports consist on ion reporting
 // func (e *Evidence) PeptideIonReport() {
 //
 // 	output := fmt.Sprintf("%s%sions.tsv", e.Temp, string(filepath.Separator))
@@ -857,16 +612,9 @@ func (e *Evidence) PeptideIonReport() {
 // 	}
 // 	defer file.Close()
 //
-// 	if len(e.Proteins) > 1 {
-// 		_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tModifications\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tWeight\tGroup Weight\tIs Non Degenerated\tSpectral Count\tIntensity\tMapped Proteins\tProtein IDs\n")
-// 		if err != nil {
-// 			logrus.Fatal("Cannot create peptide ion report header")
-// 		}
-// 	} else {
-// 		_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tModifications\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\n")
-// 		if err != nil {
-// 			logrus.Fatal("Cannot create peptide ion report header")
-// 		}
+// 	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tModifications\tCalculated M/Z\tCharge\tCalculated Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tMapped Proteins\tProtein IDs\n")
+// 	if err != nil {
+// 		logrus.Fatal("Cannot create peptide ion report header")
 // 	}
 //
 // 	// peptides with no mapped poteins are related to contaminants
@@ -891,39 +639,19 @@ func (e *Evidence) PeptideIonReport() {
 // 					ipts = append(ipts, k)
 // 				}
 //
-// 				line := fmt.Sprintf("%s\t%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%d\t%.4f\t%d\t%s\n",
+// 				line := fmt.Sprintf("%s\t%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%d\t%s\n",
 // 					i.Sequence,
 // 					i.ModifiedSequence,
-// 					i.Modifications,
+// 					"",
 // 					i.MZ,
 // 					i.ChargeState,
 // 					i.PeptideMass,
 // 					i.Probability,
 // 					i.Expectation,
-// 					i.Weight,
-// 					i.GroupWeight,
-// 					i.IsNondegenerateEvidence,
 // 					i.Spc,
 // 					i.Intensity,
 // 					len(i.MappedProteins),
 // 					strings.Join(pts, ", "),
-// 				)
-// 				_, err = io.WriteString(file, line)
-// 				if err != nil {
-// 					logrus.Fatal("Cannot print PSM to file")
-// 				}
-// 			} else {
-// 				line := fmt.Sprintf("%s\t%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\n",
-// 					i.Sequence,
-// 					i.ModifiedSequence,
-// 					i.Modifications,
-// 					i.MZ,
-// 					i.ChargeState,
-// 					i.PeptideMass,
-// 					i.Probability,
-// 					i.Expectation,
-// 					i.Spc,
-// 					i.Intensity,
 // 				)
 // 				_, err = io.WriteString(file, line)
 // 				if err != nil {
@@ -941,32 +669,104 @@ func (e *Evidence) PeptideIonReport() {
 // }
 
 // ModifiedPeptideIonReport reports consist on modified ions reporting
-func (e *Evidence) ModifiedPeptideIonReport() {
+// func (e *Evidence) ModifiedPeptideIonReport() {
+//
+// 	// get the list of modifications for each psm spectrum
+// 	//var uniqModIon = make(map[string][]string)
+// 	var uniqModIon = make(map[string]map[string]uint8)
+//
+// 	for _, i := range e.Modifications.AssignedBins {
+// 		for _, j := range i.Elements {
+// 			var ion string
+// 			if len(j.ModifiedPeptide) > 0 {
+// 				ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
+// 			} else {
+// 				ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
+// 			}
+//
+// 			mods := make(map[string]uint8)
+// 			for _, k := range i.MappedModifications {
+// 				mods[k] = 0
+// 			}
+// 			uniqModIon[ion] = mods
+// 			//uniqModIon[ion] = append(uniqModIon[ion], i.MappedModifications...)
+//
+// 		}
+// 	}
+//
+// 	output := fmt.Sprintf("%s%smod-ions.tsv", e.Temp, string(filepath.Separator))
+//
+// 	file, err := os.Create(output)
+// 	if err != nil {
+// 		logrus.Fatal("Could not create peptide output file")
+// 	}
+// 	defer file.Close()
+//
+// 	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tModifications\n")
+// 	if err != nil {
+// 		logrus.Fatal("Cannot create peptide ion report header")
+// 	}
+//
+// 	// peptides with no mapped poteins are related to contaminants
+// 	// and reverse sequences. They are dificult to clean because
+// 	// in some cases they are shared between a match decoy and a target,
+// 	// so they stay on the lists but cannot be mapped back to the
+// 	// original proteins. These cases should be rare to find.
+// 	for _, i := range e.Ions {
+//
+// 		var ion string
+// 		if len(i.ModifiedSequence) > 0 {
+// 			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
+// 		} else {
+// 			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
+// 		}
+//
+// 		v, ok := uniqModIon[ion]
+// 		if ok {
+//
+// 			if len(i.MappedProteins) > 0 {
+//
+// 				if len(e.Proteins) > 1 {
+//
+// 					var mods []string
+// 					for k := range v {
+// 						if k != "None" {
+// 							mods = append(mods, k)
+// 						}
+// 					}
+//
+// 					line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\n",
+// 						i.Sequence,
+// 						i.MZ,
+// 						i.ChargeState,
+// 						i.PeptideMass,
+// 						i.Probability,
+// 						i.Expectation,
+// 						i.Spc,
+// 						i.UnModifiedObservations,
+// 						i.ModifiedObservations,
+// 						strings.Join(mods, ", "),
+// 					)
+// 					_, err = io.WriteString(file, line)
+// 					if err != nil {
+// 						logrus.Fatal("Cannot print PSM to file")
+// 					}
+// 				}
+// 			}
+// 		}
+//
+// 	}
+//
+// 	// copy to work directory
+// 	sys.CopyFile(output, filepath.Base(output))
+//
+// 	return
+// }
 
-	// get the list of modifications for each psm spectrum
-	//var uniqModIon = make(map[string][]string)
-	var uniqModIon = make(map[string]map[string]uint8)
+// PeptideIonReport reports consist on ion reporting
+func (e *Evidence) PeptideIonReport() {
 
-	for _, i := range e.Modifications.AssignedBins {
-		for _, j := range i.Elements {
-			var ion string
-			if len(j.ModifiedPeptide) > 0 {
-				ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
-			} else {
-				ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
-			}
-
-			mods := make(map[string]uint8)
-			for _, k := range i.MappedModifications {
-				mods[k] = 0
-			}
-			uniqModIon[ion] = mods
-			//uniqModIon[ion] = append(uniqModIon[ion], i.MappedModifications...)
-
-		}
-	}
-
-	output := fmt.Sprintf("%s%smod-ions.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", e.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -974,7 +774,7 @@ func (e *Evidence) ModifiedPeptideIonReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tModifications\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -986,47 +786,53 @@ func (e *Evidence) ModifiedPeptideIonReport() {
 	// original proteins. These cases should be rare to find.
 	for _, i := range e.Ions {
 
-		var ion string
-		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-		}
+		var pts []string
+		//var ipts []string
 
-		v, ok := uniqModIon[ion]
-		if ok {
+		if len(i.MappedProteins) > 0 {
 
-			if len(i.MappedProteins) > 0 {
+			if len(e.Proteins) > 1 {
 
-				if len(e.Proteins) > 1 {
+				for k := range i.MappedProteins {
+					pts = append(pts, k)
+				}
 
-					var mods []string
-					for k := range v {
-						if k != "None" {
-							mods = append(mods, k)
-						}
-					}
+				// for k := range i.IndiMappedProteins {
+				// 	ipts = append(ipts, k)
+				// }
 
-					line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\n",
-						i.Sequence,
-						i.MZ,
-						i.ChargeState,
-						i.PeptideMass,
-						i.Probability,
-						i.Expectation,
-						i.Spc,
-						i.UnModifiedObservations,
-						i.ModifiedObservations,
-						strings.Join(mods, ", "),
-					)
-					_, err = io.WriteString(file, line)
-					if err != nil {
-						logrus.Fatal("Cannot print PSM to file")
-					}
+				var amods []string
+				for j := range i.AssignedModifications {
+					amods = append(amods, j)
+				}
+
+				var omods []string
+				for j := range i.ObservedModifications {
+					omods = append(omods, j)
+				}
+
+				line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\t%s\t%.4f\t%d\t%s\n",
+					i.Sequence,
+					i.MZ,
+					i.ChargeState,
+					i.PeptideMass,
+					i.Probability,
+					i.Expectation,
+					i.Spc,
+					i.UnModifiedObservations,
+					i.ModifiedObservations,
+					strings.Join(amods, ", "),
+					strings.Join(omods, ", "),
+					i.Intensity,
+					len(i.MappedProteins),
+					strings.Join(pts, ", "),
+				)
+				_, err = io.WriteString(file, line)
+				if err != nil {
+					logrus.Fatal("Cannot print PSM to file")
 				}
 			}
 		}
-
 	}
 
 	// copy to work directory
@@ -1083,90 +889,6 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 
 	return err
 }
-
-// func (e *Evidence) AssemblePeptideReport() error {
-//
-// 	var list PeptideEvidenceList
-// 	var pepSeqMap = make(map[string]uint8)
-// 	var pepCSMap = make(map[string][]uint8)
-// 	var pepSpc = make(map[string]int)
-// 	var pepInt = make(map[string]float64)
-// 	var err error
-//
-// 	for _, i := range e.Ions {
-//
-// 		if len(i.Sequence) > 1 {
-// 			_, ok := pepSeqMap[i.Sequence]
-// 			if !ok {
-// 				pepSeqMap[i.Sequence] = 0
-// 				pepSpc[i.Sequence] = 0
-// 				pepCSMap[i.Sequence] = append(pepCSMap[i.Sequence], i.ChargeState)
-// 				if i.Spc > pepSpc[i.Sequence] {
-// 					pepSpc[i.Sequence] = i.Spc
-// 				}
-// 				if i.Intensity > pepInt[i.Sequence] {
-// 					pepInt[i.Sequence] = i.Intensity
-// 				}
-//
-// 			} else {
-// 				pepCSMap[i.Sequence] = append(pepCSMap[i.Sequence], i.ChargeState)
-// 				if i.Spc > pepSpc[i.Sequence] {
-// 					pepSpc[i.Sequence] = i.Spc
-// 				}
-// 				if i.Intensity > pepInt[i.Sequence] {
-// 					pepInt[i.Sequence] = i.Intensity
-// 				}
-// 			}
-// 		}
-//
-// 		if len(i.ModifiedSequence) > 1 {
-// 			_, ok := pepSeqMap[i.ModifiedSequence]
-// 			if !ok {
-//
-// 				pepSeqMap[i.ModifiedSequence] = 0
-// 				pepSpc[i.ModifiedSequence] = 0
-// 				pepCSMap[i.ModifiedSequence] = append(pepCSMap[i.ModifiedSequence], i.ChargeState)
-//
-// 				if i.Spc > pepSpc[i.ModifiedSequence] {
-// 					pepSpc[i.ModifiedSequence] = i.Spc
-// 				}
-// 				if i.Intensity > pepInt[i.ModifiedSequence] {
-// 					pepInt[i.ModifiedSequence] = i.Intensity
-// 				}
-//
-// 			} else {
-// 				pepCSMap[i.ModifiedSequence] = append(pepCSMap[i.ModifiedSequence], i.ChargeState)
-// 				if i.Spc > pepSpc[i.ModifiedSequence] {
-// 					pepSpc[i.ModifiedSequence] = i.Spc
-// 				}
-// 				if i.Intensity > pepInt[i.ModifiedSequence] {
-// 					pepInt[i.ModifiedSequence] = i.Intensity
-// 				}
-// 			}
-// 		}
-//
-// 	}
-//
-// 	for k := range pepSeqMap {
-//
-// 		var pep PeptideEvidence
-// 		pep.ChargeState = make(map[uint8]uint8)
-//
-// 		pep.Sequence = k
-//
-// 		for _, i := range pepCSMap[k] {
-// 			pep.ChargeState[i] = 0
-// 		}
-// 		pep.Spc = pepSpc[k]
-// 		pep.Intensity = pepInt[k]
-// 		list = append(list, pep)
-// 	}
-//
-// 	sort.Sort(list)
-// 	e.Peptides = list
-//
-// 	return err
-// }
 
 // PeptideReport reports consist on ion reporting
 func (e *Evidence) PeptideReport() {
@@ -1732,15 +1454,6 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	}
 
-	// var name2AvgMasses = make(map[string]float64)
-	// var mass2AvgMasses = make(map[float64]float64)
-	// var name2Psms = make(map[string]PSMEvidenceList)
-	// var mass2Psms = make(map[float64]PSMEvidenceList)
-	// var mass2Names = make(map[float64][]string)
-	// var names2Mass = make(map[string]float64)
-	// var names2MonoisoMass = make(map[string]float64)
-	// var names2Composition = make(map[string]string)
-
 	// starting unimod parsing
 	u := uni.New()
 	u.ProcessUniMOD()
@@ -1776,58 +1489,6 @@ func (e *Evidence) AssembleModificationReport() error {
 
 		abins = append(abins, ab)
 	}
-
-	// for k, v := range selectedBins {
-	// 	mass := utils.Round(k, 5, 2)
-	//
-	// 	for _, j := range u.Modifications {
-	// 		mod := utils.Round(j.MonoMass, 5, 2)
-	//
-	// 		// if mass >= (0-0.2) && mass <= (0+0.2) {
-	// 		// 	mass2Psms[k] = v
-	// 		// 	name2AvgMasses[j.FullName] = j.AvgMass
-	// 		// 	mass2AvgMasses[k] = j.AvgMass
-	// 		// 	mass2Names[k] = append(mass2Names[k], j.FullName)
-	// 		// 	names2Mass[j.FullName] = k
-	// 		// 	name2Psms["none"] = v
-	// 		// 	names2MonoisoMass[j.FullName] = j.MonoMass
-	// 		// 	names2Composition["none"] = "none"
-	// 		// 	unmodbins++
-	// 		//
-	// 		// } else
-	// 		if mass == mod {
-	// 			mass2Psms[k] = v
-	// 			name2AvgMasses[j.FullName] = j.AvgMass
-	// 			mass2AvgMasses[k] = j.AvgMass
-	// 			mass2Names[k] = append(mass2Names[k], j.FullName)
-	// 			names2Mass[j.FullName] = k
-	// 			name2Psms[j.FullName] = v
-	// 			names2MonoisoMass[j.FullName] = j.MonoMass
-	// 			names2Composition[j.FullName] = j.Composition
-	//
-	// 		} else if mass >= (mod-0.2) && mass <= (mod+0.2) {
-	// 			mass2Psms[k] = v
-	// 			name2AvgMasses[j.FullName] = j.AvgMass
-	// 			mass2AvgMasses[k] = j.AvgMass
-	// 			mass2Names[k] = append(mass2Names[k], j.FullName)
-	// 			names2Mass[j.FullName] = k
-	// 			name2Psms[j.FullName] = v
-	// 			names2MonoisoMass[j.FullName] = j.MonoMass
-	// 			names2Composition[j.FullName] = j.Composition
-	// 		}
-	//
-	// 	}
-	// }
-
-	// modEvi.MapModNamesToAverageMasses = name2AvgMasses
-	// modEvi.MapModMassToAverageMasses = mass2AvgMasses
-	// modEvi.MapModNamesToPSMs = name2Psms
-	// modEvi.MapModMassesToPSMs = mass2Psms
-	// modEvi.MapModMassToModNames = mass2Names
-	// modEvi.MapModNameToModMass = names2Mass
-	// modEvi.MapModNameToMonoisotopicMass = names2MonoisoMass
-	// modEvi.MapModNameToComposition = names2Composition
-	//modEvi.UnModObservations = unmodbins
 
 	e.Modifications = modEvi
 	e.Modifications.MassBins = bins

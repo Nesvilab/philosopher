@@ -52,7 +52,7 @@ var reportCmd = &cobra.Command{
 		if len(repo.Modifications.AssignedBins) > 0 {
 			logrus.Info("Creating modification reports")
 			//repo.ModifiedPSMReport()
-			repo.ModifiedPeptideIonReport()
+			//repo.ModifiedPeptideIonReport()
 			repo.ModifiedPeptideReport()
 			repo.ModificationReport()
 		}
