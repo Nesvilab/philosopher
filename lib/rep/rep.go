@@ -602,168 +602,6 @@ func (e *Evidence) UpdatePeptideModCount() {
 }
 
 // PeptideIonReport reports consist on ion reporting
-// func (e *Evidence) PeptideIonReport() {
-//
-// 	output := fmt.Sprintf("%s%sions.tsv", e.Temp, string(filepath.Separator))
-//
-// 	file, err := os.Create(output)
-// 	if err != nil {
-// 		logrus.Fatal("Could not create peptide output file")
-// 	}
-// 	defer file.Close()
-//
-// 	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tModifications\tCalculated M/Z\tCharge\tCalculated Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tMapped Proteins\tProtein IDs\n")
-// 	if err != nil {
-// 		logrus.Fatal("Cannot create peptide ion report header")
-// 	}
-//
-// 	// peptides with no mapped poteins are related to contaminants
-// 	// and reverse sequences. They are dificult to clean because
-// 	// in some cases they are shared between a match decoy and a target,
-// 	// so they stay on the lists but cannot be mapped back to the
-// 	// original proteins. These cases should be rare to find.
-// 	for _, i := range e.Ions {
-//
-// 		var pts []string
-// 		var ipts []string
-//
-// 		if len(i.MappedProteins) > 0 {
-//
-// 			if len(e.Proteins) > 1 {
-//
-// 				for k := range i.MappedProteins {
-// 					pts = append(pts, k)
-// 				}
-//
-// 				for k := range i.IndiMappedProteins {
-// 					ipts = append(ipts, k)
-// 				}
-//
-// 				line := fmt.Sprintf("%s\t%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%d\t%s\n",
-// 					i.Sequence,
-// 					i.ModifiedSequence,
-// 					"",
-// 					i.MZ,
-// 					i.ChargeState,
-// 					i.PeptideMass,
-// 					i.Probability,
-// 					i.Expectation,
-// 					i.Spc,
-// 					i.Intensity,
-// 					len(i.MappedProteins),
-// 					strings.Join(pts, ", "),
-// 				)
-// 				_, err = io.WriteString(file, line)
-// 				if err != nil {
-// 					logrus.Fatal("Cannot print PSM to file")
-// 				}
-// 			}
-// 		}
-//
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(output, filepath.Base(output))
-//
-// 	return
-// }
-
-// ModifiedPeptideIonReport reports consist on modified ions reporting
-// func (e *Evidence) ModifiedPeptideIonReport() {
-//
-// 	// get the list of modifications for each psm spectrum
-// 	//var uniqModIon = make(map[string][]string)
-// 	var uniqModIon = make(map[string]map[string]uint8)
-//
-// 	for _, i := range e.Modifications.AssignedBins {
-// 		for _, j := range i.Elements {
-// 			var ion string
-// 			if len(j.ModifiedPeptide) > 0 {
-// 				ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
-// 			} else {
-// 				ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
-// 			}
-//
-// 			mods := make(map[string]uint8)
-// 			for _, k := range i.MappedModifications {
-// 				mods[k] = 0
-// 			}
-// 			uniqModIon[ion] = mods
-// 			//uniqModIon[ion] = append(uniqModIon[ion], i.MappedModifications...)
-//
-// 		}
-// 	}
-//
-// 	output := fmt.Sprintf("%s%smod-ions.tsv", e.Temp, string(filepath.Separator))
-//
-// 	file, err := os.Create(output)
-// 	if err != nil {
-// 		logrus.Fatal("Could not create peptide output file")
-// 	}
-// 	defer file.Close()
-//
-// 	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tModifications\n")
-// 	if err != nil {
-// 		logrus.Fatal("Cannot create peptide ion report header")
-// 	}
-//
-// 	// peptides with no mapped poteins are related to contaminants
-// 	// and reverse sequences. They are dificult to clean because
-// 	// in some cases they are shared between a match decoy and a target,
-// 	// so they stay on the lists but cannot be mapped back to the
-// 	// original proteins. These cases should be rare to find.
-// 	for _, i := range e.Ions {
-//
-// 		var ion string
-// 		if len(i.ModifiedSequence) > 0 {
-// 			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-// 		} else {
-// 			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-// 		}
-//
-// 		v, ok := uniqModIon[ion]
-// 		if ok {
-//
-// 			if len(i.MappedProteins) > 0 {
-//
-// 				if len(e.Proteins) > 1 {
-//
-// 					var mods []string
-// 					for k := range v {
-// 						if k != "None" {
-// 							mods = append(mods, k)
-// 						}
-// 					}
-//
-// 					line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\n",
-// 						i.Sequence,
-// 						i.MZ,
-// 						i.ChargeState,
-// 						i.PeptideMass,
-// 						i.Probability,
-// 						i.Expectation,
-// 						i.Spc,
-// 						i.UnModifiedObservations,
-// 						i.ModifiedObservations,
-// 						strings.Join(mods, ", "),
-// 					)
-// 					_, err = io.WriteString(file, line)
-// 					if err != nil {
-// 						logrus.Fatal("Cannot print PSM to file")
-// 					}
-// 				}
-// 			}
-// 		}
-//
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(output, filepath.Base(output))
-//
-// 	return
-// }
-
-// PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
 	output := fmt.Sprintf("%s%sion.tsv", e.Temp, string(filepath.Separator))
@@ -774,7 +612,7 @@ func (e *Evidence) PeptideIonReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -811,7 +649,7 @@ func (e *Evidence) PeptideIonReport() {
 					omods = append(omods, j)
 				}
 
-				line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\t%s\t%.4f\t%d\t%s\n",
+				line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
 					i.Sequence,
 					i.MZ,
 					i.ChargeState,
@@ -821,6 +659,7 @@ func (e *Evidence) PeptideIonReport() {
 					i.Spc,
 					i.UnModifiedObservations,
 					i.ModifiedObservations,
+					i.Intensity,
 					strings.Join(amods, ", "),
 					strings.Join(omods, ", "),
 					i.Intensity,
@@ -893,49 +732,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 // PeptideReport reports consist on ion reporting
 func (e *Evidence) PeptideReport() {
 
-	output := fmt.Sprintf("%s%speptides.tsv", e.Temp, string(filepath.Separator))
-
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Could not create peptide output file")
-	}
-	defer file.Close()
-
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\n")
-	if err != nil {
-		logrus.Fatal("Cannot create peptide report header")
-	}
-
-	for _, i := range e.Peptides {
-
-		var cs []string
-		for j := range i.ChargeState {
-			cs = append(cs, strconv.Itoa(int(j)))
-		}
-		sort.Strings(cs)
-
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\n",
-			i.Sequence,
-			strings.Join(cs, ", "),
-			i.Spc,
-			i.Intensity,
-		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
-		}
-	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
-}
-
-// ModifiedPeptideReport reports consist on ion reporting
-func (e *Evidence) ModifiedPeptideReport() {
-
-	output := fmt.Sprintf("%s%smod-peptides.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", e.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {

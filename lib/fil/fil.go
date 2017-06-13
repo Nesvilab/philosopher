@@ -152,19 +152,6 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	e.AssembleIonReport(ion, f.Tag)
 	ion = nil
 
-	// pro.Restore()
-	// err = e.AssembleProteinReport(pro, f.Tag)
-	// if err != nil {
-	// 	return err
-	// }
-	// pro = nil
-	//
-	// logrus.Info("Calculating Spectral Counts")
-	// e, err = quan.CalculateSpectralCounts(e)
-	// if err != nil {
-	// 	logrus.Fatal(err)
-	// }
-
 	var pept xml.PepIDList
 	pept.Restore("pep")
 	e.AssemblePeptideReport(pept, f.Tag)
@@ -189,6 +176,12 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 		ion.Restore("ion")
 		e.AssembleIonReport(ion, f.Tag)
 		ion = nil
+
+		// call again to update structures and reports with observed modification information
+		var pept xml.PepIDList
+		pept.Restore("pep")
+		e.AssemblePeptideReport(pept, f.Tag)
+		pept = nil
 
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
