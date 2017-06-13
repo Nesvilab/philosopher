@@ -384,7 +384,7 @@ func getUniquePeptideIons(p xml.PepIDList) map[string]xml.PepIDList {
 	var key string
 	for _, i := range p {
 
-		if len(i.ModMasses) > 0 {
+		if len(i.ModifiedPeptide) > 0 {
 			key = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
 		} else {
 			key = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)

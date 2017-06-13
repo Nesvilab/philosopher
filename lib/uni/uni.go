@@ -25,7 +25,7 @@ type MOD struct {
 type MODElement struct {
 	RecordID    int
 	Title       string
-	FullName    string
+	Description string
 	Posted      string
 	Updated     string
 	MonoMass    float64
@@ -148,7 +148,7 @@ func (u *MOD) Read(f string) error {
 		var u MODElement
 
 		u.Title = i.Title
-		u.FullName = i.FullName
+		u.Description = i.FullName
 		u.Posted = i.Posted
 		u.Updated = i.Updated
 		u.MonoMass = i.Delta.MonoMass

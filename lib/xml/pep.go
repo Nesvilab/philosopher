@@ -42,7 +42,8 @@ type PeptideIdentification struct {
 	ModifiedPeptide      string
 	AlternativeProteins  []string
 	ModPositions         []uint16
-	ModMasses            []float64
+	AssignedModMasses    []float64
+	AssignedMassDiffs    []float64
 	AssumedCharge        uint8
 	HitRank              uint8
 	PrecursorNeutralMass float64
@@ -142,7 +143,7 @@ func (p *PepXML) Read(f string) error {
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for i := range sq {
-			psm := processSpectrumQuery(sq[i])
+			psm := processSpectrumQuery(sq[i], p.DefinedModMassDiff)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -165,7 +166,7 @@ func (p *PepXML) Read(f string) error {
 	return nil
 }
 
-func processSpectrumQuery(sq pep.SpectrumQuery) PeptideIdentification {
+func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64) PeptideIdentification {
 
 	var psm PeptideIdentification
 
@@ -212,7 +213,8 @@ func processSpectrumQuery(sq pep.SpectrumQuery) PeptideIdentification {
 		if len(string(sq.SearchResult.SearchHit[j].ModificationInfo.ModifiedPeptide)) > 0 {
 			for n := range sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass {
 				psm.ModPositions = append(psm.ModPositions, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Position)
-				psm.ModMasses = append(psm.ModMasses, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass)
+				psm.AssignedModMasses = append(psm.AssignedModMasses, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass)
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass])
 			}
 
 		}
