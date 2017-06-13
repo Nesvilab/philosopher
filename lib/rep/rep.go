@@ -836,7 +836,9 @@ func (e *Evidence) ModifiedPeptideIonReport() {
 
 					var mods []string
 					for k := range v {
-						mods = append(mods, k)
+						if k != "None" {
+							mods = append(mods, k)
+						}
 					}
 
 					line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%s\n",

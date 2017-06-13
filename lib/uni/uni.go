@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl-source/data/mod"
@@ -144,44 +143,44 @@ func (u *MOD) Read(f string) error {
 
 	for _, i := range xml.UniMOD.Modifications.Mods {
 
-		if !strings.Contains(i.FullName, "substitution") {
+		//if !strings.Contains(i.FullName, "substitution") {
 
-			var u MODElement
+		var u MODElement
 
-			u.Title = i.Title
-			u.FullName = i.FullName
-			u.Posted = i.Posted
-			u.Updated = i.Updated
-			u.MonoMass = i.Delta.MonoMass
-			u.AvgMass = i.Delta.AvgMass
-			u.Composition = i.Delta.Composition
+		u.Title = i.Title
+		u.FullName = i.FullName
+		u.Posted = i.Posted
+		u.Updated = i.Updated
+		u.MonoMass = i.Delta.MonoMass
+		u.AvgMass = i.Delta.AvgMass
+		u.Composition = i.Delta.Composition
 
-			for _, j := range i.Specificities {
-				var spec Specificity
-				spec.Site = j.Site
-				spec.Position = j.Position
-				spec.Classification = j.Classification
-				spec.Note = j.Notes.Value
-				u.Specificity = append(u.Specificity, spec)
-			}
-
-			for _, j := range i.Xrefs {
-				var x Xref
-				x.Text = j.Text.Value
-				x.Source = j.Source.Value
-				x.URL = j.URL.Value
-				u.Xref = append(u.Xref, x)
-			}
-
-			for _, j := range i.Delta.Elements {
-				var e Element
-				e.Symbol = j.Symbol
-				e.Number = j.Number
-				u.Elements = append(u.Elements, e)
-			}
-
-			list = append(list, u)
+		for _, j := range i.Specificities {
+			var spec Specificity
+			spec.Site = j.Site
+			spec.Position = j.Position
+			spec.Classification = j.Classification
+			spec.Note = j.Notes.Value
+			u.Specificity = append(u.Specificity, spec)
 		}
+
+		for _, j := range i.Xrefs {
+			var x Xref
+			x.Text = j.Text.Value
+			x.Source = j.Source.Value
+			x.URL = j.URL.Value
+			u.Xref = append(u.Xref, x)
+		}
+
+		for _, j := range i.Delta.Elements {
+			var e Element
+			e.Symbol = j.Symbol
+			e.Number = j.Number
+			u.Elements = append(u.Elements, e)
+		}
+
+		list = append(list, u)
+		//}
 	}
 
 	u.Modifications = list
