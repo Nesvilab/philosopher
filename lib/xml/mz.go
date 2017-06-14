@@ -5,11 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl-source/data/mz/mzml"
+	"github.com/prvst/cmsl-source/err"
 	"github.com/prvst/philosopher-source/lib/sys"
 )
 
@@ -65,9 +67,9 @@ func (s *Raw) Read(f, t string) error {
 	if t == "mzML" {
 
 		var mz mzml.IndexedMzML
-		err := mz.Parse(f)
-		if err != nil {
-			return err
+		e := mz.Parse(f)
+		if e != nil {
+			return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: filepath.Base(f)}
 		}
 
 		s.FileName = f
@@ -90,9 +92,9 @@ func (s *Raw) Read(f, t string) error {
 			for _, j := range i.ScanList.Scan {
 				for _, k := range j.CVParam {
 					if k.Accession == "MS:1000016" {
-						val, err := strconv.ParseFloat(k.Value, 64)
-						if err != nil {
-							return nil
+						val, e := strconv.ParseFloat(k.Value, 64)
+						if e != nil {
+							return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
 						}
 						spec.StartTime = val
 					}

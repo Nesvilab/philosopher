@@ -18,6 +18,7 @@ import (
 	"github.com/prvst/cmsl-source/bio"
 	"github.com/prvst/cmsl-source/data/fas"
 	"github.com/prvst/cmsl-source/db"
+	"github.com/prvst/cmsl-source/err"
 	"github.com/prvst/philosopher-source/lib/meta"
 	"github.com/prvst/philosopher-source/lib/sys"
 )
@@ -62,9 +63,9 @@ func New() Base {
 // ProcessDB ...
 func (d *Base) ProcessDB(file, decoyTag string) error {
 
-	fastaMap, err := fas.ParseFile(file)
-	if err != nil {
-		return errors.New("Error parsing FASTA database")
+	fastaMap, e := fas.ParseFile(file)
+	if e != nil {
+		return &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: e.Error()}
 	}
 
 	for k, v := range fastaMap {

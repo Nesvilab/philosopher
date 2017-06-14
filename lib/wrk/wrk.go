@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/pierrre/archivefile/zip"
-	"github.com/prvst/cmsl-source/data/err"
+	"github.com/prvst/cmsl-source/err"
 	"github.com/prvst/philosopher-source/lib/meta"
 	"github.com/prvst/philosopher-source/lib/sys"
 )
 
 // Init creates a new workspace
-func Init() *err.Error {
+func Init() error {
 
 	var m meta.Data
 	m.Restore(sys.Meta())
@@ -45,7 +45,7 @@ func Init() *err.Error {
 }
 
 // Backup collects all binary files from the mea folder and zips them
-func Backup() *err.Error {
+func Backup() error {
 
 	var m meta.Data
 	m.Restore(sys.Meta())
@@ -56,7 +56,7 @@ func Backup() *err.Error {
 
 	var name string
 	if m.OS == sys.Windows() {
-		name = "phi-backup.zip"
+		name = "backup.zip"
 	} else {
 		t := time.Now()
 		timestamp := t.Format(time.RFC3339)
@@ -77,7 +77,7 @@ func Backup() *err.Error {
 }
 
 // Clean deletes all meta data and the directory itself
-func Clean() *err.Error {
+func Clean() error {
 
 	e := os.RemoveAll(sys.MetaDir())
 	if e != nil {
