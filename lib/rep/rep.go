@@ -12,15 +12,15 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl-source/bio"
-	"github.com/prvst/cmsl-source/utils"
-	"github.com/prvst/philosopher-source/lib/clas"
-	"github.com/prvst/philosopher-source/lib/data"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
-	"github.com/prvst/philosopher-source/lib/tmt"
-	"github.com/prvst/philosopher-source/lib/uni"
-	"github.com/prvst/philosopher-source/lib/xml"
+	"github.com/prvst/cmsl/bio"
+	"github.com/prvst/cmsl/utils"
+	"github.com/prvst/philosopher/lib/clas"
+	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/prvst/philosopher/lib/uni"
+	"github.com/prvst/philosopher/lib/xml"
 )
 
 // Evidence ...

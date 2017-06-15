@@ -11,15 +11,15 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/montanaflynn/stats"
-	"github.com/prvst/cmsl-source/bio"
-	"github.com/prvst/cmsl-source/data/mz"
-	"github.com/prvst/cmsl-source/data/mz/mzml"
-	"github.com/prvst/cmsl-source/data/mz/mzxml"
-	"github.com/prvst/cmsl-source/utils"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/rep"
-	"github.com/prvst/philosopher-source/lib/sys"
-	"github.com/prvst/philosopher-source/lib/tmt"
+	"github.com/prvst/cmsl/bio"
+	"github.com/prvst/cmsl/data/mz"
+	"github.com/prvst/cmsl/data/mz/mzml"
+	"github.com/prvst/cmsl/data/mz/mzxml"
+	"github.com/prvst/cmsl/utils"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher/lib/tmt"
 )
 
 // Quantify ...

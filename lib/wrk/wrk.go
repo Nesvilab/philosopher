@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/pierrre/archivefile/zip"
-	"github.com/prvst/cmsl-source/err"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Init creates a new workspace

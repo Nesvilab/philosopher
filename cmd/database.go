@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher-source/lib/data"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 

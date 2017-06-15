@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "github.com/prvst/philosopher-source/lib/ext/interprophet/unix"
-	wiPr "github.com/prvst/philosopher-source/lib/ext/interprophet/win"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	unix "github.com/prvst/philosopher/lib/ext/interprophet/unix"
+	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // InterProphet represents the tool configuration

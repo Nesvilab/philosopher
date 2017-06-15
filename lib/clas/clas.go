@@ -3,7 +3,7 @@ package clas
 import (
 	"strings"
 
-	"github.com/prvst/philosopher-source/lib/xml"
+	"github.com/prvst/philosopher/lib/xml"
 )
 
 // IsDecoyPSM identifies a PSM as target or Decoy based on the

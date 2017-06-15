@@ -14,9 +14,9 @@ import (
 	"github.com/gonum/plot/plotter"
 	"github.com/gonum/plot/plotutil"
 	"github.com/gonum/plot/vg"
-	"github.com/prvst/cmsl-source/data/pep"
-	"github.com/prvst/cmsl-source/err"
-	"github.com/prvst/philosopher-source/lib/sys"
+	"github.com/prvst/cmsl/data/pep"
+	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // PepXML data

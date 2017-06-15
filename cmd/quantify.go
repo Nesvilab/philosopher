@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher-source/lib/quan"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	"github.com/prvst/philosopher/lib/quan"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 

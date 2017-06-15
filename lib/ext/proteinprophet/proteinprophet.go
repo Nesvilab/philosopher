@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "github.com/prvst/philosopher-source/lib/ext/proteinprophet/unix"
-	wPoP "github.com/prvst/philosopher-source/lib/ext/proteinprophet/win"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
+	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // ProteinProphet is tool configuration

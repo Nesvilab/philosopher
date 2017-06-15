@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher-source/lib/data"
-	"github.com/prvst/philosopher-source/lib/ext/proteinprophet"
-	"github.com/prvst/philosopher-source/lib/fil"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/rep"
-	"github.com/prvst/philosopher-source/lib/sys"
-	"github.com/prvst/philosopher-source/lib/xml"
+	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/ext/proteinprophet"
+	"github.com/prvst/philosopher/lib/fil"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher/lib/xml"
 )
 
 // Abacus main structure

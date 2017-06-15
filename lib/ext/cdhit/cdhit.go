@@ -7,10 +7,10 @@ import (
 	"runtime"
 	"strconv"
 
-	ucdhit "github.com/prvst/philosopher-source/lib/ext/cdhit/unix"
-	wcdhit "github.com/prvst/philosopher-source/lib/ext/cdhit/win"
-	"github.com/prvst/philosopher-source/lib/meta"
-	"github.com/prvst/philosopher-source/lib/sys"
+	ucdhit "github.com/prvst/philosopher/lib/ext/cdhit/unix"
+	wcdhit "github.com/prvst/philosopher/lib/ext/cdhit/win"
+	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // CDhit represents the tool configuration
