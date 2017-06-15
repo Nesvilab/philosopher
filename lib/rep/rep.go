@@ -698,17 +698,17 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		}
 	}
 
-	// for _, i := range e.PSM {
-	// 	_, ok := pepSeqMap[i.Peptide]
-	// 	if ok {
-	// 		pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
-	// 		pepSpc[i.Peptide]++
-	// 		fmt.Println(i.Intensity)
-	// 		if i.Intensity > pepInt[i.Peptide] {
-	// 			pepInt[i.Peptide] = i.Intensity
-	// 		}
-	// 	}
-	// }
+	// TODO review this method, Intensity quant is not working
+	for _, i := range e.PSM {
+		_, ok := pepSeqMap[i.Peptide]
+		if ok {
+			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
+			pepSpc[i.Peptide]++
+			if i.Intensity > pepInt[i.Peptide] {
+				pepInt[i.Peptide] = i.Intensity
+			}
+		}
+	}
 
 	for k := range pepSeqMap {
 
@@ -1217,41 +1217,47 @@ func (e *Evidence) AssembleModificationReport() error {
 	}
 	e.Modifications.MassBins = bins
 
-	var binSelection []float64
-	var elsSelector []int
-	var elsMap = make(map[float64]PSMEvidenceList)
-	var apexMass float64
-	var apexElements int
-	var selectedBins = make(map[float64]PSMEvidenceList)
+	// inspect mass binning
+	// for _, i := range bins {
+	// 	fmt.Println(i.LowerMass, "\t", i.HigherRight, "\t", i.CorrectedMass, "\t", len(i.Elements))
+	// }
 
-	for _, i := range bins {
-
-		if len(i.Elements) == 0 && len(binSelection) >= 3 {
-			//apexBinTolerance := utils.Round(float64(len(i.Elements))/float64(4), 5, 0)
-			apexBinTolerance := (apexElements / 4)
-			for j := 0; j <= len(binSelection)-1; j++ {
-				if elsSelector[j] >= apexBinTolerance {
-					selectedBins[apexMass] = append(selectedBins[apexMass], elsMap[binSelection[j]]...)
-				}
-			}
-			apexElements = 0
-			apexMass = 0
-			binSelection = nil
-			elsSelector = nil
-			elsMap = make(map[float64]PSMEvidenceList)
-		}
-
-		if len(i.Elements) > 0 {
-			binSelection = append(binSelection, i.CorrectedMass)
-			elsSelector = append(elsSelector, len(i.Elements))
-			elsMap[i.CorrectedMass] = i.Elements
-			if len(i.Elements) > apexElements {
-				apexElements = len(i.Elements)
-				apexMass = i.CorrectedMass
-			}
-		}
-
-	}
+	// This block applies the grouping logic to find apex n
+	// var binSelection []float64
+	// var elsSelector []int
+	// var elsMap = make(map[float64]PSMEvidenceList)
+	// var apexMass float64
+	// var apexElements int
+	// var selectedBins = make(map[float64]PSMEvidenceList)
+	//
+	// for _, i := range bins {
+	//
+	// 	if len(i.Elements) == 0 && len(binSelection) >= 3 {
+	// 		//apexBinTolerance := utils.Round(float64(len(i.Elements))/float64(4), 5, 0)
+	// 		apexBinTolerance := (apexElements / 4)
+	// 		for j := 0; j <= len(binSelection)-1; j++ {
+	// 			if elsSelector[j] >= apexBinTolerance {
+	// 				selectedBins[apexMass] = append(selectedBins[apexMass], elsMap[binSelection[j]]...)
+	// 			}
+	// 		}
+	// 		apexElements = 0
+	// 		apexMass = 0
+	// 		binSelection = nil
+	// 		elsSelector = nil
+	// 		elsMap = make(map[float64]PSMEvidenceList)
+	// 	}
+	//
+	// 	if len(i.Elements) > 0 {
+	// 		binSelection = append(binSelection, i.CorrectedMass)
+	// 		elsSelector = append(elsSelector, len(i.Elements))
+	// 		elsMap[i.CorrectedMass] = i.Elements
+	// 		if len(i.Elements) > apexElements {
+	// 			apexElements = len(i.Elements)
+	// 			apexMass = i.CorrectedMass
+	// 		}
+	// 	}
+	//
+	// }
 
 	// starting unimod parsing
 	u := uni.New()
@@ -1259,11 +1265,11 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	// assign each modification to a certain bin based on a mass window
 	var abins AssignedBins
-	for k, v := range selectedBins {
+	for _, i := range bins {
 
 		var ab AssignedBin
-		ab.Mass = utils.Round(k, 5, 2)
-		ab.Elements = v
+		ab.Mass = utils.Round(i.CorrectedMass, 5, 2)
+		ab.Elements = i.Elements
 
 		for _, j := range u.Modifications {
 			mod := utils.Round(j.MonoMass, 5, 2)
@@ -1287,6 +1293,41 @@ func (e *Evidence) AssembleModificationReport() error {
 
 		abins = append(abins, ab)
 	}
+
+	// var abins AssignedBins
+	// for k, v := range selectedBins {
+	//
+	// 	var ab AssignedBin
+	// 	ab.Mass = utils.Round(k, 5, 2)
+	// 	ab.Elements = v
+	//
+	// 	for _, j := range u.Modifications {
+	// 		mod := utils.Round(j.MonoMass, 5, 2)
+	//
+	// 		if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
+	// 			fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
+	// 			ab.MappedModifications = append(ab.MappedModifications, fullName)
+	// 		}
+	//
+	// 	}
+	//
+	// 	// set all bins without unimod mappings to unknown
+	// 	if len(ab.MappedModifications) == 0 {
+	// 		ab.MappedModifications = append(ab.MappedModifications, "Unknown")
+	// 	}
+	//
+	// 	// reset the 0 bin to no modifications
+	// 	if ab.Mass == 0 {
+	// 		ab.MappedModifications = nil
+	// 	}
+	//
+	// 	abins = append(abins, ab)
+	// }
+
+	// inspect assigned mass binning
+	// for _, i := range abins {
+	// 	fmt.Println(i.Mass, "\t", len(i.Elements))
+	// }
 
 	e.Modifications = modEvi
 	e.Modifications.MassBins = bins
