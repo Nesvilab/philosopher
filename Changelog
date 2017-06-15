@@ -1,10 +1,12 @@
 ## [1.1] - 2017-02-06
 ### Added
-- Assigned and Observed modifications PSM and ions
-- Minimum peptide length added to PeptideProphet (InteractParser)
+- Assigned and Observed modifications into PSM and ion reports
+- Minimum peptide length parameter added to PeptideProphet (InteractParser)
+- Support for NCBI-like headers with no Organism name
 
 ### Changed
-- Information about modification is now integrated into single framework
+- The information about fixed, variable and OS modifications is now integrated into single framework
+- Mass shift binning occurs without grouping PSMs into apex bins
 
 ## [1.0] - 2017-02-06
 
