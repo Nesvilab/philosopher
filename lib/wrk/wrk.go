@@ -13,7 +13,7 @@ import (
 )
 
 // Init creates a new workspace
-func Init() error {
+func Init() *err.Error {
 
 	var m meta.Data
 	m.Restore(sys.Meta())
