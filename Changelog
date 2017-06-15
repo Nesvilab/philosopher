@@ -1,6 +1,7 @@
 ## [1.1] - 2017-02-06
 ### Added
-- Assigned and Observed modifications psm and ions
+- Assigned and Observed modifications PSM and ions
+- Minimum peptide length added to PeptideProphet (InteractParser)
 
 ### Changed
 - Information about modification is now integrated into single framework
