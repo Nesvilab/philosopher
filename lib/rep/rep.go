@@ -1267,31 +1267,35 @@ func (e *Evidence) AssembleModificationReport() error {
 	var abins AssignedBins
 	for _, i := range bins {
 
-		var ab AssignedBin
-		ab.Mass = utils.Round(i.CorrectedMass, 5, 2)
-		ab.Elements = i.Elements
+		if len(i.Elements) > 0 {
 
-		for _, j := range u.Modifications {
-			mod := utils.Round(j.MonoMass, 5, 2)
+			var ab AssignedBin
+			ab.Mass = utils.Round(i.CorrectedMass, 5, 2)
+			ab.Elements = i.Elements
 
-			if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
-				fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
-				ab.MappedModifications = append(ab.MappedModifications, fullName)
+			for _, j := range u.Modifications {
+				mod := utils.Round(j.MonoMass, 5, 2)
+
+				if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
+					fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
+					ab.MappedModifications = append(ab.MappedModifications, fullName)
+				}
+
 			}
 
-		}
+			// set all bins without unimod mappings to unknown
+			if len(ab.MappedModifications) == 0 {
+				ab.MappedModifications = append(ab.MappedModifications, "Unknown")
+			}
 
-		// set all bins without unimod mappings to unknown
-		if len(ab.MappedModifications) == 0 {
-			ab.MappedModifications = append(ab.MappedModifications, "Unknown")
-		}
+			// reset the 0 bin to no modifications
+			if ab.Mass == 0 {
+				ab.MappedModifications = nil
+			}
 
-		// reset the 0 bin to no modifications
-		if ab.Mass == 0 {
-			ab.MappedModifications = nil
-		}
+			abins = append(abins, ab)
 
-		abins = append(abins, ab)
+		}
 	}
 
 	// var abins AssignedBins
