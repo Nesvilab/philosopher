@@ -1,4 +1,6 @@
-## [1.1] - 2017-02-06
+## [1.2] - ?
+
+## [1.1] - 06-15-2017
 ### Added
 - Assigned and Observed modifications into PSM and ion reports
 - Minimum peptide length parameter added to PeptideProphet (InteractParser)
@@ -17,7 +19,6 @@
 - Added new Prophets with native modifications
 - Added modification reports
 
-## [rc6] - 2017-17-04
 
 - Preparing release candidate 6
 - Fixed TPP 5.0.0 with parameters
