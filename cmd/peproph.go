@@ -49,6 +49,7 @@ func init() {
 
 	pep = peptideprophet.New()
 
+	peprophCmd.Flags().StringVarP(&pep.MinPepLen, "minpeplen", "", "7", "minimum peptide length not rejected")
 	peprophCmd.Flags().StringVarP(&pep.Output, "output", "", "interact", "Output name prefix")
 	peprophCmd.Flags().BoolVarP(&pep.Combine, "combine", "", false, "combine the results from PeptideProphet into a single result file")
 	peprophCmd.Flags().BoolVarP(&pep.Exclude, "exclude", "", false, "exclude deltaCn*, Mascot*, and Comet* results from results (default Penalize * results)")

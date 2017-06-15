@@ -29,6 +29,7 @@ type PeptideProphet struct {
 	LibgccDLL                   string
 	Zlib1DLL                    string
 	Mv                          string
+	MinPepLen                   string
 	Output                      string
 	Clevel                      string
 	Database                    string
@@ -202,9 +203,16 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 			mzfile := fmt.Sprintf("-a%s", datadir)
 			cmd.Args = append(cmd.Args, mzfile)
 
+			// -D<path_to_database>
 			if len(p.Database) > 0 {
 				db, _ := filepath.Abs(p.Database)
 				v := fmt.Sprintf("-D%s", db)
+				cmd.Args = append(cmd.Args, v)
+			}
+
+			// -L<min_peptide_len (default 7)>
+			if len(p.MinPepLen) > 0 {
+				v := fmt.Sprintf("-L=%s", p.MinPepLen)
 				cmd.Args = append(cmd.Args, v)
 			}
 
