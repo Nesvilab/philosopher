@@ -948,7 +948,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tUnmodified Occurrences\tModified Occurrences\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Occurrences\tRazor Modified Occurrences\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1268,7 +1268,7 @@ func (e *Evidence) AssembleModificationReport() error {
 		for _, j := range u.Modifications {
 			mod := utils.Round(j.MonoMass, 5, 2)
 
-			if ab.Mass >= (mod-0.2) && ab.Mass <= (mod+0.2) {
+			if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
 				fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
 				ab.MappedModifications = append(ab.MappedModifications, fullName)
 			}
@@ -1283,7 +1283,6 @@ func (e *Evidence) AssembleModificationReport() error {
 		// reset the 0 bin to no modifications
 		if ab.Mass == 0 {
 			ab.MappedModifications = nil
-			//ab.MappedModifications = append(ab.MappedModifications, "None")
 		}
 
 		abins = append(abins, ab)
@@ -1324,13 +1323,6 @@ func (e *Evidence) ModificationReport() {
 			i.Mass,          // mass bins
 			len(i.Elements), // number of psms
 			strings.Join(i.MappedModifications, ", "))
-
-		// line = fmt.Sprintf("%s\t%.4f\t%.4f\t%s\t%d\t",
-		// 	k,
-		// 	e.Modifications.MonoIsotopicMasses[k],
-		// 	e.Modifications.AverageMasses[k],
-		// 	e.Modifications.Composition[k],
-		// 	len(v))
 
 		line += "\n"
 		n, err := io.WriteString(file, line)
