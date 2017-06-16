@@ -45,7 +45,7 @@ func Init() *err.Error {
 }
 
 // Backup collects all binary files from the mea folder and zips them
-func Backup() error {
+func Backup() *err.Error {
 
 	var m meta.Data
 	m.Restore(sys.Meta())
@@ -77,7 +77,7 @@ func Backup() error {
 }
 
 // Clean deletes all meta data and the directory itself
-func Clean() error {
+func Clean() *err.Error {
 
 	e := os.RemoveAll(sys.MetaDir())
 	if e != nil {
