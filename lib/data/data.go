@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/gob"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl/bio"
 	"github.com/prvst/cmsl/data/fas"
 	"github.com/prvst/cmsl/db"
@@ -61,46 +59,44 @@ func New() Base {
 }
 
 // ProcessDB ...
-func (d *Base) ProcessDB(file, decoyTag string) error {
+func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 
 	fastaMap, e := fas.ParseFile(file)
 	if e != nil {
-		return &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: e.Error()}
+		return e
 	}
 
 	for k, v := range fastaMap {
 
-		class, err := db.Classify(k, decoyTag)
-		if err != nil {
-			return err
+		class, e := db.Classify(k, decoyTag)
+		if e != nil {
+			return e
 		}
 
 		if class == "uniprot" {
 
-			e, err := db.ProcessUniProtKB(k, v, decoyTag)
-			if err != nil {
-				return err
+			db, e := db.ProcessUniProtKB(k, v, decoyTag)
+			if e != nil {
+				return e
 			}
-			d.Records = append(d.Records, e)
+			d.Records = append(d.Records, db)
 
 		} else if class == "ncbi" {
 
-			e, err := db.ProcessNCBI(k, v, decoyTag)
-			if err != nil {
-				return err
+			db, e := db.ProcessNCBI(k, v, decoyTag)
+			if e != nil {
+				return e
 			}
-			d.Records = append(d.Records, e)
-		} else {
-			return errors.New("Unknown database class")
-		}
+			d.Records = append(d.Records, db)
 
+		}
 	}
 
 	return nil
 }
 
 // Fetch downloads a database file from UniProt
-func (d *Base) Fetch() error {
+func (d *Base) Fetch() *err.Error {
 
 	var query string
 	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", d.Temp, string(filepath.Separator), d.ID)
@@ -118,45 +114,38 @@ func (d *Base) Fetch() error {
 	}
 
 	// tries to create an output file
-	output, err := os.Create(d.UniProtDB)
-	if err != nil {
-		msg := fmt.Sprintf("Cannot create output file %s - %s", query, err)
-		return errors.New(msg)
+	output, e := os.Create(d.UniProtDB)
+	if e != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA}
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
-	response, err := http.Get(query)
-	if err != nil {
-		msg := fmt.Sprintf("Cannot find annotation file %s", err)
-		return errors.New(msg)
+	response, e := http.Get(query)
+	if e != nil {
+		return &err.Error{Type: err.CannotFindUniProtAnnotation, Class: err.FATA, Argument: e.Error()}
 	}
 	defer response.Body.Close()
 
-	// if len(response.Body.) > 10 {
-	// 	return errors.New("Cannot connect to UniProt, hceck your internet connection")
-	// }
-
 	// Tries to download data from Uniprot
-	n, err := io.Copy(output, response.Body)
-	if err != nil {
-		msg := fmt.Sprintf("Cannot download annotation file %d - %s", n, err)
-		return errors.New(msg)
+	n, e := io.Copy(output, response.Body)
+	if e != nil {
+		return &err.Error{Type: err.CannotFindUniProtAnnotation, Class: err.FATA, Argument: e.Error()}
 	}
 
 	return nil
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create() error {
+func (d *Base) Create() *err.Error {
 
 	d.TaDeDB = make(map[string]string)
 	var crapMap = make(map[string]string)
 
 	dbfile, _ := filepath.Abs(d.UniProtDB)
-	db, err := fas.ParseFile(dbfile)
-	if err != nil {
-		return err
+	db, e := fas.ParseFile(dbfile)
+	if e != nil {
+		return e
 	}
 
 	if len(d.Add) > 0 {
@@ -173,9 +162,10 @@ func (d *Base) Create() error {
 	// adding contaminants to database before reversion
 	// repeated entries are removed and substituted by contaminants
 	if d.Crap == true {
+
 		d.Deploy()
 		//crapFile = Deploy(p)
-		crapMap, err = fas.ParseFile(d.CrapDB)
+		crapMap, e = fas.ParseFile(d.CrapDB)
 		for k, v := range crapMap {
 			split := strings.Split(k, "|")
 
@@ -190,9 +180,9 @@ func (d *Base) Create() error {
 		}
 	}
 
-	var e bio.Enzyme
-	e.Synth(d.Enz)
-	reg := regexp.MustCompile(e.Pattern)
+	var en bio.Enzyme
+	en.Synth(d.Enz)
+	reg := regexp.MustCompile(en.Pattern)
 
 	for h, s := range db {
 
@@ -211,7 +201,7 @@ func (d *Base) Create() error {
 			revPeptides = append(revPeptides, r)
 		}
 
-		rev := strings.Join(revPeptides, e.Join)
+		rev := strings.Join(revPeptides, en.Join)
 		dh := ">" + d.Tag + h
 		d.TaDeDB[dh] = rev
 	}
@@ -220,23 +210,22 @@ func (d *Base) Create() error {
 }
 
 // Deploy crap file to session folder
-func (d *Base) Deploy() error {
+func (d *Base) Deploy() *err.Error {
 
 	d.CrapDB = fmt.Sprintf("%s%scrap.fas", d.Temp, string(filepath.Separator))
 
-	param, err := Asset("crap.fas")
-	err = ioutil.WriteFile(d.CrapDB, param, 0644)
+	param, e := Asset("crap.fas")
+	e = ioutil.WriteFile(d.CrapDB, param, 0644)
 
-	if err != nil {
-		msg := fmt.Sprintf("Could not deploy Crap fasta file %s", err)
-		return errors.New(msg)
+	if e != nil {
+		return &err.Error{Type: err.CannotDeployCrapDB, Class: err.FATA, Argument: e.Error()}
 	}
 
 	return nil
 }
 
 // Save fasta file to disk
-func (d *Base) Save() error {
+func (d *Base) Save() *err.Error {
 
 	base := filepath.Base(d.UniProtDB)
 
@@ -247,10 +236,9 @@ func (d *Base) Save() error {
 	outfile := fmt.Sprintf("%s%s%s-td-%s", d.Home, string(filepath.Separator), stamp, base)
 
 	// create decoy db file
-	file, err := os.Create(workfile)
-	if err != nil {
-		msg := fmt.Sprintf("Cannot create decoy database %s", err)
-		return errors.New(msg)
+	file, e := os.Create(workfile)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the decoy database"}
 	}
 	defer file.Close()
 
@@ -263,9 +251,9 @@ func (d *Base) Save() error {
 
 	for _, i := range headers {
 		line := i + "\n" + d.TaDeDB[i] + "\n"
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			return errors.New("Cannot write database file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the database file"}
 		}
 	}
 
@@ -273,29 +261,27 @@ func (d *Base) Save() error {
 
 	d.ProcessDB(outfile, d.Tag)
 
-	err = d.Serialize()
+	err := d.Serialize()
 	if err != nil {
-		logrus.Fatal(err)
+		return err
 	}
 
 	return nil
 }
 
-// Serialize ...
-func (d *Base) Serialize() error {
-
-	var err error
+// Serialize saves to disk a gob verison of the database data structure
+func (d *Base) Serialize() *err.Error {
 
 	// create a file
-	dataFile, err := os.Create(sys.DBBin())
-	if err != nil {
-		return err
+	dataFile, e := os.Create(sys.DBBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
 	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(d)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	e = dataEncoder.Encode(d)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 	dataFile.Close()
 
@@ -303,21 +289,21 @@ func (d *Base) Serialize() error {
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *Base) Restore() error {
+func (d *Base) Restore() *err.Error {
 
 	file, _ := os.Open(sys.DBBin())
 
 	dec := gob.NewDecoder(file)
-	err := dec.Decode(&d)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e := dec.Decode(&d)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil
 }
 
 // RestoreWithPath reads philosopher results files and restore the data sctructure
-func (d *Base) RestoreWithPath(p string) error {
+func (d *Base) RestoreWithPath(p string) *err.Error {
 
 	var path string
 
@@ -330,9 +316,9 @@ func (d *Base) RestoreWithPath(p string) error {
 	file, _ := os.Open(path)
 
 	dec := gob.NewDecoder(file)
-	err := dec.Decode(&d)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e := dec.Decode(&d)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil
