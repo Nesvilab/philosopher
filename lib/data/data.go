@@ -89,7 +89,10 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 			}
 			d.Records = append(d.Records, db)
 
+		} else if class == "generic" {
+
 		}
+
 	}
 
 	return nil
@@ -128,7 +131,7 @@ func (d *Base) Fetch() *err.Error {
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
-	n, e := io.Copy(output, response.Body)
+	_, e = io.Copy(output, response.Body)
 	if e != nil {
 		return &err.Error{Type: err.CannotFindUniProtAnnotation, Class: err.FATA, Argument: e.Error()}
 	}
