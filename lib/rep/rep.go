@@ -284,6 +284,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 	}
 
 	for _, i := range pep {
+
 		if !clas.IsDecoyPSM(i, decoyTag) {
 
 			var p PSMEvidence
@@ -818,7 +819,6 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 
 			rep.ProteinName = i.ProteinName
 			rep.ProteinGroup = i.GroupNumber
-			//rep.ProteinGroup = fmt.Sprintf("%d", i.GroupNumber)
 			rep.ProteinSubGroup = i.GroupSiblingID
 			rep.Length = i.Length
 			rep.Coverage = i.PercentCoverage
@@ -965,39 +965,39 @@ func (e *Evidence) ProteinReport() {
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		if len(i.TotalPeptideIons) > 0 {
+		//if len(i.TotalPeptideIons) > 0 {
 
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
-				i.ProteinGroup,                 // Group
-				i.ProteinSubGroup,              // SubGroup
-				i.ProteinID,                    // Protein ID
-				i.EntryName,                    // Entry Name
-				i.Length,                       // Length
-				i.Coverage,                     // Percent Coverage
-				i.Description,                  // Description
-				i.ProteinExistence,             // Protein Existence
-				i.GeneNames,                    // Genes
-				i.Probability,                  // Protein Probability
-				i.TopPepProb,                   // Top Peptide Probability
-				i.UniqueStrippedPeptides,       // Stripped Peptides
-				i.TotalNumPeptideIons,          // Total Peptide Ions
-				i.NumURazorPeptideIons,         // Unique Peptide Ions
-				i.TotalSpC,                     // Total Spectral Count
-				i.UniqueSpC,                    // Unique Spectral Count
-				i.RazorSpC,                     // Razor Spectral Count
-				i.URazorUnModifiedObservations, // Unmodified Occurrences
-				i.URazorModifiedObservations,   // Modified Occurrences
-				i.TotalIntensity,               // Total Intensity
-				i.UniqueIntensity,              // Unique Intensity
-				i.RazorIntensity,               // Razor Intensity
-				strings.Join(ip, ", "))         // Indistinguishable Proteins
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
+			i.ProteinGroup,                 // Group
+			i.ProteinSubGroup,              // SubGroup
+			i.ProteinID,                    // Protein ID
+			i.EntryName,                    // Entry Name
+			i.Length,                       // Length
+			i.Coverage,                     // Percent Coverage
+			i.Description,                  // Description
+			i.ProteinExistence,             // Protein Existence
+			i.GeneNames,                    // Genes
+			i.Probability,                  // Protein Probability
+			i.TopPepProb,                   // Top Peptide Probability
+			i.UniqueStrippedPeptides,       // Stripped Peptides
+			i.TotalNumPeptideIons,          // Total Peptide Ions
+			i.NumURazorPeptideIons,         // Unique Peptide Ions
+			i.TotalSpC,                     // Total Spectral Count
+			i.UniqueSpC,                    // Unique Spectral Count
+			i.RazorSpC,                     // Razor Spectral Count
+			i.URazorUnModifiedObservations, // Unmodified Occurrences
+			i.URazorModifiedObservations,   // Modified Occurrences
+			i.TotalIntensity,               // Total Intensity
+			i.UniqueIntensity,              // Unique Intensity
+			i.RazorIntensity,               // Razor Intensity
+			strings.Join(ip, ", "))         // Indistinguishable Proteins
 
-			line += "\n"
-			n, err := io.WriteString(file, line)
-			if err != nil {
-				logrus.Fatal(n, err)
-			}
+		line += "\n"
+		n, err := io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal(n, err)
 		}
+		//}
 
 	}
 
