@@ -137,7 +137,7 @@ func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].S
 type ProteinEvidence struct {
 	OriginalHeader               string
 	ProteinName                  string
-	ProteinGroup                 string
+	ProteinGroup                 uint32
 	ProteinSubGroup              string
 	ProteinID                    string
 	EntryName                    string
@@ -817,7 +817,8 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 			rep.IndiProtein = make(map[string]uint8)
 
 			rep.ProteinName = i.ProteinName
-			rep.ProteinGroup = fmt.Sprintf("%d", i.GroupNumber)
+			rep.ProteinGroup = i.GroupNumber
+			//rep.ProteinGroup = fmt.Sprintf("%d", i.GroupNumber)
 			rep.ProteinSubGroup = i.GroupSiblingID
 			rep.Length = i.Length
 			rep.Coverage = i.PercentCoverage
@@ -966,7 +967,7 @@ func (e *Evidence) ProteinReport() {
 		// in most cases proteins with one small peptide shared with a decoy
 		if len(i.TotalPeptideIons) > 0 {
 
-			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
 				i.ProteinGroup,                 // Group
 				i.ProteinSubGroup,              // SubGroup
 				i.ProteinID,                    // Protein ID
@@ -1036,7 +1037,7 @@ func (e *Evidence) ProteinQuantReport() {
 
 		//%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t",
 				i.ProteinGroup,
 				i.ProteinSubGroup,
 				i.ProteinID,
