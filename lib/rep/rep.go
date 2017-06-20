@@ -142,6 +142,7 @@ type ProteinEvidence struct {
 	ProteinID                    string
 	EntryName                    string
 	Description                  string
+	Organism                     string
 	Length                       int
 	Coverage                     float32
 	GeneNames                    string
@@ -916,6 +917,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 					list[i].GeneNames = j.GeneNames
 					list[i].Sequence = j.Sequence
 					list[i].ProteinName = j.ProteinName
+					list[i].Organism = j.Organism
 
 					// uniprot entries have the description on ProteinName
 					if len(j.Description) < 1 {
@@ -949,7 +951,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Occurrences\tRazor Modified Occurrences\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Occurrences\tRazor Modified Occurrences\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -967,13 +969,14 @@ func (e *Evidence) ProteinReport() {
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t",
 			i.ProteinGroup,                 // Group
 			i.ProteinSubGroup,              // SubGroup
 			i.ProteinID,                    // Protein ID
 			i.EntryName,                    // Entry Name
 			i.Length,                       // Length
 			i.Coverage,                     // Percent Coverage
+			i.Organism,                     // Organism
 			i.Description,                  // Description
 			i.ProteinExistence,             // Protein Existence
 			i.GeneNames,                    // Genes
