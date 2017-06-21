@@ -2,13 +2,16 @@
 ### Added
 - Philosopher now supports 'Generic' types of databases
 
+### Changed
+- Modification list is temporarily removed from modification report
+
 ### Fixed
 - A problem was causing a few PSMs to be mis assigned as Decoys, causing an error in the number of proteins in the final report.
 
 ## [1.1] - 06-15-2017
 ### Added
 - Assigned and Observed modifications into PSM and ion reports
-- Minimum peptide length parameter added to PeptideProphet (InteractParser)
+- Min. peptide length parameter added to PeptideProphet (InteractParser)
 - Support for NCBI-like headers with no Organism name
 
 ### Changed

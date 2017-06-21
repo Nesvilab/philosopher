@@ -1368,10 +1368,15 @@ func (e *Evidence) ModificationReport() {
 
 	for _, i := range e.Modifications.AssignedBins {
 
-		line = fmt.Sprintf("%.4f\t%d\t%s\t",
+		line = fmt.Sprintf("%.4f\t%d\t",
 			i.Mass,          // mass bins
 			len(i.Elements), // number of psms
-			strings.Join(i.MappedModifications, ", "))
+		)
+
+		// line = fmt.Sprintf("%.4f\t%d\t%s\t",
+		// 	i.Mass,          // mass bins
+		// 	len(i.Elements), // number of psms
+		// 	strings.Join(i.MappedModifications, ", "))
 
 		line += "\n"
 		n, err := io.WriteString(file, line)
