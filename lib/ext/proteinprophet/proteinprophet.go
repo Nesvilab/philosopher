@@ -178,193 +178,8 @@ func (c *ProteinProphet) Run(args []string) error {
 		return err
 	}
 
-	// } else {
-	//
-	// 	var files []string
-	// 	for _, i := range args {
-	// 		file, _ := filepath.Abs(i)
-	// 		files = append(files, file)
-	// 	}
-	//
-	// 	// append pepxml files
-	// 	for _, i := range files {
-	//
-	// 		// run
-	// 		bin := c.DefaultProteinProphet
-	// 		cmd := exec.Command(bin)
-	//
-	// 		cmd.Args = append(cmd.Args, i)
-	//
-	// 		var name string
-	// 		var base string
-	// 		var baseDir string
-	//
-	// 		if strings.Contains(strings.ToLower(i), ".pep.xml") {
-	// 			base = filepath.Base(i)
-	// 			baseDir = filepath.Dir(i)
-	// 			name = strings.TrimSuffix(base, ".pep.xml")
-	// 		} else if strings.Contains(strings.ToLower(i), ".pepxml") {
-	// 			base = filepath.Base(i)
-	// 			baseDir = filepath.Dir(i)
-	// 			name = strings.TrimSuffix(base, ".pepxml")
-	// 		}
-	//
-	// 		fmt.Println(name)
-	//
-	// 		// append output file
-	// 		output := fmt.Sprintf("%s%s%s.prot.xml", c.Temp, string(filepath.Separator), name)
-	// 		output, _ = filepath.Abs(output)
-	//
-	// 		cmd.Args = append(cmd.Args, output)
-	// 		cmd = c.appendParams(cmd)
-	//
-	// 		cmd.Dir = filepath.Dir(output)
-	//
-	// 		env := os.Environ()
-	// 		env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	// 		env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", c.Temp))
-	// 		for i := range env {
-	// 			if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-	// 				env[i] = env[i] + ";" + c.Temp
-	// 			}
-	// 		}
-	// 		cmd.Env = env
-	//
-	// 		cmd.Stdout = os.Stdout
-	// 		cmd.Stderr = os.Stderr
-	// 		err := cmd.Start()
-	// 		if err != nil {
-	// 			msg := fmt.Sprintf("Could not run ProteinProphet: %s", err)
-	// 			return errors.New(msg)
-	// 		}
-	// 		_ = cmd.Wait()
-	//
-	// 		// copy to work directory
-	// 		dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
-	// 		err = sys.CopyFile(output, dest)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	//
-	// 	}
-	// }
-	//}
-
 	return nil
 }
-
-// // Run ProteinProphet executes peptideprophet
-// func (c *ProteinProphet) Run(args []string) error {
-//
-// 	if c.Combine == true {
-//
-// 		// run
-// 		bin := c.DefaultProteinProphet
-// 		cmd := exec.Command(bin)
-//
-// 		// append pepxml files
-// 		for i := range args {
-// 			file, _ := filepath.Abs(args[i])
-// 			cmd.Args = append(cmd.Args, file)
-// 		}
-//
-// 		// append output file
-// 		output := fmt.Sprintf("%s%s%s", c.Temp, string(filepath.Separator), "interact.prot.xml")
-// 		output, _ = filepath.Abs(output)
-//
-// 		cmd.Args = append(cmd.Args, output)
-// 		cmd = c.appendParams(cmd)
-//
-// 		cmd.Dir = filepath.Dir(output)
-//
-// 		env := os.Environ()
-// 		env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-// 		env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", c.Temp))
-// 		for i := range env {
-// 			if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-// 				env[i] = env[i] + ";" + c.Temp
-// 			}
-// 		}
-// 		cmd.Env = env
-//
-// 		cmd.Stdout = os.Stdout
-// 		cmd.Stderr = os.Stderr
-// 		err := cmd.Start()
-// 		if err != nil {
-// 			msg := fmt.Sprintf("Could not run ProteinProphet: %s", err)
-// 			return errors.New(msg)
-// 		}
-// 		_ = cmd.Wait()
-//
-// 		// copy to work directory
-// 		err = sys.CopyFile(output, filepath.Base(output))
-// 		if err != nil {
-// 			return err
-// 		}
-//
-// 	} else {
-//
-// 		// append pepxml files
-// 		for _, i := range args {
-//
-// 			bin := c.DefaultProteinProphet
-// 			cmd := exec.Command(bin)
-//
-// 			file, _ := filepath.Abs(i)
-// 			cmd.Args = append(cmd.Args, file)
-//
-// 			var name string
-// 			var base string
-// 			var baseDir string
-// 			if strings.Contains(strings.ToLower(file), ".pep.xml") {
-// 				base = filepath.Base(file)
-// 				baseDir = filepath.Dir(file)
-// 				name = strings.TrimSuffix(base, ".pep.xml")
-// 			} else if strings.Contains(strings.ToLower(file), ".pepxml") {
-// 				base = filepath.Base(file)
-// 				baseDir = filepath.Dir(file)
-// 				name = strings.TrimSuffix(base, ".pepxml")
-// 			}
-//
-// 			// append output file
-// 			output := fmt.Sprintf("%s%s%s.prot.xml", c.Temp, string(filepath.Separator), name)
-// 			output, _ = filepath.Abs(output)
-//
-// 			cmd.Args = append(cmd.Args, output)
-// 			cmd = c.appendParams(cmd)
-//
-// 			cmd.Dir = filepath.Dir(output)
-//
-// 			env := os.Environ()
-// 			env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-// 			env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", c.Temp))
-// 			for i := range env {
-// 				if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-// 					env[i] = env[i] + ";" + c.Temp
-// 				}
-// 			}
-// 			cmd.Env = env
-//
-// 			cmd.Stdout = os.Stdout
-// 			cmd.Stderr = os.Stderr
-// 			err := cmd.Start()
-// 			if err != nil {
-// 				return errors.New("Cannot run ProteinProphet")
-// 			}
-// 			_ = cmd.Wait()
-//
-// 			// copy to work directory
-// 			dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
-// 			err = sys.CopyFile(output, dest)
-// 			if err != nil {
-// 				return err
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return nil
-// }
 
 func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 
@@ -473,17 +288,17 @@ func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 	}
 
 	if len(c.Minprob) > 0 {
-		v := fmt.Sprintf("MINPROB=%s", c.Minprob)
+		v := fmt.Sprintf("MINPROB%s", c.Minprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
 	if len(c.Minindep) > 0 {
-		v := fmt.Sprintf("MININDEP=%s", c.Minindep)
+		v := fmt.Sprintf("MININDEP%s", c.Minindep)
 		cmd.Args = append(cmd.Args, v)
 	}
 
 	if len(c.Mufactor) > 0 {
-		v := fmt.Sprintf("MUFACTOR=%s", c.Mufactor)
+		v := fmt.Sprintf("MUFACTOR%s", c.Mufactor)
 		cmd.Args = append(cmd.Args, v)
 	}
 
