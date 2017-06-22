@@ -4,6 +4,7 @@
 
 ### Changed
 - Modification list is temporarily removed from modification report
+- Now PSMs map to UniMod instead of mass shift bins
 - Comet updated to version 2016013
 
 ### Fixed
