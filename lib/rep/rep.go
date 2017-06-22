@@ -13,6 +13,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl/bio"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/data"
@@ -53,8 +54,8 @@ type PSMEvidence struct {
 	ModPositions          []uint16
 	AssignedModMasses     []float64
 	AssignedMassDiffs     []float64
-	AssignedModifications []string
-	ObservedModifications []string
+	AssignedModifications map[string]uint8
+	ObservedModifications map[string]uint8
 	AssumedCharge         uint8
 	HitRank               uint8
 	PrecursorNeutralMass  float64
@@ -207,17 +208,7 @@ type CombinedEvidenceList []CombinedEvidence
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
-	MassBins     []MassBin
-	AssignedBins []AssignedBin
-	// MapModNamesToAverageMasses   map[string]float64
-	// MapModMassToAverageMasses    map[float64]float64
-	// MapModNamesToPSMs            map[string]PSMEvidenceList
-	// MapModMassesToPSMs           map[float64]PSMEvidenceList
-	// MapModMassToModNames         map[float64][]string
-	// MapModNameToModMass          map[string]float64
-	// MapModNameToMonoisotopicMass map[string]float64
-	// MapModNameToComposition      map[string]string
-	// UnModObservations            int
+	MassBins []MassBin
 }
 
 // MassBin represents each bin from the mass distribution
@@ -229,22 +220,7 @@ type MassBin struct {
 	CorrectedMass float64
 	Modifications []string
 	Elements      PSMEvidenceList
-	Spectra       map[string]int
 }
-
-// AssignedBin contains the bin data after collapsing entries into apex peaks
-type AssignedBin struct {
-	Mass                float64
-	MappedModifications []string
-	Elements            PSMEvidenceList
-}
-
-// AssignedBins is a list of assignedbins
-type AssignedBins []AssignedBin
-
-func (a AssignedBins) Len() int           { return len(a) }
-func (a AssignedBins) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a AssignedBins) Less(i, j int) bool { return a[i].Mass < a[j].Mass }
 
 // New constructor
 func New() Evidence {
@@ -271,18 +247,6 @@ func New() Evidence {
 func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 
 	var list PSMEvidenceList
-
-	// instantiate the unimod database for mapping fixed modification
-	u := uni.New()
-	u.ProcessUniMOD()
-
-	// get the list of modifications for each psm spectrum
-	var uniqModPSM = make(map[string][]string)
-	for _, i := range e.Modifications.AssignedBins {
-		for _, j := range i.Elements {
-			uniqModPSM[j.Spectrum] = append(uniqModPSM[j.Spectrum], i.MappedModifications...)
-		}
-	}
 
 	for _, i := range pep {
 
@@ -316,26 +280,8 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.DiscriminantValue = i.DiscriminantValue
 			p.ModNtermMass = i.ModNtermMass
 			p.Intensity = i.Intensity
-
-			// search for an explanation for fixed modifications
-			for _, j := range u.Modifications {
-				mod := utils.Round(j.MonoMass, 5, 2)
-				for _, l := range p.AssignedMassDiffs {
-					if l >= (mod-0.2) && l <= (mod+0.2) {
-						if !strings.Contains(j.Description, "substitution") {
-							fullname := fmt.Sprintf("%s (%s)", j.Title, j.Description)
-							p.AssignedModifications = append(p.AssignedModifications, fullname)
-						}
-						break
-					}
-				}
-			}
-
-			// search for an explanation for open search observed modifications
-			v, ok := uniqModPSM[i.Spectrum]
-			if ok {
-				p.ObservedModifications = append(p.ObservedModifications, v...)
-			}
+			p.AssignedModifications = make(map[string]uint8)
+			p.ObservedModifications = make(map[string]uint8)
 
 			list = append(list, p)
 		}
@@ -359,12 +305,22 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\tSpecified Modifications\tIdentified Modifications\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\tAssigned Modifications\tOberved Modifications\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
 	for _, i := range e.PSM {
+
+		var ass []string
+		for j := range i.AssignedModifications {
+			ass = append(ass, j)
+		}
+
+		var obs []string
+		for j := range i.ObservedModifications {
+			obs = append(obs, j)
+		}
 
 		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\n",
 			i.Spectrum,
@@ -379,8 +335,8 @@ func (e *Evidence) PSMReport() {
 			i.CalcNeutralPepMass,
 			i.Probability,
 			i.Expectation,
-			strings.Join(i.AssignedModifications, ", "),
-			strings.Join(i.ObservedModifications, ", "),
+			strings.Join(ass, ", "),
+			strings.Join(obs, ", "),
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -470,10 +426,10 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 			}
 
 			if ion == psmIon {
-				for _, k := range j.AssignedModifications {
+				for k := range j.AssignedModifications {
 					e.Ions[i].AssignedModifications[k]++
 				}
-				for _, k := range j.ObservedModifications {
+				for k := range j.ObservedModifications {
 					e.Ions[i].ObservedModifications[k]++
 				}
 
@@ -490,119 +446,6 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 	return
 }
 
-// UpdateIonModCount counts how many times each ion is observed modified and not modified
-func (e *Evidence) UpdateIonModCount() {
-
-	// recreate the ion list from the main report object
-	var AllIons = make(map[string]int)
-	var ModIons = make(map[string]int)
-	var UnModIons = make(map[string]int)
-
-	for _, i := range e.Ions {
-		var ion string
-		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-		}
-		AllIons[ion] = 0
-		ModIons[ion] = 0
-		UnModIons[ion] = 0
-	}
-
-	// range over PSMs looking for modified and not modified evidences
-	// if they exist on the ions map, get the numbers
-	for _, i := range e.PSM {
-		var psmIon string
-		if len(i.ModifiedPeptide) > 0 {
-			psmIon = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
-		} else {
-			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
-		}
-
-		// check the map
-		_, ok := AllIons[psmIon]
-		if ok {
-
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				UnModIons[psmIon]++
-			} else {
-				ModIons[psmIon]++
-			}
-
-		}
-	}
-
-	for i := range e.Ions {
-		var ion string
-		if len(e.Ions[i].ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-		}
-
-		v1, ok1 := UnModIons[ion]
-		if ok1 {
-			e.Ions[i].UnModifiedObservations = v1
-		}
-
-		v2, ok2 := ModIons[ion]
-		if ok2 {
-			e.Ions[i].ModifiedObservations = v2
-		}
-
-	}
-
-	return
-}
-
-// UpdatePeptideModCount counts how many times each peptide is observed modified and not modified
-func (e *Evidence) UpdatePeptideModCount() {
-
-	// recreate the ion list from the main report object
-	var all = make(map[string]int)
-	var mod = make(map[string]int)
-	var unmod = make(map[string]int)
-
-	for _, i := range e.Peptides {
-		all[i.Sequence] = 0
-		mod[i.Sequence] = 0
-		unmod[i.Sequence] = 0
-	}
-
-	// range over PSMs looking for modified and not modified evidences
-	// if they exist on the ions map, get the numbers
-	for _, i := range e.PSM {
-
-		_, ok := all[i.Peptide]
-		if ok {
-
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				unmod[i.Peptide]++
-			} else {
-				mod[i.Peptide]++
-			}
-
-		}
-	}
-
-	for i := range e.Peptides {
-
-		v1, ok1 := unmod[e.Peptides[i].Sequence]
-		if ok1 {
-			e.Peptides[i].UnModifiedObservations = v1
-		}
-
-		v2, ok2 := mod[e.Peptides[i].Sequence]
-		if ok2 {
-			e.Peptides[i].ModifiedObservations = v2
-		}
-
-	}
-
-	return
-}
-
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
@@ -614,7 +457,7 @@ func (e *Evidence) PeptideIonReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -744,7 +587,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Occurrences\tModified Occurrences\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -951,7 +794,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Occurrences\tRazor Modified Occurrences\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Observations\tRazor Modified Observations\tTotal Intensity\tUnique Intensity\tRazor Intensity\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1150,7 +993,6 @@ func (e *Evidence) AssembleModificationReport() error {
 	nBins := (amplitude*(1/binsize) + 1) * 2
 	for i := 0; i <= int(nBins); i++ {
 		var b MassBin
-		b.Spectra = make(map[string]int)
 
 		b.LowerMass = -(amplitude) - (massWindow * binsize) + (float64(i) * binsize)
 		b.LowerMass = utils.Round(b.LowerMass, 5, 4)
@@ -1164,14 +1006,6 @@ func (e *Evidence) AssembleModificationReport() error {
 		bins = append(bins, b)
 	}
 
-	// // lets consider fixed modifications from the search as massdiff values.
-	// for i := range e.PSM {
-	// 	if len(e.PSM[i].FixedMassDiffs) > 0 {
-	// 		fmt.Println(e.PSM[i].FixedMassDiffs)
-	// 		os.Exit(1)
-	// 	}
-	// }
-
 	// calculate the total number of PSMs per cluster
 	var counter int
 	for i := range e.PSM {
@@ -1179,7 +1013,6 @@ func (e *Evidence) AssembleModificationReport() error {
 		for j := range bins {
 			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
 				bins[j].Elements = append(bins[j].Elements, e.PSM[i])
-				bins[j].Spectra[e.PSM[i].Spectrum]++
 				counter++
 				break
 			}
@@ -1221,129 +1054,155 @@ func (e *Evidence) AssembleModificationReport() error {
 	}
 	e.Modifications.MassBins = bins
 
-	// inspect mass binning
-	// for _, i := range bins {
-	// 	fmt.Println(i.LowerMass, "\t", i.HigherRight, "\t", i.CorrectedMass, "\t", len(i.Elements))
-	// }
+	e.Modifications = modEvi
+	e.Modifications.MassBins = bins
 
-	// This block applies the grouping logic to find apex n
-	// var binSelection []float64
-	// var elsSelector []int
-	// var elsMap = make(map[float64]PSMEvidenceList)
-	// var apexMass float64
-	// var apexElements int
-	// var selectedBins = make(map[float64]PSMEvidenceList)
-	//
-	// for _, i := range bins {
-	//
-	// 	if len(i.Elements) == 0 && len(binSelection) >= 3 {
-	// 		//apexBinTolerance := utils.Round(float64(len(i.Elements))/float64(4), 5, 0)
-	// 		apexBinTolerance := (apexElements / 4)
-	// 		for j := 0; j <= len(binSelection)-1; j++ {
-	// 			if elsSelector[j] >= apexBinTolerance {
-	// 				selectedBins[apexMass] = append(selectedBins[apexMass], elsMap[binSelection[j]]...)
-	// 			}
-	// 		}
-	// 		apexElements = 0
-	// 		apexMass = 0
-	// 		binSelection = nil
-	// 		elsSelector = nil
-	// 		elsMap = make(map[float64]PSMEvidenceList)
-	// 	}
-	//
-	// 	if len(i.Elements) > 0 {
-	// 		binSelection = append(binSelection, i.CorrectedMass)
-	// 		elsSelector = append(elsSelector, len(i.Elements))
-	// 		elsMap[i.CorrectedMass] = i.Elements
-	// 		if len(i.Elements) > apexElements {
-	// 			apexElements = len(i.Elements)
-	// 			apexMass = i.CorrectedMass
-	// 		}
-	// 	}
-	//
-	// }
+	return nil
+}
 
-	// starting unimod parsing
+// MapMassDiffToUniMod maps PSMs to modifications based on their mass shifts
+func (e *Evidence) MapMassDiffToUniMod() *err.Error {
+
+	// 10 ppm
+	var tolerance = 0.01
+
 	u := uni.New()
 	u.ProcessUniMOD()
 
-	// assign each modification to a certain bin based on a mass window
-	var abins AssignedBins
-	for _, i := range bins {
+	for _, i := range u.Modifications {
+		for j := range e.PSM {
 
-		if len(i.Elements) > 0 {
+			if e.PSM[j].Massdiff >= (i.MonoMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoMass+tolerance) {
+				fullName := fmt.Sprintf("%s (%s)", i.Title, i.Description)
+				e.PSM[j].ObservedModifications[fullName] = 0
+			}
 
-			var ab AssignedBin
-			ab.Mass = utils.Round(i.CorrectedMass, 5, 2)
-			ab.Elements = i.Elements
-
-			for _, j := range u.Modifications {
-				mod := utils.Round(j.MonoMass, 5, 2)
-
-				if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
-					fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
-					ab.MappedModifications = append(ab.MappedModifications, fullName)
+			for k := range e.PSM[j].AssignedMassDiffs {
+				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoMass+tolerance) {
+					if !strings.Contains(i.Description, "substitution") {
+						fullname := fmt.Sprintf("%s (%s)", i.Title, i.Description)
+						e.PSM[j].AssignedModifications[fullname] = 0
+					}
 				}
-
 			}
-
-			// set all bins without unimod mappings to unknown
-			if len(ab.MappedModifications) == 0 {
-				ab.MappedModifications = append(ab.MappedModifications, "Unknown")
-			}
-
-			// reset the 0 bin to no modifications
-			if ab.Mass == 0 {
-				ab.MappedModifications = nil
-			}
-
-			abins = append(abins, ab)
 
 		}
 	}
 
-	// var abins AssignedBins
-	// for k, v := range selectedBins {
-	//
-	// 	var ab AssignedBin
-	// 	ab.Mass = utils.Round(k, 5, 2)
-	// 	ab.Elements = v
-	//
-	// 	for _, j := range u.Modifications {
-	// 		mod := utils.Round(j.MonoMass, 5, 2)
-	//
-	// 		if ab.Mass >= (mod-0.1) && ab.Mass <= (mod+0.1) {
-	// 			fullName := fmt.Sprintf("%s (%s)", j.Title, j.Description)
-	// 			ab.MappedModifications = append(ab.MappedModifications, fullName)
-	// 		}
-	//
-	// 	}
-	//
-	// 	// set all bins without unimod mappings to unknown
-	// 	if len(ab.MappedModifications) == 0 {
-	// 		ab.MappedModifications = append(ab.MappedModifications, "Unknown")
-	// 	}
-	//
-	// 	// reset the 0 bin to no modifications
-	// 	if ab.Mass == 0 {
-	// 		ab.MappedModifications = nil
-	// 	}
-	//
-	// 	abins = append(abins, ab)
-	// }
-
-	// inspect assigned mass binning
-	// for _, i := range abins {
-	// 	fmt.Println(i.Mass, "\t", len(i.Elements))
-	// }
-
-	e.Modifications = modEvi
-	e.Modifications.MassBins = bins
-
-	sort.Sort(abins)
-	e.Modifications.AssignedBins = abins
-
 	return nil
+}
+
+// UpdateIonModCount counts how many times each ion is observed modified and not modified
+func (e *Evidence) UpdateIonModCount() {
+
+	// recreate the ion list from the main report object
+	var AllIons = make(map[string]int)
+	var ModIons = make(map[string]int)
+	var UnModIons = make(map[string]int)
+
+	for _, i := range e.Ions {
+		var ion string
+		if len(i.ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
+		}
+		AllIons[ion] = 0
+		ModIons[ion] = 0
+		UnModIons[ion] = 0
+	}
+
+	// range over PSMs looking for modified and not modified evidences
+	// if they exist on the ions map, get the numbers
+	for _, i := range e.PSM {
+		var psmIon string
+		if len(i.ModifiedPeptide) > 0 {
+			psmIon = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
+		} else {
+			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
+		}
+
+		// check the map
+		_, ok := AllIons[psmIon]
+		if ok {
+
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
+				UnModIons[psmIon]++
+			} else {
+				ModIons[psmIon]++
+			}
+
+		}
+	}
+
+	for i := range e.Ions {
+		var ion string
+		if len(e.Ions[i].ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
+		}
+
+		v1, ok1 := UnModIons[ion]
+		if ok1 {
+			e.Ions[i].UnModifiedObservations = v1
+		}
+
+		v2, ok2 := ModIons[ion]
+		if ok2 {
+			e.Ions[i].ModifiedObservations = v2
+		}
+
+	}
+
+	return
+}
+
+// UpdatePeptideModCount counts how many times each peptide is observed modified and not modified
+func (e *Evidence) UpdatePeptideModCount() {
+
+	// recreate the ion list from the main report object
+	var all = make(map[string]int)
+	var mod = make(map[string]int)
+	var unmod = make(map[string]int)
+
+	for _, i := range e.Peptides {
+		all[i.Sequence] = 0
+		mod[i.Sequence] = 0
+		unmod[i.Sequence] = 0
+	}
+
+	// range over PSMs looking for modified and not modified evidences
+	// if they exist on the ions map, get the numbers
+	for _, i := range e.PSM {
+
+		_, ok := all[i.Peptide]
+		if ok {
+
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
+				unmod[i.Peptide]++
+			} else {
+				mod[i.Peptide]++
+			}
+
+		}
+	}
+
+	for i := range e.Peptides {
+
+		v1, ok1 := unmod[e.Peptides[i].Sequence]
+		if ok1 {
+			e.Peptides[i].UnModifiedObservations = v1
+		}
+
+		v2, ok2 := mod[e.Peptides[i].Sequence]
+		if ok2 {
+			e.Peptides[i].ModifiedObservations = v2
+		}
+
+	}
+
+	return
 }
 
 // ModificationReport ...
@@ -1359,24 +1218,19 @@ func (e *Evidence) ModificationReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Mass Bin\tNumber of PSMs\tModification\n")
+	line := fmt.Sprintf("Mass Bin\tNumber of PSMs\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
 		logrus.Fatal(n, err)
 	}
 
-	for _, i := range e.Modifications.AssignedBins {
+	for _, i := range e.Modifications.MassBins {
 
 		line = fmt.Sprintf("%.4f\t%d\t",
-			i.Mass,          // mass bins
+			i.CorrectedMass, // mass bins
 			len(i.Elements), // number of psms
 		)
-
-		// line = fmt.Sprintf("%.4f\t%d\t%s\t",
-		// 	i.Mass,          // mass bins
-		// 	len(i.Elements), // number of psms
-		// 	strings.Join(i.MappedModifications, ", "))
 
 		line += "\n"
 		n, err := io.WriteString(file, line)

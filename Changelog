@@ -4,6 +4,7 @@
 
 ### Changed
 - Modification list is temporarily removed from modification report
+- Comet updated to version 2016013
 
 ### Fixed
 - A problem was causing a few PSMs to be mis assigned as Decoys, causing an error in the number of proteins in the final report.

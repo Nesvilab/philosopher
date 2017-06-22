@@ -147,6 +147,18 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	e.AssemblePSMReport(psm, f.Tag)
 	psm = nil
 
+	// evaluate modifications in data set
+	if mapmod == true {
+		logrus.Info("Mapping modifications")
+		e.MapMassDiffToUniMod()
+
+		logrus.Info("Processing modifications")
+		e.AssembleModificationReport()
+
+		logrus.Info("Plotting mass distribution")
+		e.PlotMassHist()
+	}
+
 	var ion xml.PepIDList
 	ion.Restore("ion")
 	e.AssembleIonReport(ion, f.Tag)
@@ -159,33 +171,8 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 
 	// evaluate modifications in data set
 	if mapmod == true {
-		logrus.Info("Processing modifications")
-		e.AssembleModificationReport()
-
-		logrus.Info("Plotting mass distribution")
-		e.PlotMassHist()
-
-		// call again to update structures and reports with observed modification information
-		var psm xml.PepIDList
-		psm.Restore("psm")
-		e.AssemblePSMReport(psm, f.Tag)
-		psm = nil
-
-		// call again to update structures and reports with observed modification information
-		var ion xml.PepIDList
-		ion.Restore("ion")
-		e.AssembleIonReport(ion, f.Tag)
-		ion = nil
-
-		// call again to update structures and reports with observed modification information
-		var pept xml.PepIDList
-		pept.Restore("pep")
-		e.AssemblePeptideReport(pept, f.Tag)
-		pept = nil
-
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
-		e.UpdateIonAssignedAndObservedMods()
 	}
 
 	logrus.Info("Processing Protein Inference")
