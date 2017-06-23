@@ -355,12 +355,29 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
+	var assignedModMap = make(map[string][]string)
+	var observedModMap = make(map[string][]string)
 	var err error
 
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range e.PSM {
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.AlternativeProteins...)
+
+		// get the list of all assigned modifications
+		if len(i.AssignedModifications) > 0 {
+			for k := range i.AssignedModifications {
+				assignedModMap[i.Spectrum] = append(assignedModMap[i.Spectrum], k)
+			}
+		}
+
+		// get the list of all observed modifications
+		if len(i.ObservedModifications) > 0 {
+			for k := range i.ObservedModifications {
+				observedModMap[i.Spectrum] = append(observedModMap[i.Spectrum], k)
+			}
+		}
+
 	}
 
 	for _, i := range ion {
@@ -387,9 +404,23 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			// get he list of indi proteins from pepXML data
 			v, ok := psmPtMap[i.Spectrum]
 			if ok {
-				for _, i := range v {
-					pr.MappedProteins[i] = 0
-					pr.IndiMappedProteins[i]++
+				for _, j := range v {
+					pr.MappedProteins[j] = 0
+					pr.IndiMappedProteins[j]++
+				}
+			}
+
+			va, oka := assignedModMap[i.Spectrum]
+			if oka {
+				for _, j := range va {
+					pr.AssignedModifications[j] = 0
+				}
+			}
+
+			vo, oko := observedModMap[i.Spectrum]
+			if oko {
+				for _, j := range vo {
+					pr.ObservedModifications[j] = 0
 				}
 			}
 
@@ -479,10 +510,6 @@ func (e *Evidence) PeptideIonReport() {
 				for k := range i.MappedProteins {
 					pts = append(pts, k)
 				}
-
-				// for k := range i.IndiMappedProteins {
-				// 	ipts = append(ipts, k)
-				// }
 
 				var amods []string
 				for j := range i.AssignedModifications {
@@ -1070,12 +1097,8 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 	u.ProcessUniMOD()
 
 	for _, i := range u.Modifications {
-		for j := range e.PSM {
 
-			if e.PSM[j].Massdiff >= (i.MonoMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoMass+tolerance) {
-				fullName := fmt.Sprintf("%s (%s)", i.Title, i.Description)
-				e.PSM[j].ObservedModifications[fullName] = 0
-			}
+		for j := range e.PSM {
 
 			for k := range e.PSM[j].AssignedMassDiffs {
 				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoMass+tolerance) {
@@ -1086,6 +1109,17 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 				}
 			}
 
+			if e.PSM[j].Massdiff >= (i.MonoMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoMass+tolerance) {
+				fullName := fmt.Sprintf("%s (%s)", i.Title, i.Description)
+				e.PSM[j].ObservedModifications[fullName] = 0
+			}
+
+		}
+	}
+
+	for j := range e.PSM {
+		if e.PSM[j].Massdiff != 0 && len(e.PSM[j].ObservedModifications) == 0 {
+			e.PSM[j].ObservedModifications["Unknown"] = 0
 		}
 	}
 
