@@ -1261,7 +1261,7 @@ func (e *Evidence) ModificationReport() {
 
 	for _, i := range e.Modifications.MassBins {
 
-		line = fmt.Sprintf("%.4f\t%d\t",
+		line = fmt.Sprintf("%.4f\t%d",
 			i.CorrectedMass, // mass bins
 			len(i.Elements), // number of psms
 		)
