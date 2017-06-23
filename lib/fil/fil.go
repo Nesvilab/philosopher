@@ -793,43 +793,6 @@ func razorFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked b
 		}
 	}
 
-	//
-	// for _, i := range p.Groups {
-	// 	for _, j := range i.Proteins {
-	// 		if j.GroupNumber == 4146 {
-	// 			fmt.Println(j.GroupNumber)
-	// 			fmt.Println(j.TopPepProb)
-	// 		}
-	// 	}
-	// }
-
-	// for i := range p.Groups {
-	// 	for j := range p.Groups[i].Proteins {
-	//
-	// 		r := p.Groups[i].Proteins[j].TopPepProb
-	//
-	// 		for k := range p.Groups[i].Proteins[j].PeptideIons {
-	// 			if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 {
-	// 				if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
-	// 					r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
-	// 				}
-	// 			}
-	//
-	// 		}
-	// 		p.Groups[i].Proteins[j].TopPepProb = r
-	// 	}
-	// }
-
-	// for _, i := range p.Groups {
-	// 	for _, j := range i.Proteins {
-	// 		if j.GroupNumber == 772 {
-	// 			fmt.Println(j.GroupNumber)
-	// 			fmt.Println(j.TopPepProb)
-	// 			fmt.Println(j.)
-	// 		}
-	// 	}
-	// }
-
 	cleanlist, err := ProtXMLFilter(p, targetFDR, pepProb, protProb, isPicked, true)
 	if err != nil {
 		return cleanlist, err
@@ -894,6 +857,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 
 	sort.Sort(&list)
 
+	// for inspections
 	// for j := range list {
 	// 	//if list[j].TopPepProb == 0 {
 	// 	if list[j].GroupNumber == 772 {
@@ -923,19 +887,6 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 			targets--
 		}
 	}
-	// var scoreMap = make(map[float64]float64)
-	// for j := (len(list) - 1); j >= 0; j-- {
-	// 	_, ok := scoreMap[list[j].Probability]
-	// 	if !ok {
-	// 		scoreMap[list[j].Probability] = (decoys / targets)
-	// 	}
-	//
-	// 	if clas.IsDecoyProtein(list[j], p.DecoyTag) {
-	// 		decoys--
-	// 	} else {
-	// 		targets--
-	// 	}
-	// }
 
 	var keys []float64
 	for k := range scoreMap {
@@ -956,6 +907,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 			globalMinScore = (scoreMap[keys[i]] * 100)
 		}
 
+		// for inspections
 		//f := utils.Round(scoreMap[keys[i]]*100, 5, 2)
 		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", utils.ToFixed(scoreMap[keys[i]], 4), "\t", f)
 		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", utils.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
@@ -981,9 +933,9 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 		err = errors.New(msgProb)
 	}
 
-	//fmtScore := utils.Round(curScore, .5, 3)
 	fmtScore := utils.ToFixed(curScore, 4)
 
+	// for inspections
 	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)
 
 	if curScore < targetFDR && fmtScore != targetFDR && probArray[len(probArray)-1] != curProb {
@@ -1019,19 +971,6 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 			}
 		}
 	}
-
-	// var cleanlist xml.ProtIDList
-	// for i := range list {
-	// 	_, ok := probList[list[i].Probability]
-	// 	if ok {
-	// 		cleanlist = append(cleanlist, list[i])
-	// 		if clas.IsDecoyProtein(list[i], p.DecoyTag) {
-	// 			decoys++
-	// 		} else {
-	// 			targets++
-	// 		}
-	// 	}
-	// }
 
 	msg := fmt.Sprintf("Converged to %.2f %% FDR with %0.f Proteins", (calcFDR * 100), targets)
 	logrus.WithFields(logrus.Fields{
