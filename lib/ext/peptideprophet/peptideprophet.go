@@ -14,7 +14,7 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 )
 
-// PeptideProphet is the tool configuration
+// PeptideProphet is the main tool data configuration structure
 type PeptideProphet struct {
 	meta.Data
 	DefaultInteractParser       string

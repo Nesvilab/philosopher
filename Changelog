@@ -1,6 +1,7 @@
 ## [1.2] - ?
 ### Added
 - Philosopher now supports 'Generic' types of databases
+- Support for PTMProphet data on Peptide XML structures
 
 ### Changed
 - Modification list is temporarily removed from modification report
