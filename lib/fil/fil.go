@@ -759,6 +759,7 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 			for i := range v {
 
 				pep := strings.Split(v[i], "#")
+
 				weight, err := strconv.ParseFloat(pep[5], 64)
 				if err != nil {
 					return p, err
@@ -791,9 +792,12 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 							mgw = append(mgw, v[i])
 						}
 					}
+
 				}
+
 			}
 		}
+
 		razorMap[k] = mgw[0]
 	}
 
@@ -1103,8 +1107,8 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 
 				} else {
 					//if p.Groups[i].Proteins[j].Probability >= protProb {
-					//if p.Groups[i].Proteins[j].TopPepProb >= pepProb && p.Groups[i].Proteins[j].Probability >= protProb {
-					if p.Groups[i].Proteins[j].TopPepProb >= pepProb {
+					//if p.Groups[i].Proteins[j].TopPepProb >= pepProb {
+					if p.Groups[i].Proteins[j].TopPepProb >= pepProb && p.Groups[i].Proteins[j].Probability >= protProb {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
 				}
