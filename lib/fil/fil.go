@@ -585,11 +585,13 @@ func processProteinIdentifications(p xml.ProtXML, ptFDR, pepProb, protProb float
 	// applies razor algorithm
 	if isRazor == true {
 		p, err = razorFilter(p)
+		if err != nil {
+			return err
+		}
 	}
 
 	// run the FDR filter for proteins
 	pid, err = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor)
-
 	if err != nil {
 		return err
 	}
@@ -725,6 +727,7 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 	var refMap = make(map[string][]string)
 	var pepMap = make(map[string]string)
 
+	// create reference entries by collapsing into a single string all necessary information about the peptide-to-protein assignment
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
@@ -748,14 +751,18 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 		}
 	}
 
+	// for each unique peptide sequence
 	for k := range pepMap {
 
 		var gw float64
 		var w float64
 		var mgw []string
 
+		// retrieve the list of references based on the peptide sequence
 		v, ok := refMap[k]
 		if ok {
+
+			// for each reference in the list
 			for i := range v {
 
 				pep := strings.Split(v[i], "#")
@@ -769,6 +776,7 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 					return p, err
 				}
 
+				// references with weight > 0.5 are easy cases, and clearly assinged as razor
 				if weight > 0.5 {
 					mgw = nil
 					mgw = append(mgw, v[i])
@@ -814,25 +822,67 @@ func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 					p.Groups[i].Proteins[j].PeptideIons[k].Weight,
 					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
 					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
-					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass,
-				)
+					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass)
 
 				v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
 				if ok {
 					if strings.EqualFold(ref, v) {
 						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
 						p.Groups[i].Proteins[j].HasRazor = true
-
-						if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > p.Groups[i].Proteins[j].RazorTopPepProb {
-							p.Groups[i].Proteins[j].RazorTopPepProb = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
-						}
-
 					}
 				}
 
 			}
 		}
 	}
+
+	// mark as razor all peptides in the reference map
+	for i := range p.Groups {
+		for j := range p.Groups[i].Proteins {
+			var r float64
+			for k := range p.Groups[i].Proteins[j].PeptideIons {
+				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 {
+					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
+						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
+					}
+				}
+			}
+			p.Groups[i].Proteins[j].TopPepProb = r
+		}
+	}
+
+	// for i := range p.Groups {
+	// 	for j := range p.Groups[i].Proteins {
+	// 		for k := range p.Groups[i].Proteins[j].PeptideIons {
+	//
+	// 			ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
+	// 				p.Groups[i].GroupNumber,
+	// 				string(p.Groups[i].Proteins[j].GroupSiblingID),
+	// 				string(p.Groups[i].Proteins[j].ProteinName),
+	// 				string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
+	// 				p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
+	// 				p.Groups[i].Proteins[j].PeptideIons[k].Weight,
+	// 				p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
+	// 				p.Groups[i].Proteins[j].PeptideIons[k].Charge,
+	// 				p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass,
+	// 			)
+	//
+	// 			v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
+	// 			if ok {
+	// 				if strings.EqualFold(ref, v) {
+	// 					p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
+	// 					p.Groups[i].Proteins[j].HasRazor = true
+	//
+	// 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > p.Groups[i].Proteins[j].RazorTopPepProb {
+	// 						p.Groups[i].Proteins[j].RazorTopPepProb = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
+	// 					}
+	//
+	// 				}
+	// 			}
+	//
+	// 		}
+	// 	}
+	// }
 
 	return p, nil
 }
