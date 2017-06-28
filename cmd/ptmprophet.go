@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
@@ -19,7 +20,8 @@ var ptmprophetCmd = &cobra.Command{
 		var m meta.Data
 		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			logrus.Fatal("Workspace not found. Run 'philosopher init' to create a workspace")
+			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+			logrus.Fatal(e.Error())
 		}
 
 		// deploy the binaries
