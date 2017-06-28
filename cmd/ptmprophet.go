@@ -45,7 +45,7 @@ func init() {
 
 	ptm = ptmprophet.New()
 
-	ptmprophetCmd.Flags().StringVarP(&ptm.Output, "output", "", "interact", "output prefix file name")
+	ptmprophetCmd.Flags().StringVarP(&ptm.Output, "output", "", "", "output prefix file name")
 	ptmprophetCmd.Flags().BoolVarP(&ptm.NoUpdate, "noupdate", "", false, "don't update modification_info tags in pepXML")
 	ptmprophetCmd.Flags().Int8VarP(&ptm.EM, "em", "", 1, "Set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)")
 	ptmprophetCmd.Flags().BoolVarP(&ptm.KeepOld, "keepold", "", false, "retain old PTMProphet results in the pepXML file")

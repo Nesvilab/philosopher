@@ -88,16 +88,19 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 	for i := range args {
 		file, _ := filepath.Abs(args[i])
 		cmd.Args = append(cmd.Args, file)
+		cmd.Dir = filepath.Dir(file)
 	}
 
 	cmd = c.appendParams(cmd)
 
 	// append output file
-	output := fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
-	output, _ = filepath.Abs(output)
-	cmd.Args = append(cmd.Args, output)
-
-	cmd.Dir = filepath.Dir(output)
+	var output string
+	if len(c.Output) > 0 {
+		output = fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
+		output, _ = filepath.Abs(output)
+		cmd.Args = append(cmd.Args, output)
+		cmd.Dir = filepath.Dir(output)
+	}
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -112,10 +115,12 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 	baseDir = filepath.Dir(args[0])
 
 	// copy to work directory
-	dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
-	e = sys.CopyFile(output, dest)
-	if e != nil {
-		return &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "PTMProphet results"}
+	if len(c.Output) > 0 {
+		dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
+		e = sys.CopyFile(output, dest)
+		if e != nil {
+			return &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "PTMProphet results"}
+		}
 	}
 
 	return nil
