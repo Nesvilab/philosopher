@@ -34,30 +34,29 @@ type ProteinProphet struct {
 	Mufactor              string
 	Output                string
 	Maxppmdiff            string
-	//Combine               bool
-	Noplot      bool
-	Nooccam     bool
-	Softoccam   bool
-	Icat        bool
-	Glyc        bool
-	Nogroupwts  bool
-	NonSP       bool
-	Accuracy    bool
-	Asap        bool
-	Refresh     bool
-	Normprotlen bool
-	Logprobs    bool
-	Confem      bool
-	Allpeps     bool
-	Unmapped    bool
-	Noprotlen   bool
-	Instances   bool
-	Fpkm        bool
-	Protmw      bool
-	Iprophet    bool
-	Asapprophet bool
-	Delude      bool
-	Excludemods bool
+	Noplot                bool
+	Nooccam               bool
+	Softoccam             bool
+	Icat                  bool
+	Glyc                  bool
+	Nogroupwts            bool
+	NonSP                 bool
+	Accuracy              bool
+	Asap                  bool
+	Refresh               bool
+	Normprotlen           bool
+	Logprobs              bool
+	Confem                bool
+	Allpeps               bool
+	Unmapped              bool
+	Noprotlen             bool
+	Instances             bool
+	Fpkm                  bool
+	Protmw                bool
+	Iprophet              bool
+	Asapprophet           bool
+	Delude                bool
+	Excludemods           bool
 }
 
 // New constructor
