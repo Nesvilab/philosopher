@@ -1,7 +1,7 @@
 ## [1.2] - ?
 ### Added
 - Philosopher now supports 'Generic' types of databases
-- Support for PTMProphet data on Peptide XML structures
+- PTMProphet was added to the list of external tools
 
 ### Changed
 - Modification list is temporarily removed from modification report
@@ -10,6 +10,7 @@
 
 ### Fixed
 - A problem was causing a few PSMs to be mis assigned as Decoys, causing an error in the number of proteins in the final report.
+- A bug on the razor algorithm was causing an increase in the number of identified proteins
 
 ## [1.1] - 06-15-2017
 ### Added

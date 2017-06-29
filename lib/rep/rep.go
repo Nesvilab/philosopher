@@ -64,6 +64,7 @@ type PSMEvidence struct {
 	CalcNeutralPepMass    float64
 	RawMassdiff           float64
 	Massdiff              float64
+	LocalizedMassDiff     string
 	Probability           float64
 	Expectation           float64
 	Xcorr                 float64
@@ -272,6 +273,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.CalcNeutralPepMass = i.CalcNeutralPepMass
 			p.RawMassdiff = i.RawMassDiff
 			p.Massdiff = i.Massdiff
+			p.LocalizedMassDiff = i.LocalizedMassDiff
 			p.Probability = i.Probability
 			p.Expectation = i.Expectation
 			p.Xcorr = i.Xcorr
@@ -305,7 +307,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\tAssigned Modifications\tOberved Modifications\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tPeptideProphet Probability\tExpectation\tAssigned Modifications\tOberved Modifications\tDelta Mass Localization\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -322,7 +324,7 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.AssumedCharge,
@@ -337,6 +339,7 @@ func (e *Evidence) PSMReport() {
 			i.Expectation,
 			strings.Join(ass, ", "),
 			strings.Join(obs, ", "),
+			i.LocalizedMassDiff,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
