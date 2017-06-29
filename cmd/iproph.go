@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
@@ -20,7 +21,8 @@ var iprophCmd = &cobra.Command{
 		var m meta.Data
 		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			logrus.Fatal("Workspace not found. Run 'philosopher init' to create a workspace")
+			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+			logrus.Fatal(e.Error())
 		}
 
 		var err error
@@ -46,10 +48,9 @@ func init() {
 
 	ipt = interprophet.New()
 
-	iprophCmd.Flags().StringVarP(&ipt.Threads, "threads", "", "", "specify threads to use (default 1)")
+	iprophCmd.Flags().Uint8VarP(&ipt.Threads, "threads", "", 1, "specify threads to use")
 	iprophCmd.Flags().StringVarP(&ipt.Decoy, "decoy", "", "", "specify the decoy tag")
-	iprophCmd.Flags().StringVarP(&ipt.Cat, "cat", "", "", "specify file listing peptide categories")
-	iprophCmd.Flags().StringVarP(&ipt.MinProb, "minProb", "", "", "specify minimum probability of results to report")
+	iprophCmd.Flags().Float64VarP(&ipt.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
 	iprophCmd.Flags().StringVarP(&ipt.Output, "output", "", "iproph.pep.xml", "specify output name")
 	iprophCmd.Flags().BoolVarP(&ipt.Length, "length", "", false, "use Peptide Length model")
 	iprophCmd.Flags().BoolVarP(&ipt.Nofpkm, "nofpkm", "", false, "do not use FPKM model")
@@ -60,6 +61,7 @@ func init() {
 	iprophCmd.Flags().BoolVarP(&ipt.Nonsp, "nonsp", "", false, "do not use NSP model")
 	iprophCmd.Flags().BoolVarP(&ipt.Sharpnse, "sharpnse", "", false, "Use more discriminating model for NSE in SWATH mode")
 	iprophCmd.Flags().BoolVarP(&ipt.Nonsi, "nonsi", "", false, "do not use NSI model")
+	//iprophCmd.Flags().StringVarP(&ipt.Cat, "cat", "", "", "specify file listing peptide categories")
 
 	RootCmd.AddCommand(iprophCmd)
 }

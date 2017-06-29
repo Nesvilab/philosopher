@@ -14,7 +14,7 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 )
 
-// PeptideProphet is the tool configuration
+// PeptideProphet is the main tool data configuration structure
 type PeptideProphet struct {
 	meta.Data
 	DefaultInteractParser       string
@@ -29,19 +29,19 @@ type PeptideProphet struct {
 	LibgccDLL                   string
 	Zlib1DLL                    string
 	Mv                          string
-	MinPepLen                   string
+	MinPepLen                   uint8
 	Output                      string
-	Clevel                      string
+	Clevel                      uint8
 	Database                    string
-	Minpintt                    string
-	Minpiprob                   string
-	Minrtntt                    string
-	Minrtprob                   string
+	Minpintt                    uint8
+	Minpiprob                   float64
+	Minrtntt                    uint8
+	Minrtprob                   float64
 	Rtcat                       string
-	Minprob                     string
+	Minprob                     float64
 	Decoy                       string
-	Ignorechg                   string
-	Masswidth                   string
+	Ignorechg                   uint8
+	Masswidth                   float64
 	Combine                     bool
 	Exclude                     bool
 	Leave                       bool
@@ -211,8 +211,8 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 			}
 
 			// -L<min_peptide_len (default 7)>
-			if len(p.MinPepLen) > 0 {
-				v := fmt.Sprintf("-L=%s", p.MinPepLen)
+			if p.MinPepLen != 7 {
+				v := fmt.Sprintf("-L=%d", p.MinPepLen)
 				cmd.Args = append(cmd.Args, v)
 			}
 
@@ -267,8 +267,8 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 		}
 
 		// -L<min_peptide_len (default 7)>
-		if len(p.MinPepLen) > 0 {
-			v := fmt.Sprintf("-L=%s", p.MinPepLen)
+		if p.MinPepLen != 7 {
+			v := fmt.Sprintf("-L=%d", p.MinPepLen)
 			cmd.Args = append(cmd.Args, v)
 		}
 
@@ -438,33 +438,33 @@ func peptideProphet(p PeptideProphet, file string) error {
 		cmd.Args = append(cmd.Args, "NONPARAM")
 	}
 
-	if len(p.Masswidth) > 0 {
-		v := fmt.Sprintf("MASSWIDTH=%s", p.Masswidth)
+	if p.Masswidth != 5.0 {
+		v := fmt.Sprintf("MASSWIDTH=%.4f", p.Masswidth)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Clevel) > 0 {
-		v := fmt.Sprintf("CLEVEL=%s", p.Clevel)
+	if p.Clevel != 0 {
+		v := fmt.Sprintf("CLEVEL=%d", p.Clevel)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Minpintt) > 0 {
-		v := fmt.Sprintf("MINPINTT=%s", p.Minpintt)
+	if p.Minpintt != 2 {
+		v := fmt.Sprintf("MINPINTT=%d", p.Minpintt)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Minpiprob) > 0 {
-		v := fmt.Sprintf("MINPIPROB=%s", p.Minpiprob)
+	if p.Minpiprob != 0.9 {
+		v := fmt.Sprintf("MINPIPROB=%.4f", p.Minpiprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Minrtntt) > 0 {
-		v := fmt.Sprintf("MINRTNTT=%s", p.Minrtntt)
+	if p.Minrtntt != 2 {
+		v := fmt.Sprintf("MINRTNTT=%d", p.Minrtntt)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Minrtprob) > 0 {
-		v := fmt.Sprintf("MINRTPROB=%s", p.Minrtprob)
+	if p.Minrtprob != 0.9 {
+		v := fmt.Sprintf("MINRTPROB=%.4f", p.Minrtprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
@@ -473,8 +473,8 @@ func peptideProphet(p PeptideProphet, file string) error {
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Minprob) > 0 {
-		v := fmt.Sprintf("MINPROB=%s", p.Minprob)
+	if p.Minprob != 0.05 {
+		v := fmt.Sprintf("MINPROB=%.4f", p.Minprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 

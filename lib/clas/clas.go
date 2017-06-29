@@ -19,12 +19,14 @@ func IsDecoyPSM(p xml.PeptideIdentification, tag string) bool {
 		class = false
 	}
 
+	// try to find another protein, indistinguishable, that is annotate as target
+	// only one evidence is enough to promote the PSM as a "no-decoy"
 	if len(p.AlternativeProteins) > 1 {
 		for i := range p.AlternativeProteins {
 			if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
 				class = false
+				break
 			}
-			break
 		}
 	}
 

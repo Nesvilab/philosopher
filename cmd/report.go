@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
@@ -20,7 +21,8 @@ var reportCmd = &cobra.Command{
 		var m meta.Data
 		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			logrus.Fatal("Workspace not found. Run 'philosopher init' to create a workspace")
+			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+			logrus.Fatal(e.Error())
 		}
 
 		repo.Restore()
@@ -49,7 +51,7 @@ var reportCmd = &cobra.Command{
 		logrus.Info("Creating peptide report")
 		repo.PeptideReport()
 
-		if len(repo.Modifications.AssignedBins) > 0 {
+		if len(repo.Modifications.MassBins) > 0 {
 			logrus.Info("Creating modification reports")
 			repo.ModificationReport()
 		}

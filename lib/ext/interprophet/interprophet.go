@@ -22,10 +22,10 @@ type InterProphet struct {
 	UnixInterProphetParser    string
 	LibgccDLL                 string
 	Zlib1DLL                  string
-	Threads                   string
+	Threads                   uint8
 	Decoy                     string
 	Cat                       string
-	MinProb                   string
+	MinProb                   float64
 	Output                    string
 	Length                    bool
 	Nofpkm                    bool
@@ -139,8 +139,8 @@ func (c *InterProphet) Run(args []string) error {
 		cmd.Args = append(cmd.Args, "NONSI")
 	}
 
-	if len(c.Threads) > 0 {
-		v := fmt.Sprintf("THREADS=%s", c.Threads)
+	if c.Threads != 1 {
+		v := fmt.Sprintf("THREADS=%d", c.Threads)
 		cmd.Args = append(cmd.Args, v)
 	}
 
@@ -154,8 +154,8 @@ func (c *InterProphet) Run(args []string) error {
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.MinProb) > 0 {
-		v := fmt.Sprintf("MINPROB=%s", c.MinProb)
+	if c.MinProb != 0 {
+		v := fmt.Sprintf("MINPROB=%.4f", c.MinProb)
 		cmd.Args = append(cmd.Args, v)
 	}
 
