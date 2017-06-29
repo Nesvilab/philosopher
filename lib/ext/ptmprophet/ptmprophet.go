@@ -87,7 +87,8 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 	// append pepxml files
 	for i := range args {
 		file, _ := filepath.Abs(args[i])
-		cmd.Args = append(cmd.Args, file)
+		//cmd.Args = append(cmd.Args, file)
+		cmd.Args = append(cmd.Args, args[i])
 		cmd.Dir = filepath.Dir(file)
 	}
 
@@ -96,11 +97,18 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 	// append output file
 	var output string
 	if len(c.Output) > 0 {
-		output = fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
-		output, _ = filepath.Abs(output)
+		output = fmt.Sprintf("%s.mod.pep.xml", c.Output)
+		//output, _ = filepath.Abs(output)
 		cmd.Args = append(cmd.Args, output)
 		cmd.Dir = filepath.Dir(output)
 	}
+	// var output string
+	// if len(c.Output) > 0 {
+	// 	output = fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
+	// 	output, _ = filepath.Abs(output)
+	// 	cmd.Args = append(cmd.Args, output)
+	// 	cmd.Dir = filepath.Dir(output)
+	// }
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -111,17 +119,17 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 	}
 	_ = cmd.Wait()
 
-	var baseDir string
-	baseDir = filepath.Dir(args[0])
-
-	// copy to work directory
-	if len(c.Output) > 0 {
-		dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
-		e = sys.CopyFile(output, dest)
-		if e != nil {
-			return &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "PTMProphet results"}
-		}
-	}
+	// var baseDir string
+	// baseDir = filepath.Dir(args[0])
+	//
+	// // copy to work directory
+	// if len(c.Output) > 0 {
+	// 	dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
+	// 	e = sys.CopyFile(output, dest)
+	// 	if e != nil {
+	// 		return &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "PTMProphet results"}
+	// 	}
+	// }
 
 	return nil
 }
@@ -159,7 +167,7 @@ func (c *PTMProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.MinProb != 1 {
+	if c.MinProb != 0 {
 		v := fmt.Sprintf("MINPROB=%.4f", c.MinProb)
 		cmd.Args = append(cmd.Args, v)
 	}
