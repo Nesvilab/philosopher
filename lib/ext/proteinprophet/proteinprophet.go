@@ -29,11 +29,12 @@ type ProteinProphet struct {
 	Prot2html             string
 	LibgccDLL             string
 	Zlib1DLL              string
-	Minprob               string
-	Minindep              string
-	Mufactor              string
+	Minprob               float64
+	Minindep              uint8
+	Mufactor              uint8
 	Output                string
-	Maxppmdiff            string
+	Maxppmdiff            uint8
+	ExcludeZ              bool
 	Noplot                bool
 	Nooccam               bool
 	Softoccam             bool
@@ -182,6 +183,10 @@ func (c *ProteinProphet) Run(args []string) error {
 
 func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 
+	if c.ExcludeZ == true {
+		cmd.Args = append(cmd.Args, "EXCLUDE_ZEROS")
+	}
+
 	if c.Noplot == true {
 		cmd.Args = append(cmd.Args, "NOPLOT")
 	}
@@ -281,23 +286,23 @@ func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 	// 	cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
 	// }
 
-	if len(c.Maxppmdiff) > 0 {
-		v := fmt.Sprintf("MAXPPMDIFF%s", c.Maxppmdiff)
+	if c.Maxppmdiff != 20 {
+		v := fmt.Sprintf("MAXPPMDIFF%d", c.Maxppmdiff)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.Minprob) > 0 {
-		v := fmt.Sprintf("MINPROB%s", c.Minprob)
+	if c.Minprob != 0.05 {
+		v := fmt.Sprintf("MINPROB%.4f", c.Minprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.Minindep) > 0 {
-		v := fmt.Sprintf("MININDEP%s", c.Minindep)
+	if c.Minindep != 0 {
+		v := fmt.Sprintf("MININDEP%d", c.Minindep)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.Mufactor) > 0 {
-		v := fmt.Sprintf("MUFACTOR%s", c.Mufactor)
+	if c.Mufactor != 1 {
+		v := fmt.Sprintf("MUFACTOR%d", c.Mufactor)
 		cmd.Args = append(cmd.Args, v)
 	}
 
