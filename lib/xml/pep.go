@@ -234,63 +234,6 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 	return psm
 }
 
-// func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64) PeptideIdentification {
-//
-// 	var psm PeptideIdentification
-//
-// 	psm.Index = sq.Index
-// 	psm.Spectrum = string(sq.Spectrum)
-// 	psm.Scan = sq.StartScan
-// 	psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
-// 	psm.AssumedCharge = sq.AssumedCharge
-// 	psm.RetentionTime = sq.RetentionTimeSec
-//
-// 	for j := range sq.SearchResult.SearchHit {
-//
-// 		psm.HitRank = sq.SearchResult.SearchHit[j].HitRank
-// 		psm.Peptide = string(sq.SearchResult.SearchHit[j].Peptide)
-// 		psm.Protein = string(sq.SearchResult.SearchHit[j].Protein)
-// 		psm.CalcNeutralPepMass = sq.SearchResult.SearchHit[j].CalcNeutralPepMass
-// 		psm.Massdiff = sq.SearchResult.SearchHit[j].Massdiff
-//
-// 		if sq.SearchResult.SearchHit[0].AnalysisResult.InterProphetResult.Probability > 0 {
-// 			psm.Probability = sq.SearchResult.SearchHit[0].AnalysisResult.InterProphetResult.Probability
-// 		} else {
-// 			psm.Probability = sq.SearchResult.SearchHit[0].AnalysisResult.PeptideProphetResult.Probability
-// 		}
-//
-// 		psm.ModifiedPeptide = string(sq.SearchResult.SearchHit[j].ModificationInfo.ModifiedPeptide)
-// 		psm.ModNtermMass = sq.SearchResult.SearchHit[j].ModificationInfo.ModNTermMass
-//
-// 		for k := range sq.SearchResult.SearchHit[j].AlternativeProteins {
-// 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(sq.SearchResult.SearchHit[j].AlternativeProteins[k].Protein))
-// 		}
-//
-// 		for l := range sq.SearchResult.SearchHit[j].Score {
-// 			if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "expect" {
-// 				psm.Expectation = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "xcorr" {
-// 				psm.Xcorr = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "deltacn" {
-// 				psm.DeltaCN = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "sprank" {
-// 				psm.SpRank = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			}
-// 		}
-//
-// 		if len(string(sq.SearchResult.SearchHit[j].ModificationInfo.ModifiedPeptide)) > 0 {
-// 			for n := range sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass {
-// 				psm.ModPositions = append(psm.ModPositions, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Position)
-// 				psm.AssignedModMasses = append(psm.AssignedModMasses, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass)
-// 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass])
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return psm
-// }
-
 // adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
 func (p *PepXML) adjustMassDeviation() {
 
