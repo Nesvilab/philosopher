@@ -221,6 +221,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, erro
 
 	for _, i := range files {
 		var p xml.PepXML
+		p.DecoyTag = decoyTag
 		e := p.Read(i)
 		if e != nil {
 			return nil, e
@@ -256,6 +257,9 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, erro
 	pepXML.PeptideIdentification = pepIdent
 	pepXML.DefinedModAminoAcid = definedModAminoAcid
 	pepXML.DefinedModMassDiff = definedModMassDiff
+
+	// promoting Spectra that matches to both decoys and targets to TRUE hits
+	pepXML.PromoteProteinIDs()
 
 	// serialize all pep files
 	sort.Sort(pepXML.PeptideIdentification)
@@ -542,22 +546,16 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 func readProtXMLInput(meta, xmlFile, decoyTag string) (xml.ProtXML, error) {
 
 	var protXML xml.ProtXML
-	//var list xml.ProtIDList
 
 	err := protXML.Read(xmlFile)
 	if err != nil {
 		return protXML, err
 	}
-	protXML.DecoyTag = decoyTag
-	//protXML.ConTag = data.ConTag()
 
-	// for _, i := range protXML.Groups {
-	// 	list = append(list, i.Proteins...)
-	// }
+	protXML.DecoyTag = decoyTag
 
 	protXML.PromoteProteinIDs()
 
-	// serialize protXML file
 	protXML.Serialize()
 
 	return protXML, nil
