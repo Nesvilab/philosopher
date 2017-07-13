@@ -58,7 +58,11 @@ type PeptideIdentification struct {
 	Expectation               float64
 	Xcorr                     float64
 	DeltaCN                   float64
-	SpRank                    float64
+	DeltaCNStar               float64
+	SPScore                   float64
+	SPRank                    float64
+	Hyperscore                float64
+	Nextscore                 float64
 	DiscriminantValue         float64
 	ModNtermMass              float64
 	Intensity                 float64
@@ -223,8 +227,16 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.Xcorr = j.Value
 			} else if string(j.Name) == "deltacn" {
 				psm.DeltaCN = j.Value
+			} else if string(j.Name) == "deltacnstar" {
+				psm.DeltaCNStar = j.Value
+			} else if string(j.Name) == "spscore" {
+				psm.SPScore = j.Value
 			} else if string(j.Name) == "sprank" {
-				psm.SpRank = j.Value
+				psm.SPRank = j.Value
+			} else if string(j.Name) == "hyperscore" {
+				psm.Hyperscore = j.Value
+			} else if string(j.Name) == "nextscore" {
+				psm.Nextscore = j.Value
 			}
 		}
 
