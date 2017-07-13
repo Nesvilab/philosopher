@@ -46,7 +46,7 @@ func init() {
 	ptm = ptmprophet.New()
 
 	ptmprophetCmd.Flags().StringVarP(&ptm.Output, "output", "", "", "output prefix file name")
-	ptmprophetCmd.Flags().Int8VarP(&ptm.EM, "em", "", 1, "Set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)")
+	ptmprophetCmd.Flags().IntVarP(&ptm.EM, "em", "", 1, "Set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)")
 	ptmprophetCmd.Flags().BoolVarP(&ptm.KeepOld, "keepold", "", false, "retain old PTMProphet results in the pepXML file")
 	ptmprophetCmd.Flags().BoolVarP(&ptm.Verbose, "verbose", "", false, "produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues")
 	ptmprophetCmd.Flags().Float64VarP(&ptm.MzTol, "mztol", "", 0.1, "use specified +/- MS2 mz tolerance on site specific ions")

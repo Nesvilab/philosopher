@@ -19,7 +19,7 @@ import (
 type PTMProphet struct {
 	meta.Data
 	Output                  string
-	EM                      int8
+	EM                      int
 	MzTol                   float64
 	PPMTol                  float64
 	MinProb                 float64

@@ -48,7 +48,7 @@ func init() {
 
 	ipt = interprophet.New()
 
-	iprophCmd.Flags().Uint8VarP(&ipt.Threads, "threads", "", 1, "specify threads to use")
+	iprophCmd.Flags().IntVarP(&ipt.Threads, "threads", "", 1, "specify threads to use")
 	iprophCmd.Flags().StringVarP(&ipt.Decoy, "decoy", "", "", "specify the decoy tag")
 	iprophCmd.Flags().Float64VarP(&ipt.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
 	iprophCmd.Flags().StringVarP(&ipt.Output, "output", "", "iproph.pep.xml", "specify output name")

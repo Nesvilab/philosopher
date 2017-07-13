@@ -22,7 +22,7 @@ type InterProphet struct {
 	UnixInterProphetParser    string
 	LibgccDLL                 string
 	Zlib1DLL                  string
-	Threads                   uint8
+	Threads                   int
 	Decoy                     string
 	Cat                       string
 	MinProb                   float64

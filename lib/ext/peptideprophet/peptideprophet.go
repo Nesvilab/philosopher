@@ -29,18 +29,18 @@ type PeptideProphet struct {
 	LibgccDLL                   string
 	Zlib1DLL                    string
 	Mv                          string
-	MinPepLen                   uint8
+	MinPepLen                   int
 	Output                      string
-	Clevel                      uint8
+	Clevel                      int
 	Database                    string
-	Minpintt                    uint8
+	Minpintt                    int
 	Minpiprob                   float64
-	Minrtntt                    uint8
+	Minrtntt                    int
 	Minrtprob                   float64
 	Rtcat                       string
 	Minprob                     float64
 	Decoy                       string
-	Ignorechg                   uint8
+	Ignorechg                   int
 	Masswidth                   float64
 	Combine                     bool
 	Exclude                     bool

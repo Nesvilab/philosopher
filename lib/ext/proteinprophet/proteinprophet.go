@@ -30,10 +30,10 @@ type ProteinProphet struct {
 	LibgccDLL             string
 	Zlib1DLL              string
 	Minprob               float64
-	Minindep              uint8
-	Mufactor              uint8
+	Minindep              int
+	Mufactor              int
 	Output                string
-	Maxppmdiff            uint8
+	Maxppmdiff            int
 	ExcludeZ              bool
 	Noplot                bool
 	Nooccam               bool
