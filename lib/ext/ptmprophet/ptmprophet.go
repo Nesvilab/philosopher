@@ -96,12 +96,12 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 
 	// append output file
 	var output string
+	output = "interact.mod.pep.xml"
 	if len(c.Output) > 0 {
-		output = fmt.Sprintf("%s.mod.pep.xml", c.Output)
-		//output, _ = filepath.Abs(output)
-		cmd.Args = append(cmd.Args, output)
-		cmd.Dir = filepath.Dir(output)
+		output = fmt.Sprintf("%s.pep.xml", c.Output)
 	}
+	cmd.Args = append(cmd.Args, output)
+	cmd.Dir = filepath.Dir(output)
 	// var output string
 	// if len(c.Output) > 0 {
 	// 	output = fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
