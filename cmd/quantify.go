@@ -50,7 +50,6 @@ func init() {
 
 	qnt = quan.New()
 
-	//quantifyCmd.Flags().StringVarP(&qnt.Phi, "phi", "", "", "philosopher result file for input")
 	freequant.Flags().Float64VarP(&qnt.Tol, "tol", "", 10, "m/z tolerance in ppm")
 	freequant.Flags().StringVarP(&qnt.Dir, "dir", "", "", "folder path containing the raw files")
 	freequant.Flags().StringVarP(&qnt.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")

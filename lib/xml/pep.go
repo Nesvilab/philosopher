@@ -34,33 +34,38 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                uint32
-	Spectrum             string
-	Scan                 int
-	Peptide              string
-	Protein              string
-	ModifiedPeptide      string
-	AlternativeProteins  []string
-	ModPositions         []uint16
-	AssignedModMasses    []float64
-	AssignedMassDiffs    []float64
-	AssumedCharge        uint8
-	HitRank              uint8
-	PrecursorNeutralMass float64
-	PrecursorExpMass     float64
-	RetentionTime        float64
-	CalcNeutralPepMass   float64
-	RawMassDiff          float64
-	Massdiff             float64
-	LocalizedMassDiff    string
-	Probability          float64
-	Expectation          float64
-	Xcorr                float64
-	DeltaCN              float64
-	SpRank               float64
-	DiscriminantValue    float64
-	ModNtermMass         float64
-	Intensity            float64
+	Index                     uint32
+	Spectrum                  string
+	Scan                      int
+	Peptide                   string
+	Protein                   string
+	ModifiedPeptide           string
+	AlternativeProteins       []string
+	AlternativeTargetProteins []string
+	ModPositions              []uint16
+	AssignedModMasses         []float64
+	AssignedMassDiffs         []float64
+	AssumedCharge             uint8
+	HitRank                   uint8
+	PrecursorNeutralMass      float64
+	PrecursorExpMass          float64
+	RetentionTime             float64
+	CalcNeutralPepMass        float64
+	RawMassDiff               float64
+	Massdiff                  float64
+	LocalizedMassDiff         string
+	Probability               float64
+	Expectation               float64
+	Xcorr                     float64
+	DeltaCN                   float64
+	DeltaCNStar               float64
+	SPScore                   float64
+	SPRank                    float64
+	Hyperscore                float64
+	Nextscore                 float64
+	DiscriminantValue         float64
+	ModNtermMass              float64
+	Intensity                 float64
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -144,7 +149,7 @@ func (p *PepXML) Read(f string) error {
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for i := range sq {
-			psm := processSpectrumQuery(sq[i], p.DefinedModMassDiff)
+			psm := processSpectrumQuery(sq[i], p.DefinedModMassDiff, p.DecoyTag)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -167,7 +172,7 @@ func (p *PepXML) Read(f string) error {
 	return nil
 }
 
-func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64) PeptideIdentification {
+func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
 
@@ -206,7 +211,13 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 		psm.ModNtermMass = i.ModificationInfo.ModNTermMass
 
 		for _, j := range i.AlternativeProteins {
+
 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
+
+			if !strings.Contains(string(j.Protein), decoyTag) {
+				psm.AlternativeTargetProteins = append(psm.AlternativeTargetProteins, string(j.Protein))
+			}
+
 		}
 
 		for _, j := range i.Score {
@@ -216,8 +227,16 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.Xcorr = j.Value
 			} else if string(j.Name) == "deltacn" {
 				psm.DeltaCN = j.Value
+			} else if string(j.Name) == "deltacnstar" {
+				psm.DeltaCNStar = j.Value
+			} else if string(j.Name) == "spscore" {
+				psm.SPScore = j.Value
 			} else if string(j.Name) == "sprank" {
-				psm.SpRank = j.Value
+				psm.SPRank = j.Value
+			} else if string(j.Name) == "hyperscore" {
+				psm.Hyperscore = j.Value
+			} else if string(j.Name) == "nextscore" {
+				psm.Nextscore = j.Value
 			}
 		}
 
@@ -233,63 +252,6 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 
 	return psm
 }
-
-// func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64) PeptideIdentification {
-//
-// 	var psm PeptideIdentification
-//
-// 	psm.Index = sq.Index
-// 	psm.Spectrum = string(sq.Spectrum)
-// 	psm.Scan = sq.StartScan
-// 	psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
-// 	psm.AssumedCharge = sq.AssumedCharge
-// 	psm.RetentionTime = sq.RetentionTimeSec
-//
-// 	for j := range sq.SearchResult.SearchHit {
-//
-// 		psm.HitRank = sq.SearchResult.SearchHit[j].HitRank
-// 		psm.Peptide = string(sq.SearchResult.SearchHit[j].Peptide)
-// 		psm.Protein = string(sq.SearchResult.SearchHit[j].Protein)
-// 		psm.CalcNeutralPepMass = sq.SearchResult.SearchHit[j].CalcNeutralPepMass
-// 		psm.Massdiff = sq.SearchResult.SearchHit[j].Massdiff
-//
-// 		if sq.SearchResult.SearchHit[0].AnalysisResult.InterProphetResult.Probability > 0 {
-// 			psm.Probability = sq.SearchResult.SearchHit[0].AnalysisResult.InterProphetResult.Probability
-// 		} else {
-// 			psm.Probability = sq.SearchResult.SearchHit[0].AnalysisResult.PeptideProphetResult.Probability
-// 		}
-//
-// 		psm.ModifiedPeptide = string(sq.SearchResult.SearchHit[j].ModificationInfo.ModifiedPeptide)
-// 		psm.ModNtermMass = sq.SearchResult.SearchHit[j].ModificationInfo.ModNTermMass
-//
-// 		for k := range sq.SearchResult.SearchHit[j].AlternativeProteins {
-// 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(sq.SearchResult.SearchHit[j].AlternativeProteins[k].Protein))
-// 		}
-//
-// 		for l := range sq.SearchResult.SearchHit[j].Score {
-// 			if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "expect" {
-// 				psm.Expectation = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "xcorr" {
-// 				psm.Xcorr = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "deltacn" {
-// 				psm.DeltaCN = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			} else if string(sq.SearchResult.SearchHit[j].Score[l].Name) == "sprank" {
-// 				psm.SpRank = sq.SearchResult.SearchHit[j].Score[l].Value
-// 			}
-// 		}
-//
-// 		if len(string(sq.SearchResult.SearchHit[j].ModificationInfo.ModifiedPeptide)) > 0 {
-// 			for n := range sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass {
-// 				psm.ModPositions = append(psm.ModPositions, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Position)
-// 				psm.AssignedModMasses = append(psm.AssignedModMasses, sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass)
-// 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[sq.SearchResult.SearchHit[j].ModificationInfo.ModAminoacidMass[n].Mass])
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return psm
-// }
 
 // adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
 func (p *PepXML) adjustMassDeviation() {
@@ -316,7 +278,41 @@ func (p *PepXML) adjustMassDeviation() {
 	return
 }
 
-// ReportModels ...
+// PromoteProteinIDs promotes protein identifications where the reference protein
+// is indistinguishable to other target proteins.
+func (p *PepXML) PromoteProteinIDs() {
+
+	for i := range p.PeptideIdentification {
+
+		var list []string
+		var ref string
+
+		if strings.Contains(p.PeptideIdentification[i].Protein, p.DecoyTag) {
+			for j := range p.PeptideIdentification[i].AlternativeProteins {
+				if !strings.Contains(p.PeptideIdentification[i].AlternativeProteins[j], p.DecoyTag) {
+					list = append(list, p.PeptideIdentification[i].AlternativeProteins[j])
+				}
+			}
+		}
+
+		if len(list) > 1 {
+			for i := range list {
+				if strings.Contains(list[i], "sp|") {
+					ref = list[i]
+					break
+				} else {
+					ref = list[i]
+				}
+			}
+			p.PeptideIdentification[i].Protein = ref
+		}
+
+	}
+
+	return
+}
+
+// ReportModels creates PNG images using the PeptideProphet TD score distribution
 func (p *PepXML) ReportModels(session, name string) (err error) {
 
 	var xAxis []float64
