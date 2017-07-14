@@ -7,7 +7,7 @@
 
 ### Fixed
 - PTMProphet file name output is now pre-defined
-- The Prophets parameter uint8 formats changed to int
+- Prophets parameters described as uint8 now shows as int
 
 ## [1.2] - 2017-06-29
 ### Added
