@@ -645,6 +645,7 @@ func (e *Evidence) PeptideReport() {
 		for j := range i.ChargeState {
 			cs = append(cs, strconv.Itoa(int(j)))
 		}
+		sort.Strings(cs)
 
 		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\n",
 			i.Sequence,
