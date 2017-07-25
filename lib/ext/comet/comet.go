@@ -105,7 +105,7 @@ func (c *Comet) Run(cmdArgs []string) *err.Error {
 	run.Stderr = os.Stderr
 	e := run.Start()
 	if e != nil {
-		return &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: e.Error()}
+		return &err.Error{Type: err.CannotRunComet, Class: err.FATA}
 	}
 	_ = run.Wait()
 
