@@ -77,6 +77,7 @@ type PSMEvidence struct {
 	Nextscore                 float64
 	DiscriminantValue         float64
 	ModNtermMass              float64
+	ModCtermMass              float64
 	Intensity                 float64
 	Purity                    float64
 	Labels                    tmt.Labels
@@ -291,6 +292,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.Nextscore = i.Nextscore
 			p.DiscriminantValue = i.DiscriminantValue
 			p.ModNtermMass = i.ModNtermMass
+			p.ModCtermMass = i.ModCtermMass
 			p.Intensity = i.Intensity
 			p.AssignedModifications = make(map[string]uint16)
 			p.ObservedModifications = make(map[string]uint16)
@@ -330,9 +332,19 @@ func (e *Evidence) PSMReport() {
 		}
 
 		var assL []string
+		if i.ModNtermMass != 0 {
+			loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
+			assL = append(assL, loc)
+		}
+
+		if i.ModCtermMass != 0 {
+			loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
+			assL = append(assL, loc)
+		}
+
 		for j := 0; j <= len(i.ModPositions)-1; j++ {
 			if i.AssignedMassDiffs[j] != 0 {
-				loc := fmt.Sprintf("%d:%.4f", i.ModPositions[j], i.AssignedMassDiffs[j])
+				loc := fmt.Sprintf("%d(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
 				assL = append(assL, loc)
 			}
 		}
