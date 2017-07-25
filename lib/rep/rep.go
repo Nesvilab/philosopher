@@ -77,6 +77,7 @@ type PSMEvidence struct {
 	Nextscore                 float64
 	DiscriminantValue         float64
 	ModNtermMass              float64
+	ModCtermMass              float64
 	Intensity                 float64
 	Purity                    float64
 	Labels                    tmt.Labels
@@ -226,7 +227,8 @@ type MassBin struct {
 	AverageMass   float64
 	CorrectedMass float64
 	Modifications []string
-	Elements      PSMEvidenceList
+	AssignedMods  PSMEvidenceList
+	ObservedMods  PSMEvidenceList
 }
 
 // New constructor
@@ -286,8 +288,11 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.Xcorr = i.Xcorr
 			p.DeltaCN = i.DeltaCN
 			p.SPRank = i.SPRank
+			p.Hyperscore = i.Hyperscore
+			p.Nextscore = i.Nextscore
 			p.DiscriminantValue = i.DiscriminantValue
 			p.ModNtermMass = i.ModNtermMass
+			p.ModCtermMass = i.ModCtermMass
 			p.Intensity = i.Intensity
 			p.AssignedModifications = make(map[string]uint16)
 			p.ObservedModifications = make(map[string]uint16)
@@ -314,7 +319,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tPeptideProphet Probability\tAssigned Modifications\tOberved Modifications\tDelta Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tAssigned Modifications\tAssigned Mass Localization\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -326,15 +331,33 @@ func (e *Evidence) PSMReport() {
 			ass = append(ass, j)
 		}
 
+		var assL []string
+		if i.ModNtermMass != 0 {
+			loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
+			assL = append(assL, loc)
+		}
+
+		if i.ModCtermMass != 0 {
+			loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
+			assL = append(assL, loc)
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 {
+				loc := fmt.Sprintf("%d(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
 		var obs []string
 		for j := range i.ObservedModifications {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
-			i.ModifiedPeptide,
+			//i.ModifiedPeptide,
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
@@ -349,8 +372,11 @@ func (e *Evidence) PSMReport() {
 			i.SPScore,
 			i.SPRank,
 			i.Expectation,
+			i.Hyperscore,
+			i.Nextscore,
 			i.Probability,
 			strings.Join(ass, ", "),
+			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
 			len(i.AlternativeTargetProteins)+1,
@@ -641,6 +667,7 @@ func (e *Evidence) PeptideReport() {
 		for j := range i.ChargeState {
 			cs = append(cs, strconv.Itoa(int(j)))
 		}
+		sort.Strings(cs)
 
 		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\n",
 			i.Sequence,
@@ -1091,23 +1118,35 @@ func (e *Evidence) AssembleModificationReport() error {
 	for i := range e.PSM {
 
 		for j := range bins {
+
+			// for assigned mods
+			for l := range e.PSM[i].AssignedMassDiffs {
+				if e.PSM[i].AssignedMassDiffs[l] > bins[j].LowerMass && e.PSM[i].AssignedMassDiffs[l] <= bins[j].HigherRight {
+					bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
+					counter++
+					break
+				}
+			}
+
+			// for delta masses
 			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
-				bins[j].Elements = append(bins[j].Elements, e.PSM[i])
+				bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
 				counter++
 				break
 			}
+
 		}
 	}
 
 	// calculate average mass for each cluster
 	var zeroBinMassDeviation float64
 	for i := range bins {
-		pep := bins[i].Elements
+		pep := bins[i].ObservedMods
 		total := 0.0
 		for j := range pep {
 			total += pep[j].Massdiff
 		}
-		if len(bins[i].Elements) > 0 {
+		if len(bins[i].ObservedMods) > 0 {
 			bins[i].AverageMass = (float64(total) / float64(len(pep)))
 		} else {
 			bins[i].AverageMass = 0
@@ -1121,7 +1160,7 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	// correcting mass values based on Bin 0 average mass
 	for i := range bins {
-		if len(bins[i].Elements) > 0 {
+		if len(bins[i].ObservedMods) > 0 {
 			if bins[i].AverageMass > 0 {
 				bins[i].CorrectedMass = (bins[i].AverageMass - zeroBinMassDeviation)
 			} else {
@@ -1132,8 +1171,8 @@ func (e *Evidence) AssembleModificationReport() error {
 		}
 		bins[i].CorrectedMass = utils.Round(bins[i].CorrectedMass, 5, 4)
 	}
-	e.Modifications.MassBins = bins
 
+	e.Modifications.MassBins = bins
 	e.Modifications = modEvi
 	e.Modifications.MassBins = bins
 
@@ -1153,24 +1192,23 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 
 		for j := range e.PSM {
 
+			// for fixed and variable modifications
 			for k := range e.PSM[j].AssignedMassDiffs {
 				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoMass+tolerance) {
 					if !strings.Contains(i.Description, "substitution") {
-						fullname := fmt.Sprintf("%s (%s)", i.Title, i.Description)
+						fullname := fmt.Sprintf("%.4f:%s (%s)", i.MonoMass, i.Title, i.Description)
 						e.PSM[j].AssignedModifications[fullname] = 0
 					}
 				}
 			}
 
+			// for delta masses
 			if e.PSM[j].Massdiff >= (i.MonoMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoMass+tolerance) {
-				fullName := fmt.Sprintf("%s (%s)", i.Title, i.Description)
-
+				fullName := fmt.Sprintf("%.4f:%s (%s)", i.MonoMass, i.Title, i.Description)
 				_, ok := e.PSM[j].AssignedModifications[fullName]
-
 				if !ok {
 					e.PSM[j].ObservedModifications[fullName] = 0
 				}
-
 			}
 
 		}
@@ -1311,7 +1349,7 @@ func (e *Evidence) ModificationReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Mass Bin\tNumber of PSMs\n")
+	line := fmt.Sprintf("Mass Bin\tPSMs with Assigned Modifications\tPSMs with Observed Modifications\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1320,9 +1358,10 @@ func (e *Evidence) ModificationReport() {
 
 	for _, i := range e.Modifications.MassBins {
 
-		line = fmt.Sprintf("%.4f\t%d",
-			i.CorrectedMass, // mass bins
-			len(i.Elements), // number of psms
+		line = fmt.Sprintf("%.4f\t%d\t%d",
+			i.CorrectedMass,
+			len(i.AssignedMods),
+			len(i.ObservedMods),
 		)
 
 		line += "\n"
@@ -1351,17 +1390,21 @@ func (e *Evidence) PlotMassHist() error {
 	defer file.Close()
 
 	var xvar []string
-	var yvar []string
+	var y1var []string
+	var y2var []string
 
 	for _, i := range e.Modifications.MassBins {
 		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
 		xvar = append(xvar, xel)
-		yel := fmt.Sprintf("'%d',", len(i.Elements))
-		yvar = append(yvar, yel)
+		y1el := fmt.Sprintf("'%d',", len(i.AssignedMods))
+		y1var = append(y1var, y1el)
+		y2el := fmt.Sprintf("'%d',", len(i.ObservedMods))
+		y2var = append(y2var, y2el)
 	}
 
-	xline := fmt.Sprintf("	  x: %s,", xvar)
-	yline := fmt.Sprintf("	  y: %s,", yvar)
+	xAxis := fmt.Sprintf("	  x: %s,", xvar)
+	AssAxis := fmt.Sprintf("	  y: %s,", y1var)
+	ObsAxis := fmt.Sprintf("	  y: %s,", y2var)
 
 	io.WriteString(file, "<head>\n")
 	io.WriteString(file, "  <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\n")
@@ -1369,12 +1412,21 @@ func (e *Evidence) PlotMassHist() error {
 	io.WriteString(file, "<body>\n")
 	io.WriteString(file, "<div id=\"myDiv\" style=\"width: 1024px; height: 768px;\"></div>\n")
 	io.WriteString(file, "<script>\n")
-	io.WriteString(file, "	var data = [{\n")
-	io.WriteString(file, xline)
-	io.WriteString(file, yline)
-	io.WriteString(file, "	  type: 'bar'\n")
-	io.WriteString(file, "	}];\n")
-	io.WriteString(file, "	Plotly.newPlot('myDiv', data);\n")
+	io.WriteString(file, "var trace1 = {")
+	io.WriteString(file, xAxis)
+	io.WriteString(file, ObsAxis)
+	io.WriteString(file, "name: 'Observed',")
+	io.WriteString(file, "type: 'bar',")
+	io.WriteString(file, "};")
+	io.WriteString(file, "var trace2 = {")
+	io.WriteString(file, xAxis)
+	io.WriteString(file, AssAxis)
+	io.WriteString(file, "name: 'Assigned',")
+	io.WriteString(file, "type: 'bar',")
+	io.WriteString(file, "};")
+	io.WriteString(file, "var data = [trace1, trace2];\n")
+	io.WriteString(file, "var layout = {barmode: 'stack', title: 'Distribution of Mass Modifications', xaxis: {title: 'mass bins'}, yaxis: {title: '# PSMs'}};\n")
+	io.WriteString(file, "Plotly.newPlot('myDiv', data, layout);\n")
 	io.WriteString(file, "</script>\n")
 	io.WriteString(file, "</body>")
 
@@ -1387,6 +1439,55 @@ func (e *Evidence) PlotMassHist() error {
 
 	return nil
 }
+
+// // PlotMassHist plots the delta mass histogram
+// func (e *Evidence) PlotMassHist() error {
+//
+// 	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Temp, string(filepath.Separator))
+//
+// 	file, err := os.Create(outfile)
+// 	if err != nil {
+// 		return errors.New("Could not create output for delta mass binning")
+// 	}
+// 	defer file.Close()
+//
+// 	var xvar []string
+// 	var yvar []string
+//
+// 	for _, i := range e.Modifications.MassBins {
+// 		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
+// 		xvar = append(xvar, xel)
+// 		yel := fmt.Sprintf("'%d',", len(i.ObservedMods))
+// 		yvar = append(yvar, yel)
+// 	}
+//
+// 	xline := fmt.Sprintf("	  x: %s,", xvar)
+// 	yline := fmt.Sprintf("	  y: %s,", yvar)
+//
+// 	io.WriteString(file, "<head>\n")
+// 	io.WriteString(file, "  <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\n")
+// 	io.WriteString(file, "</head>\n")
+// 	io.WriteString(file, "<body>\n")
+// 	io.WriteString(file, "<div id=\"myDiv\" style=\"width: 1024px; height: 768px;\"></div>\n")
+// 	io.WriteString(file, "<script>\n")
+// 	io.WriteString(file, "	var data = [{\n")
+// 	io.WriteString(file, xline)
+// 	io.WriteString(file, yline)
+// 	io.WriteString(file, "	  type: 'bar'\n")
+// 	io.WriteString(file, "	}];\n")
+// 	io.WriteString(file, "	Plotly.newPlot('myDiv', data);\n")
+// 	io.WriteString(file, "</script>\n")
+// 	io.WriteString(file, "</body>")
+//
+// 	if err != nil {
+// 		logrus.Warning("There was an error trying to plot the mass distribution")
+// 	}
+//
+// 	// copy to work directory
+// 	sys.CopyFile(outfile, filepath.Base(outfile))
+//
+// 	return nil
+// }
 
 // Serialize converts the whle structure to a gob file
 func (e *Evidence) Serialize() error {

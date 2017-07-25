@@ -1,4 +1,13 @@
-## [1.4] - ?
+## [1.5] - ?
+
+## [1.4] - 2017-07-24
+### Added
+- Assigned modifications now show up on the modification reports
+- Extra scores added to PSM report
+- Modifications masses added to PSM report
+
+### Changed
+- Expectation value now is reported in scientific notation
 
 ## [1.3] - 2017-07-14
 ### Added
@@ -7,7 +16,7 @@
 
 ### Fixed
 - PTMProphet file name output is now pre-defined
-- The Prophets parameter uint8 formats changed to int
+- Prophets parameters described as uint8 now shows as int
 
 ## [1.2] - 2017-06-29
 ### Added

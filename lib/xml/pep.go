@@ -65,6 +65,7 @@ type PeptideIdentification struct {
 	Nextscore                 float64
 	DiscriminantValue         float64
 	ModNtermMass              float64
+	ModCtermMass              float64
 	Intensity                 float64
 }
 
@@ -192,32 +193,22 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 		psm.Massdiff = i.Massdiff
 
 		for _, j := range i.AnalysisResult {
-
 			if string(j.Analysis) == "peptideprophet" {
 				psm.Probability = j.PeptideProphetResult.Probability
 			}
-
 			if string(j.Analysis) == "interprophet" {
 				psm.Probability = j.InterProphetResult.Probability
 			}
-
 			if string(j.Analysis) == "ptmprophet" {
 				psm.LocalizedMassDiff = string(j.PTMProphetResult.PTMPeptide)
 			}
-
 		}
 
-		psm.ModifiedPeptide = string(i.ModificationInfo.ModifiedPeptide)
-		psm.ModNtermMass = i.ModificationInfo.ModNTermMass
-
 		for _, j := range i.AlternativeProteins {
-
 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
-
 			if !strings.Contains(string(j.Protein), decoyTag) {
 				psm.AlternativeTargetProteins = append(psm.AlternativeTargetProteins, string(j.Protein))
 			}
-
 		}
 
 		for _, j := range i.Score {
@@ -241,13 +232,16 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 		}
 
 		if len(string(i.ModificationInfo.ModifiedPeptide)) > 0 {
+			psm.ModifiedPeptide = string(i.ModificationInfo.ModifiedPeptide)
+			psm.ModNtermMass = i.ModificationInfo.ModNTermMass
+			psm.ModCtermMass = i.ModificationInfo.ModCTermMass
 			for _, j := range i.ModificationInfo.ModAminoacidMass {
 				psm.ModPositions = append(psm.ModPositions, j.Position)
 				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[j.Mass])
 			}
-
 		}
+
 	}
 
 	return psm
