@@ -1,12 +1,12 @@
 package comet
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 
+	"github.com/prvst/cmsl/err"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
 	"github.com/prvst/philosopher/lib/meta"
@@ -90,7 +90,7 @@ func (c *Comet) Deploy() {
 }
 
 // Run is the main fucntion to execute Comet
-func (c *Comet) Run(cmdArgs []string) error {
+func (c *Comet) Run(cmdArgs []string) *err.Error {
 
 	param := fmt.Sprintf("-P%s", c.Param)
 	args := []string{param}
@@ -103,10 +103,9 @@ func (c *Comet) Run(cmdArgs []string) error {
 	run := exec.Command(c.DefaultBin, args...)
 	run.Stdout = os.Stdout
 	run.Stderr = os.Stderr
-	err := run.Start()
-	if err != nil {
-		msg := fmt.Sprintf("Error trying to run Comet: %s", err)
-		return errors.New(msg)
+	e := run.Start()
+	if e != nil {
+		return &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: e.Error()}
 	}
 	_ = run.Wait()
 
