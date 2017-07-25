@@ -464,6 +464,8 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 				for _, j := range vo {
 					pr.ObservedModifications[j] = 0
 				}
+			} else {
+				pr.UnModifiedObservations++
 			}
 
 			list = append(list, pr)
@@ -884,7 +886,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Observations\tRazor Modified Observations\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -916,33 +918,33 @@ func (e *Evidence) ProteinReport() {
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
-			i.ProteinGroup,                 // Group
-			i.ProteinSubGroup,              // SubGroup
-			i.ProteinID,                    // Protein ID
-			i.EntryName,                    // Entry Name
-			i.Length,                       // Length
-			i.Coverage,                     // Percent Coverage
-			i.Organism,                     // Organism
-			i.Description,                  // Description
-			i.ProteinExistence,             // Protein Existence
-			i.GeneNames,                    // Genes
-			i.Probability,                  // Protein Probability
-			i.TopPepProb,                   // Top Peptide Probability
-			i.UniqueStrippedPeptides,       // Stripped Peptides
-			i.TotalNumPeptideIons,          // Total Peptide Ions
-			i.NumURazorPeptideIons,         // Unique Peptide Ions
-			i.TotalSpC,                     // Total Spectral Count
-			i.UniqueSpC,                    // Unique Spectral Count
-			i.RazorSpC,                     // Razor Spectral Count
-			i.URazorUnModifiedObservations, // Unmodified Occurrences
-			i.URazorModifiedObservations,   // Modified Occurrences
-			i.TotalIntensity,               // Total Intensity
-			i.UniqueIntensity,              // Unique Intensity
-			i.RazorIntensity,               // Razor Intensity
-			strings.Join(amods, ", "),      // Razor Assigned Modifications
-			strings.Join(omods, ", "),      // Razor Observed Modifications
-			strings.Join(ip, ", "),         // Indistinguishable Proteins
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
+			i.ProteinGroup,           // Group
+			i.ProteinSubGroup,        // SubGroup
+			i.ProteinID,              // Protein ID
+			i.EntryName,              // Entry Name
+			i.Length,                 // Length
+			i.Coverage,               // Percent Coverage
+			i.Organism,               // Organism
+			i.Description,            // Description
+			i.ProteinExistence,       // Protein Existence
+			i.GeneNames,              // Genes
+			i.Probability,            // Protein Probability
+			i.TopPepProb,             // Top Peptide Probability
+			i.UniqueStrippedPeptides, // Stripped Peptides
+			i.TotalNumPeptideIons,    // Total Peptide Ions
+			i.NumURazorPeptideIons,   // Unique Peptide Ions
+			i.TotalSpC,               // Total Spectral Count
+			i.UniqueSpC,              // Unique Spectral Count
+			i.RazorSpC,               // Razor Spectral Count
+			//i.URazorUnModifiedObservations, // Unmodified Occurrences
+			//i.URazorModifiedObservations,   // Modified Occurrences
+			i.TotalIntensity,          // Total Intensity
+			i.UniqueIntensity,         // Unique Intensity
+			i.RazorIntensity,          // Razor Intensity
+			strings.Join(amods, ", "), // Razor Assigned Modifications
+			strings.Join(omods, ", "), // Razor Observed Modifications
+			strings.Join(ip, ", "),    // Indistinguishable Proteins
 		)
 
 		line += "\n"
@@ -1439,55 +1441,6 @@ func (e *Evidence) PlotMassHist() error {
 
 	return nil
 }
-
-// // PlotMassHist plots the delta mass histogram
-// func (e *Evidence) PlotMassHist() error {
-//
-// 	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Temp, string(filepath.Separator))
-//
-// 	file, err := os.Create(outfile)
-// 	if err != nil {
-// 		return errors.New("Could not create output for delta mass binning")
-// 	}
-// 	defer file.Close()
-//
-// 	var xvar []string
-// 	var yvar []string
-//
-// 	for _, i := range e.Modifications.MassBins {
-// 		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
-// 		xvar = append(xvar, xel)
-// 		yel := fmt.Sprintf("'%d',", len(i.ObservedMods))
-// 		yvar = append(yvar, yel)
-// 	}
-//
-// 	xline := fmt.Sprintf("	  x: %s,", xvar)
-// 	yline := fmt.Sprintf("	  y: %s,", yvar)
-//
-// 	io.WriteString(file, "<head>\n")
-// 	io.WriteString(file, "  <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\n")
-// 	io.WriteString(file, "</head>\n")
-// 	io.WriteString(file, "<body>\n")
-// 	io.WriteString(file, "<div id=\"myDiv\" style=\"width: 1024px; height: 768px;\"></div>\n")
-// 	io.WriteString(file, "<script>\n")
-// 	io.WriteString(file, "	var data = [{\n")
-// 	io.WriteString(file, xline)
-// 	io.WriteString(file, yline)
-// 	io.WriteString(file, "	  type: 'bar'\n")
-// 	io.WriteString(file, "	}];\n")
-// 	io.WriteString(file, "	Plotly.newPlot('myDiv', data);\n")
-// 	io.WriteString(file, "</script>\n")
-// 	io.WriteString(file, "</body>")
-//
-// 	if err != nil {
-// 		logrus.Warning("There was an error trying to plot the mass distribution")
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(outfile, filepath.Base(outfile))
-//
-// 	return nil
-// }
 
 // Serialize converts the whle structure to a gob file
 func (e *Evidence) Serialize() error {
