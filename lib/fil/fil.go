@@ -154,9 +154,6 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
-
-		logrus.Info("Plotting mass distribution")
-		e.PlotMassHist()
 	}
 
 	var ion xml.PepIDList
