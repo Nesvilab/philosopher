@@ -1110,25 +1110,24 @@ func (e *Evidence) AssembleModificationReport() error {
 	}
 
 	// calculate the total number of PSMs per cluster
-	var counter int
 	for i := range e.PSM {
+
+		if e.PSM[i].Spectrum == "b1906_293T_proteinID_01A_QE3_122212.02097.02097.2" {
+			fmt.Println(e.PSM[i].AssignedMassDiffs)
+		}
 
 		for j := range bins {
 
 			// for assigned mods
-			for l := range e.PSM[i].AssignedMassDiffs {
-				if e.PSM[i].AssignedMassDiffs[l] > bins[j].LowerMass && e.PSM[i].AssignedMassDiffs[l] <= bins[j].HigherRight {
+			for _, l := range e.PSM[i].AssignedMassDiffs {
+				if l > bins[j].LowerMass && l <= bins[j].HigherRight {
 					bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
-					counter++
-					break
 				}
 			}
 
 			// for delta masses
 			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
 				bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
-				counter++
-				break
 			}
 
 		}
