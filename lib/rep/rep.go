@@ -52,7 +52,7 @@ type PSMEvidence struct {
 	ModifiedPeptide           string
 	AlternativeProteins       []string
 	AlternativeTargetProteins []string
-	ModPositions              []uint16
+	ModPositions              []string
 	AssignedModMasses         []float64
 	AssignedMassDiffs         []float64
 	AssignedModifications     map[string]uint16
@@ -76,8 +76,6 @@ type PSMEvidence struct {
 	Hyperscore                float64
 	Nextscore                 float64
 	DiscriminantValue         float64
-	ModNtermMass              float64
-	ModCtermMass              float64
 	Intensity                 float64
 	Purity                    float64
 	Labels                    tmt.Labels
@@ -291,8 +289,6 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.Hyperscore = i.Hyperscore
 			p.Nextscore = i.Nextscore
 			p.DiscriminantValue = i.DiscriminantValue
-			p.ModNtermMass = i.ModNtermMass
-			p.ModCtermMass = i.ModCtermMass
 			p.Intensity = i.Intensity
 			p.AssignedModifications = make(map[string]uint16)
 			p.ObservedModifications = make(map[string]uint16)
@@ -319,32 +315,32 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tAssigned Modifications\tAssigned Mass Localization\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
 	for _, i := range e.PSM {
 
-		var ass []string
-		for j := range i.AssignedModifications {
-			ass = append(ass, j)
-		}
+		// var ass []string
+		// for j := range i.AssignedModifications {
+		// 	ass = append(ass, j)
+		// }
 
 		var assL []string
-		if i.ModNtermMass != 0 {
-			loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
-			assL = append(assL, loc)
-		}
-
-		if i.ModCtermMass != 0 {
-			loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
-			assL = append(assL, loc)
-		}
+		// if i.ModNtermMass != 0 {
+		// 	loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
+		// 	assL = append(assL, loc)
+		// }
+		//
+		// if i.ModCtermMass != 0 {
+		// 	loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
+		// 	assL = append(assL, loc)
+		// }
 
 		for j := 0; j <= len(i.ModPositions)-1; j++ {
 			if i.AssignedMassDiffs[j] != 0 {
-				loc := fmt.Sprintf("%d(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
 				assL = append(assL, loc)
 			}
 		}
@@ -354,10 +350,9 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
-			//i.ModifiedPeptide,
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
@@ -375,7 +370,6 @@ func (e *Evidence) PSMReport() {
 			i.Hyperscore,
 			i.Nextscore,
 			i.Probability,
-			strings.Join(ass, ", "),
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
