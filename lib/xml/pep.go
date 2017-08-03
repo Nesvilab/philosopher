@@ -42,7 +42,7 @@ type PeptideIdentification struct {
 	ModifiedPeptide           string
 	AlternativeProteins       []string
 	AlternativeTargetProteins []string
-	ModPositions              []uint16
+	ModPositions              []string
 	AssignedModMasses         []float64
 	AssignedMassDiffs         []float64
 	AssumedCharge             uint8
@@ -64,9 +64,9 @@ type PeptideIdentification struct {
 	Hyperscore                float64
 	Nextscore                 float64
 	DiscriminantValue         float64
-	ModNtermMass              float64
-	ModCtermMass              float64
-	Intensity                 float64
+	// ModNtermMass              float64
+	// ModCtermMass              float64
+	Intensity float64
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -141,9 +141,20 @@ func (p *PepXML) Read(f string) error {
 			p.DefinedModAminoAcid = make(map[float64]string)
 		}
 
+		// internal modifications
 		for i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
 			p.DefinedModMassDiff[mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].Mass] = mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].MassDiff
 			p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].Mass] = string(mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].AminoAcid)
+		}
+
+		// termini modifications
+		for i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
+			p.DefinedModMassDiff[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Massdiff
+			if string(mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Terminus) == "N" {
+				p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = "n"
+			} else if string(mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Terminus) == "C" {
+				p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = "c"
+			}
 		}
 
 		// start processing spectra queries
@@ -232,14 +243,33 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 		}
 
 		if len(string(i.ModificationInfo.ModifiedPeptide)) > 0 {
+
 			psm.ModifiedPeptide = string(i.ModificationInfo.ModifiedPeptide)
-			psm.ModNtermMass = i.ModificationInfo.ModNTermMass
-			psm.ModCtermMass = i.ModificationInfo.ModCTermMass
+
 			for _, j := range i.ModificationInfo.ModAminoacidMass {
-				psm.ModPositions = append(psm.ModPositions, j.Position)
+				pos := fmt.Sprintf("%d", j.Position)
+				psm.ModPositions = append(psm.ModPositions, pos)
 				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[j.Mass])
 			}
+
+			// n-temrinal modificatoins are positioned to site -1
+			if i.ModificationInfo.ModNTermMass != 0 {
+				//psm.ModNtermMass = i.ModificationInfo.ModNTermMass
+				psm.ModPositions = append(psm.ModPositions, "n")
+				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModNTermMass)
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[i.ModificationInfo.ModNTermMass])
+
+			}
+
+			// n-temrinal modificatoins are positioned to site -2
+			if i.ModificationInfo.ModCTermMass != 0 {
+				//psm.ModCtermMass = i.ModificationInfo.ModCTermMass
+				psm.ModPositions = append(psm.ModPositions, "c")
+				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModCTermMass)
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[i.ModificationInfo.ModCTermMass])
+			}
+
 		}
 
 	}
