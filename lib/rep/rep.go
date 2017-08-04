@@ -55,6 +55,7 @@ type PSMEvidence struct {
 	ModPositions              []string
 	AssignedModMasses         []float64
 	AssignedMassDiffs         []float64
+	AssignedAminoAcid         []string
 	AssignedModifications     map[string]uint16
 	ObservedModifications     map[string]uint16
 	AssumedCharge             uint8
@@ -272,6 +273,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.ModPositions = i.ModPositions
 			p.AssignedModMasses = i.AssignedModMasses
 			p.AssignedMassDiffs = i.AssignedMassDiffs
+			p.AssignedAminoAcid = i.AssignedAminoAcid
 			p.AssumedCharge = i.AssumedCharge
 			p.HitRank = i.HitRank
 			p.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -327,7 +329,6 @@ func (e *Evidence) PSMReport() {
 		// 	ass = append(ass, j)
 		// }
 
-		var assL []string
 		// if i.ModNtermMass != 0 {
 		// 	loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
 		// 	assL = append(assL, loc)
@@ -338,8 +339,24 @@ func (e *Evidence) PSMReport() {
 		// 	assL = append(assL, loc)
 		// }
 
+		var assL []string
+
 		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
+				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
 				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
 				assL = append(assL, loc)
 			}

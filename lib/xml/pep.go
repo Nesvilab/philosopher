@@ -46,6 +46,7 @@ type PeptideIdentification struct {
 	ModPositions              []string
 	AssignedModMasses         []float64
 	AssignedMassDiffs         []float64
+	AssignedAminoAcid         []string
 	AssumedCharge             uint8
 	HitRank                   uint8
 	PrecursorNeutralMass      float64
@@ -160,7 +161,7 @@ func (p *PepXML) Read(f string) error {
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for _, i := range sq {
-			psm := processSpectrumQuery(i, p.DefinedModMassDiff, p.DecoyTag)
+			psm := processSpectrumQuery(i, p.DefinedModMassDiff, p.DefinedModAminoAcid, p.DecoyTag)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -183,7 +184,7 @@ func (p *PepXML) Read(f string) error {
 	return nil
 }
 
-func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64, decoyTag string) PeptideIdentification {
+func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64, definedModAminoAcid map[float64]string, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
 
@@ -250,6 +251,7 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.ModPositions = append(psm.ModPositions, pos)
 				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(j.Mass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(j.Mass, 5, 2)])
 			}
 
 			// n-temrinal modifications
@@ -257,6 +259,7 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.ModPositions = append(psm.ModPositions, "n")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModNTermMass)
 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
 			}
 
 			// c-terminal modifications
@@ -264,6 +267,7 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.ModPositions = append(psm.ModPositions, "c")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModCTermMass)
 				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
 			}
 
 		}
