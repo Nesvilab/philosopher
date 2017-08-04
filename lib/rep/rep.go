@@ -1112,20 +1112,34 @@ func (e *Evidence) AssembleModificationReport() error {
 	// calculate the total number of PSMs per cluster
 	for i := range e.PSM {
 
+		// the checklist will not allow the same PSM to be added multiple times to the
+		// same bin in case multiple identical mods are present in te sequence
+		var assignChecklist = make(map[float64]uint8)
+		var obsChecklist = make(map[float64]uint8)
+
 		for j := range bins {
 
 			// for assigned mods
+			// 0 here means something that doest not map to the pepXML header
+			// like multiple mods on n-term
 			for _, l := range e.PSM[i].AssignedMassDiffs {
-				if l > bins[j].LowerMass && l <= bins[j].HigherRight {
-					bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
-					break
+
+				if l > bins[j].LowerMass && l <= bins[j].HigherRight && l != 0 {
+					_, ok := assignChecklist[l]
+					if !ok {
+						bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
+						assignChecklist[l] = 0
+					}
 				}
 			}
 
 			// for delta masses
 			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
-				bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
-				break
+				_, ok := obsChecklist[e.PSM[i].Massdiff]
+				if !ok {
+					bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
+					obsChecklist[e.PSM[i].Massdiff] = 0
+				}
 			}
 
 		}

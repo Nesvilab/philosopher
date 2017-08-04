@@ -16,6 +16,7 @@ import (
 	"github.com/gonum/plot/vg"
 	"github.com/prvst/cmsl/data/pep"
 	"github.com/prvst/cmsl/err"
+	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -64,9 +65,7 @@ type PeptideIdentification struct {
 	Hyperscore                float64
 	Nextscore                 float64
 	DiscriminantValue         float64
-	// ModNtermMass              float64
-	// ModCtermMass              float64
-	Intensity float64
+	Intensity                 float64
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -108,30 +107,30 @@ func (p *PepXML) Read(f string) error {
 		pps := mpa.AnalysisSummary[0].PeptideprophetSummary
 
 		// collect distribution points from meta
-		for i := range pps.DistributionPoint {
+		for _, i := range pps.DistributionPoint {
 			var m pep.DistributionPoint
-			m.Fvalue = pps.DistributionPoint[i].Fvalue
-			m.Obs1Distr = pps.DistributionPoint[i].Obs1Distr
-			m.Model1PosDistr = pps.DistributionPoint[i].Model1PosDistr
-			m.Model1NegDistr = pps.DistributionPoint[i].Model1NegDistr
-			m.Obs2Distr = pps.DistributionPoint[i].Obs2Distr
-			m.Model2PosDistr = pps.DistributionPoint[i].Model2PosDistr
-			m.Model2NegDistr = pps.DistributionPoint[i].Model2NegDistr
-			m.Obs3Distr = pps.DistributionPoint[i].Obs3Distr
-			m.Model3PosDistr = pps.DistributionPoint[i].Model3PosDistr
-			m.Model3NegDistr = pps.DistributionPoint[i].Model3NegDistr
-			m.Obs4Distr = pps.DistributionPoint[i].Obs4Distr
-			m.Model4PosDistr = pps.DistributionPoint[i].Model4PosDistr
-			m.Model4NegDistr = pps.DistributionPoint[i].Model4NegDistr
-			m.Obs5Distr = pps.DistributionPoint[i].Obs5Distr
-			m.Model5PosDistr = pps.DistributionPoint[i].Model5PosDistr
-			m.Model5NegDistr = pps.DistributionPoint[i].Model5NegDistr
-			m.Obs6Distr = pps.DistributionPoint[i].Obs6Distr
-			m.Model6PosDistr = pps.DistributionPoint[i].Model6PosDistr
-			m.Model6NegDistr = pps.DistributionPoint[i].Model6NegDistr
-			m.Obs7Distr = pps.DistributionPoint[i].Obs7Distr
-			m.Model7PosDistr = pps.DistributionPoint[i].Model7PosDistr
-			m.Model7NegDistr = pps.DistributionPoint[i].Model7NegDistr
+			m.Fvalue = i.Fvalue
+			m.Obs1Distr = i.Obs1Distr
+			m.Model1PosDistr = i.Model1PosDistr
+			m.Model1NegDistr = i.Model1NegDistr
+			m.Obs2Distr = i.Obs2Distr
+			m.Model2PosDistr = i.Model2PosDistr
+			m.Model2NegDistr = i.Model2NegDistr
+			m.Obs3Distr = i.Obs3Distr
+			m.Model3PosDistr = i.Model3PosDistr
+			m.Model3NegDistr = i.Model3NegDistr
+			m.Obs4Distr = i.Obs4Distr
+			m.Model4PosDistr = i.Model4PosDistr
+			m.Model4NegDistr = i.Model4NegDistr
+			m.Obs5Distr = i.Obs5Distr
+			m.Model5PosDistr = i.Model5PosDistr
+			m.Model5NegDistr = i.Model5NegDistr
+			m.Obs6Distr = i.Obs6Distr
+			m.Model6PosDistr = i.Model6PosDistr
+			m.Model6NegDistr = i.Model6NegDistr
+			m.Obs7Distr = i.Obs7Distr
+			m.Model7PosDistr = i.Model7PosDistr
+			m.Model7NegDistr = i.Model7NegDistr
 			models = append(models, m)
 		}
 
@@ -141,27 +140,27 @@ func (p *PepXML) Read(f string) error {
 			p.DefinedModAminoAcid = make(map[float64]string)
 		}
 
-		// internal modifications
-		for i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
-			p.DefinedModMassDiff[mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].Mass] = mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].MassDiff
-			p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].Mass] = string(mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications[i].AminoAcid)
+		// internal modifications (variable only)
+		for _, i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
+			p.DefinedModMassDiff[utils.Round(i.Mass, 5, 2)] = i.MassDiff
+			p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = string(i.AminoAcid)
 		}
 
 		// termini modifications
-		for i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
-			p.DefinedModMassDiff[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Massdiff
-			if string(mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Terminus) == "N" {
-				p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = "n"
-			} else if string(mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Terminus) == "C" {
-				p.DefinedModAminoAcid[mpa.MsmsRunSummary.SearchSummary.TerminalModifications[i].Mass] = "c"
+		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
+			p.DefinedModMassDiff[utils.Round(i.Mass, 5, 2)] = i.Massdiff
+			if string(i.Terminus) == "N" {
+				p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = "n"
+			} else if string(i.Terminus) == "C" {
+				p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = "c"
 			}
 		}
 
 		// start processing spectra queries
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
-		for i := range sq {
-			psm := processSpectrumQuery(sq[i], p.DefinedModMassDiff, p.DecoyTag)
+		for _, i := range sq {
+			psm := processSpectrumQuery(i, p.DefinedModMassDiff, p.DecoyTag)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -250,24 +249,21 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				pos := fmt.Sprintf("%d", j.Position)
 				psm.ModPositions = append(psm.ModPositions, pos)
 				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[j.Mass])
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(j.Mass, 5, 2)])
 			}
 
-			// n-temrinal modificatoins are positioned to site -1
+			// n-temrinal modifications
 			if i.ModificationInfo.ModNTermMass != 0 {
-				//psm.ModNtermMass = i.ModificationInfo.ModNTermMass
 				psm.ModPositions = append(psm.ModPositions, "n")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModNTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[i.ModificationInfo.ModNTermMass])
-
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
 			}
 
-			// n-temrinal modificatoins are positioned to site -2
+			// c-terminal modifications
 			if i.ModificationInfo.ModCTermMass != 0 {
-				//psm.ModCtermMass = i.ModificationInfo.ModCTermMass
 				psm.ModPositions = append(psm.ModPositions, "c")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModCTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[i.ModificationInfo.ModCTermMass])
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
 			}
 
 		}
