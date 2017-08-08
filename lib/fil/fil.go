@@ -154,9 +154,6 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
-
-		logrus.Info("Plotting mass distribution")
-		e.PlotMassHist()
 	}
 
 	var ion xml.PepIDList
@@ -377,6 +374,14 @@ func getUniquePSMs(p xml.PepIDList) map[string]xml.PepIDList {
 
 //getUniquePeptideIons selects only unique pepetide ions for the given data stucture
 func getUniquePeptideIons(p xml.PepIDList) map[string]xml.PepIDList {
+
+	uniqMap := ExtractIonsFromPSMs(p)
+
+	return uniqMap
+}
+
+// ExtractIonsFromPSMs takes a pepidlist and transforms into an ion map
+func ExtractIonsFromPSMs(p xml.PepIDList) map[string]xml.PepIDList {
 
 	uniqMap := make(map[string]xml.PepIDList)
 

@@ -52,9 +52,10 @@ type PSMEvidence struct {
 	ModifiedPeptide           string
 	AlternativeProteins       []string
 	AlternativeTargetProteins []string
-	ModPositions              []uint16
+	ModPositions              []string
 	AssignedModMasses         []float64
 	AssignedMassDiffs         []float64
+	AssignedAminoAcid         []string
 	AssignedModifications     map[string]uint16
 	ObservedModifications     map[string]uint16
 	AssumedCharge             uint8
@@ -76,8 +77,6 @@ type PSMEvidence struct {
 	Hyperscore                float64
 	Nextscore                 float64
 	DiscriminantValue         float64
-	ModNtermMass              float64
-	ModCtermMass              float64
 	Intensity                 float64
 	Purity                    float64
 	Labels                    tmt.Labels
@@ -274,6 +273,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.ModPositions = i.ModPositions
 			p.AssignedModMasses = i.AssignedModMasses
 			p.AssignedMassDiffs = i.AssignedMassDiffs
+			p.AssignedAminoAcid = i.AssignedAminoAcid
 			p.AssumedCharge = i.AssumedCharge
 			p.HitRank = i.HitRank
 			p.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -291,8 +291,6 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.Hyperscore = i.Hyperscore
 			p.Nextscore = i.Nextscore
 			p.DiscriminantValue = i.DiscriminantValue
-			p.ModNtermMass = i.ModNtermMass
-			p.ModCtermMass = i.ModCtermMass
 			p.Intensity = i.Intensity
 			p.AssignedModifications = make(map[string]uint16)
 			p.ObservedModifications = make(map[string]uint16)
@@ -319,32 +317,47 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tAssigned Modifications\tAssigned Mass Localization\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
 	for _, i := range e.PSM {
 
-		var ass []string
-		for j := range i.AssignedModifications {
-			ass = append(ass, j)
-		}
+		// var ass []string
+		// for j := range i.AssignedModifications {
+		// 	ass = append(ass, j)
+		// }
+
+		// if i.ModNtermMass != 0 {
+		// 	loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
+		// 	assL = append(assL, loc)
+		// }
+		//
+		// if i.ModCtermMass != 0 {
+		// 	loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
+		// 	assL = append(assL, loc)
+		// }
 
 		var assL []string
-		if i.ModNtermMass != 0 {
-			loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
-			assL = append(assL, loc)
-		}
 
-		if i.ModCtermMass != 0 {
-			loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
-			assL = append(assL, loc)
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
 		}
 
 		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 {
-				loc := fmt.Sprintf("%d(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
+				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
 				assL = append(assL, loc)
 			}
 		}
@@ -354,10 +367,9 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
-			//i.ModifiedPeptide,
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
@@ -375,7 +387,6 @@ func (e *Evidence) PSMReport() {
 			i.Hyperscore,
 			i.Nextscore,
 			i.Probability,
-			strings.Join(ass, ", "),
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
@@ -464,6 +475,8 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 				for _, j := range vo {
 					pr.ObservedModifications[j] = 0
 				}
+			} else {
+				pr.UnModifiedObservations++
 			}
 
 			list = append(list, pr)
@@ -884,7 +897,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tRazor Unmodified Observations\tRazor Modified Observations\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -916,33 +929,33 @@ func (e *Evidence) ProteinReport() {
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
-			i.ProteinGroup,                 // Group
-			i.ProteinSubGroup,              // SubGroup
-			i.ProteinID,                    // Protein ID
-			i.EntryName,                    // Entry Name
-			i.Length,                       // Length
-			i.Coverage,                     // Percent Coverage
-			i.Organism,                     // Organism
-			i.Description,                  // Description
-			i.ProteinExistence,             // Protein Existence
-			i.GeneNames,                    // Genes
-			i.Probability,                  // Protein Probability
-			i.TopPepProb,                   // Top Peptide Probability
-			i.UniqueStrippedPeptides,       // Stripped Peptides
-			i.TotalNumPeptideIons,          // Total Peptide Ions
-			i.NumURazorPeptideIons,         // Unique Peptide Ions
-			i.TotalSpC,                     // Total Spectral Count
-			i.UniqueSpC,                    // Unique Spectral Count
-			i.RazorSpC,                     // Razor Spectral Count
-			i.URazorUnModifiedObservations, // Unmodified Occurrences
-			i.URazorModifiedObservations,   // Modified Occurrences
-			i.TotalIntensity,               // Total Intensity
-			i.UniqueIntensity,              // Unique Intensity
-			i.RazorIntensity,               // Razor Intensity
-			strings.Join(amods, ", "),      // Razor Assigned Modifications
-			strings.Join(omods, ", "),      // Razor Observed Modifications
-			strings.Join(ip, ", "),         // Indistinguishable Proteins
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
+			i.ProteinGroup,           // Group
+			i.ProteinSubGroup,        // SubGroup
+			i.ProteinID,              // Protein ID
+			i.EntryName,              // Entry Name
+			i.Length,                 // Length
+			i.Coverage,               // Percent Coverage
+			i.Organism,               // Organism
+			i.Description,            // Description
+			i.ProteinExistence,       // Protein Existence
+			i.GeneNames,              // Genes
+			i.Probability,            // Protein Probability
+			i.TopPepProb,             // Top Peptide Probability
+			i.UniqueStrippedPeptides, // Stripped Peptides
+			i.TotalNumPeptideIons,    // Total Peptide Ions
+			i.NumURazorPeptideIons,   // Unique Peptide Ions
+			i.TotalSpC,               // Total Spectral Count
+			i.UniqueSpC,              // Unique Spectral Count
+			i.RazorSpC,               // Razor Spectral Count
+			//i.URazorUnModifiedObservations, // Unmodified Occurrences
+			//i.URazorModifiedObservations,   // Modified Occurrences
+			i.TotalIntensity,          // Total Intensity
+			i.UniqueIntensity,         // Unique Intensity
+			i.RazorIntensity,          // Razor Intensity
+			strings.Join(amods, ", "), // Razor Assigned Modifications
+			strings.Join(omods, ", "), // Razor Observed Modifications
+			strings.Join(ip, ", "),    // Indistinguishable Proteins
 		)
 
 		line += "\n"
@@ -1114,25 +1127,36 @@ func (e *Evidence) AssembleModificationReport() error {
 	}
 
 	// calculate the total number of PSMs per cluster
-	var counter int
 	for i := range e.PSM {
+
+		// the checklist will not allow the same PSM to be added multiple times to the
+		// same bin in case multiple identical mods are present in te sequence
+		var assignChecklist = make(map[float64]uint8)
+		var obsChecklist = make(map[float64]uint8)
 
 		for j := range bins {
 
 			// for assigned mods
-			for l := range e.PSM[i].AssignedMassDiffs {
-				if e.PSM[i].AssignedMassDiffs[l] > bins[j].LowerMass && e.PSM[i].AssignedMassDiffs[l] <= bins[j].HigherRight {
-					bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
-					counter++
-					break
+			// 0 here means something that doest not map to the pepXML header
+			// like multiple mods on n-term
+			for _, l := range e.PSM[i].AssignedMassDiffs {
+
+				if l > bins[j].LowerMass && l <= bins[j].HigherRight && l != 0 {
+					_, ok := assignChecklist[l]
+					if !ok {
+						bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
+						assignChecklist[l] = 0
+					}
 				}
 			}
 
 			// for delta masses
 			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
-				bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
-				counter++
-				break
+				_, ok := obsChecklist[e.PSM[i].Massdiff]
+				if !ok {
+					bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
+					obsChecklist[e.PSM[i].Massdiff] = 0
+				}
 			}
 
 		}
@@ -1439,55 +1463,6 @@ func (e *Evidence) PlotMassHist() error {
 
 	return nil
 }
-
-// // PlotMassHist plots the delta mass histogram
-// func (e *Evidence) PlotMassHist() error {
-//
-// 	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Temp, string(filepath.Separator))
-//
-// 	file, err := os.Create(outfile)
-// 	if err != nil {
-// 		return errors.New("Could not create output for delta mass binning")
-// 	}
-// 	defer file.Close()
-//
-// 	var xvar []string
-// 	var yvar []string
-//
-// 	for _, i := range e.Modifications.MassBins {
-// 		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
-// 		xvar = append(xvar, xel)
-// 		yel := fmt.Sprintf("'%d',", len(i.ObservedMods))
-// 		yvar = append(yvar, yel)
-// 	}
-//
-// 	xline := fmt.Sprintf("	  x: %s,", xvar)
-// 	yline := fmt.Sprintf("	  y: %s,", yvar)
-//
-// 	io.WriteString(file, "<head>\n")
-// 	io.WriteString(file, "  <script src=\"https://cdn.plot.ly/plotly-latest.min.js\"></script>\n")
-// 	io.WriteString(file, "</head>\n")
-// 	io.WriteString(file, "<body>\n")
-// 	io.WriteString(file, "<div id=\"myDiv\" style=\"width: 1024px; height: 768px;\"></div>\n")
-// 	io.WriteString(file, "<script>\n")
-// 	io.WriteString(file, "	var data = [{\n")
-// 	io.WriteString(file, xline)
-// 	io.WriteString(file, yline)
-// 	io.WriteString(file, "	  type: 'bar'\n")
-// 	io.WriteString(file, "	}];\n")
-// 	io.WriteString(file, "	Plotly.newPlot('myDiv', data);\n")
-// 	io.WriteString(file, "</script>\n")
-// 	io.WriteString(file, "</body>")
-//
-// 	if err != nil {
-// 		logrus.Warning("There was an error trying to plot the mass distribution")
-// 	}
-//
-// 	// copy to work directory
-// 	sys.CopyFile(outfile, filepath.Base(outfile))
-//
-// 	return nil
-// }
 
 // Serialize converts the whle structure to a gob file
 func (e *Evidence) Serialize() error {

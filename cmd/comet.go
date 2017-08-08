@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
@@ -53,7 +54,10 @@ var cometCmd = &cobra.Command{
 		//m.Experimental.CometParam = binFile
 
 		// run
-		cmt.Run(args)
+		e := cmt.Run(args)
+		if e != nil {
+			fmt.Println(e.Error())
+		}
 
 		m.Serialize()
 

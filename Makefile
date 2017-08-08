@@ -2,7 +2,7 @@ SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 
 BINARY = philosopher
-VERSION = 1.4
+VERSION = 1.5
 
 BUILD_TIME = `date +%FT%T%z`
 

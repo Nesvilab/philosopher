@@ -54,6 +54,9 @@ var reportCmd = &cobra.Command{
 		if len(repo.Modifications.MassBins) > 0 {
 			logrus.Info("Creating modification reports")
 			repo.ModificationReport()
+
+			logrus.Info("Plotting mass distribution")
+			repo.PlotMassHist()
 		}
 
 		logrus.Info("Done")

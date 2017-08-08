@@ -1,4 +1,16 @@
-## [1.5] - ?
+## [1.6] - ?
+
+## [1.5] - 2017-08-08
+### Added
+- N-terminal modifications added to report
+- Modified amino acid index position added to report
+
+### Changed
+- Assigned mod description removed from report
+
+### Fixed
+- Fixed bug on Comet deployment and execution
+- Fixed bug with the Generic Database parser.
 
 ## [1.4] - 2017-07-24
 ### Added
