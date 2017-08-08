@@ -91,6 +91,12 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 
 		} else if class == "generic" {
 
+			db, e := db.ProcessGeneric(k, v, decoyTag)
+			if e != nil {
+				return e
+			}
+			d.Records = append(d.Records, db)
+
 		}
 
 	}
