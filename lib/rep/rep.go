@@ -1196,7 +1196,6 @@ func (e *Evidence) AssembleModificationReport() error {
 		bins[i].CorrectedMass = utils.Round(bins[i].CorrectedMass, 5, 4)
 	}
 
-	e.Modifications.MassBins = bins
 	e.Modifications = modEvi
 	e.Modifications.MassBins = bins
 
