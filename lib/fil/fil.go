@@ -186,9 +186,11 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 		logrus.Fatal(err)
 	}
 
-	err = e.Serialize()
-	if err != nil {
-		return err
+	//err = e.Serialize()
+	cmslErr := e.SerializeGranular()
+	if cmslErr != nil {
+		fmt.Println("aqui")
+		return cmslErr
 	}
 
 	return nil

@@ -25,7 +25,11 @@ var reportCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		repo.Restore()
+		//repo.Restore()
+		err := repo.RestoreGranular()
+		if err != nil {
+			logrus.Fatal(err.Error())
+		}
 
 		if len(repo.Proteins) > 0 {
 

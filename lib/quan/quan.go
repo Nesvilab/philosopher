@@ -2050,7 +2050,7 @@ func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, error) {
 	var spcMap = make(map[string]int)
 	var ionRefMap = make(map[string]int)
 
-	if len(e.PSM) < 1 || len(e.Ions) < 1 {
+	if len(e.PSM) < 1 && len(e.Ions) < 1 {
 		return e, errors.New("No peptide identification found")
 	}
 
