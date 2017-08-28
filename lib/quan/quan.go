@@ -78,10 +78,10 @@ func (p *Quantify) RunLabelFreeQuantification() error {
 	var err error
 
 	var evi rep.Evidence
-	evi.Restore()
+	evi.RestoreGranular()
 
 	if len(evi.Proteins) < 1 {
-		logrus.Fatal("This restult file does not contains report data")
+		logrus.Fatal("This result file does not contains report data")
 	}
 
 	logrus.Info("Calculating Spectral Counts")
