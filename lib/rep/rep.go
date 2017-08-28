@@ -1743,7 +1743,7 @@ func RestoreEVIon(e *Evidence) *err.Error {
 
 // RestoreEVPeptide restores Ev Ion data
 func RestoreEVPeptide(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvProteinBin())
+	f, _ := os.Open(sys.EvPeptideBin())
 	d := gob.NewDecoder(f)
 	er := d.Decode(&e.Peptides)
 	if er != nil {
