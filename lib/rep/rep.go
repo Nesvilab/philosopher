@@ -1205,9 +1205,6 @@ func (e *Evidence) AssembleModificationReport() error {
 	modEvi.MassBins = bins
 	e.Modifications = modEvi
 
-	fmt.Println(len(e.PSM))
-	fmt.Println(len(e.Modifications.MassBins))
-
 	return nil
 }
 
@@ -1473,21 +1470,20 @@ func (e *Evidence) PlotMassHist() error {
 }
 
 // Serialize converts the whle structure to a gob file
-func (e *Evidence) Serialize() error {
+func (e *Evidence) Serialize() *err.Error {
 
-	var err error
+	//TODO fix error name convetion
 
 	// create a file
-	dataFile, err := os.Create(sys.EvBin())
-	if err != nil {
-		return err
+	dataFile, er := os.Create(sys.EvBin())
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
 	dataEncoder := gob.NewEncoder(dataFile)
 	goberr := dataEncoder.Encode(e)
 	if goberr != nil {
-		msg := fmt.Sprintf("Cannot save results: %s", goberr)
-		return errors.New(msg)
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
 	}
 	dataFile.Close()
 
