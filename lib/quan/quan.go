@@ -103,7 +103,7 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 		return e
 	}
 
-	e = evi.Serialize()
+	e = evi.SerializeGranular()
 	if e != nil {
 		return e
 	}
