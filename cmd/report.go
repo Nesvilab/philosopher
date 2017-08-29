@@ -26,7 +26,7 @@ var reportCmd = &cobra.Command{
 		}
 
 		//repo.Restore()
-		err := repo.RestoreGranular()
+		err := repo.RestoreGranular(nil)
 		if err != nil {
 			logrus.Fatal(err.Error())
 		}
