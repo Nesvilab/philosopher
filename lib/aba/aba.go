@@ -60,16 +60,12 @@ func New() Abacus {
 // Run abacus
 func (a *Abacus) Run(args []string) error {
 
+	var names []string
 	var xmlFiles []string
 	var database data.Base
 	var globalPepMap = make(map[string]int)
 	var PsmMap = make(map[string]rep.PSMEvidenceList)
-	var names []string
-
-	// initialize proteinprophet
-	var e rep.Evidence
-	e.RestoreWithPath(args[0])
-	pop := initializeProteinProphet(e)
+	var decoyTag = a.DecoyTag
 
 	// recover all files
 	logrus.Info("Restoring Philospher results")
@@ -77,21 +73,17 @@ func (a *Abacus) Run(args []string) error {
 	for _, i := range args {
 
 		var e rep.Evidence
-		e.RestoreWithPath(i)
+		e.RestoreGranularWithPath(i)
 
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "pep.xml") {
-				absPath, _ := filepath.Abs(f.Name())
+				interactFile := fmt.Sprintf("%s%s", i, f.Name())
+				absPath, _ := filepath.Abs(interactFile)
 				xmlFiles = append(xmlFiles, absPath)
 			}
 		}
 
-		// if len(e.Proteins) < 1 {
-		// 	logrus.Fatal("result files does not contains protein inference information. Run the filter option with a protXML file in order to have the results.")
-		// }
-
-		//xmlFiles = append(xmlFiles, r.PepXML.Files...)
 		database = data.Base{}
 		database.RestoreWithPath(i)
 		names = append(names, e.ProjectName)
@@ -118,28 +110,31 @@ func (a *Abacus) Run(args []string) error {
 	if len(a.Comb) < 1 {
 		logrus.Info("Creating the combined protXML file")
 
-		// set the output name
-		//pop.Combine = true
-		// deploy the binaries
-		pop.Deploy()
+		logrus.Info("Initializing ProteinProphet")
+		pop := proteinprophet.New()
 
-		// run ProteinProphet
-		err := pop.Run(xmlFiles)
+		combinedFile = "combined"
+		pop.Output = combinedFile
+
+		// deploy the binaries
+		err := pop.Deploy()
 		if err != nil {
-			return err
+			logrus.Fatal(err)
 		}
 
-		combinedFile = "combined.prot.xml"
+		// run ProteinProphet
+		err = pop.Run(xmlFiles)
+		if err != nil {
+			logrus.Fatal(err)
+		}
+
 	} else {
 		combinedFile = a.Comb
 	}
 
-	var m meta.Data
-	metaPath := fmt.Sprintf("%s%s%s", args[0], string(filepath.Separator), sys.Meta())
-	m.Restore(metaPath)
-
-	var decoyTag = m.DecoyTag
-	//var conTag = data.ConTag()
+	//var m meta.Data
+	//metaPath := fmt.Sprintf("%s%s%s", args[0], string(filepath.Separator), sys.Meta())
+	//m.Restore(metaPath)
 
 	evidences, err := a.processCombinedFile(combinedFile, decoyTag, a.PepProb, a.ProtProb, database)
 	if err != nil {
@@ -149,7 +144,7 @@ func (a *Abacus) Run(args []string) error {
 	// build map list with all centroids and quantifications
 	// one report to rule them all
 	// Assuming that the same database was used for everyone
-	saveCompareResults(m.Temp, evidences, globalPepMap, PsmMap, names)
+	saveCompareResults(a.Temp, evidences, globalPepMap, PsmMap, names)
 
 	return nil
 }
@@ -164,11 +159,8 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 	} else {
 
 		var protxml xml.ProtXML
-		// protxml.Read(combinedFile)
-
 		protxml.Read(combinedFile)
 		protxml.DecoyTag = decoyTag
-		//protxml.ConTag = data.ConTag()
 
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
@@ -426,29 +418,29 @@ func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string)
 	return totalQuantInt, uniqueQuantInt
 }
 
-func initializeProteinProphet(e rep.Evidence) proteinprophet.ProteinProphet {
-
-	var pop proteinprophet.ProteinProphet
-
-	pop.UUID = e.UUID
-	pop.Distro = e.Distro
-	pop.Home = e.Home
-	pop.MetaFile = e.MetaFile
-	pop.MetaDir = e.MetaDir
-	pop.DB = e.DB
-	pop.Temp = e.Temp
-	pop.TimeStamp = e.TimeStamp
-	pop.OS = e.OS
-	pop.Arch = e.Arch
-
-	pop.UnixBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage"
-	pop.UnixDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser"
-	pop.UnixProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet"
-	pop.WinBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage.exe"
-	pop.WinDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser.exe"
-	pop.WinProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet.exe"
-	pop.LibgccDLL = pop.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
-	pop.Zlib1DLL = pop.Temp + string(filepath.Separator) + "zlib1.dll"
-
-	return pop
-}
+// func initializeProteinProphet(e rep.Evidence) proteinprophet.ProteinProphet {
+//
+// 	pop := proteinprophet.New()
+//
+// 	pop.UUID = e.UUID
+// 	pop.Distro = e.Distro
+// 	pop.Home = e.Home
+// 	pop.MetaFile = e.MetaFile
+// 	pop.MetaDir = e.MetaDir
+// 	pop.DB = e.DB
+// 	pop.Temp = e.Temp
+// 	pop.TimeStamp = e.TimeStamp
+// 	pop.OS = e.OS
+// 	pop.Arch = e.Arch
+//
+// 	pop.UnixBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage"
+// 	pop.UnixDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser"
+// 	pop.UnixProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet"
+// 	pop.WinBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage.exe"
+// 	pop.WinDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser.exe"
+// 	pop.WinProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet.exe"
+// 	pop.LibgccDLL = pop.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
+// 	pop.Zlib1DLL = pop.Temp + string(filepath.Separator) + "zlib1.dll"
+//
+// 	return pop
+// }

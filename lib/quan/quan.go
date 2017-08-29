@@ -77,7 +77,7 @@ func New() Quantify {
 func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 
 	var evi rep.Evidence
-	e := evi.RestoreGranular(nil)
+	e := evi.RestoreGranular()
 	if e != nil {
 		return e
 	}
