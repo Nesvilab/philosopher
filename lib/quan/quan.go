@@ -15,6 +15,7 @@ import (
 	"github.com/prvst/cmsl/data/mz"
 	"github.com/prvst/cmsl/data/mz/mzml"
 	"github.com/prvst/cmsl/data/mz/mzxml"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
@@ -73,35 +74,39 @@ func New() Quantify {
 }
 
 // RunLabelFreeQuantification is the top function for label free quantification
-func (p *Quantify) RunLabelFreeQuantification() error {
-
-	var err error
+func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 
 	var evi rep.Evidence
-	evi.RestoreGranular()
+	e := evi.RestoreGranular()
+	if e != nil {
+		return e
+	}
 
 	if len(evi.Proteins) < 1 {
 		logrus.Fatal("This result file does not contains report data")
 	}
 
 	logrus.Info("Calculating Spectral Counts")
-	evi, err = CalculateSpectralCounts(evi)
-	if err != nil {
-		return err
+	evi, e = CalculateSpectralCounts(evi)
+	if e != nil {
+		return e
 	}
 
 	logrus.Info("Calculating MS1 Intensities")
-	evi, err = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
-	if err != nil {
-		return err
+	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
+	if e != nil {
+		return e
 	}
 
-	evi, err = calculateIntensities(evi)
-	if err != nil {
-		return err
+	evi, e = calculateIntensities(evi)
+	if e != nil {
+		return e
 	}
 
-	evi.Serialize()
+	e = evi.Serialize()
+	if e != nil {
+		return e
+	}
 
 	return nil
 }
@@ -1805,7 +1810,7 @@ func ratioToControlChannel(evi rep.Evidence, control string) (rep.Evidence, erro
 }
 
 // peakIntensity ...
-func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, error) {
+func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
 
 	// get all spectra in centralized structure
 	logrus.Info("Reading spectra")
@@ -1922,9 +1927,8 @@ func getSpectra(path, format string, evi rep.Evidence) (map[string]mz.MS1, map[s
 }
 
 // getMS1Spectra gets MS1 infor from spectra files
-func getMS1Spectra(path, format string, pep rep.PSMEvidenceList) (map[string][]mz.Ms1Scan, error) {
+func getMS1Spectra(path, format string, pep rep.PSMEvidenceList) (map[string][]mz.Ms1Scan, *err.Error) {
 
-	var err error
 	// get the name of all raw files used in the experiment from pepxml
 	var spec = make(map[string][]mz.Ms1Scan)
 	var mzs = make(map[string]int)
@@ -1946,12 +1950,12 @@ func getMS1Spectra(path, format string, pep rep.PSMEvidenceList) (map[string][]m
 		var ms1Reader mz.MS1
 
 		if strings.Contains(k, "mzML") {
-			err = ms1Reader.ReadMzML(name)
+			err := ms1Reader.ReadMzML(name)
 			if err != nil {
 				return spec, err
 			}
 		} else if strings.Contains(k, "mzXML") {
-			err = ms1Reader.ReadMzXML(name)
+			err := ms1Reader.ReadMzXML(name)
 			if err != nil {
 				return spec, err
 			}
@@ -2045,13 +2049,13 @@ func xic(v []mz.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]fl
 }
 
 // CalculateSpectralCounts add Spc to ions and proteins
-func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, error) {
+func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	var spcMap = make(map[string]int)
 	var ionRefMap = make(map[string]int)
 
 	if len(e.PSM) < 1 && len(e.Ions) < 1 {
-		return e, errors.New("No peptide identification found")
+		return e, &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 	}
 
 	for _, i := range e.PSM {
@@ -2112,14 +2116,14 @@ func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, error) {
 }
 
 // calculateIntensities calculates the protein intensity
-func calculateIntensities(e rep.Evidence) (rep.Evidence, error) {
+func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	var intMap = make(map[string]float64)
 	var intRefMap = make(map[string]float64)
 	var intPepMap = make(map[string]float64)
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		return e, errors.New("No peptide identification found")
+		return e, &err.Error{Type: err.CannotFindPSMData, Class: err.FATA, Argument: "mzXML"}
 	}
 
 	for i := range e.PSM {
