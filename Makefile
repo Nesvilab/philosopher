@@ -2,7 +2,7 @@ SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 
 BINARY = philosopher
-VERSION = 1.5
+VERSION = 1.6
 
 BUILD_TIME = `date +%FT%T%z`
 
@@ -16,6 +16,7 @@ $(BINARY): $(SOURCES)
 .PHONY: deps
 deps:
 	go get github.com/mitchellh/gox
+	go get github.com/inconshreveable/mousetrap
 	go get github.com/Sirupsen/logrus
 	go get github.com/gonum/plot
 	go get github.com/gonum/plot/plotter

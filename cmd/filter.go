@@ -44,7 +44,7 @@ var filterCmd = &cobra.Command{
 		//stat.Run(fp, psmFDR, pepFDR, ionFDR, prtFDR, pepProb, prtProb)
 		e := fp.Run(fp.Psmfdr, fp.Pepfdr, fp.Ionfdr, fp.Ptfdr, fp.PepProb, fp.ProtProb, fp.Picked, fp.Razor, fp.Mapmods)
 		if e != nil {
-			logrus.Fatal(e)
+			logrus.Fatal(e.Error())
 		}
 
 		// m.Experimental.DecoyTag = fp.Tag

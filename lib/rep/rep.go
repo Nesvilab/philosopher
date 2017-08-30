@@ -1,7 +1,6 @@
 package rep
 
 import (
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"io"
@@ -734,6 +733,17 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 	var list ProteinEvidenceList
 	var err error
 
+	var evidenceIons = make(map[string]IonEvidence)
+	for _, i := range e.Ions {
+		var ion string
+		if len(i.ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
+		}
+		evidenceIons[ion] = i
+	}
+
 	for _, i := range pro {
 		if !strings.HasPrefix(i.ProteinName, decoyTag) {
 
@@ -755,6 +765,9 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 			rep.Probability = i.Probability
 			rep.TopPepProb = i.TopPepProb
 
+			rep.TotalNumPeptideIons = len(i.PeptideIons)
+			//rep.TotalPeptideIons[ion] = v
+
 			if strings.Contains(i.ProteinName, decoyTag) {
 				rep.IsDecoy = true
 			} else {
@@ -765,79 +778,68 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 				rep.IndiProtein[i.IndistinguishableProtein[j]] = 0
 			}
 
-			for j := range e.Ions {
+			for _, k := range i.PeptideIons {
 
-				_, ok := e.Ions[j].MappedProteins[i.ProteinName]
-				if ok {
+				var ion string
+				if len(k.ModifiedPeptide) > 0 {
+					ion = fmt.Sprintf("%s#%d", k.ModifiedPeptide, k.Charge)
+				} else {
+					ion = fmt.Sprintf("%s#%d", k.PeptideSequence, k.Charge)
+				}
 
-					var ion string
-					if len(e.Ions[j].ModifiedSequence) > 0 {
-						ion = fmt.Sprintf("%s#%d", e.Ions[j].ModifiedSequence, e.Ions[j].ChargeState)
-					} else {
-						ion = fmt.Sprintf("%s#%d", e.Ions[j].Sequence, e.Ions[j].ChargeState)
+				rep.TotalPeptideIons[ion] = evidenceIons[ion]
+
+				if k.IsUnique == true {
+					rep.UniquePeptideIons[ion] = evidenceIons[ion]
+					rep.URazorPeptideIons[ion] = evidenceIons[ion]
+					rep.NumURazorPeptideIons++
+					rep.TotalNumRazorPeptides++
+
+					rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
+					rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
+
+					for key, value := range evidenceIons[ion].AssignedModifications {
+						rep.URazorAssignedModifications[key] += value
 					}
 
-					rep.TotalNumPeptideIons++
-					rep.TotalPeptideIons[ion] = e.Ions[j]
-
-					for _, k := range i.PeptideIons {
-
-						var ption string
-						if len(k.ModifiedPeptide) > 0 {
-							ption = fmt.Sprintf("%s#%d", k.ModifiedPeptide, k.Charge)
-						} else {
-							ption = fmt.Sprintf("%s#%d", k.PeptideSequence, k.Charge)
-						}
-
-						if ion == ption {
-
-							if k.Razor == 1 {
-								e.Ions[j].IsRazor = true
-							}
-
-							//if ion == ption {
-
-							if k.IsUnique == true {
-								rep.UniquePeptideIons[ion] = e.Ions[j]
-								rep.URazorPeptideIons[ion] = e.Ions[j]
-								rep.NumURazorPeptideIons++
-								rep.TotalNumRazorPeptides++
-
-								rep.URazorUnModifiedObservations += e.Ions[j].UnModifiedObservations
-								rep.URazorModifiedObservations += e.Ions[j].ModifiedObservations
-
-								for key, value := range e.Ions[j].AssignedModifications {
-									rep.URazorAssignedModifications[key] += value
-								}
-
-								for key, value := range e.Ions[j].ObservedModifications {
-									rep.URazorObservedModifications[key] += value
-								}
-
-							}
-
-							if k.Razor == 1 {
-								rep.URazorUnModifiedObservations += e.Ions[j].UnModifiedObservations
-								rep.URazorModifiedObservations += e.Ions[j].ModifiedObservations
-
-								rep.URazorPeptideIons[ion] = e.Ions[j]
-								rep.TotalNumRazorPeptides++
-
-								for key, value := range e.Ions[j].AssignedModifications {
-									rep.URazorAssignedModifications[key] += value
-								}
-
-								for key, value := range e.Ions[j].ObservedModifications {
-									rep.URazorObservedModifications[key] += value
-								}
-
-							}
-
-						}
-
+					for key, value := range evidenceIons[ion].ObservedModifications {
+						rep.URazorObservedModifications[key] += value
 					}
 
 				}
+
+				if k.Razor == 1 {
+					rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
+					rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
+
+					rep.URazorPeptideIons[ion] = evidenceIons[ion]
+					rep.TotalNumRazorPeptides++
+
+					for key, value := range evidenceIons[ion].AssignedModifications {
+						rep.URazorAssignedModifications[key] += value
+					}
+
+					for key, value := range evidenceIons[ion].ObservedModifications {
+						rep.URazorObservedModifications[key] += value
+					}
+
+				}
+
+				// for j := range e.Ions {
+				// 	var eIon string
+				// 	if len(e.Ions[j].ModifiedSequence) > 0 {
+				// 		eIon = fmt.Sprintf("%s#%d", e.Ions[j].ModifiedSequence, e.Ions[j].ChargeState)
+				// 	} else {
+				// 		eIon = fmt.Sprintf("%s#%d", e.Ions[j].Sequence, e.Ions[j].ChargeState)
+				// 	}
+				//
+				// 	if ion == eIon {
+				// 		if k.Razor == 1 {
+				// 			e.Ions[j].IsRazor = true
+				// 		}
+				// 	}
+				// }
+
 			}
 
 			list = append(list, rep)
@@ -1196,9 +1198,11 @@ func (e *Evidence) AssembleModificationReport() error {
 		bins[i].CorrectedMass = utils.Round(bins[i].CorrectedMass, 5, 4)
 	}
 
-	e.Modifications.MassBins = bins
+	//e.Modifications = modEvi
+	//e.Modifications.MassBins = bins
+
+	modEvi.MassBins = bins
 	e.Modifications = modEvi
-	e.Modifications.MassBins = bins
 
 	return nil
 }
@@ -1460,64 +1464,6 @@ func (e *Evidence) PlotMassHist() error {
 
 	// copy to work directory
 	sys.CopyFile(outfile, filepath.Base(outfile))
-
-	return nil
-}
-
-// Serialize converts the whle structure to a gob file
-func (e *Evidence) Serialize() error {
-
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.EvBin())
-	if err != nil {
-		return err
-	}
-
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(e)
-	if goberr != nil {
-		msg := fmt.Sprintf("Cannot save results: %s", goberr)
-		return errors.New(msg)
-	}
-	dataFile.Close()
-
-	return nil
-}
-
-// Restore reads philosopher results files and restore the data sctructure
-func (e *Evidence) Restore() error {
-
-	file, _ := os.Open(sys.EvBin())
-
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&e)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
-	}
-
-	return nil
-}
-
-// RestoreWithPath reads philosopher results files and restore the data sctructure
-func (e *Evidence) RestoreWithPath(p string) error {
-
-	var path string
-
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvBin())
-	}
-
-	file, _ := os.Open(path)
-
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&e)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
-	}
 
 	return nil
 }

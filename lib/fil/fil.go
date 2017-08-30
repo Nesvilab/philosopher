@@ -181,12 +181,16 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	pro = nil
 
 	logrus.Info("Calculating Spectral Counts")
-	e, err = quan.CalculateSpectralCounts(e)
-	if err != nil {
-		logrus.Fatal(err)
+	e, cerr := quan.CalculateSpectralCounts(e)
+	if cerr != nil {
+		return cerr
 	}
 
-	e.Serialize()
+	//err = e.Serialize()
+	cerr = e.SerializeGranular()
+	if cerr != nil {
+		return cerr
+	}
 
 	return nil
 }
