@@ -128,8 +128,6 @@ func (c *ProteinProphet) Deploy() error {
 // Run ProteinProphet executes peptideprophet
 func (c *ProteinProphet) Run(args []string) error {
 
-	//if c.Combine == true {
-
 	// run
 	bin := c.DefaultProteinProphet
 	cmd := exec.Command(bin)
@@ -168,11 +166,8 @@ func (c *ProteinProphet) Run(args []string) error {
 	}
 	_ = cmd.Wait()
 
-	var baseDir string
-	baseDir = filepath.Dir(args[0])
-
 	// copy to work directory
-	dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
+	dest := fmt.Sprintf("%s%s%s", c.Home, string(filepath.Separator), filepath.Base(output))
 	err = sys.CopyFile(output, dest)
 	if err != nil {
 		return err
