@@ -25,6 +25,7 @@ type Abacus struct {
 	ProtProb float64
 	PepProb  float64
 	Comb     string
+	Tag      string
 }
 
 // ExperimentalData ...
@@ -65,7 +66,6 @@ func (a *Abacus) Run(args []string) error {
 	var database data.Base
 	var globalPepMap = make(map[string]int)
 	var PsmMap = make(map[string]rep.PSMEvidenceList)
-	var decoyTag = a.DecoyTag
 
 	// recover all files
 	logrus.Info("Restoring Philospher results")
@@ -75,6 +75,7 @@ func (a *Abacus) Run(args []string) error {
 		var e rep.Evidence
 		e.RestoreGranularWithPath(i)
 
+		// collect interact full file names
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "pep.xml") {
@@ -84,9 +85,16 @@ func (a *Abacus) Run(args []string) error {
 			}
 		}
 
+		// restore database
 		database = data.Base{}
 		database.RestoreWithPath(i)
-		names = append(names, e.ProjectName)
+
+		// collect project names
+		prjName := i
+		if strings.Contains(prjName, string(filepath.Separator)) {
+			prjName = strings.Replace(prjName, string(filepath.Separator), "", -1)
+		}
+		names = append(names, prjName)
 
 		for _, j := range e.PSM {
 			var ion string
@@ -96,11 +104,11 @@ func (a *Abacus) Run(args []string) error {
 				} else {
 					ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
 				}
-				key := fmt.Sprintf("%s@%s", e.ProjectName, ion)
+				key := fmt.Sprintf("%s@%s", prjName, ion)
 				globalPepMap[key]++
 			}
 		}
-		PsmMap[e.ProjectName] = e.PSM
+		PsmMap[prjName] = e.PSM
 	}
 
 	sort.Strings(names)
@@ -132,11 +140,8 @@ func (a *Abacus) Run(args []string) error {
 		combinedFile = a.Comb
 	}
 
-	//var m meta.Data
-	//metaPath := fmt.Sprintf("%s%s%s", args[0], string(filepath.Separator), sys.Meta())
-	//m.Restore(metaPath)
-
-	evidences, err := a.processCombinedFile(combinedFile, decoyTag, a.PepProb, a.ProtProb, database)
+	logrus.Info("Processing combined file")
+	evidences, err := a.processCombinedFile(combinedFile, a.Tag, a.PepProb, a.ProtProb, database)
 	if err != nil {
 		return err
 	}
@@ -161,6 +166,8 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 		var protxml xml.ProtXML
 		protxml.Read(combinedFile)
 		protxml.DecoyTag = decoyTag
+
+		fmt.Println(protxml.DecoyTag)
 
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
@@ -417,30 +424,3 @@ func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string)
 
 	return totalQuantInt, uniqueQuantInt
 }
-
-// func initializeProteinProphet(e rep.Evidence) proteinprophet.ProteinProphet {
-//
-// 	pop := proteinprophet.New()
-//
-// 	pop.UUID = e.UUID
-// 	pop.Distro = e.Distro
-// 	pop.Home = e.Home
-// 	pop.MetaFile = e.MetaFile
-// 	pop.MetaDir = e.MetaDir
-// 	pop.DB = e.DB
-// 	pop.Temp = e.Temp
-// 	pop.TimeStamp = e.TimeStamp
-// 	pop.OS = e.OS
-// 	pop.Arch = e.Arch
-//
-// 	pop.UnixBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage"
-// 	pop.UnixDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser"
-// 	pop.UnixProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet"
-// 	pop.WinBatchCoverage = pop.Temp + string(filepath.Separator) + "batchcoverage.exe"
-// 	pop.WinDatabaseParser = pop.Temp + string(filepath.Separator) + "DatabaseParser.exe"
-// 	pop.WinProteinProphet = pop.Temp + string(filepath.Separator) + "ProteinProphet.exe"
-// 	pop.LibgccDLL = pop.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
-// 	pop.Zlib1DLL = pop.Temp + string(filepath.Separator) + "zlib1.dll"
-//
-// 	return pop
-// }
