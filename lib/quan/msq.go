@@ -53,6 +53,11 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 					}
 				}
 			}
+
+			// if topI > e.PSM[i].Intensity {
+			// 	e.PSM[i].Intensity = topI
+			// }
+
 			e.PSM[i].Intensity = topI
 		}
 
