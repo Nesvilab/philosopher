@@ -1,6 +1,8 @@
 package tmt
 
-import "errors"
+import (
+	"github.com/prvst/cmsl/err"
+)
 
 // Labels main struct
 type Labels struct {
@@ -133,7 +135,7 @@ type Channel10 struct {
 }
 
 // New builds a new Labelled spectra object
-func New(plex string) (Labels, error) {
+func New(plex string) (Labels, *err.Error) {
 
 	var o Labels
 
@@ -156,7 +158,7 @@ func New(plex string) (Labels, error) {
 		o.Channel9.Mz = 130.141141
 		o.Channel10.Mz = 131.138176
 	} else {
-		return o, errors.New("Unknown multiplex value")
+		return o, &err.Error{Type: err.UnknownMultiplex, Class: err.FATA}
 	}
 
 	return o, nil

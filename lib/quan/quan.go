@@ -108,7 +108,10 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 func (p *Quantify) RunLabeledQuantification() error {
 
 	var evi rep.Evidence
-	evi.Restore()
+	e := evi.RestoreGranular()
+	if e != nil {
+		return e
+	}
 
 	// removed all calculated defined bvalues from before
 	cleanPreviousData(p.Plex)
@@ -180,42 +183,50 @@ func (p *Quantify) RunLabeledQuantification() error {
 }
 
 // cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(plex string) error {
+func cleanPreviousData(plex string) *err.Error {
 
-	var err error
 	var evi rep.Evidence
-	evi.Restore()
+	e := evi.RestoreGranular()
+	if e != nil {
+		return e
+	}
 
 	for i := range evi.PSM {
-		evi.PSM[i].Labels, err = tmt.New(plex)
-		if err != nil {
-			return err
+		evi.PSM[i].Labels, e = tmt.New(plex)
+		if e != nil {
+			return e
 		}
 	}
 
 	for i := range evi.Ions {
-		evi.Ions[i].Labels, err = tmt.New(plex)
-		if err != nil {
-			return err
+		evi.Ions[i].Labels, e = tmt.New(plex)
+		if e != nil {
+			return e
 		}
 	}
 
 	for i := range evi.Proteins {
-		evi.Proteins[i].TotalLabels, err = tmt.New(plex)
-		if err != nil {
-			return err
+		evi.Proteins[i].TotalLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
 		}
-		evi.Proteins[i].UniqueLabels, err = tmt.New(plex)
-		if err != nil {
-			return err
+
+		evi.Proteins[i].UniqueLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
 		}
-		evi.Proteins[i].RazorLabels, err = tmt.New(plex)
-		if err != nil {
-			return err
+
+		evi.Proteins[i].RazorLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
 		}
+
 	}
 
-	evi.Serialize()
+	e = evi.SerializeGranular()
+	if e != nil {
+		return e
+	}
 
 	return nil
 }
