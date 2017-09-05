@@ -140,44 +140,49 @@ func (p *Quantify) RunLabeledQuantification() error {
 		return err
 	}
 
+	// optional
 	// logrus.Info("Normalizing peptide channels")
 	// evi, err = totalTop3LabelQuantification(evi)
 	// if err != nil {
 	// 	return err
 	// }
 
-	evi, err = labelQuantificationOnTotalIons(evi)
-	if err != nil {
-		return err
-	}
+	// evi, err = labelQuantificationOnTotalIons(evi)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// evi, err = labelQuantificationOnUniqueIons(evi)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// evi, err = labelQuantificationOnURazors(evi)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// if len(p.ChanNorm) > 0 {
+	// 	logrus.Info("Applying normalization to control channel ", p.ChanNorm)
+	// 	evi, err = ratioToControlChannel(evi, p.ChanNorm)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	//
+	// if p.IntNorm == true {
+	// 	logrus.Info("Applying normalization to intensity means")
+	// 	evi, err = ratioToIntensityMean(evi)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
 
-	evi, err = labelQuantificationOnUniqueIons(evi)
-	if err != nil {
-		return err
+	e = evi.SerializeGranular()
+	if e != nil {
+		fmt.Println("Err")
+		return e
 	}
-
-	evi, err = labelQuantificationOnURazors(evi)
-	if err != nil {
-		return err
-	}
-
-	if len(p.ChanNorm) > 0 {
-		logrus.Info("Applying normalization to control channel ", p.ChanNorm)
-		evi, err = ratioToControlChannel(evi, p.ChanNorm)
-		if err != nil {
-			return err
-		}
-	}
-
-	if p.IntNorm == true {
-		logrus.Info("Applying normalization to intensity means")
-		evi, err = ratioToIntensityMean(evi)
-		if err != nil {
-			return err
-		}
-	}
-
-	evi.Serialize()
 
 	return nil
 }

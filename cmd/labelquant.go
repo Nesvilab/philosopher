@@ -73,6 +73,6 @@ func init() {
 	labelquantCmd.Flags().StringVarP(&lbl.ChanNorm, "normToChannel", "", "", "normalize intensities to a control channel (provide a channel number as control)")
 	labelquantCmd.Flags().BoolVarP(&lbl.IntNorm, "normToIntensity", "", false, "normalize intensities to the total intensity from all channels")
 
-	//RootCmd.AddCommand(labelquantCmd)
+	RootCmd.AddCommand(labelquantCmd)
 
 }
