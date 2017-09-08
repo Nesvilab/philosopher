@@ -175,8 +175,6 @@ func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi rep.Ev
 				purityMap[name] = evi.PSM[i].Purity
 			}
 
-			fmt.Println(evi.PSM[i].Labels.Channel1.Intensity)
-
 		}
 	}
 

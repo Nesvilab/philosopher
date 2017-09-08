@@ -45,7 +45,13 @@ var reportCmd = &cobra.Command{
 
 		}
 
-		if repo.PSM[0].Labels.Channel1.Intensity > 0 || repo.PSM[10].Labels.Channel1.Intensity > 0 || repo.PSM[100].Labels.Channel1.Intensity > 0 {
+		// verifying if there is any quantification on labels
+		var lblMarker float64
+		for i := 0; i <= 1000; i++ {
+			lblMarker += repo.PSM[i].Labels.Channel1.Intensity
+		}
+
+		if lblMarker > 0 {
 			logrus.Info("Creating labeled PSM report")
 			repo.PSMQuantReport()
 		} else {

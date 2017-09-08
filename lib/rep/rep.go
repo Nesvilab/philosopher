@@ -418,7 +418,7 @@ func (e *Evidence) PSMQuantReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\tPurity\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -453,7 +453,7 @@ func (e *Evidence) PSMQuantReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.AssumedCharge,
@@ -480,6 +480,7 @@ func (e *Evidence) PSMQuantReport() {
 			len(i.AlternativeTargetProteins)+1,
 			i.Protein,
 			strings.Join(i.AlternativeTargetProteins, ", "),
+			i.Purity,
 			i.Labels.Channel1.Intensity,
 			i.Labels.Channel2.Intensity,
 			i.Labels.Channel3.Intensity,
