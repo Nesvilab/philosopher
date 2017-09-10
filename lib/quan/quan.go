@@ -85,7 +85,12 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 		return e
 	}
 
-	logrus.Info("Calculating MS1 Intensities")
+	// logrus.Info("Calculating MS1 Intensities")
+	// evi, e = traceApexPeaks(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
+	// if e != nil {
+	// 	return e
+	// }
+
 	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
 	if e != nil {
 		return e
