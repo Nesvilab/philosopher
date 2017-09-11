@@ -3,7 +3,6 @@ package quan
 import (
 	"fmt"
 	"math"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -15,95 +14,6 @@ import (
 	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/rep"
 )
-
-// traceApexPeaks is the main function responsible for looking into spectra data using ID info in order to trace MS 1 apex peaks
-func traceApexPeaks(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
-
-	// get all spectra in centralized structure
-	logrus.Info("Reading spectra")
-	ms1Map, err := getMS1Spectra(dir, format, e.PSM)
-	if err != nil {
-		return e, err
-	}
-
-	for k := range ms1Map {
-		fmt.Println(k)
-	}
-
-	os.Exit(1)
-
-	logrus.Info("Tracing Peaks")
-	for i := range e.PSM {
-
-		// process pepXML information
-		ppmPrecision := tol / math.Pow(10, 6)
-		mz := utils.Round(((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge)), 5, 4)
-		minRT := (e.PSM[i].RetentionTime / 60) - rTWin
-		maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
-
-		var measured = make(map[float64]float64)
-		var retrieved bool
-
-		// XIC on MS1 level
-		for _, j := range ms1Map {
-			measured, retrieved = xic(j, minRT, maxRT, ppmPrecision, mz)
-		}
-
-		if retrieved == true {
-			var timeW = e.PSM[i].RetentionTime / 60
-			var topI = 0.0
-
-			for k, v := range measured {
-				if k > (timeW-pTWin) && k < (timeW+pTWin) {
-					if v > topI {
-						topI = v
-					}
-				}
-			}
-
-			// if topI > e.PSM[i].Intensity {
-			// 	e.PSM[i].Intensity = topI
-			// }
-
-			e.PSM[i].Intensity = topI
-		}
-
-	}
-
-	return e, nil
-}
-
-// getMatchedMS1Spectra gets MS1 infor from spectra files
-func getMatchedMS1Spectra(path, format string, pep rep.PSMEvidence) ([]mz.Ms1Scan, *err.Error) {
-
-	// collects mz file name from identified spectra
-	specName := strings.Split(pep.Spectrum, ".")
-	source := fmt.Sprintf("%s.%s", specName[0], format)
-
-	//ext := filepath.Ext(source)
-	name := filepath.Base(source)
-	//clean := name[0 : len(name)-len(ext)]
-	fullpath, _ := filepath.Abs(path)
-	name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
-
-	var ms1Reader mz.MS1
-
-	if strings.Contains(source, "mzML") {
-		err := ms1Reader.ReadMzML(name)
-		if err != nil {
-			return ms1Reader.Ms1Scan, err
-		}
-	} else if strings.Contains(source, "mzXML") {
-		err := ms1Reader.ReadMzXML(name)
-		if err != nil {
-			return ms1Reader.Ms1Scan, err
-		}
-	} else {
-		logrus.Fatal("Cannot open file: ", name)
-	}
-
-	return ms1Reader.Ms1Scan, nil
-}
 
 // peakIntensity ...
 func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
