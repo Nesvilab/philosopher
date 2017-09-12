@@ -316,7 +316,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -366,9 +366,10 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
+			i.ModifiedPeptide,
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
@@ -418,7 +419,7 @@ func (e *Evidence) PSMQuantReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\tPurity\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\tPurity\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -453,9 +454,10 @@ func (e *Evidence) PSMQuantReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
+			i.ModifiedPeptide,
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
@@ -641,7 +643,7 @@ func (e *Evidence) PeptideIonReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -674,8 +676,9 @@ func (e *Evidence) PeptideIonReport() {
 					omods = append(omods, j)
 				}
 
-				line := fmt.Sprintf("%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
+				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
 					i.Sequence,
+					i.ModifiedSequence,
 					i.MZ,
 					i.ChargeState,
 					i.PeptideMass,
