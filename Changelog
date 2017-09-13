@@ -1,4 +1,7 @@
 ## [1.7] - 2017-09-12
+### Added
+- TMT quant is back to the menu
+
 ### Fixed
 - MS1 quantification and TMT label quantification had bugs fixed.
 
