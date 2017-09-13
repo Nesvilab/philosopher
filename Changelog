@@ -1,3 +1,7 @@
+## [1.7] - 2017-09-12
+### Fixed
+- MS1 quantification and TMT label quantification had bugs fixed.
+
 ## [1.6] - 2017-08-29
 ### Changed
 - Processing time for the filter command reduced dramatically.
