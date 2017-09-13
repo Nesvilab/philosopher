@@ -15,6 +15,10 @@ import (
 	"github.com/prvst/philosopher/lib/tmt"
 )
 
+const (
+	mzDeltaWindow float64 = 1.5
+)
+
 func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi rep.Evidence) (rep.Evidence, error) {
 
 	// organize them by index
@@ -25,34 +29,31 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 		}
 	}
 
-	//ms1 = nil
+	// nulls the ms1 input
+	ms1 = nil
 
 	// range over IDs and spectra searching for a match
 	for i := range evi.PSM {
 
-		// locate the corresponding mz file for this identification
+		// get spectrum name
 		name := strings.Split(evi.PSM[i].Spectrum, ".")
 
+		// locate the corresponding mz file for this identification
 		s2, ok2 := ms2[name[0]]
 		if ok2 {
 
 			S2spec, S2ok := s2.Ms2Scan[evi.PSM[i].Spectrum]
 			if S2ok {
 
-				//for _, j := range s2.Ms2Scan {
-				// search for the given spectra correspondent to the identification
-				//FullSpectrumName := fmt.Sprintf("%s.%d", j.SpectrumName, j.Precursor.ChargeState)
-
-				//if FullSpectrumName == evi.PSM[i].Spectrum {
-
 				// recover the matching ms1 structure based on index number
 				s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
 				if ok1 {
 
-					lowerDelta := S2spec.Precursor.SelectedIon - 1.5
-					higherDelta := S2spec.Precursor.SelectedIon + 1.5
-					var ions []mz.Ms1Peak
+					// create a MZ delta based on the selected Ion
+					lowerDelta := S2spec.Precursor.SelectedIon - mzDeltaWindow
+					higherDelta := S2spec.Precursor.SelectedIon + mzDeltaWindow
 
+					var ions []mz.Ms1Peak
 					for _, k := range s1.Spectrum {
 						if k.Mz <= higherDelta && k.Mz >= lowerDelta {
 							ions = append(ions, k)
