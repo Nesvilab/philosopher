@@ -37,7 +37,6 @@ var reportCmd = &cobra.Command{
 			repo.ProteinFastaReport()
 
 			logrus.Info("Creating Protein identification report")
-
 			if repo.Proteins[0].TotalLabels.Channel1.Mean > 0 || repo.Proteins[10].TotalLabels.Channel1.Mean > 0 {
 				repo.ProteinQuantReport()
 			} else {
@@ -46,8 +45,19 @@ var reportCmd = &cobra.Command{
 
 		}
 
-		logrus.Info("Creating PSM report")
-		repo.PSMReport()
+		// verifying if there is any quantification on labels
+		var lblMarker float64
+		for i := 0; i <= 1000; i++ {
+			lblMarker += repo.PSM[i].Labels.Channel1.Intensity
+		}
+
+		if lblMarker > 0 {
+			logrus.Info("Creating labeled PSM report")
+			repo.PSMQuantReport()
+		} else {
+			logrus.Info("Creating PSM report")
+			repo.PSMReport()
+		}
 
 		logrus.Info("Creating peptide Ion report")
 		repo.PeptideIonReport()
