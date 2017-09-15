@@ -49,9 +49,25 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 				s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
 				if ok1 {
 
+					// buffer variable for both target or Selected ions
+					var ion float64
+					if S2spec.Precursor.TargetIon != 0 {
+						ion = S2spec.Precursor.TargetIon
+					} else {
+						ion = S2spec.Precursor.SelectedIon
+					}
+
 					// create a MZ delta based on the selected Ion
-					lowerDelta := S2spec.Precursor.SelectedIon - mzDeltaWindow
-					higherDelta := S2spec.Precursor.SelectedIon + mzDeltaWindow
+					var lowerDelta float64
+					var higherDelta float64
+
+					if S2spec.Precursor.IsolationWindowLowerOffset != 0 && S2spec.Precursor.IsolationWindowUpperOffset != 0 {
+						lowerDelta = S2spec.Precursor.IsolationWindowLowerOffset
+						higherDelta = S2spec.Precursor.IsolationWindowUpperOffset
+					} else {
+						lowerDelta = S2spec.Precursor.SelectedIon - mzDeltaWindow
+						higherDelta = S2spec.Precursor.SelectedIon + mzDeltaWindow
+					}
 
 					var ions []mz.Ms1Peak
 					for _, k := range s1.Spectrum {
@@ -74,7 +90,7 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 						summedInt += l.Intensity
 
 						for _, m := range mzRatio {
-							if math.Abs(S2spec.Precursor.SelectedIon-l.Mz) <= (m+0.05) && math.Abs(S2spec.Precursor.SelectedIon-l.Mz) >= (m-0.05) {
+							if math.Abs(ion-l.Mz) <= (m+0.05) && math.Abs(ion-l.Mz) >= (m-0.05) {
 								ionPackage = append(ionPackage, l)
 								break
 							}
