@@ -67,8 +67,8 @@ func init() {
 	labelquantCmd.Flags().Float64VarP(&lbl.Tol, "tol", "", 10, "m/z tolerance in ppm")
 	labelquantCmd.Flags().StringVarP(&lbl.Dir, "dir", "", "", "folder path containing the raw files")
 	labelquantCmd.Flags().StringVarP(&lbl.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
+	labelquantCmd.Flags().Float64VarP(&lbl.Purity, "purity", "", 0.5, "ion purity threshold")
 	//labelquantCmd.Flags().StringVarP(&lbl.Brand, "brand", "", "", "type of label (tmt or itraq)")
-	//labelquantCmd.Flags().Float64VarP(&lbl.Purity, "purity", "", 0.5, "ion purity threshold")
 	//labelquantCmd.Flags().StringVarP(&lbl.ChanNorm, "normToChannel", "", "", "normalize intensities to a control channel (provide a channel number as control)")
 	//labelquantCmd.Flags().BoolVarP(&lbl.IntNorm, "normToIntensity", "", false, "normalize intensities to the total intensity from all channels")
 
