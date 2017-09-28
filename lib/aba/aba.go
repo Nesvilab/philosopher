@@ -196,6 +196,7 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 			ce.Length = j.Length
 			ce.GroupNumber = j.GroupNumber
 			ce.SiblingID = j.GroupSiblingID
+			ce.IndiProtein = j.IndistinguishableProtein
 
 			for _, k := range j.PeptideIons {
 
@@ -268,7 +269,7 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	}
 	defer file.Close()
 
-	line := "Protein Group\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
@@ -288,7 +289,9 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		var line string
 
-		line += fmt.Sprintf("%d-%s\t", i.GroupNumber, i.SiblingID)
+		line += fmt.Sprintf("%d\t", i.GroupNumber)
+
+		line += fmt.Sprintf("%s\t", i.SiblingID)
 
 		line += fmt.Sprintf("%s\t", i.ProteinID)
 
@@ -311,6 +314,8 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 		line += fmt.Sprintf("%d\t", i.UniquePeptideIons)
 
 		line += fmt.Sprintf("%d\t", i.RazorPeptideIons)
+
+		line += fmt.Sprintf("%s\t", i.IndiProtein)
 
 		var tIons []string
 		for j := range i.TotalPeptideIonStrings {

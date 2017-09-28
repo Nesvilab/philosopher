@@ -193,6 +193,7 @@ type CombinedEvidence struct {
 	SiblingID               string
 	ProteinName             string
 	ProteinID               string
+	IndiProtein             []string
 	EntryName               string
 	GeneNames               string
 	Length                  int
