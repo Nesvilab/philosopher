@@ -200,9 +200,11 @@ type CombinedEvidence struct {
 	UniqueStrippedPeptides  int
 	TotalPeptideIonStrings  map[string]int
 	UniquePeptideIonStrings map[string]int
+	RazorPeptideIonStrings  map[string]int
 	TotalPeptideIons        int
 	UniquePeptideIons       int
 	SharedPeptideIons       int
+	RazorPeptideIons        int
 	TotalSpc                []int
 	UniqueSpc               []int
 	ProteinProbability      float64
