@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.9-blue.svg) ![Version](https://img.shields.io/badge/version-1.7-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.9-blue.svg) ![Version](https://img.shields.io/badge/version-1.8-blue.svg)
 
 
 ## Features
