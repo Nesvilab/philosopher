@@ -44,6 +44,7 @@ func init() {
 	a = aba.New()
 
 	abacusCmd.Flags().StringVarP(&a.Comb, "comb", "", "", "combined file")
+	abacusCmd.Flags().BoolVarP(&a.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
 	abacusCmd.Flags().StringVarP(&a.Tag, "tag", "", "rev_", "decoy tag")
 	abacusCmd.Flags().Float64VarP(&a.ProtProb, "prtProb", "", 0.9, "minimun protein probability")
 	abacusCmd.Flags().Float64VarP(&a.PepProb, "pepProb", "", 0.5, "minimun peptide probability")

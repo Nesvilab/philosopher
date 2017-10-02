@@ -591,7 +591,7 @@ func processProteinIdentifications(p xml.ProtXML, ptFDR, pepProb, protProb float
 
 	// applies razor algorithm
 	if isRazor == true {
-		p, err = razorFilter(p)
+		p, err = RazorFilter(p)
 		if err != nil {
 			return err
 		}
@@ -693,8 +693,8 @@ func pickedFDR(p xml.ProtXML) xml.ProtXML {
 	return p
 }
 
-// razorFilter filters the protein list under a specific fdr
-func razorFilter(p xml.ProtXML) (xml.ProtXML, error) {
+// RazorFilter filters the protein list under a specific fdr
+func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 
 	var razorMap = make(map[string]string)
 	var refMap = make(map[string][]string)

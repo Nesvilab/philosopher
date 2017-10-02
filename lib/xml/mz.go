@@ -34,17 +34,18 @@ type Spectrum struct {
 	Precursor   Precursor
 	Peaks       []byte
 	Intensities []byte
-	//Peaks       []float64
-	//Intensities []float64
 }
 
 // Precursor struct
 type Precursor struct {
-	ParentIndex   int
-	ParentScan    int
-	SelectedIon   float64
-	ChargeState   int
-	PeakIntensity float64
+	ParentIndex                int
+	ParentScan                 int
+	ChargeState                int
+	SelectedIon                float64
+	TargetIon                  float64
+	IsolationWindowLowerOffset float64
+	IsolationWindowUpperOffset float64
+	PeakIntensity              float64
 }
 
 // Len function for Sort
@@ -116,26 +117,75 @@ func (s *Raw) Read(f, t string) error {
 				prec.ParentScan = ind
 
 				for _, k := range j.IsolationWindow.CVParam {
-					if k.Accession == "MS:1000744" {
+
+					if k.Accession == "MS:1000827" {
 						val, err := strconv.ParseFloat(k.Value, 64)
 						if err != nil {
 							return nil
 						}
-						prec.SelectedIon = val
-					} else if k.Accession == "MS:1000041" {
-						val, err := strconv.Atoi(k.Value)
+						prec.TargetIon = val
+
+					} else if k.Accession == "MS:1000828" {
+						val, err := strconv.ParseFloat(k.Value, 64)
 						if err != nil {
 							return err
 						}
-						prec.ChargeState = val
-					} else if k.Accession == "MS:1000042" {
+						prec.IsolationWindowLowerOffset = val
+
+					} else if k.Accession == "MS:1000829" {
 						val, err := strconv.ParseFloat(k.Value, 64)
 						if err != nil {
 							return nil
 						}
-						prec.PeakIntensity = val
+						prec.IsolationWindowUpperOffset = val
+
 					}
 				}
+
+				for _, k := range j.SelectedIonList.SelectedIon {
+					for _, l := range k.CVParam {
+
+						if l.Accession == "MS:1000744" {
+							val, err := strconv.ParseFloat(l.Value, 64)
+							if err != nil {
+								return nil
+							}
+							prec.SelectedIon = val
+
+						} else if l.Accession == "MS:1000041" {
+							val, err := strconv.Atoi(l.Value)
+							if err != nil {
+								return err
+							}
+							prec.ChargeState = val
+
+						}
+					}
+				}
+
+				fmt.Println(prec)
+
+				// for _, k := range j.IsolationWindow.CVParam {
+				// 	if k.Accession == "MS:1000744" {
+				// 		val, err := strconv.ParseFloat(k.Value, 64)
+				// 		if err != nil {
+				// 			return nil
+				// 		}
+				// 		prec.SelectedIon = val
+				// 	} else if k.Accession == "MS:1000041" {
+				// 		val, err := strconv.Atoi(k.Value)
+				// 		if err != nil {
+				// 			return err
+				// 		}
+				// 		prec.ChargeState = val
+				// 	} else if k.Accession == "MS:1000042" {
+				// 		val, err := strconv.ParseFloat(k.Value, 64)
+				// 		if err != nil {
+				// 			return nil
+				// 		}
+				// 		prec.PeakIntensity = val
+				// 	}
+				// }
 
 				spec.Precursor = prec
 			}

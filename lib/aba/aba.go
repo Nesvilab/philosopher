@@ -25,6 +25,7 @@ type Abacus struct {
 	ProtProb float64
 	PepProb  float64
 	Comb     string
+	Razor    bool
 	Tag      string
 }
 
@@ -167,13 +168,19 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 		protxml.Read(combinedFile)
 		protxml.DecoyTag = decoyTag
 
-		fmt.Println(protxml.DecoyTag)
-
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
 
+		// applies razor algorithm
+		if a.Razor == true {
+			protxml, err = fil.RazorFilter(protxml)
+			if err != nil {
+				return list, err
+			}
+		}
+
 		//	p.Filter(0.01, pepProb, protProb, false, false, false)
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, pepProb, protProb, false, false)
+		proid, err := fil.ProtXMLFilter(protxml, 0.01, pepProb, protProb, false, a.Razor)
 		if err != nil {
 			return nil, err
 		}
@@ -183,11 +190,13 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 			var ce rep.CombinedEvidence
 			ce.TotalPeptideIonStrings = make(map[string]int)
 			ce.UniquePeptideIonStrings = make(map[string]int)
+			ce.RazorPeptideIonStrings = make(map[string]int)
 
 			ce.ProteinName = j.ProteinName
 			ce.Length = j.Length
 			ce.GroupNumber = j.GroupNumber
 			ce.SiblingID = j.GroupSiblingID
+			ce.IndiProtein = j.IndistinguishableProtein
 
 			for _, k := range j.PeptideIons {
 
@@ -204,6 +213,10 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 					ce.UniquePeptideIonStrings[ion] = 0
 				}
 
+				if k.Razor == 1 {
+					ce.RazorPeptideIonStrings[ion] = 0
+				}
+
 			}
 
 			ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
@@ -214,6 +227,9 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 					ce.SharedPeptideIons++
 				} else {
 					ce.UniquePeptideIons++
+				}
+				if j.Razor == 1 {
+					ce.RazorPeptideIons++
 				}
 			}
 
@@ -253,12 +269,14 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	}
 	defer file.Close()
 
-	line := "Protein Group\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
+		line += fmt.Sprintf("%s Razor Spectral Count\t", i)
 		line += fmt.Sprintf("%s Total Intensity\t", i)
 		line += fmt.Sprintf("%s Unique Intensity\t", i)
+		line += fmt.Sprintf("%s Razor Intensity\t", i)
 	}
 
 	line += "\n"
@@ -271,7 +289,9 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		var line string
 
-		line += fmt.Sprintf("%d-%s\t", i.GroupNumber, i.SiblingID)
+		line += fmt.Sprintf("%d\t", i.GroupNumber)
+
+		line += fmt.Sprintf("%s\t", i.SiblingID)
 
 		line += fmt.Sprintf("%s\t", i.ProteinID)
 
@@ -293,6 +313,10 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		line += fmt.Sprintf("%d\t", i.UniquePeptideIons)
 
+		line += fmt.Sprintf("%d\t", i.RazorPeptideIons)
+
+		line += fmt.Sprintf("%s\t", i.IndiProtein)
+
 		var tIons []string
 		for j := range i.TotalPeptideIonStrings {
 			tIons = append(tIons, j)
@@ -303,10 +327,15 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 			uIons = append(uIons, j)
 		}
 
+		var rIons []string
+		for j := range i.RazorPeptideIonStrings {
+			rIons = append(rIons, j)
+		}
+
 		for _, j := range namesList {
-			totalSpC, uniqueSpC := getSpectralCounts(tIons, uIons, globalPepMap, j)
-			totalInt, uniqueInt := sumIntensities(tIons, uIons, psmMap[j], j)
-			line += fmt.Sprintf("%d\t%d\t%6.f\t%6.f\t", totalSpC, uniqueSpC, totalInt, uniqueInt)
+			totalSpC, uniqueSpC, razorSpC := getSpectralCounts(tIons, uIons, rIons, globalPepMap, j)
+			totalInt, uniqueInt, razorInt := sumIntensities(tIons, uIons, rIons, psmMap[j], j)
+			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", totalSpC, uniqueSpC, razorSpC, totalInt, uniqueInt, razorInt)
 		}
 
 		line += "\n"
@@ -323,10 +352,11 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	return
 }
 
-func getSpectralCounts(tIons, uIons []string, globalPepMap map[string]int, name string) (int, int) {
+func getSpectralCounts(tIons, uIons, rIons []string, globalPepMap map[string]int, name string) (int, int, int) {
 
 	var totalSpc int
 	var uniqueSpc int
+	var razorSpc int
 
 	for _, i := range tIons {
 		key := fmt.Sprintf("%s@%s", name, i)
@@ -344,33 +374,27 @@ func getSpectralCounts(tIons, uIons []string, globalPepMap map[string]int, name 
 		}
 	}
 
-	// for _, i := range tIons {
-	// 	key := fmt.Sprintf("%s@%s", name, i)
-	// 	_, okT := globalPepMap[key]
-	// 	if okT {
-	// 		totalSpc++
-	// 	}
-	// }
-	//
-	// for _, i := range uIons {
-	// 	key := fmt.Sprintf("%s@%s", name, i)
-	// 	_, okU := globalPepMap[key]
-	// 	if okU {
-	// 		uniqueSpc++
-	// 	}
-	// }
+	for _, i := range rIons {
+		key := fmt.Sprintf("%s@%s", name, i)
+		v, okR := globalPepMap[key]
+		if okR {
+			razorSpc += v
+		}
+	}
 
-	return totalSpc, uniqueSpc
+	return totalSpc, uniqueSpc, razorSpc
 }
 
 // sumIntensities calculates the protein intensity
-func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string) (float64, float64) {
+func sumIntensities(tIons, uIons, rIons []string, pep rep.PSMEvidenceList, name string) (float64, float64, float64) {
 
 	var totalInt []float64
 	var uniqueInt []float64
+	var razorInt []float64
 
 	var totalQuantInt float64
 	var uniqueQuantInt float64
+	var razorQuantInt float64
 
 	var totalMap = make(map[string]int)
 	for _, i := range tIons {
@@ -380,6 +404,11 @@ func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string)
 	var uniqueMap = make(map[string]int)
 	for _, i := range uIons {
 		uniqueMap[i]++
+	}
+
+	var razorMap = make(map[string]int)
+	for _, i := range rIons {
+		razorMap[i]++
 	}
 
 	for _, i := range pep {
@@ -401,8 +430,22 @@ func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string)
 			uniqueInt = append(uniqueInt, i.Intensity)
 		}
 
+		_, okR := razorMap[ion]
+		if okR {
+			razorInt = append(razorInt, i.Intensity)
+		}
+
 		sort.Float64s(uniqueInt)
 		sort.Float64s(totalInt)
+		sort.Float64s(razorInt)
+
+		if len(razorInt) >= 3 {
+			razorQuantInt = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
+		} else if len(razorInt) >= 2 {
+			razorQuantInt = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
+		} else if len(razorInt) == 1 {
+			razorQuantInt = (razorInt[len(razorInt)-1])
+		}
 
 		if len(uniqueInt) >= 3 {
 			uniqueQuantInt = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2] + uniqueInt[len(uniqueInt)-3])
@@ -422,5 +465,5 @@ func sumIntensities(tIons, uIons []string, pep rep.PSMEvidenceList, name string)
 
 	}
 
-	return totalQuantInt, uniqueQuantInt
+	return totalQuantInt, uniqueQuantInt, razorQuantInt
 }

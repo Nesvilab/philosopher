@@ -11,7 +11,6 @@ import (
 	"github.com/prvst/cmsl/bio"
 	"github.com/prvst/cmsl/data/mz"
 	"github.com/prvst/cmsl/err"
-	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/rep"
 )
 
@@ -30,7 +29,8 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 
 		// process pepXML information
 		ppmPrecision := tol / math.Pow(10, 6)
-		mz := utils.Round(((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge)), 5, 4)
+		//mz := utils.Round(((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge)), 5, 4)
+		mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
 		minRT := (e.PSM[i].RetentionTime / 60) - rTWin
 		maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
 
@@ -164,7 +164,8 @@ func xic(v []mz.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]fl
 
 	for j := range v {
 
-		if v[j].ScanStartTime > minRT && v[j].ScanStartTime < maxRT {
+		if v[j].ScanStartTime >= minRT && v[j].ScanStartTime <= maxRT {
+			//if v[j].ScanStartTime >= minRT && v[j].ScanStartTime < maxRT {
 
 			lowi := sort.Search(len(v[j].Spectrum), func(i int) bool { return v[j].Spectrum[i].Mz >= mz-ppmPrecision*mz })
 			highi := sort.Search(len(v[j].Spectrum), func(i int) bool { return v[j].Spectrum[i].Mz >= mz+ppmPrecision*mz })
