@@ -78,6 +78,8 @@ type PSMEvidence struct {
 	DiscriminantValue         float64
 	Intensity                 float64
 	Purity                    float64
+	IsUnique                  bool
+	IsRazor                   bool
 	Labels                    tmt.Labels
 }
 
@@ -319,7 +321,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -369,7 +371,7 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -394,6 +396,8 @@ func (e *Evidence) PSMReport() {
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
+			i.IsUnique,
+			i.IsRazor,
 			len(i.AlternativeTargetProteins)+1,
 			i.Protein,
 			strings.Join(i.AlternativeTargetProteins, ", "),
@@ -1202,6 +1206,37 @@ func (e *Evidence) ProteinQuantReport() {
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIonStatus() {
+
+	for i := range e.PSM {
+
+		var ion string
+		if len(e.PSM[i].ModifiedPeptide) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
+		}
+
+		for _, j := range e.Proteins {
+			_, uOK := j.UniquePeptideIons[ion]
+			if uOK {
+				e.PSM[i].IsUnique = true
+			}
+		}
+
+		for _, j := range e.Proteins {
+			_, uOK := j.URazorPeptideIons[ion]
+			if uOK {
+				e.PSM[i].IsRazor = true
+			}
+		}
+
+	}
 
 	return
 }

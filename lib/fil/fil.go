@@ -180,6 +180,10 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	}
 	pro = nil
 
+	// ADD ERROR CASES
+	logrus.Info("Mapping Ion status to PSMs")
+	e.UpdateIonStatus()
+
 	logrus.Info("Calculating Spectral Counts")
 	e, cerr := quan.CalculateSpectralCounts(e)
 	if cerr != nil {

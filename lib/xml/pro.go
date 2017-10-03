@@ -29,17 +29,16 @@ type GroupIdentification struct {
 
 // ProteinIdentification struct
 type ProteinIdentification struct {
-	GroupNumber            uint32
-	GroupSiblingID         string
-	ProteinName            string
-	UniqueStrippedPeptides []string
-	Length                 int
-	PercentCoverage        float32
-	PctSpectrumIDs         float32
-	GroupProbability       float64
-	Probability            float64
-	Confidence             float64
-	//RazorTopPepProb          float64
+	GroupNumber              uint32
+	GroupSiblingID           string
+	ProteinName              string
+	UniqueStrippedPeptides   []string
+	Length                   int
+	PercentCoverage          float32
+	PctSpectrumIDs           float32
+	GroupProbability         float64
+	Probability              float64
+	Confidence               float64
 	TopPepProb               float64
 	IndistinguishableProtein []string
 	PeptideIons              []PeptideIonIdentification
