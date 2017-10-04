@@ -804,6 +804,7 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 			}
 		}
 
+		razorMap[k] = mgw
 	}
 
 	for i := range p.Groups {
@@ -820,6 +821,8 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
 					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
 					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass)
+
+				//pepCheck := fmt.Sprintf("%s#%d", p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence, p.Groups[i].Proteins[j].PeptideIons[k].Charge)
 
 				v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
 				if ok {
