@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -74,6 +75,12 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 						if k.Mz <= higherDelta && k.Mz >= lowerDelta {
 							ions = append(ions, k)
 						}
+					}
+
+					if evi.PSM[i].Spectrum == "01CPTAC3_Benchmarking_W_BI_20170508_BL_f19.13589.13589.2" {
+						fmt.Println("parent index:", S2spec.Precursor.ParentIndex)
+						fmt.Println(ions)
+						os.Exit(1)
 					}
 
 					// create the list of mz differences for each peak
