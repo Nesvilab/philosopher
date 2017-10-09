@@ -201,17 +201,24 @@ type CombinedEvidence struct {
 	Length                  int
 	Names                   []string
 	UniqueStrippedPeptides  int
+	TotalIons               int
 	TotalPeptideIonStrings  map[string]int
 	UniquePeptideIonStrings map[string]int
 	RazorPeptideIonStrings  map[string]int
-	TotalPeptideIons        int
-	UniquePeptideIons       int
-	SharedPeptideIons       int
-	RazorPeptideIons        int
-	TotalSpc                []int
-	UniqueSpc               []int
-	ProteinProbability      float64
-	TopPepProb              float64
+	// TotalPeptideIons        map[string]int
+	// UniquePeptideIons       map[string]int
+	// RazorPeptideIons        map[string]int
+	TotalPeptideIntensity  map[string]float64
+	UniquePeptideIntensity map[string]float64
+	RazorPeptideIntensity  map[string]float64
+	TotalPeptideIons       int
+	UniquePeptideIons      int
+	SharedPeptideIons      int
+	RazorPeptideIons       int
+	TotalSpc               []int
+	UniqueSpc              []int
+	ProteinProbability     float64
+	TopPepProb             float64
 }
 
 // CombinedEvidenceList ...

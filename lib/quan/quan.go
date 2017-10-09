@@ -79,11 +79,11 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 		logrus.Fatal("This result file does not contains report data")
 	}
 
-	logrus.Info("Calculating Spectral Counts")
-	evi, e = CalculateSpectralCounts(evi)
-	if e != nil {
-		return e
-	}
+	// logrus.Info("Calculating Spectral Counts")
+	// evi, e = CalculateSpectralCounts(evi)
+	// if e != nil {
+	// 	return e
+	// }
 
 	// logrus.Info("Calculating MS1 Intensities")
 	// evi, e = traceApexPeaks(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
