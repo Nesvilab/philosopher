@@ -52,7 +52,8 @@ var labelquantCmd = &cobra.Command{
 		// 	logrus.Fatal("Missing normalization method, type 'philosopher labelquant --help' for more information")
 		// }
 
-		err := lbl.RunLabeledQuantification()
+		//err := lbl.RunLabeledQuantification()
+		err := lbl.RunTMTQuantification()
 		if err != nil {
 			logrus.Fatal(err)
 		}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,7 +19,7 @@ const (
 	mzDeltaWindow float64 = 1.5
 )
 
-func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi rep.Evidence) (rep.Evidence, error) {
+func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	// organize them by index
 	var indexedMs1 = make(map[int]mz.Ms1Scan)
@@ -30,20 +29,17 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 		}
 	}
 
-	// nulls the ms1 input
-	ms1 = nil
-
 	// range over IDs and spectra searching for a match
-	for i := range evi.PSM {
+	for i := range evi {
 
 		// get spectrum name
-		name := strings.Split(evi.PSM[i].Spectrum, ".")
+		name := strings.Split(evi[i].Spectrum, ".")
 
 		// locate the corresponding mz file for this identification
 		s2, ok2 := ms2[name[0]]
 		if ok2 {
 
-			S2spec, S2ok := s2.Ms2Scan[evi.PSM[i].Spectrum]
+			S2spec, S2ok := s2.Ms2Scan[evi[i].Spectrum]
 			if S2ok {
 
 				// recover the matching ms1 structure based on index number
@@ -77,12 +73,6 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 						}
 					}
 
-					if evi.PSM[i].Spectrum == "01CPTAC3_Benchmarking_W_BI_20170508_BL_f19.13589.13589.2" {
-						fmt.Println("parent index:", S2spec.Precursor.ParentIndex)
-						fmt.Println(ions)
-						os.Exit(1)
-					}
-
 					// create the list of mz differences for each peak
 					var mzRatio []float64
 					for k := 1; k <= 6; k++ {
@@ -113,9 +103,9 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 					summedPackageInt += S2spec.Precursor.PeakIntensity
 
 					if summedInt == 0 {
-						evi.PSM[i].Purity = 0
+						evi[i].Purity = 0
 					} else {
-						evi.PSM[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
+						evi[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
 					}
 
 				}
@@ -127,13 +117,57 @@ func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS
 	return evi, nil
 }
 
+// // labeledPeakIntensity ...
+// func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi rep.Evidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
+//
+// 	// get all spectra names from PSMs and create the label list
+// 	var spectra = make(map[string]tmt.Labels)
+//
+// 	for _, i := range evi.PSM {
+//
+// 		ls, err := tmt.New(plex)
+// 		if err != nil {
+// 			return spectra, err
+// 		}
+//
+// 		// remove the charge state from the spectrum name key
+// 		split := strings.Split(i.Spectrum, ".")
+// 		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
+//
+// 		ls.Spectrum = i.Spectrum
+// 		ls.RetentionTime = i.RetentionTime
+//
+// 		if format == "mzML" {
+// 			index, err := strconv.Atoi(split[1])
+// 			if err != nil {
+// 				return spectra, err
+// 			}
+// 			ls.Index = (uint32(index) - 1)
+// 		} else {
+// 			index, err := strconv.Atoi(split[1])
+// 			if err != nil {
+// 				return spectra, err
+// 			}
+// 			ls.Index = uint32(index)
+// 		}
+//
+// 		spectra[name] = ls
+// 	}
+//
+// 	ppmPrecision := tol / math.Pow(10, 6)
+//
+// 	spectra = getLabels(spectra, ms2, ppmPrecision)
+//
+// 	return spectra, nil
+// }
+
 // labeledPeakIntensity ...
-func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi rep.Evidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
+func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi []rep.PSMEvidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
 
 	// get all spectra names from PSMs and create the label list
 	var spectra = make(map[string]tmt.Labels)
 
-	for _, i := range evi.PSM {
+	for _, i := range evi {
 
 		ls, err := tmt.New(plex)
 		if err != nil {
@@ -171,32 +205,65 @@ func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi rep.
 	return spectra, nil
 }
 
+// // mapLabeledSpectra maps all labeled spectra to ions
+// func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi rep.Evidence) (rep.Evidence, error) {
+//
+// 	var purityMap = make(map[string]float64)
+//
+// 	for i := range evi.PSM {
+// 		split := strings.Split(evi.PSM[i].Spectrum, ".")
+// 		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
+// 		v, ok := spectra[name]
+// 		if ok {
+// 			evi.PSM[i].Labels.Spectrum = v.Spectrum
+// 			evi.PSM[i].Labels.Index = v.Index
+// 			evi.PSM[i].Labels.Channel1.Intensity = v.Channel1.Intensity
+// 			evi.PSM[i].Labels.Channel2.Intensity = v.Channel2.Intensity
+// 			evi.PSM[i].Labels.Channel3.Intensity = v.Channel3.Intensity
+// 			evi.PSM[i].Labels.Channel4.Intensity = v.Channel4.Intensity
+// 			evi.PSM[i].Labels.Channel5.Intensity = v.Channel5.Intensity
+// 			evi.PSM[i].Labels.Channel6.Intensity = v.Channel6.Intensity
+// 			evi.PSM[i].Labels.Channel7.Intensity = v.Channel7.Intensity
+// 			evi.PSM[i].Labels.Channel8.Intensity = v.Channel8.Intensity
+// 			evi.PSM[i].Labels.Channel9.Intensity = v.Channel9.Intensity
+// 			evi.PSM[i].Labels.Channel10.Intensity = v.Channel10.Intensity
+//
+// 			// create a purity map for later use from ions and proteins
+// 			if evi.PSM[i].Purity >= purity && evi.PSM[i].Probability >= 0.9 {
+// 				purityMap[name] = evi.PSM[i].Purity
+// 			}
+//
+// 		}
+// 	}
+//
+// 	return evi, nil
+// }
 // mapLabeledSpectra maps all labeled spectra to ions
-func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi rep.Evidence) (rep.Evidence, error) {
+func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	var purityMap = make(map[string]float64)
 
-	for i := range evi.PSM {
-		split := strings.Split(evi.PSM[i].Spectrum, ".")
+	for i := range evi {
+		split := strings.Split(evi[i].Spectrum, ".")
 		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
 		v, ok := spectra[name]
 		if ok {
-			evi.PSM[i].Labels.Spectrum = v.Spectrum
-			evi.PSM[i].Labels.Index = v.Index
-			evi.PSM[i].Labels.Channel1.Intensity = v.Channel1.Intensity
-			evi.PSM[i].Labels.Channel2.Intensity = v.Channel2.Intensity
-			evi.PSM[i].Labels.Channel3.Intensity = v.Channel3.Intensity
-			evi.PSM[i].Labels.Channel4.Intensity = v.Channel4.Intensity
-			evi.PSM[i].Labels.Channel5.Intensity = v.Channel5.Intensity
-			evi.PSM[i].Labels.Channel6.Intensity = v.Channel6.Intensity
-			evi.PSM[i].Labels.Channel7.Intensity = v.Channel7.Intensity
-			evi.PSM[i].Labels.Channel8.Intensity = v.Channel8.Intensity
-			evi.PSM[i].Labels.Channel9.Intensity = v.Channel9.Intensity
-			evi.PSM[i].Labels.Channel10.Intensity = v.Channel10.Intensity
+			evi[i].Labels.Spectrum = v.Spectrum
+			evi[i].Labels.Index = v.Index
+			evi[i].Labels.Channel1.Intensity = v.Channel1.Intensity
+			evi[i].Labels.Channel2.Intensity = v.Channel2.Intensity
+			evi[i].Labels.Channel3.Intensity = v.Channel3.Intensity
+			evi[i].Labels.Channel4.Intensity = v.Channel4.Intensity
+			evi[i].Labels.Channel5.Intensity = v.Channel5.Intensity
+			evi[i].Labels.Channel6.Intensity = v.Channel6.Intensity
+			evi[i].Labels.Channel7.Intensity = v.Channel7.Intensity
+			evi[i].Labels.Channel8.Intensity = v.Channel8.Intensity
+			evi[i].Labels.Channel9.Intensity = v.Channel9.Intensity
+			evi[i].Labels.Channel10.Intensity = v.Channel10.Intensity
 
 			// create a purity map for later use from ions and proteins
-			if evi.PSM[i].Purity >= purity && evi.PSM[i].Probability >= 0.9 {
-				purityMap[name] = evi.PSM[i].Purity
+			if evi[i].Purity >= purity && evi[i].Probability >= 0.9 {
+				purityMap[name] = evi[i].Purity
 			}
 
 		}
