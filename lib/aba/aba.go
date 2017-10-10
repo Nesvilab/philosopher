@@ -11,7 +11,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/data"
-	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
@@ -65,8 +64,12 @@ func (a *Abacus) Run(args []string) error {
 	var names []string
 	var xmlFiles []string
 	var database data.Base
-	var globalPepMap = make(map[string]int)
+	//var globalPepMap = make(map[string]int)
 	var PsmMap = make(map[string]rep.PSMEvidenceList)
+
+	var totalIons = make(map[string][]string)
+	var uniqueIons = make(map[string][]string)
+	var razorIons = make(map[string][]string)
 
 	// recover all files
 	logrus.Info("Restoring Philospher results")
@@ -96,53 +99,35 @@ func (a *Abacus) Run(args []string) error {
 			prjName = strings.Replace(prjName, string(filepath.Separator), "", -1)
 		}
 		names = append(names, prjName)
+		sort.Strings(names)
 
 		for _, j := range e.PSM {
 			var ion string
-			if j.Probability >= a.PepProb {
-				if len(j.ModifiedPeptide) > 0 {
-					ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
-				} else {
-					ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
-				}
-				key := fmt.Sprintf("%s@%s", prjName, ion)
-				globalPepMap[key]++
+
+			if len(j.ModifiedPeptide) > 0 {
+				ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
+			} else {
+				ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
 			}
+
+			key := fmt.Sprintf("%s#%s", prjName, j.Protein)
+
+			totalIons[key] = append(totalIons[key], ion)
+
+			if j.IsUnique == true {
+				uniqueIons[key] = append(uniqueIons[key], ion)
+			}
+
+			if j.IsRazor == true {
+				razorIons[key] = append(razorIons[key], ion)
+			}
+
 		}
 		PsmMap[prjName] = e.PSM
 	}
 
-	sort.Strings(names)
-
-	var combinedFile string
-
-	if len(a.Comb) < 1 {
-		logrus.Info("Creating the combined protXML file")
-
-		logrus.Info("Initializing ProteinProphet")
-		pop := proteinprophet.New()
-
-		combinedFile = "combined"
-		pop.Output = combinedFile
-
-		// deploy the binaries
-		err := pop.Deploy()
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-		// run ProteinProphet
-		err = pop.Run(xmlFiles)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-	} else {
-		combinedFile = a.Comb
-	}
-
 	logrus.Info("Processing combined file")
-	evidences, err := a.processCombinedFile(combinedFile, a.Tag, a.PepProb, a.ProtProb, database)
+	evidences, err := a.processCombinedFile(a.Comb, a.Tag, a.PepProb, a.ProtProb, database)
 	if err != nil {
 		return err
 	}
@@ -150,7 +135,7 @@ func (a *Abacus) Run(args []string) error {
 	// build map list with all centroids and quantifications
 	// one report to rule them all
 	// Assuming that the same database was used for everyone
-	saveCompareResults(a.Temp, evidences, globalPepMap, PsmMap, names)
+	saveCompareResults(a.Temp, evidences, totalIons, uniqueIons, razorIons, PsmMap, names)
 
 	return nil
 }
@@ -257,7 +242,7 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 }
 
 // saveCompareResults creates a single report using 1 or more philosopher result files
-func saveCompareResults(session string, evidences rep.CombinedEvidenceList, globalPepMap map[string]int, psmMap map[string]rep.PSMEvidenceList, namesList []string) {
+func saveCompareResults(session string, evidences rep.CombinedEvidenceList, totalIons, uniqueIons, razorIons map[string][]string, psmMap map[string]rep.PSMEvidenceList, namesList []string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -315,26 +300,12 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		line += fmt.Sprintf("%d\t", i.RazorPeptideIons)
 
-		line += fmt.Sprintf("%s\t", i.IndiProtein)
-
-		var tIons []string
-		for j := range i.TotalPeptideIonStrings {
-			tIons = append(tIons, j)
-		}
-
-		var uIons []string
-		for j := range i.UniquePeptideIonStrings {
-			uIons = append(uIons, j)
-		}
-
-		var rIons []string
-		for j := range i.RazorPeptideIonStrings {
-			rIons = append(rIons, j)
-		}
+		ip := strings.Join(i.IndiProtein, ", ")
+		line += fmt.Sprintf("%s\t", ip)
 
 		for _, j := range namesList {
-			totalSpC, uniqueSpC, razorSpC := getSpectralCounts(tIons, uIons, rIons, globalPepMap, j)
-			totalInt, uniqueInt, razorInt := sumIntensities(tIons, uIons, rIons, psmMap[j], j)
+			totalSpC, uniqueSpC, razorSpC := getSpectralCounts(totalIons, uniqueIons, razorIons, i.ProteinName, j)
+			totalInt, uniqueInt, razorInt := sumIntensities(totalIons, uniqueIons, razorIons, psmMap[j], i.ProteinName, j)
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", totalSpC, uniqueSpC, razorSpC, totalInt, uniqueInt, razorInt)
 		}
 
@@ -352,41 +323,122 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	return
 }
 
-func getSpectralCounts(tIons, uIons, rIons []string, globalPepMap map[string]int, name string) (int, int, int) {
+// // saveCompareResults creates a single report using 1 or more philosopher result files
+// func saveCompareResults(session string, evidences rep.CombinedEvidenceList, globalPepMap map[string]int, psmMap map[string]rep.PSMEvidenceList, namesList []string) {
+//
+// 	// create result file
+// 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
+//
+// 	// create result file
+// 	file, err := os.Create(output)
+// 	if err != nil {
+// 		logrus.Fatal("Cannot create report file:", err)
+// 	}
+// 	defer file.Close()
+//
+// 	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
+// 	for _, i := range namesList {
+// 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
+// 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
+// 		line += fmt.Sprintf("%s Razor Spectral Count\t", i)
+// 		line += fmt.Sprintf("%s Total Intensity\t", i)
+// 		line += fmt.Sprintf("%s Unique Intensity\t", i)
+// 		line += fmt.Sprintf("%s Razor Intensity\t", i)
+// 	}
+//
+// 	line += "\n"
+// 	n, err := io.WriteString(file, line)
+// 	if err != nil {
+// 		logrus.Fatal(n, err)
+// 	}
+//
+// 	for _, i := range evidences {
+//
+// 		var line string
+//
+// 		line += fmt.Sprintf("%d\t", i.GroupNumber)
+//
+// 		line += fmt.Sprintf("%s\t", i.SiblingID)
+//
+// 		line += fmt.Sprintf("%s\t", i.ProteinID)
+//
+// 		line += fmt.Sprintf("%s\t", i.EntryName)
+//
+// 		line += fmt.Sprintf("%s\t", i.GeneNames)
+//
+// 		line += fmt.Sprintf("%s\t", i.ProteinName)
+//
+// 		line += fmt.Sprintf("%d\t", i.Length)
+//
+// 		line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
+//
+// 		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
+//
+// 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
+//
+// 		line += fmt.Sprintf("%d\t", i.TotalPeptideIons)
+//
+// 		line += fmt.Sprintf("%d\t", i.UniquePeptideIons)
+//
+// 		line += fmt.Sprintf("%d\t", i.RazorPeptideIons)
+//
+// 		ip := strings.Join(i.IndiProtein, ", ")
+// 		line += fmt.Sprintf("%s\t", ip)
+//
+// 		for _, j := range namesList {
+//
+// 			totalSpC, uniqueSpC, razorSpC := getSpectralCounts(globalPepMap, i.ProteinName, j)
+// 			//totalInt, uniqueInt, razorInt := sumIntensities(tIons, uIons, rIons, psmMap[j], j)
+// 			//line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", totalSpC, uniqueSpC, razorSpC, totalInt, uniqueInt, razorInt)
+//
+// 			if j == "pcdna-E1" && i.EntryName == "CIAO1_HUMAN" {
+// 				fmt.Println(totalSpC, uniqueSpC, razorSpC)
+// 			}
+//
+// 		}
+//
+// 		line += "\n"
+// 		n, err := io.WriteString(file, line)
+// 		if err != nil {
+// 			logrus.Fatal(n, err)
+// 		}
+//
+// 	}
+//
+// 	// copy to work directory
+// 	sys.CopyFile(output, filepath.Base(output))
+//
+// 	return
+// }
+
+func getSpectralCounts(totalIons, uniqueIons, razorIons map[string][]string, proteinName, name string) (int, int, int) {
 
 	var totalSpc int
 	var uniqueSpc int
 	var razorSpc int
 
-	for _, i := range tIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okT := globalPepMap[key]
-		if okT {
-			totalSpc += v
-		}
+	key := fmt.Sprintf("%s#%s", name, proteinName)
+
+	Tv, Tok := totalIons[key]
+	if Tok {
+		totalSpc = len(Tv)
 	}
 
-	for _, i := range uIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okU := globalPepMap[key]
-		if okU {
-			uniqueSpc += v
-		}
+	Uv, Uok := uniqueIons[key]
+	if Uok {
+		uniqueSpc = len(Uv)
 	}
 
-	for _, i := range rIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okR := globalPepMap[key]
-		if okR {
-			razorSpc += v
-		}
+	Rv, Rok := razorIons[key]
+	if Rok {
+		razorSpc = len(Rv)
 	}
 
 	return totalSpc, uniqueSpc, razorSpc
 }
 
 // sumIntensities calculates the protein intensity
-func sumIntensities(tIons, uIons, rIons []string, pep rep.PSMEvidenceList, name string) (float64, float64, float64) {
+func sumIntensities(totalIons, uniqueIons, razorIons map[string][]string, pep rep.PSMEvidenceList, proteinName, name string) (float64, float64, float64) {
 
 	var totalInt []float64
 	var uniqueInt []float64
@@ -396,19 +448,31 @@ func sumIntensities(tIons, uIons, rIons []string, pep rep.PSMEvidenceList, name 
 	var uniqueQuantInt float64
 	var razorQuantInt float64
 
-	var totalMap = make(map[string]int)
-	for _, i := range tIons {
-		totalMap[i]++
+	var totalIonsList = make(map[string]uint8)
+	var uniqueIonsList = make(map[string]uint8)
+	var razorIonsList = make(map[string]uint8)
+
+	key := fmt.Sprintf("%s#%s", name, proteinName)
+
+	Tv, Tok := totalIons[key]
+	if Tok {
+		for _, i := range Tv {
+			totalIonsList[i] = 0
+		}
 	}
 
-	var uniqueMap = make(map[string]int)
-	for _, i := range uIons {
-		uniqueMap[i]++
+	Uv, Uok := uniqueIons[key]
+	if Uok {
+		for _, i := range Uv {
+			uniqueIonsList[i] = 0
+		}
 	}
 
-	var razorMap = make(map[string]int)
-	for _, i := range rIons {
-		razorMap[i]++
+	Rv, Rok := razorIons[key]
+	if Rok {
+		for _, i := range Rv {
+			razorIonsList[i] = 0
+		}
 	}
 
 	for _, i := range pep {
@@ -420,17 +484,17 @@ func sumIntensities(tIons, uIons, rIons []string, pep rep.PSMEvidenceList, name 
 			ion = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
 		}
 
-		_, okT := totalMap[ion]
+		_, okT := totalIonsList[ion]
 		if okT {
 			totalInt = append(totalInt, i.Intensity)
 		}
 
-		_, okU := uniqueMap[ion]
+		_, okU := uniqueIonsList[ion]
 		if okU {
 			uniqueInt = append(uniqueInt, i.Intensity)
 		}
 
-		_, okR := razorMap[ion]
+		_, okR := razorIonsList[ion]
 		if okR {
 			razorInt = append(razorInt, i.Intensity)
 		}
