@@ -132,11 +132,13 @@ func (p *Quantify) RunTMTQuantification() error {
 		specName := strings.Split(i.Spectrum, ".")
 		source := fmt.Sprintf("%s.%s", specName[0], p.Format)
 		specGroup[source] = append(specGroup[source], i)
-		spectra = append(spectra, source)
 		// mapp all spectra for latter when we recover the quantifications
 		specMap[i.Spectrum] = i
 	}
 
+	for i := range specGroup {
+		spectra = append(spectra, i)
+	}
 	sort.Strings(spectra)
 
 	logrus.Info("Calculating intensities and ion interference")

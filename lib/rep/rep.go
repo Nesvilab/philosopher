@@ -1235,37 +1235,6 @@ func (e *Evidence) ProteinQuantReport() {
 	return
 }
 
-// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-func (e *Evidence) UpdateIonStatus() {
-
-	for i := range e.PSM {
-
-		var ion string
-		if len(e.PSM[i].ModifiedPeptide) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
-		}
-
-		for _, j := range e.Proteins {
-			_, uOK := j.UniquePeptideIons[ion]
-			if uOK {
-				e.PSM[i].IsUnique = true
-			}
-		}
-
-		for _, j := range e.Proteins {
-			_, uOK := j.URazorPeptideIons[ion]
-			if uOK {
-				e.PSM[i].IsRazor = true
-			}
-		}
-
-	}
-
-	return
-}
-
 // AssembleModificationReport cretaes the modifications lists
 func (e *Evidence) AssembleModificationReport() error {
 
@@ -1414,6 +1383,67 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 	}
 
 	return nil
+}
+
+// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIonStatus() {
+
+	var uniqueMap = make(map[string]bool)
+	var razorMap = make(map[string]bool)
+
+	for _, i := range e.Proteins {
+
+		for _, j := range i.UniquePeptideIons {
+			var ion string
+			if len(j.ModifiedSequence) > 0 {
+				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
+			} else {
+				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
+			}
+			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
+			key := fmt.Sprintf("%s", ion)
+			uniqueMap[key] = true
+		}
+
+		for _, j := range i.URazorPeptideIons {
+			var ion string
+			if len(j.ModifiedSequence) > 0 {
+				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
+			} else {
+				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
+			}
+			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
+			key := fmt.Sprintf("%s", ion)
+			razorMap[key] = true
+		}
+
+	}
+
+	for i := range e.PSM {
+
+		var ion string
+		if len(e.PSM[i].ModifiedPeptide) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
+		}
+
+		//key := fmt.Sprintf("%s#%s", e.PSM[i].Protein, ion)
+		key := fmt.Sprintf("%s", ion)
+
+		_, uOK := uniqueMap[key]
+		if uOK {
+			e.PSM[i].IsUnique = true
+		}
+
+		_, rOK := razorMap[key]
+		if rOK {
+			e.PSM[i].IsRazor = true
+		}
+
+	}
+
+	return
 }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
