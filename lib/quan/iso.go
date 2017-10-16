@@ -1451,27 +1451,27 @@ func labelQuantificationOnURazors(evi rep.Evidence) (rep.Evidence, error) {
 			c10Data = append(c10Data, v.Labels.Channel10.NormIntensity)
 		}
 
-		evi.Proteins[i].RazorLabels.Channel1.Mean, _ = stats.Mean(c1Data)
-		evi.Proteins[i].RazorLabels.Channel2.Mean, _ = stats.Mean(c2Data)
-		evi.Proteins[i].RazorLabels.Channel3.Mean, _ = stats.Mean(c3Data)
-		evi.Proteins[i].RazorLabels.Channel4.Mean, _ = stats.Mean(c4Data)
-		evi.Proteins[i].RazorLabels.Channel5.Mean, _ = stats.Mean(c5Data)
-		evi.Proteins[i].RazorLabels.Channel6.Mean, _ = stats.Mean(c6Data)
-		evi.Proteins[i].RazorLabels.Channel7.Mean, _ = stats.Mean(c7Data)
-		evi.Proteins[i].RazorLabels.Channel8.Mean, _ = stats.Mean(c8Data)
-		evi.Proteins[i].RazorLabels.Channel9.Mean, _ = stats.Mean(c9Data)
-		evi.Proteins[i].RazorLabels.Channel10.Mean, _ = stats.Mean(c10Data)
+		evi.Proteins[i].URazorLabels.Channel1.Mean, _ = stats.Mean(c1Data)
+		evi.Proteins[i].URazorLabels.Channel2.Mean, _ = stats.Mean(c2Data)
+		evi.Proteins[i].URazorLabels.Channel3.Mean, _ = stats.Mean(c3Data)
+		evi.Proteins[i].URazorLabels.Channel4.Mean, _ = stats.Mean(c4Data)
+		evi.Proteins[i].URazorLabels.Channel5.Mean, _ = stats.Mean(c5Data)
+		evi.Proteins[i].URazorLabels.Channel6.Mean, _ = stats.Mean(c6Data)
+		evi.Proteins[i].URazorLabels.Channel7.Mean, _ = stats.Mean(c7Data)
+		evi.Proteins[i].URazorLabels.Channel8.Mean, _ = stats.Mean(c8Data)
+		evi.Proteins[i].URazorLabels.Channel9.Mean, _ = stats.Mean(c9Data)
+		evi.Proteins[i].URazorLabels.Channel10.Mean, _ = stats.Mean(c10Data)
 
-		evi.Proteins[i].RazorLabels.Channel1.StDev, _ = stats.StandardDeviationPopulation(c1Data)
-		evi.Proteins[i].RazorLabels.Channel2.StDev, _ = stats.StandardDeviationPopulation(c2Data)
-		evi.Proteins[i].RazorLabels.Channel3.StDev, _ = stats.StandardDeviationPopulation(c3Data)
-		evi.Proteins[i].RazorLabels.Channel4.StDev, _ = stats.StandardDeviationPopulation(c4Data)
-		evi.Proteins[i].RazorLabels.Channel5.StDev, _ = stats.StandardDeviationPopulation(c5Data)
-		evi.Proteins[i].RazorLabels.Channel6.StDev, _ = stats.StandardDeviationPopulation(c6Data)
-		evi.Proteins[i].RazorLabels.Channel7.StDev, _ = stats.StandardDeviationPopulation(c7Data)
-		evi.Proteins[i].RazorLabels.Channel8.StDev, _ = stats.StandardDeviationPopulation(c8Data)
-		evi.Proteins[i].RazorLabels.Channel9.StDev, _ = stats.StandardDeviationPopulation(c9Data)
-		evi.Proteins[i].RazorLabels.Channel10.StDev, _ = stats.StandardDeviationPopulation(c10Data)
+		evi.Proteins[i].URazorLabels.Channel1.StDev, _ = stats.StandardDeviationPopulation(c1Data)
+		evi.Proteins[i].URazorLabels.Channel2.StDev, _ = stats.StandardDeviationPopulation(c2Data)
+		evi.Proteins[i].URazorLabels.Channel3.StDev, _ = stats.StandardDeviationPopulation(c3Data)
+		evi.Proteins[i].URazorLabels.Channel4.StDev, _ = stats.StandardDeviationPopulation(c4Data)
+		evi.Proteins[i].URazorLabels.Channel5.StDev, _ = stats.StandardDeviationPopulation(c5Data)
+		evi.Proteins[i].URazorLabels.Channel6.StDev, _ = stats.StandardDeviationPopulation(c6Data)
+		evi.Proteins[i].URazorLabels.Channel7.StDev, _ = stats.StandardDeviationPopulation(c7Data)
+		evi.Proteins[i].URazorLabels.Channel8.StDev, _ = stats.StandardDeviationPopulation(c8Data)
+		evi.Proteins[i].URazorLabels.Channel9.StDev, _ = stats.StandardDeviationPopulation(c9Data)
+		evi.Proteins[i].URazorLabels.Channel10.StDev, _ = stats.StandardDeviationPopulation(c10Data)
 
 	}
 
@@ -1584,16 +1584,16 @@ func ratioToIntensityMean(evi rep.Evidence) (rep.Evidence, error) {
 		uniqRef += evi.Proteins[i].UniqueLabels.Channel9.Mean
 		uniqRef += evi.Proteins[i].UniqueLabels.Channel10.Mean
 
-		razorRef += evi.Proteins[i].RazorLabels.Channel1.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel2.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel3.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel4.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel5.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel6.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel7.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel8.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel9.Mean
-		razorRef += evi.Proteins[i].RazorLabels.Channel10.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel1.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel2.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel3.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel4.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel5.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel6.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel7.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel8.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel9.Mean
+		razorRef += evi.Proteins[i].URazorLabels.Channel10.Mean
 
 		evi.Proteins[i].TotalLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel1.Mean/totalRef), 4, 5) * 100)
 		evi.Proteins[i].TotalLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel2.Mean/totalRef), 4, 5) * 100)
@@ -1617,16 +1617,16 @@ func ratioToIntensityMean(evi rep.Evidence) (rep.Evidence, error) {
 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
 
-		evi.Proteins[i].RazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
 
 	}
 
@@ -1645,43 +1645,43 @@ func ratioToControlChannel(evi rep.Evidence, control string) (rep.Evidence, erro
 		case "1":
 			totalRef = evi.Proteins[i].TotalLabels.Channel1.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel1.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel1.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel1.Mean
 		case "2":
 			totalRef = evi.Proteins[i].TotalLabels.Channel2.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel2.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel2.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel2.Mean
 		case "3":
 			totalRef = evi.Proteins[i].TotalLabels.Channel3.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel3.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel3.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel3.Mean
 		case "4":
 			totalRef = evi.Proteins[i].TotalLabels.Channel4.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel4.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel4.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel4.Mean
 		case "5":
 			totalRef = evi.Proteins[i].TotalLabels.Channel5.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel5.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel5.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel5.Mean
 		case "6":
 			totalRef = evi.Proteins[i].TotalLabels.Channel6.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel6.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel6.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel6.Mean
 		case "7":
 			totalRef = evi.Proteins[i].TotalLabels.Channel7.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel7.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel7.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel7.Mean
 		case "8":
 			totalRef = evi.Proteins[i].TotalLabels.Channel8.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel8.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel8.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel8.Mean
 		case "9":
 			totalRef = evi.Proteins[i].TotalLabels.Channel9.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel9.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel9.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel9.Mean
 		case "10":
 			totalRef = evi.Proteins[i].TotalLabels.Channel10.Mean
 			uniqRef = evi.Proteins[i].UniqueLabels.Channel10.Mean
-			razorRef = evi.Proteins[i].RazorLabels.Channel10.Mean
+			razorRef = evi.Proteins[i].URazorLabels.Channel10.Mean
 		default:
 			return evi, errors.New("Cant find the given channel for normalization")
 		}
@@ -1708,16 +1708,16 @@ func ratioToControlChannel(evi rep.Evidence, control string) (rep.Evidence, erro
 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
 
-		evi.Proteins[i].RazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
-		evi.Proteins[i].RazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].RazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
+		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
 
 	}
 

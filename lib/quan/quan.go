@@ -288,7 +288,7 @@ func cleanPreviousData(plex string) *err.Error {
 			return e
 		}
 
-		evi.Proteins[i].RazorLabels, e = tmt.New(plex)
+		evi.Proteins[i].URazorLabels, e = tmt.New(plex)
 		if e != nil {
 			return e
 		}

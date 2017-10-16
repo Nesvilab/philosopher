@@ -50,7 +50,7 @@ func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, *err.Error) {
 			v, ok := ionRefMap[k]
 			if ok {
 				e.Proteins[i].UniqueSpC += v
-				e.Proteins[i].RazorSpC += v
+				e.Proteins[i].URazorSpC += v
 				uniqIons[k] = 0
 			}
 		}
@@ -63,7 +63,7 @@ func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, *err.Error) {
 				if j.IsRazor {
 					_, ok := uniqIons[k]
 					if !ok {
-						e.Proteins[i].RazorSpC += v
+						e.Proteins[i].URazorSpC += v
 					}
 				}
 			}

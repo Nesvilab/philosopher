@@ -118,7 +118,7 @@ func (a *Abacus) Run(args []string) error {
 				uniqueIons[key] = append(uniqueIons[key], ion)
 			}
 
-			if j.IsRazor == true {
+			if j.IsURazor == true {
 				razorIons[key] = append(razorIons[key], ion)
 			}
 

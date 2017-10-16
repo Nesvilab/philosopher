@@ -79,7 +79,7 @@ type PSMEvidence struct {
 	Intensity                 float64
 	Purity                    float64
 	IsUnique                  bool
-	IsRazor                   bool
+	IsURazor                  bool
 	Labels                    tmt.Labels
 }
 
@@ -165,10 +165,10 @@ type ProteinEvidence struct {
 	URazorPeptideIons            map[string]IonEvidence // Unique + razor
 	TotalSpC                     int
 	UniqueSpC                    int
-	RazorSpC                     int // Unique + razor
+	URazorSpC                    int // Unique + razor
 	TotalIntensity               float64
 	UniqueIntensity              float64
-	RazorIntensity               float64 // Unique + razor
+	URazorIntensity              float64 // Unique + razor
 	Probability                  float64
 	TopPepProb                   float64
 	IsDecoy                      bool
@@ -179,7 +179,7 @@ type ProteinEvidence struct {
 	URazorObservedModifications  map[string]uint16
 	TotalLabels                  tmt.Labels
 	UniqueLabels                 tmt.Labels
-	RazorLabels                  tmt.Labels // Unique + razor
+	URazorLabels                 tmt.Labels // Unique + razor
 }
 
 // ProteinEvidenceList list
@@ -404,7 +404,7 @@ func (e *Evidence) PSMReport() {
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
 			i.IsUnique,
-			i.IsRazor,
+			i.IsURazor,
 			len(i.AlternativeTargetProteins)+1,
 			i.Protein,
 			strings.Join(i.AlternativeTargetProteins, ", "),
@@ -506,7 +506,7 @@ func (e *Evidence) PSMQuantReport() {
 			i.Probability,
 			i.Intensity,
 			i.IsUnique,
-			i.IsRazor,
+			i.IsURazor,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
@@ -619,6 +619,133 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 	e.Ions = list
 
 	return err
+}
+
+// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIonStatus() {
+
+	var uniqueMap = make(map[string]bool)
+	var urazorMap = make(map[string]bool)
+
+	for _, i := range e.Proteins {
+
+		for _, j := range i.UniquePeptideIons {
+			var ion string
+			if len(j.ModifiedSequence) > 0 {
+				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
+			} else {
+				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
+			}
+			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
+			key := fmt.Sprintf("%s", ion)
+			uniqueMap[key] = true
+		}
+
+		for _, j := range i.URazorPeptideIons {
+			var ion string
+			if len(j.ModifiedSequence) > 0 {
+				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
+			} else {
+				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
+			}
+			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
+			key := fmt.Sprintf("%s", ion)
+			urazorMap[key] = true
+		}
+
+	}
+
+	for i := range e.PSM {
+
+		var ion string
+		if len(e.PSM[i].ModifiedPeptide) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
+		}
+
+		//key := fmt.Sprintf("%s#%s", e.PSM[i].Protein, ion)
+		key := fmt.Sprintf("%s", ion)
+
+		_, uOK := uniqueMap[key]
+		if uOK {
+			e.PSM[i].IsUnique = true
+		}
+
+		_, rOK := urazorMap[key]
+		if rOK {
+			e.PSM[i].IsURazor = true
+		}
+
+	}
+
+	return
+}
+
+// UpdateIonModCount counts how many times each ion is observed modified and not modified
+func (e *Evidence) UpdateIonModCount() {
+
+	// recreate the ion list from the main report object
+	var AllIons = make(map[string]int)
+	var ModIons = make(map[string]int)
+	var UnModIons = make(map[string]int)
+
+	for _, i := range e.Ions {
+		var ion string
+		if len(i.ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
+		}
+		AllIons[ion] = 0
+		ModIons[ion] = 0
+		UnModIons[ion] = 0
+	}
+
+	// range over PSMs looking for modified and not modified evidences
+	// if they exist on the ions map, get the numbers
+	for _, i := range e.PSM {
+		var psmIon string
+		if len(i.ModifiedPeptide) > 0 {
+			psmIon = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
+		} else {
+			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
+		}
+
+		// check the map
+		_, ok := AllIons[psmIon]
+		if ok {
+
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
+				UnModIons[psmIon]++
+			} else {
+				ModIons[psmIon]++
+			}
+
+		}
+	}
+
+	for i := range e.Ions {
+		var ion string
+		if len(e.Ions[i].ModifiedSequence) > 0 {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
+		} else {
+			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
+		}
+
+		v1, ok1 := UnModIons[ion]
+		if ok1 {
+			e.Ions[i].UnModifiedObservations = v1
+		}
+
+		v2, ok2 := ModIons[ion]
+		if ok2 {
+			e.Ions[i].ModifiedObservations = v2
+		}
+
+	}
+
+	return
 }
 
 // UpdateIonAssignedAndObservedMods collects all Assigned and Observed modifications from
@@ -1083,12 +1210,12 @@ func (e *Evidence) ProteinReport() {
 			i.NumURazorPeptideIons,   // Unique Peptide Ions
 			i.TotalSpC,               // Total Spectral Count
 			i.UniqueSpC,              // Unique Spectral Count
-			i.RazorSpC,               // Razor Spectral Count
+			i.URazorSpC,              // Razor Spectral Count
 			//i.URazorUnModifiedObservations, // Unmodified Occurrences
 			//i.URazorModifiedObservations,   // Modified Occurrences
 			i.TotalIntensity,          // Total Intensity
 			i.UniqueIntensity,         // Unique Intensity
-			i.RazorIntensity,          // Razor Intensity
+			i.URazorIntensity,         // Razor Intensity
 			strings.Join(amods, ", "), // Razor Assigned Modifications
 			strings.Join(omods, ", "), // Razor Observed Modifications
 			strings.Join(ip, ", "),    // Indistinguishable Proteins
@@ -1179,16 +1306,16 @@ func (e *Evidence) ProteinQuantReport() {
 				i.UniqueLabels.Channel8.NormIntensity,
 				i.UniqueLabels.Channel9.NormIntensity,
 				i.UniqueLabels.Channel10.NormIntensity,
-				i.RazorLabels.Channel1.NormIntensity,
-				i.RazorLabels.Channel2.NormIntensity,
-				i.RazorLabels.Channel3.NormIntensity,
-				i.RazorLabels.Channel4.NormIntensity,
-				i.RazorLabels.Channel5.NormIntensity,
-				i.RazorLabels.Channel6.NormIntensity,
-				i.RazorLabels.Channel7.NormIntensity,
-				i.RazorLabels.Channel8.NormIntensity,
-				i.RazorLabels.Channel9.NormIntensity,
-				i.RazorLabels.Channel10.NormIntensity,
+				i.URazorLabels.Channel1.NormIntensity,
+				i.URazorLabels.Channel2.NormIntensity,
+				i.URazorLabels.Channel3.NormIntensity,
+				i.URazorLabels.Channel4.NormIntensity,
+				i.URazorLabels.Channel5.NormIntensity,
+				i.URazorLabels.Channel6.NormIntensity,
+				i.URazorLabels.Channel7.NormIntensity,
+				i.URazorLabels.Channel8.NormIntensity,
+				i.URazorLabels.Channel9.NormIntensity,
+				i.URazorLabels.Channel10.NormIntensity,
 				i.TotalLabels.Channel1.RatioIntensity,
 				i.TotalLabels.Channel2.RatioIntensity,
 				i.TotalLabels.Channel3.RatioIntensity,
@@ -1209,16 +1336,16 @@ func (e *Evidence) ProteinQuantReport() {
 				i.UniqueLabels.Channel8.RatioIntensity,
 				i.UniqueLabels.Channel9.RatioIntensity,
 				i.UniqueLabels.Channel10.RatioIntensity,
-				i.RazorLabels.Channel1.RatioIntensity,
-				i.RazorLabels.Channel2.RatioIntensity,
-				i.RazorLabels.Channel3.RatioIntensity,
-				i.RazorLabels.Channel4.RatioIntensity,
-				i.RazorLabels.Channel5.RatioIntensity,
-				i.RazorLabels.Channel6.RatioIntensity,
-				i.RazorLabels.Channel7.RatioIntensity,
-				i.RazorLabels.Channel8.RatioIntensity,
-				i.RazorLabels.Channel9.RatioIntensity,
-				i.RazorLabels.Channel10.RatioIntensity,
+				i.URazorLabels.Channel1.RatioIntensity,
+				i.URazorLabels.Channel2.RatioIntensity,
+				i.URazorLabels.Channel3.RatioIntensity,
+				i.URazorLabels.Channel4.RatioIntensity,
+				i.URazorLabels.Channel5.RatioIntensity,
+				i.URazorLabels.Channel6.RatioIntensity,
+				i.URazorLabels.Channel7.RatioIntensity,
+				i.URazorLabels.Channel8.RatioIntensity,
+				i.URazorLabels.Channel9.RatioIntensity,
+				i.URazorLabels.Channel10.RatioIntensity,
 				strings.Join(ip, ", "))
 
 			line += "\n"
@@ -1383,133 +1510,6 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 	}
 
 	return nil
-}
-
-// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-func (e *Evidence) UpdateIonStatus() {
-
-	var uniqueMap = make(map[string]bool)
-	var razorMap = make(map[string]bool)
-
-	for _, i := range e.Proteins {
-
-		for _, j := range i.UniquePeptideIons {
-			var ion string
-			if len(j.ModifiedSequence) > 0 {
-				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
-			} else {
-				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
-			}
-			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
-			key := fmt.Sprintf("%s", ion)
-			uniqueMap[key] = true
-		}
-
-		for _, j := range i.URazorPeptideIons {
-			var ion string
-			if len(j.ModifiedSequence) > 0 {
-				ion = fmt.Sprintf("%s#%d", j.ModifiedSequence, j.ChargeState)
-			} else {
-				ion = fmt.Sprintf("%s#%d", j.Sequence, j.ChargeState)
-			}
-			//key := fmt.Sprintf("%s#%s", i.ProteinName, ion)
-			key := fmt.Sprintf("%s", ion)
-			razorMap[key] = true
-		}
-
-	}
-
-	for i := range e.PSM {
-
-		var ion string
-		if len(e.PSM[i].ModifiedPeptide) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
-		}
-
-		//key := fmt.Sprintf("%s#%s", e.PSM[i].Protein, ion)
-		key := fmt.Sprintf("%s", ion)
-
-		_, uOK := uniqueMap[key]
-		if uOK {
-			e.PSM[i].IsUnique = true
-		}
-
-		_, rOK := razorMap[key]
-		if rOK {
-			e.PSM[i].IsRazor = true
-		}
-
-	}
-
-	return
-}
-
-// UpdateIonModCount counts how many times each ion is observed modified and not modified
-func (e *Evidence) UpdateIonModCount() {
-
-	// recreate the ion list from the main report object
-	var AllIons = make(map[string]int)
-	var ModIons = make(map[string]int)
-	var UnModIons = make(map[string]int)
-
-	for _, i := range e.Ions {
-		var ion string
-		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-		}
-		AllIons[ion] = 0
-		ModIons[ion] = 0
-		UnModIons[ion] = 0
-	}
-
-	// range over PSMs looking for modified and not modified evidences
-	// if they exist on the ions map, get the numbers
-	for _, i := range e.PSM {
-		var psmIon string
-		if len(i.ModifiedPeptide) > 0 {
-			psmIon = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
-		} else {
-			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
-		}
-
-		// check the map
-		_, ok := AllIons[psmIon]
-		if ok {
-
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				UnModIons[psmIon]++
-			} else {
-				ModIons[psmIon]++
-			}
-
-		}
-	}
-
-	for i := range e.Ions {
-		var ion string
-		if len(e.Ions[i].ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-		}
-
-		v1, ok1 := UnModIons[ion]
-		if ok1 {
-			e.Ions[i].UnModifiedObservations = v1
-		}
-
-		v2, ok2 := ModIons[ion]
-		if ok2 {
-			e.Ions[i].ModifiedObservations = v2
-		}
-
-	}
-
-	return
 }
 
 // UpdatePeptideModCount counts how many times each peptide is observed modified and not modified

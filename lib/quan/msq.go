@@ -311,11 +311,11 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 		}
 
 		if len(razorInt) >= 3 {
-			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
+			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
 		} else if len(razorInt) == 2 {
-			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
+			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
 		} else if len(razorInt) == 1 {
-			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1])
+			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1])
 		}
 
 	}
