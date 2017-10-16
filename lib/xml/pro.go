@@ -141,7 +141,6 @@ func (p *ProtXML) Read(f string) error {
 
 				pepid.PeptideSequence = string(k.PeptideSequence)
 				pepid.ModifiedPeptide = string(k.ModificationInfo.ModifiedPeptide)
-
 				pepid.Charge = k.Charge
 				pepid.InitialProbability = k.InitialProbability
 				pepid.Weight = k.Weight
@@ -150,6 +149,10 @@ func (p *ProtXML) Read(f string) error {
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Razor = -1
 
+				if string(k.IsNondegenerateEvidence) == "y" || string(k.IsNondegenerateEvidence) == "Y" {
+					pepid.IsNondegenerateEvidence = true
+				}
+
 				// get the number of shared ions
 				if pepid.Weight < 1 {
 					pepid.IsUnique = false
@@ -157,7 +160,7 @@ func (p *ProtXML) Read(f string) error {
 					pepid.IsUnique = true
 				}
 
-				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") {
+				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
 					pepid.IsNondegenerateEvidence = true
 				} else {
 					pepid.IsNondegenerateEvidence = false
