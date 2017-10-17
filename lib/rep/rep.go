@@ -156,6 +156,7 @@ type ProteinEvidence struct {
 	GeneNames              string
 	ProteinExistence       string
 	Sequence               string
+	SupportingSpectra      map[string]int
 	IndiProtein            map[string]uint8
 	UniqueStrippedPeptides int
 	// TotalNumRazorPeptides        int
@@ -192,38 +193,47 @@ func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[
 
 // CombinedEvidence represents all combined proteins detected
 type CombinedEvidence struct {
-	GroupNumber             uint32
-	SiblingID               string
-	ProteinName             string
-	ProteinID               string
-	IndiProtein             []string
-	EntryName               string
-	GeneNames               string
-	Length                  int
-	Names                   []string
-	UniqueStrippedPeptides  int
-	TotalIons               int
-	TotalPeptideIonStrings  map[string]int
-	UniquePeptideIonStrings map[string]int
-	RazorPeptideIonStrings  map[string]int
-	// TotalPeptideIons        map[string]int
-	// UniquePeptideIons       map[string]int
-	// RazorPeptideIons        map[string]int
-	TotalPeptideIntensity  map[string]float64
-	UniquePeptideIntensity map[string]float64
-	RazorPeptideIntensity  map[string]float64
-	TotalPeptideIons       int
-	UniquePeptideIons      int
-	SharedPeptideIons      int
-	RazorPeptideIons       int
-	TotalSpc               []int
-	UniqueSpc              []int
+	GroupNumber            uint32
+	SiblingID              string
+	ProteinName            string
+	ProteinID              string
+	IndiProtein            []string
+	EntryName              string
+	GeneNames              string
+	Description            string
+	Length                 int
+	Names                  []string
+	UniqueStrippedPeptides int
+	TotalIons              int
+	SupportingSpectra      map[string]string
 	ProteinProbability     float64
 	TopPepProb             float64
+	PeptideIons            []xml.PeptideIonIdentification
+	TotalSpc               map[string]int
+	UniqueSpc              map[string]int
+	UrazorSpc              map[string]int
+	TotalIntensity         map[string]float64
+	UniqueIntensity        map[string]float64
+	UrazorIntensity        map[string]float64
+	//UniquePeptideIons      []xml.PeptideIonIdentification
+	// TotalPeptideIonStrings  map[string]int
+	// UniquePeptideIonStrings map[string]int
+	// RazorPeptideIonStrings  map[string]int
+	// TotalPeptideIntensity   map[string]float64
+	// UniquePeptideIntensity  map[string]float64
+	// RazorPeptideIntensity   map[string]float64
+	// TotalPeptideIons        int
+	// UniquePeptideIons       int
+	// SharedPeptideIons       int
+	// RazorPeptideIons        int
 }
 
 // CombinedEvidenceList ...
 type CombinedEvidenceList []CombinedEvidence
+
+func (a CombinedEvidenceList) Len() int           { return len(a) }
+func (a CombinedEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
@@ -535,12 +545,23 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
+	var psmIonMap = make(map[string][]string)
 	var assignedModMap = make(map[string][]string)
 	var observedModMap = make(map[string][]string)
 	var err error
 
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range e.PSM {
+
+		var ion string
+		if len(i.ModifiedPeptide) > 0 {
+			ion = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
+		} else {
+			ion = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
+		}
+
+		psmIonMap[ion] = append(psmIonMap[ion], i.Spectrum)
+
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.AlternativeProteins...)
 
@@ -562,6 +583,13 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 	for _, i := range ion {
 		if !clas.IsDecoyPSM(i, decoyTag) {
 
+			var key string
+			if len(i.ModifiedPeptide) > 0 {
+				key = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
+			} else {
+				key = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
+			}
+
 			var pr IonEvidence
 
 			pr.Spectra = make(map[string]int)
@@ -569,7 +597,12 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			pr.ObservedModifications = make(map[string]uint16)
 			pr.AssignedModifications = make(map[string]uint16)
 
-			pr.Spectra[i.Spectrum]++
+			v, ok := psmIonMap[key]
+			if ok {
+				for _, j := range v {
+					pr.Spectra[j]++
+				}
+			}
 
 			pr.Sequence = i.Peptide
 			pr.ModifiedSequence = i.ModifiedPeptide
@@ -580,7 +613,7 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			pr.Expectation = i.Expectation
 
 			// get he list of indi proteins from pepXML data
-			v, ok := psmPtMap[i.Spectrum]
+			v, ok = psmPtMap[i.Spectrum]
 			if ok {
 				for _, j := range v {
 					pr.MappedProteins[j] = 0
@@ -1059,6 +1092,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 
 			var rep ProteinEvidence
 
+			rep.SupportingSpectra = make(map[string]int)
 			rep.TotalPeptideIons = make(map[string]IonEvidence)
 			rep.UniquePeptideIons = make(map[string]IonEvidence)
 			rep.URazorPeptideIons = make(map[string]IonEvidence)
@@ -1096,6 +1130,13 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 
 				v, ok := evidenceIons[ion]
 				if ok {
+
+					for spec := range v.Spectra {
+						rep.SupportingSpectra[spec]++
+					}
+
+					v.MappedProteins = nil
+
 					ref := v
 					ref.Weight = k.Weight
 					ref.GroupWeight = k.GroupWeight
