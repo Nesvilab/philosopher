@@ -181,6 +181,10 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	pro = nil
 
 	// ADD ERROR CASES
+	logrus.Info("Correcting PSM to Protein mappings")
+	e.UpdateIndistinguishableProteinLists()
+
+	// ADD ERROR CASES
 	logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
 

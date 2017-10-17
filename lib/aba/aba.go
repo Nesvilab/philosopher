@@ -123,6 +123,7 @@ func (a *Abacus) Run(args []string) error {
 			}
 
 		}
+
 		PsmMap[prjName] = e.PSM
 	}
 
@@ -208,7 +209,7 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 			ce.TotalPeptideIons = len(j.PeptideIons)
 
 			for _, j := range j.PeptideIons {
-				if j.IsUnique == false {
+				if j.IsNondegenerateEvidence == false {
 					ce.SharedPeptideIons++
 				} else {
 					ce.UniquePeptideIons++

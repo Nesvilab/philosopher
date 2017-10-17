@@ -43,46 +43,45 @@ type Modifications struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Index                     uint32
-	Spectrum                  string
-	Scan                      int
-	Peptide                   string
-	Protein                   string
-	ProteinID                 string
-	GeneName                  string
-	ModifiedPeptide           string
-	AlternativeProteins       []string
-	AlternativeTargetProteins []string
-	ModPositions              []string
-	AssignedModMasses         []float64
-	AssignedMassDiffs         []float64
-	AssignedAminoAcid         []string
-	AssignedModifications     map[string]uint16
-	ObservedModifications     map[string]uint16
-	AssumedCharge             uint8
-	HitRank                   uint8
-	PrecursorNeutralMass      float64
-	PrecursorExpMass          float64
-	RetentionTime             float64
-	CalcNeutralPepMass        float64
-	RawMassdiff               float64
-	Massdiff                  float64
-	LocalizedMassDiff         string
-	Probability               float64
-	Expectation               float64
-	Xcorr                     float64
-	DeltaCN                   float64
-	DeltaCNStar               float64
-	SPScore                   float64
-	SPRank                    float64
-	Hyperscore                float64
-	Nextscore                 float64
-	DiscriminantValue         float64
-	Intensity                 float64
-	Purity                    float64
-	IsUnique                  bool
-	IsURazor                  bool
-	Labels                    tmt.Labels
+	Index                 uint32
+	Spectrum              string
+	Scan                  int
+	Peptide               string
+	Protein               string
+	ProteinID             string
+	GeneName              string
+	ModifiedPeptide       string
+	AlternativeProteins   []string
+	ModPositions          []string
+	AssignedModMasses     []float64
+	AssignedMassDiffs     []float64
+	AssignedAminoAcid     []string
+	AssignedModifications map[string]uint16
+	ObservedModifications map[string]uint16
+	AssumedCharge         uint8
+	HitRank               uint8
+	PrecursorNeutralMass  float64
+	PrecursorExpMass      float64
+	RetentionTime         float64
+	CalcNeutralPepMass    float64
+	RawMassdiff           float64
+	Massdiff              float64
+	LocalizedMassDiff     string
+	Probability           float64
+	Expectation           float64
+	Xcorr                 float64
+	DeltaCN               float64
+	DeltaCNStar           float64
+	SPScore               float64
+	SPRank                float64
+	Hyperscore            float64
+	Nextscore             float64
+	DiscriminantValue     float64
+	Intensity             float64
+	Purity                float64
+	IsUnique              bool
+	IsURazor              bool
+	Labels                tmt.Labels
 }
 
 // PSMEvidenceList ...
@@ -273,12 +272,12 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 	var dtb data.Base
 	dtb.Restore()
 
-	// var genes = make(map[string]string)
-	// var ptid = make(map[string]string)
-	// for _, j := range dtb.Records {
-	// 	genes[j.ProteinName] = j.GeneNames
-	// 	ptid[j.ProteinName] = j.ID
-	// }
+	var genes = make(map[string]string)
+	var ptid = make(map[string]string)
+	for _, j := range dtb.Records {
+		genes[j.PartHeader] = j.GeneNames
+		ptid[j.PartHeader] = j.ID
+	}
 
 	for _, i := range pep {
 		if !clas.IsDecoyPSM(i, decoyTag) {
@@ -292,7 +291,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.Protein = i.Protein
 			p.ModifiedPeptide = i.ModifiedPeptide
 			p.AlternativeProteins = i.AlternativeProteins
-			p.AlternativeTargetProteins = i.AlternativeTargetProteins
+			//p.AlternativeTargetProteins = i.AlternativeTargetProteins
 			p.ModPositions = i.ModPositions
 			p.AssignedModMasses = i.AssignedModMasses
 			p.AssignedMassDiffs = i.AssignedMassDiffs
@@ -318,16 +317,16 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 			p.AssignedModifications = make(map[string]uint16)
 			p.ObservedModifications = make(map[string]uint16)
 
-			// TODO find a way to map gene names to the psm
-			// gn, ok := genes[i.Protein]
-			// if ok {
-			// 	p.GeneName = gn
-			// }
-			//
-			// id, ok := ptid[i.Protein]
-			// if ok {
-			// 	p.ProteinID = id
-			// }
+			// TODO find a better way to map gene names to the psm
+			gn, ok := genes[i.Protein]
+			if ok {
+				p.GeneName = gn
+			}
+
+			id, ok := ptid[i.Protein]
+			if ok {
+				p.ProteinID = id
+			}
 
 			list = append(list, p)
 		}
@@ -413,9 +412,9 @@ func (e *Evidence) PSMReport() {
 			i.LocalizedMassDiff,
 			i.IsUnique,
 			i.IsURazor,
-			len(i.AlternativeTargetProteins)+1,
+			len(i.AlternativeProteins)+1, // Mapped Proteins //len(i.AlternativeTargetProteins)+1,
 			i.Protein,
-			strings.Join(i.AlternativeTargetProteins, ", "),
+			strings.Join(i.AlternativeProteins, ", "), // strings.Join(i.AlternativeTargetProteins, ", "),
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -503,10 +502,10 @@ func (e *Evidence) PSMQuantReport() {
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
-			len(i.AlternativeTargetProteins)+1,
+			len(i.AlternativeProteins)+1, //len(i.AlternativeTargetProteins)+1,
 			i.GeneName,
 			i.Protein,
-			strings.Join(i.AlternativeTargetProteins, ", "),
+			strings.Join(i.AlternativeProteins, ", "), // strings.Join(i.AlternativeTargetProteins, ", "),
 			i.Purity,
 			i.Labels.Channel1.Intensity,
 			i.Labels.Channel2.Intensity,
@@ -761,6 +760,39 @@ func (e *Evidence) UpdateIonModCount() {
 		}
 
 	}
+
+	return
+}
+
+// UpdateIndistinguishableProteinLists pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIndistinguishableProteinLists() {
+
+	var ptNetMap = make(map[string][]string)
+
+	for _, i := range e.Proteins {
+
+		var list []string
+		for k := range i.IndiProtein {
+			list = append(list, k)
+		}
+
+		ptNetMap[i.ProteinID] = list
+
+	}
+
+	for i := range e.PSM {
+		v, ok := ptNetMap[e.PSM[i].ProteinID]
+		if ok {
+			e.PSM[i].AlternativeProteins = v
+		}
+	}
+
+	// for i := range e.Ions {
+	// 	v, ok := ptNetMap[e.Ions[i].]
+	// 	if ok {
+	// 		e.PSM[i].AlternativeProteins = v
+	// 	}
+	// }
 
 	return
 }
