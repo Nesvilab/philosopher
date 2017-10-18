@@ -104,6 +104,7 @@ type IonEvidence struct {
 	Spc                     int
 	MZ                      float64
 	PeptideMass             float64
+	PrecursorNeutralMass    float64
 	IsNondegenerateEvidence bool
 	Weight                  float64
 	GroupWeight             float64
@@ -609,6 +610,7 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 			pr.MZ = utils.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
 			pr.ChargeState = i.AssumedCharge
 			pr.PeptideMass = i.CalcNeutralPepMass
+			pr.PrecursorNeutralMass = i.PrecursorNeutralMass
 			pr.Probability = i.Probability
 			pr.Expectation = i.Expectation
 
@@ -1080,9 +1082,9 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 	for _, i := range e.Ions {
 		var ion string
 		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
+			ion = fmt.Sprintf("%s#%d#%.4f", i.ModifiedSequence, i.ChargeState, i.PeptideMass)
 		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
+			ion = fmt.Sprintf("%s#%d#%.4f", i.Sequence, i.ChargeState, i.PeptideMass)
 		}
 		evidenceIons[ion] = i
 	}
@@ -1121,12 +1123,14 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 
 			for _, k := range i.PeptideIons {
 
-				var ion string
-				if len(k.ModifiedPeptide) > 0 {
-					ion = fmt.Sprintf("%s#%d", k.ModifiedPeptide, k.Charge)
-				} else {
-					ion = fmt.Sprintf("%s#%d", k.PeptideSequence, k.Charge)
-				}
+				// var ion string
+				// if len(k.ModifiedPeptide) > 0 {
+				// 	ion = fmt.Sprintf("%s#%d#%.4f", k.ModifiedPeptide, k.Charge, k.CalcNeutralPepMass)
+				// } else {
+				// 	ion = fmt.Sprintf("%s#%d#%.4f", k.PeptideSequence, k.Charge, k.CalcNeutralPepMass)
+				// }
+
+				ion := fmt.Sprintf("%s#%d#%.4f", k.PeptideSequence, k.Charge, k.CalcNeutralPepMass)
 
 				v, ok := evidenceIons[ion]
 				if ok {
