@@ -14,7 +14,7 @@ import (
 	"github.com/prvst/philosopher/lib/rep"
 )
 
-// peakIntensity ...
+// peakIntensity collects PSM intensities from the apex peak
 func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
 
 	// get all spectra in centralized structure
@@ -29,7 +29,6 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 
 		// process pepXML information
 		ppmPrecision := tol / math.Pow(10, 6)
-		//mz := utils.Round(((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge)), 5, 4)
 		mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
 		minRT := (e.PSM[i].RetentionTime / 60) - rTWin
 		maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
@@ -55,10 +54,6 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 					}
 				}
 			}
-
-			// if topI > e.PSM[i].Intensity {
-			// 	e.PSM[i].Intensity = topI
-			// }
 
 			e.PSM[i].Intensity = topI
 		}
@@ -165,7 +160,6 @@ func xic(v []mz.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]fl
 	for j := range v {
 
 		if v[j].ScanStartTime >= minRT && v[j].ScanStartTime <= maxRT {
-			//if v[j].ScanStartTime >= minRT && v[j].ScanStartTime < maxRT {
 
 			lowi := sort.Search(len(v[j].Spectrum), func(i int) bool { return v[j].Spectrum[i].Mz >= mz-ppmPrecision*mz })
 			highi := sort.Search(len(v[j].Spectrum), func(i int) bool { return v[j].Spectrum[i].Mz >= mz+ppmPrecision*mz })
@@ -193,6 +187,137 @@ func xic(v []mz.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]fl
 }
 
 // calculateIntensities calculates the protein intensity
+// func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
+//
+// 	var intPepMap = make(map[string]float64)
+// 	var intIonMap = make(map[string]float64)
+//
+// 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
+// 		return e, &err.Error{Type: err.CannotFindPSMData, Class: err.FATA, Argument: "cannot attribute intensity calculations"}
+// 	}
+//
+// 	for i := range e.PSM {
+//
+// 		// global intensity map for Peptides, getting the most intense
+// 		_, okPep := intPepMap[e.PSM[i].Peptide]
+// 		if okPep {
+// 			if e.PSM[i].Intensity > intPepMap[e.PSM[i].Peptide] {
+// 				intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
+// 			}
+// 		} else {
+// 			intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
+// 		}
+//
+// 		// global intensity map for Ions, getting the most intense
+// 		_, okIon := intIonMap[e.PSM[i].IonForm]
+// 		if okIon {
+// 			if e.PSM[i].Intensity > intIonMap[e.PSM[i].IonForm] {
+// 				intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
+// 			}
+// 		} else {
+// 			intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
+// 		}
+//
+// 	}
+//
+// 	// attribute intensities to peptide evidences
+// 	for i := range e.Peptides {
+// 		v, ok := intPepMap[e.Peptides[i].Sequence]
+// 		if ok {
+// 			e.Peptides[i].Intensity = v
+// 		}
+// 	}
+//
+// 	// attribute intensities to ion evidences
+// 	for i := range e.Ions {
+// 		v, ok := intIonMap[e.Ions[i].IonForm]
+// 		if ok {
+// 			e.Ions[i].Intensity = v
+// 		}
+// 	}
+//
+// 	// attribute intensities to protein evidences
+// 	for i := range e.Proteins {
+//
+// 		var totalInt []float64
+// 		var uniqueInt []float64
+// 		var razorInt []float64
+//
+// 		// for total ions
+// 		for k := range e.Proteins[i].TotalPeptideIons {
+// 			v, ok := intIonMap[k]
+// 			if ok {
+// 				totalInt = append(totalInt, v)
+// 			}
+// 		}
+//
+// 		// for unique ions
+// 		for k, ion := range e.Proteins[i].TotalPeptideIons {
+// 			v, ok := intIonMap[k]
+// 			if ok {
+// 				if ion.IsNondegenerateEvidence == true {
+// 					_, exists := ion.MappedProteins[e.Proteins[i].ProteinName]
+// 					if exists {
+// 						uniqueInt = append(uniqueInt, v)
+// 					}
+// 				}
+// 			}
+// 		}
+//
+// 		// for razor ions
+// 		for k, ion := range e.Proteins[i].TotalPeptideIons {
+// 			v, ok := intIonMap[k]
+// 			if ok {
+// 				if ion.IsURazor == true {
+// 					_, exists := ion.MappedProteins[e.Proteins[i].ProteinName]
+// 					if exists {
+// 						razorInt = append(razorInt, v)
+// 					}
+// 				}
+// 			}
+// 		}
+//
+// 		// if e.Proteins[i].ProteinID == "Q9H0U4" {
+// 		// 	litter.Dump(e.Proteins[i])
+// 		// 	fmt.Println(len(totalInt))
+// 		// 	fmt.Println(len(uniqueInt))
+// 		// 	fmt.Println(len(razorInt))
+// 		// 	os.Exit(1)
+// 		// }
+//
+// 		sort.Float64s(totalInt)
+// 		sort.Float64s(uniqueInt)
+// 		sort.Float64s(razorInt)
+//
+// 		if len(totalInt) >= 3 {
+// 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2] + totalInt[len(totalInt)-3])
+// 		} else if len(totalInt) == 2 {
+// 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2])
+// 		} else if len(totalInt) == 1 {
+// 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1])
+// 		}
+//
+// 		if len(uniqueInt) >= 3 {
+// 			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2] + uniqueInt[len(uniqueInt)-3])
+// 		} else if len(uniqueInt) == 2 {
+// 			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2])
+// 		} else if len(uniqueInt) == 1 {
+// 			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1])
+// 		}
+//
+// 		if len(razorInt) >= 3 {
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
+// 		} else if len(razorInt) == 2 {
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
+// 		} else if len(razorInt) == 1 {
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1])
+// 		}
+//
+// 	}
+//
+// 	return e, nil
+// }
+
 func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	var intPepMap = make(map[string]float64)
@@ -203,13 +328,6 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 	}
 
 	for i := range e.PSM {
-
-		var key string
-		if len(e.PSM[i].ModifiedPeptide) > 0 {
-			key = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
-		} else {
-			key = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
-		}
 
 		// global intensity map for Peptides, getting the most intense
 		_, okPep := intPepMap[e.PSM[i].Peptide]
@@ -222,13 +340,13 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 		}
 
 		// global intensity map for Ions, getting the most intense
-		_, okIon := intIonMap[key]
+		_, okIon := intIonMap[e.PSM[i].IonForm]
 		if okIon {
-			if e.PSM[i].Intensity > intIonMap[key] {
-				intIonMap[key] = e.PSM[i].Intensity
+			if e.PSM[i].Intensity > intIonMap[e.PSM[i].IonForm] {
+				intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 			}
 		} else {
-			intIonMap[key] = e.PSM[i].Intensity
+			intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 		}
 
 	}
@@ -243,20 +361,10 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	// attribute intensities to ion evidences
 	for i := range e.Ions {
-
-		var key string
-
-		if len(e.Ions[i].ModifiedSequence) > 0 {
-			key = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-		} else {
-			key = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-		}
-
-		v, ok := intIonMap[key]
+		v, ok := intIonMap[e.Ions[i].IonForm]
 		if ok {
 			e.Ions[i].Intensity = v
 		}
-
 	}
 
 	// attribute intensities to protein evidences
@@ -267,18 +375,22 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 		var razorInt []float64
 
 		// for unique ions
-		for k := range e.Proteins[i].UniquePeptideIons {
-			v, ok := intIonMap[k]
+		for _, k := range e.Proteins[i].TotalPeptideIons {
+			v, ok := intIonMap[k.IonForm]
 			if ok {
-				uniqueInt = append(uniqueInt, v)
+				if k.IsNondegenerateEvidence == true {
+					uniqueInt = append(uniqueInt, v)
+				}
 			}
 		}
 
 		// for razor ions
-		for k := range e.Proteins[i].URazorPeptideIons {
-			v, ok := intIonMap[k]
+		for _, k := range e.Proteins[i].TotalPeptideIons {
+			v, ok := intIonMap[k.IonForm]
 			if ok {
-				razorInt = append(razorInt, v)
+				if k.IsURazor == true {
+					razorInt = append(razorInt, v)
+				}
 			}
 		}
 
@@ -323,11 +435,8 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 	return e, nil
 }
 
-// // calculateIntensities calculates the protein intensity
 // func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 //
-// 	var intMap = make(map[string]float64)
-// 	var intRefMap = make(map[string]float64)
 // 	var intPepMap = make(map[string]float64)
 // 	var intIonMap = make(map[string]float64)
 //
@@ -337,24 +446,7 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 //
 // 	for i := range e.PSM {
 //
-// 		var key string
-// 		if len(e.PSM[i].ModifiedPeptide) > 0 {
-// 			key = fmt.Sprintf("%s#%d", e.PSM[i].ModifiedPeptide, e.PSM[i].AssumedCharge)
-// 		} else {
-// 			key = fmt.Sprintf("%s#%d", e.PSM[i].Peptide, e.PSM[i].AssumedCharge)
-// 		}
-//
-// 		// global intensity map for spectra
-// 		_, ok := intMap[key]
-// 		if ok {
-// 			if e.PSM[i].Intensity > intMap[key] {
-// 				intMap[key] = e.PSM[i].Intensity
-// 			}
-// 		} else {
-// 			intMap[key] = e.PSM[i].Intensity
-// 		}
-//
-// 		// global intensity map for Peptides
+// 		// global intensity map for Peptides, getting the most intense
 // 		_, okPep := intPepMap[e.PSM[i].Peptide]
 // 		if okPep {
 // 			if e.PSM[i].Intensity > intPepMap[e.PSM[i].Peptide] {
@@ -364,72 +456,62 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 // 			intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
 // 		}
 //
-// 		// global intensity map for Ions
-// 		_, okIon := intIonMap[key]
+// 		// global intensity map for Ions, getting the most intense
+// 		_, okIon := intIonMap[e.PSM[i].IonForm]
 // 		if okIon {
-// 			if e.PSM[i].Intensity > intIonMap[key] {
-// 				intIonMap[key] = e.PSM[i].Intensity
+// 			if e.PSM[i].Intensity > intIonMap[e.PSM[i].IonForm] {
+// 				intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 // 			}
 // 		} else {
-// 			intIonMap[key] = e.PSM[i].Intensity
+// 			intIonMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 // 		}
 //
 // 	}
 //
-// 	// peptides get the higest intense from the matching sequences
+// 	// attribute intensities to peptide evidences
 // 	for i := range e.Peptides {
-// 		v, ok := intMap[e.Peptides[i].Sequence]
+// 		v, ok := intPepMap[e.Peptides[i].Sequence]
 // 		if ok {
 // 			e.Peptides[i].Intensity = v
 // 		}
 // 	}
 //
-// 	// ions get the higest intense from the matching sequences
+// 	// attribute intensities to ion evidences
 // 	for i := range e.Ions {
-//
-// 		var key string
-// 		if len(e.Ions[i].ModifiedSequence) > 0 {
-// 			key = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-// 		} else {
-// 			key = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-// 		}
-//
-// 		v, ok := intMap[key]
+// 		v, ok := intIonMap[e.Ions[i].IonForm]
 // 		if ok {
 // 			e.Ions[i].Intensity = v
-// 			intRefMap[key] = v
 // 		}
-//
 // 	}
 //
+// 	// attribute intensities to protein evidences
 // 	for i := range e.Proteins {
 //
 // 		var totalInt []float64
 // 		var uniqueInt []float64
 // 		var razorInt []float64
 //
-// 		// make a reference for razor peptides
-// 		var uniqIons = make(map[string]uint8)
-//
+// 		// for unique ions
 // 		for k := range e.Proteins[i].UniquePeptideIons {
-// 			v, ok := intRefMap[k]
+// 			v, ok := intIonMap[k]
 // 			if ok {
 // 				uniqueInt = append(uniqueInt, v)
-// 				razorInt = append(razorInt, v)
-// 				uniqIons[k] = 0
 // 			}
 // 		}
 //
-// 		for k, j := range e.Proteins[i].TotalPeptideIons {
-// 			v, ok := intRefMap[k]
+// 		// for razor ions
+// 		for k := range e.Proteins[i].URazorPeptideIons {
+// 			v, ok := intIonMap[k]
+// 			if ok {
+// 				razorInt = append(razorInt, v)
+// 			}
+// 		}
+//
+// 		// for total ions
+// 		for k := range e.Proteins[i].TotalPeptideIons {
+// 			v, ok := intIonMap[k]
 // 			if ok {
 // 				totalInt = append(totalInt, v)
-// 				if j.IsRazor {
-// 					_, ok := uniqIons[k]
-// 					if !ok {
-// 						razorInt = append(razorInt, v)
-// 					}
-// 				}
 // 			}
 // 		}
 //
@@ -454,11 +536,11 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 // 		}
 //
 // 		if len(razorInt) >= 3 {
-// 			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
 // 		} else if len(razorInt) == 2 {
-// 			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
 // 		} else if len(razorInt) == 1 {
-// 			e.Proteins[i].RazorIntensity = (razorInt[len(razorInt)-1])
+// 			e.Proteins[i].URazorIntensity = (razorInt[len(razorInt)-1])
 // 		}
 //
 // 	}
