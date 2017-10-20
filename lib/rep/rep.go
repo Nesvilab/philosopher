@@ -49,6 +49,7 @@ type PSMEvidence struct {
 	Peptide               string
 	IonForm               string
 	Protein               string
+	RazorProtein          string
 	ProteinID             string
 	GeneName              string
 	ModifiedPeptide       string
@@ -146,6 +147,7 @@ func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].S
 // ProteinEvidence ...
 type ProteinEvidence struct {
 	OriginalHeader         string
+	PartHeader             string
 	ProteinName            string
 	ProteinGroup           uint32
 	ProteinSubGroup        string
@@ -363,7 +365,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tRazor Protein\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -398,7 +400,7 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -425,6 +427,7 @@ func (e *Evidence) PSMReport() {
 			i.LocalizedMassDiff,
 			i.IsUnique,
 			i.IsURazor,
+			i.RazorProtein,
 			len(i.AlternativeProteins)+1, // Mapped Proteins //len(i.AlternativeTargetProteins)+1,
 			i.Protein,
 			strings.Join(i.AlternativeProteins, ", "), // strings.Join(i.AlternativeTargetProteins, ", "),
@@ -644,7 +647,7 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 func (e *Evidence) UpdateIonStatus() {
 
 	var uniqueMap = make(map[string]bool)
-	var urazorMap = make(map[string]bool)
+	var urazorMap = make(map[string]string)
 	var ptMap = make(map[string]string)
 	var ptIndiMap = make(map[string][]string)
 
@@ -658,7 +661,7 @@ func (e *Evidence) UpdateIonStatus() {
 
 		for _, j := range i.TotalPeptideIons {
 			if j.IsURazor == true {
-				urazorMap[j.IonForm] = true
+				urazorMap[j.IonForm] = i.PartHeader
 			}
 		}
 
@@ -671,9 +674,10 @@ func (e *Evidence) UpdateIonStatus() {
 			e.PSM[i].IsUnique = true
 		}
 
-		_, rOK := urazorMap[e.PSM[i].IonForm]
+		rp, rOK := urazorMap[e.PSM[i].IonForm]
 		if rOK {
 			e.PSM[i].IsURazor = true
+			e.PSM[i].RazorProtein = rp
 		}
 
 		v, ok := ptMap[e.PSM[i].IonForm]
@@ -1111,6 +1115,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
 				if (j.IsDecoy == true && list[i].IsDecoy == true) || (j.IsDecoy == false && list[i].IsDecoy == false) {
 					list[i].OriginalHeader = j.OriginalHeader
+					list[i].PartHeader = j.PartHeader
 					list[i].ProteinID = j.ID
 					list[i].EntryName = j.EntryName
 					list[i].ProteinExistence = j.ProteinExistence
