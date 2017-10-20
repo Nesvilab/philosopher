@@ -193,6 +193,7 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 	for k, v := range datasets {
 
 		var ions = make(map[string]int)
+		var exclusion = make(map[string]uint8)
 
 		for _, i := range v.PSM {
 			ions[i.IonForm]++
@@ -210,24 +211,17 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 
 		for i := range combined {
 			for _, j := range combined[i].PeptideIons {
-
 				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
-
 				sum, ok := ions[ion]
 				if ok {
-
-					//combined[i].TotalSpc[k] += sum
-
-					// if j.IsUnique == true {
-					// 	combined[i].UniqueSpc[k] += sum
-					// }
-
-					if j.Razor == 1 {
-						combined[i].UrazorSpc[k] += sum
+					_, excl := exclusion[ion]
+					if !excl {
+						if j.Razor == 1 {
+							combined[i].UrazorSpc[k] += sum
+							exclusion[ion] = 0
+						}
 					}
-
 				}
-
 			}
 		}
 

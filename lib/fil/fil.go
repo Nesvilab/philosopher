@@ -715,7 +715,7 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
+				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
 					p.Groups[i].GroupNumber,
 					string(p.Groups[i].Proteins[j].GroupSiblingID),
 					string(p.Groups[i].Proteins[j].ProteinName),
@@ -754,12 +754,18 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 				if err != nil {
 					return p, err
 				}
+
 				groupWeight, err := strconv.ParseFloat(pep[6], 64)
 				if err != nil {
 					return p, err
 				}
 
-				pepCheck := fmt.Sprintf("%s#%s", pep[3], pep[7])
+				cnpm, err := strconv.ParseFloat(pep[8], 64)
+				if err != nil {
+					return p, err
+				}
+
+				pepCheck := fmt.Sprintf("%s#%s#%.4f", pep[3], pep[7], cnpm)
 
 				// references with weight > 0.5 are easy cases, and clearly assinged as razor
 				if weight > 0.5 {
@@ -815,7 +821,7 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
+				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
 					p.Groups[i].GroupNumber,
 					string(p.Groups[i].Proteins[j].GroupSiblingID),
 					string(p.Groups[i].Proteins[j].ProteinName),
@@ -840,7 +846,6 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 
 			}
 		}
-
 	}
 
 	// mark as razor all peptides in the reference map
@@ -857,15 +862,6 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
 	}
-
-	// for i := range p.Groups {
-	// 	for j := range p.Groups[i].Proteins {
-	// 		if strings.Contains(p.Groups[i].Proteins[j].ProteinName, "Q8NC51") {
-	// 			litter.Dump(p.Groups[i].Proteins[j])
-	// 			os.Exit(1)
-	// 		}
-	// 	}
-	// }
 
 	return p, nil
 }
