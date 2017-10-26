@@ -140,23 +140,35 @@ func New(plex string) (Labels, *err.Error) {
 	var o Labels
 
 	if plex == "6" {
-		o.Channel1.Mz = 126.1277
-		o.Channel2.Mz = 127.1248
-		o.Channel3.Mz = 128.1344
-		o.Channel4.Mz = 129.1315
-		o.Channel5.Mz = 130.1411
-		o.Channel6.Mz = 131.1382
+		o.Channel1.Mz = 126.127726
+		o.Channel2.Mz = 127.124761
+		o.Channel3.Mz = 127.131081
+		o.Channel4.Mz = 128.128116
+		o.Channel5.Mz = 128.134436
+		o.Channel6.Mz = 129.131471
 	} else if plex == "10" {
-		o.Channel1.Mz = 126.127725
-		o.Channel2.Mz = 127.124760
-		o.Channel3.Mz = 127.131079
-		o.Channel4.Mz = 128.128114
-		o.Channel5.Mz = 128.134433
-		o.Channel6.Mz = 129.131468
-		o.Channel7.Mz = 129.137787
-		o.Channel8.Mz = 130.134822
-		o.Channel9.Mz = 130.141141
-		o.Channel10.Mz = 131.138176
+		o.Channel1.Mz = 126.127726
+		o.Channel2.Mz = 127.124761
+		o.Channel3.Mz = 127.131081
+		o.Channel4.Mz = 128.128116
+		o.Channel5.Mz = 128.134436
+		o.Channel6.Mz = 129.131471
+		o.Channel7.Mz = 129.137790
+		o.Channel8.Mz = 130.134825
+		o.Channel9.Mz = 130.141145
+		o.Channel10.Mz = 131.138180
+	} else if plex == "11" {
+		o.Channel1.Mz = 126.127726
+		o.Channel2.Mz = 127.124761
+		o.Channel3.Mz = 127.131081
+		o.Channel4.Mz = 128.128116
+		o.Channel5.Mz = 128.134436
+		o.Channel6.Mz = 129.131471
+		o.Channel7.Mz = 129.137790
+		o.Channel8.Mz = 130.134825
+		o.Channel9.Mz = 130.141145
+		o.Channel10.Mz = 131.138180
+		//o.Channel11.MZ = 131.144499
 	} else {
 		return o, &err.Error{Type: err.UnknownMultiplex, Class: err.FATA}
 	}
