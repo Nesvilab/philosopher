@@ -2,7 +2,6 @@ package quan
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -131,98 +130,131 @@ func (p *Quantify) RunTMTQuantification() error {
 
 	for k := range sourceList {
 
-		fmt.Println(sourceList[k])
+		logrus.Info("Reading ", sourceList[k])
 
 		mz, e := getSpectra(p.Dir, p.Format, sourceList[k])
 		if e != nil {
 			return e
 		}
 
-		newEvi, e := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[k]])
+		mappedPurity, e := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[k]])
 		if e != nil {
 			return e
 		}
 
-		for _, x := range newEvi {
-			fmt.Println(x.Spectrum, "\t", x.Purity)
+		labels, err := prepareLabelStructure(p.Dir, p.Format, strings.ToLower(p.Brand), p.Plex, p.Tol, mz)
+		if err != nil {
+			return err
 		}
 
-		fmt.Println("expired")
-		os.Exit(1)
+		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[k]])
+		if err != nil {
+			return err
+		}
+
+		for j := range evi.PSM {
+
+			for _, mapped := range mappedPurity {
+				if evi.PSM[j].Spectrum == mapped.Spectrum {
+					evi.PSM[j].Purity = mapped.Purity
+					break
+				}
+			}
+
+			for _, mapped := range mappedPSM {
+				if evi.PSM[j].Spectrum == mapped.Spectrum {
+
+					evi.PSM[j].Labels = mapped.Labels
+					break
+				}
+			}
+
+		}
 
 	}
 
-	os.Exit(1)
+	e = evi.SerializeGranular()
+	if e != nil {
+		return e
+	}
 
-	// var spectra []string
-	// var specGroup = make(map[string][]rep.PSMEvidence)
-	// var annotSpecGroup = make(map[string][]rep.PSMEvidence)
-	// var specMap = make(map[string]rep.PSMEvidence)
-	//
-	// // group ms2 spectra by source file and
-	// // map all spectra for latter when we recover the quantifications
-	// for _, i := range evi.PSM {
-	// 	specName := strings.Split(i.Spectrum, ".")
-	// 	source := fmt.Sprintf("%s.%s", specName[0], p.Format)
-	// 	specGroup[source] = append(specGroup[source], i)
-	// 	specMap[i.Spectrum] = i
-	// }
-	//
-	// for i := range specGroup {
-	// 	spectra = append(spectra, i)
-	// }
-	// sort.Strings(spectra)
-	//
-	// logrus.Info("Calculating intensities and ion interference")
-	// for _, k := range spectra {
-	//
-	// 	logrus.Info("Processing ", k)
-	//
-	// 	ms1, ms2, e := getSpectra(p.Dir, p.Format, k)
-	// 	if e != nil {
-	// 		return e
-	// 	}
-	//
-	// 	annotSpecGroup[k], e = calculateIonPurity(p.Dir, p.Format, ms1, ms2, specGroup[k])
-	// 	if e != nil {
-	// 		return e
-	// 	}
-	//
-	// 	labels, err := labeledPeakIntensity(p.Dir, p.Format, strings.ToLower(p.Brand), p.Plex, p.Tol, specGroup[k], ms2)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	//
-	// 	annotSpecGroup[k], err = mapLabeledSpectra(labels, p.Purity, specGroup[k])
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	//
-	// }
-	//
-	// logrus.Info("Mapping quantification values")
-	//
-	// // collect back the values from the annotate spectra to the original evidence structure
-	// for _, v := range annotSpecGroup {
-	// 	for _, i := range v {
-	// 		_, ok := specMap[i.Spectrum]
-	// 		if ok {
-	// 			specMap[i.Spectrum] = i
-	// 		}
-	// 	}
-	// }
-	//
-	// var annotEviList rep.PSMEvidenceList
-	// for _, i := range specMap {
-	// 	annotEviList = append(annotEviList, i)
-	// }
-	//
-	// evi.PSM = annotEviList
-	//
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return e
-	// }
+	return nil
+}
+
+func getSpectra(path, format string, spectra string) (xml.Raw, error) {
+
+	var err error
+	var mzData xml.Raw
+
+	//ext := filepath.Ext(spectra)
+	name := filepath.Base(spectra)
+	//clean := name[0 : len(name)-len(ext)]
+	fullpath, _ := filepath.Abs(path)
+	name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
+
+	if strings.Contains(spectra, "mzML") {
+
+		err = mzData.Read(name, "mzML")
+		if err != nil {
+			return mzData, err
+		}
+
+	} else if strings.Contains(spectra, "mzXML") {
+
+		fmt.Println("NULL")
+
+	} else {
+		logrus.Fatal("Cannot open file: ", name)
+	}
+
+	return mzData, nil
+}
+
+// cleanPreviousData cleans previous label quantifications
+func cleanPreviousData(plex string) *err.Error {
+
+	var evi rep.Evidence
+	e := evi.RestoreGranular()
+	if e != nil {
+		return e
+	}
+
+	for i := range evi.PSM {
+		evi.PSM[i].Labels, e = tmt.New(plex)
+		if e != nil {
+			return e
+		}
+	}
+
+	for i := range evi.Ions {
+		evi.Ions[i].Labels, e = tmt.New(plex)
+		if e != nil {
+			return e
+		}
+	}
+
+	for i := range evi.Proteins {
+		evi.Proteins[i].TotalLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
+		}
+
+		evi.Proteins[i].UniqueLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
+		}
+
+		evi.Proteins[i].URazorLabels, e = tmt.New(plex)
+		if e != nil {
+			return e
+		}
+
+	}
+
+	e = evi.SerializeGranular()
+	if e != nil {
+		return e
+	}
 
 	return nil
 }
@@ -310,84 +342,6 @@ func (p *Quantify) RunTMTQuantification() error {
 //
 // 	return nil
 // }
-
-func getSpectra(path, format string, spectra string) (xml.Raw, error) {
-
-	var err error
-	var mzData xml.Raw
-
-	//ext := filepath.Ext(spectra)
-	name := filepath.Base(spectra)
-	//clean := name[0 : len(name)-len(ext)]
-	fullpath, _ := filepath.Abs(path)
-	name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
-
-	if strings.Contains(spectra, "mzML") {
-
-		err = mzData.Read(name, "mzML")
-		if err != nil {
-			return mzData, err
-		}
-
-	} else if strings.Contains(spectra, "mzXML") {
-
-		fmt.Println("NULL")
-
-	} else {
-		logrus.Fatal("Cannot open file: ", name)
-	}
-
-	return mzData, nil
-}
-
-// cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(plex string) *err.Error {
-
-	var evi rep.Evidence
-	e := evi.RestoreGranular()
-	if e != nil {
-		return e
-	}
-
-	for i := range evi.PSM {
-		evi.PSM[i].Labels, e = tmt.New(plex)
-		if e != nil {
-			return e
-		}
-	}
-
-	for i := range evi.Ions {
-		evi.Ions[i].Labels, e = tmt.New(plex)
-		if e != nil {
-			return e
-		}
-	}
-
-	for i := range evi.Proteins {
-		evi.Proteins[i].TotalLabels, e = tmt.New(plex)
-		if e != nil {
-			return e
-		}
-
-		evi.Proteins[i].UniqueLabels, e = tmt.New(plex)
-		if e != nil {
-			return e
-		}
-
-		evi.Proteins[i].URazorLabels, e = tmt.New(plex)
-		if e != nil {
-			return e
-		}
-
-	}
-
-	e = evi.SerializeGranular()
-	if e != nil {
-		return e
-	}
-
-	return nil
-}
 
 // func getSpectra(path, format string, spectra string) (map[string]mz.MS1, map[string]mz.MS2, error) {
 //
