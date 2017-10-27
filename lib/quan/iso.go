@@ -13,109 +13,336 @@ import (
 	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/prvst/philosopher/lib/xml"
 )
 
 const (
-	mzDeltaWindow float64 = 1.5
+	mzDeltaWindow float64 = 0.5
 )
 
-func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
-	// organize them by index
-	var indexedMs1 = make(map[int]mz.Ms1Scan)
-	for _, v := range ms1 {
-		for _, i := range v.Ms1Scan {
-			indexedMs1[i.Index] = i
+	// index spectra in a dictionary
+	var indexedMz = make(map[string]xml.Spectrum)
+	for _, i := range mzData.Spectra {
+
+		if i.Level == "2" && i.Precursor.IsolationWindowLowerOffset == 0 && i.Precursor.IsolationWindowUpperOffset == 0 {
+			i.Precursor.IsolationWindowLowerOffset = mzDeltaWindow
+			i.Precursor.IsolationWindowUpperOffset = mzDeltaWindow
 		}
+
+		// left-pad the spectrum index
+		paddedIndex := fmt.Sprintf("%05s", i.Index)
+
+		// left-pad the spectrum scan
+		paddedScan := fmt.Sprintf("%05s", i.Scan)
+
+		// left-pad the precursor spectrum index
+		paddedPI := fmt.Sprintf("%05s", i.Precursor.ParentIndex)
+
+		// left-pad the precursor spectrum scan
+		paddedPS := fmt.Sprintf("%05s", i.Precursor.ParentScan)
+
+		i.Index = paddedIndex
+		i.Scan = paddedScan
+		i.Precursor.ParentIndex = paddedPI
+		i.Precursor.ParentScan = paddedPS
+
+		indexedMz[paddedScan] = i
 	}
 
-	// range over IDs and spectra searching for a match
 	for i := range evi {
 
-		// get spectrum name
-		name := strings.Split(evi[i].Spectrum, ".")
+		// get spectrum index
+		split := strings.Split(evi[i].Spectrum, ".")
 
-		// locate the corresponding mz file for this identification
-		s2, ok2 := ms2[name[0]]
-		if ok2 {
+		ms2, ok := indexedMz[split[1]]
+		if ok {
 
-			S2spec, S2ok := s2.Ms2Scan[evi[i].Spectrum]
-			if S2ok {
+			ms1 := indexedMz[ms2.Precursor.ParentScan]
 
-				// recover the matching ms1 structure based on index number
-				s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
-				if ok1 {
-
-					// buffer variable for both target or Selected ions
-					var ion float64
-					if S2spec.Precursor.TargetIon != 0 {
-						ion = S2spec.Precursor.TargetIon
-					} else {
-						ion = S2spec.Precursor.SelectedIon
-					}
-
-					// create a MZ delta based on the selected Ion
-					var lowerDelta float64
-					var higherDelta float64
-
-					if S2spec.Precursor.IsolationWindowLowerOffset != 0 && S2spec.Precursor.IsolationWindowUpperOffset != 0 {
-						lowerDelta = S2spec.Precursor.IsolationWindowLowerOffset
-						higherDelta = S2spec.Precursor.IsolationWindowUpperOffset
-					} else {
-						lowerDelta = S2spec.Precursor.SelectedIon - mzDeltaWindow
-						higherDelta = S2spec.Precursor.SelectedIon + mzDeltaWindow
-					}
-
-					var ions []mz.Ms1Peak
-					for _, k := range s1.Spectrum {
-						if k.Mz <= higherDelta && k.Mz >= lowerDelta {
-							ions = append(ions, k)
-						}
-					}
-
-					// create the list of mz differences for each peak
-					var mzRatio []float64
-					for k := 1; k <= 6; k++ {
-						r := float64(k) * (float64(1) / float64(S2spec.Precursor.ChargeState))
-						mzRatio = append(mzRatio, utils.ToFixed(r, 2))
-					}
-
-					var ionPackage []mz.Ms1Peak
-					var summedInt float64
-					for _, l := range ions {
-
-						summedInt += l.Intensity
-
-						for _, m := range mzRatio {
-							if math.Abs(ion-l.Mz) <= (m+0.05) && math.Abs(ion-l.Mz) >= (m-0.05) {
-								ionPackage = append(ionPackage, l)
-								break
-							}
-						}
-					}
-					summedInt += S2spec.Precursor.PeakIntensity
-
-					// calculate the total inensity for the selected ions from the ion package
-					var summedPackageInt float64
-					for _, k := range ionPackage {
-						summedPackageInt += k.Intensity
-					}
-					summedPackageInt += S2spec.Precursor.PeakIntensity
-
-					if summedInt == 0 {
-						evi[i].Purity = 0
-					} else {
-						evi[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
-					}
-
+			var ions = make(map[float64]float64)
+			var isolationWindowSummedInt float64
+			for k := range ms1.Peaks {
+				if ms1.Peaks[k] >= (ms2.Precursor.TargetIon-ms2.Precursor.IsolationWindowUpperOffset) && ms1.Peaks[k] <= (ms2.Precursor.TargetIon+ms2.Precursor.IsolationWindowUpperOffset) {
+					ions[ms1.Peaks[k]] = ms1.Intensities[k]
+					isolationWindowSummedInt += ms1.Intensities[k]
 				}
 			}
 
+			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
+			// 	fmt.Println("\nions in range")
+			// fmt.Println(ms1.Index)
+			// fmt.Println(ms1.Scan)
+			// fmt.Println(ms1.Level)
+			//
+			// fmt.Println(ms2.Precursor.ParentIndex)
+			// fmt.Println(ms2.Precursor.TargetIon)
+			// fmt.Println(ms2.Precursor.SelectedIon)
+			// fmt.Println(ms2.Precursor.IsolationWindowUpperOffset)
+			// fmt.Println(ms2.Precursor.TargetIon - ms2.Precursor.IsolationWindowUpperOffset)
+			// fmt.Println(ms2.Precursor.TargetIon + ms2.Precursor.IsolationWindowUpperOffset)
+			// 	litter.Dump(ions)
+			// 	fmt.Println(isolationWindowSummedInt)
+			// }
+
+			// create the list of mz differences for each peak
+			var mzRatio []float64
+			for k := 1; k <= 6; k++ {
+				r := float64(k) * (float64(1) / float64(ms2.Precursor.ChargeState))
+				mzRatio = append(mzRatio, utils.ToFixed(r, 2))
+			}
+
+			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
+			// 	fmt.Println("\nratios")
+			// 	litter.Dump(mzRatio)
+			// }
+
+			var isotopePackage = make(map[float64]float64)
+
+			isotopePackage[ms2.Precursor.TargetIon] = ms2.Precursor.PeakIntensity
+			isotopesInt := ms2.Precursor.PeakIntensity
+
+			for k, v := range ions {
+				for _, m := range mzRatio {
+					if math.Abs(ms2.Precursor.TargetIon-k) <= (m+0.02) && math.Abs(ms2.Precursor.TargetIon-k) >= (m-0.02) {
+						isotopePackage[k] = v
+						isotopesInt += v
+						break
+					}
+				}
+			}
+
+			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
+			// 	fmt.Println("\nIsotopes and Intensities")
+			// 	litter.Dump(isotopePackage)
+			// 	fmt.Println(isotopesInt)
+			// }
+
+			// calculate the total inensity for the selected ions from the ion package
+			// var summedPackageInt float64
+			// for _, v := range ionPackage {
+			// 	summedPackageInt += v
+			// }
+			//summedPackageInt += ms2.Precursor.PeakIntensity
+
+			if isotopesInt == 0 {
+				evi[i].Purity = 0
+			} else {
+				evi[i].Purity = utils.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
+			}
+
+			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
+			// 	fmt.Println("\nPurity")
+			// 	fmt.Println(evi[i].Purity)
+			// 	os.Exit(1)
+			// }
+
 		}
+
 	}
+
+	// range over IDs and spectra searching for a match
+	// for i := range evi {
+	//
+	// 	// get spectrum name
+	// 	name := strings.Split(evi[i].Spectrum, ".")
+	//
+	// 	// locate the corresponding mz file for this identification
+	// 	s2, ok2 := ms2[name[0]]
+	// 	if ok2 {
+	//
+	// 		S2spec, S2ok := s2.Ms2Scan[evi[i].Spectrum]
+	// 		if S2ok {
+	//
+	// 			// recover the matching ms1 structure based on index number
+	// 			s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
+	// 			if ok1 {
+	//
+	// 				// buffer variable for both target or Selected ions
+	// 				var ion float64
+	// 				if S2spec.Precursor.TargetIon != 0 {
+	// 					ion = S2spec.Precursor.TargetIon
+	// 				} else {
+	// 					ion = S2spec.Precursor.SelectedIon
+	// 				}
+	//
+	// 				// create a MZ delta based on the selected Ion
+	// 				var lowerDelta float64
+	// 				var higherDelta float64
+	//
+	// 				if S2spec.Precursor.IsolationWindowLowerOffset != 0 && S2spec.Precursor.IsolationWindowUpperOffset != 0 {
+	// 					lowerDelta = S2spec.Precursor.IsolationWindowLowerOffset
+	// 					higherDelta = S2spec.Precursor.IsolationWindowUpperOffset
+	// 				} else {
+	// 					lowerDelta = S2spec.Precursor.SelectedIon - mzDeltaWindow
+	// 					higherDelta = S2spec.Precursor.SelectedIon + mzDeltaWindow
+	// 				}
+	//
+	// 				if S2spec.Index == 4794 {
+	// 					fmt.Println("found")
+	// 					fmt.Println(ion)
+	// 					fmt.Println(S2spec.Precursor.IsolationWindowLowerOffset, S2spec.Precursor.IsolationWindowUpperOffset)
+	// 					fmt.Println(lowerDelta, higherDelta)
+	// 					os.Exit(1)
+	// 				}
+	//
+	// 				var ions []mz.Ms1Peak
+	// 				for _, k := range s1.Spectrum {
+	// 					if k.Mz <= higherDelta && k.Mz >= lowerDelta {
+	// 						ions = append(ions, k)
+	// 					}
+	// 				}
+	//
+	// 				// create the list of mz differences for each peak
+	// 				var mzRatio []float64
+	// 				for k := 1; k <= 6; k++ {
+	// 					r := float64(k) * (float64(1) / float64(S2spec.Precursor.ChargeState))
+	// 					mzRatio = append(mzRatio, utils.ToFixed(r, 2))
+	// 				}
+	//
+	// 				var ionPackage []mz.Ms1Peak
+	// 				var summedInt float64
+	// 				for _, l := range ions {
+	//
+	// 					summedInt += l.Intensity
+	//
+	// 					for _, m := range mzRatio {
+	// 						if math.Abs(ion-l.Mz) <= (m+0.05) && math.Abs(ion-l.Mz) >= (m-0.05) {
+	// 							ionPackage = append(ionPackage, l)
+	// 							break
+	// 						}
+	// 					}
+	// 				}
+	// 				summedInt += S2spec.Precursor.PeakIntensity
+	//
+	// 				// calculate the total inensity for the selected ions from the ion package
+	// 				var summedPackageInt float64
+	// 				for _, k := range ionPackage {
+	// 					summedPackageInt += k.Intensity
+	// 				}
+	// 				summedPackageInt += S2spec.Precursor.PeakIntensity
+	//
+	// 				if summedInt == 0 {
+	// 					evi[i].Purity = 0
+	// 				} else {
+	// 					evi[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
+	// 				}
+	//
+	// 			}
+	// 		}
+	//
+	// 	}
+	// }
 
 	return evi, nil
 }
+
+// func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+//
+// 	// organize them by index
+// 	var indexedMs1 = make(map[int]mz.Ms1Scan)
+// 	for _, v := range ms1 {
+// 		for _, i := range v.Ms1Scan {
+// 			indexedMs1[i.Index] = i
+// 		}
+// 	}
+//
+// 	// range over IDs and spectra searching for a match
+// 	for i := range evi {
+//
+// 		// get spectrum name
+// 		name := strings.Split(evi[i].Spectrum, ".")
+//
+// 		// locate the corresponding mz file for this identification
+// 		s2, ok2 := ms2[name[0]]
+// 		if ok2 {
+//
+// 			S2spec, S2ok := s2.Ms2Scan[evi[i].Spectrum]
+// 			if S2ok {
+//
+// 				// recover the matching ms1 structure based on index number
+// 				s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
+// 				if ok1 {
+//
+// 					// buffer variable for both target or Selected ions
+// 					var ion float64
+// 					if S2spec.Precursor.TargetIon != 0 {
+// 						ion = S2spec.Precursor.TargetIon
+// 					} else {
+// 						ion = S2spec.Precursor.SelectedIon
+// 					}
+//
+// 					// create a MZ delta based on the selected Ion
+// 					var lowerDelta float64
+// 					var higherDelta float64
+//
+// 					if S2spec.Precursor.IsolationWindowLowerOffset != 0 && S2spec.Precursor.IsolationWindowUpperOffset != 0 {
+// 						lowerDelta = S2spec.Precursor.IsolationWindowLowerOffset
+// 						higherDelta = S2spec.Precursor.IsolationWindowUpperOffset
+// 					} else {
+// 						lowerDelta = S2spec.Precursor.SelectedIon - mzDeltaWindow
+// 						higherDelta = S2spec.Precursor.SelectedIon + mzDeltaWindow
+// 					}
+//
+// 					if S2spec.Index == 4794 {
+// 						fmt.Println("found")
+// 						fmt.Println(ion)
+// 						fmt.Println(S2spec.Precursor.IsolationWindowLowerOffset, S2spec.Precursor.IsolationWindowUpperOffset)
+// 						fmt.Println(lowerDelta, higherDelta)
+// 						os.Exit(1)
+// 					}
+//
+// 					var ions []mz.Ms1Peak
+// 					for _, k := range s1.Spectrum {
+// 						if k.Mz <= higherDelta && k.Mz >= lowerDelta {
+// 							ions = append(ions, k)
+// 						}
+// 					}
+//
+// 					// create the list of mz differences for each peak
+// 					var mzRatio []float64
+// 					for k := 1; k <= 6; k++ {
+// 						r := float64(k) * (float64(1) / float64(S2spec.Precursor.ChargeState))
+// 						mzRatio = append(mzRatio, utils.ToFixed(r, 2))
+// 					}
+//
+// 					var ionPackage []mz.Ms1Peak
+// 					var summedInt float64
+// 					for _, l := range ions {
+//
+// 						summedInt += l.Intensity
+//
+// 						for _, m := range mzRatio {
+// 							if math.Abs(ion-l.Mz) <= (m+0.05) && math.Abs(ion-l.Mz) >= (m-0.05) {
+// 								ionPackage = append(ionPackage, l)
+// 								break
+// 							}
+// 						}
+// 					}
+// 					summedInt += S2spec.Precursor.PeakIntensity
+//
+// 					// calculate the total inensity for the selected ions from the ion package
+// 					var summedPackageInt float64
+// 					for _, k := range ionPackage {
+// 						summedPackageInt += k.Intensity
+// 					}
+// 					summedPackageInt += S2spec.Precursor.PeakIntensity
+//
+// 					if summedInt == 0 {
+// 						evi[i].Purity = 0
+// 					} else {
+// 						evi[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
+// 					}
+//
+// 				}
+// 			}
+//
+// 		}
+// 	}
+//
+// 	return evi, nil
+// }
 
 // // labeledPeakIntensity ...
 // func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi rep.Evidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
