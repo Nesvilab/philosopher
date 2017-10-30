@@ -70,16 +70,16 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 
 			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
 			// 	fmt.Println("\nions in range")
-			// fmt.Println(ms1.Index)
-			// fmt.Println(ms1.Scan)
-			// fmt.Println(ms1.Level)
+			// 	fmt.Println(ms1.Index)
+			// 	fmt.Println(ms1.Scan)
+			// 	fmt.Println(ms1.Level)
 			//
-			// fmt.Println(ms2.Precursor.ParentIndex)
-			// fmt.Println(ms2.Precursor.TargetIon)
-			// fmt.Println(ms2.Precursor.SelectedIon)
-			// fmt.Println(ms2.Precursor.IsolationWindowUpperOffset)
-			// fmt.Println(ms2.Precursor.TargetIon - ms2.Precursor.IsolationWindowUpperOffset)
-			// fmt.Println(ms2.Precursor.TargetIon + ms2.Precursor.IsolationWindowUpperOffset)
+			// 	fmt.Println(ms2.Precursor.ParentIndex)
+			// 	fmt.Println(ms2.Precursor.TargetIon)
+			// 	fmt.Println(ms2.Precursor.SelectedIon)
+			// 	fmt.Println(ms2.Precursor.IsolationWindowUpperOffset)
+			// 	fmt.Println(ms2.Precursor.TargetIon - ms2.Precursor.IsolationWindowUpperOffset)
+			// 	fmt.Println(ms2.Precursor.TargetIon + ms2.Precursor.IsolationWindowUpperOffset)
 			// 	litter.Dump(ions)
 			// 	fmt.Println(isolationWindowSummedInt)
 			// }
@@ -147,7 +147,7 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 	return evi, nil
 }
 
-func prepareLabelStructure(dir, format, brand, plex string, tol float64, mzData xml.Raw) (map[string]tmt.Labels, error) {
+func prepareLabelStructure(dir, format, plex string, tol float64, mzData xml.Raw) (map[string]tmt.Labels, error) {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
@@ -161,8 +161,11 @@ func prepareLabelStructure(dir, format, brand, plex string, tol float64, mzData 
 				return labels, err
 			}
 
+			// left-pad the spectrum scan
+			paddedScan := fmt.Sprintf("%05s", i.Scan)
+
 			tmt.Index = i.Index
-			tmt.Scan = i.Scan
+			tmt.Scan = paddedScan
 			tmt.ChargeState = i.Precursor.ChargeState
 
 			for j := range i.Peaks {
@@ -233,7 +236,7 @@ func prepareLabelStructure(dir, format, brand, plex string, tol float64, mzData 
 
 			}
 
-			labels[i.Scan] = tmt
+			labels[paddedScan] = tmt
 
 		}
 	}
@@ -275,20 +278,23 @@ func prepareLabelStructure(dir, format, brand, plex string, tol float64, mzData 
 // 	return evi, nil
 // }
 // mapLabeledSpectra maps all labeled spectra to ions
-func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
-
-	var purityMap = make(map[string]float64)
+func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	for i := range evi {
 
 		split := strings.Split(evi[i].Spectrum, ".")
-		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
 
 		// referenced by scan number
-		v, ok := spectra[split[2]]
+		v, ok := labels[split[2]]
 		if ok {
+
+			if evi[i].Spectrum == "01CPTAC3_Benchmarking_W_BI_20170508_BL_f01.04795.04795.4" {
+				fmt.Println("found")
+			}
+
 			evi[i].Labels.Spectrum = v.Spectrum
 			evi[i].Labels.Index = v.Index
+			evi[i].Labels.Scan = v.Scan
 			evi[i].Labels.Channel1.Intensity = v.Channel1.Intensity
 			evi[i].Labels.Channel2.Intensity = v.Channel2.Intensity
 			evi[i].Labels.Channel3.Intensity = v.Channel3.Intensity
@@ -300,473 +306,11 @@ func mapLabeledSpectra(spectra map[string]tmt.Labels, purity float64, evi []rep.
 			evi[i].Labels.Channel9.Intensity = v.Channel9.Intensity
 			evi[i].Labels.Channel10.Intensity = v.Channel10.Intensity
 
-			// create a purity map for later use from ions and proteins
-			if evi[i].Purity >= purity && evi[i].Probability >= 0.9 {
-				purityMap[name] = evi[i].Purity
-			}
-
 		}
 	}
 
 	return evi, nil
 }
-
-// func getLabels(spec map[string]tmt.Labels, ms2 map[string]mz.MS2, ppmPrecision float64) map[string]tmt.Labels {
-//
-// 	// for each ms2 data from a different file
-// 	for _, v := range ms2 {
-// 		// for each ms2 spectra
-// 		for _, i := range v.Ms2Scan {
-//
-// 			split := strings.Split(i.SpectrumName, ".")
-// 			name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-//
-// 			sp, ok := spec[name]
-// 			if ok {
-//
-// 				v := sp
-//
-// 				for _, k := range i.Spectrum {
-//
-// 					if k.Mz <= (v.Channel1.Mz+(ppmPrecision*v.Channel1.Mz)) && k.Mz >= (v.Channel1.Mz-(ppmPrecision*v.Channel1.Mz)) {
-// 						if k.Intensity > v.Channel1.Intensity {
-// 							v.Channel1.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel2.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel2.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 						if k.Intensity > v.Channel2.Intensity {
-// 							v.Channel2.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel3.Mz+(ppmPrecision*v.Channel3.Mz)) && k.Mz >= (v.Channel3.Mz-(ppmPrecision*v.Channel3.Mz)) {
-// 						if k.Intensity > v.Channel3.Intensity {
-// 							v.Channel3.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel4.Mz+(ppmPrecision*v.Channel4.Mz)) && k.Mz >= (v.Channel4.Mz-(ppmPrecision*v.Channel4.Mz)) {
-// 						if k.Intensity > v.Channel4.Intensity {
-// 							v.Channel4.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel5.Mz+(ppmPrecision*v.Channel5.Mz)) && k.Mz >= (v.Channel5.Mz-(ppmPrecision*v.Channel5.Mz)) {
-// 						if k.Intensity > v.Channel5.Intensity {
-// 							v.Channel5.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel6.Mz+(ppmPrecision*v.Channel6.Mz)) && k.Mz >= (v.Channel6.Mz-(ppmPrecision*v.Channel6.Mz)) {
-// 						if k.Intensity > v.Channel6.Intensity {
-// 							v.Channel6.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel7.Mz+(ppmPrecision*v.Channel7.Mz)) && k.Mz >= (v.Channel7.Mz-(ppmPrecision*v.Channel7.Mz)) {
-// 						if k.Intensity > v.Channel7.Intensity {
-// 							v.Channel7.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel8.Mz+(ppmPrecision*v.Channel8.Mz)) && k.Mz >= (v.Channel8.Mz-(ppmPrecision*v.Channel8.Mz)) {
-// 						if k.Intensity > v.Channel8.Intensity {
-// 							v.Channel8.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel9.Mz+(ppmPrecision*v.Channel9.Mz)) && k.Mz >= (v.Channel9.Mz-(ppmPrecision*v.Channel9.Mz)) {
-// 						if k.Intensity > v.Channel9.Intensity {
-// 							v.Channel9.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel10.Mz+(ppmPrecision*v.Channel10.Mz)) && k.Mz >= (v.Channel10.Mz-(ppmPrecision*v.Channel10.Mz)) {
-// 						if k.Intensity > v.Channel10.Intensity {
-// 							v.Channel10.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					// if k.Mz <= (v.Channel1.Mz+(ppmPrecision*v.Channel1.Mz)) && k.Mz >= (v.Channel1.Mz-(ppmPrecision*v.Channel1.Mz)) {
-// 					// 	v.Channel1.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel2.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel2.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 					// 	v.Channel2.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel3.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel3.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 					// 	v.Channel3.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel4.Mz+(ppmPrecision*v.Channel4.Mz)) && k.Mz >= (v.Channel4.Mz-(ppmPrecision*v.Channel4.Mz)) {
-// 					// 	v.Channel4.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel5.Mz+(ppmPrecision*v.Channel5.Mz)) && k.Mz >= (v.Channel5.Mz-(ppmPrecision*v.Channel5.Mz)) {
-// 					// 	v.Channel5.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel6.Mz+(ppmPrecision*v.Channel6.Mz)) && k.Mz >= (v.Channel6.Mz-(ppmPrecision*v.Channel6.Mz)) {
-// 					// 	v.Channel6.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel7.Mz+(ppmPrecision*v.Channel7.Mz)) && k.Mz >= (v.Channel7.Mz-(ppmPrecision*v.Channel7.Mz)) {
-// 					// 	v.Channel7.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel8.Mz+(ppmPrecision*v.Channel8.Mz)) && k.Mz >= (v.Channel8.Mz-(ppmPrecision*v.Channel8.Mz)) {
-// 					// 	v.Channel8.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel9.Mz+(ppmPrecision*v.Channel9.Mz)) && k.Mz >= (v.Channel9.Mz-(ppmPrecision*v.Channel9.Mz)) {
-// 					// 	v.Channel9.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel10.Mz+(ppmPrecision*v.Channel10.Mz)) && k.Mz >= (v.Channel10.Mz-(ppmPrecision*v.Channel10.Mz)) {
-// 					// 	v.Channel10.Intensity += k.Intensity
-// 					// }
-//
-// 					if k.Mz > 150 {
-// 						break
-// 					}
-// 				}
-//
-// 				spec[name] = v
-//
-// 			}
-// 		}
-// 	}
-//
-// 	return spec
-// }
-
-// func calculateIonPurity(d, f string, ms1 map[string]mz.MS1, ms2 map[string]mz.MS2, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
-//
-// 	// organize them by index
-// 	var indexedMs1 = make(map[int]mz.Ms1Scan)
-// 	for _, v := range ms1 {
-// 		for _, i := range v.Ms1Scan {
-// 			indexedMs1[i.Index] = i
-// 		}
-// 	}
-//
-// 	// range over IDs and spectra searching for a match
-// 	for i := range evi {
-//
-// 		// get spectrum name
-// 		name := strings.Split(evi[i].Spectrum, ".")
-//
-// 		// locate the corresponding mz file for this identification
-// 		s2, ok2 := ms2[name[0]]
-// 		if ok2 {
-//
-// 			S2spec, S2ok := s2.Ms2Scan[evi[i].Spectrum]
-// 			if S2ok {
-//
-// 				// recover the matching ms1 structure based on index number
-// 				s1, ok1 := indexedMs1[S2spec.Precursor.ParentIndex]
-// 				if ok1 {
-//
-// 					// buffer variable for both target or Selected ions
-// 					var ion float64
-// 					if S2spec.Precursor.TargetIon != 0 {
-// 						ion = S2spec.Precursor.TargetIon
-// 					} else {
-// 						ion = S2spec.Precursor.SelectedIon
-// 					}
-//
-// 					// create a MZ delta based on the selected Ion
-// 					var lowerDelta float64
-// 					var higherDelta float64
-//
-// 					if S2spec.Precursor.IsolationWindowLowerOffset != 0 && S2spec.Precursor.IsolationWindowUpperOffset != 0 {
-// 						lowerDelta = S2spec.Precursor.IsolationWindowLowerOffset
-// 						higherDelta = S2spec.Precursor.IsolationWindowUpperOffset
-// 					} else {
-// 						lowerDelta = S2spec.Precursor.SelectedIon - mzDeltaWindow
-// 						higherDelta = S2spec.Precursor.SelectedIon + mzDeltaWindow
-// 					}
-//
-// 					if S2spec.Index == 4794 {
-// 						fmt.Println("found")
-// 						fmt.Println(ion)
-// 						fmt.Println(S2spec.Precursor.IsolationWindowLowerOffset, S2spec.Precursor.IsolationWindowUpperOffset)
-// 						fmt.Println(lowerDelta, higherDelta)
-// 						os.Exit(1)
-// 					}
-//
-// 					var ions []mz.Ms1Peak
-// 					for _, k := range s1.Spectrum {
-// 						if k.Mz <= higherDelta && k.Mz >= lowerDelta {
-// 							ions = append(ions, k)
-// 						}
-// 					}
-//
-// 					// create the list of mz differences for each peak
-// 					var mzRatio []float64
-// 					for k := 1; k <= 6; k++ {
-// 						r := float64(k) * (float64(1) / float64(S2spec.Precursor.ChargeState))
-// 						mzRatio = append(mzRatio, utils.ToFixed(r, 2))
-// 					}
-//
-// 					var ionPackage []mz.Ms1Peak
-// 					var summedInt float64
-// 					for _, l := range ions {
-//
-// 						summedInt += l.Intensity
-//
-// 						for _, m := range mzRatio {
-// 							if math.Abs(ion-l.Mz) <= (m+0.05) && math.Abs(ion-l.Mz) >= (m-0.05) {
-// 								ionPackage = append(ionPackage, l)
-// 								break
-// 							}
-// 						}
-// 					}
-// 					summedInt += S2spec.Precursor.PeakIntensity
-//
-// 					// calculate the total inensity for the selected ions from the ion package
-// 					var summedPackageInt float64
-// 					for _, k := range ionPackage {
-// 						summedPackageInt += k.Intensity
-// 					}
-// 					summedPackageInt += S2spec.Precursor.PeakIntensity
-//
-// 					if summedInt == 0 {
-// 						evi[i].Purity = 0
-// 					} else {
-// 						evi[i].Purity = utils.Round((summedPackageInt / summedInt), 5, 2)
-// 					}
-//
-// 				}
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return evi, nil
-// }
-
-// // labeledPeakIntensity ...
-// func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi rep.Evidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
-//
-// 	// get all spectra names from PSMs and create the label list
-// 	var spectra = make(map[string]tmt.Labels)
-//
-// 	for _, i := range evi.PSM {
-//
-// 		ls, err := tmt.New(plex)
-// 		if err != nil {
-// 			return spectra, err
-// 		}
-//
-// 		// remove the charge state from the spectrum name key
-// 		split := strings.Split(i.Spectrum, ".")
-// 		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-//
-// 		ls.Spectrum = i.Spectrum
-// 		ls.RetentionTime = i.RetentionTime
-//
-// 		if format == "mzML" {
-// 			index, err := strconv.Atoi(split[1])
-// 			if err != nil {
-// 				return spectra, err
-// 			}
-// 			ls.Index = (uint32(index) - 1)
-// 		} else {
-// 			index, err := strconv.Atoi(split[1])
-// 			if err != nil {
-// 				return spectra, err
-// 			}
-// 			ls.Index = uint32(index)
-// 		}
-//
-// 		spectra[name] = ls
-// 	}
-//
-// 	ppmPrecision := tol / math.Pow(10, 6)
-//
-// 	spectra = getLabels(spectra, ms2, ppmPrecision)
-//
-// 	return spectra, nil
-// }
-
-// labeledPeakIntensity ...
-// func labeledPeakIntensity(dir, format, brand, plex string, tol float64, evi []rep.PSMEvidence, ms2 map[string]mz.MS2) (map[string]tmt.Labels, error) {
-//
-// 	// get all spectra names from PSMs and create the label list
-// 	var spectra = make(map[string]tmt.Labels)
-//
-// 	for _, i := range evi {
-//
-// 		ls, err := tmt.New(plex)
-// 		if err != nil {
-// 			return spectra, err
-// 		}
-//
-// 		// remove the charge state from the spectrum name key
-// 		split := strings.Split(i.Spectrum, ".")
-// 		name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-//
-// 		ls.Spectrum = i.Spectrum
-// 		ls.RetentionTime = i.RetentionTime
-//
-// 		if format == "mzML" {
-// 			index, err := strconv.Atoi(split[1])
-// 			if err != nil {
-// 				return spectra, err
-// 			}
-// 			ls.Index = (uint32(index) - 1)
-// 		} else {
-// 			index, err := strconv.Atoi(split[1])
-// 			if err != nil {
-// 				return spectra, err
-// 			}
-// 			ls.Index = uint32(index)
-// 		}
-//
-// 		spectra[name] = ls
-// 	}
-//
-// 	ppmPrecision := tol / math.Pow(10, 6)
-//
-// 	spectra = getLabels(spectra, ms2, ppmPrecision)
-//
-// 	return spectra, nil
-// }
-
-// getLabels extract ion chomatograms
-// func getLabels(spec map[string]tmt.Labels, ms2 map[string]mz.MS2, ppmPrecision float64) map[string]tmt.Labels {
-//
-// 	// for each ms2 data from a different file
-// 	for _, v := range ms2 {
-// 		// for each ms2 spectra
-// 		for _, i := range v.Ms2Scan {
-//
-// 			split := strings.Split(i.SpectrumName, ".")
-// 			name := fmt.Sprintf("%s.%s.%s", split[0], split[1], split[2])
-//
-// 			sp, ok := spec[name]
-// 			if ok {
-//
-// 				v := sp
-//
-// 				for _, k := range i.Spectrum {
-//
-// 					if k.Mz <= (v.Channel1.Mz+(ppmPrecision*v.Channel1.Mz)) && k.Mz >= (v.Channel1.Mz-(ppmPrecision*v.Channel1.Mz)) {
-// 						if k.Intensity > v.Channel1.Intensity {
-// 							v.Channel1.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel2.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel2.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 						if k.Intensity > v.Channel2.Intensity {
-// 							v.Channel2.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel3.Mz+(ppmPrecision*v.Channel3.Mz)) && k.Mz >= (v.Channel3.Mz-(ppmPrecision*v.Channel3.Mz)) {
-// 						if k.Intensity > v.Channel3.Intensity {
-// 							v.Channel3.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel4.Mz+(ppmPrecision*v.Channel4.Mz)) && k.Mz >= (v.Channel4.Mz-(ppmPrecision*v.Channel4.Mz)) {
-// 						if k.Intensity > v.Channel4.Intensity {
-// 							v.Channel4.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel5.Mz+(ppmPrecision*v.Channel5.Mz)) && k.Mz >= (v.Channel5.Mz-(ppmPrecision*v.Channel5.Mz)) {
-// 						if k.Intensity > v.Channel5.Intensity {
-// 							v.Channel5.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel6.Mz+(ppmPrecision*v.Channel6.Mz)) && k.Mz >= (v.Channel6.Mz-(ppmPrecision*v.Channel6.Mz)) {
-// 						if k.Intensity > v.Channel6.Intensity {
-// 							v.Channel6.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel7.Mz+(ppmPrecision*v.Channel7.Mz)) && k.Mz >= (v.Channel7.Mz-(ppmPrecision*v.Channel7.Mz)) {
-// 						if k.Intensity > v.Channel7.Intensity {
-// 							v.Channel7.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel8.Mz+(ppmPrecision*v.Channel8.Mz)) && k.Mz >= (v.Channel8.Mz-(ppmPrecision*v.Channel8.Mz)) {
-// 						if k.Intensity > v.Channel8.Intensity {
-// 							v.Channel8.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel9.Mz+(ppmPrecision*v.Channel9.Mz)) && k.Mz >= (v.Channel9.Mz-(ppmPrecision*v.Channel9.Mz)) {
-// 						if k.Intensity > v.Channel9.Intensity {
-// 							v.Channel9.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					if k.Mz <= (v.Channel10.Mz+(ppmPrecision*v.Channel10.Mz)) && k.Mz >= (v.Channel10.Mz-(ppmPrecision*v.Channel10.Mz)) {
-// 						if k.Intensity > v.Channel10.Intensity {
-// 							v.Channel10.Intensity = k.Intensity
-// 						}
-// 					}
-//
-// 					// if k.Mz <= (v.Channel1.Mz+(ppmPrecision*v.Channel1.Mz)) && k.Mz >= (v.Channel1.Mz-(ppmPrecision*v.Channel1.Mz)) {
-// 					// 	v.Channel1.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel2.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel2.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 					// 	v.Channel2.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel3.Mz+(ppmPrecision*v.Channel2.Mz)) && k.Mz >= (v.Channel3.Mz-(ppmPrecision*v.Channel2.Mz)) {
-// 					// 	v.Channel3.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel4.Mz+(ppmPrecision*v.Channel4.Mz)) && k.Mz >= (v.Channel4.Mz-(ppmPrecision*v.Channel4.Mz)) {
-// 					// 	v.Channel4.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel5.Mz+(ppmPrecision*v.Channel5.Mz)) && k.Mz >= (v.Channel5.Mz-(ppmPrecision*v.Channel5.Mz)) {
-// 					// 	v.Channel5.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel6.Mz+(ppmPrecision*v.Channel6.Mz)) && k.Mz >= (v.Channel6.Mz-(ppmPrecision*v.Channel6.Mz)) {
-// 					// 	v.Channel6.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel7.Mz+(ppmPrecision*v.Channel7.Mz)) && k.Mz >= (v.Channel7.Mz-(ppmPrecision*v.Channel7.Mz)) {
-// 					// 	v.Channel7.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel8.Mz+(ppmPrecision*v.Channel8.Mz)) && k.Mz >= (v.Channel8.Mz-(ppmPrecision*v.Channel8.Mz)) {
-// 					// 	v.Channel8.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel9.Mz+(ppmPrecision*v.Channel9.Mz)) && k.Mz >= (v.Channel9.Mz-(ppmPrecision*v.Channel9.Mz)) {
-// 					// 	v.Channel9.Intensity += k.Intensity
-// 					// }
-// 					//
-// 					// if k.Mz <= (v.Channel10.Mz+(ppmPrecision*v.Channel10.Mz)) && k.Mz >= (v.Channel10.Mz-(ppmPrecision*v.Channel10.Mz)) {
-// 					// 	v.Channel10.Intensity += k.Intensity
-// 					// }
-//
-// 					if k.Mz > 150 {
-// 						break
-// 					}
-// 				}
-//
-// 				spec[name] = v
-//
-// 			}
-// 		}
-// 	}
-//
-// 	return spec
-// }
 
 func totalTop3LabelQuantification(evi rep.Evidence) (rep.Evidence, error) {
 

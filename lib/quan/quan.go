@@ -99,6 +99,7 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 // RunTMTQuantification is the top function for label quantification
 func (p *Quantify) RunTMTQuantification() error {
 
+	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
@@ -118,59 +119,67 @@ func (p *Quantify) RunTMTQuantification() error {
 		specName := strings.Split(i.Spectrum, ".")
 		source := fmt.Sprintf("%s.%s", specName[0], p.Format)
 		sourceMap[source] = append(sourceMap[source], i)
+
+		psmMap[i.Spectrum] = i
 	}
 
-	for k := range sourceMap {
-		sourceList = append(sourceList, k)
+	for i := range sourceMap {
+		sourceList = append(sourceList, i)
 	}
 
 	sort.Strings(sourceList)
 
 	logrus.Info("Calculating intensities and ion interference")
 
-	for k := range sourceList {
+	for i := range sourceList {
 
-		logrus.Info("Reading ", sourceList[k])
+		logrus.Info("Reading ", sourceList[i])
 
-		mz, e := getSpectra(p.Dir, p.Format, sourceList[k])
+		mz, e := getSpectra(p.Dir, p.Format, sourceList[i])
 		if e != nil {
 			return e
 		}
 
-		mappedPurity, e := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[k]])
+		mappedPurity, e := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 		if e != nil {
 			return e
 		}
 
-		labels, err := prepareLabelStructure(p.Dir, p.Format, strings.ToLower(p.Brand), p.Plex, p.Tol, mz)
+		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, mz)
 		if err != nil {
 			return err
 		}
 
-		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[k]])
+		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 		if err != nil {
 			return err
 		}
 
-		for j := range evi.PSM {
-
-			for _, mapped := range mappedPurity {
-				if evi.PSM[j].Spectrum == mapped.Spectrum {
-					evi.PSM[j].Purity = mapped.Purity
-					break
-				}
+		for _, j := range mappedPurity {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Purity = j.Purity
+				psmMap[j.Spectrum] = psm
 			}
-
-			for _, mapped := range mappedPSM {
-				if evi.PSM[j].Spectrum == mapped.Spectrum {
-
-					evi.PSM[j].Labels = mapped.Labels
-					break
-				}
-			}
-
 		}
 
+		for _, j := range mappedPSM {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Labels = j.Labels
+				psmMap[j.Spectrum] = psm
+			}
+		}
+	}
+
+	for i := range evi.PSM {
+		v, ok := psmMap[evi.PSM[i].Spectrum]
+		if ok {
+			evi.PSM[i].Purity = v.Purity
+			evi.PSM[i].Labels = v.Labels
+		}
 	}
 
 	e = evi.SerializeGranular()
@@ -187,8 +196,8 @@ func getSpectra(path, format string, spectra string) (xml.Raw, error) {
 	var mzData xml.Raw
 
 	//ext := filepath.Ext(spectra)
-	name := filepath.Base(spectra)
 	//clean := name[0 : len(name)-len(ext)]
+	name := filepath.Base(spectra)
 	fullpath, _ := filepath.Abs(path)
 	name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
 
