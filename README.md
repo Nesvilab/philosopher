@@ -6,7 +6,7 @@ A data processing toolkit for shotgun proteomics.
 [![https://philosopher-toolkit.slack.com](https://img.shields.io/badge/slack-channel-blue.svg)](https://philosopher-toolkit.slack.com?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Features
-Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tunned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
+Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tuned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
 
 - Database downloading and formatting.
 
@@ -25,7 +25,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 - FDR filtering with custom algorithms.
 
   - Two-dimensional filtering for simultaneous control of PSM and Protein FDR levels.
-  - Sequential FDR estimantion for large data sets using filtered PSM and proteins lists.
+  - Sequential FDR estimation for large data sets using filtered PSM and proteins lists.
   - PickedFDR for scalable estimations.
   - Razor peptide assignment for better quantification and interpretation.
 
