@@ -467,7 +467,7 @@ func (e *Evidence) PSMQuantReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -1289,8 +1289,37 @@ func (e *Evidence) ProteinQuantReport() {
 	}
 	defer file.Close()
 
-	//Total Channel 1\tTotal Channel 2\tTotal Channel 3\t Total Channel 4\t Total Channel 5\t Total Channel 6\t Total Channel 7\tTotal Channel 8\tTotal Channel 9\tTotal Channel 10\tUnique Channel 1\tUnique Channel 2\tUnique Channel 3\tUnique Channel 4\tUnique Channel 5\tUnique Channel 6\tUnique Channel 7\tUnique Channel 8\tUnique Channel 9\tUnique Channel 10\n")
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tTotal Intensity\tUnique Intensity\tTotal Raw Channel 1\tTotal Raw Channel 2\tTotal Raw Channel 3\t Total Raw Channel 4\t Total Raw Channel 5\t Total Raw Channel 6\t Total Raw Channel 7\tTotal Raw Channel 8\tTotal Raw Channel 9\tTotal Raw Channel 10\tUnique Raw Channel 1\tUnique Raw Channel 2\tUnique Raw Channel 3\tUnique Raw Channel 4\tUnique Raw Channel 5\tUnique Raw Channel 6\tUnique Raw Channel 7\tUnique Raw Channel 8\tUnique Raw Channel 9\tUnique Raw Channel 10\tRazor Raw Channel 1\tRazor Raw Channel 2\tRazor Raw Channel 3\tRazor Raw Channel 4\tRazor Raw Channel 5\tRazor Raw Channel 6\tRazor Raw Channel 7\tRazor Raw Channel 8\tRazor Raw Channel 9\tRazor Raw Channel 10\tTotal Channel 1\tTotal Channel 2\tTotal Channel 3\t Total Channel 4\t Total Channel 5\t Total Channel 6\t Total Channel 7\tTotal Channel 8\tTotal Channel 9\tTotal Channel 10\tUnique Channel 1\tUnique Channel 2\tUnique Channel 3\tUnique Channel 4\tUnique Channel 5\tUnique Channel 6\tUnique Channel 7\tUnique Channel 8\tUnique Channel 9\tUnique Channel 10\tRazor Channel 1\tRazor Channel 2\tRazor Channel 3\tRazor Channel 4\tRazor Channel 5\tRazor Channel 6\tRazor Channel 7\tRazor Channel 8\tRazor Channel 9\tRazor Channel 10\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf(
+		`Group\t
+		SubGroup\t
+		Protein ID\t
+		Entry Name\t
+		Length\t
+		Percent Coverage\t
+		Description\t
+		Protein Existence\t
+		Genes\t
+		Protein Probability\t
+		Top Peptide Probability\t
+		Unique Stripped Peptides\t
+		Razor Peptides\t
+		Total Peptide Ions\t
+		Unique Peptide Ions\t
+		Total Spectral Count\t
+		Unique Spectral Count\t
+		Total Intensity\t
+		Unique Intensity\t
+		126 Abundance\t
+		127N Abundance\t
+		127C Abundance\t
+		128N Abundance\t
+		128C Abundance\t
+		129N Abundance\t
+		129C Abundance\t
+		130N Abundance\t
+		130C Abundance\t
+		131N Abundance\t
+		Indistinguishable Proteins\n`)
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1330,9 +1359,8 @@ func (e *Evidence) ProteinQuantReport() {
 			}
 		}
 
-		//%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%s\t",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -1352,66 +1380,16 @@ func (e *Evidence) ProteinQuantReport() {
 				i.UniqueSpC,              // Unique Spectral Count
 				i.TotalIntensity,         // Total Intensity
 				i.UniqueIntensity,        // Unique Intensity
-				i.TotalLabels.Channel1.NormIntensity,
-				i.TotalLabels.Channel2.NormIntensity,
-				i.TotalLabels.Channel3.NormIntensity,
-				i.TotalLabels.Channel4.NormIntensity,
-				i.TotalLabels.Channel5.NormIntensity,
-				i.TotalLabels.Channel6.NormIntensity,
-				i.TotalLabels.Channel7.NormIntensity,
-				i.TotalLabels.Channel8.NormIntensity,
-				i.TotalLabels.Channel9.NormIntensity,
-				i.TotalLabels.Channel10.NormIntensity,
-				i.UniqueLabels.Channel1.NormIntensity,
-				i.UniqueLabels.Channel2.NormIntensity,
-				i.UniqueLabels.Channel3.NormIntensity,
-				i.UniqueLabels.Channel4.NormIntensity,
-				i.UniqueLabels.Channel5.NormIntensity,
-				i.UniqueLabels.Channel6.NormIntensity,
-				i.UniqueLabels.Channel7.NormIntensity,
-				i.UniqueLabels.Channel8.NormIntensity,
-				i.UniqueLabels.Channel9.NormIntensity,
-				i.UniqueLabels.Channel10.NormIntensity,
-				i.URazorLabels.Channel1.NormIntensity,
-				i.URazorLabels.Channel2.NormIntensity,
-				i.URazorLabels.Channel3.NormIntensity,
-				i.URazorLabels.Channel4.NormIntensity,
-				i.URazorLabels.Channel5.NormIntensity,
-				i.URazorLabels.Channel6.NormIntensity,
-				i.URazorLabels.Channel7.NormIntensity,
-				i.URazorLabels.Channel8.NormIntensity,
-				i.URazorLabels.Channel9.NormIntensity,
-				i.URazorLabels.Channel10.NormIntensity,
-				i.TotalLabels.Channel1.RatioIntensity,
-				i.TotalLabels.Channel2.RatioIntensity,
-				i.TotalLabels.Channel3.RatioIntensity,
-				i.TotalLabels.Channel4.RatioIntensity,
-				i.TotalLabels.Channel5.RatioIntensity,
-				i.TotalLabels.Channel6.RatioIntensity,
-				i.TotalLabels.Channel7.RatioIntensity,
-				i.TotalLabels.Channel8.RatioIntensity,
-				i.TotalLabels.Channel9.RatioIntensity,
-				i.TotalLabels.Channel10.RatioIntensity,
-				i.UniqueLabels.Channel1.RatioIntensity,
-				i.UniqueLabels.Channel2.RatioIntensity,
-				i.UniqueLabels.Channel3.RatioIntensity,
-				i.UniqueLabels.Channel4.RatioIntensity,
-				i.UniqueLabels.Channel5.RatioIntensity,
-				i.UniqueLabels.Channel6.RatioIntensity,
-				i.UniqueLabels.Channel7.RatioIntensity,
-				i.UniqueLabels.Channel8.RatioIntensity,
-				i.UniqueLabels.Channel9.RatioIntensity,
-				i.UniqueLabels.Channel10.RatioIntensity,
-				i.URazorLabels.Channel1.RatioIntensity,
-				i.URazorLabels.Channel2.RatioIntensity,
-				i.URazorLabels.Channel3.RatioIntensity,
-				i.URazorLabels.Channel4.RatioIntensity,
-				i.URazorLabels.Channel5.RatioIntensity,
-				i.URazorLabels.Channel6.RatioIntensity,
-				i.URazorLabels.Channel7.RatioIntensity,
-				i.URazorLabels.Channel8.RatioIntensity,
-				i.URazorLabels.Channel9.RatioIntensity,
-				i.URazorLabels.Channel10.RatioIntensity,
+				// i.TotalLabels.Channel1.NormIntensity,
+				// i.TotalLabels.Channel2.NormIntensity,
+				// i.TotalLabels.Channel3.NormIntensity,
+				// i.TotalLabels.Channel4.NormIntensity,
+				// i.TotalLabels.Channel5.NormIntensity,
+				// i.TotalLabels.Channel6.NormIntensity,
+				// i.TotalLabels.Channel7.NormIntensity,
+				// i.TotalLabels.Channel8.NormIntensity,
+				// i.TotalLabels.Channel9.NormIntensity,
+				// i.TotalLabels.Channel10.NormIntensity,
 				strings.Join(ip, ", "))
 
 			line += "\n"

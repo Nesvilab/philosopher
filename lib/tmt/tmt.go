@@ -21,6 +21,7 @@ type Labels struct {
 	Channel8      Channel8
 	Channel9      Channel9
 	Channel10     Channel10
+	Channel11     Channel11
 }
 
 // LabeledSpectra is a list of spectra lables
@@ -28,129 +29,97 @@ type LabeledSpectra map[string]Labels
 
 // Channel1 TMT
 type Channel1 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel2 TMT
 type Channel2 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel3 TMT
 type Channel3 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel4 TMT
 type Channel4 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel5 TMT
 type Channel5 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel6 TMT
 type Channel6 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel7 TMT
 type Channel7 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel8 TMT
 type Channel8 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel9 TMT
 type Channel9 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel10 TMT
 type Channel10 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
+	Name      string
+	Mz        float64
+	Intensity float64
 }
 
 // Channel11 TMT
-// type Channel11 struct {
-// 	Mz             float64
-// 	Intensity      float64
-// 	NormIntensity  float64
-// 	RatioIntensity float64
-// 	TopIntensity   float64
-// 	Mean           float64
-// 	StDev          float64
-// }
+type Channel11 struct {
+	Name      string
+	Mz        float64
+	Intensity float64
+}
 
 // New builds a new Labelled spectra object
 func New(plex string) (Labels, *err.Error) {
 
 	var o Labels
+
+	o.Channel1.Name = "126"
+	o.Channel2.Name = "127N"
+	o.Channel3.Name = "127C"
+	o.Channel4.Name = "128N"
+	o.Channel5.Name = "128C"
+	o.Channel6.Name = "129N"
+	o.Channel7.Name = "129C"
+	o.Channel8.Name = "130N"
+	o.Channel9.Name = "130C"
+	o.Channel10.Name = "131N"
+	o.Channel11.Name = "131C"
 
 	if plex == "6" {
 		o.Channel1.Mz = 126.127726
@@ -181,7 +150,7 @@ func New(plex string) (Labels, *err.Error) {
 		o.Channel8.Mz = 130.134825
 		o.Channel9.Mz = 130.141145
 		o.Channel10.Mz = 131.138180
-		//o.Channel11.MZ = 131.144499
+		o.Channel11.Mz = 131.144499
 	} else {
 		return o, &err.Error{Type: err.UnknownMultiplex, Class: err.FATA}
 	}

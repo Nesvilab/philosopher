@@ -1,3 +1,21 @@
+## [2.0] - ?
+### Added
+### Changed
+### Fixed
+
+## [1.9] - 2017-11-31
+### Added
+- Decoy option to reports allowing decoys to be reported
+
+### Changed
+- TMT processing is now faster
+- TMT label names are not the channel name
+
+### Fixed
+- Several small bugs and code-fixes
+- PSM purity score based on ion interference
+- PSM TMT levels had a problem with the ppm tolerance
+
 ## [1.8] - 2017-10-02
 ### Added
 - Razor quant to abacus report
