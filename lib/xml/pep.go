@@ -35,38 +35,37 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                     uint32
-	Spectrum                  string
-	Scan                      int
-	Peptide                   string
-	Protein                   string
-	ModifiedPeptide           string
-	AlternativeProteins       []string
-	AlternativeTargetProteins []string
-	ModPositions              []string
-	AssignedModMasses         []float64
-	AssignedMassDiffs         []float64
-	AssignedAminoAcid         []string
-	AssumedCharge             uint8
-	HitRank                   uint8
-	PrecursorNeutralMass      float64
-	PrecursorExpMass          float64
-	RetentionTime             float64
-	CalcNeutralPepMass        float64
-	RawMassDiff               float64
-	Massdiff                  float64
-	LocalizedMassDiff         string
-	Probability               float64
-	Expectation               float64
-	Xcorr                     float64
-	DeltaCN                   float64
-	DeltaCNStar               float64
-	SPScore                   float64
-	SPRank                    float64
-	Hyperscore                float64
-	Nextscore                 float64
-	DiscriminantValue         float64
-	Intensity                 float64
+	Index                uint32
+	Spectrum             string
+	Scan                 int
+	Peptide              string
+	Protein              string
+	ModifiedPeptide      string
+	AlternativeProteins  []string
+	ModPositions         []string
+	AssignedModMasses    []float64
+	AssignedMassDiffs    []float64
+	AssignedAminoAcid    []string
+	AssumedCharge        uint8
+	HitRank              uint8
+	PrecursorNeutralMass float64
+	PrecursorExpMass     float64
+	RetentionTime        float64
+	CalcNeutralPepMass   float64
+	RawMassDiff          float64
+	Massdiff             float64
+	LocalizedMassDiff    string
+	Probability          float64
+	Expectation          float64
+	Xcorr                float64
+	DeltaCN              float64
+	DeltaCNStar          float64
+	SPScore              float64
+	SPRank               float64
+	Hyperscore           float64
+	Nextscore            float64
+	DiscriminantValue    float64
+	Intensity            float64
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -217,9 +216,6 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 
 		for _, j := range i.AlternativeProteins {
 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
-			if !strings.Contains(string(j.Protein), decoyTag) {
-				psm.AlternativeTargetProteins = append(psm.AlternativeTargetProteins, string(j.Protein))
-			}
 		}
 
 		for _, j := range i.Score {

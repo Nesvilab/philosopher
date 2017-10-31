@@ -62,3 +62,21 @@ func IsDecoy(name string, tag string) bool {
 
 	return class
 }
+
+// IsDecoyIon identifies a Protein as target or Decoy based on the decoy tag
+func IsDecoyIon(names map[string]int, tag string) bool {
+
+	// default for TRUE ( DECOY)
+	var class = true
+
+	for i := range names {
+		if strings.Contains(i, tag) {
+			class = true
+		} else {
+			class = false
+			break
+		}
+	}
+
+	return class
+}

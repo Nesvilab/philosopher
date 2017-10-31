@@ -88,7 +88,6 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	if err != nil {
 		return err
 	}
-	//pepid = nil
 
 	if len(f.Pox) > 0 {
 
@@ -201,6 +200,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	}
 
 	e.Meta.DecoyTag = f.Tag
+
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return cerr
