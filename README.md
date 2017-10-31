@@ -27,7 +27,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
   - Two-dimensional filtering for simultaneous control of PSM and Protein FDR levels.
   - Sequential FDR estimantion for large data sets using filtered PSM and proteins lists.
   - PickedFDR for scalable estimations.
-  - Razor peptides determination for better quantification and interpretationinterpretation.
+  - Razor peptide assignment for better quantification and interpretation.
 
 - Label-free quantification via Spectral counting and MS1 Quantification.
 
