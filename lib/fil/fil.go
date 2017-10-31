@@ -1207,39 +1207,6 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 		}
 	}
 
-	// for k := range targets {
-	// 	decoy := decoyTag + k
-	// 	_, ok := decoys[decoy]
-	// 	if !ok {
-	// 		v, okRef := refMap[decoy]
-	// 		if okRef {
-	// 			list = append(list, v)
-	// 		} else {
-	// 			var pt xml.ProteinIdentification
-	// 			pt.ProteinName = decoy
-	// 			list = append(list, pt)
-	// 		}
-	// 	}
-	// }
-
-	// first check if the oposite list doesn't have an entry already.
-	// if not, search for the mirror entry on the original list, if found
-	// move it to the mirror list, otherwise add fake entry.
-	// for k := range decoys {
-	// 	target := strings.Replace(k, decoyTag, "", -1)
-	// 	_, ok := targets[target]
-	// 	if !ok {
-	// 		v, okRef := refMap[target]
-	// 		if okRef {
-	// 			list = append(list, v)
-	// 		} else {
-	// 			var pt xml.ProteinIdentification
-	// 			pt.ProteinName = target
-	// 			list = append(list, pt)
-	// 		}
-	// 	}
-	// }
-
 	return list
 }
 

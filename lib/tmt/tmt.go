@@ -21,7 +21,6 @@ type Labels struct {
 	Channel8      Channel8
 	Channel9      Channel9
 	Channel10     Channel10
-	Channel11     Channel11
 }
 
 // LabeledSpectra is a list of spectra lables
@@ -138,15 +137,15 @@ type Channel10 struct {
 }
 
 // Channel11 TMT
-type Channel11 struct {
-	Mz             float64
-	Intensity      float64
-	NormIntensity  float64
-	RatioIntensity float64
-	TopIntensity   float64
-	Mean           float64
-	StDev          float64
-}
+// type Channel11 struct {
+// 	Mz             float64
+// 	Intensity      float64
+// 	NormIntensity  float64
+// 	RatioIntensity float64
+// 	TopIntensity   float64
+// 	Mean           float64
+// 	StDev          float64
+// }
 
 // New builds a new Labelled spectra object
 func New(plex string) (Labels, *err.Error) {

@@ -219,17 +219,6 @@ type CombinedEvidence struct {
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64
-	//UniquePeptideIons      []xml.PeptideIonIdentification
-	// TotalPeptideIonStrings  map[string]int
-	// UniquePeptideIonStrings map[string]int
-	// RazorPeptideIonStrings  map[string]int
-	// TotalPeptideIntensity   map[string]float64
-	// UniquePeptideIntensity  map[string]float64
-	// RazorPeptideIntensity   map[string]float64
-	// TotalPeptideIons        int
-	// UniquePeptideIons       int
-	// SharedPeptideIons       int
-	// RazorPeptideIons        int
 }
 
 // CombinedEvidenceList ...
@@ -1220,10 +1209,6 @@ func (e *Evidence) ProteinReport() {
 			strings.Join(amods, ", "), // Razor Assigned Modifications
 			strings.Join(omods, ", "), // Razor Observed Modifications
 			strings.Join(ip, ", "),    // Indistinguishable Proteins
-			// i.TotalNumPeptideIons,    // Total Peptide Ions
-			// i.NumURazorPeptideIons,   // Unique Peptide Ions
-			//i.URazorUnModifiedObservations, // Unmodified Occurrences
-			//i.URazorModifiedObservations,   // Modified Occurrences
 		)
 
 		line += "\n"
@@ -1301,13 +1286,10 @@ func (e *Evidence) ProteinQuantReport() {
 				razorIons,                // Razor peptides
 				len(i.TotalPeptideIons),  // Total peptide Ions
 				uniqIons,                 // Unique Peptide Ions
-				// len(i.ur),
-				// len(i.TotalPeptideIons),
-				// len(i.URazorPeptideIons),
-				i.TotalSpC,        // Total Spectral Count
-				i.UniqueSpC,       // Unique Spectral Count
-				i.TotalIntensity,  // Total Intensity
-				i.UniqueIntensity, // Unique Intensity
+				i.TotalSpC,               // Total Spectral Count
+				i.UniqueSpC,              // Unique Spectral Count
+				i.TotalIntensity,         // Total Intensity
+				i.UniqueIntensity,        // Unique Intensity
 				i.TotalLabels.Channel1.NormIntensity,
 				i.TotalLabels.Channel2.NormIntensity,
 				i.TotalLabels.Channel3.NormIntensity,

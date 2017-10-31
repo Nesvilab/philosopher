@@ -68,33 +68,12 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 				}
 			}
 
-			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
-			// 	fmt.Println("\nions in range")
-			// 	fmt.Println(ms1.Index)
-			// 	fmt.Println(ms1.Scan)
-			// 	fmt.Println(ms1.Level)
-			//
-			// 	fmt.Println(ms2.Precursor.ParentIndex)
-			// 	fmt.Println(ms2.Precursor.TargetIon)
-			// 	fmt.Println(ms2.Precursor.SelectedIon)
-			// 	fmt.Println(ms2.Precursor.IsolationWindowUpperOffset)
-			// 	fmt.Println(ms2.Precursor.TargetIon - ms2.Precursor.IsolationWindowUpperOffset)
-			// 	fmt.Println(ms2.Precursor.TargetIon + ms2.Precursor.IsolationWindowUpperOffset)
-			// 	litter.Dump(ions)
-			// 	fmt.Println(isolationWindowSummedInt)
-			// }
-
 			// create the list of mz differences for each peak
 			var mzRatio []float64
 			for k := 1; k <= 6; k++ {
 				r := float64(k) * (float64(1) / float64(ms2.Precursor.ChargeState))
 				mzRatio = append(mzRatio, utils.ToFixed(r, 2))
 			}
-
-			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
-			// 	fmt.Println("\nratios")
-			// 	litter.Dump(mzRatio)
-			// }
 
 			var isotopePackage = make(map[float64]float64)
 
@@ -111,19 +90,6 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 				}
 			}
 
-			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
-			// 	fmt.Println("\nIsotopes and Intensities")
-			// 	litter.Dump(isotopePackage)
-			// 	fmt.Println(isotopesInt)
-			// }
-
-			// calculate the total inensity for the selected ions from the ion package
-			// var summedPackageInt float64
-			// for _, v := range ionPackage {
-			// 	summedPackageInt += v
-			// }
-			//summedPackageInt += ms2.Precursor.PeakIntensity
-
 			if isotopesInt == 0 {
 				evi[i].Purity = 0
 			} else {
@@ -133,12 +99,6 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 			if evi[i].Purity > 1 {
 				evi[i].Purity = 1
 			}
-
-			// if ms2.Scan == "04795" || ms2.Scan == "4795" {
-			// 	fmt.Println("\nPurity")
-			// 	fmt.Println(evi[i].Purity)
-			// 	os.Exit(1)
-			// }
 
 		}
 
