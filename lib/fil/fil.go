@@ -88,7 +88,6 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	if err != nil {
 		return err
 	}
-	pepid = nil
 
 	if len(f.Pox) > 0 {
 
@@ -101,7 +100,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 		if err != nil {
 			return err
 		}
-		protXML = xml.ProtXML{}
+		//protXML = xml.ProtXML{}
 
 		if f.Seq == true {
 
@@ -110,6 +109,9 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 			pep.Restore("psm")
 			pro.Restore()
 			err = sequentialFDRControl(pep, pro, psmFDR, pepFDR, ionFDR, f.Tag)
+			if err != nil {
+				return err
+			}
 			pep = nil
 			pro = nil
 
@@ -120,6 +122,9 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 			pepxml.Restore()
 			pro.Restore()
 			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, psmFDR, pepFDR, ionFDR, f.Tag)
+			if err != nil {
+				return err
+			}
 			pepxml = xml.PepXML{}
 			pro = nil
 
@@ -180,13 +185,22 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	}
 	pro = nil
 
+	// ADD ERROR CASES
+	logrus.Info("Correcting PSM to Protein mappings")
+	e.UpdateIndistinguishableProteinLists()
+
+	// ADD ERROR CASES
+	logrus.Info("Mapping Ion status to PSMs")
+	e.UpdateIonStatus()
+
 	logrus.Info("Calculating Spectral Counts")
 	e, cerr := quan.CalculateSpectralCounts(e)
 	if cerr != nil {
 		return cerr
 	}
 
-	//err = e.Serialize()
+	e.Meta.DecoyTag = f.Tag
+
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return cerr
@@ -389,15 +403,9 @@ func ExtractIonsFromPSMs(p xml.PepIDList) map[string]xml.PepIDList {
 
 	uniqMap := make(map[string]xml.PepIDList)
 
-	var key string
 	for _, i := range p {
-
-		if len(i.ModifiedPeptide) > 0 {
-			key = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
-		} else {
-			key = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
-		}
-		uniqMap[key] = append(uniqMap[key], i)
+		ion := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+		uniqMap[ion] = append(uniqMap[ion], i)
 	}
 
 	// organize id list by score
@@ -693,19 +701,21 @@ func pickedFDR(p xml.ProtXML) xml.ProtXML {
 	return p
 }
 
-// RazorFilter filters the protein list under a specific fdr
+// RazorFilter classifies peptides as razor
 func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 
-	var razorMap = make(map[string]string)
+	//var razorMap = make(map[string]string)
+	var razorMap = make(map[string][]string)
 	var refMap = make(map[string][]string)
 	var pepMap = make(map[string]string)
+	var checkRazor = make(map[string]uint8)
 
 	// create reference entries by collapsing into a single string all necessary information about the peptide-to-protein assignment
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
+				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
 					p.Groups[i].GroupNumber,
 					string(p.Groups[i].Proteins[j].GroupSiblingID),
 					string(p.Groups[i].Proteins[j].ProteinName),
@@ -744,33 +754,59 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 				if err != nil {
 					return p, err
 				}
+
 				groupWeight, err := strconv.ParseFloat(pep[6], 64)
 				if err != nil {
 					return p, err
 				}
 
+				cnpm, err := strconv.ParseFloat(pep[8], 64)
+				if err != nil {
+					return p, err
+				}
+
+				pepCheck := fmt.Sprintf("%s#%s#%.4f", pep[3], pep[7], cnpm)
+
 				// references with weight > 0.5 are easy cases, and clearly assinged as razor
 				if weight > 0.5 {
-					mgw = nil
+
 					mgw = append(mgw, v[i])
-					break
+					_, ok := checkRazor[pepCheck]
+					if !ok {
+						mgw = append(mgw, v[i])
+						checkRazor[pepCheck] = 1
+					}
 
 				} else {
 
 					if groupWeight > gw {
 						gw = groupWeight
 						w = weight
-						mgw = nil
-						mgw = append(mgw, v[i])
+						_, ok := checkRazor[pepCheck]
+						if !ok {
+							mgw = append(mgw, v[i])
+							checkRazor[pepCheck] = 1
+						}
 
 					} else if groupWeight == gw {
 						if weight > w {
 							w = weight
-							mgw = nil
-							mgw = append(mgw, v[i])
+
+							_, ok := checkRazor[pepCheck]
+							if !ok {
+								mgw = append(mgw, v[i])
+								checkRazor[pepCheck] = 1
+							}
+
 						} else if weight == w {
 							w = weight
-							mgw = append(mgw, v[i])
+
+							_, ok := checkRazor[pepCheck]
+							if !ok {
+								mgw = append(mgw, v[i])
+								checkRazor[pepCheck] = 1
+							}
+
 						}
 					}
 
@@ -778,15 +814,14 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 
 			}
 		}
-
-		razorMap[k] = mgw[0]
+		razorMap[k] = mgw
 	}
 
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
+				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
 					p.Groups[i].GroupNumber,
 					string(p.Groups[i].Proteins[j].GroupSiblingID),
 					string(p.Groups[i].Proteins[j].ProteinName),
@@ -799,9 +834,13 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 
 				v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
 				if ok {
-					if strings.EqualFold(ref, v) {
-						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
-						p.Groups[i].Proteins[j].HasRazor = true
+
+					for _, l := range v {
+						if strings.EqualFold(ref, l) {
+							p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
+							p.Groups[i].Proteins[j].HasRazor = true
+							break
+						}
 					}
 				}
 
@@ -814,7 +853,7 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 		for j := range p.Groups[i].Proteins {
 			var r float64
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
-				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 {
+				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
@@ -823,39 +862,6 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
 	}
-
-	// for i := range p.Groups {
-	// 	for j := range p.Groups[i].Proteins {
-	// 		for k := range p.Groups[i].Proteins[j].PeptideIons {
-	//
-	// 			ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%f",
-	// 				p.Groups[i].GroupNumber,
-	// 				string(p.Groups[i].Proteins[j].GroupSiblingID),
-	// 				string(p.Groups[i].Proteins[j].ProteinName),
-	// 				string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
-	// 				p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
-	// 				p.Groups[i].Proteins[j].PeptideIons[k].Weight,
-	// 				p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
-	// 				p.Groups[i].Proteins[j].PeptideIons[k].Charge,
-	// 				p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass,
-	// 			)
-	//
-	// 			v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
-	// 			if ok {
-	// 				if strings.EqualFold(ref, v) {
-	// 					p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
-	// 					p.Groups[i].Proteins[j].HasRazor = true
-	//
-	// 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > p.Groups[i].Proteins[j].RazorTopPepProb {
-	// 						p.Groups[i].Proteins[j].RazorTopPepProb = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
-	// 					}
-	//
-	// 				}
-	// 			}
-	//
-	// 		}
-	// 	}
-	// }
 
 	return p, nil
 }
@@ -895,8 +901,6 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 					}
 
 				} else {
-					//if p.Groups[i].Proteins[j].Probability >= protProb {
-					//if p.Groups[i].Proteins[j].TopPepProb >= pepProb {
 					if p.Groups[i].Proteins[j].TopPepProb >= pepProb && p.Groups[i].Proteins[j].Probability >= protProb {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
@@ -1202,39 +1206,6 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 			list = append(list, pt)
 		}
 	}
-
-	// for k := range targets {
-	// 	decoy := decoyTag + k
-	// 	_, ok := decoys[decoy]
-	// 	if !ok {
-	// 		v, okRef := refMap[decoy]
-	// 		if okRef {
-	// 			list = append(list, v)
-	// 		} else {
-	// 			var pt xml.ProteinIdentification
-	// 			pt.ProteinName = decoy
-	// 			list = append(list, pt)
-	// 		}
-	// 	}
-	// }
-
-	// first check if the oposite list doesn't have an entry already.
-	// if not, search for the mirror entry on the original list, if found
-	// move it to the mirror list, otherwise add fake entry.
-	// for k := range decoys {
-	// 	target := strings.Replace(k, decoyTag, "", -1)
-	// 	_, ok := targets[target]
-	// 	if !ok {
-	// 		v, okRef := refMap[target]
-	// 		if okRef {
-	// 			list = append(list, v)
-	// 		} else {
-	// 			var pt xml.ProteinIdentification
-	// 			pt.ProteinName = target
-	// 			list = append(list, pt)
-	// 		}
-	// 	}
-	// }
 
 	return list
 }

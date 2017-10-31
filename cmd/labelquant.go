@@ -52,7 +52,8 @@ var labelquantCmd = &cobra.Command{
 		// 	logrus.Fatal("Missing normalization method, type 'philosopher labelquant --help' for more information")
 		// }
 
-		err := lbl.RunLabeledQuantification()
+		//err := lbl.RunLabeledQuantification()
+		err := lbl.RunTMTQuantification()
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -64,7 +65,7 @@ var labelquantCmd = &cobra.Command{
 
 func init() {
 	labelquantCmd.Flags().StringVarP(&lbl.Plex, "plex", "", "", "number of channels")
-	labelquantCmd.Flags().Float64VarP(&lbl.Tol, "tol", "", 10, "m/z tolerance in ppm")
+	labelquantCmd.Flags().Float64VarP(&lbl.Tol, "tol", "", 20, "m/z tolerance in ppm")
 	labelquantCmd.Flags().StringVarP(&lbl.Dir, "dir", "", "", "folder path containing the raw files")
 	labelquantCmd.Flags().StringVarP(&lbl.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
 	labelquantCmd.Flags().Float64VarP(&lbl.Purity, "purity", "", 0.5, "ion purity threshold")

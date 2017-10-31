@@ -36,8 +36,14 @@ func (e *Evidence) Serialize() *err.Error {
 // SerializeGranular converts the whole structure into sevral small gob files
 func (e *Evidence) SerializeGranular() *err.Error {
 
+	// create EV Meta
+	er := SerializeEVMeta(e)
+	if er != nil {
+		return er
+	}
+
 	// create EV PSM
-	er := SerializeEVPSM(e)
+	er = SerializeEVPSM(e)
 	if er != nil {
 		return er
 	}
@@ -77,6 +83,23 @@ func (e *Evidence) SerializeGranular() *err.Error {
 	if er != nil {
 		return er
 	}
+
+	return nil
+}
+
+// SerializeEVMeta creates an ev serial with Evidence data
+func SerializeEVMeta(e *Evidence) *err.Error {
+
+	f, er := os.Create(sys.EvMetaBin())
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	}
+	de := gob.NewEncoder(f)
+	goberr := de.Encode(e.Meta)
+	if goberr != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+	}
+	f.Close()
 
 	return nil
 }
@@ -217,8 +240,14 @@ func (e *Evidence) Restore() error {
 // RestoreGranular reads philosopher results files and restore the data sctructure
 func (e *Evidence) RestoreGranular() *err.Error {
 
+	// Meta
+	err := RestoreEVMeta(e)
+	if err != nil {
+		return err
+	}
+
 	// PSM
-	err := RestoreEVPSM(e)
+	err = RestoreEVPSM(e)
 	if err != nil {
 		return err
 	}
@@ -259,6 +288,17 @@ func (e *Evidence) RestoreGranular() *err.Error {
 		return err
 	}
 
+	return nil
+}
+
+// RestoreEVMeta restores Ev PSM data
+func RestoreEVMeta(e *Evidence) *err.Error {
+	f, _ := os.Open(sys.EvMetaBin())
+	d := gob.NewDecoder(f)
+	er := d.Decode(&e.Meta)
+	if er != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	}
 	return nil
 }
 
@@ -526,25 +566,3 @@ func RestoreEVCombinedWithPath(e *Evidence, p string) *err.Error {
 	}
 	return nil
 }
-
-// // RestoreWithPath reads philosopher results files and restore the data sctructure
-// func (e *Evidence) RestoreWithPath(p string) error {
-//
-// 	var path string
-//
-// 	if strings.Contains(p, string(filepath.Separator)) {
-// 		path = fmt.Sprintf("%s%s", p, sys.EvBin())
-// 	} else {
-// 		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvBin())
-// 	}
-//
-// 	file, _ := os.Open(path)
-//
-// 	dec := gob.NewDecoder(file)
-// 	err := dec.Decode(&e)
-// 	if err != nil {
-// 		return errors.New("Could not restore Philosopher result. Please check file path")
-// 	}
-//
-// 	return nil
-// }

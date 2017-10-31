@@ -25,7 +25,8 @@ import (
 
 // Evidence ...
 type Evidence struct {
-	meta.Data
+	Decoys        bool
+	Meta          MetaEvidence
 	PSM           PSMEvidenceList
 	Ions          IonEvidenceList
 	Peptides      PeptideEvidenceList
@@ -33,6 +34,21 @@ type Evidence struct {
 	Mods          Modifications
 	Modifications ModificationEvidence
 	Combined      CombinedEvidenceList
+}
+
+// MetaEvidence contains information about the data and the analysis
+type MetaEvidence struct {
+	UUID      string
+	Distro    string
+	Home      string
+	MetaFile  string
+	MetaDir   string
+	DB        string
+	Temp      string
+	TimeStamp string
+	OS        string
+	Arch      string
+	DecoyTag  string
 }
 
 // Modifications ...
@@ -43,42 +59,47 @@ type Modifications struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Index                     uint32
-	Spectrum                  string
-	Scan                      int
-	Peptide                   string
-	Protein                   string
-	ModifiedPeptide           string
-	AlternativeProteins       []string
-	AlternativeTargetProteins []string
-	ModPositions              []string
-	AssignedModMasses         []float64
-	AssignedMassDiffs         []float64
-	AssignedAminoAcid         []string
-	AssignedModifications     map[string]uint16
-	ObservedModifications     map[string]uint16
-	AssumedCharge             uint8
-	HitRank                   uint8
-	PrecursorNeutralMass      float64
-	PrecursorExpMass          float64
-	RetentionTime             float64
-	CalcNeutralPepMass        float64
-	RawMassdiff               float64
-	Massdiff                  float64
-	LocalizedMassDiff         string
-	Probability               float64
-	Expectation               float64
-	Xcorr                     float64
-	DeltaCN                   float64
-	DeltaCNStar               float64
-	SPScore                   float64
-	SPRank                    float64
-	Hyperscore                float64
-	Nextscore                 float64
-	DiscriminantValue         float64
-	Intensity                 float64
-	Purity                    float64
-	Labels                    tmt.Labels
+	Index                 uint32
+	Spectrum              string
+	Scan                  int
+	Peptide               string
+	IonForm               string
+	Protein               string
+	RazorProtein          string
+	ProteinID             string
+	GeneName              string
+	ModifiedPeptide       string
+	AlternativeProteins   []string
+	ModPositions          []string
+	AssignedModMasses     []float64
+	AssignedMassDiffs     []float64
+	AssignedAminoAcid     []string
+	AssignedModifications map[string]uint16
+	ObservedModifications map[string]uint16
+	AssumedCharge         uint8
+	HitRank               uint8
+	PrecursorNeutralMass  float64
+	PrecursorExpMass      float64
+	RetentionTime         float64
+	CalcNeutralPepMass    float64
+	RawMassdiff           float64
+	Massdiff              float64
+	LocalizedMassDiff     string
+	Probability           float64
+	Expectation           float64
+	Xcorr                 float64
+	DeltaCN               float64
+	DeltaCNStar           float64
+	SPScore               float64
+	SPRank                float64
+	Hyperscore            float64
+	Nextscore             float64
+	DiscriminantValue     float64
+	Intensity             float64
+	Purity                float64
+	IsUnique              bool
+	IsURazor              bool
+	Labels                tmt.Labels
 }
 
 // PSMEvidenceList ...
@@ -91,23 +112,25 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
 	Sequence                string
+	IonForm                 string
 	ModifiedSequence        string
 	AssignedModifications   map[string]uint16
 	ObservedModifications   map[string]uint16
 	RetentionTime           string
 	Spectra                 map[string]int
-	MappedProteins          map[string]uint8
+	MappedProteins          map[string]int
 	ChargeState             uint8
-	Spc                     int
 	MZ                      float64
 	PeptideMass             float64
+	PrecursorNeutralMass    float64
 	IsNondegenerateEvidence bool
 	Weight                  float64
 	GroupWeight             float64
 	Intensity               float64
 	Probability             float64
 	Expectation             float64
-	IsRazor                 bool
+	IsURazor                bool
+	IsDecoy                 bool
 	Labels                  tmt.Labels
 	SummedLabelIntensity    float64
 	ModifiedObservations    int
@@ -129,6 +152,7 @@ type PeptideEvidence struct {
 	Intensity              float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	IsDecoy                bool
 }
 
 // PeptideEvidenceList ...
@@ -141,6 +165,7 @@ func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].S
 // ProteinEvidence ...
 type ProteinEvidence struct {
 	OriginalHeader               string
+	PartHeader                   string
 	ProteinName                  string
 	ProteinGroup                 uint32
 	ProteinSubGroup              string
@@ -153,20 +178,16 @@ type ProteinEvidence struct {
 	GeneNames                    string
 	ProteinExistence             string
 	Sequence                     string
+	SupportingSpectra            map[string]int
 	IndiProtein                  map[string]uint8
 	UniqueStrippedPeptides       int
-	TotalNumRazorPeptides        int
-	TotalNumPeptideIons          int
-	NumURazorPeptideIons         int // Unique + razor
 	TotalPeptideIons             map[string]IonEvidence
-	UniquePeptideIons            map[string]IonEvidence
-	URazorPeptideIons            map[string]IonEvidence // Unique + razor
 	TotalSpC                     int
 	UniqueSpC                    int
-	RazorSpC                     int // Unique + razor
+	URazorSpC                    int // Unique + razor
 	TotalIntensity               float64
 	UniqueIntensity              float64
-	RazorIntensity               float64 // Unique + razor
+	URazorIntensity              float64 // Unique + razor
 	Probability                  float64
 	TopPepProb                   float64
 	IsDecoy                      bool
@@ -177,7 +198,7 @@ type ProteinEvidence struct {
 	URazorObservedModifications  map[string]uint16
 	TotalLabels                  tmt.Labels
 	UniqueLabels                 tmt.Labels
-	RazorLabels                  tmt.Labels // Unique + razor
+	URazorLabels                 tmt.Labels // Unique + razor
 }
 
 // ProteinEvidenceList list
@@ -189,31 +210,36 @@ func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[
 
 // CombinedEvidence represents all combined proteins detected
 type CombinedEvidence struct {
-	GroupNumber             uint32
-	SiblingID               string
-	ProteinName             string
-	ProteinID               string
-	IndiProtein             []string
-	EntryName               string
-	GeneNames               string
-	Length                  int
-	Names                   []string
-	UniqueStrippedPeptides  int
-	TotalPeptideIonStrings  map[string]int
-	UniquePeptideIonStrings map[string]int
-	RazorPeptideIonStrings  map[string]int
-	TotalPeptideIons        int
-	UniquePeptideIons       int
-	SharedPeptideIons       int
-	RazorPeptideIons        int
-	TotalSpc                []int
-	UniqueSpc               []int
-	ProteinProbability      float64
-	TopPepProb              float64
+	GroupNumber            uint32
+	SiblingID              string
+	ProteinName            string
+	ProteinID              string
+	IndiProtein            []string
+	EntryName              string
+	GeneNames              string
+	Description            string
+	Length                 int
+	Names                  []string
+	UniqueStrippedPeptides int
+	TotalIons              int
+	SupportingSpectra      map[string]string
+	ProteinProbability     float64
+	TopPepProb             float64
+	PeptideIons            []xml.PeptideIonIdentification
+	TotalSpc               map[string]int
+	UniqueSpc              map[string]int
+	UrazorSpc              map[string]int
+	TotalIntensity         map[string]float64
+	UniqueIntensity        map[string]float64
+	UrazorIntensity        map[string]float64
 }
 
 // CombinedEvidenceList ...
 type CombinedEvidenceList []CombinedEvidence
+
+func (a CombinedEvidenceList) Len() int           { return len(a) }
+func (a CombinedEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
@@ -239,16 +265,16 @@ func New() Evidence {
 	var m meta.Data
 	m.Restore(sys.Meta())
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	o.Meta.UUID = m.UUID
+	o.Meta.Distro = m.Distro
+	o.Meta.Home = m.Home
+	o.Meta.MetaFile = m.MetaFile
+	o.Meta.MetaDir = m.MetaDir
+	o.Meta.DB = m.DB
+	o.Meta.Temp = m.Temp
+	o.Meta.TimeStamp = m.TimeStamp
+	o.Meta.OS = m.OS
+	o.Meta.Arch = m.Arch
 
 	return o
 }
@@ -258,47 +284,66 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 
 	var list PSMEvidenceList
 
+	// collect database information
+	var dtb data.Base
+	dtb.Restore()
+
+	var genes = make(map[string]string)
+	var ptid = make(map[string]string)
+	for _, j := range dtb.Records {
+		genes[j.PartHeader] = j.GeneNames
+		ptid[j.PartHeader] = j.ID
+	}
+
 	for _, i := range pep {
 
-		if !clas.IsDecoyPSM(i, decoyTag) {
+		var p PSMEvidence
 
-			var p PSMEvidence
+		p.Index = i.Index
+		p.Spectrum = i.Spectrum
+		p.Scan = i.Scan
+		p.Peptide = i.Peptide
+		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+		p.Protein = i.Protein
+		p.ModifiedPeptide = i.ModifiedPeptide
+		p.AlternativeProteins = i.AlternativeProteins
+		p.ModPositions = i.ModPositions
+		p.AssignedModMasses = i.AssignedModMasses
+		p.AssignedMassDiffs = i.AssignedMassDiffs
+		p.AssignedAminoAcid = i.AssignedAminoAcid
+		p.AssumedCharge = i.AssumedCharge
+		p.HitRank = i.HitRank
+		p.PrecursorNeutralMass = i.PrecursorNeutralMass
+		p.PrecursorExpMass = i.PrecursorExpMass
+		p.RetentionTime = i.RetentionTime
+		p.CalcNeutralPepMass = i.CalcNeutralPepMass
+		p.RawMassdiff = i.RawMassDiff
+		p.Massdiff = i.Massdiff
+		p.LocalizedMassDiff = i.LocalizedMassDiff
+		p.Probability = i.Probability
+		p.Expectation = i.Expectation
+		p.Xcorr = i.Xcorr
+		p.DeltaCN = i.DeltaCN
+		p.SPRank = i.SPRank
+		p.Hyperscore = i.Hyperscore
+		p.Nextscore = i.Nextscore
+		p.DiscriminantValue = i.DiscriminantValue
+		p.Intensity = i.Intensity
+		p.AssignedModifications = make(map[string]uint16)
+		p.ObservedModifications = make(map[string]uint16)
 
-			p.Index = i.Index
-			p.Spectrum = i.Spectrum
-			p.Scan = i.Scan
-			p.Peptide = i.Peptide
-			p.Protein = i.Protein
-			p.ModifiedPeptide = i.ModifiedPeptide
-			p.AlternativeProteins = i.AlternativeProteins
-			p.AlternativeTargetProteins = i.AlternativeTargetProteins
-			p.ModPositions = i.ModPositions
-			p.AssignedModMasses = i.AssignedModMasses
-			p.AssignedMassDiffs = i.AssignedMassDiffs
-			p.AssignedAminoAcid = i.AssignedAminoAcid
-			p.AssumedCharge = i.AssumedCharge
-			p.HitRank = i.HitRank
-			p.PrecursorNeutralMass = i.PrecursorNeutralMass
-			p.PrecursorExpMass = i.PrecursorExpMass
-			p.RetentionTime = i.RetentionTime
-			p.CalcNeutralPepMass = i.CalcNeutralPepMass
-			p.RawMassdiff = i.RawMassDiff
-			p.Massdiff = i.Massdiff
-			p.LocalizedMassDiff = i.LocalizedMassDiff
-			p.Probability = i.Probability
-			p.Expectation = i.Expectation
-			p.Xcorr = i.Xcorr
-			p.DeltaCN = i.DeltaCN
-			p.SPRank = i.SPRank
-			p.Hyperscore = i.Hyperscore
-			p.Nextscore = i.Nextscore
-			p.DiscriminantValue = i.DiscriminantValue
-			p.Intensity = i.Intensity
-			p.AssignedModifications = make(map[string]uint16)
-			p.ObservedModifications = make(map[string]uint16)
-
-			list = append(list, p)
+		// TODO find a better way to map gene names to the psm
+		gn, ok := genes[i.Protein]
+		if ok {
+			p.GeneName = gn
 		}
+
+		id, ok := ptid[i.Protein]
+		if ok {
+			p.ProteinID = id
+		}
+
+		list = append(list, p)
 	}
 
 	sort.Sort(list)
@@ -310,7 +355,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 // PSMReport report all psms from study that passed the FDR filter
 func (e *Evidence) PSMReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -319,27 +364,24 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tRazor Protein\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
+		if e.Decoys == false {
+			if !clas.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
 
-		// var ass []string
-		// for j := range i.AssignedModifications {
-		// 	ass = append(ass, j)
-		// }
-
-		// if i.ModNtermMass != 0 {
-		// 	loc := fmt.Sprintf("n(%.4f)", i.ModNtermMass)
-		// 	assL = append(assL, loc)
-		// }
-		//
-		// if i.ModCtermMass != 0 {
-		// 	loc := fmt.Sprintf("c(%.4f)", i.ModCtermMass)
-		// 	assL = append(assL, loc)
-		// }
+	for _, i := range printSet {
 
 		var assL []string
 
@@ -369,7 +411,7 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%s\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -394,9 +436,12 @@ func (e *Evidence) PSMReport() {
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
-			len(i.AlternativeTargetProteins)+1,
+			i.IsUnique,
+			i.IsURazor,
+			i.RazorProtein,
+			len(i.AlternativeProteins)+1, // Mapped Proteins
 			i.Protein,
-			strings.Join(i.AlternativeTargetProteins, ", "),
+			strings.Join(i.AlternativeProteins, ", "),
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -413,7 +458,7 @@ func (e *Evidence) PSMReport() {
 // PSMQuantReport report all psms with TMT labels from study that passed the FDR filter
 func (e *Evidence) PSMQuantReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -422,12 +467,24 @@ func (e *Evidence) PSMQuantReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tProtein\tAlternative Proteins\tPurity\tRaw Channel 1\tRaw Channel 2\tRaw Channel 3\tRaw Channel 4\tRaw Channel 5\tRaw Channel 6\tRaw Channel 7\tRaw Channel 8\tRaw Channel 9\tRaw Channel 10\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
+		if e.Decoys == false {
+			if !clas.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
 
 		var assL []string
 
@@ -457,7 +514,7 @@ func (e *Evidence) PSMQuantReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%d\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -479,12 +536,15 @@ func (e *Evidence) PSMQuantReport() {
 			i.Nextscore,
 			i.Probability,
 			i.Intensity,
+			i.IsUnique,
+			i.IsURazor,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
-			len(i.AlternativeTargetProteins)+1,
+			len(i.AlternativeProteins)+1,
+			i.GeneName,
 			i.Protein,
-			strings.Join(i.AlternativeTargetProteins, ", "),
+			strings.Join(i.AlternativeProteins, ", "),
 			i.Purity,
 			i.Labels.Channel1.Intensity,
 			i.Labels.Channel2.Intensity,
@@ -514,12 +574,16 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
+	var psmIonMap = make(map[string][]string)
 	var assignedModMap = make(map[string][]string)
 	var observedModMap = make(map[string][]string)
 	var err error
 
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range e.PSM {
+
+		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Spectrum)
+
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.AlternativeProteins...)
 
@@ -539,51 +603,63 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 	}
 
 	for _, i := range ion {
-		if !clas.IsDecoyPSM(i, decoyTag) {
+		var pr IonEvidence
 
-			var pr IonEvidence
+		pr.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 
-			pr.Spectra = make(map[string]int)
-			pr.MappedProteins = make(map[string]uint8)
-			pr.ObservedModifications = make(map[string]uint16)
-			pr.AssignedModifications = make(map[string]uint16)
+		pr.Spectra = make(map[string]int)
+		pr.MappedProteins = make(map[string]int)
+		pr.ObservedModifications = make(map[string]uint16)
+		pr.AssignedModifications = make(map[string]uint16)
 
-			pr.Spectra[i.Spectrum]++
-
-			pr.Sequence = i.Peptide
-			pr.ModifiedSequence = i.ModifiedPeptide
-			pr.MZ = utils.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
-			pr.ChargeState = i.AssumedCharge
-			pr.PeptideMass = i.CalcNeutralPepMass
-			pr.Probability = i.Probability
-			pr.Expectation = i.Expectation
-
-			// get he list of indi proteins from pepXML data
-			v, ok := psmPtMap[i.Spectrum]
-			if ok {
-				for _, j := range v {
-					pr.MappedProteins[j] = 0
-				}
+		v, ok := psmIonMap[pr.IonForm]
+		if ok {
+			for _, j := range v {
+				pr.Spectra[j]++
 			}
-
-			va, oka := assignedModMap[i.Spectrum]
-			if oka {
-				for _, j := range va {
-					pr.AssignedModifications[j] = 0
-				}
-			}
-
-			vo, oko := observedModMap[i.Spectrum]
-			if oko {
-				for _, j := range vo {
-					pr.ObservedModifications[j] = 0
-				}
-			} else {
-				pr.UnModifiedObservations++
-			}
-
-			list = append(list, pr)
 		}
+
+		pr.Sequence = i.Peptide
+		pr.ModifiedSequence = i.ModifiedPeptide
+		pr.MZ = utils.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
+		pr.ChargeState = i.AssumedCharge
+		pr.PeptideMass = i.CalcNeutralPepMass
+		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
+		pr.Probability = i.Probability
+		pr.Expectation = i.Expectation
+
+		pr.MappedProteins[i.Protein] = 0
+
+		// get he list of indi proteins from pepXML data
+		v, ok = psmPtMap[i.Spectrum]
+		if ok {
+			for _, j := range v {
+				pr.MappedProteins[j] = 0
+			}
+		}
+
+		va, oka := assignedModMap[i.Spectrum]
+		if oka {
+			for _, j := range va {
+				pr.AssignedModifications[j] = 0
+			}
+		}
+
+		vo, oko := observedModMap[i.Spectrum]
+		if oko {
+			for _, j := range vo {
+				pr.ObservedModifications[j] = 0
+			}
+		} else {
+			pr.UnModifiedObservations++
+		}
+
+		// is this bservation a decoy ?
+		if clas.IsDecoyPSM(i, decoyTag) {
+			pr.IsDecoy = true
+		}
+
+		list = append(list, pr)
 	}
 
 	sort.Sort(list)
@@ -592,29 +668,151 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 	return err
 }
 
+// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIonStatus() {
+
+	var uniqueMap = make(map[string]bool)
+	var urazorMap = make(map[string]string)
+	var ptMap = make(map[string]string)
+	var ptIndiMap = make(map[string][]string)
+
+	for _, i := range e.Proteins {
+
+		for _, j := range i.TotalPeptideIons {
+			if j.IsNondegenerateEvidence == true {
+				uniqueMap[j.IonForm] = true
+			}
+		}
+
+		for _, j := range i.TotalPeptideIons {
+			if j.IsURazor == true {
+				urazorMap[j.IonForm] = i.PartHeader
+			}
+		}
+
+	}
+
+	for i := range e.PSM {
+
+		_, uOK := uniqueMap[e.PSM[i].IonForm]
+		if uOK {
+			e.PSM[i].IsUnique = true
+		}
+
+		rp, rOK := urazorMap[e.PSM[i].IonForm]
+		if rOK {
+			e.PSM[i].IsURazor = true
+			e.PSM[i].RazorProtein = rp
+		}
+
+		v, ok := ptMap[e.PSM[i].IonForm]
+		if ok {
+			e.PSM[i].Protein = v
+			e.PSM[i].AlternativeProteins = ptIndiMap[v]
+		}
+
+	}
+
+	for i := range e.Ions {
+
+		_, uOK := uniqueMap[e.Ions[i].IonForm]
+		if uOK {
+			e.Ions[i].IsNondegenerateEvidence = true
+		}
+
+		_, rOK := urazorMap[e.Ions[i].IonForm]
+		if rOK {
+			e.PSM[i].IsURazor = true
+		}
+
+	}
+
+	return
+}
+
+// UpdateIonModCount counts how many times each ion is observed modified and not modified
+func (e *Evidence) UpdateIonModCount() {
+
+	// recreate the ion list from the main report object
+	var AllIons = make(map[string]int)
+	var ModIons = make(map[string]int)
+	var UnModIons = make(map[string]int)
+
+	for _, i := range e.Ions {
+		AllIons[i.IonForm] = 0
+		ModIons[i.IonForm] = 0
+		UnModIons[i.IonForm] = 0
+	}
+
+	// range over PSMs looking for modified and not modified evidences
+	// if they exist on the ions map, get the numbers
+	for _, i := range e.PSM {
+
+		// check the map
+		_, ok := AllIons[i.IonForm]
+		if ok {
+
+			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
+				UnModIons[i.IonForm]++
+			} else {
+				ModIons[i.IonForm]++
+			}
+
+		}
+	}
+
+	for i := range e.Ions {
+
+		v1, ok1 := UnModIons[e.Ions[i].IonForm]
+		if ok1 {
+			e.Ions[i].UnModifiedObservations = v1
+		}
+
+		v2, ok2 := ModIons[e.Ions[i].IonForm]
+		if ok2 {
+			e.Ions[i].ModifiedObservations = v2
+		}
+
+	}
+
+	return
+}
+
+// UpdateIndistinguishableProteinLists pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIndistinguishableProteinLists() {
+
+	var ptNetMap = make(map[string][]string)
+
+	for _, i := range e.Proteins {
+
+		var list []string
+		for k := range i.IndiProtein {
+			list = append(list, k)
+		}
+
+		ptNetMap[i.ProteinID] = list
+
+	}
+
+	for i := range e.PSM {
+		v, ok := ptNetMap[e.PSM[i].ProteinID]
+		if ok {
+			e.PSM[i].AlternativeProteins = v
+		}
+	}
+
+	return
+}
+
 // UpdateIonAssignedAndObservedMods collects all Assigned and Observed modifications from
 // individual PSM and assign them to ions
 func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 
-	//var list IonEvidenceList
-
 	for i := range e.Ions {
-		var ion string
-		if len(e.Ions[i].ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-		}
 
 		for _, j := range e.PSM {
-			var psmIon string
-			if len(j.ModifiedPeptide) > 0 {
-				psmIon = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
-			} else {
-				psmIon = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
-			}
 
-			if ion == psmIon {
+			if e.Ions[i].IonForm == j.IonForm {
 				for k := range j.AssignedModifications {
 					e.Ions[i].AssignedModifications[k]++
 				}
@@ -624,13 +822,8 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 
 				break
 			}
-
 		}
-
-		//list = append(list, e.Ions[i])
 	}
-
-	//e.Ions = list
 
 	return
 }
@@ -638,7 +831,7 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
-	output := fmt.Sprintf("%s%sion.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -651,12 +844,24 @@ func (e *Evidence) PeptideIonReport() {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet IonEvidenceList
+	for _, i := range e.Ions {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
 	// peptides with no mapped poteins are related to contaminants
 	// and reverse sequences. They are dificult to clean because
 	// in some cases they are shared between a match decoy and a target,
 	// so they stay on the lists but cannot be mapped back to the
 	// original proteins. These cases should be rare to find.
-	for _, i := range e.Ions {
+	for _, i := range printSet {
 
 		var pts []string
 		//var ipts []string
@@ -687,7 +892,7 @@ func (e *Evidence) PeptideIonReport() {
 					i.PeptideMass,
 					i.Probability,
 					i.Expectation,
-					i.Spc,
+					len(i.Spectra),
 					i.UnModifiedObservations,
 					i.ModifiedObservations,
 					i.Intensity,
@@ -715,7 +920,7 @@ func (e *Evidence) PeptideIonReport() {
 func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) error {
 
 	var list PeptideEvidenceList
-	var pepSeqMap = make(map[string]uint8)
+	var pepSeqMap = make(map[string]bool) //is this a decoy
 	var pepCSMap = make(map[string][]uint8)
 	var pepSpc = make(map[string]int)
 	var pepInt = make(map[string]float64)
@@ -723,10 +928,12 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 
 	for _, i := range pep {
 		if !clas.IsDecoyPSM(i, decoyTag) {
-			pepSeqMap[i.Peptide] = 0
-			pepSpc[i.Peptide] = 0
-			pepInt[i.Peptide] = 0
+			pepSeqMap[i.Peptide] = false
+		} else {
+			pepSeqMap[i.Peptide] = true
 		}
+		pepSpc[i.Peptide] = 0
+		pepInt[i.Peptide] = 0
 	}
 
 	// TODO review this method, Intensity quant is not working
@@ -741,7 +948,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		}
 	}
 
-	for k := range pepSeqMap {
+	for k, v := range pepSeqMap {
 
 		var pep PeptideEvidence
 		pep.ChargeState = make(map[uint8]uint8)
@@ -752,6 +959,9 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		}
 		pep.Spc = pepSpc[k]
 		pep.Intensity = pepInt[k]
+
+		// is this a decoy ?
+		pep.IsDecoy = v
 
 		list = append(list, pep)
 	}
@@ -765,7 +975,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 // PeptideReport reports consist on ion reporting
 func (e *Evidence) PeptideReport() {
 
-	output := fmt.Sprintf("%s%speptide.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -778,7 +988,19 @@ func (e *Evidence) PeptideReport() {
 		logrus.Fatal("Cannot create peptide report header")
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet PeptideEvidenceList
 	for _, i := range e.Peptides {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
 
 		var cs []string
 		for j := range i.ChargeState {
@@ -806,32 +1028,6 @@ func (e *Evidence) PeptideReport() {
 	return
 }
 
-// ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
-func (e *Evidence) ProteinFastaReport() error {
-
-	output := fmt.Sprintf("%s%sproteins.fas", e.Temp, string(filepath.Separator))
-
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Could not create output file")
-	}
-	defer file.Close()
-
-	for _, i := range e.Proteins {
-		header := i.OriginalHeader
-		line := ">" + header + "\n" + i.Sequence + "\n"
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			return errors.New("Cannot print PSM to file")
-		}
-	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return nil
-}
-
 // AssembleProteinReport ...
 func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) error {
 
@@ -840,115 +1036,97 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 
 	var evidenceIons = make(map[string]IonEvidence)
 	for _, i := range e.Ions {
-		var ion string
-		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-		}
-		evidenceIons[ion] = i
+		evidenceIons[i.IonForm] = i
 	}
 
 	for _, i := range pro {
-		if !strings.HasPrefix(i.ProteinName, decoyTag) {
 
-			var rep ProteinEvidence
+		var rep ProteinEvidence
 
-			rep.TotalPeptideIons = make(map[string]IonEvidence)
-			rep.UniquePeptideIons = make(map[string]IonEvidence)
-			rep.URazorPeptideIons = make(map[string]IonEvidence)
-			rep.IndiProtein = make(map[string]uint8)
-			rep.URazorAssignedModifications = make(map[string]uint16)
-			rep.URazorObservedModifications = make(map[string]uint16)
+		rep.SupportingSpectra = make(map[string]int)
+		rep.TotalPeptideIons = make(map[string]IonEvidence)
+		rep.IndiProtein = make(map[string]uint8)
+		rep.URazorAssignedModifications = make(map[string]uint16)
+		rep.URazorObservedModifications = make(map[string]uint16)
 
-			rep.ProteinName = i.ProteinName
-			rep.ProteinGroup = i.GroupNumber
-			rep.ProteinSubGroup = i.GroupSiblingID
-			rep.Length = i.Length
-			rep.Coverage = i.PercentCoverage
-			rep.UniqueStrippedPeptides = len(i.UniqueStrippedPeptides)
-			rep.Probability = i.Probability
-			rep.TopPepProb = i.TopPepProb
+		rep.ProteinName = i.ProteinName
+		rep.ProteinGroup = i.GroupNumber
+		rep.ProteinSubGroup = i.GroupSiblingID
+		rep.Length = i.Length
+		rep.Coverage = i.PercentCoverage
+		rep.UniqueStrippedPeptides = len(i.UniqueStrippedPeptides)
+		rep.Probability = i.Probability
+		rep.TopPepProb = i.TopPepProb
 
-			rep.TotalNumPeptideIons = len(i.PeptideIons)
-			//rep.TotalPeptideIons[ion] = v
+		//if !strings.HasPrefix(i.ProteinName, decoyTag) {
+		if strings.Contains(i.ProteinName, decoyTag) {
+			rep.IsDecoy = true
+		} else {
+			rep.IsDecoy = false
+		}
 
-			if strings.Contains(i.ProteinName, decoyTag) {
-				rep.IsDecoy = true
-			} else {
-				rep.IsDecoy = false
-			}
+		for j := range i.IndistinguishableProtein {
+			rep.IndiProtein[i.IndistinguishableProtein[j]] = 0
+		}
 
-			for j := range i.IndistinguishableProtein {
-				rep.IndiProtein[i.IndistinguishableProtein[j]] = 0
-			}
+		for _, k := range i.PeptideIons {
 
-			for _, k := range i.PeptideIons {
+			ion := fmt.Sprintf("%s#%d#%.4f", k.PeptideSequence, k.Charge, k.CalcNeutralPepMass)
 
-				var ion string
-				if len(k.ModifiedPeptide) > 0 {
-					ion = fmt.Sprintf("%s#%d", k.ModifiedPeptide, k.Charge)
-				} else {
-					ion = fmt.Sprintf("%s#%d", k.PeptideSequence, k.Charge)
+			v, ok := evidenceIons[ion]
+			if ok {
+
+				for spec := range v.Spectra {
+					rep.SupportingSpectra[spec]++
 				}
 
-				rep.TotalPeptideIons[ion] = evidenceIons[ion]
+				v.MappedProteins = make(map[string]int)
 
-				if k.IsUnique == true {
-					rep.UniquePeptideIons[ion] = evidenceIons[ion]
-					rep.URazorPeptideIons[ion] = evidenceIons[ion]
-					rep.NumURazorPeptideIons++
-					rep.TotalNumRazorPeptides++
-
-					rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
-					rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
-
-					for key, value := range evidenceIons[ion].AssignedModifications {
-						rep.URazorAssignedModifications[key] += value
-					}
-
-					for key, value := range evidenceIons[ion].ObservedModifications {
-						rep.URazorObservedModifications[key] += value
-					}
-
-				}
+				ref := v
+				ref.Weight = k.Weight
+				ref.GroupWeight = k.GroupWeight
+				ref.MappedProteins[i.ProteinName]++
+				ref.IsNondegenerateEvidence = k.IsNondegenerateEvidence
 
 				if k.Razor == 1 {
-					rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
-					rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
-
-					rep.URazorPeptideIons[ion] = evidenceIons[ion]
-					rep.TotalNumRazorPeptides++
-
-					for key, value := range evidenceIons[ion].AssignedModifications {
-						rep.URazorAssignedModifications[key] += value
-					}
-
-					for key, value := range evidenceIons[ion].ObservedModifications {
-						rep.URazorObservedModifications[key] += value
-					}
-
+					ref.IsURazor = true
 				}
 
-				// for j := range e.Ions {
-				// 	var eIon string
-				// 	if len(e.Ions[j].ModifiedSequence) > 0 {
-				// 		eIon = fmt.Sprintf("%s#%d", e.Ions[j].ModifiedSequence, e.Ions[j].ChargeState)
-				// 	} else {
-				// 		eIon = fmt.Sprintf("%s#%d", e.Ions[j].Sequence, e.Ions[j].ChargeState)
-				// 	}
-				//
-				// 	if ion == eIon {
-				// 		if k.Razor == 1 {
-				// 			e.Ions[j].IsRazor = true
-				// 		}
-				// 	}
-				// }
-
+				rep.TotalPeptideIons[ion] = ref
+				//evidenceIons[ion] = ref
 			}
 
-			list = append(list, rep)
+			//rep.TotalPeptideIons[ion] = evidenceIons[ion]
+
+			if k.IsUnique == true {
+				rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
+				rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
+
+				for key, value := range evidenceIons[ion].AssignedModifications {
+					rep.URazorAssignedModifications[key] += value
+				}
+
+				for key, value := range evidenceIons[ion].ObservedModifications {
+					rep.URazorObservedModifications[key] += value
+				}
+			}
+
+			if k.Razor == 1 {
+				rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
+				rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
+
+				for key, value := range evidenceIons[ion].AssignedModifications {
+					rep.URazorAssignedModifications[key] += value
+				}
+
+				for key, value := range evidenceIons[ion].ObservedModifications {
+					rep.URazorObservedModifications[key] += value
+				}
+			}
+
 		}
+
+		list = append(list, rep)
 	}
 
 	var dtb data.Base
@@ -964,6 +1142,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
 				if (j.IsDecoy == true && list[i].IsDecoy == true) || (j.IsDecoy == false && list[i].IsDecoy == false) {
 					list[i].OriginalHeader = j.OriginalHeader
+					list[i].PartHeader = j.PartHeader
 					list[i].ProteinID = j.ID
 					list[i].EntryName = j.EntryName
 					list[i].ProteinExistence = j.ProteinExistence
@@ -995,7 +1174,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 func (e *Evidence) ProteinReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1011,7 +1190,19 @@ func (e *Evidence) ProteinReport() {
 		logrus.Fatal(n, err)
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet ProteinEvidenceList
 	for _, i := range e.Proteins {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
 
 		var ip []string
 		for k := range i.IndiProtein {
@@ -1032,34 +1223,39 @@ func (e *Evidence) ProteinReport() {
 			}
 		}
 
+		var uniqIons int
+		for _, j := range i.TotalPeptideIons {
+			if j.IsNondegenerateEvidence == true {
+				uniqIons++
+			}
+		}
+
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
 		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
-			i.ProteinGroup,           // Group
-			i.ProteinSubGroup,        // SubGroup
-			i.ProteinID,              // Protein ID
-			i.EntryName,              // Entry Name
-			i.Length,                 // Length
-			i.Coverage,               // Percent Coverage
-			i.Organism,               // Organism
-			i.Description,            // Description
-			i.ProteinExistence,       // Protein Existence
-			i.GeneNames,              // Genes
-			i.Probability,            // Protein Probability
-			i.TopPepProb,             // Top Peptide Probability
-			i.UniqueStrippedPeptides, // Stripped Peptides
-			i.TotalNumPeptideIons,    // Total Peptide Ions
-			i.NumURazorPeptideIons,   // Unique Peptide Ions
-			i.TotalSpC,               // Total Spectral Count
-			i.UniqueSpC,              // Unique Spectral Count
-			i.RazorSpC,               // Razor Spectral Count
-			//i.URazorUnModifiedObservations, // Unmodified Occurrences
-			//i.URazorModifiedObservations,   // Modified Occurrences
+			i.ProteinGroup,            // Group
+			i.ProteinSubGroup,         // SubGroup
+			i.ProteinID,               // Protein ID
+			i.EntryName,               // Entry Name
+			i.Length,                  // Length
+			i.Coverage,                // Percent Coverage
+			i.Organism,                // Organism
+			i.Description,             // Description
+			i.ProteinExistence,        // Protein Existence
+			i.GeneNames,               // Genes
+			i.Probability,             // Protein Probability
+			i.TopPepProb,              // Top Peptide Probability
+			i.UniqueStrippedPeptides,  // Stripped Peptides
+			len(i.TotalPeptideIons),   // Total Peptide Ions
+			uniqIons,                  // Unique Peptide Ions
+			i.TotalSpC,                // Total Spectral Count
+			i.UniqueSpC,               // Unique Spectral Count
+			i.URazorSpC,               // Razor Spectral Count
 			i.TotalIntensity,          // Total Intensity
 			i.UniqueIntensity,         // Unique Intensity
-			i.RazorIntensity,          // Razor Intensity
+			i.URazorIntensity,         // Razor Intensity
 			strings.Join(amods, ", "), // Razor Assigned Modifications
 			strings.Join(omods, ", "), // Razor Observed Modifications
 			strings.Join(ip, ", "),    // Indistinguishable Proteins
@@ -1084,7 +1280,7 @@ func (e *Evidence) ProteinReport() {
 func (e *Evidence) ProteinQuantReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1093,103 +1289,107 @@ func (e *Evidence) ProteinQuantReport() {
 	}
 	defer file.Close()
 
-	//Total Channel 1\tTotal Channel 2\tTotal Channel 3\t Total Channel 4\t Total Channel 5\t Total Channel 6\t Total Channel 7\tTotal Channel 8\tTotal Channel 9\tTotal Channel 10\tUnique Channel 1\tUnique Channel 2\tUnique Channel 3\tUnique Channel 4\tUnique Channel 5\tUnique Channel 6\tUnique Channel 7\tUnique Channel 8\tUnique Channel 9\tUnique Channel 10\n")
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tTotal Intensity\tUnique Intensity\tTotal Raw Channel 1\tTotal Raw Channel 2\tTotal Raw Channel 3\t Total Raw Channel 4\t Total Raw Channel 5\t Total Raw Channel 6\t Total Raw Channel 7\tTotal Raw Channel 8\tTotal Raw Channel 9\tTotal Raw Channel 10\tUnique Raw Channel 1\tUnique Raw Channel 2\tUnique Raw Channel 3\tUnique Raw Channel 4\tUnique Raw Channel 5\tUnique Raw Channel 6\tUnique Raw Channel 7\tUnique Raw Channel 8\tUnique Raw Channel 9\tUnique Raw Channel 10\tRazor Raw Channel 1\tRazor Raw Channel 2\tRazor Raw Channel 3\tRazor Raw Channel 4\tRazor Raw Channel 5\tRazor Raw Channel 6\tRazor Raw Channel 7\tRazor Raw Channel 8\tRazor Raw Channel 9\tRazor Raw Channel 10\tTotal Channel 1\tTotal Channel 2\tTotal Channel 3\t Total Channel 4\t Total Channel 5\t Total Channel 6\t Total Channel 7\tTotal Channel 8\tTotal Channel 9\tTotal Channel 10\tUnique Channel 1\tUnique Channel 2\tUnique Channel 3\tUnique Channel 4\tUnique Channel 5\tUnique Channel 6\tUnique Channel 7\tUnique Channel 8\tUnique Channel 9\tUnique Channel 10\tRazor Channel 1\tRazor Channel 2\tRazor Channel 3\tRazor Channel 4\tRazor Channel 5\tRazor Channel 6\tRazor Channel 7\tRazor Channel 8\tRazor Channel 9\tRazor Channel 10\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf(
+		`Group\t
+		SubGroup\t
+		Protein ID\t
+		Entry Name\t
+		Length\t
+		Percent Coverage\t
+		Description\t
+		Protein Existence\t
+		Genes\t
+		Protein Probability\t
+		Top Peptide Probability\t
+		Unique Stripped Peptides\t
+		Razor Peptides\t
+		Total Peptide Ions\t
+		Unique Peptide Ions\t
+		Total Spectral Count\t
+		Unique Spectral Count\t
+		Total Intensity\t
+		Unique Intensity\t
+		126 Abundance\t
+		127N Abundance\t
+		127C Abundance\t
+		128N Abundance\t
+		128C Abundance\t
+		129N Abundance\t
+		129C Abundance\t
+		130N Abundance\t
+		130C Abundance\t
+		131N Abundance\t
+		Indistinguishable Proteins\n`)
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
 		logrus.Fatal(n, err)
 	}
 
+	// building the printing set tat may or not contain decoys
+	var printSet ProteinEvidenceList
 	for _, i := range e.Proteins {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
 
 		var ip []string
 		for k := range i.IndiProtein {
 			ip = append(ip, k)
 		}
 
-		//%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t
+		var uniqIons int
+		for _, j := range i.TotalPeptideIons {
+			if j.IsNondegenerateEvidence == true {
+				uniqIons++
+			}
+		}
+
+		var razorIons int
+		for _, j := range i.TotalPeptideIons {
+			if j.IsNondegenerateEvidence == true {
+				razorIons++
+			}
+		}
+
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t",
-				i.ProteinGroup,
-				i.ProteinSubGroup,
-				i.ProteinID,
-				i.EntryName,
-				i.Length,
-				i.Coverage,
-				i.Description,
-				i.ProteinExistence,
-				i.GeneNames,
-				i.Probability,
-				i.TopPepProb,
-				i.UniqueStrippedPeptides,
-				i.TotalNumRazorPeptides,
-				i.TotalNumPeptideIons,
-				i.NumURazorPeptideIons,
-				i.TotalSpC,
-				i.UniqueSpC,
-				i.TotalIntensity,
-				i.UniqueIntensity,
-				i.TotalLabels.Channel1.NormIntensity,
-				i.TotalLabels.Channel2.NormIntensity,
-				i.TotalLabels.Channel3.NormIntensity,
-				i.TotalLabels.Channel4.NormIntensity,
-				i.TotalLabels.Channel5.NormIntensity,
-				i.TotalLabels.Channel6.NormIntensity,
-				i.TotalLabels.Channel7.NormIntensity,
-				i.TotalLabels.Channel8.NormIntensity,
-				i.TotalLabels.Channel9.NormIntensity,
-				i.TotalLabels.Channel10.NormIntensity,
-				i.UniqueLabels.Channel1.NormIntensity,
-				i.UniqueLabels.Channel2.NormIntensity,
-				i.UniqueLabels.Channel3.NormIntensity,
-				i.UniqueLabels.Channel4.NormIntensity,
-				i.UniqueLabels.Channel5.NormIntensity,
-				i.UniqueLabels.Channel6.NormIntensity,
-				i.UniqueLabels.Channel7.NormIntensity,
-				i.UniqueLabels.Channel8.NormIntensity,
-				i.UniqueLabels.Channel9.NormIntensity,
-				i.UniqueLabels.Channel10.NormIntensity,
-				i.RazorLabels.Channel1.NormIntensity,
-				i.RazorLabels.Channel2.NormIntensity,
-				i.RazorLabels.Channel3.NormIntensity,
-				i.RazorLabels.Channel4.NormIntensity,
-				i.RazorLabels.Channel5.NormIntensity,
-				i.RazorLabels.Channel6.NormIntensity,
-				i.RazorLabels.Channel7.NormIntensity,
-				i.RazorLabels.Channel8.NormIntensity,
-				i.RazorLabels.Channel9.NormIntensity,
-				i.RazorLabels.Channel10.NormIntensity,
-				i.TotalLabels.Channel1.RatioIntensity,
-				i.TotalLabels.Channel2.RatioIntensity,
-				i.TotalLabels.Channel3.RatioIntensity,
-				i.TotalLabels.Channel4.RatioIntensity,
-				i.TotalLabels.Channel5.RatioIntensity,
-				i.TotalLabels.Channel6.RatioIntensity,
-				i.TotalLabels.Channel7.RatioIntensity,
-				i.TotalLabels.Channel8.RatioIntensity,
-				i.TotalLabels.Channel9.RatioIntensity,
-				i.TotalLabels.Channel10.RatioIntensity,
-				i.UniqueLabels.Channel1.RatioIntensity,
-				i.UniqueLabels.Channel2.RatioIntensity,
-				i.UniqueLabels.Channel3.RatioIntensity,
-				i.UniqueLabels.Channel4.RatioIntensity,
-				i.UniqueLabels.Channel5.RatioIntensity,
-				i.UniqueLabels.Channel6.RatioIntensity,
-				i.UniqueLabels.Channel7.RatioIntensity,
-				i.UniqueLabels.Channel8.RatioIntensity,
-				i.UniqueLabels.Channel9.RatioIntensity,
-				i.UniqueLabels.Channel10.RatioIntensity,
-				i.RazorLabels.Channel1.RatioIntensity,
-				i.RazorLabels.Channel2.RatioIntensity,
-				i.RazorLabels.Channel3.RatioIntensity,
-				i.RazorLabels.Channel4.RatioIntensity,
-				i.RazorLabels.Channel5.RatioIntensity,
-				i.RazorLabels.Channel6.RatioIntensity,
-				i.RazorLabels.Channel7.RatioIntensity,
-				i.RazorLabels.Channel8.RatioIntensity,
-				i.RazorLabels.Channel9.RatioIntensity,
-				i.RazorLabels.Channel10.RatioIntensity,
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%s\t",
+				i.ProteinGroup,           // Group
+				i.ProteinSubGroup,        // SubGroup
+				i.ProteinID,              // Protein ID
+				i.EntryName,              // EntryName
+				i.Length,                 // Length
+				i.Coverage,               // Percent Coverage
+				i.Description,            // Description
+				i.ProteinExistence,       // Protein Existence
+				i.GeneNames,              // Genes
+				i.Probability,            // Protein Probability
+				i.TopPepProb,             // Top peptide Probability
+				i.UniqueStrippedPeptides, // Unique Stripped Peptides
+				razorIons,                // Razor peptides
+				len(i.TotalPeptideIons),  // Total peptide Ions
+				uniqIons,                 // Unique Peptide Ions
+				i.TotalSpC,               // Total Spectral Count
+				i.UniqueSpC,              // Unique Spectral Count
+				i.TotalIntensity,         // Total Intensity
+				i.UniqueIntensity,        // Unique Intensity
+				// i.TotalLabels.Channel1.NormIntensity,
+				// i.TotalLabels.Channel2.NormIntensity,
+				// i.TotalLabels.Channel3.NormIntensity,
+				// i.TotalLabels.Channel4.NormIntensity,
+				// i.TotalLabels.Channel5.NormIntensity,
+				// i.TotalLabels.Channel6.NormIntensity,
+				// i.TotalLabels.Channel7.NormIntensity,
+				// i.TotalLabels.Channel8.NormIntensity,
+				// i.TotalLabels.Channel9.NormIntensity,
+				// i.TotalLabels.Channel10.NormIntensity,
 				strings.Join(ip, ", "))
 
 			line += "\n"
@@ -1204,6 +1404,44 @@ func (e *Evidence) ProteinQuantReport() {
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
+}
+
+// ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
+func (e *Evidence) ProteinFastaReport() error {
+
+	output := fmt.Sprintf("%s%sproteins.fas", e.Meta.Temp, string(filepath.Separator))
+
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Could not create output file")
+	}
+	defer file.Close()
+
+	// building the printing set tat may or not contain decoys
+	var printSet ProteinEvidenceList
+	for _, i := range e.Proteins {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
+		header := i.OriginalHeader
+		line := ">" + header + "\n" + i.Sequence + "\n"
+		_, err = io.WriteString(file, line)
+		if err != nil {
+			return errors.New("Cannot print PSM to file")
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return nil
 }
 
 // AssembleModificationReport cretaes the modifications lists
@@ -1356,72 +1594,6 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 	return nil
 }
 
-// UpdateIonModCount counts how many times each ion is observed modified and not modified
-func (e *Evidence) UpdateIonModCount() {
-
-	// recreate the ion list from the main report object
-	var AllIons = make(map[string]int)
-	var ModIons = make(map[string]int)
-	var UnModIons = make(map[string]int)
-
-	for _, i := range e.Ions {
-		var ion string
-		if len(i.ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedSequence, i.ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Sequence, i.ChargeState)
-		}
-		AllIons[ion] = 0
-		ModIons[ion] = 0
-		UnModIons[ion] = 0
-	}
-
-	// range over PSMs looking for modified and not modified evidences
-	// if they exist on the ions map, get the numbers
-	for _, i := range e.PSM {
-		var psmIon string
-		if len(i.ModifiedPeptide) > 0 {
-			psmIon = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
-		} else {
-			psmIon = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
-		}
-
-		// check the map
-		_, ok := AllIons[psmIon]
-		if ok {
-
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				UnModIons[psmIon]++
-			} else {
-				ModIons[psmIon]++
-			}
-
-		}
-	}
-
-	for i := range e.Ions {
-		var ion string
-		if len(e.Ions[i].ModifiedSequence) > 0 {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].ModifiedSequence, e.Ions[i].ChargeState)
-		} else {
-			ion = fmt.Sprintf("%s#%d", e.Ions[i].Sequence, e.Ions[i].ChargeState)
-		}
-
-		v1, ok1 := UnModIons[ion]
-		if ok1 {
-			e.Ions[i].UnModifiedObservations = v1
-		}
-
-		v2, ok2 := ModIons[ion]
-		if ok2 {
-			e.Ions[i].ModifiedObservations = v2
-		}
-
-	}
-
-	return
-}
-
 // UpdatePeptideModCount counts how many times each peptide is observed modified and not modified
 func (e *Evidence) UpdatePeptideModCount() {
 
@@ -1473,7 +1645,7 @@ func (e *Evidence) UpdatePeptideModCount() {
 func (e *Evidence) ModificationReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%smodifications.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%smodifications.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1514,7 +1686,7 @@ func (e *Evidence) ModificationReport() {
 // PlotMassHist plots the delta mass histogram
 func (e *Evidence) PlotMassHist() error {
 
-	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Temp, string(filepath.Separator))
+	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(outfile)
 	if err != nil {

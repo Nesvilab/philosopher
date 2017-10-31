@@ -37,7 +37,7 @@ var reportCmd = &cobra.Command{
 			repo.ProteinFastaReport()
 
 			logrus.Info("Creating Protein identification report")
-			if repo.Proteins[0].TotalLabels.Channel1.Mean > 0 || repo.Proteins[10].TotalLabels.Channel1.Mean > 0 {
+			if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
 				repo.ProteinQuantReport()
 			} else {
 				repo.ProteinReport()
@@ -81,6 +81,8 @@ var reportCmd = &cobra.Command{
 func init() {
 
 	repo = rep.New()
+
+	reportCmd.Flags().BoolVarP(&repo.Decoys, "decoys", "", false, "add decoy observations to reports")
 
 	RootCmd.AddCommand(reportCmd)
 }

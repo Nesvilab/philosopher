@@ -11,7 +11,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/data"
-	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
@@ -65,14 +64,18 @@ func (a *Abacus) Run(args []string) error {
 	var names []string
 	var xmlFiles []string
 	var database data.Base
-	var globalPepMap = make(map[string]int)
-	var PsmMap = make(map[string]rep.PSMEvidenceList)
+	var datasets = make(map[string]rep.Evidence)
+
+	// restore database
+	database = data.Base{}
+	database.RestoreWithPath(args[0])
 
 	// recover all files
-	logrus.Info("Restoring Philospher results")
+	logrus.Info("Restoring results")
 
 	for _, i := range args {
 
+		// restoring the database
 		var e rep.Evidence
 		e.RestoreGranularWithPath(i)
 
@@ -86,76 +89,35 @@ func (a *Abacus) Run(args []string) error {
 			}
 		}
 
-		// restore database
-		database = data.Base{}
-		database.RestoreWithPath(i)
-
 		// collect project names
 		prjName := i
 		if strings.Contains(prjName, string(filepath.Separator)) {
 			prjName = strings.Replace(prjName, string(filepath.Separator), "", -1)
 		}
-		names = append(names, prjName)
 
-		for _, j := range e.PSM {
-			var ion string
-			if j.Probability >= a.PepProb {
-				if len(j.ModifiedPeptide) > 0 {
-					ion = fmt.Sprintf("%s#%d", j.ModifiedPeptide, j.AssumedCharge)
-				} else {
-					ion = fmt.Sprintf("%s#%d", j.Peptide, j.AssumedCharge)
-				}
-				key := fmt.Sprintf("%s@%s", prjName, ion)
-				globalPepMap[key]++
-			}
-		}
-		PsmMap[prjName] = e.PSM
+		// unique list and map of datasets
+		datasets[prjName] = e
+		names = append(names, prjName)
 	}
 
 	sort.Strings(names)
 
-	var combinedFile string
-
-	if len(a.Comb) < 1 {
-		logrus.Info("Creating the combined protXML file")
-
-		logrus.Info("Initializing ProteinProphet")
-		pop := proteinprophet.New()
-
-		combinedFile = "combined"
-		pop.Output = combinedFile
-
-		// deploy the binaries
-		err := pop.Deploy()
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-		// run ProteinProphet
-		err = pop.Run(xmlFiles)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
-	} else {
-		combinedFile = a.Comb
-	}
-
 	logrus.Info("Processing combined file")
-	evidences, err := a.processCombinedFile(combinedFile, a.Tag, a.PepProb, a.ProtProb, database)
+	evidences, err := a.processCombinedFile(a.Comb, a.Tag, a.PepProb, a.ProtProb, database)
 	if err != nil {
 		return err
 	}
 
-	// build map list with all centroids and quantifications
-	// one report to rule them all
-	// Assuming that the same database was used for everyone
-	saveCompareResults(a.Temp, evidences, globalPepMap, PsmMap, names)
+	evidences = getSpectralCounts(evidences, datasets)
+
+	evidences = sumIntensities(evidences, datasets)
+
+	saveCompareResults(a.Temp, evidences, names)
 
 	return nil
 }
 
-// processCombinedFile ...
+// processCombinedFile reads the combined protXML and creates a unique protein list as a reference fo all counts
 func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, protProb float64, database data.Base) (rep.CombinedEvidenceList, error) {
 
 	var list rep.CombinedEvidenceList
@@ -179,7 +141,6 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 			}
 		}
 
-		//	p.Filter(0.01, pepProb, protProb, false, false, false)
 		proid, err := fil.ProtXMLFilter(protxml, 0.01, pepProb, protProb, false, a.Razor)
 		if err != nil {
 			return nil, err
@@ -188,57 +149,28 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 		for _, j := range proid {
 
 			var ce rep.CombinedEvidence
-			ce.TotalPeptideIonStrings = make(map[string]int)
-			ce.UniquePeptideIonStrings = make(map[string]int)
-			ce.RazorPeptideIonStrings = make(map[string]int)
 
+			ce.TotalSpc = make(map[string]int)
+			ce.UniqueSpc = make(map[string]int)
+			ce.UrazorSpc = make(map[string]int)
+
+			ce.TotalIntensity = make(map[string]float64)
+			ce.UniqueIntensity = make(map[string]float64)
+			ce.UrazorIntensity = make(map[string]float64)
+
+			ce.SupportingSpectra = make(map[string]string)
 			ce.ProteinName = j.ProteinName
 			ce.Length = j.Length
 			ce.GroupNumber = j.GroupNumber
 			ce.SiblingID = j.GroupSiblingID
 			ce.IndiProtein = j.IndistinguishableProtein
-
-			for _, k := range j.PeptideIons {
-
-				var ion string
-				if len(k.ModifiedPeptide) > 0 {
-					ion = fmt.Sprintf("%s#%d", k.ModifiedPeptide, k.Charge)
-				} else {
-					ion = fmt.Sprintf("%s#%d", k.PeptideSequence, k.Charge)
-				}
-
-				ce.TotalPeptideIonStrings[ion] = 0
-
-				if k.IsUnique == true {
-					ce.UniquePeptideIonStrings[ion] = 0
-				}
-
-				if k.Razor == 1 {
-					ce.RazorPeptideIonStrings[ion] = 0
-				}
-
-			}
-
 			ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
-			ce.TotalPeptideIons = len(j.PeptideIons)
-
-			for _, j := range j.PeptideIons {
-				if j.IsUnique == false {
-					ce.SharedPeptideIons++
-				} else {
-					ce.UniquePeptideIons++
-				}
-				if j.Razor == 1 {
-					ce.RazorPeptideIons++
-				}
-			}
-
+			ce.PeptideIons = j.PeptideIons
 			ce.ProteinProbability = j.Probability
 			ce.TopPepProb = j.TopPepProb
 
 			list = append(list, ce)
 		}
-		//}
 
 	}
 
@@ -256,8 +188,104 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 	return list, nil
 }
 
+func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]rep.Evidence) rep.CombinedEvidenceList {
+
+	for k, v := range datasets {
+
+		var ions = make(map[string]int)
+		var exclusion = make(map[string]uint8)
+
+		for _, i := range v.PSM {
+			ions[i.IonForm]++
+		}
+
+		for _, i := range v.Proteins {
+			for j := range combined {
+				if i.ProteinID == combined[j].ProteinID {
+					combined[j].UniqueSpc[k] = i.UniqueSpC
+					combined[j].TotalSpc[k] = i.TotalSpC
+					break
+				}
+			}
+		}
+
+		for i := range combined {
+			for _, j := range combined[i].PeptideIons {
+				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
+				sum, ok := ions[ion]
+				if ok {
+					_, excl := exclusion[ion]
+					if !excl {
+						if j.Razor == 1 {
+							combined[i].UrazorSpc[k] += sum
+							exclusion[ion] = 0
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	return combined
+}
+
+// sumIntensities calculates the protein intensity
+func sumIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.Evidence) rep.CombinedEvidenceList {
+
+	for k, v := range datasets {
+
+		var ions = make(map[string]float64)
+		for _, i := range v.Ions {
+			ions[i.IonForm] = i.Intensity
+		}
+
+		for _, i := range v.Proteins {
+			for j := range combined {
+				if i.ProteinID == combined[j].ProteinID {
+					combined[j].TotalIntensity[k] = i.TotalIntensity
+					combined[j].UniqueIntensity[k] = i.UniqueIntensity
+					break
+				}
+			}
+		}
+
+		for i := range combined {
+
+			var urazorInt []float64
+
+			for _, j := range combined[i].PeptideIons {
+
+				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
+
+				intList, ok := ions[ion]
+				if ok {
+
+					if j.Razor == 1 {
+						urazorInt = append(urazorInt, intList)
+						sort.Float64s(urazorInt)
+
+						if len(urazorInt) >= 3 {
+							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2] + urazorInt[len(urazorInt)-3])
+						} else if len(urazorInt) >= 2 {
+							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2])
+						} else if len(urazorInt) == 1 {
+							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1])
+						}
+					}
+
+				}
+
+			}
+		}
+
+	}
+
+	return combined
+}
+
 // saveCompareResults creates a single report using 1 or more philosopher result files
-func saveCompareResults(session string, evidences rep.CombinedEvidenceList, globalPepMap map[string]int, psmMap map[string]rep.PSMEvidenceList, namesList []string) {
+func saveCompareResults(session string, evidences rep.CombinedEvidenceList, namesList []string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -269,7 +297,9 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	}
 	defer file.Close()
 
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
@@ -279,11 +309,16 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 		line += fmt.Sprintf("%s Razor Intensity\t", i)
 	}
 
+	line += "Indistinguishable Proteins\t"
+
 	line += "\n"
 	n, err := io.WriteString(file, line)
 	if err != nil {
 		logrus.Fatal(n, err)
 	}
+
+	// organize by group number
+	sort.Sort(evidences)
 
 	for _, i := range evidences {
 
@@ -299,8 +334,6 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		line += fmt.Sprintf("%s\t", i.GeneNames)
 
-		line += fmt.Sprintf("%s\t", i.ProteinName)
-
 		line += fmt.Sprintf("%d\t", i.Length)
 
 		line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
@@ -309,34 +342,14 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		line += fmt.Sprintf("%d\t", i.TotalPeptideIons)
-
-		line += fmt.Sprintf("%d\t", i.UniquePeptideIons)
-
-		line += fmt.Sprintf("%d\t", i.RazorPeptideIons)
-
-		line += fmt.Sprintf("%s\t", i.IndiProtein)
-
-		var tIons []string
-		for j := range i.TotalPeptideIonStrings {
-			tIons = append(tIons, j)
-		}
-
-		var uIons []string
-		for j := range i.UniquePeptideIonStrings {
-			uIons = append(uIons, j)
-		}
-
-		var rIons []string
-		for j := range i.RazorPeptideIonStrings {
-			rIons = append(rIons, j)
-		}
+		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
 
 		for _, j := range namesList {
-			totalSpC, uniqueSpC, razorSpC := getSpectralCounts(tIons, uIons, rIons, globalPepMap, j)
-			totalInt, uniqueInt, razorInt := sumIntensities(tIons, uIons, rIons, psmMap[j], j)
-			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", totalSpC, uniqueSpC, razorSpC, totalInt, uniqueInt, razorInt)
+			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
 		}
+
+		ip := strings.Join(i.IndiProtein, ", ")
+		line += fmt.Sprintf("%s\t", ip)
 
 		line += "\n"
 		n, err := io.WriteString(file, line)
@@ -350,120 +363,4 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, glob
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
-}
-
-func getSpectralCounts(tIons, uIons, rIons []string, globalPepMap map[string]int, name string) (int, int, int) {
-
-	var totalSpc int
-	var uniqueSpc int
-	var razorSpc int
-
-	for _, i := range tIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okT := globalPepMap[key]
-		if okT {
-			totalSpc += v
-		}
-	}
-
-	for _, i := range uIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okU := globalPepMap[key]
-		if okU {
-			uniqueSpc += v
-		}
-	}
-
-	for _, i := range rIons {
-		key := fmt.Sprintf("%s@%s", name, i)
-		v, okR := globalPepMap[key]
-		if okR {
-			razorSpc += v
-		}
-	}
-
-	return totalSpc, uniqueSpc, razorSpc
-}
-
-// sumIntensities calculates the protein intensity
-func sumIntensities(tIons, uIons, rIons []string, pep rep.PSMEvidenceList, name string) (float64, float64, float64) {
-
-	var totalInt []float64
-	var uniqueInt []float64
-	var razorInt []float64
-
-	var totalQuantInt float64
-	var uniqueQuantInt float64
-	var razorQuantInt float64
-
-	var totalMap = make(map[string]int)
-	for _, i := range tIons {
-		totalMap[i]++
-	}
-
-	var uniqueMap = make(map[string]int)
-	for _, i := range uIons {
-		uniqueMap[i]++
-	}
-
-	var razorMap = make(map[string]int)
-	for _, i := range rIons {
-		razorMap[i]++
-	}
-
-	for _, i := range pep {
-
-		var ion string
-		if len(i.ModifiedPeptide) > 0 {
-			ion = fmt.Sprintf("%s#%d", i.ModifiedPeptide, i.AssumedCharge)
-		} else {
-			ion = fmt.Sprintf("%s#%d", i.Peptide, i.AssumedCharge)
-		}
-
-		_, okT := totalMap[ion]
-		if okT {
-			totalInt = append(totalInt, i.Intensity)
-		}
-
-		_, okU := uniqueMap[ion]
-		if okU {
-			uniqueInt = append(uniqueInt, i.Intensity)
-		}
-
-		_, okR := razorMap[ion]
-		if okR {
-			razorInt = append(razorInt, i.Intensity)
-		}
-
-		sort.Float64s(uniqueInt)
-		sort.Float64s(totalInt)
-		sort.Float64s(razorInt)
-
-		if len(razorInt) >= 3 {
-			razorQuantInt = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2] + razorInt[len(razorInt)-3])
-		} else if len(razorInt) >= 2 {
-			razorQuantInt = (razorInt[len(razorInt)-1] + razorInt[len(razorInt)-2])
-		} else if len(razorInt) == 1 {
-			razorQuantInt = (razorInt[len(razorInt)-1])
-		}
-
-		if len(uniqueInt) >= 3 {
-			uniqueQuantInt = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2] + uniqueInt[len(uniqueInt)-3])
-		} else if len(uniqueInt) >= 2 {
-			uniqueQuantInt = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2])
-		} else if len(uniqueInt) == 1 {
-			uniqueQuantInt = (uniqueInt[len(uniqueInt)-1])
-		}
-
-		if len(totalInt) >= 3 {
-			totalQuantInt = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2] + totalInt[len(totalInt)-3])
-		} else if len(totalInt) >= 2 {
-			totalQuantInt = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2])
-		} else if len(totalInt) == 1 {
-			totalQuantInt = (totalInt[len(totalInt)-1])
-		}
-
-	}
-
-	return totalQuantInt, uniqueQuantInt, razorQuantInt
 }

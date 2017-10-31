@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.9-blue.svg) ![Version](https://img.shields.io/badge/version-1.8-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.9.2-blue.svg) ![Version](https://img.shields.io/badge/version-1.9-blue.svg)
 
 
 ## Features
@@ -15,16 +15,20 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 - Multi-level integrative analysis with iProphet.
 
+- PTM site localization with PTMProphet
+
 - Protein inference with ProteinProphet.
 
 - FDR filtering with custom algorithms.
 
   - Two-dimensional filtering for simultaneous control of PSM and Protein FDR levels.
-  - Sequential FDR estimation using filtered PSM and proteins lists.
+  - Sequential FDR estimation for large data sets using filtered PSM and proteins lists.
 
-- MS1 Quantification
+- Label-free quantification via Spectral counting and MS1 Quantification.
 
-- Detailed protein reports with optional protein annotation.
+- Labeling-based quantification using TMT isobaric tags.
+
+- Multi-level detailed reports including peptides, ions and proteins.
 
 
 ## How to Download

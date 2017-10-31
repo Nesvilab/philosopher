@@ -29,6 +29,12 @@ var filterCmd = &cobra.Command{
 
 		/// clean, clean clean
 		os.RemoveAll(sys.EvBin())
+		os.RemoveAll(sys.EvIonBin())
+		os.RemoveAll(sys.EvModificationsBin())
+		os.RemoveAll(sys.EvModificationsEvBin())
+		os.RemoveAll(sys.EvPSMBin())
+		os.RemoveAll(sys.EvPeptideBin())
+		os.RemoveAll(sys.EvProteinBin())
 		os.RemoveAll(sys.PsmBin())
 		os.RemoveAll(sys.IonBin())
 		os.RemoveAll(sys.PepBin())

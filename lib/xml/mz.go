@@ -26,20 +26,19 @@ type Spectra []Spectrum
 
 // Spectrum struct
 type Spectrum struct {
-	Index       int
-	Scan        int
-	Level       int
+	Index       string
+	Scan        string
+	Level       string
 	StartTime   float64
-	EndTime     float64
 	Precursor   Precursor
-	Peaks       []byte
-	Intensities []byte
+	Peaks       []float64
+	Intensities []float64
 }
 
 // Precursor struct
 type Precursor struct {
-	ParentIndex                int
-	ParentScan                 int
+	ParentIndex                string
+	ParentScan                 string
 	ChargeState                int
 	SelectedIon                float64
 	TargetIon                  float64
@@ -80,13 +79,19 @@ func (s *Raw) Read(f, t string) error {
 
 			var spec Spectrum
 			spec.Index = i.Index
-			spec.Scan = i.Index + 1
+
+			split := strings.Split(i.ID, " ")
+			scan := strings.Split(split[2], "=")
+
+			ind, _ := strconv.Atoi(scan[1])
+
+			adjInd := ind - 1
+			spec.Index = strconv.Itoa(adjInd)
+			spec.Scan = scan[1]
 
 			for _, j := range i.CVParam {
-				if j.Accession == "MS:1000579" {
-					spec.Level = 1
-				} else if j.Accession == "MS:1000511" {
-					spec.Level = 2
+				if j.Accession == "MS:1000511" {
+					spec.Level = j.Value
 				}
 			}
 
@@ -102,96 +107,100 @@ func (s *Raw) Read(f, t string) error {
 				}
 			}
 
-			for _, j := range i.PrecursorList.Precursor {
+			if spec.Level == "2" {
+				for _, j := range i.PrecursorList.Precursor {
 
-				var prec Precursor
-				split := strings.Split(j.SpectrumRef, " ")
-				scan := strings.Split(split[2], "=")
+					var prec Precursor
 
-				ind, err := strconv.Atoi(scan[1])
-				if err != nil {
-					return err
-				}
+					split := strings.Split(j.SpectrumRef, " ")
+					scan := strings.Split(split[2], "=")
 
-				prec.ParentIndex = ind - 1
-				prec.ParentScan = ind
-
-				for _, k := range j.IsolationWindow.CVParam {
-
-					if k.Accession == "MS:1000827" {
-						val, err := strconv.ParseFloat(k.Value, 64)
-						if err != nil {
-							return nil
-						}
-						prec.TargetIon = val
-
-					} else if k.Accession == "MS:1000828" {
-						val, err := strconv.ParseFloat(k.Value, 64)
-						if err != nil {
-							return err
-						}
-						prec.IsolationWindowLowerOffset = val
-
-					} else if k.Accession == "MS:1000829" {
-						val, err := strconv.ParseFloat(k.Value, 64)
-						if err != nil {
-							return nil
-						}
-						prec.IsolationWindowUpperOffset = val
-
+					ind, err := strconv.Atoi(scan[1])
+					if err != nil {
+						return err
 					}
-				}
 
-				for _, k := range j.SelectedIonList.SelectedIon {
-					for _, l := range k.CVParam {
+					adjInd := ind - 1
+					prec.ParentIndex = strconv.Itoa(adjInd)
+					prec.ParentScan = scan[1]
 
-						if l.Accession == "MS:1000744" {
-							val, err := strconv.ParseFloat(l.Value, 64)
+					for _, k := range j.IsolationWindow.CVParam {
+
+						if k.Accession == "MS:1000827" {
+							val, err := strconv.ParseFloat(k.Value, 64)
 							if err != nil {
 								return nil
 							}
-							prec.SelectedIon = val
+							prec.TargetIon = val
+						}
 
-						} else if l.Accession == "MS:1000041" {
-							val, err := strconv.Atoi(l.Value)
+						if k.Accession == "MS:1000828" {
+							val, err := strconv.ParseFloat(k.Value, 64)
 							if err != nil {
 								return err
 							}
-							prec.ChargeState = val
+							prec.IsolationWindowLowerOffset = val
+						}
+
+						if k.Accession == "MS:1000829" {
+							val, err := strconv.ParseFloat(k.Value, 64)
+							if err != nil {
+								return nil
+							}
+							prec.IsolationWindowUpperOffset = val
+						}
+
+						if k.Accession == "MS:1000042" {
+							val, err := strconv.ParseFloat(k.Value, 64)
+							if err != nil {
+								return nil
+							}
+							prec.PeakIntensity = val
+						}
+
+					}
+
+					for _, k := range j.SelectedIonList.SelectedIon {
+						for _, l := range k.CVParam {
+
+							if l.Accession == "MS:1000744" {
+								val, err := strconv.ParseFloat(l.Value, 64)
+								if err != nil {
+									return nil
+								}
+								prec.SelectedIon = val
+							}
+
+							if l.Accession == "MS:1000041" {
+								val, err := strconv.Atoi(l.Value)
+								if err != nil {
+									return err
+								}
+								prec.ChargeState = val
+							}
+
+							if l.Accession == "MS:1000042" {
+								val, err := strconv.ParseFloat(l.Value, 64)
+								if err != nil {
+									return nil
+								}
+								prec.PeakIntensity = val
+							}
 
 						}
 					}
+
+					spec.Precursor = prec
 				}
-
-				fmt.Println(prec)
-
-				// for _, k := range j.IsolationWindow.CVParam {
-				// 	if k.Accession == "MS:1000744" {
-				// 		val, err := strconv.ParseFloat(k.Value, 64)
-				// 		if err != nil {
-				// 			return nil
-				// 		}
-				// 		prec.SelectedIon = val
-				// 	} else if k.Accession == "MS:1000041" {
-				// 		val, err := strconv.Atoi(k.Value)
-				// 		if err != nil {
-				// 			return err
-				// 		}
-				// 		prec.ChargeState = val
-				// 	} else if k.Accession == "MS:1000042" {
-				// 		val, err := strconv.ParseFloat(k.Value, 64)
-				// 		if err != nil {
-				// 			return nil
-				// 		}
-				// 		prec.PeakIntensity = val
-				// 	}
-				// }
-
-				spec.Precursor = prec
 			}
 
-			spec.Peaks = i.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
-			spec.Intensities = i.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
+			for m := 0; m <= len(i.Peaks)-1; m++ {
+				spec.Peaks = append(spec.Peaks, i.Peaks[m])
+				spec.Intensities = append(spec.Intensities, i.Intensities[m])
+			}
+
+			//spec.Peaks = i.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
+			//spec.Intensities = i.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
 
 			// spec.Peaks = i.Peaks
 			// spec.Intensities = i.Intensities
