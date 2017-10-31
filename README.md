@@ -1,11 +1,10 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.9.2-blue.svg) ![Version](https://img.shields.io/badge/version-1.9-blue.svg)
-
+![Golang](https://img.shields.io/badge/Go-1.9.2-blue.svg) ![Version](https://img.shields.io/badge/version-1.9-blue.svg) [![https://philosopher-toolkit.slack.com](https://img.shields.io/badge/slack-channel-blue.svg)](https://philosopher-toolkit.slack.com?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Features
-Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports.
+Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tunned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
 
 - Database downloading and formatting.
 
@@ -15,7 +14,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 - Multi-level integrative analysis with iProphet.
 
-- PTM site localization with PTMProphet
+- PTM site localization with PTMProphet.
 
 - Protein inference with ProteinProphet.
 
@@ -27,6 +26,8 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 - Label-free quantification via Spectral counting and MS1 Quantification.
 
 - Labeling-based quantification using TMT isobaric tags.
+
+- Clustering analysis for proteomics results.
 
 - Multi-level detailed reports including peptides, ions and proteins.
 
