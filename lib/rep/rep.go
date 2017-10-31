@@ -25,7 +25,8 @@ import (
 
 // Evidence ...
 type Evidence struct {
-	meta.Data
+	Decoys        bool
+	Meta          MetaEvidence
 	PSM           PSMEvidenceList
 	Ions          IonEvidenceList
 	Peptides      PeptideEvidenceList
@@ -33,6 +34,21 @@ type Evidence struct {
 	Mods          Modifications
 	Modifications ModificationEvidence
 	Combined      CombinedEvidenceList
+}
+
+// MetaEvidence contains information about the data and the analysis
+type MetaEvidence struct {
+	UUID      string
+	Distro    string
+	Home      string
+	MetaFile  string
+	MetaDir   string
+	DB        string
+	Temp      string
+	TimeStamp string
+	OS        string
+	Arch      string
+	DecoyTag  string
 }
 
 // Modifications ...
@@ -252,16 +268,16 @@ func New() Evidence {
 	var m meta.Data
 	m.Restore(sys.Meta())
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	o.Meta.UUID = m.UUID
+	o.Meta.Distro = m.Distro
+	o.Meta.Home = m.Home
+	o.Meta.MetaFile = m.MetaFile
+	o.Meta.MetaDir = m.MetaDir
+	o.Meta.DB = m.DB
+	o.Meta.Temp = m.Temp
+	o.Meta.TimeStamp = m.TimeStamp
+	o.Meta.OS = m.OS
+	o.Meta.Arch = m.Arch
 
 	return o
 }
@@ -283,57 +299,54 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 	}
 
 	for _, i := range pep {
-		if !clas.IsDecoyPSM(i, decoyTag) {
 
-			var p PSMEvidence
+		var p PSMEvidence
 
-			p.Index = i.Index
-			p.Spectrum = i.Spectrum
-			p.Scan = i.Scan
-			p.Peptide = i.Peptide
-			p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
-			p.Protein = i.Protein
-			p.ModifiedPeptide = i.ModifiedPeptide
-			p.AlternativeProteins = i.AlternativeProteins
-			p.ModPositions = i.ModPositions
-			p.AssignedModMasses = i.AssignedModMasses
-			p.AssignedMassDiffs = i.AssignedMassDiffs
-			p.AssignedAminoAcid = i.AssignedAminoAcid
-			p.AssumedCharge = i.AssumedCharge
-			p.HitRank = i.HitRank
-			p.PrecursorNeutralMass = i.PrecursorNeutralMass
-			p.PrecursorExpMass = i.PrecursorExpMass
-			p.RetentionTime = i.RetentionTime
-			p.CalcNeutralPepMass = i.CalcNeutralPepMass
-			p.RawMassdiff = i.RawMassDiff
-			p.Massdiff = i.Massdiff
-			p.LocalizedMassDiff = i.LocalizedMassDiff
-			p.Probability = i.Probability
-			p.Expectation = i.Expectation
-			p.Xcorr = i.Xcorr
-			p.DeltaCN = i.DeltaCN
-			p.SPRank = i.SPRank
-			p.Hyperscore = i.Hyperscore
-			p.Nextscore = i.Nextscore
-			p.DiscriminantValue = i.DiscriminantValue
-			p.Intensity = i.Intensity
-			p.AssignedModifications = make(map[string]uint16)
-			p.ObservedModifications = make(map[string]uint16)
-			//p.AlternativeTargetProteins = i.AlternativeTargetProteins
+		p.Index = i.Index
+		p.Spectrum = i.Spectrum
+		p.Scan = i.Scan
+		p.Peptide = i.Peptide
+		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+		p.Protein = i.Protein
+		p.ModifiedPeptide = i.ModifiedPeptide
+		p.AlternativeProteins = i.AlternativeProteins
+		p.ModPositions = i.ModPositions
+		p.AssignedModMasses = i.AssignedModMasses
+		p.AssignedMassDiffs = i.AssignedMassDiffs
+		p.AssignedAminoAcid = i.AssignedAminoAcid
+		p.AssumedCharge = i.AssumedCharge
+		p.HitRank = i.HitRank
+		p.PrecursorNeutralMass = i.PrecursorNeutralMass
+		p.PrecursorExpMass = i.PrecursorExpMass
+		p.RetentionTime = i.RetentionTime
+		p.CalcNeutralPepMass = i.CalcNeutralPepMass
+		p.RawMassdiff = i.RawMassDiff
+		p.Massdiff = i.Massdiff
+		p.LocalizedMassDiff = i.LocalizedMassDiff
+		p.Probability = i.Probability
+		p.Expectation = i.Expectation
+		p.Xcorr = i.Xcorr
+		p.DeltaCN = i.DeltaCN
+		p.SPRank = i.SPRank
+		p.Hyperscore = i.Hyperscore
+		p.Nextscore = i.Nextscore
+		p.DiscriminantValue = i.DiscriminantValue
+		p.Intensity = i.Intensity
+		p.AssignedModifications = make(map[string]uint16)
+		p.ObservedModifications = make(map[string]uint16)
 
-			// TODO find a better way to map gene names to the psm
-			gn, ok := genes[i.Protein]
-			if ok {
-				p.GeneName = gn
-			}
-
-			id, ok := ptid[i.Protein]
-			if ok {
-				p.ProteinID = id
-			}
-
-			list = append(list, p)
+		// TODO find a better way to map gene names to the psm
+		gn, ok := genes[i.Protein]
+		if ok {
+			p.GeneName = gn
 		}
+
+		id, ok := ptid[i.Protein]
+		if ok {
+			p.ProteinID = id
+		}
+
+		list = append(list, p)
 	}
 
 	sort.Sort(list)
@@ -345,7 +358,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 // PSMReport report all psms from study that passed the FDR filter
 func (e *Evidence) PSMReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -359,7 +372,20 @@ func (e *Evidence) PSMReport() {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
+	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
+		if e.Decoys == false {
+			if !clas.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	fmt.Println(e.Meta.DecoyTag)
+
+	for _, i := range printSet {
 
 		var assL []string
 
@@ -436,7 +462,7 @@ func (e *Evidence) PSMReport() {
 // PSMQuantReport report all psms with TMT labels from study that passed the FDR filter
 func (e *Evidence) PSMQuantReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -795,7 +821,7 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
-	output := fmt.Sprintf("%s%sion.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -922,7 +948,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 // PeptideReport reports consist on ion reporting
 func (e *Evidence) PeptideReport() {
 
-	output := fmt.Sprintf("%s%speptide.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -966,7 +992,7 @@ func (e *Evidence) PeptideReport() {
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
 func (e *Evidence) ProteinFastaReport() error {
 
-	output := fmt.Sprintf("%s%sproteins.fas", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sproteins.fas", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -1136,7 +1162,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 func (e *Evidence) ProteinReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1230,7 +1256,7 @@ func (e *Evidence) ProteinReport() {
 func (e *Evidence) ProteinQuantReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1567,7 +1593,7 @@ func (e *Evidence) UpdatePeptideModCount() {
 func (e *Evidence) ModificationReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%smodifications.tsv", e.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%smodifications.tsv", e.Meta.Temp, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1608,7 +1634,7 @@ func (e *Evidence) ModificationReport() {
 // PlotMassHist plots the delta mass histogram
 func (e *Evidence) PlotMassHist() error {
 
-	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Temp, string(filepath.Separator))
+	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Meta.Temp, string(filepath.Separator))
 
 	file, err := os.Create(outfile)
 	if err != nil {

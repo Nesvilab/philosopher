@@ -200,7 +200,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 		return cerr
 	}
 
-	//err = e.Serialize()
+	e.Meta.DecoyTag = f.Tag
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return cerr

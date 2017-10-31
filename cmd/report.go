@@ -82,5 +82,7 @@ func init() {
 
 	repo = rep.New()
 
+	reportCmd.Flags().BoolVarP(&repo.Decoys, "decoys", "", false, "add decoy observations to reports")
+
 	RootCmd.AddCommand(reportCmd)
 }

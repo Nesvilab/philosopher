@@ -27,7 +27,6 @@ type Data struct {
 	Distro      string
 	TimeStamp   string
 	ProjectName string
-	DecoyTag    string
 }
 
 // // Experimental data
