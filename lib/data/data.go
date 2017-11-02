@@ -19,6 +19,7 @@ import (
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Base main structure
@@ -287,7 +288,7 @@ func (d *Base) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
+	dataEncoder := msgpack.NewEncoder(dataFile)
 	e = dataEncoder.Encode(d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
@@ -302,7 +303,7 @@ func (d *Base) Restore() *err.Error {
 
 	file, _ := os.Open(sys.DBBin())
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}

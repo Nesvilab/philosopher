@@ -1,7 +1,6 @@
 package rep
 
 import (
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"os"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Serialize converts the whle structure to a gob file
@@ -23,7 +23,7 @@ func (e *Evidence) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
+	dataEncoder := msgpack.NewEncoder(dataFile)
 	goberr := dataEncoder.Encode(e)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -94,7 +94,7 @@ func SerializeEVMeta(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Meta)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -111,7 +111,7 @@ func SerializeEVPSM(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.PSM)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -121,6 +121,23 @@ func SerializeEVPSM(e *Evidence) *err.Error {
 	return nil
 }
 
+// // SerializeEVPSM creates an ev serial with Evidence data
+// func SerializeEVPSM(e *Evidence) *err.Error {
+//
+// 	f, er := os.Create(sys.EvPSMBin())
+// 	if er != nil {
+// 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+// 	}
+// 	de := msgpack.NewEncoder(f)
+// 	goberr := de.Encode(e.PSM)
+// 	if goberr != nil {
+// 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+// 	}
+// 	f.Close()
+//
+// 	return nil
+// }
+
 // SerializeEVIon creates an ev serial with Evidence data
 func SerializeEVIon(e *Evidence) *err.Error {
 
@@ -128,7 +145,7 @@ func SerializeEVIon(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Ions)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -145,7 +162,7 @@ func SerializeEVPeptides(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Peptides)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -162,7 +179,7 @@ func SerializeEVProteins(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Proteins)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -179,7 +196,7 @@ func SerializeEVMods(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Mods)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -196,7 +213,7 @@ func SerializeEVModifications(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Modifications)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -213,7 +230,7 @@ func SerializeEVCombined(e *Evidence) *err.Error {
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := gob.NewEncoder(f)
+	de := msgpack.NewEncoder(f)
 	goberr := de.Encode(e.Combined)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
@@ -228,7 +245,7 @@ func (e *Evidence) Restore() error {
 
 	file, _ := os.Open(sys.EvBin())
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	err := dec.Decode(&e)
 	if err != nil {
 		return errors.New("Could not restore Philosopher result. Please check file path")
@@ -294,7 +311,7 @@ func (e *Evidence) RestoreGranular() *err.Error {
 // RestoreEVMeta restores Ev PSM data
 func RestoreEVMeta(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvMetaBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Meta)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -305,7 +322,7 @@ func RestoreEVMeta(e *Evidence) *err.Error {
 // RestoreEVPSM restores Ev PSM data
 func RestoreEVPSM(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvPSMBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.PSM)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -313,10 +330,21 @@ func RestoreEVPSM(e *Evidence) *err.Error {
 	return nil
 }
 
+// // RestoreEVPSM restores Ev PSM data
+// func RestoreEVPSM(e *Evidence) *err.Error {
+// 	f, _ := os.Open(sys.EvPSMBin())
+// 	d := msgpack.NewDecoder(f)
+// 	er := d.Decode(&e.PSM)
+// 	if er != nil {
+// 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+// 	}
+// 	return nil
+// }
+
 // RestoreEVIon restores Ev Ion data
 func RestoreEVIon(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvIonBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Ions)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -327,7 +355,7 @@ func RestoreEVIon(e *Evidence) *err.Error {
 // RestoreEVPeptide restores Ev Ion data
 func RestoreEVPeptide(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvPeptideBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Peptides)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -338,7 +366,7 @@ func RestoreEVPeptide(e *Evidence) *err.Error {
 // RestoreEVProtein restores Ev Protein data
 func RestoreEVProtein(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvProteinBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Proteins)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -349,7 +377,7 @@ func RestoreEVProtein(e *Evidence) *err.Error {
 // RestoreEVMods restores Ev Mods data
 func RestoreEVMods(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvModificationsBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Mods)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -360,7 +388,7 @@ func RestoreEVMods(e *Evidence) *err.Error {
 // RestoreEVModifications restores Ev Mods data
 func RestoreEVModifications(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvModificationsEvBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Modifications)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -371,7 +399,7 @@ func RestoreEVModifications(e *Evidence) *err.Error {
 // RestoreEVCombined restores Ev Mods data
 func RestoreEVCombined(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvCombinedBin())
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Combined)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -439,7 +467,7 @@ func RestoreEVPSMWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.PSM)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -459,7 +487,7 @@ func RestoreEVIonWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Ions)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -479,7 +507,7 @@ func RestoreEVPeptideWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Peptides)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -499,7 +527,7 @@ func RestoreEVProteinWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Proteins)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -519,7 +547,7 @@ func RestoreEVModsWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Mods)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -539,7 +567,7 @@ func RestoreEVModificationsWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Modifications)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
@@ -559,7 +587,7 @@ func RestoreEVCombinedWithPath(e *Evidence, p string) *err.Error {
 	}
 
 	f, _ := os.Open(path)
-	d := gob.NewDecoder(f)
+	d := msgpack.NewDecoder(f)
 	er := d.Decode(&e.Combined)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
