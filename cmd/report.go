@@ -36,10 +36,11 @@ var reportCmd = &cobra.Command{
 			logrus.Info("Creating Protein FASTA report")
 			repo.ProteinFastaReport()
 
-			logrus.Info("Creating Protein identification report")
+			logrus.Info("Creating Protein TMT report")
 			if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
-				repo.ProteinQuantReport()
+				repo.ProteinTMTReport()
 			} else {
+				logrus.Info("Creating Protein report")
 				repo.ProteinReport()
 			}
 
@@ -52,18 +53,28 @@ var reportCmd = &cobra.Command{
 		}
 
 		if lblMarker > 0 {
-			logrus.Info("Creating labeled PSM report")
-			repo.PSMQuantReport()
+
+			logrus.Info("Creating TMT PSM report")
+			repo.PSMQTMTReport()
+
+			logrus.Info("Creating TMT peptide report")
+			repo.PeptideTMTReport()
+
+			logrus.Info("Creating TMT peptide Ion report")
+			repo.PeptideIonTMTReport()
+
 		} else {
+
 			logrus.Info("Creating PSM report")
 			repo.PSMReport()
+
+			logrus.Info("Creating peptide report")
+			repo.PeptideReport()
+
+			logrus.Info("Creating peptide Ion report")
+			repo.PeptideIonReport()
+
 		}
-
-		logrus.Info("Creating peptide Ion report")
-		repo.PeptideIonReport()
-
-		logrus.Info("Creating peptide report")
-		repo.PeptideReport()
 
 		if len(repo.Modifications.MassBins) > 0 {
 			logrus.Info("Creating modification reports")

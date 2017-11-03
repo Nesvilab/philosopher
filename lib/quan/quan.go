@@ -182,6 +182,12 @@ func (p *Quantify) RunTMTQuantification() error {
 		}
 	}
 
+	evi = rollUpPeptides(evi, p.Purity)
+
+	evi = rollUpPeptideIons(evi, p.Purity)
+
+	evi = rollUpProteins(evi, p.Purity)
+
 	e = evi.SerializeGranular()
 	if e != nil {
 		return e

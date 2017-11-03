@@ -131,10 +131,10 @@ type IonEvidence struct {
 	Expectation             float64
 	IsURazor                bool
 	IsDecoy                 bool
-	Labels                  tmt.Labels
 	SummedLabelIntensity    float64
 	ModifiedObservations    int
 	UnModifiedObservations  int
+	Labels                  tmt.Labels
 }
 
 // IonEvidenceList ...
@@ -148,11 +148,13 @@ func (a IonEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Seque
 type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
+	Spectra                map[string]uint8
 	Spc                    int
 	Intensity              float64
 	ModifiedObservations   int
 	UnModifiedObservations int
 	IsDecoy                bool
+	Labels                 tmt.Labels
 }
 
 // PeptideEvidenceList ...
@@ -455,8 +457,8 @@ func (e *Evidence) PSMReport() {
 	return
 }
 
-// PSMQuantReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMQuantReport() {
+// PSMQTMTReport report all psms with TMT labels from study that passed the FDR filter
+func (e *Evidence) PSMQTMTReport() {
 
 	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
 
@@ -916,14 +918,113 @@ func (e *Evidence) PeptideIonReport() {
 	return
 }
 
+// PeptideIonTMTReport reports the ion table with TMT quantification
+func (e *Evidence) PeptideIonTMTReport() {
+
+	output := fmt.Sprintf("%s%sion.tsv", e.Meta.Temp, string(filepath.Separator))
+
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Could not create peptide output file")
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
+	if err != nil {
+		logrus.Fatal("Cannot create peptide ion report header")
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet IonEvidenceList
+	for _, i := range e.Ions {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	// peptides with no mapped poteins are related to contaminants
+	// and reverse sequences. They are dificult to clean because
+	// in some cases they are shared between a match decoy and a target,
+	// so they stay on the lists but cannot be mapped back to the
+	// original proteins. These cases should be rare to find.
+	for _, i := range printSet {
+
+		var pts []string
+		//var ipts []string
+
+		if len(i.MappedProteins) > 0 {
+
+			if len(e.Proteins) > 1 {
+
+				for k := range i.MappedProteins {
+					pts = append(pts, k)
+				}
+
+				var amods []string
+				for j := range i.AssignedModifications {
+					amods = append(amods, j)
+				}
+
+				var omods []string
+				for j := range i.ObservedModifications {
+					omods = append(omods, j)
+				}
+
+				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+					i.Sequence,
+					i.ModifiedSequence,
+					i.MZ,
+					i.ChargeState,
+					i.PeptideMass,
+					i.Probability,
+					i.Expectation,
+					len(i.Spectra),
+					i.UnModifiedObservations,
+					i.ModifiedObservations,
+					i.Intensity,
+					strings.Join(amods, ", "),
+					strings.Join(omods, ", "),
+					i.Intensity,
+					len(i.MappedProteins),
+					strings.Join(pts, ", "),
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+				_, err = io.WriteString(file, line)
+				if err != nil {
+					logrus.Fatal("Cannot print PSM to file")
+				}
+			}
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
 // AssemblePeptideReport reports consist on ion reporting
 func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) error {
 
 	var list PeptideEvidenceList
 	var pepSeqMap = make(map[string]bool) //is this a decoy
 	var pepCSMap = make(map[string][]uint8)
-	var pepSpc = make(map[string]int)
+	//var pepSpc = make(map[string]int)
 	var pepInt = make(map[string]float64)
+	var spectra = make(map[string][]string)
 	var err error
 
 	for _, i := range pep {
@@ -932,7 +1033,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 		} else {
 			pepSeqMap[i.Peptide] = true
 		}
-		pepSpc[i.Peptide] = 0
+		//pepSpc[i.Peptide] = 0
 		pepInt[i.Peptide] = 0
 	}
 
@@ -940,8 +1041,11 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 	for _, i := range e.PSM {
 		_, ok := pepSeqMap[i.Peptide]
 		if ok {
+
 			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
-			pepSpc[i.Peptide]++
+			//pepSpc[i.Peptide]++
+			spectra[i.Peptide] = append(spectra[i.Peptide], i.Spectrum)
+
 			if i.Intensity > pepInt[i.Peptide] {
 				pepInt[i.Peptide] = i.Intensity
 			}
@@ -951,13 +1055,19 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 	for k, v := range pepSeqMap {
 
 		var pep PeptideEvidence
+		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
+
 		pep.Sequence = k
+
+		for _, i := range spectra[k] {
+			pep.Spectra[i] = 0
+		}
 
 		for _, i := range pepCSMap[k] {
 			pep.ChargeState[i] = 0
 		}
-		pep.Spc = pepSpc[k]
+		pep.Spc = len(spectra[k])
 		pep.Intensity = pepInt[k]
 
 		// is this a decoy ?
@@ -1028,6 +1138,71 @@ func (e *Evidence) PeptideReport() {
 	return
 }
 
+// PeptideTMTReport reports consist on ion reporting
+func (e *Evidence) PeptideTMTReport() {
+
+	output := fmt.Sprintf("%s%speptide.tsv", e.Meta.Temp, string(filepath.Separator))
+
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Could not create peptide output file")
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
+	if err != nil {
+		logrus.Fatal("Cannot create peptide report header")
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet PeptideEvidenceList
+	for _, i := range e.Peptides {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
+
+		var cs []string
+		for j := range i.ChargeState {
+			cs = append(cs, strconv.Itoa(int(j)))
+		}
+		sort.Strings(cs)
+
+		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+			i.Sequence,
+			strings.Join(cs, ", "),
+			i.Spc,
+			i.UnModifiedObservations,
+			i.ModifiedObservations,
+			i.Labels.Channel1.Intensity,
+			i.Labels.Channel2.Intensity,
+			i.Labels.Channel3.Intensity,
+			i.Labels.Channel4.Intensity,
+			i.Labels.Channel5.Intensity,
+			i.Labels.Channel6.Intensity,
+			i.Labels.Channel7.Intensity,
+			i.Labels.Channel8.Intensity,
+			i.Labels.Channel9.Intensity,
+			i.Labels.Channel10.Intensity,
+		)
+		_, err = io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal("Cannot print PSM to file")
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
 // AssembleProteinReport ...
 func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) error {
 
@@ -1058,7 +1233,6 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 		rep.Probability = i.Probability
 		rep.TopPepProb = i.TopPepProb
 
-		//if !strings.HasPrefix(i.ProteinName, decoyTag) {
 		if strings.Contains(i.ProteinName, decoyTag) {
 			rep.IsDecoy = true
 		} else {
@@ -1093,10 +1267,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 				}
 
 				rep.TotalPeptideIons[ion] = ref
-				//evidenceIons[ion] = ref
 			}
-
-			//rep.TotalPeptideIons[ion] = evidenceIons[ion]
 
 			if k.IsUnique == true {
 				rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
@@ -1276,8 +1447,8 @@ func (e *Evidence) ProteinReport() {
 	return
 }
 
-// ProteinQuantReport ...
-func (e *Evidence) ProteinQuantReport() {
+// ProteinTMTReport ...
+func (e *Evidence) ProteinTMTReport() {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
@@ -1289,37 +1460,7 @@ func (e *Evidence) ProteinQuantReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf(
-		`Group\t
-		SubGroup\t
-		Protein ID\t
-		Entry Name\t
-		Length\t
-		Percent Coverage\t
-		Description\t
-		Protein Existence\t
-		Genes\t
-		Protein Probability\t
-		Top Peptide Probability\t
-		Unique Stripped Peptides\t
-		Razor Peptides\t
-		Total Peptide Ions\t
-		Unique Peptide Ions\t
-		Total Spectral Count\t
-		Unique Spectral Count\t
-		Total Intensity\t
-		Unique Intensity\t
-		126 Abundance\t
-		127N Abundance\t
-		127C Abundance\t
-		128N Abundance\t
-		128C Abundance\t
-		129N Abundance\t
-		129C Abundance\t
-		130N Abundance\t
-		130C Abundance\t
-		131N Abundance\t
-		Indistinguishable Proteins\n`)
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tTotal Intensity\tUnique Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1360,7 +1501,7 @@ func (e *Evidence) ProteinQuantReport() {
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%s\t",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -1380,19 +1521,19 @@ func (e *Evidence) ProteinQuantReport() {
 				i.UniqueSpC,              // Unique Spectral Count
 				i.TotalIntensity,         // Total Intensity
 				i.UniqueIntensity,        // Unique Intensity
-				// i.TotalLabels.Channel1.NormIntensity,
-				// i.TotalLabels.Channel2.NormIntensity,
-				// i.TotalLabels.Channel3.NormIntensity,
-				// i.TotalLabels.Channel4.NormIntensity,
-				// i.TotalLabels.Channel5.NormIntensity,
-				// i.TotalLabels.Channel6.NormIntensity,
-				// i.TotalLabels.Channel7.NormIntensity,
-				// i.TotalLabels.Channel8.NormIntensity,
-				// i.TotalLabels.Channel9.NormIntensity,
-				// i.TotalLabels.Channel10.NormIntensity,
+				i.URazorLabels.Channel1.Intensity,
+				i.URazorLabels.Channel2.Intensity,
+				i.URazorLabels.Channel3.Intensity,
+				i.URazorLabels.Channel4.Intensity,
+				i.URazorLabels.Channel5.Intensity,
+				i.URazorLabels.Channel6.Intensity,
+				i.URazorLabels.Channel7.Intensity,
+				i.URazorLabels.Channel8.Intensity,
+				i.URazorLabels.Channel9.Intensity,
+				i.URazorLabels.Channel10.Intensity,
 				strings.Join(ip, ", "))
 
-			line += "\n"
+			//			line += "\n"
 			n, err := io.WriteString(file, line)
 			if err != nil {
 				logrus.Fatal(n, err)
