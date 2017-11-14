@@ -28,6 +28,7 @@ type Data struct {
 	TimeStamp   string
 	ProjectName string
 	Database    Database
+	Comet       Comet
 }
 
 // Database options and parameters
@@ -41,6 +42,13 @@ type Database struct {
 	Crap   bool
 	Rev    bool
 	Iso    bool
+}
+
+// Comet options and parameters
+type Comet struct {
+	Param     string
+	ParamFile []byte
+	Print     bool
 }
 
 // // Experimental data

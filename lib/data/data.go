@@ -28,6 +28,19 @@ type Base struct {
 	Records   []db.Record
 }
 
+// New constructor
+func New() Base {
+
+	var self Base
+
+	self.UniProtDB = ""
+	self.CrapDB = ""
+	self.TaDeDB = make(map[string]string)
+	self.Records = []db.Record{}
+
+	return self
+}
+
 // ProcessDB ...
 func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 

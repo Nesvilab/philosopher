@@ -9,15 +9,11 @@ import (
 	"github.com/prvst/cmsl/err"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
-	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Comet represents the tool configuration
 type Comet struct {
-	meta.Data
-	OS           string
-	Arch         string
 	DefaultBin   string
 	DefaultParam string
 	Win32        string
@@ -25,47 +21,36 @@ type Comet struct {
 	Unix64       string
 	WinParam     string
 	UnixParam    string
-	Param        string
-	Print        bool
 }
 
 // New constructor
 func New() Comet {
 
-	var o Comet
-	var m meta.Data
-	m.Restore(sys.Meta())
+	var self Comet
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	temp, _ := sys.GetTemp()
 
-	o.Win32 = o.Temp + string(filepath.Separator) + "comet.2016012.win32.exe"
-	o.Win64 = o.Temp + string(filepath.Separator) + "comet.2016012.win64.exe"
-	o.WinParam = o.Temp + string(filepath.Separator) + "comet.params.txt"
-	o.Unix64 = o.Temp + string(filepath.Separator) + "comet.2016012.linux.exe"
-	o.UnixParam = o.Temp + string(filepath.Separator) + "comet.params"
+	self.DefaultBin = ""
+	self.DefaultParam = ""
+	self.Win32 = temp + string(filepath.Separator) + "comet.2016012.win32.exe"
+	self.Win64 = temp + string(filepath.Separator) + "comet.2016012.win64.exe"
+	self.Unix64 = temp + string(filepath.Separator) + "comet.2016012.linux.exe"
+	self.WinParam = temp + string(filepath.Separator) + "comet.params.txt"
+	self.UnixParam = temp + string(filepath.Separator) + "comet.params"
 
-	return o
+	return self
 }
 
 // Deploy generates comet binary on workdir bin directory
-func (c *Comet) Deploy() {
+func (c *Comet) Deploy(os, arch string) {
 
-	if c.OS == sys.Windows() {
+	if os == sys.Windows() {
 
 		// deploy comet param file
 		wcomet.WinParameterFile(c.WinParam)
 		c.DefaultParam = c.WinParam
 
-		if c.Arch == sys.Arch386() {
+		if arch == sys.Arch386() {
 			wcomet.Win32(c.Win32)
 			c.DefaultBin = c.Win32
 
@@ -90,10 +75,10 @@ func (c *Comet) Deploy() {
 }
 
 // Run is the main fucntion to execute Comet
-func (c *Comet) Run(cmdArgs []string) *err.Error {
+func (c *Comet) Run(cmdArgs []string, param string) *err.Error {
 
-	param := fmt.Sprintf("-P%s", c.Param)
-	args := []string{param}
+	par := fmt.Sprintf("-P%s", param)
+	args := []string{par}
 
 	for _, i := range cmdArgs {
 		file, _ := filepath.Abs(i)

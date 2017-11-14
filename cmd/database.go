@@ -19,7 +19,7 @@ var databaseCmd = &cobra.Command{
 		// store paramters on meta data
 		m.Serialize()
 
-		var db data.Base
+		var db = data.New()
 
 		if len(m.Database.Annot) > 0 {
 
