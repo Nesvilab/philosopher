@@ -1,7 +1,6 @@
 package meta
 
 import (
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Data is the global parameter container
@@ -27,6 +27,20 @@ type Data struct {
 	Distro      string
 	TimeStamp   string
 	ProjectName string
+	Database    Database
+}
+
+// Database options and parameters
+type Database struct {
+	ID     string
+	Annot  string
+	Enz    string
+	Tag    string
+	Add    string
+	Custom string
+	Crap   bool
+	Rev    bool
+	Iso    bool
 }
 
 // // Experimental data
@@ -92,7 +106,7 @@ func (d *Data) Serialize() error {
 		return err
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
+	dataEncoder := msgpack.NewEncoder(dataFile)
 	err = dataEncoder.Encode(d)
 	if err != nil {
 		return err
@@ -107,7 +121,7 @@ func (d *Data) Restore(f string) error {
 
 	file, _ := os.Open(f)
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	err := dec.Decode(&d)
 	if err != nil {
 		return errors.New("Could not restore meta data")
