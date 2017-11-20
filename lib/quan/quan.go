@@ -188,6 +188,9 @@ func (p *Quantify) RunTMTQuantification() error {
 
 	evi = rollUpProteins(evi, p.Purity)
 
+	// Protein Norm
+	evi = NormToTotalProteins(evi)
+
 	e = evi.SerializeGranular()
 	if e != nil {
 		return e

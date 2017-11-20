@@ -514,6 +514,56 @@ func rollUpProteins(evi rep.Evidence, purity float64) rep.Evidence {
 	return evi
 }
 
+// NormToTotalProteins calculates the protein level normalization based on total proteins
+func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
+
+	var topValue float64
+	var channelSum = [10]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	var normFactors = [10]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	// sum TMT singal for each column
+	for _, i := range evi.Proteins {
+		channelSum[0] += i.URazorLabels.Channel1.Intensity
+		channelSum[1] += i.URazorLabels.Channel2.Intensity
+		channelSum[2] += i.URazorLabels.Channel3.Intensity
+		channelSum[3] += i.URazorLabels.Channel4.Intensity
+		channelSum[4] += i.URazorLabels.Channel5.Intensity
+		channelSum[5] += i.URazorLabels.Channel6.Intensity
+		channelSum[6] += i.URazorLabels.Channel7.Intensity
+		channelSum[7] += i.URazorLabels.Channel8.Intensity
+		channelSum[8] += i.URazorLabels.Channel9.Intensity
+		channelSum[9] += i.URazorLabels.Channel10.Intensity
+	}
+
+	// find the higest value amongst channels
+	for _, i := range channelSum {
+		if i > topValue {
+			topValue = i
+		}
+	}
+
+	// calculate normalizing factors
+	for i := range channelSum {
+		normFactors[i] = channelSum[i] / topValue
+	}
+
+	// multiply each protein TMT set by the factors to get normalized values
+	for _, i := range evi.Proteins {
+		i.URazorLabels.Channel1.Intensity *= normFactors[0]
+		i.URazorLabels.Channel2.Intensity *= normFactors[1]
+		i.URazorLabels.Channel3.Intensity *= normFactors[2]
+		i.URazorLabels.Channel4.Intensity *= normFactors[3]
+		i.URazorLabels.Channel5.Intensity *= normFactors[4]
+		i.URazorLabels.Channel6.Intensity *= normFactors[5]
+		i.URazorLabels.Channel7.Intensity *= normFactors[6]
+		i.URazorLabels.Channel8.Intensity *= normFactors[7]
+		i.URazorLabels.Channel9.Intensity *= normFactors[8]
+		i.URazorLabels.Channel10.Intensity *= normFactors[9]
+	}
+
+	return evi
+}
+
 // func totalTop3LabelQuantification(evi rep.Evidence) (rep.Evidence, error) {
 //
 // 	for i := range evi.Proteins {
