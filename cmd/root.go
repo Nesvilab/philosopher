@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"os"
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
 	colorable "github.com/mattn/go-colorable"
+	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -24,6 +26,15 @@ var RootCmd = &cobra.Command{
 // Execute adds all child commands to the root command sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+
+	// verify if the command is been executed on a workspace directory
+	if os.Args[1] != "workspace" {
+		if len(m.UUID) < 1 && len(m.Home) < 1 {
+			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+			logrus.Fatal(e.Error())
+		}
+	}
+
 	if err := RootCmd.Execute(); err != nil {
 		logrus.Fatal(err)
 	}
@@ -31,6 +42,7 @@ func Execute() {
 
 // init sets up the configuration for the Cobra package and the Logrus logger
 func init() {
+
 	cobra.OnInitialize(initConfig)
 
 	fmt := new(logrus.TextFormatter)
@@ -48,5 +60,5 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-
+	// empty
 }

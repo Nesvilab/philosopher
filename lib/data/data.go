@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/gob"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -18,7 +19,6 @@ import (
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/vmihailenco/msgpack"
 )
 
 // Base main structure
@@ -278,7 +278,7 @@ func (d *Base) Save() *err.Error {
 	return nil
 }
 
-// Serialize saves to disk a msgpack verison of the database data structure
+// Serialize saves to disk a gob verison of the database data structure
 func (d *Base) Serialize() *err.Error {
 
 	// create a file
@@ -287,7 +287,7 @@ func (d *Base) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
+	dataEncoder := gob.NewEncoder(dataFile)
 	e = dataEncoder.Encode(d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
@@ -302,7 +302,7 @@ func (d *Base) Restore() *err.Error {
 
 	file, _ := os.Open(sys.DBBin())
 
-	dec := msgpack.NewDecoder(file)
+	dec := gob.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
@@ -324,7 +324,7 @@ func (d *Base) RestoreWithPath(p string) *err.Error {
 
 	file, _ := os.Open(path)
 
-	dec := msgpack.NewDecoder(file)
+	dec := gob.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
