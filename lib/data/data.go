@@ -1,7 +1,6 @@
 package data
 
 import (
-	"encoding/gob"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -279,7 +278,7 @@ func (d *Base) Save() *err.Error {
 	return nil
 }
 
-// Serialize saves to disk a gob verison of the database data structure
+// Serialize saves to disk a msgpack verison of the database data structure
 func (d *Base) Serialize() *err.Error {
 
 	// create a file
@@ -325,7 +324,7 @@ func (d *Base) RestoreWithPath(p string) *err.Error {
 
 	file, _ := os.Open(path)
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
