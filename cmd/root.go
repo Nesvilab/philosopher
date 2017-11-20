@@ -13,7 +13,7 @@ import (
 
 // constants
 const (
-	Version = "1.8"
+	Version = "2.0"
 )
 
 var cfgFile string

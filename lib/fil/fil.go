@@ -1127,33 +1127,50 @@ func twoDFDRFilter(pep xml.PepIDList, pro xml.ProtIDList, psm, peptide, ion floa
 // using protein names from <protein> and <alternative_proteins> tags
 func extractPSMfromPepXML(peplist xml.PepIDList, pro xml.ProtIDList) xml.PepIDList {
 
-	var protmap = make(map[string]string)
+	var protmap = make(map[string]uint16)
 	var filterMap = make(map[string]xml.PeptideIdentification)
 	var output xml.PepIDList
 
 	// get all protein names from protxml
-
-	for _, j := range pro {
-		protmap[string(j.ProteinName)] = ""
+	for _, i := range pro {
+		protmap[string(i.ProteinName)] = 0
 	}
 
-	// match protein names to <protein> tag on pepxml
-	for j := range peplist {
-		_, ok := protmap[string(peplist[j].Protein)]
-		if ok {
-			filterMap[string(peplist[j].Spectrum)] = peplist[j]
-		}
-	}
+	for _, i := range peplist {
 
-	// match protein names to <alternative_proteins> tag on pepxml
-	for m := range peplist {
-		for n := range peplist[m].AlternativeProteins {
-			_, ok := protmap[peplist[m].AlternativeProteins[n]]
-			if ok {
-				filterMap[string(peplist[m].Spectrum)] = peplist[m]
+		_, ptTag := protmap[string(i.Protein)]
+		if ptTag {
+			filterMap[string(i.Spectrum)] = i
+			protmap[string(i.Protein)]++
+		} else {
+			for _, j := range i.AlternativeProteins {
+				_, altTag := protmap[j]
+				if altTag {
+					filterMap[string(i.Spectrum)] = i
+					protmap[string(j)]++
+				}
 			}
 		}
+
 	}
+
+	// // match protein names to <protein> tag on pepxml
+	// for j := range peplist {
+	// 	_, ok := protmap[string(peplist[j].Protein)]
+	// 	if ok {
+	// 		filterMap[string(peplist[j].Spectrum)] = peplist[j]
+	// 	}
+	// }
+	//
+	// // match protein names to <alternative_proteins> tag on pepxml
+	// for m := range peplist {
+	// 	for n := range peplist[m].AlternativeProteins {
+	// 		_, ok := protmap[peplist[m].AlternativeProteins[n]]
+	// 		if ok {
+	// 			filterMap[string(peplist[m].Spectrum)] = peplist[m]
+	// 		}
+	// 	}
+	// }
 
 	for _, v := range filterMap {
 		output = append(output, v)

@@ -27,6 +27,11 @@ var filterCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		// check file existence
+		if len(fp.Pex) < 1 {
+			logrus.Fatal("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information")
+		}
+
 		/// clean, clean clean
 		os.RemoveAll(sys.EvBin())
 		os.RemoveAll(sys.EvIonBin())
@@ -41,11 +46,6 @@ var filterCmd = &cobra.Command{
 		os.RemoveAll(sys.PepxmlBin())
 		os.RemoveAll(sys.ProBin())
 		os.RemoveAll(sys.ProtxmlBin())
-
-		// check file existence
-		if len(fp.Pex) < 1 {
-			logrus.Fatal("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information")
-		}
 
 		//stat.Run(fp, psmFDR, pepFDR, ionFDR, prtFDR, pepProb, prtProb)
 		e := fp.Run(fp.Psmfdr, fp.Pepfdr, fp.Ionfdr, fp.Ptfdr, fp.PepProb, fp.ProtProb, fp.Picked, fp.Razor, fp.Mapmods)

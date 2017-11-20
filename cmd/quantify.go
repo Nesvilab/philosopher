@@ -54,7 +54,7 @@ func init() {
 	freequant.Flags().StringVarP(&qnt.Dir, "dir", "", "", "folder path containing the raw files")
 	freequant.Flags().StringVarP(&qnt.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
 	freequant.Flags().Float64VarP(&qnt.RTWin, "rtw", "", 3, "specify the retention time window for xic (minute)")
-	freequant.Flags().Float64VarP(&qnt.PTWin, "ptw", "", 0.2, "specify the time windows for the peak (minute)")
+	freequant.Flags().Float64VarP(&qnt.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
 
 	RootCmd.AddCommand(freequant)
 }

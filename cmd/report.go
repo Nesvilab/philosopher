@@ -36,8 +36,8 @@ var reportCmd = &cobra.Command{
 			logrus.Info("Creating Protein FASTA report")
 			repo.ProteinFastaReport()
 
-			logrus.Info("Creating Protein TMT report")
 			if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
+				logrus.Info("Creating Protein TMT report")
 				repo.ProteinTMTReport()
 			} else {
 				logrus.Info("Creating Protein report")
