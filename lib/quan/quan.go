@@ -103,7 +103,7 @@ func (p *Quantify) RunTMTQuantification() error {
 	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
-	logrus.Info("Restoring Data")
+	logrus.Info("Restoring data")
 
 	var evi rep.Evidence
 	e := evi.RestoreGranular()
@@ -172,6 +172,7 @@ func (p *Quantify) RunTMTQuantification() error {
 				psmMap[j.Spectrum] = psm
 			}
 		}
+
 	}
 
 	for i := range evi.PSM {
@@ -182,15 +183,24 @@ func (p *Quantify) RunTMTQuantification() error {
 		}
 	}
 
-	evi = rollUpPeptides(evi, p.Purity)
+	var spectrumMap = make(map[string]tmt.Labels)
+	for _, i := range evi.PSM {
+		if i.Purity >= p.Purity {
+			spectrumMap[i.Spectrum] = i.Labels
+		}
+	}
 
-	evi = rollUpPeptideIons(evi, p.Purity)
+	evi = rollUpPeptides(evi, spectrumMap)
 
-	evi = rollUpProteins(evi, p.Purity)
+	evi = rollUpPeptideIons(evi, spectrumMap)
 
-	// Protein Norm
+	evi = rollUpProteins(evi, spectrumMap)
+
+	// normalize to the total protein levels
+	logrus.Info("Calculating normalized protein levels")
 	evi = NormToTotalProteins(evi)
 
+	logrus.Info("Saving")
 	e = evi.SerializeGranular()
 	if e != nil {
 		return e
