@@ -16,19 +16,24 @@ import (
 
 // Data is the global parameter container
 type Data struct {
-	UUID        string
-	Home        string
-	Temp        string
-	MetaFile    string
-	MetaDir     string
-	DB          string
-	OS          string
-	Arch        string
-	Distro      string
-	TimeStamp   string
-	ProjectName string
-	Database    Database
-	Comet       Comet
+	UUID           string
+	Home           string
+	Temp           string
+	MetaFile       string
+	MetaDir        string
+	DB             string
+	OS             string
+	Arch           string
+	Distro         string
+	TimeStamp      string
+	ProjectName    string
+	Database       Database
+	Comet          Comet
+	PeptideProphet PeptideProphet
+	InterProphet   InterProphet
+	ProteinProphet ProteinProphet
+	PTMProphet     PTMProphet
+	Filter         Filter
 }
 
 // Database options and parameters
@@ -48,23 +53,144 @@ type Database struct {
 type Comet struct {
 	Param     string
 	ParamFile []byte
+	RawFiles  []string
 	Print     bool
 }
 
-// // Experimental data
-// type Experimental struct {
-// 	ProjectName string
-// 	DecoyTag    string
-// 	ConTag      string
-// 	PsmFDR      float64
-// 	PepFDR      float64
-// 	IonFDR      float64
-// 	PrtFDR      float64
-// 	PepProb     float64
-// 	PrtProb     float64
-// 	topPepProb  float64
-// 	CometParam  []byte
-// }
+// PeptideProphet options and parameters
+type PeptideProphet struct {
+	InputFiles   []string
+	Output       string
+	Database     string
+	Rtcat        string
+	Decoy        string
+	Minpiprob    float64
+	Minrtprob    float64
+	Minprob      float64
+	Masswidth    float64
+	MinPepLen    int
+	Clevel       int
+	Minpintt     int
+	Ignorechg    int
+	Minrtntt     int
+	Combine      bool
+	Exclude      bool
+	Leave        bool
+	Perfectlib   bool
+	Icat         bool
+	Noicat       bool
+	Zero         bool
+	Accmass      bool
+	Ppm          bool
+	Nomass       bool
+	Pi           bool
+	Rt           bool
+	Glyc         bool
+	Phospho      bool
+	Maldi        bool
+	Instrwarn    bool
+	Decoyprobs   bool
+	Nontt        bool
+	Nonmc        bool
+	Expectscore  bool
+	Nonparam     bool
+	Neggamma     bool
+	Forcedistr   bool
+	Optimizefval bool
+}
+
+// InterProphet options and parameters
+type InterProphet struct {
+	InputFiles []string
+	Threads    int
+	Decoy      string
+	Cat        string
+	MinProb    float64
+	Output     string
+	Length     bool
+	Nofpkm     bool
+	Nonss      bool
+	Nonse      bool
+	Nonrs      bool
+	Nonsm      bool
+	Nonsp      bool
+	Sharpnse   bool
+	Nonsi      bool
+}
+
+// ProteinProphet options and parameters
+type ProteinProphet struct {
+	InputFiles  []string
+	Minprob     float64
+	Minindep    int
+	Mufactor    int
+	Output      string
+	Maxppmdiff  int
+	ExcludeZ    bool
+	Noplot      bool
+	Nooccam     bool
+	Softoccam   bool
+	Icat        bool
+	Glyc        bool
+	Nogroupwts  bool
+	NonSP       bool
+	Accuracy    bool
+	Asap        bool
+	Refresh     bool
+	Normprotlen bool
+	Logprobs    bool
+	Confem      bool
+	Allpeps     bool
+	Unmapped    bool
+	Noprotlen   bool
+	Instances   bool
+	Fpkm        bool
+	Protmw      bool
+	Iprophet    bool
+	Asapprophet bool
+	Delude      bool
+	Excludemods bool
+}
+
+// PTMProphet options and parameters
+type PTMProphet struct {
+	InputFiles   []string
+	Output       string
+	EM           int
+	MzTol        float64
+	PPMTol       float64
+	MinProb      float64
+	NoUpdate     bool
+	KeepOld      bool
+	Verbose      bool
+	MassDiffMode bool
+}
+
+// Filter options and parameters
+type Filter struct {
+	Phi      string
+	Pex      string
+	Pox      string
+	Tag      string
+	Con      string
+	Ptconf   string
+	RepProt  string
+	Save     string
+	Database string
+	PsmFDR   float32
+	PepFDR   float32
+	IonFDR   float32
+	PtFDR    float32
+	ProtProb float32
+	PepProb  float32
+	TopPep   bool
+	Model    bool
+	RepPSM   bool
+	Razor    bool
+	Picked   bool
+	Seq      bool
+	Mapmods  bool
+}
 
 var err error
 
