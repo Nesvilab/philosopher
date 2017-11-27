@@ -6,12 +6,12 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/quan"
+	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
-var lbl quan.Quantify
+var lbl qua.Quantify
 
 // labelquantCmd represents the labelquant command
 var labelquantCmd = &cobra.Command{

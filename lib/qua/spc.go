@@ -1,4 +1,4 @@
-package quan
+package qua
 
 import (
 	"github.com/prvst/philosopher/lib/err"

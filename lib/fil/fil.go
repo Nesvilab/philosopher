@@ -13,7 +13,7 @@ import (
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/quan"
+	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
@@ -194,7 +194,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	e.UpdateIonStatus()
 
 	logrus.Info("Calculating Spectral Counts")
-	e, cerr := quan.CalculateSpectralCounts(e)
+	e, cerr := qua.CalculateSpectralCounts(e)
 	if cerr != nil {
 		return cerr
 	}

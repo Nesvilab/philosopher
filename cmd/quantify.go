@@ -6,12 +6,12 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
-	"github.com/prvst/philosopher/lib/quan"
+	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
-var qnt quan.Quantify
+var qnt qua.Quantify
 
 // quantifyCmd represents the quantify command
 var freequant = &cobra.Command{
@@ -48,7 +48,7 @@ var freequant = &cobra.Command{
 
 func init() {
 
-	qnt = quan.New()
+	qnt = qua.New()
 
 	freequant.Flags().Float64VarP(&qnt.Tol, "tol", "", 10, "m/z tolerance in ppm")
 	freequant.Flags().StringVarP(&qnt.Dir, "dir", "", "", "folder path containing the raw files")
