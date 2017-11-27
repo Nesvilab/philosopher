@@ -1,4 +1,4 @@
-package data
+package dat
 
 import (
 	"encoding/gob"
@@ -15,7 +15,6 @@ import (
 
 	"github.com/prvst/cmsl/bio"
 	"github.com/prvst/cmsl/data/fas"
-	"github.com/prvst/cmsl/db"
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
@@ -36,7 +35,7 @@ type Base struct {
 	Iso       bool
 	Rev       bool
 	TaDeDB    map[string]string
-	Records   []db.Record
+	Records   []Record
 }
 
 // New constructor
@@ -68,14 +67,14 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 
 	for k, v := range fastaMap {
 
-		class, e := db.Classify(k, decoyTag)
+		class, e := Classify(k, decoyTag)
 		if e != nil {
 			return e
 		}
 
 		if class == "uniprot" {
 
-			db, e := db.ProcessUniProtKB(k, v, decoyTag)
+			db, e := ProcessUniProtKB(k, v, decoyTag)
 			if e != nil {
 				return e
 			}
@@ -83,7 +82,7 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 
 		} else if class == "ncbi" {
 
-			db, e := db.ProcessNCBI(k, v, decoyTag)
+			db, e := ProcessNCBI(k, v, decoyTag)
 			if e != nil {
 				return e
 			}
@@ -91,7 +90,7 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 
 		} else if class == "generic" {
 
-			db, e := db.ProcessGeneric(k, v, decoyTag)
+			db, e := ProcessGeneric(k, v, decoyTag)
 			if e != nil {
 				return e
 			}

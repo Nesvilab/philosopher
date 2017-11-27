@@ -11,7 +11,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/clas"
-	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/quan"
 	"github.com/prvst/philosopher/lib/rep"
@@ -132,7 +132,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 
 	}
 
-	var dtb data.Base
+	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
 		return errors.New("Database data not available, interrupting processing")

@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
@@ -63,11 +63,11 @@ func (a *Abacus) Run(args []string) error {
 
 	var names []string
 	var xmlFiles []string
-	var database data.Base
+	var database dat.Base
 	var datasets = make(map[string]rep.Evidence)
 
 	// restore database
-	database = data.Base{}
+	database = dat.Base{}
 	database.RestoreWithPath(args[0])
 
 	// recover all files
@@ -118,7 +118,7 @@ func (a *Abacus) Run(args []string) error {
 }
 
 // processCombinedFile reads the combined protXML and creates a unique protein list as a reference fo all counts
-func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, protProb float64, database data.Base) (rep.CombinedEvidenceList, error) {
+func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, protProb float64, database dat.Base) (rep.CombinedEvidenceList, error) {
 
 	var list rep.CombinedEvidenceList
 

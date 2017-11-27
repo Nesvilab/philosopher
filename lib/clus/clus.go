@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/cdhit"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/rep"
@@ -103,7 +103,7 @@ func (c *Cluster) CreateCleanDataBaseReference() (string, error) {
 
 	var err error
 
-	var u data.Base
+	var u dat.Base
 	u.Restore()
 
 	clstrFasta := c.Temp + string(filepath.Separator) + c.UUID + ".fasta"
@@ -202,7 +202,7 @@ func (c *Cluster) ParseClusterFile(cls, database string) (List, error) {
 		}
 	}
 
-	var u data.Base
+	var u dat.Base
 	u.Restore()
 
 	var fastaMap = make(map[string]string)
@@ -396,7 +396,7 @@ func mapProtXML2Clusters(clusters List) List {
 	return clusters
 }
 
-func retrieveInfoFromUniProtDB(clusters List, db data.Base) List {
+func retrieveInfoFromUniProtDB(clusters List, db dat.Base) List {
 
 	for i := range clusters {
 		for _, j := range db.Records {
@@ -467,7 +467,7 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	return
 }
 
-func parseFastaFile(db data.Base) map[string]string {
+func parseFastaFile(db dat.Base) map[string]string {
 
 	var fastaMap = make(map[string]string)
 

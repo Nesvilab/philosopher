@@ -3,13 +3,13 @@ package cmd
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl/err"
-	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
-var dtb data.Base
+var dtb dat.Base
 
 var databaseCmd = &cobra.Command{
 	Use:   "database",
@@ -29,7 +29,7 @@ var databaseCmd = &cobra.Command{
 
 			logrus.Info("Processing database")
 
-			var u data.Base
+			var u dat.Base
 			err := u.ProcessDB(dtb.Annot, dtb.Tag)
 			if err != nil {
 				logrus.Fatal(err)
@@ -78,7 +78,7 @@ var databaseCmd = &cobra.Command{
 
 func init() {
 
-	dtb = data.New()
+	dtb = dat.New()
 
 	databaseCmd.Flags().StringVarP(&dtb.ID, "id", "", "", "UniProt proteome ID")
 	databaseCmd.Flags().StringVarP(&dtb.Annot, "annotate", "", "", "process a ready-to-use database")

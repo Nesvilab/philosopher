@@ -14,7 +14,7 @@ import (
 	"github.com/prvst/cmsl/bio"
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/clas"
-	"github.com/prvst/philosopher/lib/data"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
@@ -287,7 +287,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 	var list PSMEvidenceList
 
 	// collect database information
-	var dtb data.Base
+	var dtb dat.Base
 	dtb.Restore()
 
 	var genes = make(map[string]string)
@@ -1300,7 +1300,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 		list = append(list, rep)
 	}
 
-	var dtb data.Base
+	var dtb dat.Base
 	dtb.Restore()
 
 	if len(dtb.Records) < 1 {
