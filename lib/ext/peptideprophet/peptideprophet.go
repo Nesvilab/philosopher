@@ -1,13 +1,13 @@
 package peptideprophet
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -16,7 +16,6 @@ import (
 
 // PeptideProphet is the main tool data configuration structure
 type PeptideProphet struct {
-	met.Data
 	DefaultInteractParser       string
 	DefaultRefreshParser        string
 	DefaultPeptideProphetParser string
@@ -29,106 +28,58 @@ type PeptideProphet struct {
 	LibgccDLL                   string
 	Zlib1DLL                    string
 	Mv                          string
-	MinPepLen                   int
-	Output                      string
-	Clevel                      int
-	Database                    string
-	Minpintt                    int
-	Minpiprob                   float64
-	Minrtntt                    int
-	Minrtprob                   float64
-	Rtcat                       string
-	Minprob                     float64
-	Decoy                       string
-	Ignorechg                   int
-	Masswidth                   float64
-	Combine                     bool
-	Exclude                     bool
-	Leave                       bool
-	Perfectlib                  bool
-	Icat                        bool
-	Noicat                      bool
-	Zero                        bool
-	Accmass                     bool
-	Ppm                         bool
-	Nomass                      bool
-	Pi                          bool
-	Rt                          bool
-	Glyc                        bool
-	Phospho                     bool
-	Maldi                       bool
-	Instrwarn                   bool
-	Decoyprobs                  bool
-	Nontt                       bool
-	Nonmc                       bool
-	Expectscore                 bool
-	Nonparam                    bool
-	Neggamma                    bool
-	Forcedistr                  bool
-	Optimizefval                bool
 }
 
 // New constructor
 func New() PeptideProphet {
 
-	var o PeptideProphet
-	var m met.Data
-	m.Restore(sys.Meta())
+	var self PeptideProphet
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	temp, _ := sys.GetTemp()
 
-	o.UnixInteractParser = o.Temp + string(filepath.Separator) + "InteractParser"
-	o.UnixRefreshParser = o.Temp + string(filepath.Separator) + "RefreshParser"
-	o.UnixPeptideProphetParser = o.Temp + string(filepath.Separator) + "PeptideProphetParser"
-	o.WinInteractParser = o.Temp + string(filepath.Separator) + "InteractParser.exe"
-	o.WinRefreshParser = o.Temp + string(filepath.Separator) + "RefreshParser.exe"
-	o.WinPeptideProphetParser = o.Temp + string(filepath.Separator) + "PeptideProphetParser.exe"
-	o.Mv = o.Temp + string(filepath.Separator) + "mv.exe"
-	o.LibgccDLL = o.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
-	o.Zlib1DLL = o.Temp + string(filepath.Separator) + "zlib1.dll"
+	self.UnixInteractParser = temp + string(filepath.Separator) + "InteractParser"
+	self.UnixRefreshParser = temp + string(filepath.Separator) + "RefreshParser"
+	self.UnixPeptideProphetParser = temp + string(filepath.Separator) + "PeptideProphetParser"
+	self.WinInteractParser = temp + string(filepath.Separator) + "InteractParser.exe"
+	self.WinRefreshParser = temp + string(filepath.Separator) + "RefreshParser.exe"
+	self.WinPeptideProphetParser = temp + string(filepath.Separator) + "PeptideProphetParser.exe"
+	self.Mv = temp + string(filepath.Separator) + "mv.exe"
+	self.LibgccDLL = temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
+	self.Zlib1DLL = temp + string(filepath.Separator) + "zlib1.dll"
 
-	return o
+	return self
 }
 
 // Deploy PeptideProphet binaries on binary directory
-func (c *PeptideProphet) Deploy() error {
+func (p *PeptideProphet) Deploy(os, distro string) *err.Error {
 
-	if c.OS == sys.Windows() {
-		wPeP.WinInteractParser(c.WinInteractParser)
-		c.DefaultInteractParser = c.WinInteractParser
-		wPeP.WinRefreshParser(c.WinRefreshParser)
-		c.DefaultRefreshParser = c.WinRefreshParser
-		wPeP.WinPeptideProphetParser(c.WinPeptideProphetParser)
-		c.DefaultPeptideProphetParser = c.WinPeptideProphetParser
-		wPeP.LibgccDLL(c.LibgccDLL)
-		wPeP.Zlib1DLL(c.Zlib1DLL)
-		wPeP.Mv(c.Mv)
+	if os == sys.Windows() {
+		wPeP.WinInteractParser(p.WinInteractParser)
+		p.DefaultInteractParser = p.WinInteractParser
+		wPeP.WinRefreshParser(p.WinRefreshParser)
+		p.DefaultRefreshParser = p.WinRefreshParser
+		wPeP.WinPeptideProphetParser(p.WinPeptideProphetParser)
+		p.DefaultPeptideProphetParser = p.WinPeptideProphetParser
+		wPeP.LibgccDLL(p.LibgccDLL)
+		wPeP.Zlib1DLL(p.Zlib1DLL)
+		wPeP.Mv(p.Mv)
 	} else {
-		if strings.EqualFold(c.Distro, sys.Debian()) {
-			unix.UnixInteractParser(c.UnixInteractParser)
-			c.DefaultInteractParser = c.UnixInteractParser
-			unix.UnixRefreshParser(c.UnixRefreshParser)
-			c.DefaultRefreshParser = c.UnixRefreshParser
-			unix.UnixPeptideProphetParser(c.UnixPeptideProphetParser)
-			c.DefaultPeptideProphetParser = c.UnixPeptideProphetParser
-		} else if strings.EqualFold(c.Distro, sys.Redhat()) {
-			unix.UnixInteractParser(c.UnixInteractParser)
-			c.DefaultInteractParser = c.UnixInteractParser
-			unix.UnixRefreshParser(c.UnixRefreshParser)
-			c.DefaultRefreshParser = c.UnixRefreshParser
-			unix.UnixPeptideProphetParser(c.UnixPeptideProphetParser)
-			c.DefaultPeptideProphetParser = c.UnixPeptideProphetParser
+		if strings.EqualFold(distro, sys.Debian()) {
+			unix.UnixInteractParser(p.UnixInteractParser)
+			p.DefaultInteractParser = p.UnixInteractParser
+			unix.UnixRefreshParser(p.UnixRefreshParser)
+			p.DefaultRefreshParser = p.UnixRefreshParser
+			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
+			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
+		} else if strings.EqualFold(distro, sys.Redhat()) {
+			unix.UnixInteractParser(p.UnixInteractParser)
+			p.DefaultInteractParser = p.UnixInteractParser
+			unix.UnixRefreshParser(p.UnixRefreshParser)
+			p.DefaultRefreshParser = p.UnixRefreshParser
+			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
+			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
 		} else {
-			return errors.New("Unsupported distribution for PeptideProphet")
+			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy PeptideProphet"}
 		}
 	}
 
@@ -136,7 +87,10 @@ func (c *PeptideProphet) Deploy() error {
 }
 
 // Run PeptideProphet
-func (c *PeptideProphet) Run(args []string) error {
+func (p PeptideProphet) Run(params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
+
+	// holds the finished pepXML file, we push this up to be indexed
+	var output []string
 
 	var listedArgs []string
 	for _, i := range args {
@@ -145,38 +99,38 @@ func (c *PeptideProphet) Run(args []string) error {
 	}
 
 	// run InteractParser
-	files, err := interactParser(*c, listedArgs)
-	if err != nil {
-		return err
+	files, e := interactParser(p, params, home, temp, listedArgs)
+	if e != nil {
+		return nil, e
 	}
 
 	for _, i := range files {
-		if strings.Contains(i, c.Output) {
+		if strings.Contains(i, params.Output) {
 
 			// run RefreshParser
-			err = refreshParser(*c, i)
-			if err != nil {
-				return err
+			e = refreshParser(p, i, params.Database, params.Output, temp)
+			if e != nil {
+				return nil, e
 			}
 
 			// run PeptideProphetParser
-			err = peptideProphet(*c, i)
-			if err != nil {
-				return err
+			output, e = peptideProphet(p, params, temp, i)
+			if e != nil {
+				return nil, e
 			}
 
 		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // interactParser executes InteractParser binary
-func interactParser(p PeptideProphet, args []string) ([]string, error) {
+func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	var files []string
 
-	if p.Combine == false {
+	if params.Combine == false {
 
 		for i := range args {
 
@@ -190,7 +144,7 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 			name = strings.TrimSuffix(name, filepath.Ext(name))
 
 			// set the output name and sufix
-			output := fmt.Sprintf("%s%s%s-%s.pep.xml", datadir, string(filepath.Separator), p.Output, name)
+			output := fmt.Sprintf("%s%s%s-%s.pep.xml", datadir, string(filepath.Separator), params.Output, name)
 			cmd.Args = append(cmd.Args, output)
 			files = append(files, output)
 
@@ -204,15 +158,15 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 			cmd.Args = append(cmd.Args, mzfile)
 
 			// -D<path_to_database>
-			if len(p.Database) > 0 {
-				db, _ := filepath.Abs(p.Database)
+			if len(params.Database) > 0 {
+				db, _ := filepath.Abs(params.Database)
 				v := fmt.Sprintf("-D%s", db)
 				cmd.Args = append(cmd.Args, v)
 			}
 
 			// -L<min_peptide_len (default 7)>
-			if p.MinPepLen != 7 {
-				v := fmt.Sprintf("-L=%d", p.MinPepLen)
+			if params.MinPepLen != 7 {
+				v := fmt.Sprintf("-L=%d", params.MinPepLen)
 				cmd.Args = append(cmd.Args, v)
 			}
 
@@ -220,19 +174,19 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 
 			env := os.Environ()
 			env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-			env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", p.Home))
+			env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", home))
 			for i := range env {
 				if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-					env[i] = env[i] + ";" + p.Home
+					env[i] = env[i] + ";" + home
 				}
 			}
 			cmd.Env = env
 
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
-			err := cmd.Start()
-			if err != nil {
-				return nil, errors.New("Could not run InteractParser")
+			e := cmd.Start()
+			if e != nil {
+				return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "interactParser"}
 			}
 			_ = cmd.Wait()
 
@@ -245,7 +199,7 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 
 		datadir := filepath.Dir(strings.TrimSpace(args[0]))
 
-		output := fmt.Sprintf("%s%s%s.pep.xml", datadir, string(filepath.Separator), p.Output)
+		output := fmt.Sprintf("%s%s%s.pep.xml", datadir, string(filepath.Separator), params.Output)
 		cmd.Args = append(cmd.Args, output)
 		files = append(files, output)
 
@@ -260,15 +214,15 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 		cmd.Args = append(cmd.Args, mzfile)
 
 		// -D<path_to_database>
-		if len(p.Database) > 0 {
-			db, _ := filepath.Abs(p.Database)
+		if len(params.Database) > 0 {
+			db, _ := filepath.Abs(params.Database)
 			v := fmt.Sprintf("-D%s", db)
 			cmd.Args = append(cmd.Args, v)
 		}
 
 		// -L<min_peptide_len (default 7)>
-		if p.MinPepLen != 7 {
-			v := fmt.Sprintf("-L=%d", p.MinPepLen)
+		if params.MinPepLen != 7 {
+			v := fmt.Sprintf("-L=%d", params.MinPepLen)
 			cmd.Args = append(cmd.Args, v)
 		}
 
@@ -276,19 +230,19 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 
 		env := os.Environ()
 		env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-		env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", p.Temp))
+		env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
 		for i := range env {
 			if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-				env[i] = env[i] + ";" + p.Temp
+				env[i] = env[i] + ";" + temp
 			}
 		}
 		cmd.Env = env
 
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		err := cmd.Start()
-		if err != nil {
-			return nil, errors.New("Could not run InteractParser")
+		e := cmd.Start()
+		if e != nil {
+			return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "interactParser"}
 		}
 		_ = cmd.Wait()
 
@@ -298,7 +252,7 @@ func interactParser(p PeptideProphet, args []string) ([]string, error) {
 }
 
 // refreshParser executes RefreshParser binary
-func refreshParser(p PeptideProphet, file string) error {
+func refreshParser(p PeptideProphet, file, database, output, temp string) *err.Error {
 
 	bin := p.DefaultRefreshParser
 	cmd := exec.Command(bin)
@@ -307,18 +261,18 @@ func refreshParser(p PeptideProphet, file string) error {
 	cmd.Args = append(cmd.Args, file)
 
 	// append the database
-	if len(p.Database) > 0 {
-		db, _ := filepath.Abs(p.Database)
+	if len(database) > 0 {
+		db, _ := filepath.Abs(database)
 		v := fmt.Sprintf("%s", db)
 		cmd.Args = append(cmd.Args, v)
 	}
 
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", p.Temp))
+	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
 	for i := range env {
 		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-			env[i] = env[i] + ";" + p.Temp
+			env[i] = env[i] + ";" + temp
 		}
 	}
 	cmd.Env = env
@@ -328,9 +282,9 @@ func refreshParser(p PeptideProphet, file string) error {
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		return errors.New("Cannot run RefreshParser")
+	e := cmd.Start()
+	if e != nil {
+		return &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "refreshParser"}
 	}
 	_ = cmd.Wait()
 
@@ -338,148 +292,147 @@ func refreshParser(p PeptideProphet, file string) error {
 }
 
 // peptideProphet executes peptideprophet
-func peptideProphet(p PeptideProphet, file string) error {
-
+func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file string) ([]string, *err.Error) {
 	bin := p.DefaultPeptideProphetParser
 	cmd := exec.Command(bin)
 
 	// string of arguments to be passed as a command
 	cmd.Args = append(cmd.Args, file)
 
-	if p.Exclude == true {
+	if params.Exclude == true {
 		cmd.Args = append(cmd.Args, "EXCLUDE")
 	}
 
-	if p.Leave == true {
+	if params.Leave == true {
 		cmd.Args = append(cmd.Args, "LEAVE")
 	}
 
-	if p.Perfectlib == true {
+	if params.Perfectlib == true {
 		cmd.Args = append(cmd.Args, "PERFECTLIB")
 	}
 
-	if p.Icat == true {
+	if params.Icat == true {
 		cmd.Args = append(cmd.Args, "ICAT")
 	}
 
-	if p.Noicat == true {
+	if params.Noicat == true {
 		cmd.Args = append(cmd.Args, "NOICAT")
 	}
 
-	if p.Zero == true {
+	if params.Zero == true {
 		cmd.Args = append(cmd.Args, "ZERO")
 	}
 
-	if p.Accmass == true {
+	if params.Accmass == true {
 		cmd.Args = append(cmd.Args, "ACCMASS")
 	}
 
-	if p.Ppm == true {
+	if params.Ppm == true {
 		cmd.Args = append(cmd.Args, "PPM")
 	}
 
-	if p.Nomass == true {
+	if params.Nomass == true {
 		cmd.Args = append(cmd.Args, "NOMASS")
 	}
 
-	if p.Pi == true {
+	if params.Pi == true {
 		cmd.Args = append(cmd.Args, "PI")
 	}
 
-	if p.Rt == true {
+	if params.Rt == true {
 		cmd.Args = append(cmd.Args, "RT")
 	}
 
-	if p.Glyc == true {
+	if params.Glyc == true {
 		cmd.Args = append(cmd.Args, "GLYC")
 	}
 
-	if p.Phospho == true {
+	if params.Phospho == true {
 		cmd.Args = append(cmd.Args, "PHOSPHO")
 	}
 
-	if p.Maldi == true {
+	if params.Maldi == true {
 		cmd.Args = append(cmd.Args, "MALDI")
 	}
 
-	if p.Instrwarn == true {
+	if params.Instrwarn == true {
 		cmd.Args = append(cmd.Args, "INSTRWARN")
 	}
 
-	if p.Decoyprobs == true {
+	if params.Decoyprobs == true {
 		cmd.Args = append(cmd.Args, "DECOYPROBS")
 	}
 
-	if p.Nontt == true {
+	if params.Nontt == true {
 		cmd.Args = append(cmd.Args, "NONTT")
 	}
 
-	if p.Nonmc == true {
+	if params.Nonmc == true {
 		cmd.Args = append(cmd.Args, "NONMC")
 	}
 
-	if p.Expectscore == true {
+	if params.Expectscore == true {
 		cmd.Args = append(cmd.Args, "EXPECTSCORE")
 	}
 
-	if p.Nonparam == true {
+	if params.Nonparam == true {
 		cmd.Args = append(cmd.Args, "NONPARAM")
 	}
 
-	if p.Neggamma == true {
+	if params.Neggamma == true {
 		cmd.Args = append(cmd.Args, "NEGGAMMA")
 	}
 
-	if p.Forcedistr == true {
+	if params.Forcedistr == true {
 		cmd.Args = append(cmd.Args, "FORCEDISTR")
 	}
 
-	if p.Nonparam == true {
+	if params.Nonparam == true {
 		cmd.Args = append(cmd.Args, "NONPARAM")
 	}
 
-	if p.Masswidth != 5.0 {
-		v := fmt.Sprintf("MASSWIDTH=%.4f", p.Masswidth)
+	if params.Masswidth != 5.0 {
+		v := fmt.Sprintf("MASSWIDTH=%.4f", params.Masswidth)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Clevel != 0 {
-		v := fmt.Sprintf("CLEVEL=%d", p.Clevel)
+	if params.Clevel != 0 {
+		v := fmt.Sprintf("CLEVEL=%d", params.Clevel)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Minpintt != 2 {
-		v := fmt.Sprintf("MINPINTT=%d", p.Minpintt)
+	if params.Minpintt != 2 {
+		v := fmt.Sprintf("MINPINTT=%d", params.Minpintt)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Minpiprob != 0.9 {
-		v := fmt.Sprintf("MINPIPROB=%.4f", p.Minpiprob)
+	if params.Minpiprob != 0.9 {
+		v := fmt.Sprintf("MINPIPROB=%.4f", params.Minpiprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Minrtntt != 2 {
-		v := fmt.Sprintf("MINRTNTT=%d", p.Minrtntt)
+	if params.Minrtntt != 2 {
+		v := fmt.Sprintf("MINRTNTT=%d", params.Minrtntt)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Minrtprob != 0.9 {
-		v := fmt.Sprintf("MINRTPROB=%.4f", p.Minrtprob)
+	if params.Minrtprob != 0.9 {
+		v := fmt.Sprintf("MINRTPROB=%.4f", params.Minrtprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Rtcat) > 0 {
-		v := fmt.Sprintf("RTCAT=%s", p.Rtcat)
+	if len(params.Rtcat) > 0 {
+		v := fmt.Sprintf("RTCAT=%s", params.Rtcat)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if p.Minprob != 0.05 {
-		v := fmt.Sprintf("MINPROB=%.4f", p.Minprob)
+	if params.Minprob != 0.05 {
+		v := fmt.Sprintf("MINPROB=%.4f", params.Minprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(p.Decoy) > 0 {
-		v := fmt.Sprintf("DECOY=%s", p.Decoy)
+	if len(params.Decoy) > 0 {
+		v := fmt.Sprintf("DECOY=%s", params.Decoy)
 		cmd.Args = append(cmd.Args, v)
 	}
 
@@ -487,21 +440,29 @@ func peptideProphet(p PeptideProphet, file string) error {
 
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", p.Temp))
+	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
 	for i := range env {
 		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-			env[i] = env[i] + ";" + p.Temp
+			env[i] = env[i] + ";" + temp
 		}
 	}
 	cmd.Env = env
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		return errors.New("Cannot run PeptidePophet")
+	e := cmd.Start()
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "PeptideProphet"}
 	}
 	_ = cmd.Wait()
 
-	return nil
+	// collect all resulting files
+	var output []string
+	for _, i := range cmd.Args {
+		if strings.Contains(i, "interact") {
+			output = append(output, i)
+		}
+	}
+
+	return output, nil
 }
