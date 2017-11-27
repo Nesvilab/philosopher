@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prvst/cmsl/data/fas"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/fas"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 )
