@@ -16,8 +16,8 @@ import (
 	"github.com/gonum/plot/vg"
 	"github.com/prvst/cmsl/data/pep"
 	"github.com/prvst/cmsl/err"
-	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher/lib/utils"
 )
 
 // PepXML data

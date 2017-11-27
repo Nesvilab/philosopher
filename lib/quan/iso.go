@@ -5,9 +5,9 @@ import (
 	"math"
 	"strings"
 
-	"github.com/prvst/cmsl/utils"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/prvst/philosopher/lib/utils"
 	"github.com/prvst/philosopher/lib/xml"
 )
 
