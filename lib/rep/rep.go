@@ -12,7 +12,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/bio"
-	"github.com/prvst/philosopher/lib/clas"
+	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
@@ -375,7 +375,7 @@ func (e *Evidence) PSMReport() {
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
 		if e.Decoys == false {
-			if !clas.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+			if !cla.IsDecoy(i.Protein, e.Meta.DecoyTag) {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -478,7 +478,7 @@ func (e *Evidence) PSMQTMTReport() {
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
 		if e.Decoys == false {
-			if !clas.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+			if !cla.IsDecoy(i.Protein, e.Meta.DecoyTag) {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -657,7 +657,7 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 		}
 
 		// is this bservation a decoy ?
-		if clas.IsDecoyPSM(i, decoyTag) {
+		if cla.IsDecoyPSM(i, decoyTag) {
 			pr.IsDecoy = true
 		}
 
@@ -1028,7 +1028,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 	var err error
 
 	for _, i := range pep {
-		if !clas.IsDecoyPSM(i, decoyTag) {
+		if !cla.IsDecoyPSM(i, decoyTag) {
 			pepSeqMap[i.Peptide] = false
 		} else {
 			pepSeqMap[i.Peptide] = true

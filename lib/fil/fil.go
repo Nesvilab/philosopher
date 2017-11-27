@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/clas"
+	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
@@ -450,7 +450,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 		// move all entries to list and count the number of targets and decoys
 		for _, i := range input {
 			for _, j := range i {
-				if clas.IsDecoyPSM(j, decoyTag) {
+				if cla.IsDecoyPSM(j, decoyTag) {
 					decoys++
 				} else {
 					targets++
@@ -467,7 +467,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 		}
 
 		for i := range peplist {
-			if clas.IsDecoyPSM(peplist[i], decoyTag) {
+			if cla.IsDecoyPSM(peplist[i], decoyTag) {
 				decoys++
 			} else {
 				targets++
@@ -483,7 +483,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 		}
 
 		for i := range peplist {
-			if clas.IsDecoyPSM(peplist[i], decoyTag) {
+			if cla.IsDecoyPSM(peplist[i], decoyTag) {
 				decoys++
 			} else {
 				targets++
@@ -504,7 +504,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 		if !ok {
 			scoreMap[list[j].Probability] = (decoys / targets)
 		}
-		if clas.IsDecoyPSM(list[j], decoyTag) {
+		if cla.IsDecoyPSM(list[j], decoyTag) {
 			decoys--
 		} else {
 			targets--
@@ -541,7 +541,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 		_, ok := probList[list[i].Probability]
 		if ok {
 			cleanlist = append(cleanlist, list[i])
-			if clas.IsDecoyPSM(list[i], decoyTag) {
+			if cla.IsDecoyPSM(list[i], decoyTag) {
 				decoys++
 			} else {
 				targets++
@@ -622,7 +622,7 @@ func proteinProfile(p xml.ProtXML) (t, d int, err error) {
 
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
-			if clas.IsDecoyProtein(j, p.DecoyTag) {
+			if cla.IsDecoyProtein(j, p.DecoyTag) {
 				d++
 			} else {
 				t++
@@ -644,7 +644,7 @@ func pickedFDR(p xml.ProtXML) xml.ProtXML {
 	// collect all proteins from every group
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
-			if clas.IsDecoyProtein(j, p.DecoyTag) {
+			if cla.IsDecoyProtein(j, p.DecoyTag) {
 				decoyMap[string(j.ProteinName)] = j.PeptideIons[0].InitialProbability
 			} else {
 				targetMap[string(j.ProteinName)] = j.PeptideIons[0].InitialProbability
@@ -912,7 +912,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 	}
 
 	for i := range list {
-		if clas.IsDecoyProtein(list[i], p.DecoyTag) {
+		if cla.IsDecoyProtein(list[i], p.DecoyTag) {
 			decoys++
 		} else {
 			targets++
@@ -931,7 +931,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 			scoreMap[list[j].TopPepProb] = (decoys / targets)
 		}
 
-		if clas.IsDecoyProtein(list[j], p.DecoyTag) {
+		if cla.IsDecoyProtein(list[j], p.DecoyTag) {
 			decoys--
 		} else {
 			targets--
@@ -1012,7 +1012,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 		_, ok := probList[list[i].TopPepProb]
 		if ok {
 			cleanlist = append(cleanlist, list[i])
-			if clas.IsDecoyProtein(list[i], p.DecoyTag) {
+			if cla.IsDecoyProtein(list[i], p.DecoyTag) {
 				decoys++
 			} else {
 				targets++
@@ -1188,14 +1188,14 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 	// get filtered list
 	var list xml.ProtIDList
 	for _, i := range p {
-		if !clas.IsDecoyProtein(i, decoyTag) {
+		if !cla.IsDecoyProtein(i, decoyTag) {
 			list = append(list, i)
 		}
 	}
 
 	// get the list of identified taget proteins
 	for _, i := range p {
-		if clas.IsDecoy(i.ProteinName, decoyTag) {
+		if cla.IsDecoy(i.ProteinName, decoyTag) {
 			decoys[i.ProteinName] = 0
 		} else {
 			targets[i.ProteinName] = 0
@@ -1231,7 +1231,7 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 func proteinProfileWithList(list []xml.ProteinIdentification, decoyTag string) (t, d int, err error) {
 
 	for i := range list {
-		if clas.IsDecoyProtein(list[i], decoyTag) {
+		if cla.IsDecoyProtein(list[i], decoyTag) {
 			d++
 		} else {
 			t++

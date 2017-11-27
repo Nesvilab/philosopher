@@ -1,4 +1,4 @@
-package finn
+package fin
 
 import (
 	"bytes"

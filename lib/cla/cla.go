@@ -1,4 +1,4 @@
-package clas
+package cla
 
 import (
 	"strings"

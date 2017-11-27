@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/clus"
+	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
-var cls clus.Cluster
+var cls clu.Cluster
 
 // clusterCmd represents the cluster command
 var clusterCmd = &cobra.Command{
@@ -35,7 +35,7 @@ var clusterCmd = &cobra.Command{
 
 func init() {
 
-	cls = clus.New()
+	cls = clu.New()
 
 	clusterCmd.Flags().StringVarP(&cls.UID, "id", "", "", "UniProt proteome ID")
 	clusterCmd.Flags().Float64VarP(&cls.Level, "level", "", 0.9, "cluster identity level")

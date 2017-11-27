@@ -1,4 +1,4 @@
-package clus
+package clu
 
 import (
 	"bufio"

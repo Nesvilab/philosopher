@@ -18,7 +18,7 @@ import (
 	"strconv"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/finn"
+	"github.com/prvst/philosopher/lib/fin"
 	"github.com/rogpeppe/go-charset/charset"
 	// anon charset
 	_ "github.com/rogpeppe/go-charset/data"
@@ -329,7 +329,7 @@ func readEncoded(peaks Peaks, precision string, isCompressed bool) ([]float64, e
 // }
 
 // Write ...
-func Write(raw finn.RawData) error {
+func Write(raw fin.RawData) error {
 
 	var mz MzXML
 
