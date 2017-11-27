@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/prvst/cmsl/data/mod"
 	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
