@@ -1,7 +1,6 @@
 package dat
 
 import (
-	"encoding/gob"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,24 +15,14 @@ import (
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fas"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Base main structure
 type Base struct {
-	met.Data
-	ID        string
-	Enz       string
-	Tag       string
 	UniProtDB string
 	CrapDB    string
-	Add       string
-	Custom    string
-	Annot     string
-	Crap      bool
-	Iso       bool
-	Rev       bool
 	TaDeDB    map[string]string
 	Records   []Record
 }
@@ -41,20 +30,14 @@ type Base struct {
 // New constructor
 func New() Base {
 
-	var o Base
-	var m met.Data
-	m.Restore(sys.Meta())
+	var self Base
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
+	self.UniProtDB = ""
+	self.CrapDB = ""
+	self.TaDeDB = make(map[string]string)
+	self.Records = []Record{}
 
-	return o
+	return self
 }
 
 // ProcessDB ...
@@ -104,18 +87,18 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 }
 
 // Fetch downloads a database file from UniProt
-func (d *Base) Fetch() *err.Error {
+func (d *Base) Fetch(id, temp string, iso, rev bool) *err.Error {
 
 	var query string
-	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", d.Temp, string(filepath.Separator), d.ID)
+	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
 
-	if d.Rev == true {
-		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=reviewed:yes+AND+proteome:", d.ID, "&format=fasta")
+	if rev == true {
+		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=reviewed:yes+AND+proteome:", id, "&format=fasta")
 	} else {
-		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=proteome:", d.ID, "&format=fasta")
+		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=proteome:", id, "&format=fasta")
 	}
 
-	if d.Iso == true {
+	if iso == true {
 		query = fmt.Sprintf("%s&include=yes", query)
 	} else {
 		query = fmt.Sprintf("%s&include=no", query)
@@ -145,10 +128,9 @@ func (d *Base) Fetch() *err.Error {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create() *err.Error {
+func (d *Base) Create(temp, add, enz, tag string, crap bool) *err.Error {
 
 	d.TaDeDB = make(map[string]string)
-	var crapMap = make(map[string]string)
 
 	dbfile, _ := filepath.Abs(d.UniProtDB)
 	db, e := fas.ParseFile(dbfile)
@@ -156,8 +138,8 @@ func (d *Base) Create() *err.Error {
 		return e
 	}
 
-	if len(d.Add) > 0 {
-		add, adderr := fas.ParseFile(d.Add)
+	if len(add) > 0 {
+		add, adderr := fas.ParseFile(add)
 		if adderr != nil {
 			return adderr
 		}
@@ -169,27 +151,29 @@ func (d *Base) Create() *err.Error {
 
 	// adding contaminants to database before reversion
 	// repeated entries are removed and substituted by contaminants
-	if d.Crap == true {
+	if crap == true {
 
-		d.Deploy()
-		//crapFile = Deploy(p)
-		crapMap, e = fas.ParseFile(d.CrapDB)
+		d.Deploy(temp)
+
+		crapMap, e := fas.ParseFile(d.CrapDB)
+		if e != nil {
+			return &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA}
+		}
+
 		for k, v := range crapMap {
 			split := strings.Split(k, "|")
-
 			for i := range db {
 				if strings.Contains(i, split[1]) {
 					delete(db, i)
 				}
 			}
-
 			db[k] = v
-
 		}
+
 	}
 
 	var en bio.Enzyme
-	en.Synth(d.Enz)
+	en.Synth(enz)
 	reg := regexp.MustCompile(en.Pattern)
 
 	for h, s := range db {
@@ -210,7 +194,7 @@ func (d *Base) Create() *err.Error {
 		}
 
 		rev := strings.Join(revPeptides, en.Join)
-		dh := ">" + d.Tag + h
+		dh := ">" + tag + h
 		d.TaDeDB[dh] = rev
 	}
 
@@ -218,9 +202,9 @@ func (d *Base) Create() *err.Error {
 }
 
 // Deploy crap file to session folder
-func (d *Base) Deploy() *err.Error {
+func (d *Base) Deploy(temp string) *err.Error {
 
-	d.CrapDB = fmt.Sprintf("%s%scrap.fas", d.Temp, string(filepath.Separator))
+	d.CrapDB = fmt.Sprintf("%s%scrap.fas", temp, string(filepath.Separator))
 
 	param, e := Asset("crap.fas")
 	e = ioutil.WriteFile(d.CrapDB, param, 0644)
@@ -233,15 +217,15 @@ func (d *Base) Deploy() *err.Error {
 }
 
 // Save fasta file to disk
-func (d *Base) Save() *err.Error {
+func (d *Base) Save(home, temp, tag string) *err.Error {
 
 	base := filepath.Base(d.UniProtDB)
 
 	t := time.Now()
 	stamp := fmt.Sprintf(t.Format("2006-01-02"))
 
-	workfile := fmt.Sprintf("%s%s%s-td-%s", d.Temp, string(filepath.Separator), stamp, base)
-	outfile := fmt.Sprintf("%s%s%s-td-%s", d.Home, string(filepath.Separator), stamp, base)
+	workfile := fmt.Sprintf("%s%s%s-td-%s", temp, string(filepath.Separator), stamp, base)
+	outfile := fmt.Sprintf("%s%s%s-td-%s", home, string(filepath.Separator), stamp, base)
 
 	// create decoy db file
 	file, e := os.Create(workfile)
@@ -267,7 +251,7 @@ func (d *Base) Save() *err.Error {
 
 	sys.CopyFile(workfile, outfile)
 
-	d.ProcessDB(outfile, d.Tag)
+	d.ProcessDB(outfile, tag)
 
 	err := d.Serialize()
 	if err != nil {
@@ -277,7 +261,7 @@ func (d *Base) Save() *err.Error {
 	return nil
 }
 
-// Serialize saves to disk a gob verison of the database data structure
+// Serialize saves to disk a msgpack verison of the database data structure
 func (d *Base) Serialize() *err.Error {
 
 	// create a file
@@ -286,7 +270,7 @@ func (d *Base) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
+	dataEncoder := msgpack.NewEncoder(dataFile)
 	e = dataEncoder.Encode(d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
@@ -301,7 +285,7 @@ func (d *Base) Restore() *err.Error {
 
 	file, _ := os.Open(sys.DBBin())
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
@@ -323,7 +307,7 @@ func (d *Base) RestoreWithPath(p string) *err.Error {
 
 	file, _ := os.Open(path)
 
-	dec := gob.NewDecoder(file)
+	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}

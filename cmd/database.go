@@ -1,15 +1,14 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
-
-var dtb dat.Base
 
 var databaseCmd = &cobra.Command{
 	Use:   "database",
@@ -18,24 +17,27 @@ var databaseCmd = &cobra.Command{
 	//provides options for downloading a fresh snapshot from UniProt`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m met.Data
-		m.Restore(sys.Meta())
+		// verify if the command is been executed on a workspace directory
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 			logrus.Fatal(e.Error())
 		}
 
-		if len(dtb.Annot) > 0 {
+		// store paramters on meta data
+		m.Serialize()
+
+		var db = dat.New()
+
+		if len(m.Database.Annot) > 0 {
 
 			logrus.Info("Processing database")
 
-			var u dat.Base
-			err := u.ProcessDB(dtb.Annot, dtb.Tag)
+			err := db.ProcessDB(m.Database.Annot, m.Database.Tag)
 			if err != nil {
 				logrus.Fatal(err)
 			}
 
-			err = u.Serialize()
+			err = db.Serialize()
 			if err != nil {
 				logrus.Fatal(err)
 			}
@@ -45,28 +47,30 @@ var databaseCmd = &cobra.Command{
 
 		}
 
-		if len(dtb.ID) < 1 && len(dtb.Custom) < 1 {
+		if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
 			logrus.Fatal("You need to provide a taxon ID or a custom FASTA file")
 		}
 
-		if dtb.Crap == false {
+		if m.Database.Crap == false {
 			logrus.Warning("Contaminants are not going to be added to database")
 		}
 
-		if len(dtb.Custom) < 1 {
+		if len(m.Database.Custom) < 1 {
+
 			logrus.Info("Fetching database")
-			dtb.Fetch()
+			db.Fetch(m.Database.ID, m.Temp, m.Database.Iso, m.Database.Rev)
+
 		} else {
-			dtb.UniProtDB = dtb.Custom
+			db.UniProtDB = m.Database.Custom
 		}
 
 		logrus.Info("Processing decoys")
-		dtb.Create()
+		db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
 
 		logrus.Info("Creating file")
-		dtb.Save()
+		db.Save(m.Home, m.Temp, m.Database.Tag)
 
-		err := dtb.Serialize()
+		err := db.Serialize()
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -78,17 +82,20 @@ var databaseCmd = &cobra.Command{
 
 func init() {
 
-	dtb = dat.New()
+	if os.Args[1] == "database" {
 
-	databaseCmd.Flags().StringVarP(&dtb.ID, "id", "", "", "UniProt proteome ID")
-	databaseCmd.Flags().StringVarP(&dtb.Annot, "annotate", "", "", "process a ready-to-use database")
-	databaseCmd.Flags().StringVarP(&dtb.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, chymotrypsin)")
-	databaseCmd.Flags().StringVarP(&dtb.Tag, "prefix", "", "rev_", "decoy prefix to be added")
-	databaseCmd.Flags().StringVarP(&dtb.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
-	databaseCmd.Flags().StringVarP(&dtb.Custom, "custom", "", "", "use a pre formatted custom database")
-	databaseCmd.Flags().BoolVarP(&dtb.Crap, "contam", "", false, "add common contaminants")
-	databaseCmd.Flags().BoolVarP(&dtb.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
-	databaseCmd.Flags().BoolVarP(&dtb.Iso, "isoform", "", false, "add isoform sequences")
+		m.Restore(sys.Meta())
+
+		databaseCmd.Flags().StringVarP(&m.Database.ID, "id", "", "", "UniProt proteome ID")
+		databaseCmd.Flags().StringVarP(&m.Database.Annot, "annotate", "", "", "process a ready-to-use database")
+		databaseCmd.Flags().StringVarP(&m.Database.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, chymotrypsin)")
+		databaseCmd.Flags().StringVarP(&m.Database.Tag, "prefix", "", "rev_", "decoy prefix to be added")
+		databaseCmd.Flags().StringVarP(&m.Database.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
+		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre formatted custom database")
+		databaseCmd.Flags().BoolVarP(&m.Database.Crap, "contam", "", false, "add common contaminants")
+		databaseCmd.Flags().BoolVarP(&m.Database.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
+		databaseCmd.Flags().BoolVarP(&m.Database.Iso, "isoform", "", false, "add isoform sequences")
+	}
 
 	RootCmd.AddCommand(databaseCmd)
 }
