@@ -36,6 +36,7 @@ type Data struct {
 	Filter         Filter
 	Quantify       Quantify
 	Cluster        Cluster
+	Abacus         Abacus
 }
 
 // Database options and parameters
@@ -207,6 +208,15 @@ type Quantify struct {
 	Tol      float64
 	Purity   float64
 	IntNorm  bool
+}
+
+// Abacus options ad parameters
+type Abacus struct {
+	Comb     string
+	Tag      string
+	Razor    bool
+	ProtProb float64
+	PepProb  float64
 }
 
 // Cluster options and parameters

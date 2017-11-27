@@ -18,16 +18,6 @@ import (
 	"github.com/prvst/philosopher/lib/xml"
 )
 
-// Abacus main structure
-type Abacus struct {
-	met.Data
-	ProtProb float64
-	PepProb  float64
-	Comb     string
-	Razor    bool
-	Tag      string
-}
-
 // ExperimentalData ...
 type ExperimentalData struct {
 	Name        string
@@ -37,29 +27,8 @@ type ExperimentalData struct {
 // ExperimentalDataList ...
 type ExperimentalDataList []ExperimentalData
 
-// New constructor
-func New() Abacus {
-
-	var o Abacus
-	var m met.Data
-	m.Restore(sys.Meta())
-
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
-
-	return o
-}
-
 // Run abacus
-func (a *Abacus) Run(args []string) error {
+func Run(a met.Abacus, temp string, args []string) error {
 
 	var names []string
 	var xmlFiles []string
@@ -103,7 +72,7 @@ func (a *Abacus) Run(args []string) error {
 	sort.Strings(names)
 
 	logrus.Info("Processing combined file")
-	evidences, err := a.processCombinedFile(a.Comb, a.Tag, a.PepProb, a.ProtProb, database)
+	evidences, err := processCombinedFile(a, database)
 	if err != nil {
 		return err
 	}
@@ -112,23 +81,23 @@ func (a *Abacus) Run(args []string) error {
 
 	evidences = sumIntensities(evidences, datasets)
 
-	saveCompareResults(a.Temp, evidences, names)
+	saveCompareResults(temp, evidences, names)
 
 	return nil
 }
 
 // processCombinedFile reads the combined protXML and creates a unique protein list as a reference fo all counts
-func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, protProb float64, database dat.Base) (rep.CombinedEvidenceList, error) {
+func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceList, error) {
 
 	var list rep.CombinedEvidenceList
 
-	if _, err := os.Stat(combinedFile); os.IsNotExist(err) {
+	if _, err := os.Stat(a.Comb); os.IsNotExist(err) {
 		logrus.Fatal("Cannot find combined.prot.xml file")
 	} else {
 
 		var protxml xml.ProtXML
-		protxml.Read(combinedFile)
-		protxml.DecoyTag = decoyTag
+		protxml.Read(a.Comb)
+		protxml.DecoyTag = a.Tag
 
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
@@ -141,7 +110,7 @@ func (a *Abacus) processCombinedFile(combinedFile, decoyTag string, pepProb, pro
 			}
 		}
 
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, pepProb, protProb, false, a.Razor)
+		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, false, a.Razor)
 		if err != nil {
 			return nil, err
 		}
