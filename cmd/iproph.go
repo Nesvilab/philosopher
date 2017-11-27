@@ -4,7 +4,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +18,7 @@ var iprophCmd = &cobra.Command{
 	//Long:  "Multi-level integrative analysis of shotgun proteomic data\niProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m meta.Data
+		var m met.Data
 		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}

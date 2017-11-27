@@ -1,4 +1,4 @@
-package meta
+package met
 
 import (
 	"errors"

@@ -4,7 +4,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/clus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -18,7 +18,7 @@ var clusterCmd = &cobra.Command{
 	//Long:  `Proteins are clustered based on sequence identity levels, and peptides are mapped to clusters, providing MS/MS evidence on a functional level.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m meta.Data
+		var m met.Data
 		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}

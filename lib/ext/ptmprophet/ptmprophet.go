@@ -11,13 +11,13 @@ import (
 	wPeP "github.com/prvst/philosopher/lib/ext/ptmprophet/win"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // PTMProphet is the main tool data configuration structure
 type PTMProphet struct {
-	meta.Data
+	met.Data
 	Output                  string
 	EM                      int
 	MzTol                   float64
@@ -36,7 +36,7 @@ type PTMProphet struct {
 func New() PTMProphet {
 
 	var o PTMProphet
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

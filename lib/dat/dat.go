@@ -16,13 +16,13 @@ import (
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fas"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Base main structure
 type Base struct {
-	meta.Data
+	met.Data
 	ID        string
 	Enz       string
 	Tag       string
@@ -42,7 +42,7 @@ type Base struct {
 func New() Base {
 
 	var o Base
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

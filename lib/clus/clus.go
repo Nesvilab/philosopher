@@ -16,14 +16,14 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/cdhit"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Cluster struct
 type Cluster struct {
-	meta.Data
+	met.Data
 	UID                     string
 	Level                   float64
 	Number                  int
@@ -48,7 +48,7 @@ type List []Cluster
 func New() Cluster {
 
 	var o Cluster
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

@@ -12,7 +12,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
@@ -22,7 +22,7 @@ import (
 
 // Filter object
 type Filter struct {
-	meta.Data
+	met.Data
 	Phi      string
 	Pex      string
 	Pox      string
@@ -51,7 +51,7 @@ type Filter struct {
 func New() Filter {
 
 	var o Filter
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

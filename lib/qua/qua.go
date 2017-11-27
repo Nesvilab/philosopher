@@ -8,7 +8,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
@@ -17,7 +17,7 @@ import (
 
 // Quantify ...
 type Quantify struct {
-	meta.Data
+	met.Data
 	Phi      string
 	Format   string
 	Dir      string
@@ -48,7 +48,7 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func New() Quantify {
 
 	var o Quantify
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

@@ -10,13 +10,13 @@ import (
 
 	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // ProteinProphet is tool configuration
 type ProteinProphet struct {
-	meta.Data
+	met.Data
 	DefaultBatchCoverage  string
 	DefaultDatabaseParser string
 	DefaultProteinProphet string
@@ -64,7 +64,7 @@ type ProteinProphet struct {
 func New() ProteinProphet {
 
 	var o ProteinProphet
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

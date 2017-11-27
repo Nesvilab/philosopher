@@ -10,13 +10,13 @@ import (
 
 	unix "github.com/prvst/philosopher/lib/ext/interprophet/unix"
 	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // InterProphet represents the tool configuration
 type InterProphet struct {
-	meta.Data
+	met.Data
 	DefaultInterProphetParser string
 	WinInterProphetParser     string
 	UnixInterProphetParser    string
@@ -42,7 +42,7 @@ type InterProphet struct {
 func New() InterProphet {
 
 	var o InterProphet
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

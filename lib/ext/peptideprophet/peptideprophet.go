@@ -10,13 +10,13 @@ import (
 
 	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // PeptideProphet is the main tool data configuration structure
 type PeptideProphet struct {
-	meta.Data
+	met.Data
 	DefaultInteractParser       string
 	DefaultRefreshParser        string
 	DefaultPeptideProphetParser string
@@ -72,7 +72,7 @@ type PeptideProphet struct {
 func New() PeptideProphet {
 
 	var o PeptideProphet
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

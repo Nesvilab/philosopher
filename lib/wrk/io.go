@@ -8,14 +8,14 @@ import (
 
 	"github.com/pierrre/archivefile/zip"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Backup collects all binary files from the workspace and zips them
 func Backup() *err.Error {
 
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {

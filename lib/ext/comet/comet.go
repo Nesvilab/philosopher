@@ -9,13 +9,13 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Comet represents the tool configuration
 type Comet struct {
-	meta.Data
+	met.Data
 	OS           string
 	Arch         string
 	DefaultBin   string
@@ -33,7 +33,7 @@ type Comet struct {
 func New() Comet {
 
 	var o Comet
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

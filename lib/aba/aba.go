@@ -12,7 +12,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/fil"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/xml"
@@ -20,7 +20,7 @@ import (
 
 // Abacus main structure
 type Abacus struct {
-	meta.Data
+	met.Data
 	ProtProb float64
 	PepProb  float64
 	Comb     string
@@ -41,7 +41,7 @@ type ExperimentalDataList []ExperimentalData
 func New() Abacus {
 
 	var o Abacus
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

@@ -15,7 +15,7 @@ import (
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
@@ -264,7 +264,7 @@ type MassBin struct {
 func New() Evidence {
 
 	var o Evidence
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.Meta.UUID = m.UUID
