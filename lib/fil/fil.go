@@ -20,56 +20,9 @@ import (
 	"github.com/prvst/philosopher/lib/xml"
 )
 
-// Filter object
-type Filter struct {
-	met.Data
-	Phi      string
-	Pex      string
-	Pox      string
-	Tag      string
-	Con      string
-	Psmfdr   float64
-	Pepfdr   float64
-	Ionfdr   float64
-	Ptfdr    float64
-	ProtProb float64
-	PepProb  float64
-	Ptconf   string
-	RepProt  string
-	Save     string
-	Database string
-	TopPep   bool
-	Model    bool
-	RepPSM   bool
-	Razor    bool
-	Picked   bool
-	Seq      bool
-	Mapmods  bool
-}
-
-// New constructor
-func New() Filter {
-
-	var o Filter
-	var m met.Data
-	m.Restore(sys.Meta())
-
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
-
-	return o
-}
-
 // Run executes the Filter processing
-func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, isPicked, isRazor, mapmod bool) error {
+//func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, isPicked, isRazor, mapmod bool) error {
+func Run(f met.Filter) error {
 
 	e := rep.New()
 	var pepxml xml.PepXML
@@ -84,7 +37,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 		return err
 	}
 
-	err = processPeptideIdentifications(pepid, f.Tag, psmFDR, pepFDR, ionFDR)
+	err = processPeptideIdentifications(pepid, f.Tag, f.PsmFDR, f.PepFDR, f.IonFDR)
 	if err != nil {
 		return err
 	}
@@ -96,7 +49,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 			return proerr
 		}
 
-		err = processProteinIdentifications(protXML, ptFDR, pepProb, protProb, isPicked, isRazor)
+		err = processProteinIdentifications(protXML, f.PtFDR, f.PepFDR, f.ProtProb, f.Picked, f.Razor)
 		if err != nil {
 			return err
 		}
@@ -108,7 +61,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 			// filtered psm list and filtered prot list
 			pep.Restore("psm")
 			pro.Restore()
-			err = sequentialFDRControl(pep, pro, psmFDR, pepFDR, ionFDR, f.Tag)
+			err = sequentialFDRControl(pep, pro, f.PsmFDR, f.PepFDR, f.IonFDR, f.Tag)
 			if err != nil {
 				return err
 			}
@@ -121,7 +74,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 			// complete pep list and filtered mirror-image prot list
 			pepxml.Restore()
 			pro.Restore()
-			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, psmFDR, pepFDR, ionFDR, f.Tag)
+			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, f.PsmFDR, f.PepFDR, f.IonFDR, f.Tag)
 			if err != nil {
 				return err
 			}
@@ -153,7 +106,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	psm = nil
 
 	// evaluate modifications in data set
-	if mapmod == true {
+	if f.Mapmods == true {
 		logrus.Info("Mapping modifications")
 		e.MapMassDiffToUniMod()
 
@@ -172,7 +125,7 @@ func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, i
 	pept = nil
 
 	// evaluate modifications in data set
-	if mapmod == true {
+	if f.Mapmods == true {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}

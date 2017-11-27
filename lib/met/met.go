@@ -177,12 +177,12 @@ type Filter struct {
 	RepProt  string
 	Save     string
 	Database string
-	PsmFDR   float32
-	PepFDR   float32
-	IonFDR   float32
-	PtFDR    float32
-	ProtProb float32
-	PepProb  float32
+	PsmFDR   float64
+	PepFDR   float64
+	IonFDR   float64
+	PtFDR    float64
+	ProtProb float64
+	PepProb  float64
 	TopPep   bool
 	Model    bool
 	RepPSM   bool
