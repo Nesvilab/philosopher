@@ -18,78 +18,51 @@ import (
 	"github.com/prvst/philosopher/lib/ext/cdhit"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Cluster struct
 type Cluster struct {
-	met.Data
-	UID                     string
-	Level                   float64
-	Number                  int
 	Centroid                string
 	Description             string
-	Coverage                float32
-	Members                 map[string]uint8
 	GeneNames               string
-	Peptides                []string
-	PeptideIons             []string
+	Number                  int
 	TotalPeptideNumber      int
 	SharedPeptides          int
-	UniqueClusterPeptides   []string
+	Coverage                float32
 	UniqueClusterTopPepProb float64
 	TopPepProb              float64
+	Peptides                []string
+	PeptideIons             []string
+	UniqueClusterPeptides   []string
+	Members                 map[string]uint8
 }
 
 // List list
 type List []Cluster
 
-// New constructor
-func New() Cluster {
-
-	var o Cluster
-	var m met.Data
-	m.Restore(sys.Meta())
-
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
-
-	return o
-}
-
 // GenerateReport creates the protein report output
-func (c *Cluster) GenerateReport() error {
-
-	var err error
+func GenerateReport(c met.Cluster, home, temp string) error {
 
 	// create clean reference db for clustering
-	clusterFasta, err := c.CreateCleanDataBaseReference()
+	clusterFasta, err := createCleanDataBaseReference(c.UID, temp)
 	if err != nil {
 		return err
 	}
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")
-	clusterFile, clusterFasta := c.Execute()
+	clusterFile, clusterFasta := execute(c.Level)
 
 	// parse the cluster file
 	logrus.Info("Parsing clusters")
-	clusters, err := c.ParseClusterFile(clusterFile, clusterFasta)
+	clusters, err := parseClusterFile(clusterFile, clusterFasta)
 
 	// maps all proteins from the db against the clusters
 	logrus.Info("Mapping proteins to clusters")
 	mappedClust := mapProtXML2Clusters(clusters)
 
 	// mapping to functional annotation and save to disk
-	c.SavetoDisk(mappedClust)
+	savetoDisk(mappedClust, home, c.UID)
 
 	if err != nil {
 		return err
@@ -99,14 +72,14 @@ func (c *Cluster) GenerateReport() error {
 }
 
 // CreateCleanDataBaseReference removes decoys and contaminants from struct
-func (c *Cluster) CreateCleanDataBaseReference() (string, error) {
+func createCleanDataBaseReference(uid, temp string) (string, error) {
 
 	var err error
 
 	var u dat.Base
 	u.Restore()
 
-	clstrFasta := c.Temp + string(filepath.Separator) + c.UUID + ".fasta"
+	clstrFasta := temp + string(filepath.Separator) + uid + ".fasta"
 
 	file, err := os.Create(clstrFasta)
 	if err != nil {
@@ -134,7 +107,7 @@ func (c *Cluster) CreateCleanDataBaseReference() (string, error) {
 }
 
 // Execute is top function for Comet
-func (c *Cluster) Execute() (string, string) {
+func execute(level float64) (string, string) {
 
 	cd := cdhit.New()
 
@@ -145,13 +118,13 @@ func (c *Cluster) Execute() (string, string) {
 	cd.Deploy()
 
 	// run cdhit and create the clusters
-	cd.Run(c.Level)
+	cd.Run(level)
 
 	return cd.ClusterFile, cd.ClusterFasta
 }
 
 // ParseClusterFile ...
-func (c *Cluster) ParseClusterFile(cls, database string) (List, error) {
+func parseClusterFile(cls, database string) (List, error) {
 
 	var list List
 	var clustermap = make(map[int][]string)
@@ -228,7 +201,7 @@ func (c *Cluster) ParseClusterFile(cls, database string) (List, error) {
 }
 
 // SavetoDisk saves functional inference result to disk
-func (c *Cluster) SavetoDisk(list List) {
+func savetoDisk(list List, home, uid string) {
 
 	output := fmt.Sprintf(".%sclusters.tsv", string(filepath.Separator))
 
@@ -243,7 +216,7 @@ func (c *Cluster) SavetoDisk(list List) {
 	var line string
 	line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n")
 
-	if len(c.UID) > 0 {
+	if len(uid) > 0 {
 		log.Println("Retrieving annotation from UniProt")
 		line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n")
 	}
@@ -255,8 +228,8 @@ func (c *Cluster) SavetoDisk(list List) {
 	}
 
 	var faMap = make(map[string][]string)
-	if len(c.UID) > 0 {
-		faMap = getFile(true, c.Home, c.UID)
+	if len(uid) > 0 {
+		faMap = getFile(true, home, uid)
 	} else {
 		//faMap, _ = fasta.ParseFastaDescription(rep.DB)
 	}
@@ -279,14 +252,13 @@ func (c *Cluster) SavetoDisk(list List) {
 				list[i].Coverage,
 				list[i].TotalPeptideNumber,
 				len(list[i].UniqueClusterPeptides),
-				//list[i].UniqueClusterTopPepProb,
 				(list[i].TotalPeptideNumber - len(list[i].UniqueClusterPeptides)),
 				list[i].Description)
 
 			v, ok := faMap[list[i].Centroid]
 			if ok {
 				var index int
-				if len(c.UID) > 0 {
+				if len(uid) > 0 {
 					index = 1
 				} else {
 					index = 0

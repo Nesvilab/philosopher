@@ -35,6 +35,7 @@ type Data struct {
 	PTMProphet     PTMProphet
 	Filter         Filter
 	Quantify       Quantify
+	Cluster        Cluster
 }
 
 // Database options and parameters
@@ -206,6 +207,12 @@ type Quantify struct {
 	Tol      float64
 	Purity   float64
 	IntNorm  bool
+}
+
+// Cluster options and parameters
+type Cluster struct {
+	UID   string
+	Level float64
 }
 
 var err error
