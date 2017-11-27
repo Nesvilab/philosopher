@@ -1,13 +1,13 @@
 package proteinprophet
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -16,7 +16,6 @@ import (
 
 // ProteinProphet is tool configuration
 type ProteinProphet struct {
-	met.Data
 	DefaultBatchCoverage  string
 	DefaultDatabaseParser string
 	DefaultProteinProphet string
@@ -29,96 +28,56 @@ type ProteinProphet struct {
 	Prot2html             string
 	LibgccDLL             string
 	Zlib1DLL              string
-	Minprob               float64
-	Minindep              int
-	Mufactor              int
-	Output                string
-	Maxppmdiff            int
-	ExcludeZ              bool
-	Noplot                bool
-	Nooccam               bool
-	Softoccam             bool
-	Icat                  bool
-	Glyc                  bool
-	Nogroupwts            bool
-	NonSP                 bool
-	Accuracy              bool
-	Asap                  bool
-	Refresh               bool
-	Normprotlen           bool
-	Logprobs              bool
-	Confem                bool
-	Allpeps               bool
-	Unmapped              bool
-	Noprotlen             bool
-	Instances             bool
-	Fpkm                  bool
-	Protmw                bool
-	Iprophet              bool
-	Asapprophet           bool
-	Delude                bool
-	Excludemods           bool
 }
 
 // New constructor
 func New() ProteinProphet {
 
-	var o ProteinProphet
-	var m met.Data
-	m.Restore(sys.Meta())
+	var self ProteinProphet
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	temp, _ := sys.GetTemp()
 
-	o.UnixBatchCoverage = o.Temp + string(filepath.Separator) + "batchcoverage"
-	o.UnixDatabaseParser = o.Temp + string(filepath.Separator) + "DatabaseParser"
-	o.UnixProteinProphet = o.Temp + string(filepath.Separator) + "ProteinProphet"
-	o.WinBatchCoverage = o.Temp + string(filepath.Separator) + "batchcoverage.exe"
-	o.WinDatabaseParser = o.Temp + string(filepath.Separator) + "DatabaseParser.exe"
-	o.WinProteinProphet = o.Temp + string(filepath.Separator) + "ProteinProphet.exe"
-	o.LibgccDLL = o.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
-	o.Zlib1DLL = o.Temp + string(filepath.Separator) + "zlib1.dll"
+	self.UnixBatchCoverage = temp + string(filepath.Separator) + "batchcoverage"
+	self.UnixDatabaseParser = temp + string(filepath.Separator) + "DatabaseParser"
+	self.UnixProteinProphet = temp + string(filepath.Separator) + "ProteinProphet"
+	self.WinBatchCoverage = temp + string(filepath.Separator) + "batchcoverage.exe"
+	self.WinDatabaseParser = temp + string(filepath.Separator) + "DatabaseParser.exe"
+	self.WinProteinProphet = temp + string(filepath.Separator) + "ProteinProphet.exe"
+	self.LibgccDLL = temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
+	self.Zlib1DLL = temp + string(filepath.Separator) + "zlib1.dll"
 
-	return o
+	return self
 }
 
 // Deploy generates comet binary on workdir bin directory
-func (c *ProteinProphet) Deploy() error {
+func (p *ProteinProphet) Deploy(os, distro string) *err.Error {
 
-	if c.OS == sys.Windows() {
-		wPoP.WinBatchCoverage(c.WinBatchCoverage)
-		c.DefaultBatchCoverage = c.WinBatchCoverage
-		wPoP.WinDatabaseParser(c.WinDatabaseParser)
-		c.DefaultDatabaseParser = c.WinDatabaseParser
-		wPoP.WinProteinProphet(c.WinProteinProphet)
-		c.DefaultProteinProphet = c.WinProteinProphet
-		wPoP.LibgccDLL(c.LibgccDLL)
-		wPoP.Zlib1DLL(c.Zlib1DLL)
+	if os == sys.Windows() {
+		wPoP.WinBatchCoverage(p.WinBatchCoverage)
+		p.DefaultBatchCoverage = p.WinBatchCoverage
+		wPoP.WinDatabaseParser(p.WinDatabaseParser)
+		p.DefaultDatabaseParser = p.WinDatabaseParser
+		wPoP.WinProteinProphet(p.WinProteinProphet)
+		p.DefaultProteinProphet = p.WinProteinProphet
+		wPoP.LibgccDLL(p.LibgccDLL)
+		wPoP.Zlib1DLL(p.Zlib1DLL)
 	} else {
-		if strings.EqualFold(c.Distro, sys.Debian()) {
-			unix.UnixBatchCoverage(c.UnixBatchCoverage)
-			c.DefaultBatchCoverage = c.UnixBatchCoverage
-			unix.UnixDatabaseParser(c.UnixDatabaseParser)
-			c.DefaultDatabaseParser = c.UnixDatabaseParser
-			unix.UnixProteinProphet(c.UnixProteinProphet)
-			c.DefaultProteinProphet = c.UnixProteinProphet
-		} else if strings.EqualFold(c.Distro, sys.Redhat()) {
-			unix.UnixBatchCoverage(c.UnixBatchCoverage)
-			c.DefaultBatchCoverage = c.UnixBatchCoverage
-			unix.UnixDatabaseParser(c.UnixDatabaseParser)
-			c.DefaultDatabaseParser = c.UnixDatabaseParser
-			unix.UnixProteinProphet(c.UnixProteinProphet)
-			c.DefaultProteinProphet = c.UnixProteinProphet
+		if strings.EqualFold(distro, sys.Debian()) {
+			unix.UnixBatchCoverage(p.UnixBatchCoverage)
+			p.DefaultBatchCoverage = p.UnixBatchCoverage
+			unix.UnixDatabaseParser(p.UnixDatabaseParser)
+			p.DefaultDatabaseParser = p.UnixDatabaseParser
+			unix.UnixProteinProphet(p.UnixProteinProphet)
+			p.DefaultProteinProphet = p.UnixProteinProphet
+		} else if strings.EqualFold(distro, sys.Redhat()) {
+			unix.UnixBatchCoverage(p.UnixBatchCoverage)
+			p.DefaultBatchCoverage = p.UnixBatchCoverage
+			unix.UnixDatabaseParser(p.UnixDatabaseParser)
+			p.DefaultDatabaseParser = p.UnixDatabaseParser
+			unix.UnixProteinProphet(p.UnixProteinProphet)
+			p.DefaultProteinProphet = p.UnixProteinProphet
 		} else {
-			return errors.New("Unsupported distribution for ProteinProphet")
+			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy ProteinProphet"}
 		}
 	}
 
@@ -126,10 +85,10 @@ func (c *ProteinProphet) Deploy() error {
 }
 
 // Run ProteinProphet executes peptideprophet
-func (c *ProteinProphet) Run(args []string) error {
+func (p ProteinProphet) Run(params met.ProteinProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	// run
-	bin := c.DefaultProteinProphet
+	bin := p.DefaultProteinProphet
 	cmd := exec.Command(bin)
 
 	// append pepxml files
@@ -139,134 +98,141 @@ func (c *ProteinProphet) Run(args []string) error {
 	}
 
 	// append output file
-	output := fmt.Sprintf("%s%s%s.prot.xml", c.Temp, string(filepath.Separator), c.Output)
+	output := fmt.Sprintf("%s%s%s.prot.xml", temp, string(filepath.Separator), params.Output)
 	output, _ = filepath.Abs(output)
 
 	cmd.Args = append(cmd.Args, output)
-	cmd = c.appendParams(cmd)
+	cmd = p.appendParams(params, cmd)
 
 	cmd.Dir = filepath.Dir(output)
 
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", c.Temp))
+	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
 	for i := range env {
 		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-			env[i] = env[i] + ";" + c.Temp
+			env[i] = env[i] + ";" + temp
 		}
 	}
 	cmd.Env = env
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		msg := fmt.Sprintf("Could not run ProteinProphet: %s", err)
-		return errors.New(msg)
+	e := cmd.Start()
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "ProteinProphet"}
 	}
 	_ = cmd.Wait()
 
 	// copy to work directory
-	dest := fmt.Sprintf("%s%s%s", c.Home, string(filepath.Separator), filepath.Base(output))
-	err = sys.CopyFile(output, dest)
-	if err != nil {
-		return err
+	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))
+	e = sys.CopyFile(output, dest)
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "ProtXML"}
 	}
 
-	return nil
+	// collect all resulting files
+	var processedOutput []string
+	for _, i := range cmd.Args {
+		if strings.Contains(i, "prot.xml") || i == params.Output {
+			processedOutput = append(processedOutput, i)
+		}
+	}
+
+	return processedOutput, nil
 }
 
-func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
+func (p ProteinProphet) appendParams(params met.ProteinProphet, cmd *exec.Cmd) *exec.Cmd {
 
-	if c.ExcludeZ == true {
+	if params.ExcludeZ == true {
 		cmd.Args = append(cmd.Args, "EXCLUDE_ZEROS")
 	}
 
-	if c.Noplot == true {
+	if params.Noplot == true {
 		cmd.Args = append(cmd.Args, "NOPLOT")
 	}
 
-	if c.Nooccam == true {
+	if params.Nooccam == true {
 		cmd.Args = append(cmd.Args, "NOOCCAM")
 	}
 
-	if c.Softoccam == true {
+	if params.Softoccam == true {
 		cmd.Args = append(cmd.Args, "SOFTOCCAM")
 	}
 
-	if c.Icat == true {
+	if params.Icat == true {
 		cmd.Args = append(cmd.Args, "ICAT")
 	}
 
-	if c.Glyc == true {
+	if params.Glyc == true {
 		cmd.Args = append(cmd.Args, "GLYC")
 	}
 
-	if c.Nogroupwts == true {
+	if params.Nogroupwts == true {
 		cmd.Args = append(cmd.Args, "NOGROUPWTS")
 	}
 
-	if c.NonSP == true {
+	if params.NonSP == true {
 		cmd.Args = append(cmd.Args, "NONSP")
 	}
 
-	if c.Accuracy == true {
+	if params.Accuracy == true {
 		cmd.Args = append(cmd.Args, "ACCURACY")
 	}
 
-	if c.Asap == true {
+	if params.Asap == true {
 		cmd.Args = append(cmd.Args, "ASAP")
 	}
 
-	if c.Refresh == true {
+	if params.Refresh == true {
 		cmd.Args = append(cmd.Args, "REFRESH")
 	}
 
-	if c.Normprotlen == true {
+	if params.Normprotlen == true {
 		cmd.Args = append(cmd.Args, "NORMPROTLEN")
 	}
 
-	if c.Logprobs == true {
+	if params.Logprobs == true {
 		cmd.Args = append(cmd.Args, "LOGPROBS")
 	}
 
-	if c.Confem == true {
+	if params.Confem == true {
 		cmd.Args = append(cmd.Args, "CONFEM")
 	}
 
-	if c.Allpeps == true {
+	if params.Allpeps == true {
 		cmd.Args = append(cmd.Args, "ALLPEPS")
 	}
 
-	if c.Unmapped == true {
+	if params.Unmapped == true {
 		cmd.Args = append(cmd.Args, "UNMAPPED")
 	}
 
-	if c.Noprotlen == true {
+	if params.Noprotlen == true {
 		cmd.Args = append(cmd.Args, "NOPROTLEN")
 	}
 
-	if c.Instances == true {
+	if params.Instances == true {
 		cmd.Args = append(cmd.Args, "INSTANCES")
 	}
 
-	if c.Fpkm == true {
+	if params.Fpkm == true {
 		cmd.Args = append(cmd.Args, "FPKM")
 	}
 
-	if c.Protmw == true {
+	if params.Protmw == true {
 		cmd.Args = append(cmd.Args, "PROTMW")
 	}
 
-	if c.Iprophet == true {
+	if params.Iprophet == true {
 		cmd.Args = append(cmd.Args, "IPROPHET")
 	}
 
-	if c.Asapprophet == true {
+	if params.Asapprophet == true {
 		cmd.Args = append(cmd.Args, "ASAP_PROPHET")
 	}
 
-	if c.Delude == true {
+	if params.Delude == true {
 		cmd.Args = append(cmd.Args, "DELUDE")
 	}
 
@@ -281,23 +247,23 @@ func (c *ProteinProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
 	// 	cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
 	// }
 
-	if c.Maxppmdiff != 20 {
-		v := fmt.Sprintf("MAXPPMDIFF%d", c.Maxppmdiff)
+	if params.Maxppmdiff != 20 {
+		v := fmt.Sprintf("MAXPPMDIFF%d", params.Maxppmdiff)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.Minprob != 0.05 {
-		v := fmt.Sprintf("MINPROB%.4f", c.Minprob)
+	if params.Minprob != 0.05 {
+		v := fmt.Sprintf("MINPROB%.4f", params.Minprob)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.Minindep != 0 {
-		v := fmt.Sprintf("MININDEP%d", c.Minindep)
+	if params.Minindep != 0 {
+		v := fmt.Sprintf("MININDEP%d", params.Minindep)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.Mufactor != 1 {
-		v := fmt.Sprintf("MUFACTOR%d", c.Mufactor)
+	if params.Mufactor != 1 {
+		v := fmt.Sprintf("MUFACTOR%d", params.Mufactor)
 		cmd.Args = append(cmd.Args, v)
 	}
 
