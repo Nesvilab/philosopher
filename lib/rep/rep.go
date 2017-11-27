@@ -11,10 +11,10 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/bio"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
