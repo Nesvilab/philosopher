@@ -1,17 +1,15 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
-
-var qnt qua.Quantify
 
 // quantifyCmd represents the quantify command
 var freequant = &cobra.Command{
@@ -20,26 +18,28 @@ var freequant = &cobra.Command{
 	//Long:  `Provides methods for MS1 Peak Intensity calculation based on XIC`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m met.Data
-		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 			logrus.Fatal(e.Error())
 		}
 
-		if len(qnt.Format) < 1 || len(qnt.Dir) < 1 {
+		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
 
-		if strings.EqualFold(qnt.Format, "mzml") {
-			qnt.Format = "mzML"
-		} else if strings.EqualFold(qnt.Format, "mzxml") {
-			qnt.Format = "mzXML"
+		if strings.EqualFold(m.Quantify.Format, "mzml") {
+			m.Quantify.Format = "mzML"
+		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
+			m.Quantify.Format = "mzXML"
 		} else {
 			logrus.Fatal("Unknown file format")
 		}
 
-		qnt.RunLabelFreeQuantification()
+		// run label-free quantification
+		qua.RunLabelFreeQuantification(m.Quantify)
+
+		// store paramters on meta data
+		m.Serialize()
 
 		logrus.Info("Done")
 		return
@@ -48,13 +48,16 @@ var freequant = &cobra.Command{
 
 func init() {
 
-	qnt = qua.New()
+	if os.Args[1] == "quantify" {
 
-	freequant.Flags().Float64VarP(&qnt.Tol, "tol", "", 10, "m/z tolerance in ppm")
-	freequant.Flags().StringVarP(&qnt.Dir, "dir", "", "", "folder path containing the raw files")
-	freequant.Flags().StringVarP(&qnt.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
-	freequant.Flags().Float64VarP(&qnt.RTWin, "rtw", "", 3, "specify the retention time window for xic (minute)")
-	freequant.Flags().Float64VarP(&qnt.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
+		m.Restore(sys.Meta())
+
+		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
+		freequant.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
+		freequant.Flags().StringVarP(&m.Quantify.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
+		freequant.Flags().Float64VarP(&m.Quantify.RTWin, "rtw", "", 3, "specify the retention time window for xic (minute)")
+		freequant.Flags().Float64VarP(&m.Quantify.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
+	}
 
 	RootCmd.AddCommand(freequant)
 }

@@ -1,43 +1,38 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
-var lbl qua.Quantify
-
 // labelquantCmd represents the labelquant command
 var labelquantCmd = &cobra.Command{
 	Use:   "labelquant",
 	Short: "Isobaric Labeling-Based Relative Quantification ",
-	//Long:  `Provides methods for labeled data quantification`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m met.Data
-		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 			logrus.Fatal(e.Error())
 		}
 
-		if len(lbl.Format) < 1 || len(lbl.Dir) < 1 {
+		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
 
 		// hardcoded tmt for now
-		lbl.Brand = "tmt"
+		m.Quantify.Brand = "tmt"
 
-		if strings.EqualFold(strings.ToLower(lbl.Format), "mzml") {
-			lbl.Format = "mzML"
-		} else if strings.EqualFold(lbl.Format, "mzxml") {
-			lbl.Format = "mzXML"
+		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
+			m.Quantify.Format = "mzML"
+		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
+			m.Quantify.Format = "mzXML"
 		} else {
 			logrus.Fatal("Unknown file format")
 		}
@@ -53,10 +48,13 @@ var labelquantCmd = &cobra.Command{
 		// }
 
 		//err := lbl.RunLabeledQuantification()
-		err := lbl.RunTMTQuantification()
+		err := qua.RunTMTQuantification(m.Quantify)
 		if err != nil {
 			logrus.Fatal(err)
 		}
+
+		// store paramters on meta data
+		m.Serialize()
 
 		logrus.Info("Done")
 		return
@@ -64,15 +62,17 @@ var labelquantCmd = &cobra.Command{
 }
 
 func init() {
-	labelquantCmd.Flags().StringVarP(&lbl.Plex, "plex", "", "", "number of channels")
-	labelquantCmd.Flags().Float64VarP(&lbl.Tol, "tol", "", 20, "m/z tolerance in ppm")
-	labelquantCmd.Flags().StringVarP(&lbl.Dir, "dir", "", "", "folder path containing the raw files")
-	labelquantCmd.Flags().StringVarP(&lbl.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
-	labelquantCmd.Flags().Float64VarP(&lbl.Purity, "purity", "", 0.5, "ion purity threshold")
-	//labelquantCmd.Flags().StringVarP(&lbl.Brand, "brand", "", "", "type of label (tmt or itraq)")
-	//labelquantCmd.Flags().StringVarP(&lbl.ChanNorm, "normToChannel", "", "", "normalize intensities to a control channel (provide a channel number as control)")
-	//labelquantCmd.Flags().BoolVarP(&lbl.IntNorm, "normToIntensity", "", false, "normalize intensities to the total intensity from all channels")
+
+	if os.Args[1] == "labequant" {
+
+		m.Restore(sys.Meta())
+
+		labelquantCmd.Flags().StringVarP(&m.Quantify.Plex, "plex", "", "", "number of channels")
+		labelquantCmd.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 20, "m/z tolerance in ppm")
+		labelquantCmd.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
+		labelquantCmd.Flags().StringVarP(&m.Quantify.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
+		labelquantCmd.Flags().Float64VarP(&m.Quantify.Purity, "purity", "", 0.5, "ion purity threshold")
+	}
 
 	RootCmd.AddCommand(labelquantCmd)
-
 }

@@ -10,26 +10,9 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/xml"
 )
-
-// Quantify ...
-type Quantify struct {
-	met.Data
-	Phi      string
-	Format   string
-	Dir      string
-	Brand    string
-	Plex     string
-	ChanNorm string
-	RTWin    float64
-	PTWin    float64
-	Tol      float64
-	Purity   float64
-	IntNorm  bool
-}
 
 // Pair struct
 type Pair struct {
@@ -44,29 +27,8 @@ func (p PairList) Len() int           { return len(p) }
 func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-// New constructor
-func New() Quantify {
-
-	var o Quantify
-	var m met.Data
-	m.Restore(sys.Meta())
-
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
-
-	return o
-}
-
 // RunLabelFreeQuantification is the top function for label free quantification
-func (p *Quantify) RunLabelFreeQuantification() *err.Error {
+func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 
 	var evi rep.Evidence
 	e := evi.RestoreGranular()
@@ -97,7 +59,7 @@ func (p *Quantify) RunLabelFreeQuantification() *err.Error {
 }
 
 // RunTMTQuantification is the top function for label quantification
-func (p *Quantify) RunTMTQuantification() error {
+func RunTMTQuantification(p met.Quantify) error {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)

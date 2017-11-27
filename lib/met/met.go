@@ -34,6 +34,7 @@ type Data struct {
 	ProteinProphet ProteinProphet
 	PTMProphet     PTMProphet
 	Filter         Filter
+	Quantify       Quantify
 }
 
 // Database options and parameters
@@ -190,6 +191,21 @@ type Filter struct {
 	Picked   bool
 	Seq      bool
 	Mapmods  bool
+}
+
+// Quantify options and parameters
+type Quantify struct {
+	Phi      string
+	Format   string
+	Dir      string
+	Brand    string
+	Plex     string
+	ChanNorm string
+	RTWin    float64
+	PTWin    float64
+	Tol      float64
+	Purity   float64
+	IntNorm  bool
 }
 
 var err error
