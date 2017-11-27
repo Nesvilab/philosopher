@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/data/pro"
+	"github.com/prvst/philosopher/lib/pro"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 )
