@@ -30,7 +30,7 @@ var abacusCmd = &cobra.Command{
 			logrus.Fatal(err)
 		}
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		logrus.Info("Done")

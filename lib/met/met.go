@@ -37,6 +37,7 @@ type Data struct {
 	Quantify       Quantify
 	Cluster        Cluster
 	Abacus         Abacus
+	Report         Report
 }
 
 // Database options and parameters
@@ -223,6 +224,11 @@ type Abacus struct {
 type Cluster struct {
 	UID   string
 	Level float64
+}
+
+// Report options and parameters
+type Report struct {
+	Decoys bool
 }
 
 var err error

@@ -15,7 +15,6 @@ import (
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
@@ -263,22 +262,9 @@ type MassBin struct {
 // New constructor
 func New() Evidence {
 
-	var o Evidence
-	var m met.Data
-	m.Restore(sys.Meta())
+	var self Evidence
 
-	o.Meta.UUID = m.UUID
-	o.Meta.Distro = m.Distro
-	o.Meta.Home = m.Home
-	o.Meta.MetaFile = m.MetaFile
-	o.Meta.MetaDir = m.MetaDir
-	o.Meta.DB = m.DB
-	o.Meta.Temp = m.Temp
-	o.Meta.TimeStamp = m.TimeStamp
-	o.Meta.OS = m.OS
-	o.Meta.Arch = m.Arch
-
-	return o
+	return self
 }
 
 // AssemblePSMReport ...

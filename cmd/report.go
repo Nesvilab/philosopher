@@ -1,15 +1,14 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
-
-var repo rep.Evidence
 
 // reportCmd represents the report commands
 var reportCmd = &cobra.Command{
@@ -18,14 +17,13 @@ var reportCmd = &cobra.Command{
 	//Long:  `Creates peptide-level and protein-level reportsbased on the experimental results.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m met.Data
-		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 			logrus.Fatal(e.Error())
 		}
 
-		//repo.Restore()
+		var repo = rep.New()
+
 		err := repo.RestoreGranular()
 		if err != nil {
 			logrus.Fatal(err.Error())
@@ -84,6 +82,9 @@ var reportCmd = &cobra.Command{
 			repo.PlotMassHist()
 		}
 
+		// store parameters on meta data
+		m.Serialize()
+
 		logrus.Info("Done")
 		return
 	},
@@ -91,9 +92,12 @@ var reportCmd = &cobra.Command{
 
 func init() {
 
-	repo = rep.New()
+	if os.Args[1] == "report" {
 
-	reportCmd.Flags().BoolVarP(&repo.Decoys, "decoys", "", false, "add decoy observations to reports")
+		m.Restore(sys.Meta())
+
+		reportCmd.Flags().BoolVarP(&m.Report.Decoys, "decoys", "", false, "add decoy observations to reports")
+	}
 
 	RootCmd.AddCommand(reportCmd)
 }
