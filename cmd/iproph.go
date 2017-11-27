@@ -1,15 +1,14 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
-
-var ipt interprophet.InterProphet
 
 // iprophCmd represents the iproph command
 var iprophCmd = &cobra.Command{
@@ -18,50 +17,58 @@ var iprophCmd = &cobra.Command{
 	//Long:  "Multi-level integrative analysis of shotgun proteomic data\niProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var m met.Data
-		m.Restore(sys.Meta())
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
 			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
 			logrus.Fatal(e.Error())
 		}
 
-		var err error
+		logrus.Info("Executing InterProphet")
+		var ipt = interprophet.New()
 
 		// prepare binaries
-		err = ipt.Deploy()
-		if err != nil {
-			logrus.Fatal(err)
+		e := ipt.Deploy(m.OS, m.Distro)
+		if e != nil {
+			logrus.Fatal(e.Message)
 		}
 
 		// run
-		err = ipt.Run(args)
-		if err != nil {
-			logrus.Fatal(err)
+		xml, e := ipt.Run(m.InterProphet, m.Home, m.Temp, args)
+		if e != nil {
+			logrus.Fatal(e.Message)
 		}
 
+		m.InterProphet.InputFiles = args
+
+		_ = xml
+		//evi.IndexIdentification(xml, m.InterProphet.Decoy)
+
+		m.Serialize()
 		logrus.Info("Done")
+
 		return
 	},
 }
 
 func init() {
 
-	ipt = interprophet.New()
+	if os.Args[1] == "iprophet" {
 
-	iprophCmd.Flags().IntVarP(&ipt.Threads, "threads", "", 1, "specify threads to use")
-	iprophCmd.Flags().StringVarP(&ipt.Decoy, "decoy", "", "", "specify the decoy tag")
-	iprophCmd.Flags().Float64VarP(&ipt.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
-	iprophCmd.Flags().StringVarP(&ipt.Output, "output", "", "iproph.pep.xml", "specify output name")
-	iprophCmd.Flags().BoolVarP(&ipt.Length, "length", "", false, "use Peptide Length model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nofpkm, "nofpkm", "", false, "do not use FPKM model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonss, "nonss", "", false, "do not use NSS model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonse, "nonse", "", false, "do not use NSE model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonrs, "nonrs", "", false, "do not use NRS model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonsm, "nonsm", "", false, "do not use NSM model")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonsp, "nonsp", "", false, "do not use NSP model")
-	iprophCmd.Flags().BoolVarP(&ipt.Sharpnse, "sharpnse", "", false, "Use more discriminating model for NSE in SWATH mode")
-	iprophCmd.Flags().BoolVarP(&ipt.Nonsi, "nonsi", "", false, "do not use NSI model")
-	//iprophCmd.Flags().StringVarP(&ipt.Cat, "cat", "", "", "specify file listing peptide categories")
+		m.Restore(sys.Meta())
+
+		iprophCmd.Flags().IntVarP(&m.InterProphet.Threads, "threads", "", 1, "specify threads to use")
+		iprophCmd.Flags().StringVarP(&m.InterProphet.Decoy, "decoy", "", "", "specify the decoy tag")
+		iprophCmd.Flags().Float64VarP(&m.InterProphet.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
+		iprophCmd.Flags().StringVarP(&m.InterProphet.Output, "output", "", "iproph.pep.xml", "specify output name")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Length, "length", "", false, "use Peptide Length model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nofpkm, "nofpkm", "", false, "do not use FPKM model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonss, "nonss", "", false, "do not use NSS model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonse, "nonse", "", false, "do not use NSE model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonrs, "nonrs", "", false, "do not use NRS model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsm, "nonsm", "", false, "do not use NSM model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsp, "nonsp", "", false, "do not use NSP model")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Sharpnse, "sharpnse", "", false, "Use more discriminating model for NSE in SWATH mode")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsi, "nonsi", "", false, "do not use NSI model")
+	}
 
 	RootCmd.AddCommand(iprophCmd)
 }
