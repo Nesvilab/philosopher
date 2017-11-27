@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // Record is the root of all database parsers

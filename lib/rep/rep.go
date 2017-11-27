@@ -12,7 +12,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/cmsl/bio"
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/clas"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/meta"

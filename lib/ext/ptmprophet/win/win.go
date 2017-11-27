@@ -3,7 +3,7 @@ package ptmprophet
 import (
 	"io/ioutil"
 
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // WinPTMProphetParser locates and extracts the PTMProphet binary

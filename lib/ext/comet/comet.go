@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
 	"github.com/prvst/philosopher/lib/meta"

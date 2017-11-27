@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 )

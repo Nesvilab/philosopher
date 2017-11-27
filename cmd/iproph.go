@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"

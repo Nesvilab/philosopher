@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"

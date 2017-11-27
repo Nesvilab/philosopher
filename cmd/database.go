@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"

@@ -15,7 +15,7 @@ import (
 	"github.com/gonum/plot/plotutil"
 	"github.com/gonum/plot/vg"
 	"github.com/prvst/cmsl/data/pep"
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
 )

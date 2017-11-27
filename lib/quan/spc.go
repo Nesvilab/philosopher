@@ -1,7 +1,7 @@
 package quan
 
 import (
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/rep"
 )
 

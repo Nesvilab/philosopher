@@ -10,7 +10,7 @@ import (
 	unix "github.com/prvst/philosopher/lib/ext/ptmprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/ptmprophet/win"
 
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/meta"
 	"github.com/prvst/philosopher/lib/sys"
 )
