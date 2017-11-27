@@ -1,5 +1,5 @@
-// Package utils provides general, low priority methods and functions for different purposes
-package utils
+// Package uti provides general, low priority methods and functions for different purposes
+package uti
 
 import "math"
 

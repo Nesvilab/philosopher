@@ -17,7 +17,7 @@ import (
 	"github.com/prvst/cmsl/data/pep"
 	"github.com/prvst/cmsl/err"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/utils"
+	"github.com/prvst/philosopher/lib/uti"
 )
 
 // PepXML data
@@ -142,17 +142,17 @@ func (p *PepXML) Read(f string) error {
 
 		// internal modifications (variable only)
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
-			p.DefinedModMassDiff[utils.Round(i.Mass, 5, 2)] = i.MassDiff
-			p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = string(i.AminoAcid)
+			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.MassDiff
+			p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = string(i.AminoAcid)
 		}
 
 		// termini modifications
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
-			p.DefinedModMassDiff[utils.Round(i.Mass, 5, 2)] = i.Massdiff
+			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.Massdiff
 			if string(i.Terminus) == "N" {
-				p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = "n"
+				p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = "n"
 			} else if string(i.Terminus) == "C" {
-				p.DefinedModAminoAcid[utils.Round(i.Mass, 5, 2)] = "c"
+				p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = "c"
 			}
 		}
 
@@ -246,24 +246,24 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				pos := fmt.Sprintf("%d", j.Position)
 				psm.ModPositions = append(psm.ModPositions, pos)
 				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(j.Mass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(j.Mass, 5, 2)])
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(j.Mass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(j.Mass, 5, 2)])
 			}
 
 			// n-temrinal modifications
 			if i.ModificationInfo.ModNTermMass != 0 {
 				psm.ModPositions = append(psm.ModPositions, "n")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModNTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
 			}
 
 			// c-terminal modifications
 			if i.ModificationInfo.ModCTermMass != 0 {
 				psm.ModPositions = append(psm.ModPositions, "c")
 				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModCTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[utils.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[utils.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
+				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
+				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
 			}
 
 		}

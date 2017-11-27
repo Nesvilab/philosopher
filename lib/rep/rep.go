@@ -19,7 +19,7 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
-	"github.com/prvst/philosopher/lib/utils"
+	"github.com/prvst/philosopher/lib/uti"
 	"github.com/prvst/philosopher/lib/xml"
 )
 
@@ -623,7 +623,7 @@ func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
 
 		pr.Sequence = i.Peptide
 		pr.ModifiedSequence = i.ModifiedPeptide
-		pr.MZ = utils.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
+		pr.MZ = uti.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
 		pr.ChargeState = i.AssumedCharge
 		pr.PeptideMass = i.CalcNeutralPepMass
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -1601,13 +1601,13 @@ func (e *Evidence) AssembleModificationReport() error {
 		var b MassBin
 
 		b.LowerMass = -(amplitude) - (massWindow * binsize) + (float64(i) * binsize)
-		b.LowerMass = utils.Round(b.LowerMass, 5, 4)
+		b.LowerMass = uti.Round(b.LowerMass, 5, 4)
 
 		b.HigherRight = -(amplitude) + (massWindow * binsize) + (float64(i) * binsize)
-		b.HigherRight = utils.Round(b.HigherRight, 5, 4)
+		b.HigherRight = uti.Round(b.HigherRight, 5, 4)
 
 		b.MassCenter = -(amplitude) + (float64(i) * binsize)
-		b.MassCenter = utils.Round(b.MassCenter, 5, 4)
+		b.MassCenter = uti.Round(b.MassCenter, 5, 4)
 
 		bins = append(bins, b)
 	}
@@ -1665,7 +1665,7 @@ func (e *Evidence) AssembleModificationReport() error {
 			zeroBinMassDeviation = bins[i].AverageMass
 		}
 
-		bins[i].AverageMass = utils.Round(bins[i].AverageMass, 5, 4)
+		bins[i].AverageMass = uti.Round(bins[i].AverageMass, 5, 4)
 	}
 
 	// correcting mass values based on Bin 0 average mass
@@ -1679,7 +1679,7 @@ func (e *Evidence) AssembleModificationReport() error {
 		} else {
 			bins[i].CorrectedMass = bins[i].MassCenter
 		}
-		bins[i].CorrectedMass = utils.Round(bins[i].CorrectedMass, 5, 4)
+		bins[i].CorrectedMass = uti.Round(bins[i].CorrectedMass, 5, 4)
 	}
 
 	//e.Modifications = modEvi

@@ -16,7 +16,7 @@ import (
 	"github.com/prvst/philosopher/lib/quan"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/utils"
+	"github.com/prvst/philosopher/lib/uti"
 	"github.com/prvst/philosopher/lib/xml"
 )
 
@@ -522,13 +522,13 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 	for i := range keys {
 
 		//f := fmt.Sprintf("%.2f", scoreMap[keys[i]]*100)
-		//f := utils.Round(scoreMap[keys[i]]*100, 5, 2)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", utils.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
+		//f := uti.Round(scoreMap[keys[i]]*100, 5, 2)
+		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
 
-		if utils.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
+		if uti.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
 			probList[keys[i]] = 0
 			minProb = keys[i]
-			calcFDR = utils.ToFixed(scoreMap[keys[i]], 4)
+			calcFDR = uti.ToFixed(scoreMap[keys[i]], 4)
 		}
 
 	}
@@ -953,13 +953,13 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 	for i := range keys {
 
 		// for inspections
-		//f := utils.Round(scoreMap[keys[i]]*100, 5, 2)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", utils.ToFixed(scoreMap[keys[i]], 4), "\t", f)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", utils.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
+		//f := uti.Round(scoreMap[keys[i]]*100, 5, 2)
+		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f)
+		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
 
 		probArray = append(probArray, keys[i])
 
-		if utils.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
+		if uti.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
 			probList[keys[i]] = 0
 			minProb = keys[i]
 			calcFDR = scoreMap[keys[i]]
@@ -978,7 +978,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 		err = errors.New(msgProb)
 	}
 
-	fmtScore := utils.ToFixed(curScore, 4)
+	fmtScore := uti.ToFixed(curScore, 4)
 
 	// for inspections
 	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)

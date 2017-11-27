@@ -7,7 +7,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
-	"github.com/prvst/philosopher/lib/utils"
+	"github.com/prvst/philosopher/lib/uti"
 	"github.com/prvst/philosopher/lib/xml"
 )
 
@@ -70,7 +70,7 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 			var mzRatio []float64
 			for k := 1; k <= 6; k++ {
 				r := float64(k) * (float64(1) / float64(ms2.Precursor.ChargeState))
-				mzRatio = append(mzRatio, utils.ToFixed(r, 2))
+				mzRatio = append(mzRatio, uti.ToFixed(r, 2))
 			}
 
 			var isotopePackage = make(map[float64]float64)
@@ -91,7 +91,7 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 			if isotopesInt == 0 {
 				evi[i].Purity = 0
 			} else {
-				evi[i].Purity = utils.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
+				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
 			}
 
 			if evi[i].Purity > 1 {
@@ -1409,38 +1409,38 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 // 		razorRef += evi.Proteins[i].URazorLabels.Channel9.Mean
 // 		razorRef += evi.Proteins[i].URazorLabels.Channel10.Mean
 //
-// 		evi.Proteins[i].TotalLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel1.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel2.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel3.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel4.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel5.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel6.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel7.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel8.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel9.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel10.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel1.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel2.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel3.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel4.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel5.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel6.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel7.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel8.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel9.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel10.Mean/totalRef), 4, 5) * 100)
 //
-// 		evi.Proteins[i].UniqueLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel1.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel2.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel3.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel4.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel5.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel6.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel7.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel8.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel1.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel2.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel3.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel4.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel5.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel6.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel7.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel8.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
 //
-// 		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
 //
 // 	}
 //
@@ -1500,38 +1500,38 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 // 			return evi, errors.New("Cant find the given channel for normalization")
 // 		}
 //
-// 		evi.Proteins[i].TotalLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel1.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel2.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel3.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel4.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel5.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel6.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel7.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel8.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel9.Mean/totalRef), 4, 5) * 100)
-// 		evi.Proteins[i].TotalLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].TotalLabels.Channel10.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel1.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel2.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel3.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel4.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel5.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel6.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel7.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel8.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel9.Mean/totalRef), 4, 5) * 100)
+// 		evi.Proteins[i].TotalLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].TotalLabels.Channel10.Mean/totalRef), 4, 5) * 100)
 //
-// 		evi.Proteins[i].UniqueLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel1.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel2.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel3.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel4.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel5.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel6.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel7.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel8.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
-// 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel1.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel2.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel3.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel4.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel5.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel6.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel7.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel8.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel9.Mean/uniqRef), 4, 5) * 100)
+// 		evi.Proteins[i].UniqueLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].UniqueLabels.Channel10.Mean/uniqRef), 4, 5) * 100)
 //
-// 		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
-// 		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (utils.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel1.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel1.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel2.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel2.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel3.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel3.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel4.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel4.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel5.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel5.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel6.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel6.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel7.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel7.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel8.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel8.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel9.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel9.Mean/razorRef), 4, 5) * 100)
+// 		evi.Proteins[i].URazorLabels.Channel10.RatioIntensity = (uti.Round((evi.Proteins[i].URazorLabels.Channel10.Mean/razorRef), 4, 5) * 100)
 //
 // 	}
 //
