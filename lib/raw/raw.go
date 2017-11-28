@@ -21,9 +21,9 @@ type Data struct {
 // IndexMz receives a list of mz files and creates a binary index for each one
 func IndexMz(f []string) *err.Error {
 
-	var raws Data
-
 	for _, i := range f {
+
+		var d Data
 
 		if strings.Contains(i, "mzml") || strings.Contains(i, "mzML") {
 
@@ -32,14 +32,14 @@ func IndexMz(f []string) *err.Error {
 				return e
 			}
 
-			raws.Raw = raw
+			d.Raw = raw
 
 		} else if strings.Contains(i, "mzxml") || strings.Contains(i, "mzXML") {
 			return &err.Error{Type: err.MethodNotImplemented, Class: err.FATA, Argument: "mzXML reader not implemented"}
 		}
-	}
 
-	raws.Serialize()
+		d.Serialize()
+	}
 
 	return nil
 }
