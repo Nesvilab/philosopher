@@ -199,6 +199,7 @@ type Parameter struct {
 type SpectrumQuery struct {
 	XMLName              xml.Name     `xml:"spectrum_query"`
 	Spectrum             []byte       `xml:"spectrum,attr"`
+	SpectrumNativeID     []byte       `xml:"spectrumNativeID,attr"`
 	StartScan            int          `xml:"start_scan,attr"`
 	EndScan              int          `xml:"end_scan,attr"`
 	PrecursorNeutralMass float64      `xml:"precursor_neutral_mass,attr"`
