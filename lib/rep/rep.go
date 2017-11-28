@@ -343,7 +343,7 @@ func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
 // PSMReport report all psms from study that passed the FDR filter
 func (e *Evidence) PSMReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -446,7 +446,7 @@ func (e *Evidence) PSMReport() {
 // PSMQTMTReport report all psms with TMT labels from study that passed the FDR filter
 func (e *Evidence) PSMQTMTReport() {
 
-	output := fmt.Sprintf("%s%spsm.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -819,7 +819,7 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
-	output := fmt.Sprintf("%s%sion.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -907,7 +907,7 @@ func (e *Evidence) PeptideIonReport() {
 // PeptideIonTMTReport reports the ion table with TMT quantification
 func (e *Evidence) PeptideIonTMTReport() {
 
-	output := fmt.Sprintf("%s%sion.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -1071,7 +1071,7 @@ func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) err
 // PeptideReport reports consist on ion reporting
 func (e *Evidence) PeptideReport() {
 
-	output := fmt.Sprintf("%s%speptide.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -1127,7 +1127,7 @@ func (e *Evidence) PeptideReport() {
 // PeptideTMTReport reports consist on ion reporting
 func (e *Evidence) PeptideTMTReport() {
 
-	output := fmt.Sprintf("%s%speptide.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -1331,7 +1331,7 @@ func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) er
 func (e *Evidence) ProteinReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1437,7 +1437,7 @@ func (e *Evidence) ProteinReport() {
 func (e *Evidence) ProteinTMTReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1446,7 +1446,7 @@ func (e *Evidence) ProteinTMTReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tTotal Intensity\tUnique Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1487,7 +1487,7 @@ func (e *Evidence) ProteinTMTReport() {
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -1505,6 +1505,7 @@ func (e *Evidence) ProteinTMTReport() {
 				uniqIons,                 // Unique Peptide Ions
 				i.TotalSpC,               // Total Spectral Count
 				i.UniqueSpC,              // Unique Spectral Count
+				i.URazorSpC,              //Unique+Razor Spectral Count
 				i.TotalIntensity,         // Total Intensity
 				i.UniqueIntensity,        // Unique Intensity
 				i.URazorLabels.Channel1.Intensity,
@@ -1536,7 +1537,7 @@ func (e *Evidence) ProteinTMTReport() {
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
 func (e *Evidence) ProteinFastaReport() error {
 
-	output := fmt.Sprintf("%s%sproteins.fas", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sproteins.fas", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {
@@ -1772,7 +1773,7 @@ func (e *Evidence) UpdatePeptideModCount() {
 func (e *Evidence) ModificationReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%smodifications.tsv", e.Meta.Temp, string(filepath.Separator))
+	output := fmt.Sprintf("%s%smodifications.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -1813,7 +1814,7 @@ func (e *Evidence) ModificationReport() {
 // PlotMassHist plots the delta mass histogram
 func (e *Evidence) PlotMassHist() error {
 
-	outfile := fmt.Sprintf("%s%sdelta-mass.html", e.Meta.Temp, string(filepath.Separator))
+	outfile := fmt.Sprintf("%s%sdelta-mass.html", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(outfile)
 	if err != nil {
