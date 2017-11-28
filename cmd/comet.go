@@ -39,6 +39,7 @@ var cometCmd = &cobra.Command{
 		cmt.Deploy(m.OS, m.Arch)
 
 		if m.Comet.Print == true {
+			logrus.Info("Printing parameter file")
 			sys.CopyFile(cmt.DefaultParam, filepath.Base(cmt.DefaultParam))
 			return
 		}

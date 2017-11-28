@@ -9,9 +9,9 @@ import (
 
 // Record is the root of all database parsers
 type Record struct {
+	ID               string
 	OriginalHeader   string
 	PartHeader       string
-	ID               string
 	EntryName        string
 	ProteinName      string
 	Organism         string

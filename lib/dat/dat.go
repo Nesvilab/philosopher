@@ -32,8 +32,6 @@ func New() Base {
 
 	var self Base
 
-	self.UniProtDB = ""
-	self.CrapDB = ""
 	self.TaDeDB = make(map[string]string)
 	self.Records = []Record{}
 
