@@ -102,6 +102,9 @@ const (
 
 	// UnknownMultiplex is used when the TMT label setting does not exists
 	UnknownMultiplex string = "unknown multiplex setting"
+
+	// MethodNotImplemented is used when a incomplete or empty method is called
+	MethodNotImplemented string = "method is non-existent"
 )
 
 // Error is the base struct for all errors

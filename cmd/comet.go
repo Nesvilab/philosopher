@@ -8,6 +8,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/comet"
+	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -58,14 +59,14 @@ var cometCmd = &cobra.Command{
 
 		// the indexing will help later in case other commands are used for qunatification
 		// it will provide easy and fast access to mz data
-		logrus.Info("indexing spectra: please wait, this can take a a few minutes")
-		//raw.IndexMz(args)
+		logrus.Info("Indexing spectra: please wait, this can take a a few minutes")
+		raw.IndexMz(args)
 
 		// run comet
-		e = cmt.Run(args, m.Comet.Param)
-		if e != nil {
-			//logrus.Fatal(e)
-		}
+		// e = cmt.Run(args, m.Comet.Param)
+		// if e != nil {
+		// 	//logrus.Fatal(e)
+		// }
 
 		// store paramters on meta data
 		m.Serialize()
