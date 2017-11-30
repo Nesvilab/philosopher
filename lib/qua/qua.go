@@ -36,10 +36,6 @@ func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 		return e
 	}
 
-	if len(evi.Proteins) < 1 {
-		logrus.Fatal("This result file does not contains report data")
-	}
-
 	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
 	if e != nil {
 		return e

@@ -63,7 +63,7 @@ var labelquantCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "labequant" {
+	if os.Args[1] == "labelquant" {
 
 		m.Restore(sys.Meta())
 
