@@ -8,10 +8,10 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
-	"github.com/prvst/philosopher/lib/xml"
 )
 
 // Pair struct
@@ -167,10 +167,10 @@ func RunTMTQuantification(p met.Quantify) error {
 	return nil
 }
 
-func getSpectra(path, format string, spectra string) (xml.Raw, error) {
+func getSpectra(path, format string, spectra string) (id.Raw, error) {
 
 	var err error
-	var mzData xml.Raw
+	var mzData id.Raw
 
 	//ext := filepath.Ext(spectra)
 	//clean := name[0 : len(name)-len(ext)]

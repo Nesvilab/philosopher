@@ -3,12 +3,12 @@ package cla
 import (
 	"strings"
 
-	"github.com/prvst/philosopher/lib/xml"
+	"github.com/prvst/philosopher/lib/id"
 )
 
 // IsDecoyPSM identifies a PSM as target or Decoy based on the
 // presence of the TAG string on <protein> and <alternative_proteins>
-func IsDecoyPSM(p xml.PeptideIdentification, tag string) bool {
+func IsDecoyPSM(p id.PeptideIdentification, tag string) bool {
 
 	// default for TRUE (DECOY)
 	var class = true
@@ -34,7 +34,7 @@ func IsDecoyPSM(p xml.PeptideIdentification, tag string) bool {
 }
 
 // IsDecoyProtein identifies a Protein as target or Decoy based on the decoy tag
-func IsDecoyProtein(p xml.ProteinIdentification, tag string) bool {
+func IsDecoyProtein(p id.ProteinIdentification, tag string) bool {
 
 	// default for TRUE ( DECOY)
 	var class = true

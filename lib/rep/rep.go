@@ -15,11 +15,11 @@ import (
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
 	"github.com/prvst/philosopher/lib/uti"
-	"github.com/prvst/philosopher/lib/xml"
 )
 
 // Evidence ...
@@ -226,7 +226,7 @@ type CombinedEvidence struct {
 	SupportingSpectra      map[string]string
 	ProteinProbability     float64
 	TopPepProb             float64
-	PeptideIons            []xml.PeptideIonIdentification
+	PeptideIons            []id.PeptideIonIdentification
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
@@ -268,7 +268,7 @@ func New() Evidence {
 }
 
 // AssemblePSMReport ...
-func (e *Evidence) AssemblePSMReport(pep xml.PepIDList, decoyTag string) error {
+func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 
 	var list PSMEvidenceList
 
@@ -558,7 +558,7 @@ func (e *Evidence) PSMQTMTReport() {
 }
 
 // AssembleIonReport reports consist on ion reporting
-func (e *Evidence) AssembleIonReport(ion xml.PepIDList, decoyTag string) error {
+func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
@@ -1003,7 +1003,7 @@ func (e *Evidence) PeptideIonTMTReport() {
 }
 
 // AssemblePeptideReport reports consist on ion reporting
-func (e *Evidence) AssemblePeptideReport(pep xml.PepIDList, decoyTag string) error {
+func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) error {
 
 	var list PeptideEvidenceList
 	var pepSeqMap = make(map[string]bool) //is this a decoy
@@ -1190,7 +1190,7 @@ func (e *Evidence) PeptideTMTReport() {
 }
 
 // AssembleProteinReport ...
-func (e *Evidence) AssembleProteinReport(pro xml.ProtIDList, decoyTag string) error {
+func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) error {
 
 	var list ProteinEvidenceList
 	var err error

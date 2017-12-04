@@ -12,10 +12,10 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/fil"
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/xml"
 )
 
 // ExperimentalData ...
@@ -95,7 +95,7 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 		logrus.Fatal("Cannot find combined.prot.xml file")
 	} else {
 
-		var protxml xml.ProtXML
+		var protxml id.ProtXML
 		protxml.Read(a.Comb)
 		protxml.DecoyTag = a.Tag
 

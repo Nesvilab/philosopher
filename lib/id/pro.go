@@ -1,4 +1,4 @@
-package xml
+package id
 
 import (
 	"encoding/gob"

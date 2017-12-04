@@ -12,12 +12,12 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
-	"github.com/prvst/philosopher/lib/xml"
 )
 
 // Run executes the Filter processing
@@ -25,9 +25,9 @@ import (
 func Run(f met.Filter) error {
 
 	e := rep.New()
-	var pepxml xml.PepXML
-	var pep xml.PepIDList
-	var pro xml.ProtIDList
+	var pepxml id.PepXML
+	var pep id.PepIDList
+	var pro id.ProtIDList
 	var err error
 
 	logrus.Info("Processing peptide identification files")
@@ -53,7 +53,7 @@ func Run(f met.Filter) error {
 		if err != nil {
 			return err
 		}
-		//protXML = xml.ProtXML{}
+		//protXML = id.ProtXML{}
 
 		if f.Seq == true {
 
@@ -78,7 +78,7 @@ func Run(f met.Filter) error {
 			if err != nil {
 				return err
 			}
-			pepxml = xml.PepXML{}
+			pepxml = id.PepXML{}
 			pro = nil
 
 		}
@@ -94,13 +94,13 @@ func Run(f met.Filter) error {
 	logrus.Info("Post processing identifications")
 
 	// restoring for the modifications
-	var pxml xml.PepXML
+	var pxml id.PepXML
 	pxml.Restore()
 	e.Mods.DefinedModAminoAcid = pxml.DefinedModAminoAcid
 	e.Mods.DefinedModMassDiff = pxml.DefinedModMassDiff
-	pxml = xml.PepXML{}
+	pxml = id.PepXML{}
 
-	var psm xml.PepIDList
+	var psm id.PepIDList
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Tag)
 	psm = nil
@@ -114,12 +114,12 @@ func Run(f met.Filter) error {
 		e.AssembleModificationReport()
 	}
 
-	var ion xml.PepIDList
+	var ion id.PepIDList
 	ion.Restore("ion")
 	e.AssembleIonReport(ion, f.Tag)
 	ion = nil
 
-	var pept xml.PepIDList
+	var pept id.PepIDList
 	pept.Restore("pep")
 	e.AssemblePeptideReport(pept, f.Tag)
 	pept = nil
@@ -163,10 +163,10 @@ func Run(f met.Filter) error {
 }
 
 // readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, error) {
+func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error) {
 
 	var files []string
-	var pepIdent xml.PepIDList
+	var pepIdent id.PepIDList
 	var definedModMassDiff = make(map[float64]float64)
 	var definedModAminoAcid = make(map[float64]string)
 
@@ -188,7 +188,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, erro
 	}
 
 	for _, i := range files {
-		var p xml.PepXML
+		var p id.PepXML
 		p.DecoyTag = decoyTag
 		e := p.Read(i)
 		if e != nil {
@@ -220,7 +220,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, erro
 	}
 
 	// create a "fake" global pepXML comprising all data
-	var pepXML xml.PepXML
+	var pepXML id.PepXML
 	pepXML.DecoyTag = decoyTag
 	pepXML.PeptideIdentification = pepIdent
 	pepXML.DefinedModAminoAcid = definedModAminoAcid
@@ -237,7 +237,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (xml.PepIDList, erro
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p xml.PepIDList, decoyTag string, psm, peptide, ion float64) error {
+func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) error {
 
 	var err error
 
@@ -312,7 +312,7 @@ func processPeptideIdentifications(p xml.PepIDList, decoyTag string, psm, peptid
 }
 
 // chargeProfile ...
-func chargeProfile(p xml.PepIDList, charge uint8, decoyTag string) (t, d int, err error) {
+func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int, err error) {
 
 	for _, i := range p {
 		if i.AssumedCharge == charge {
@@ -332,9 +332,9 @@ func chargeProfile(p xml.PepIDList, charge uint8, decoyTag string) (t, d int, er
 }
 
 //getUniquePSMs selects only unique pepetide ions for the given data stucture
-func getUniquePSMs(p xml.PepIDList) map[string]xml.PepIDList {
+func getUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
 
-	uniqMap := make(map[string]xml.PepIDList)
+	uniqMap := make(map[string]id.PepIDList)
 
 	for _, i := range p {
 		uniqMap[i.Spectrum] = append(uniqMap[i.Spectrum], i)
@@ -344,7 +344,7 @@ func getUniquePSMs(p xml.PepIDList) map[string]xml.PepIDList {
 }
 
 //getUniquePeptideIons selects only unique pepetide ions for the given data stucture
-func getUniquePeptideIons(p xml.PepIDList) map[string]xml.PepIDList {
+func getUniquePeptideIons(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := ExtractIonsFromPSMs(p)
 
@@ -352,9 +352,9 @@ func getUniquePeptideIons(p xml.PepIDList) map[string]xml.PepIDList {
 }
 
 // ExtractIonsFromPSMs takes a pepidlist and transforms into an ion map
-func ExtractIonsFromPSMs(p xml.PepIDList) map[string]xml.PepIDList {
+func ExtractIonsFromPSMs(p id.PepIDList) map[string]id.PepIDList {
 
-	uniqMap := make(map[string]xml.PepIDList)
+	uniqMap := make(map[string]id.PepIDList)
 
 	for _, i := range p {
 		ion := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
@@ -370,9 +370,9 @@ func ExtractIonsFromPSMs(p xml.PepIDList) map[string]xml.PepIDList {
 }
 
 // getUniquePeptides selects only unique pepetide for the given data stucture
-func getUniquePeptides(p xml.PepIDList) map[string]xml.PepIDList {
+func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 
-	uniqMap := make(map[string]xml.PepIDList)
+	uniqMap := make(map[string]id.PepIDList)
 
 	for _, i := range p {
 		uniqMap[string(i.Peptide)] = append(uniqMap[string(i.Peptide)], i)
@@ -387,14 +387,14 @@ func getUniquePeptides(p xml.PepIDList) map[string]xml.PepIDList {
 }
 
 // pepXMLFDRFilter applies FDR filtering at the PSM level
-func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, decoyTag string) (xml.PepIDList, error) {
+func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, error) {
 
 	//var msg string
 	var targets float64
 	var decoys float64
 	var calcFDR float64
-	var list xml.PepIDList
-	var peplist xml.PepIDList
+	var list id.PepIDList
+	var peplist id.PepIDList
 	var minProb float64 = 10
 	var err error
 
@@ -486,7 +486,7 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 
 	}
 
-	var cleanlist xml.PepIDList
+	var cleanlist id.PepIDList
 	decoys = 0
 	targets = 0
 
@@ -513,9 +513,9 @@ func pepXMLFDRFilter(input map[string]xml.PepIDList, targetFDR float64, level, d
 }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
-func readProtXMLInput(meta, xmlFile, decoyTag string) (xml.ProtXML, error) {
+func readProtXMLInput(meta, xmlFile, decoyTag string) (id.ProtXML, error) {
 
-	var protXML xml.ProtXML
+	var protXML id.ProtXML
 
 	err := protXML.Read(xmlFile)
 	if err != nil {
@@ -533,10 +533,10 @@ func readProtXMLInput(meta, xmlFile, decoyTag string) (xml.ProtXML, error) {
 
 // processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p xml.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor bool) error {
+func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor bool) error {
 
 	var err error
-	var pid xml.ProtIDList
+	var pid id.ProtIDList
 
 	// tagget / decoy / threshold
 	t, d, _ := proteinProfile(p)
@@ -571,7 +571,7 @@ func processProteinIdentifications(p xml.ProtXML, ptFDR, pepProb, protProb float
 }
 
 // proteinProfile ...
-func proteinProfile(p xml.ProtXML) (t, d int, err error) {
+func proteinProfile(p id.ProtXML) (t, d int, err error) {
 
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
@@ -587,7 +587,7 @@ func proteinProfile(p xml.ProtXML) (t, d int, err error) {
 }
 
 // Picked employs the picked FDR strategy
-func pickedFDR(p xml.ProtXML) xml.ProtXML {
+func pickedFDR(p id.ProtXML) id.ProtXML {
 
 	// var appMap = make(map[string]int)
 	var targetMap = make(map[string]float64)
@@ -655,7 +655,7 @@ func pickedFDR(p xml.ProtXML) xml.ProtXML {
 }
 
 // RazorFilter classifies peptides as razor
-func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
+func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
 	//var razorMap = make(map[string]string)
 	var razorMap = make(map[string][]string)
@@ -820,10 +820,10 @@ func RazorFilter(p xml.ProtXML) (xml.ProtXML, error) {
 }
 
 // ProtXMLFilter filters the protein list under a specific fdr
-func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool) (xml.ProtIDList, error) {
+func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool) (id.ProtIDList, error) {
 
 	//var proteinIDs ProtIDList
-	var list xml.ProtIDList
+	var list id.ProtIDList
 	var targets float64
 	var decoys float64
 	var calcFDR float64
@@ -960,7 +960,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 	// for inspections
 	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)
 
-	var cleanlist xml.ProtIDList
+	var cleanlist id.ProtIDList
 	for i := range list {
 		_, ok := probList[list[i].TopPepProb]
 		if ok {
@@ -985,7 +985,7 @@ func ProtXMLFilter(p xml.ProtXML, targetFDR, pepProb, protProb float64, isPicked
 
 // sequentialFDRControl estimates FDR levels by applying a second filter where all
 // proteins from the protein filtered list are matched against filtered PSMs
-func sequentialFDRControl(pep xml.PepIDList, pro xml.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
+func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
 
 	extPep := extractPSMfromPepXML(pep, pro)
 
@@ -1025,7 +1025,7 @@ func sequentialFDRControl(pep xml.PepIDList, pro xml.ProtIDList, psm, peptide, i
 
 // twoDFDRFilter estimates FDR levels by applying a second filter by regenerating
 // a protein list with decoys from protXML and pepXML.
-func twoDFDRFilter(pep xml.PepIDList, pro xml.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
+func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
 
 	// filter protein list at given FDR level and regenerate protein list by adding pairing decoys
 	//logrus.Info("Creating mirror image from filtered protein list")
@@ -1078,11 +1078,11 @@ func twoDFDRFilter(pep xml.PepIDList, pro xml.ProtIDList, psm, peptide, ion floa
 
 // extractPSMfromPepXML retrieves all psm from protxml that maps into pepxml files
 // using protein names from <protein> and <alternative_proteins> tags
-func extractPSMfromPepXML(peplist xml.PepIDList, pro xml.ProtIDList) xml.PepIDList {
+func extractPSMfromPepXML(peplist id.PepIDList, pro id.ProtIDList) id.PepIDList {
 
 	var protmap = make(map[string]uint16)
-	var filterMap = make(map[string]xml.PeptideIdentification)
-	var output xml.PepIDList
+	var filterMap = make(map[string]id.PeptideIdentification)
+	var output id.PepIDList
 
 	// get all protein names from protxml
 	for _, i := range pro {
@@ -1133,13 +1133,13 @@ func extractPSMfromPepXML(peplist xml.PepIDList, pro xml.ProtIDList) xml.PepIDLi
 }
 
 // mirrorProteinList takes a filtered list and regenerate the correspondedn decoys
-func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
+func mirrorProteinList(p id.ProtIDList, decoyTag string) id.ProtIDList {
 
 	var targets = make(map[string]uint8)
 	var decoys = make(map[string]uint8)
 
 	// get filtered list
-	var list xml.ProtIDList
+	var list id.ProtIDList
 	for _, i := range p {
 		if !cla.IsDecoyProtein(i, decoyTag) {
 			list = append(list, i)
@@ -1156,7 +1156,7 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 	}
 
 	// collect all original protein ids in case we need to put them on mirror list
-	var refMap = make(map[string]xml.ProteinIdentification)
+	var refMap = make(map[string]id.ProteinIdentification)
 	for _, i := range p {
 		refMap[i.ProteinName] = i
 	}
@@ -1171,7 +1171,7 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 		if ok {
 			list = append(list, v)
 		} else {
-			var pt xml.ProteinIdentification
+			var pt id.ProteinIdentification
 			pt.ProteinName = decoy
 			list = append(list, pt)
 		}
@@ -1181,7 +1181,7 @@ func mirrorProteinList(p xml.ProtIDList, decoyTag string) xml.ProtIDList {
 }
 
 // proteinProfileWithList ...
-func proteinProfileWithList(list []xml.ProteinIdentification, decoyTag string) (t, d int, err error) {
+func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t, d int, err error) {
 
 	for i := range list {
 		if cla.IsDecoyProtein(list[i], decoyTag) {

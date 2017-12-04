@@ -5,10 +5,10 @@ import (
 	"math"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uti"
-	"github.com/prvst/philosopher/lib/xml"
 )
 
 const (
@@ -16,10 +16,10 @@ const (
 )
 
 // calculateIonPurity verifies how much interference there is on the precursor scans for each fragment
-func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+func calculateIonPurity(d, f string, mzData id.Raw, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	// index spectra in a dictionary
-	var indexedMz = make(map[string]xml.Spectrum)
+	var indexedMz = make(map[string]id.Spectrum)
 	for _, i := range mzData.Spectra {
 
 		if i.Level == "2" && i.Precursor.IsolationWindowLowerOffset == 0 && i.Precursor.IsolationWindowUpperOffset == 0 {
@@ -106,7 +106,7 @@ func calculateIonPurity(d, f string, mzData xml.Raw, evi []rep.PSMEvidence) ([]r
 }
 
 // prepareLabelStructure instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
-func prepareLabelStructure(dir, format, plex string, tol float64, mzData xml.Raw) (map[string]tmt.Labels, error) {
+func prepareLabelStructure(dir, format, plex string, tol float64, mzData id.Raw) (map[string]tmt.Labels, error) {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
