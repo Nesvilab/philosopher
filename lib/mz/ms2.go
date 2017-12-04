@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/mz/mzxml"
 	"github.com/prvst/philosopher/lib/mzm"
+	"github.com/prvst/philosopher/lib/mzx"
 	"github.com/prvst/philosopher/lib/uti"
 	"golang.org/x/net/html/charset"
 )
@@ -313,7 +313,7 @@ func (m *MS2) ReadMzXML(f string) error {
 	decoder := xml.NewDecoder(xmlFile)
 	decoder.CharsetReader = charset.NewReaderLabel
 
-	var mz mzxml.MzXML
+	var mz mzx.MzXML
 	if err = decoder.Decode(&mz); err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func (m *MS2) ReadMzXML(f string) error {
 			var peaklist []float64
 			var intlist []float64
 
-			covertedPeaks, err := mzxml.Decode(i.Peaks)
+			covertedPeaks, err := mzx.Decode(i.Peaks)
 			if err != nil {
 				return err
 			}
@@ -379,7 +379,7 @@ func (m *MS2) ReadMzXML(f string) error {
 }
 
 // GetMzXMLMS2Spectra parses only MS2 data from mzXML
-func GetMzXMLMS2Spectra(mz mzxml.MzXML, cleanFileName string) (MS2, error) {
+func GetMzXMLMS2Spectra(mz mzx.MzXML, cleanFileName string) (MS2, error) {
 
 	var m MS2
 
@@ -408,7 +408,7 @@ func GetMzXMLMS2Spectra(mz mzxml.MzXML, cleanFileName string) (MS2, error) {
 			var peaklist []float64
 			var intlist []float64
 
-			covertedPeaks, err := mzxml.Decode(i.Peaks)
+			covertedPeaks, err := mzx.Decode(i.Peaks)
 			if err != nil {
 				return m, err
 			}

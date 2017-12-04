@@ -1,4 +1,4 @@
-package mzxml
+package mzx
 
 import (
 	"bytes"
