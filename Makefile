@@ -18,7 +18,7 @@ deps:
 	go get github.com/mitchellh/gox
 	go get github.com/inconshreveable/mousetrap
 	go get github.com/Sirupsen/logrus
-	go get github.com/gonum/plot
+	go get github.com/gonum/plot/
 	go get github.com/gonum/plot/plotter
 	go get github.com/gonum/plot/plotutil
 	go get github.com/gonum/plot/vg
