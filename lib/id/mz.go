@@ -11,7 +11,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/mz/mzml"
+	"github.com/prvst/philosopher/lib/mzm"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -66,7 +66,7 @@ func (s *Raw) Read(f, t string) error {
 
 	if t == "mzML" {
 
-		var mz mzml.IndexedMzML
+		var mz mzm.IndexedMzML
 		e := mz.Parse(f)
 		if e != nil {
 			return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: filepath.Base(f)}

@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/mz/mzml"
 	"github.com/prvst/philosopher/lib/mz/mzxml"
+	"github.com/prvst/philosopher/lib/mzm"
 	"github.com/prvst/philosopher/lib/uti"
 	"golang.org/x/net/html/charset"
 )
@@ -60,7 +60,7 @@ func (m *MS2) ReadMzML(f string) error {
 
 	m.Ms2Scan = make(map[string]Ms2Scan)
 
-	var mz mzml.IndexedMzML
+	var mz mzm.IndexedMzML
 	err := mz.Parse(f)
 	if err != nil {
 		return err
@@ -164,12 +164,12 @@ func (m *MS2) ReadMzML(f string) error {
 					ms2.Precursor = prec
 				}
 
-				mzPeaks, err := mzml.Decode("mz", i.BinaryDataArrayList.BinaryDataArray[0])
+				mzPeaks, err := mzm.Decode("mz", i.BinaryDataArrayList.BinaryDataArray[0])
 				if err != nil {
 					return err
 				}
 
-				mzIntensities, err := mzml.Decode("int", i.BinaryDataArrayList.BinaryDataArray[1])
+				mzIntensities, err := mzm.Decode("int", i.BinaryDataArrayList.BinaryDataArray[1])
 				if err != nil {
 					return err
 				}
@@ -195,7 +195,7 @@ func (m *MS2) ReadMzML(f string) error {
 }
 
 // GetMzMLMS2Spectra parses only MS2 data from mzML
-func GetMzMLMS2Spectra(mz mzml.IndexedMzML, cleanFileName string) (MS2, error) {
+func GetMzMLMS2Spectra(mz mzm.IndexedMzML, cleanFileName string) (MS2, error) {
 
 	var m MS2
 	m.Ms2Scan = make(map[string]Ms2Scan)
@@ -264,12 +264,12 @@ func GetMzMLMS2Spectra(mz mzml.IndexedMzML, cleanFileName string) (MS2, error) {
 					ms2.Precursor = prec
 				}
 
-				mzPeaks, err := mzml.Decode("mz", i.BinaryDataArrayList.BinaryDataArray[0])
+				mzPeaks, err := mzm.Decode("mz", i.BinaryDataArrayList.BinaryDataArray[0])
 				if err != nil {
 					return m, err
 				}
 
-				mzIntensities, err := mzml.Decode("int", i.BinaryDataArrayList.BinaryDataArray[1])
+				mzIntensities, err := mzm.Decode("int", i.BinaryDataArrayList.BinaryDataArray[1])
 				if err != nil {
 					return m, err
 				}

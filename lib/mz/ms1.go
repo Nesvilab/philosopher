@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/mz/mzml"
 	"github.com/prvst/philosopher/lib/mz/mzxml"
+	"github.com/prvst/philosopher/lib/mzm"
 	"github.com/prvst/philosopher/lib/uti"
 )
 
@@ -54,7 +54,7 @@ func (m *MS1) ReadMzML(f string) *err.Error {
 	name := filepath.Base(f)
 	cleanFileName := name[0 : len(name)-len(ext)]
 
-	var mz mzml.IndexedMzML
+	var mz mzm.IndexedMzML
 	e = mz.Parse(f)
 	if e != nil {
 		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "mzML"}
@@ -102,7 +102,7 @@ func (m *MS1) ReadMzML(f string) *err.Error {
 }
 
 // GetMzMLSpectra parses only MS1 data from mzML
-func GetMzMLSpectra(mz mzml.IndexedMzML, cleanFileName string) (MS1, error) {
+func GetMzMLSpectra(mz mzm.IndexedMzML, cleanFileName string) (MS1, error) {
 
 	var m MS1
 
