@@ -55,7 +55,7 @@ var iprophCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "iprophet" {
+	if len(os.Args) > 1 && os.Args[1] == "iprophet" {
 
 		m.Restore(sys.Meta())
 

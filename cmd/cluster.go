@@ -34,7 +34,7 @@ var clusterCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "cluster" {
+	if len(os.Args) > 1 && os.Args[1] == "cluster" {
 
 		m.Restore(sys.Meta())
 

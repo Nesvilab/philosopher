@@ -82,7 +82,7 @@ var databaseCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "database" {
+	if len(os.Args) > 1 && os.Args[1] == "database" {
 
 		m.Restore(sys.Meta())
 

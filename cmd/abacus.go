@@ -40,7 +40,7 @@ var abacusCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "abacus" {
+	if len(os.Args) > 1 && os.Args[1] == "abacus" {
 
 		m.Restore(sys.Meta())
 

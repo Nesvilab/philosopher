@@ -50,7 +50,7 @@ var ptmprophetCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "ptmprophet" {
+	if len(os.Args) > 1 && os.Args[1] == "ptmprophet" {
 
 		m.Restore(sys.Meta())
 

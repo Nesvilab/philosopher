@@ -50,7 +50,7 @@ var freequant = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "freequant" {
+	if len(os.Args) > 1 && os.Args[1] == "freequant" {
 
 		m.Restore(sys.Meta())
 

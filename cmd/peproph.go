@@ -58,7 +58,7 @@ var peprophCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "peptideprophet" {
+	if len(os.Args) > 1 && os.Args[1] == "peptideprophet" {
 
 		m.Restore(sys.Meta())
 

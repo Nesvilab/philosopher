@@ -77,7 +77,7 @@ var cometCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "comet" {
+	if len(os.Args) > 1 && os.Args[1] == "comet" {
 
 		m.Restore(sys.Meta())
 

@@ -59,7 +59,7 @@ var filterCmd = &cobra.Command{
 
 func init() {
 
-	if os.Args[1] == "filter" {
+	if len(os.Args) > 1 && os.Args[1] == "filter" {
 
 		m.Restore(sys.Meta())
 
