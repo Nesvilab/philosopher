@@ -27,6 +27,8 @@ var freequant = &cobra.Command{
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
 
+		logrus.Info("Executing label-free quantification")
+
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {

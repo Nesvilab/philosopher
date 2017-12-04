@@ -22,6 +22,8 @@ var filterCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		logrus.Info("Executing filter")
+
 		/// clean, clean clean
 		os.RemoveAll(sys.EvBin())
 		os.RemoveAll(sys.EvIonBin())

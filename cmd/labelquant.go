@@ -26,6 +26,7 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
 
+		logrus.Info("Executing label-based quantification")
 		// hardcoded tmt for now
 		m.Quantify.Brand = "tmt"
 

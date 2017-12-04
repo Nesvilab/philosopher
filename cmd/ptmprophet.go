@@ -22,6 +22,7 @@ var ptmprophetCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		logrus.Info("Executing PTMProphet")
 		var ptm = ptmprophet.New()
 
 		// deploy the binaries

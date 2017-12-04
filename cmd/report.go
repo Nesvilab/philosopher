@@ -22,6 +22,7 @@ var reportCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		logrus.Info("Executing report")
 		var repo = rep.New()
 
 		err := repo.RestoreGranular()

@@ -22,7 +22,7 @@ var proprophCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		logrus.Info("Executing PeptideProphet")
+		logrus.Info("Executing ProteinProphet")
 		var pop = proteinprophet.New()
 
 		if len(args) < 1 {

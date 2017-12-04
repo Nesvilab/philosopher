@@ -25,6 +25,10 @@ var iprophCmd = &cobra.Command{
 		logrus.Info("Executing InterProphet")
 		var ipt = interprophet.New()
 
+		if len(args) < 1 {
+			logrus.Fatal("No input file provided")
+		}
+
 		// prepare binaries
 		e := ipt.Deploy(m.OS, m.Distro)
 		if e != nil {
