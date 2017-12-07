@@ -117,6 +117,7 @@ func Restore(f string) (*Data, *err.Error) {
 	var name = f[0 : len(f)-len(extension)]
 
 	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
+
 	file, _ := os.Open(input)
 
 	dec := msgpack.NewDecoder(file)
@@ -126,6 +127,55 @@ func Restore(f string) (*Data, *err.Error) {
 	}
 
 	return &data, nil
+}
+
+// RestoreFromFile reads the mz information directly from a mz file, not from indxed binaries
+func RestoreFromFile(dir, f, format string) (*Data, *err.Error) {
+
+	var d Data
+
+	fullPath := fmt.Sprintf("%s%s%s.%s", dir, string(filepath.Separator), f, format)
+
+	if format == "mzML" {
+
+		raw := &mz.Raw{}
+		raw.FileName = f
+
+		e := raw.ParRead(fullPath)
+		if e != nil {
+			return &d, e
+		}
+
+		s := make(map[interface{}]interface{})
+		raw.RefSpectra.Range(func(k, v interface{}) bool {
+			s[k] = v
+			return true
+		})
+
+		for _, v := range s {
+
+			var spectrum mz.Spectrum
+			spectrum.Index = v.(mz.Spectrum).Index
+			spectrum.Level = v.(mz.Spectrum).Level
+			spectrum.Intensities = v.(mz.Spectrum).Intensities
+			spectrum.Peaks = v.(mz.Spectrum).Peaks
+			spectrum.Precursor = v.(mz.Spectrum).Precursor
+			spectrum.Scan = v.(mz.Spectrum).Scan
+			spectrum.StartTime = v.(mz.Spectrum).StartTime
+
+			raw.Spectra = append(raw.Spectra, spectrum)
+		}
+
+		d.Raw = raw
+
+		s = nil
+		raw = nil
+
+	} else if strings.Contains(f, "mzxml") || strings.Contains(f, "mzXML") {
+		return &d, &err.Error{Type: err.MethodNotImplemented, Class: err.FATA, Argument: "mzXML reader not implemented"}
+	}
+
+	return &d, nil
 }
 
 // GetMS1 from Spectral Data

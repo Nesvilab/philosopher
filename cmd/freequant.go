@@ -38,7 +38,10 @@ var freequant = &cobra.Command{
 		}
 
 		// run label-free quantification
-		qua.RunLabelFreeQuantification(m.Quantify)
+		e := qua.RunLabelFreeQuantification(m.Quantify)
+		if e != nil {
+			logrus.Fatal(e.Error())
+		}
 
 		// store paramters on meta data
 		m.Serialize()

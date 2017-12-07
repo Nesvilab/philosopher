@@ -1,7 +1,10 @@
 package qua
 
 import (
+	"fmt"
 	"math"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -10,14 +13,15 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // peakIntensity collects PSM intensities from the apex peak
-func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
+func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
 
 	// collect all source file names present on the PSM list
 	var sourceMap = make(map[string]uint8)
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		specName := strings.Split(i.Spectrum, ".")
 		sourceMap[specName[0]] = 0
 	}
@@ -25,31 +29,52 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 	logrus.Info("Reading spectra and tracing peaks")
 	for k := range sourceMap {
 
-		// get all MS1 spectra
-		spec, err := raw.Restore(k)
-		if err != nil {
-			return e, err
-		}
-		ms1 := raw.GetMS1(spec)
+		var ms1 raw.MS1
 
-		for i := range e.PSM {
+		// get the clean name, remove the extension
+		var extension = filepath.Ext(filepath.Base(k))
+		var name = k[0 : len(k)-len(extension)]
+		input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
+
+		// get all MS1 spectra
+		if _, e := os.Stat(input); e == nil {
+
+			spec, e := raw.Restore(k)
+			if e != nil {
+				return evi, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
+			}
+
+			ms1 = raw.GetMS1(spec)
+
+		} else {
+
+			spec, rer := raw.RestoreFromFile(dir, k, format)
+			if rer != nil {
+				return evi, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
+			}
+
+			ms1 = raw.GetMS1(spec)
+			fmt.Println(spec.Raw.FileName)
+		}
+
+		for i := range evi.PSM {
 
 			// process pepXML information
 			ppmPrecision := tol / math.Pow(10, 6)
-			mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
-			minRT := (e.PSM[i].RetentionTime / 60) - rTWin
-			maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
+			mz := ((evi.PSM[i].PrecursorNeutralMass + (float64(evi.PSM[i].AssumedCharge) * bio.Proton)) / float64(evi.PSM[i].AssumedCharge))
+			minRT := (evi.PSM[i].RetentionTime / 60) - rTWin
+			maxRT := (evi.PSM[i].RetentionTime / 60) + rTWin
 
 			var measured = make(map[float64]float64)
 			var retrieved bool
 
 			// XIC on MS1 level
-			if strings.Contains(e.PSM[i].Spectrum, k) {
+			if strings.Contains(evi.PSM[i].Spectrum, k) {
 				measured, retrieved = xic(ms1.Ms1Scan, minRT, maxRT, ppmPrecision, mz)
 			}
 
 			if retrieved == true {
-				var timeW = e.PSM[i].RetentionTime / 60
+				var timeW = evi.PSM[i].RetentionTime / 60
 				var topI = 0.0
 
 				for k, v := range measured {
@@ -60,14 +85,14 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 					}
 				}
 
-				e.PSM[i].Intensity = topI
+				evi.PSM[i].Intensity = topI
 			}
 
 		}
 
 	}
 
-	return e, nil
+	return evi, nil
 }
 
 // xic extract ion chomatograms
