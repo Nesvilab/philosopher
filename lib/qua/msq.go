@@ -1,61 +1,68 @@
 package qua
 
 import (
-	"fmt"
 	"math"
-	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/mz"
+	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
 )
 
 // peakIntensity collects PSM intensities from the apex peak
 func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
 
-	// get all spectra in centralized structure
-	logrus.Info("Reading spectra")
-	ms1Map, err := getMS1Spectra(dir, format, e.PSM)
-	if err != nil {
-		return e, err
+	// collect all source file names present on the PSM list
+	var sourceMap = make(map[string]uint8)
+	for _, i := range e.PSM {
+		specName := strings.Split(i.Spectrum, ".")
+		sourceMap[specName[0]] = 0
 	}
 
-	logrus.Info("Tracing Peaks")
-	for i := range e.PSM {
+	logrus.Info("Reading spectra and tracing peaks")
+	for k := range sourceMap {
 
-		// process pepXML information
-		ppmPrecision := tol / math.Pow(10, 6)
-		mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
-		minRT := (e.PSM[i].RetentionTime / 60) - rTWin
-		maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
-
-		var measured = make(map[float64]float64)
-		var retrieved bool
-
-		// XIC on MS1 level
-		for k, j := range ms1Map {
-			if strings.Contains(e.PSM[i].Spectrum, k) {
-				measured, retrieved = xic(j, minRT, maxRT, ppmPrecision, mz)
-			}
+		// get all MS1 spectra
+		spec, err := raw.Restore(k)
+		if err != nil {
+			return e, err
 		}
+		ms1 := raw.GetMS1(spec)
 
-		if retrieved == true {
-			var timeW = e.PSM[i].RetentionTime / 60
-			var topI = 0.0
+		for i := range e.PSM {
 
-			for k, v := range measured {
-				if k > (timeW-pTWin) && k < (timeW+pTWin) {
-					if v > topI {
-						topI = v
+			// process pepXML information
+			ppmPrecision := tol / math.Pow(10, 6)
+			mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
+			minRT := (e.PSM[i].RetentionTime / 60) - rTWin
+			maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
+
+			var measured = make(map[float64]float64)
+			var retrieved bool
+
+			// XIC on MS1 level
+			if strings.Contains(e.PSM[i].Spectrum, k) {
+				measured, retrieved = xic(ms1.Ms1Scan, minRT, maxRT, ppmPrecision, mz)
+			}
+
+			if retrieved == true {
+				var timeW = e.PSM[i].RetentionTime / 60
+				var topI = 0.0
+
+				for k, v := range measured {
+					if k > (timeW-pTWin) && k < (timeW+pTWin) {
+						if v > topI {
+							topI = v
+						}
 					}
 				}
+
+				e.PSM[i].Intensity = topI
 			}
 
-			e.PSM[i].Intensity = topI
 		}
 
 	}
@@ -63,97 +70,8 @@ func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64
 	return e, nil
 }
 
-// getMS1Spectra gets MS1 infor from spectra files
-func getMS1Spectra(path, format string, pep rep.PSMEvidenceList) (map[string][]mz.Ms1Scan, *err.Error) {
-
-	// get the name of all raw files used in the experiment from pepxml
-	var spec = make(map[string][]mz.Ms1Scan)
-	var mzs = make(map[string]int)
-
-	// collects all mz file names from identified spectra
-	for _, i := range pep {
-		specName := strings.Split(i.Spectrum, ".")
-		source := fmt.Sprintf("%s.%s", specName[0], format)
-		mzs[source]++
-	}
-
-	for k := range mzs {
-
-		ext := filepath.Ext(k)
-		name := filepath.Base(k)
-		clean := name[0 : len(name)-len(ext)]
-		fullpath, _ := filepath.Abs(path)
-		name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
-
-		var ms1Reader mz.MS1
-
-		if strings.Contains(k, "mzML") {
-			err := ms1Reader.ReadMzML(name)
-			if err != nil {
-				return spec, err
-			}
-		} else if strings.Contains(k, "mzXML") {
-			err := ms1Reader.ReadMzXML(name)
-			if err != nil {
-				return spec, err
-			}
-		} else {
-			logrus.Fatal("Cannot open file: ", name)
-		}
-
-		spec[clean] = ms1Reader.Ms1Scan
-
-	}
-
-	return spec, nil
-}
-
-// getMS2Spectra gets MS1 infor from spectra files
-func getMS2Spectra(path, format string, pep rep.PSMEvidenceList) (map[string]map[string]mz.Ms2Scan, error) {
-
-	// get the name of all raw files used in the experiment from pepxml
-	spec := make(map[string]map[string]mz.Ms2Scan)
-	var mzs = make(map[string]int)
-
-	for _, i := range pep {
-		specName := strings.Split(i.Spectrum, ".")
-		source := fmt.Sprintf("%s.%s", specName[0], format)
-		mzs[source]++
-	}
-
-	for k := range mzs {
-
-		ext := filepath.Ext(k)
-		name := filepath.Base(k)
-		clean := name[0 : len(name)-len(ext)]
-		fullpath, _ := filepath.Abs(path)
-		name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
-
-		if strings.Contains(k, "mzML") {
-
-			var ms2Reader mz.MS2
-			err := ms2Reader.ReadMzML(name)
-			if err != nil {
-				return spec, err
-			}
-			spec[clean] = ms2Reader.Ms2Scan
-
-		} else if strings.Contains(k, "mzXML") {
-
-			var ms2Reader mz.MS2
-			ms2Reader.ReadMzXML(name)
-			spec[clean] = ms2Reader.Ms2Scan
-
-		} else {
-			logrus.Fatal("Cannot open file: ", name)
-		}
-	}
-
-	return spec, nil
-}
-
 // xic extract ion chomatograms
-func xic(v []mz.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]float64, bool) {
+func xic(v []raw.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
 
@@ -302,3 +220,152 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	return e, nil
 }
+
+// func peakIntensity(e rep.Evidence, dir, format string, rTWin, pTWin, tol float64) (rep.Evidence, *err.Error) {
+//
+// 	var sourceMap = make(map[string]uint8)
+// 	// collect all used source file names
+// 	for _, i := range e.PSM {
+// 		specName := strings.Split(i.Spectrum, ".")
+// 		source := fmt.Sprintf("%s.%s", specName[0], format)
+// 		sourceMap[source] = 0
+// 	}
+//
+// 	for k := range sourceMap {
+//
+// 		// get all spectra in centralized structure
+// 		logrus.Info("Reading spectra")
+// 		// ms1Map, err := getMS1Spectra(dir, format, e.PSM)
+// 		// if err != nil {
+// 		// 	return e, err
+// 		// }
+//
+// 		logrus.Info("Tracing Peaks")
+// 		for i := range e.PSM {
+//
+// 			// process pepXML information
+// 			ppmPrecision := tol / math.Pow(10, 6)
+// 			mz := ((e.PSM[i].PrecursorNeutralMass + (float64(e.PSM[i].AssumedCharge) * bio.Proton)) / float64(e.PSM[i].AssumedCharge))
+// 			minRT := (e.PSM[i].RetentionTime / 60) - rTWin
+// 			maxRT := (e.PSM[i].RetentionTime / 60) + rTWin
+//
+// 			var measured = make(map[float64]float64)
+// 			var retrieved bool
+//
+// 			// XIC on MS1 level
+// 			for k, j := range ms1Map {
+// 				if strings.Contains(e.PSM[i].Spectrum, k) {
+// 					measured, retrieved = xic(j, minRT, maxRT, ppmPrecision, mz)
+// 				}
+// 			}
+//
+// 			if retrieved == true {
+// 				var timeW = e.PSM[i].RetentionTime / 60
+// 				var topI = 0.0
+//
+// 				for k, v := range measured {
+// 					if k > (timeW-pTWin) && k < (timeW+pTWin) {
+// 						if v > topI {
+// 							topI = v
+// 						}
+// 					}
+// 				}
+//
+// 				e.PSM[i].Intensity = topI
+// 			}
+//
+// 		}
+//
+// 	}
+//
+// 	return e, nil
+// }
+
+// getMS1Spectra gets MS1 infor from spectra files
+// func getMS1Spectra(path, format string, pep rep.PSMEvidenceList) (map[string][]mz.Ms1Scan, *err.Error) {
+//
+// 	// get the name of all raw files used in the experiment from pepxml
+// 	var spec = make(map[string][]mz.Ms1Scan)
+// 	var mzs = make(map[string]int)
+//
+// 	// collects all mz file names from identified spectra
+// 	for _, i := range pep {
+// 		specName := strings.Split(i.Spectrum, ".")
+// 		source := fmt.Sprintf("%s.%s", specName[0], format)
+// 		mzs[source]++
+// 	}
+//
+// 	for k := range mzs {
+//
+// 		ext := filepath.Ext(k)
+// 		name := filepath.Base(k)
+// 		clean := name[0 : len(name)-len(ext)]
+// 		fullpath, _ := filepath.Abs(path)
+// 		name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
+//
+// 		var ms1Reader mz.MS1
+//
+// 		if strings.Contains(k, "mzML") {
+// 			err := ms1Reader.ReadMzML(name)
+// 			if err != nil {
+// 				return spec, err
+// 			}
+// 		} else if strings.Contains(k, "mzXML") {
+// 			err := ms1Reader.ReadMzXML(name)
+// 			if err != nil {
+// 				return spec, err
+// 			}
+// 		} else {
+// 			logrus.Fatal("Cannot open file: ", name)
+// 		}
+//
+// 		spec[clean] = ms1Reader.Ms1Scan
+//
+// 	}
+//
+// 	return spec, nil
+// }
+
+// getMS2Spectra gets MS1 infor from spectra files
+// func getMS2Spectra(path, format string, pep rep.PSMEvidenceList) (map[string]map[string]mz.Ms2Scan, error) {
+//
+// 	// get the name of all raw files used in the experiment from pepxml
+// 	spec := make(map[string]map[string]mz.Ms2Scan)
+// 	var mzs = make(map[string]int)
+//
+// 	for _, i := range pep {
+// 		specName := strings.Split(i.Spectrum, ".")
+// 		source := fmt.Sprintf("%s.%s", specName[0], format)
+// 		mzs[source]++
+// 	}
+//
+// 	for k := range mzs {
+//
+// 		ext := filepath.Ext(k)
+// 		name := filepath.Base(k)
+// 		clean := name[0 : len(name)-len(ext)]
+// 		fullpath, _ := filepath.Abs(path)
+// 		name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
+//
+// 		if strings.Contains(k, "mzML") {
+//
+// 			var ms2Reader mz.MS2
+// 			err := ms2Reader.ReadMzML(name)
+// 			if err != nil {
+// 				return spec, err
+// 			}
+// 			spec[clean] = ms2Reader.Ms2Scan
+//
+// 		} else if strings.Contains(k, "mzXML") {
+//
+// 			var ms2Reader mz.MS2
+// 			ms2Reader.ReadMzXML(name)
+// 			spec[clean] = ms2Reader.Ms2Scan
+//
+// 		} else {
+// 			logrus.Fatal("Cannot open file: ", name)
+// 		}
+// 	}
+//
+// 	return spec, nil
+// }
