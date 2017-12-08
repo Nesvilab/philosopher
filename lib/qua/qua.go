@@ -2,15 +2,17 @@ package qua
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 )
 
@@ -75,9 +77,7 @@ func RunTMTQuantification(p met.Quantify) error {
 	// collect all used source file names
 	for _, i := range evi.PSM {
 		specName := strings.Split(i.Spectrum, ".")
-		source := fmt.Sprintf("%s.%s", specName[0], p.Format)
-		sourceMap[source] = append(sourceMap[source], i)
-
+		sourceMap[specName[0]] = append(sourceMap[specName[0]], i)
 		psmMap[i.Spectrum] = i
 	}
 
@@ -85,7 +85,9 @@ func RunTMTQuantification(p met.Quantify) error {
 		sourceList = append(sourceList, i)
 	}
 
-	sort.Strings(sourceList)
+	if len(sourceMap) > 1 {
+		sort.Strings(sourceList)
+	}
 
 	logrus.Info("Calculating intensities and ion interference")
 
@@ -93,12 +95,12 @@ func RunTMTQuantification(p met.Quantify) error {
 
 		logrus.Info("Reading ", sourceList[i])
 
-		mz, e := getSpectra(p.Dir, p.Format, sourceList[i])
+		ms1, ms2, e := getSpectra(p.Dir, p.Format, sourceList[i])
 		if e != nil {
 			return e
 		}
 
-		mappedPurity, e := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
+		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, ms1, ms2, sourceMap[sourceList[i]])
 		if e != nil {
 			return e
 		}
@@ -108,92 +110,99 @@ func RunTMTQuantification(p met.Quantify) error {
 			return err
 		}
 
-		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
-		if err != nil {
-			return err
-		}
-
-		for _, j := range mappedPurity {
-			v, ok := psmMap[j.Spectrum]
-			if ok {
-				psm := v
-				psm.Purity = j.Purity
-				psmMap[j.Spectrum] = psm
-			}
-		}
-
-		for _, j := range mappedPSM {
-			v, ok := psmMap[j.Spectrum]
-			if ok {
-				psm := v
-				psm.Labels = j.Labels
-				psmMap[j.Spectrum] = psm
-			}
-		}
-
+		// 	mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		//
+		// 	for _, j := range mappedPurity {
+		// 		v, ok := psmMap[j.Spectrum]
+		// 		if ok {
+		// 			psm := v
+		// 			psm.Purity = j.Purity
+		// 			psmMap[j.Spectrum] = psm
+		// 		}
+		// 	}
+		//
+		// 	for _, j := range mappedPSM {
+		// 		v, ok := psmMap[j.Spectrum]
+		// 		if ok {
+		// 			psm := v
+		// 			psm.Labels = j.Labels
+		// 			psmMap[j.Spectrum] = psm
+		// 		}
+		// 	}
+		//
+		// }
+		//
+		// for i := range evi.PSM {
+		// 	v, ok := psmMap[evi.PSM[i].Spectrum]
+		// 	if ok {
+		// 		evi.PSM[i].Purity = v.Purity
+		// 		evi.PSM[i].Labels = v.Labels
+		// 	}
+		// }
+		//
+		// var spectrumMap = make(map[string]tmt.Labels)
+		// for _, i := range evi.PSM {
+		// 	if i.Purity >= p.Purity {
+		// 		spectrumMap[i.Spectrum] = i.Labels
+		// 	}
 	}
 
-	for i := range evi.PSM {
-		v, ok := psmMap[evi.PSM[i].Spectrum]
-		if ok {
-			evi.PSM[i].Purity = v.Purity
-			evi.PSM[i].Labels = v.Labels
-		}
-	}
-
-	var spectrumMap = make(map[string]tmt.Labels)
-	for _, i := range evi.PSM {
-		if i.Purity >= p.Purity {
-			spectrumMap[i.Spectrum] = i.Labels
-		}
-	}
-
-	evi = rollUpPeptides(evi, spectrumMap)
-
-	evi = rollUpPeptideIons(evi, spectrumMap)
-
-	evi = rollUpProteins(evi, spectrumMap)
-
-	// normalize to the total protein levels
-	logrus.Info("Calculating normalized protein levels")
-	evi = NormToTotalProteins(evi)
-
-	logrus.Info("Saving")
-	e = evi.SerializeGranular()
-	if e != nil {
-		return e
-	}
+	//
+	// evi = rollUpPeptides(evi, spectrumMap)
+	//
+	// evi = rollUpPeptideIons(evi, spectrumMap)
+	//
+	// evi = rollUpProteins(evi, spectrumMap)
+	//
+	// // normalize to the total protein levels
+	// logrus.Info("Calculating normalized protein levels")
+	// evi = NormToTotalProteins(evi)
+	//
+	// logrus.Info("Saving")
+	// e = evi.SerializeGranular()
+	// if e != nil {
+	// 	return e
+	// }
 
 	return nil
 }
 
-func getSpectra(path, format string, spectra string) (id.Raw, error) {
+func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
 
-	var err error
-	var mzData id.Raw
+	var ms1 raw.MS1
+	var ms2 raw.MS2
 
-	//ext := filepath.Ext(spectra)
-	//clean := name[0 : len(name)-len(ext)]
-	name := filepath.Base(spectra)
-	fullpath, _ := filepath.Abs(path)
-	name = fmt.Sprintf("%s%s%s", fullpath, string(filepath.Separator), name)
+	// get the clean name, remove the extension
+	var extension = filepath.Ext(filepath.Base(k))
+	var name = k[0 : len(k)-len(extension)]
+	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
 
-	if strings.Contains(spectra, "mzML") {
+	// get all MS1 spectra
+	if _, e := os.Stat(input); e == nil {
 
-		err = mzData.Read(name, "mzML")
-		if err != nil {
-			return mzData, err
+		spec, e := raw.Restore(k)
+		if e != nil {
+			return ms1, ms2, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
 		}
 
-	} else if strings.Contains(spectra, "mzXML") {
-
-		fmt.Println("NULL")
+		ms1 = raw.GetMS1(spec)
+		ms2 = raw.GetMS2(spec)
 
 	} else {
-		logrus.Fatal("Cannot open file: ", name)
+
+		spec, rer := raw.RestoreFromFile(dir, k, format)
+		if rer != nil {
+			return ms1, ms2, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
+		}
+
+		ms1 = raw.GetMS1(spec)
+		ms2 = raw.GetMS2(spec)
 	}
 
-	return mzData, nil
+	return ms1, ms2, nil
 }
 
 // cleanPreviousData cleans previous label quantifications

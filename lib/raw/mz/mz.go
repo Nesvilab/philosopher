@@ -12,6 +12,7 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/prvst/philosopher/lib/err"
@@ -33,7 +34,7 @@ type Spectrum struct {
 	Index       string
 	Scan        string
 	Level       string
-	StartTime   string
+	StartTime   float64
 	Precursor   Precursor
 	Peaks       Peaks
 	Intensities Intensities
@@ -59,149 +60,173 @@ type Intensities struct {
 type Precursor struct {
 	ParentIndex                string
 	ParentScan                 string
-	ChargeState                string
-	SelectedIon                string
-	TargetIon                  string
-	IsolationWindowLowerOffset string
-	IsolationWindowUpperOffset string
-	PeakIntensity              string
+	ChargeState                int
+	SelectedIon                float64
+	TargetIon                  float64
+	IsolationWindowLowerOffset float64
+	IsolationWindowUpperOffset float64
+	PeakIntensity              float64
 }
 
 // Read is a simple mzML reader
-func (r *Raw) Read(f string) *err.Error {
-
-	xmlFile, e := os.Open(f)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-	}
-	defer xmlFile.Close()
-
-	decoder := xml.NewDecoder((bufio.NewReader(xmlFile)))
-
-	var inElement string
-	for {
-
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
-
-		switch se := t.(type) {
-		case xml.StartElement:
-
-			inElement = se.Name.Local
-
-			if inElement == "spectrum" {
-				var rawSpec mzml.Spectrum
-				decoder.DecodeElement(&rawSpec, &se)
-				_ = decoder.Decode(&se)
-
-				var spec Spectrum
-				spec.Index = string(rawSpec.Index)
-
-				indexStr := string(rawSpec.Index)
-				indexInt, _ := strconv.Atoi(indexStr)
-				indexInt++
-				spec.Scan = string(strconv.Itoa(indexInt))
-
-				for _, j := range rawSpec.CVParam {
-					if string(j.Accession) == "MS:1000511" {
-						spec.Level = string(j.Value)
-					}
-				}
-
-				for _, j := range rawSpec.ScanList.Scan[0].CVParam {
-					if string(j.Accession) == "MS:1000016" {
-						spec.StartTime = string(j.Value)
-					}
-				}
-
-				spec.Precursor = Precursor{}
-				if len(rawSpec.PrecursorList.Precursor) > 0 {
-					for _, j := range rawSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
-						if string(j.Accession) == "MS:1000828" {
-							spec.Precursor.IsolationWindowLowerOffset = string(j.Value)
-						}
-
-						if string(j.Accession) == "MS:1000829" {
-							spec.Precursor.IsolationWindowUpperOffset = string(j.Value)
-						}
-					}
-
-					for _, j := range rawSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
-						if string(j.Accession) == "MS:1000744" {
-							spec.Precursor.SelectedIon = string(j.Value)
-						}
-
-						if string(j.Accession) == "MS:1000041" {
-							spec.Precursor.ChargeState = string(j.Value)
-						}
-
-						if string(j.Accession) == "MS:1000042" {
-							spec.Precursor.PeakIntensity = string(j.Value)
-						}
-					}
-				}
-
-				//TODO TARGETION
-
-				var binPeak Peaks
-				binPeak.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
-				for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[0].CVParam {
-					if string(j.Accession) == "MS:1000523" {
-						binPeak.Precision = "64"
-					} else if string(j.Accession) == "MS:1000521" {
-						binPeak.Precision = "32"
-					}
-
-					if string(j.Accession) == "MS:1000574" {
-						binPeak.Compression = "1"
-					} else if string(j.Accession) == "MS:1000576" {
-						binPeak.Compression = "0"
-					}
-				}
-
-				spec.Peaks = binPeak
-				spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
-				spec.Peaks.Stream = nil
-
-				var binInt Intensities
-				binInt.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
-				for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[1].CVParam {
-					if string(j.Accession) == "MS:1000523" {
-						binInt.Precision = "64"
-					} else if string(j.Accession) == "MS:1000521" {
-						binInt.Precision = "32"
-					}
-
-					if string(j.Accession) == "MS:1000574" {
-						binInt.Compression = "1"
-					} else if string(j.Accession) == "MS:1000576" {
-						binInt.Compression = "0"
-					}
-				}
-
-				spec.Intensities = binInt
-				spec.Intensities.DecodedStream, _ = Decode("int", rawSpec.BinaryDataArrayList.BinaryDataArray[1])
-				spec.Intensities.Stream = nil
-
-				r.Spectra = append(r.Spectra, spec)
-
-				//nil
-				spec = Spectrum{}
-				rawSpec = mzml.Spectrum{}
-			}
-
-		default:
-
-		}
-
-	}
-
-	decoder = nil
-
-	return nil
-}
+// func (r *Raw) Read(f string) *err.Error {
+//
+// 	xmlFile, e := os.Open(f)
+// 	if e != nil {
+// 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+// 	}
+// 	defer xmlFile.Close()
+//
+// 	decoder := xml.NewDecoder((bufio.NewReader(xmlFile)))
+//
+// 	var inElement string
+// 	for {
+//
+// 		t, _ := decoder.Token()
+// 		if t == nil {
+// 			break
+// 		}
+//
+// 		switch se := t.(type) {
+// 		case xml.StartElement:
+//
+// 			inElement = se.Name.Local
+//
+// 			if inElement == "spectrum" {
+// 				var rawSpec mzml.Spectrum
+// 				decoder.DecodeElement(&rawSpec, &se)
+// 				_ = decoder.Decode(&se)
+//
+// 				var spec Spectrum
+// 				spec.Index = string(rawSpec.Index)
+//
+// 				indexStr := string(rawSpec.Index)
+// 				indexInt, _ := strconv.Atoi(indexStr)
+// 				indexInt++
+// 				spec.Scan = string(strconv.Itoa(indexInt))
+//
+// 				for _, j := range rawSpec.CVParam {
+// 					if j.Accession == "MS:1000511" {
+// 						spec.Level = j.Value
+// 					}
+// 				}
+//
+// 				for _, j := range rawSpec.ScanList.Scan[0].CVParam {
+// 					if j.Accession == "MS:1000016" {
+// 						val, e := strconv.ParseFloat(j.Value, 64)
+// 						if e != nil {
+// 							return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 						}
+// 						spec.StartTime = val
+// 					}
+// 				}
+//
+// 				spec.Precursor = Precursor{}
+// 				if len(rawSpec.PrecursorList.Precursor) > 0 {
+// 					for _, j := range rawSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
+// 						if string(j.Accession) == "MS:1000828" {
+// 							val, e := strconv.ParseFloat(j.Value, 64)
+// 							if e != nil {
+// 								return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 							}
+// 							spec.Precursor.IsolationWindowLowerOffset = val
+// 						}
+//
+// 						if string(j.Accession) == "MS:1000829" {
+// 							val, e := strconv.ParseFloat(j.Value, 64)
+// 							if e != nil {
+// 								return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 							}
+// 							spec.Precursor.IsolationWindowUpperOffset = val
+// 						}
+// 					}
+//
+// 					for _, j := range rawSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
+// 						if string(j.Accession) == "MS:1000744" {
+// 							val, e := strconv.ParseFloat(j.Value, 64)
+// 							if e != nil {
+// 								return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 							}
+// 							spec.Precursor.SelectedIon = val
+// 						}
+//
+// 						if string(j.Accession) == "MS:1000041" {
+// 							val, e := strconv.Atoi(j.Value)
+// 							if e != nil {
+// 								return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 							}
+// 							spec.Precursor.ChargeState = val
+// 						}
+//
+// 						if string(j.Accession) == "MS:1000042" {
+// 							val, e := strconv.ParseFloat(j.Value, 64)
+// 							if e != nil {
+// 								return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA, Argument: filepath.Base(f)}
+// 							}
+// 							spec.Precursor.PeakIntensity = val
+// 						}
+// 					}
+// 				}
+//
+// 				//TODO TARGETION
+//
+// 				var binPeak Peaks
+// 				binPeak.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
+// 				for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[0].CVParam {
+// 					if string(j.Accession) == "MS:1000523" {
+// 						binPeak.Precision = "64"
+// 					} else if string(j.Accession) == "MS:1000521" {
+// 						binPeak.Precision = "32"
+// 					}
+//
+// 					if string(j.Accession) == "MS:1000574" {
+// 						binPeak.Compression = "1"
+// 					} else if string(j.Accession) == "MS:1000576" {
+// 						binPeak.Compression = "0"
+// 					}
+// 				}
+//
+// 				spec.Peaks = binPeak
+// 				spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
+// 				spec.Peaks.Stream = nil
+//
+// 				var binInt Intensities
+// 				binInt.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
+// 				for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[1].CVParam {
+// 					if string(j.Accession) == "MS:1000523" {
+// 						binInt.Precision = "64"
+// 					} else if string(j.Accession) == "MS:1000521" {
+// 						binInt.Precision = "32"
+// 					}
+//
+// 					if string(j.Accession) == "MS:1000574" {
+// 						binInt.Compression = "1"
+// 					} else if string(j.Accession) == "MS:1000576" {
+// 						binInt.Compression = "0"
+// 					}
+// 				}
+//
+// 				spec.Intensities = binInt
+// 				spec.Intensities.DecodedStream, _ = Decode("int", rawSpec.BinaryDataArrayList.BinaryDataArray[1])
+// 				spec.Intensities.Stream = nil
+//
+// 				r.Spectra = append(r.Spectra, spec)
+//
+// 				//nil
+// 				spec = Spectrum{}
+// 				rawSpec = mzml.Spectrum{}
+// 			}
+//
+// 		default:
+//
+// 		}
+//
+// 	}
+//
+// 	decoder = nil
+//
+// 	return nil
+// }
 
 // ParRead is a parallel reader implementing sync.Map
 func (r *Raw) ParRead(f string) *err.Error {
@@ -245,144 +270,7 @@ func (r *Raw) ParRead(f string) *err.Error {
 	return nil
 }
 
-// func (r *Raw) ParRead(f string) *err.Error {
-//
-// 	xmlFile, e := os.Open(f)
-// 	if e != nil {
-// 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-// 	}
-// 	defer xmlFile.Close()
-//
-// 	decoder := xml.NewDecoder((bufio.NewReader(xmlFile)))
-//
-// 	var inElement string
-// 	for {
-//
-// 		t, _ := decoder.Token()
-// 		if t == nil {
-// 			break
-// 		}
-//
-// 		switch se := t.(type) {
-// 		case xml.StartElement:
-//
-// 			inElement = se.Name.Local
-//
-// 			if inElement == "spectrum" {
-// 				var rawSpec mzml.Spectrum
-// 				decoder.DecodeElement(&rawSpec, &se)
-//
-// 				go procSpectra(r, rawSpec)
-//
-// 				//_ = decoder.Decode(&se)
-// 				// var spec Spectrum
-// 				// spec.Index = string(rawSpec.Index)
-// 				//
-// 				// indexStr := string(rawSpec.Index)
-// 				// indexInt, _ := strconv.Atoi(indexStr)
-// 				// indexInt++
-// 				// spec.Scan = string(strconv.Itoa(indexInt))
-// 				//
-// 				// for _, j := range rawSpec.CVParam {
-// 				// 	if string(j.Accession) == "MS:1000511" {
-// 				// 		spec.Level = string(j.Value)
-// 				// 	}
-// 				// }
-// 				//
-// 				// for _, j := range rawSpec.ScanList.Scan[0].CVParam {
-// 				// 	if string(j.Accession) == "MS:1000016" {
-// 				// 		spec.StartTime = string(j.Value)
-// 				// 	}
-// 				// }
-// 				//
-// 				// spec.Precursor = Precursor{}
-// 				// if len(rawSpec.PrecursorList.Precursor) > 0 {
-// 				// 	for _, j := range rawSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
-// 				// 		if string(j.Accession) == "MS:1000828" {
-// 				// 			spec.Precursor.IsolationWindowLowerOffset = string(j.Value)
-// 				// 		}
-// 				//
-// 				// 		if string(j.Accession) == "MS:1000829" {
-// 				// 			spec.Precursor.IsolationWindowUpperOffset = string(j.Value)
-// 				// 		}
-// 				// 	}
-// 				//
-// 				// 	for _, j := range rawSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
-// 				// 		if string(j.Accession) == "MS:1000744" {
-// 				// 			spec.Precursor.SelectedIon = string(j.Value)
-// 				// 		}
-// 				//
-// 				// 		if string(j.Accession) == "MS:1000041" {
-// 				// 			spec.Precursor.ChargeState = string(j.Value)
-// 				// 		}
-// 				//
-// 				// 		if string(j.Accession) == "MS:1000042" {
-// 				// 			spec.Precursor.PeakIntensity = string(j.Value)
-// 				// 		}
-// 				// 	}
-// 				// }
-// 				//
-// 				// //TODO TARGETION
-// 				//
-// 				// var binPeak Peaks
-// 				// binPeak.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
-// 				// for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[0].CVParam {
-// 				// 	if string(j.Accession) == "MS:1000523" {
-// 				// 		binPeak.Precision = "64"
-// 				// 	} else if string(j.Accession) == "MS:1000521" {
-// 				// 		binPeak.Precision = "32"
-// 				// 	}
-// 				//
-// 				// 	if string(j.Accession) == "MS:1000574" {
-// 				// 		binPeak.Compression = "1"
-// 				// 	} else if string(j.Accession) == "MS:1000576" {
-// 				// 		binPeak.Compression = "0"
-// 				// 	}
-// 				// }
-// 				//
-// 				// spec.Peaks = binPeak
-// 				// spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
-// 				// spec.Peaks.Stream = nil
-// 				//
-// 				// var binInt Intensities
-// 				// binInt.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
-// 				// for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[1].CVParam {
-// 				// 	if string(j.Accession) == "MS:1000523" {
-// 				// 		binInt.Precision = "64"
-// 				// 	} else if string(j.Accession) == "MS:1000521" {
-// 				// 		binInt.Precision = "32"
-// 				// 	}
-// 				//
-// 				// 	if string(j.Accession) == "MS:1000574" {
-// 				// 		binInt.Compression = "1"
-// 				// 	} else if string(j.Accession) == "MS:1000576" {
-// 				// 		binInt.Compression = "0"
-// 				// 	}
-// 				// }
-// 				//
-// 				// spec.Intensities = binInt
-// 				// spec.Intensities.DecodedStream, _ = Decode("int", rawSpec.BinaryDataArrayList.BinaryDataArray[1])
-// 				// spec.Intensities.Stream = nil
-// 				//
-// 				// r.RefSpectra.Store(spec.Scan, spec)
-// 				//
-// 				// //nil
-// 				// spec = Spectrum{}
-// 				// rawSpec = mzml.Spectrum{}
-// 			}
-//
-// 		default:
-//
-// 		}
-//
-// 	}
-//
-// 	decoder = nil
-//
-// 	return nil
-// }
-
-func procSpectra(r *Raw, rawSpec mzml.Spectrum) {
+func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 
 	var spec Spectrum
 	spec.Index = string(rawSpec.Index)
@@ -400,38 +288,79 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) {
 
 	for _, j := range rawSpec.ScanList.Scan[0].CVParam {
 		if string(j.Accession) == "MS:1000016" {
-			spec.StartTime = string(j.Value)
+			val, e := strconv.ParseFloat(j.Value, 64)
+			if e != nil {
+				return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+			}
+			spec.StartTime = val
 		}
 	}
 
 	spec.Precursor = Precursor{}
 	if len(rawSpec.PrecursorList.Precursor) > 0 {
+
+		// parent index and parent scan
+		ref := strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
+		precRef := strings.Split(ref[2], "=")
+		spec.Precursor.ParentScan = precRef[1]
+		pi, _ := strconv.Atoi(precRef[1])
+		pi = (pi - 1)
+		spec.Precursor.ParentIndex = strconv.Itoa(pi)
+
 		for _, j := range rawSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
+
+			if string(j.Accession) == "MS:1000827" {
+				val, e := strconv.ParseFloat(j.Value, 64)
+				if e != nil {
+					return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+				}
+				spec.Precursor.TargetIon = val
+			}
+
 			if string(j.Accession) == "MS:1000828" {
-				spec.Precursor.IsolationWindowLowerOffset = string(j.Value)
+				val, e := strconv.ParseFloat(j.Value, 64)
+				if e != nil {
+					return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+				}
+				spec.Precursor.IsolationWindowLowerOffset = val
 			}
 
 			if string(j.Accession) == "MS:1000829" {
-				spec.Precursor.IsolationWindowUpperOffset = string(j.Value)
+				val, e := strconv.ParseFloat(j.Value, 64)
+				if e != nil {
+					return nil
+				}
+				spec.Precursor.IsolationWindowUpperOffset = val
 			}
+
 		}
 
 		for _, j := range rawSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
 			if string(j.Accession) == "MS:1000744" {
-				spec.Precursor.SelectedIon = string(j.Value)
+				val, e := strconv.ParseFloat(j.Value, 64)
+				if e != nil {
+					return nil
+				}
+				spec.Precursor.SelectedIon = val
 			}
 
 			if string(j.Accession) == "MS:1000041" {
-				spec.Precursor.ChargeState = string(j.Value)
+				val, e := strconv.Atoi(j.Value)
+				if e != nil {
+					return nil
+				}
+				spec.Precursor.ChargeState = val
 			}
 
 			if string(j.Accession) == "MS:1000042" {
-				spec.Precursor.PeakIntensity = string(j.Value)
+				val, e := strconv.ParseFloat(j.Value, 64)
+				if e != nil {
+					return nil
+				}
+				spec.Precursor.PeakIntensity = val
 			}
 		}
 	}
-
-	//TODO TARGETION
 
 	var binPeak Peaks
 	binPeak.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
@@ -479,7 +408,7 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) {
 	spec = Spectrum{}
 	rawSpec = mzml.Spectrum{}
 
-	return
+	return nil
 }
 
 // Decode processes the binary data

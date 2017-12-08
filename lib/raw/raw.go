@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
@@ -191,12 +190,12 @@ func GetMS1(d *Data) MS1 {
 			scan.Index = i.Index
 			scan.Scan = i.Scan
 
-			time, _ := strconv.ParseFloat(i.StartTime, 64)
+			time := i.StartTime
 			scan.ScanStartTime = time
 
-			var stream Ms1Spectrum
+			var stream Spectrum
 			for m := 0; m <= len(i.Peaks.DecodedStream)-1; m++ {
-				var peak Ms1Peak
+				var peak Peak
 				peak.Mz = i.Peaks.DecodedStream[m]
 				peak.Intensity = i.Intensities.DecodedStream[m]
 				stream = append(stream, peak)
@@ -204,6 +203,48 @@ func GetMS1(d *Data) MS1 {
 
 			scan.Spectrum = stream
 			list.Ms1Scan = append(list.Ms1Scan, scan)
+		}
+	}
+
+	return list
+}
+
+// GetMS2 from Spectral Data
+func GetMS2(d *Data) MS2 {
+
+	var list MS2
+
+	for _, i := range d.Raw.Spectra {
+		if string(i.Level) == "2" {
+
+			var scan Ms2Scan
+
+			scan.Index = i.Index
+			scan.Scan = i.Scan
+
+			time := i.StartTime
+			scan.ScanStartTime = time
+
+			scan.Precursor.ChargeState = i.Precursor.ChargeState
+			scan.Precursor.IsolationWindowLowerOffset = i.Precursor.IsolationWindowLowerOffset
+			scan.Precursor.IsolationWindowUpperOffset = i.Precursor.IsolationWindowUpperOffset
+			scan.Precursor.ParentIndex = i.Precursor.ParentIndex
+			scan.Precursor.ParentScan = i.Precursor.ParentScan
+			scan.Precursor.PeakIntensity = i.Precursor.PeakIntensity
+			scan.Precursor.SelectedIon = i.Precursor.SelectedIon
+			scan.Precursor.TargetIon = i.Precursor.TargetIon
+
+			var stream Spectrum
+			for m := 0; m <= len(i.Peaks.DecodedStream)-1; m++ {
+				var peak Peak
+				peak.Mz = i.Peaks.DecodedStream[m]
+				peak.Intensity = i.Intensities.DecodedStream[m]
+				stream = append(stream, peak)
+			}
+
+			scan.Spectrum = stream
+			list.Ms2Scan = append(list.Ms2Scan, scan)
+
 		}
 	}
 
