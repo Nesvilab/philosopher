@@ -160,6 +160,9 @@ func RunTMTQuantification(p met.Quantify) error {
 		}
 	}
 
+	// forces psms with no label to have 0 intensities
+	evi = correctUnlabelledSpectra(evi)
+
 	evi = rollUpPeptides(evi, spectrumMap)
 
 	evi = rollUpPeptideIons(evi, spectrumMap)

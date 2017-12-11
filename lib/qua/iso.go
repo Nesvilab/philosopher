@@ -345,6 +345,60 @@ func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.P
 	return evi, nil
 }
 
+func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
+
+	for i := range evi.PSM {
+
+		if evi.PSM[i].Spectrum == "20170314_LC_TMTB4_prot_F24_01.17257.17257.3" {
+			fmt.Println(evi.PSM[i].Labels.Channel1.Intensity)
+		}
+
+		var flag = 0
+
+		if len(evi.PSM[i].AssignedMassDiffs) < 1 {
+			evi.PSM[i].Labels.Channel1.Intensity = 0
+			evi.PSM[i].Labels.Channel2.Intensity = 0
+			evi.PSM[i].Labels.Channel3.Intensity = 0
+			evi.PSM[i].Labels.Channel4.Intensity = 0
+			evi.PSM[i].Labels.Channel5.Intensity = 0
+			evi.PSM[i].Labels.Channel6.Intensity = 0
+			evi.PSM[i].Labels.Channel7.Intensity = 0
+			evi.PSM[i].Labels.Channel8.Intensity = 0
+			evi.PSM[i].Labels.Channel9.Intensity = 0
+			evi.PSM[i].Labels.Channel10.Intensity = 0
+		} else {
+			for _, j := range evi.PSM[i].AssignedMassDiffs {
+				if j == 229.162932 {
+					flag++
+				}
+			}
+
+			if flag == 0 {
+				evi.PSM[i].Labels.Channel1.Intensity = 0
+				evi.PSM[i].Labels.Channel2.Intensity = 0
+				evi.PSM[i].Labels.Channel3.Intensity = 0
+				evi.PSM[i].Labels.Channel4.Intensity = 0
+				evi.PSM[i].Labels.Channel5.Intensity = 0
+				evi.PSM[i].Labels.Channel6.Intensity = 0
+				evi.PSM[i].Labels.Channel7.Intensity = 0
+				evi.PSM[i].Labels.Channel8.Intensity = 0
+				evi.PSM[i].Labels.Channel9.Intensity = 0
+				evi.PSM[i].Labels.Channel10.Intensity = 0
+			}
+
+		}
+
+		if evi.PSM[i].Spectrum == "20170314_LC_TMTB4_prot_F24_01.17257.17257.3" {
+			fmt.Println(evi.PSM[i].AssignedMassDiffs)
+			fmt.Println(flag)
+			fmt.Println(evi.PSM[i].Labels.Channel1.Intensity)
+		}
+
+	}
+
+	return evi
+}
+
 // rollUpPeptides gathers PSM info and filters them before summing the instensities to the peptide level
 func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]tmt.Labels) rep.Evidence {
 
