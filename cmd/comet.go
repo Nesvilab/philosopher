@@ -63,10 +63,10 @@ var cometCmd = &cobra.Command{
 		raw.IndexMz(args)
 
 		// run comet
-		// e = cmt.Run(args, m.Comet.Param)
-		// if e != nil {
-		// 	//logrus.Fatal(e)
-		// }
+		e = cmt.Run(args, m.Comet.Param)
+		if e != nil {
+			//logrus.Fatal(e)
+		}
 
 		// store paramters on meta data
 		m.Serialize()

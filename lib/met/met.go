@@ -38,6 +38,7 @@ type Data struct {
 	Cluster        Cluster
 	Abacus         Abacus
 	Report         Report
+	Index          Index
 }
 
 // Database options and parameters
@@ -229,6 +230,11 @@ type Cluster struct {
 // Report options and parameters
 type Report struct {
 	Decoys bool
+}
+
+// Index options and parameters
+type Index struct {
+	Spectra string
 }
 
 var err error
