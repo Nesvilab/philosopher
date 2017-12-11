@@ -93,9 +93,12 @@ func RunTMTQuantification(p met.Quantify) error {
 
 	for i := range sourceList {
 
+		var ms1 raw.MS1
+		var ms2 raw.MS2
+
 		logrus.Info("Reading ", sourceList[i])
 
-		ms1, ms2, e := getSpectra(p.Dir, p.Format, sourceList[i])
+		ms1, ms2, e = getSpectra(p.Dir, p.Format, sourceList[i])
 		if e != nil {
 			return e
 		}
@@ -105,67 +108,73 @@ func RunTMTQuantification(p met.Quantify) error {
 			return e
 		}
 
-		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, mz)
+		ms1 = raw.MS1{}
+
+		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, ms2)
 		if err != nil {
 			return err
 		}
 
-		// 	mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		//
-		// 	for _, j := range mappedPurity {
-		// 		v, ok := psmMap[j.Spectrum]
-		// 		if ok {
-		// 			psm := v
-		// 			psm.Purity = j.Purity
-		// 			psmMap[j.Spectrum] = psm
-		// 		}
-		// 	}
-		//
-		// 	for _, j := range mappedPSM {
-		// 		v, ok := psmMap[j.Spectrum]
-		// 		if ok {
-		// 			psm := v
-		// 			psm.Labels = j.Labels
-		// 			psmMap[j.Spectrum] = psm
-		// 		}
-		// 	}
-		//
-		// }
-		//
-		// for i := range evi.PSM {
-		// 	v, ok := psmMap[evi.PSM[i].Spectrum]
-		// 	if ok {
-		// 		evi.PSM[i].Purity = v.Purity
-		// 		evi.PSM[i].Labels = v.Labels
-		// 	}
-		// }
-		//
-		// var spectrumMap = make(map[string]tmt.Labels)
-		// for _, i := range evi.PSM {
-		// 	if i.Purity >= p.Purity {
-		// 		spectrumMap[i.Spectrum] = i.Labels
-		// 	}
+		ms2 = raw.MS2{}
+
+		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
+		if err != nil {
+			return err
+		}
+
+		for _, j := range mappedPurity {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Purity = j.Purity
+				psmMap[j.Spectrum] = psm
+			}
+		}
+		mappedPurity = nil
+
+		for _, j := range mappedPSM {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Labels = j.Labels
+				psmMap[j.Spectrum] = psm
+			}
+		}
+		mappedPSM = nil
+
 	}
 
-	//
-	// evi = rollUpPeptides(evi, spectrumMap)
-	//
-	// evi = rollUpPeptideIons(evi, spectrumMap)
-	//
-	// evi = rollUpProteins(evi, spectrumMap)
-	//
-	// // normalize to the total protein levels
-	// logrus.Info("Calculating normalized protein levels")
-	// evi = NormToTotalProteins(evi)
-	//
-	// logrus.Info("Saving")
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return e
-	// }
+	for i := range evi.PSM {
+		v, ok := psmMap[evi.PSM[i].Spectrum]
+		if ok {
+			evi.PSM[i].Purity = v.Purity
+			evi.PSM[i].Labels = v.Labels
+		}
+	}
+	psmMap = nil
+
+	var spectrumMap = make(map[string]tmt.Labels)
+	for _, i := range evi.PSM {
+		if i.Purity >= p.Purity {
+			spectrumMap[i.Spectrum] = i.Labels
+		}
+	}
+
+	evi = rollUpPeptides(evi, spectrumMap)
+
+	evi = rollUpPeptideIons(evi, spectrumMap)
+
+	evi = rollUpProteins(evi, spectrumMap)
+
+	// normalize to the total protein levels
+	logrus.Info("Calculating normalized protein levels")
+	evi = NormToTotalProteins(evi)
+
+	logrus.Info("Saving")
+	e = evi.SerializeGranular()
+	if e != nil {
+		return e
+	}
 
 	return nil
 }
