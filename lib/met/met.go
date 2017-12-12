@@ -211,6 +211,7 @@ type Quantify struct {
 	Tol      float64
 	Purity   float64
 	IntNorm  bool
+	Unique   bool
 }
 
 // Abacus options ad parameters

@@ -110,30 +110,31 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence                string
-	IonForm                 string
-	ModifiedSequence        string
-	AssignedModifications   map[string]uint16
-	ObservedModifications   map[string]uint16
-	RetentionTime           string
-	Spectra                 map[string]int
-	MappedProteins          map[string]int
-	ChargeState             uint8
-	MZ                      float64
-	PeptideMass             float64
-	PrecursorNeutralMass    float64
-	IsNondegenerateEvidence bool
-	Weight                  float64
-	GroupWeight             float64
-	Intensity               float64
-	Probability             float64
-	Expectation             float64
-	IsURazor                bool
-	IsDecoy                 bool
-	SummedLabelIntensity    float64
-	ModifiedObservations    int
-	UnModifiedObservations  int
-	Labels                  tmt.Labels
+	Sequence               string
+	IonForm                string
+	ModifiedSequence       string
+	RetentionTime          string
+	ChargeState            uint8
+	ModifiedObservations   int
+	UnModifiedObservations int
+	AssignedModifications  map[string]uint16
+	ObservedModifications  map[string]uint16
+	Spectra                map[string]int
+	MappedProteins         map[string]int
+	MZ                     float64
+	PeptideMass            float64
+	PrecursorNeutralMass   float64
+	Weight                 float64
+	GroupWeight            float64
+	Intensity              float64
+	Probability            float64
+	Expectation            float64
+	SummedLabelIntensity   float64
+	IsUnique               bool
+	IsURazor               bool
+	IsDecoy                bool
+	Labels                 tmt.Labels
+	//IsNondegenerateEvidence bool
 }
 
 // IonEvidenceList ...
@@ -666,7 +667,8 @@ func (e *Evidence) UpdateIonStatus() {
 	for _, i := range e.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
-			if j.IsNondegenerateEvidence == true {
+			//if j.IsNondegenerateEvidence == true {
+			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
 			}
 		}
@@ -704,7 +706,8 @@ func (e *Evidence) UpdateIonStatus() {
 
 		_, uOK := uniqueMap[e.Ions[i].IonForm]
 		if uOK {
-			e.Ions[i].IsNondegenerateEvidence = true
+			//e.Ions[i].IsNondegenerateEvidence = true
+			e.Ions[i].IsUnique = true
 		}
 
 		_, rOK := urazorMap[e.Ions[i].IonForm]
@@ -1275,7 +1278,8 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
 				ref.MappedProteins[i.ProteinName]++
-				ref.IsNondegenerateEvidence = k.IsNondegenerateEvidence
+				ref.IsUnique = k.IsUnique
+				//ref.IsNondegenerateEvidence = k.IsNondegenerateEvidence
 
 				if k.Razor == 1 {
 					ref.IsURazor = true
@@ -1411,7 +1415,8 @@ func (e *Evidence) ProteinReport() {
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsNondegenerateEvidence == true {
+			//if j.IsNondegenerateEvidence == true {
+			if j.IsUnique == true {
 				uniqIons++
 			}
 		}
@@ -1471,7 +1476,7 @@ func (e *Evidence) ProteinReport() {
 }
 
 // ProteinTMTReport ...
-func (e *Evidence) ProteinTMTReport() {
+func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
@@ -1511,16 +1516,44 @@ func (e *Evidence) ProteinTMTReport() {
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsNondegenerateEvidence == true {
+			//if j.IsNondegenerateEvidence == true {
+			if j.IsUnique == true {
 				uniqIons++
 			}
 		}
 
 		var razorIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsNondegenerateEvidence == true {
+			//if j.IsNondegenerateEvidence == true {
+			if j.IsUnique == true {
 				razorIons++
 			}
+		}
+
+		// change between Unique+Razor and Unique only based on paramter defined on labelquant
+		var reportIntensities [10]float64
+		if uniqueOnly == true {
+			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
+			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
+			reportIntensities[2] = i.UniqueLabels.Channel3.Intensity
+			reportIntensities[3] = i.UniqueLabels.Channel4.Intensity
+			reportIntensities[4] = i.UniqueLabels.Channel5.Intensity
+			reportIntensities[5] = i.UniqueLabels.Channel6.Intensity
+			reportIntensities[6] = i.UniqueLabels.Channel7.Intensity
+			reportIntensities[7] = i.UniqueLabels.Channel8.Intensity
+			reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
+			reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
+		} else {
+			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
+			reportIntensities[1] = i.URazorLabels.Channel2.Intensity
+			reportIntensities[2] = i.URazorLabels.Channel3.Intensity
+			reportIntensities[3] = i.URazorLabels.Channel4.Intensity
+			reportIntensities[4] = i.URazorLabels.Channel5.Intensity
+			reportIntensities[5] = i.URazorLabels.Channel6.Intensity
+			reportIntensities[6] = i.URazorLabels.Channel7.Intensity
+			reportIntensities[7] = i.URazorLabels.Channel8.Intensity
+			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
+			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
@@ -1546,16 +1579,16 @@ func (e *Evidence) ProteinTMTReport() {
 				i.TotalIntensity,         // Total Intensity
 				i.UniqueIntensity,        // Unique Intensity
 				i.URazorIntensity,        // Razor Intensity
-				i.URazorLabels.Channel1.Intensity,
-				i.URazorLabels.Channel2.Intensity,
-				i.URazorLabels.Channel3.Intensity,
-				i.URazorLabels.Channel4.Intensity,
-				i.URazorLabels.Channel5.Intensity,
-				i.URazorLabels.Channel6.Intensity,
-				i.URazorLabels.Channel7.Intensity,
-				i.URazorLabels.Channel8.Intensity,
-				i.URazorLabels.Channel9.Intensity,
-				i.URazorLabels.Channel10.Intensity,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
 				strings.Join(ip, ", "))
 
 			//			line += "\n"

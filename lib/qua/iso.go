@@ -252,10 +252,6 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 	for i := range evi.PSM {
 
-		if evi.PSM[i].Spectrum == "20170314_LC_TMTB4_prot_F24_01.17257.17257.3" {
-			fmt.Println(evi.PSM[i].Labels.Channel1.Intensity)
-		}
-
 		var flag = 0
 
 		if len(evi.PSM[i].AssignedMassDiffs) < 1 {
@@ -290,13 +286,6 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			}
 
 		}
-
-		if evi.PSM[i].Spectrum == "20170314_LC_TMTB4_prot_F24_01.17257.17257.3" {
-			fmt.Println(evi.PSM[i].AssignedMassDiffs)
-			fmt.Println(flag)
-			fmt.Println(evi.PSM[i].Labels.Channel1.Intensity)
-		}
-
 	}
 
 	return evi
@@ -473,7 +462,8 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]tmt.Labels) rep.Evi
 					evi.Proteins[j].TotalLabels.Channel11.Mz = i.Channel11.Mz
 					evi.Proteins[j].TotalLabels.Channel11.Intensity += i.Channel11.Intensity
 
-					if k.IsNondegenerateEvidence {
+					//if k.IsNondegenerateEvidence {
+					if k.IsUnique {
 						evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
 						evi.Proteins[j].UniqueLabels.Channel1.Mz = i.Channel1.Mz
 						evi.Proteins[j].UniqueLabels.Channel1.Intensity += i.Channel1.Intensity

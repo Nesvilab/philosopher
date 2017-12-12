@@ -188,7 +188,8 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 		for _, k := range e.Proteins[i].TotalPeptideIons {
 			v, ok := intIonMap[k.IonForm]
 			if ok {
-				if k.IsNondegenerateEvidence == true {
+				//if k.IsNondegenerateEvidence == true {
+				if k.IsUnique == true {
 					uniqueInt = append(uniqueInt, v)
 				}
 			}

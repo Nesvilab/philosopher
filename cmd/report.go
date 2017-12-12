@@ -37,7 +37,7 @@ var reportCmd = &cobra.Command{
 
 			if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
 				logrus.Info("Creating Protein TMT report")
-				repo.ProteinTMTReport()
+				repo.ProteinTMTReport(m.Quantify.Unique)
 			} else {
 				logrus.Info("Creating Protein report")
 				repo.ProteinReport()
