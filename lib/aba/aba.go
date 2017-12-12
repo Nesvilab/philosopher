@@ -81,7 +81,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	evidences = sumIntensities(evidences, datasets)
 
-	saveCompareResults(temp, evidences, names)
+	saveCompareResults(temp, evidences, datasets, names)
 
 	return nil
 }
@@ -254,7 +254,7 @@ func sumIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.E
 }
 
 // saveCompareResults creates a single report using 1 or more philosopher result files
-func saveCompareResults(session string, evidences rep.CombinedEvidenceList, namesList []string) {
+func saveCompareResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -319,6 +319,106 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, name
 
 		ip := strings.Join(i.IndiProtein, ", ")
 		line += fmt.Sprintf("%s\t", ip)
+
+		line += "\n"
+		n, err := io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal(n, err)
+		}
+
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// saveCompareTMTResults creates a single report using 1 or more philosopher result files
+func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string) {
+
+	// create result file
+	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+
+	for _, i := range namesList {
+		line += fmt.Sprintf("%s Total Spectral Count\t", i)
+		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
+		line += fmt.Sprintf("%s Razor Spectral Count\t", i)
+		line += fmt.Sprintf("%s Total Intensity\t", i)
+		line += fmt.Sprintf("%s Unique Intensity\t", i)
+		line += fmt.Sprintf("%s Razor Intensity\t", i)
+	}
+
+	line += "Indistinguishable Proteins\t"
+
+	for _, i := range namesList {
+		line += fmt.Sprintf("%s 126 Abundance\t", i)
+		line += fmt.Sprintf("%s 127N Abundance\t", i)
+		line += fmt.Sprintf("%s 127C Abundance\t", i)
+		line += fmt.Sprintf("%s 128N Abundance\t", i)
+		line += fmt.Sprintf("%s 128C Abundance\t", i)
+		line += fmt.Sprintf("%s 129N Abundance\t", i)
+		line += fmt.Sprintf("%s 129C Abundance\t", i)
+		line += fmt.Sprintf("%s 130N Abundance\t", i)
+		line += fmt.Sprintf("%s 130C Abundance\t", i)
+		line += fmt.Sprintf("%s 131N Abundance\t", i)
+	}
+
+	line += "\n"
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		logrus.Fatal(n, err)
+	}
+
+	// organize by group number
+	sort.Sort(evidences)
+
+	for _, i := range evidences {
+
+		var line string
+
+		line += fmt.Sprintf("%d\t", i.GroupNumber)
+
+		line += fmt.Sprintf("%s\t", i.SiblingID)
+
+		line += fmt.Sprintf("%s\t", i.ProteinID)
+
+		line += fmt.Sprintf("%s\t", i.EntryName)
+
+		line += fmt.Sprintf("%s\t", i.GeneNames)
+
+		line += fmt.Sprintf("%d\t", i.Length)
+
+		line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
+
+		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
+
+		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
+
+		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+
+		for _, j := range namesList {
+			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
+		}
+
+		ip := strings.Join(i.IndiProtein, ", ")
+		line += fmt.Sprintf("%s\t", ip)
+
+		// for _, j := range namesList {
+		// 	line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+		// 		datasets[j].Proteins[i].URazorLabels.Channel1.Intensity,
+		// 	)
+		// }
 
 		line += "\n"
 		n, err := io.WriteString(file, line)
