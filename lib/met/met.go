@@ -60,6 +60,7 @@ type Comet struct {
 	ParamFile []byte
 	RawFiles  []string
 	Print     bool
+	NoIndex   bool
 }
 
 // PeptideProphet options and parameters

@@ -57,10 +57,12 @@ var cometCmd = &cobra.Command{
 		}
 		m.Comet.ParamFile = binFile
 
-		// the indexing will help later in case other commands are used for qunatification
-		// it will provide easy and fast access to mz data
-		logrus.Info("Indexing spectra: please wait, this can take a few minutes")
-		raw.IndexMz(args)
+		if m.Comet.NoIndex == false {
+			// the indexing will help later in case other commands are used for qunatification
+			// it will provide easy and fast access to mz data
+			logrus.Info("Indexing spectra: please wait, this can take a few minutes")
+			raw.IndexMz(args)
+		}
 
 		// run comet
 		e = cmt.Run(args, m.Comet.Param)
@@ -83,6 +85,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		cometCmd.Flags().BoolVarP(&m.Comet.Print, "print", "", false, "print a comet.params file")
+		cometCmd.Flags().BoolVarP(&m.Comet.NoIndex, "noindex", "", false, "skip raw file indexing")
 		cometCmd.Flags().StringVarP(&m.Comet.Param, "param", "", "comet.params.txt", "comet parameter file")
 	}
 
