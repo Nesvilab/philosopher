@@ -44,7 +44,7 @@ func Run(f met.Filter) error {
 
 	if len(f.Pox) > 0 {
 
-		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Pox, f.Tag)
+		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Pox, f.Tag, f.Weight)
 		if proerr != nil {
 			return proerr
 		}
@@ -518,7 +518,7 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
-func readProtXMLInput(meta, xmlFile, decoyTag string) (id.ProtXML, error) {
+func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXML, error) {
 
 	var protXML id.ProtXML
 
@@ -528,6 +528,8 @@ func readProtXMLInput(meta, xmlFile, decoyTag string) (id.ProtXML, error) {
 	}
 
 	protXML.DecoyTag = decoyTag
+
+	protXML.MarkUniquePeptides(weight)
 
 	protXML.PromoteProteinIDs()
 

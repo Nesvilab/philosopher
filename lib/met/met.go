@@ -188,6 +188,7 @@ type Filter struct {
 	PtFDR    float64
 	ProtProb float64
 	PepProb  float64
+	Weight   float64
 	TopPep   bool
 	Model    bool
 	RepPSM   bool

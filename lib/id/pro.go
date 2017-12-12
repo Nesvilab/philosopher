@@ -149,16 +149,12 @@ func (p *ProtXML) Read(f string) error {
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Razor = -1
 
-				if string(k.IsNondegenerateEvidence) == "y" || string(k.IsNondegenerateEvidence) == "Y" {
-					pepid.IsNondegenerateEvidence = true
-				}
-
-				// get the number of shared ions
-				if pepid.Weight < 1 {
-					pepid.IsUnique = false
-				} else {
-					pepid.IsUnique = true
-				}
+				// // get the number of shared ions
+				// if pepid.Weight < 1 {
+				// 	pepid.IsUnique = false
+				// } else {
+				// 	pepid.IsUnique = true
+				// }
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
 					pepid.IsNondegenerateEvidence = true
@@ -220,6 +216,22 @@ func (p *ProtXML) PromoteProteinIDs() {
 				p.Groups[i].Proteins[j].ProteinName = ref
 			}
 
+		}
+	}
+
+	return
+}
+
+// MarkUniquePeptides classifies peptides as unique based on a defined threshold
+func (p *ProtXML) MarkUniquePeptides(w float64) {
+
+	for i := range p.Groups {
+		for j := range p.Groups[i].Proteins {
+			for k := range p.Groups[i].Proteins[j].PeptideIons {
+				if p.Groups[i].Proteins[j].PeptideIons[k].Weight >= w {
+					p.Groups[i].Proteins[j].PeptideIons[k].IsUnique = true
+				}
+			}
 		}
 	}
 
