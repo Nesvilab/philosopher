@@ -146,6 +146,11 @@ func Run(f met.Filter) error {
 	logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
 
+	// reorganizes the selected proteins and the alternative proteins list
+	if f.Razor == true {
+		e.UpdateProteinStatus()
+	}
+
 	logrus.Info("Calculating Spectral Counts")
 	e, cerr := qua.CalculateSpectralCounts(e)
 	if cerr != nil {

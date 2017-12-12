@@ -352,7 +352,7 @@ func (e *Evidence) PSMReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tRazor Protein\tMapped Proteins\tProtein\tAlternative Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tIs Unique\tIs Razor\tMapped Proteins\tProtein\tAlternative Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -399,7 +399,7 @@ func (e *Evidence) PSMReport() {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%s\t%d\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%t\t%d\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -426,7 +426,6 @@ func (e *Evidence) PSMReport() {
 			i.LocalizedMassDiff,
 			i.IsUnique,
 			i.IsURazor,
-			i.RazorProtein,
 			len(i.AlternativeProteins)+1, // Mapped Proteins
 			i.Protein,
 			strings.Join(i.AlternativeProteins, ", "),
@@ -760,6 +759,36 @@ func (e *Evidence) UpdateIonModCount() {
 		if ok2 {
 			e.Ions[i].ModifiedObservations = v2
 		}
+
+	}
+
+	return
+}
+
+// UpdateProteinStatus assignes the razor protein to THE protein column and removes it form the alt Protein
+// it basically swiches places with the current protein assignment from pepXML
+func (e *Evidence) UpdateProteinStatus() {
+
+	for i := range e.PSM {
+
+		var altProteins []string
+
+		// push the selected protein to the top fo the list
+		altProteins = append(altProteins, e.PSM[i].Protein)
+
+		// add all the other alternative proteins that do not mach to the razor protein
+		for _, j := range e.PSM[i].AlternativeProteins {
+			if j != e.PSM[i].RazorProtein {
+				altProteins = append(altProteins, j)
+			}
+		}
+
+		// replace the selected protein by the razor one
+		e.PSM[i].Protein = e.PSM[i].RazorProtein
+
+		// replace the alternative proteins list
+		e.PSM[i].AlternativeProteins = nil
+		e.PSM[i].AlternativeProteins = altProteins
 
 	}
 
@@ -1340,7 +1369,7 @@ func (e *Evidence) ProteinReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1387,11 +1416,18 @@ func (e *Evidence) ProteinReport() {
 			}
 		}
 
+		var urazorIons int
+		for _, j := range i.TotalPeptideIons {
+			if j.IsURazor == true {
+				urazorIons++
+			}
+		}
+
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
 			i.ProteinGroup,            // Group
 			i.ProteinSubGroup,         // SubGroup
 			i.ProteinID,               // Protein ID
@@ -1407,6 +1443,7 @@ func (e *Evidence) ProteinReport() {
 			i.UniqueStrippedPeptides,  // Stripped Peptides
 			len(i.TotalPeptideIons),   // Total Peptide Ions
 			uniqIons,                  // Unique Peptide Ions
+			urazorIons,                // Razor Peptide Ions
 			i.TotalSpC,                // Total Spectral Count
 			i.UniqueSpC,               // Unique Spectral Count
 			i.URazorSpC,               // Razor Spectral Count
@@ -1446,7 +1483,7 @@ func (e *Evidence) ProteinTMTReport() {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tRazor Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -1487,7 +1524,7 @@ func (e *Evidence) ProteinTMTReport() {
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -1500,14 +1537,15 @@ func (e *Evidence) ProteinTMTReport() {
 				i.Probability,            // Protein Probability
 				i.TopPepProb,             // Top peptide Probability
 				i.UniqueStrippedPeptides, // Unique Stripped Peptides
-				razorIons,                // Razor peptides
 				len(i.TotalPeptideIons),  // Total peptide Ions
 				uniqIons,                 // Unique Peptide Ions
+				razorIons,                // Unique+Razor peptide Ions
 				i.TotalSpC,               // Total Spectral Count
 				i.UniqueSpC,              // Unique Spectral Count
-				i.URazorSpC,              //Unique+Razor Spectral Count
+				i.URazorSpC,              // Unique+Razor Spectral Count
 				i.TotalIntensity,         // Total Intensity
 				i.UniqueIntensity,        // Unique Intensity
+				i.URazorIntensity,        // Razor Intensity
 				i.URazorLabels.Channel1.Intensity,
 				i.URazorLabels.Channel2.Intensity,
 				i.URazorLabels.Channel3.Intensity,

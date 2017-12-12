@@ -60,7 +60,8 @@ deploy:
 .PHONY: install
 install:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	mv philosopher.${VERSION} ${GOBIN}/philosopher;
+	cp philosopher.${VERSION} ${GOBIN}/philosopher;
+	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 
 .PHONY: linux
 linux:
