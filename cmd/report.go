@@ -46,12 +46,7 @@ var reportCmd = &cobra.Command{
 		}
 
 		// verifying if there is any quantification on labels
-		var lblMarker float64
-		for i := 0; i <= 1000; i++ {
-			lblMarker += repo.PSM[i].Labels.Channel1.Intensity
-		}
-
-		if lblMarker > 0 {
+		if len(m.Quantify.Plex) > 0 {
 
 			logrus.Info("Creating TMT PSM report")
 			repo.PSMQTMTReport()
