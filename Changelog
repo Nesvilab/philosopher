@@ -1,7 +1,21 @@
-## [2.0] - ?
+## [2.1] - ?
 ### Added
 ### Changed
 ### Fixed
+
+## [2.0] - 2017-12-14
+### Added
+- A new parameter on Filter adds more flexibility to the definition of a 'Unique' peptide.
+- A new parameter on labelquant allows to report quantification on 'unique-only' peptides (no razor).
+- Comet function now has an indexing step that creates indexes from mzML files.
+
+### Changed
+- Report and TMT report have their headers fixed, Razor ions are showing again.
+- non-modified peptides are now ignored from the TMT quantification.
+- Speed and efficiency of the labelquant option are now improved, process is faster and memory-efficient.
+
+### Fixed
+- Several bug fixes added to the code.
 
 ## [1.9] - 2017-11-31
 ### Added

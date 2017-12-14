@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/prvst/cmsl/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Init creates a new workspace
 func Init() *err.Error {
 
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	if len(m.UUID) > 1 && len(m.Home) > 1 {
@@ -24,7 +24,7 @@ func Init() *err.Error {
 		return &err.Error{Type: err.CannotStatLocalDirectory, Class: err.FATA, Argument: "check folder permissions"}
 	}
 
-	da := meta.New(dir)
+	da := met.New(dir)
 
 	os.Mkdir(da.MetaDir, 0755)
 	os.Mkdir(da.Temp, 0755)

@@ -1,7 +1,7 @@
 package tmt
 
 import (
-	"github.com/prvst/cmsl/err"
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // Labels main struct

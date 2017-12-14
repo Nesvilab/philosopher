@@ -6,14 +6,14 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/prvst/cmsl/data/mod"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // MOD main structure
 type MOD struct {
-	meta.Data
+	met.Data
 	XMLFile       string
 	Modifications ModList
 }
@@ -76,7 +76,7 @@ func (p ModList) Swap(i, j int) {
 func New() MOD {
 
 	var o MOD
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID

@@ -1,86 +1,60 @@
 package interprophet
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/interprophet/unix"
 	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // InterProphet represents the tool configuration
 type InterProphet struct {
-	meta.Data
 	DefaultInterProphetParser string
 	WinInterProphetParser     string
 	UnixInterProphetParser    string
 	LibgccDLL                 string
 	Zlib1DLL                  string
-	Threads                   int
-	Decoy                     string
-	Cat                       string
-	MinProb                   float64
-	Output                    string
-	Length                    bool
-	Nofpkm                    bool
-	Nonss                     bool
-	Nonse                     bool
-	Nonrs                     bool
-	Nonsm                     bool
-	Nonsp                     bool
-	Sharpnse                  bool
-	Nonsi                     bool
 }
 
 // New constructor
 func New() InterProphet {
 
-	var o InterProphet
-	var m meta.Data
-	m.Restore(sys.Meta())
+	var self InterProphet
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	temp, _ := sys.GetTemp()
 
-	o.UnixInterProphetParser = o.Temp + string(filepath.Separator) + "InterProphetParser"
-	o.WinInterProphetParser = o.Temp + string(filepath.Separator) + "InterProphetParser.exe"
-	o.LibgccDLL = o.Temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
-	o.Zlib1DLL = o.Temp + string(filepath.Separator) + "zlib1.dll"
+	self.UnixInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser"
+	self.WinInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser.exe"
+	self.LibgccDLL = temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
+	self.Zlib1DLL = temp + string(filepath.Separator) + "zlib1.dll"
 
-	return o
+	return self
 }
 
 // Deploy generates comet binary on workdir bin directory
-func (c *InterProphet) Deploy() error {
+func (i *InterProphet) Deploy(os, distro string) *err.Error {
 
-	if c.OS == sys.Windows() {
-		wiPr.WinInterProphetParser(c.WinInterProphetParser)
-		c.DefaultInterProphetParser = c.WinInterProphetParser
-		wiPr.LibgccDLL(c.LibgccDLL)
-		wiPr.Zlib1DLL(c.Zlib1DLL)
+	if os == sys.Windows() {
+		wiPr.WinInterProphetParser(i.WinInterProphetParser)
+		i.DefaultInterProphetParser = i.WinInterProphetParser
+		wiPr.LibgccDLL(i.LibgccDLL)
+		wiPr.Zlib1DLL(i.Zlib1DLL)
 	} else {
-		if strings.EqualFold(c.Distro, sys.Debian()) {
-			unix.UnixInterProphetParser(c.UnixInterProphetParser)
-			c.DefaultInterProphetParser = c.UnixInterProphetParser
-		} else if strings.EqualFold(c.Distro, sys.Redhat()) {
-			unix.UnixInterProphetParser(c.UnixInterProphetParser)
-			c.DefaultInterProphetParser = c.UnixInterProphetParser
+		if strings.EqualFold(distro, sys.Debian()) {
+			unix.UnixInterProphetParser(i.UnixInterProphetParser)
+			i.DefaultInterProphetParser = i.UnixInterProphetParser
+		} else if strings.EqualFold(distro, sys.Redhat()) {
+			unix.UnixInterProphetParser(i.UnixInterProphetParser)
+			i.DefaultInterProphetParser = i.UnixInterProphetParser
 		} else {
-			return errors.New("Unsupported distribution for InterProphet")
+			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy InterProphet"}
 		}
 	}
 
@@ -88,98 +62,102 @@ func (c *InterProphet) Deploy() error {
 }
 
 // Run IProphet ...
-func (c *InterProphet) Run(args []string) error {
+func (i InterProphet) Run(params met.InterProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	// run
-	bin := c.DefaultInterProphetParser
+	bin := i.DefaultInterProphetParser
 	cmd := exec.Command(bin)
-
-	if len(args) < 1 {
-		return errors.New("You need to provide a pepXML file")
-	}
 
 	for i := 0; i <= len(args)-1; i++ {
 		file, _ := filepath.Abs(args[i])
 		cmd.Args = append(cmd.Args, file)
 	}
 
-	if c.Length == true {
+	if params.Length == true {
 		cmd.Args = append(cmd.Args, "LENGTH")
 	}
 
-	if c.Nofpkm == true {
+	if params.Nofpkm == true {
 		cmd.Args = append(cmd.Args, "NOFPKM")
 	}
 
-	if c.Nonss == true {
+	if params.Nonss == true {
 		cmd.Args = append(cmd.Args, "NONSS")
 	}
 
-	if c.Nonse == true {
+	if params.Nonse == true {
 		cmd.Args = append(cmd.Args, "NONSE")
 	}
 
-	if c.Nonrs == true {
+	if params.Nonrs == true {
 		cmd.Args = append(cmd.Args, "NONRS")
 	}
 
-	if c.Nonsm == true {
+	if params.Nonsm == true {
 		cmd.Args = append(cmd.Args, "NONSM")
 	}
 
-	if c.Nonsp == true {
+	if params.Nonsp == true {
 		cmd.Args = append(cmd.Args, "NONSP")
 	}
 
-	if c.Sharpnse == true {
+	if params.Sharpnse == true {
 		cmd.Args = append(cmd.Args, "SHARPNSE")
 	}
 
-	if c.Nonsi == true {
+	if params.Nonsi == true {
 		cmd.Args = append(cmd.Args, "NONSI")
 	}
 
-	if c.Threads != 1 {
-		v := fmt.Sprintf("THREADS=%d", c.Threads)
+	if params.Threads != 1 {
+		v := fmt.Sprintf("THREADS=%d", params.Threads)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.Decoy) > 0 {
-		v := fmt.Sprintf("DECOY=%s", c.Decoy)
+	if len(params.Decoy) > 0 {
+		v := fmt.Sprintf("DECOY=%s", params.Decoy)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(c.Cat) > 0 {
-		v := fmt.Sprintf("CAT=%s", c.Cat)
+	if len(params.Cat) > 0 {
+		v := fmt.Sprintf("CAT=%s", params.Cat)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.MinProb != 0 {
-		v := fmt.Sprintf("MINPROB=%.4f", c.MinProb)
+	if params.MinProb != 0 {
+		v := fmt.Sprintf("MINPROB=%.4f", params.MinProb)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	cmd.Args = append(cmd.Args, c.Output)
+	cmd.Args = append(cmd.Args, params.Output)
 
 	cmd.Dir = filepath.Dir(args[0])
 
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", c.Temp))
+	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
 	for i := range env {
 		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-			env[i] = env[i] + ";" + c.Temp
+			env[i] = env[i] + ";" + temp
 		}
 	}
 	cmd.Env = env
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Start()
-	if err != nil {
-		return errors.New("Cannot run iProphet")
+	e := cmd.Start()
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "InterProphet"}
 	}
 	_ = cmd.Wait()
 
-	return nil
+	// collect all resulting files
+	var output []string
+	for _, i := range cmd.Args {
+		if strings.Contains(i, "iproph") || i == params.Output {
+			output = append(output, i)
+		}
+	}
+
+	return output, nil
 }

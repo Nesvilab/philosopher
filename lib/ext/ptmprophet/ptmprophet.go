@@ -7,26 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/ptmprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/ptmprophet/win"
-
-	"github.com/prvst/cmsl/err"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // PTMProphet is the main tool data configuration structure
 type PTMProphet struct {
-	meta.Data
-	Output                  string
-	EM                      int
-	MzTol                   float64
-	PPMTol                  float64
-	MinProb                 float64
-	NoUpdate                bool
-	KeepOld                 bool
-	Verbose                 bool
-	MassDiffMode            bool
 	DefaultPTMProphetParser string
 	WinPTMProphetParser     string
 	UnixPTMProphetParser    string
@@ -35,40 +24,29 @@ type PTMProphet struct {
 // New constructor
 func New() PTMProphet {
 
-	var o PTMProphet
-	var m meta.Data
-	m.Restore(sys.Meta())
+	var self PTMProphet
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	temp, _ := sys.GetTemp()
 
-	o.UnixPTMProphetParser = o.Temp + string(filepath.Separator) + "PTMProphetParser"
-	o.WinPTMProphetParser = o.Temp + string(filepath.Separator) + "PTMProphetParser.exe"
+	self.UnixPTMProphetParser = temp + string(filepath.Separator) + "PTMProphetParser"
+	self.WinPTMProphetParser = temp + string(filepath.Separator) + "PTMProphetParser.exe"
 
-	return o
+	return self
 }
 
 // Deploy PTMProphet binaries on binary directory
-func (c *PTMProphet) Deploy() *err.Error {
+func (p *PTMProphet) Deploy(os, distro string) *err.Error {
 
-	if c.OS == sys.Windows() {
-		wPeP.WinPTMProphetParser(c.WinPTMProphetParser)
-		c.DefaultPTMProphetParser = c.WinPTMProphetParser
+	if os == sys.Windows() {
+		wPeP.WinPTMProphetParser(p.WinPTMProphetParser)
+		p.DefaultPTMProphetParser = p.WinPTMProphetParser
 	} else {
-		if strings.EqualFold(c.Distro, sys.Debian()) {
-			unix.UnixPTMProphetParser(c.UnixPTMProphetParser)
-			c.DefaultPTMProphetParser = c.UnixPTMProphetParser
-		} else if strings.EqualFold(c.Distro, sys.Redhat()) {
-			unix.UnixPTMProphetParser(c.UnixPTMProphetParser)
-			c.DefaultPTMProphetParser = c.UnixPTMProphetParser
+		if strings.EqualFold(distro, sys.Debian()) {
+			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
+			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
+		} else if strings.EqualFold(distro, sys.Redhat()) {
+			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
+			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
 		} else {
 			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "PTMProphetParser"}
 		}
@@ -78,10 +56,10 @@ func (c *PTMProphet) Deploy() *err.Error {
 }
 
 // Run PTMProphet
-func (c *PTMProphet) Run(args []string) *err.Error {
+func (p *PTMProphet) Run(params met.PTMProphet, args []string) ([]string, *err.Error) {
 
 	// get the execution commands
-	bin := c.DefaultPTMProphetParser
+	bin := p.DefaultPTMProphetParser
 	cmd := exec.Command(bin)
 
 	// append pepxml files
@@ -92,83 +70,71 @@ func (c *PTMProphet) Run(args []string) *err.Error {
 		cmd.Dir = filepath.Dir(file)
 	}
 
-	cmd = c.appendParams(cmd)
+	cmd = p.appendParams(params, cmd)
 
 	// append output file
 	var output string
 	output = "interact.mod.pep.xml"
-	if len(c.Output) > 0 {
-		output = fmt.Sprintf("%s.pep.xml", c.Output)
+	if len(params.Output) > 0 {
+		output = fmt.Sprintf("%s.pep.xml", params.Output)
 	}
 	cmd.Args = append(cmd.Args, output)
 	cmd.Dir = filepath.Dir(output)
-	// var output string
-	// if len(c.Output) > 0 {
-	// 	output = fmt.Sprintf("%s%s%s.mod.pep.xml", c.Temp, string(filepath.Separator), c.Output)
-	// 	output, _ = filepath.Abs(output)
-	// 	cmd.Args = append(cmd.Args, output)
-	// 	cmd.Dir = filepath.Dir(output)
-	// }
-
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	e := cmd.Start()
 	if e != nil {
-		return &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "PTMprophet"}
+		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "PTMprophet"}
 	}
 	_ = cmd.Wait()
 
-	// var baseDir string
-	// baseDir = filepath.Dir(args[0])
-	//
-	// // copy to work directory
-	// if len(c.Output) > 0 {
-	// 	dest := fmt.Sprintf("%s%s%s", baseDir, string(filepath.Separator), filepath.Base(output))
-	// 	e = sys.CopyFile(output, dest)
-	// 	if e != nil {
-	// 		return &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "PTMProphet results"}
-	// 	}
-	// }
+	// collect all resulting files
+	var processedOutput []string
+	for _, i := range cmd.Args {
+		if strings.Contains(i, output) || i == params.Output {
+			processedOutput = append(processedOutput, i)
+		}
+	}
 
-	return nil
+	return processedOutput, nil
 }
 
-func (c *PTMProphet) appendParams(cmd *exec.Cmd) *exec.Cmd {
+func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd {
 
-	if c.NoUpdate == true {
+	if params.NoUpdate == true {
 		cmd.Args = append(cmd.Args, "NOUPDATE")
 	}
 
-	if c.KeepOld == true {
+	if params.KeepOld == true {
 		cmd.Args = append(cmd.Args, "KEEPOLD")
 	}
 
-	if c.Verbose == true {
+	if params.Verbose == true {
 		cmd.Args = append(cmd.Args, "VERBOSE")
 	}
 
-	if c.MassDiffMode == true {
+	if params.MassDiffMode == true {
 		cmd.Args = append(cmd.Args, "MASSDIFFMODE")
 	}
 
-	if c.EM != 1 {
-		v := fmt.Sprintf("EM=%d", c.EM)
+	if params.EM != 1 {
+		v := fmt.Sprintf("EM=%d", params.EM)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.MzTol != 0.1 {
-		v := fmt.Sprintf("MZTOL=%.4f", c.MzTol)
+	if params.MzTol != 0.1 {
+		v := fmt.Sprintf("MZTOL=%.4f", params.MzTol)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.PPMTol != 1 {
-		v := fmt.Sprintf("PPMTOL=%.4f", c.PPMTol)
+	if params.PPMTol != 1 {
+		v := fmt.Sprintf("PPMTOL=%.4f", params.PPMTol)
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if c.MinProb != 0 {
-		v := fmt.Sprintf("MINPROB=%.4f", c.MinProb)
+	if params.MinProb != 0 {
+		v := fmt.Sprintf("MINPROB=%.4f", params.MinProb)
 		cmd.Args = append(cmd.Args, v)
 	}
 

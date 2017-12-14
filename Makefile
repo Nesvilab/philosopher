@@ -2,9 +2,9 @@ SOURCEDIR=.
 SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 
 BINARY = philosopher
-VERSION = 1.9
 
-BUILD_TIME = `date +%FT%T%z`
+VERSION = $(shell date +%Y%m%d)
+BUILD = $(shell  date +%Y%m%d%H%M)
 
 LDFLAGS = -ldflags "-w -s"
 
@@ -18,7 +18,7 @@ deps:
 	go get github.com/mitchellh/gox
 	go get github.com/inconshreveable/mousetrap
 	go get github.com/Sirupsen/logrus
-	go get github.com/gonum/plot
+	go get github.com/gonum/plot/
 	go get github.com/gonum/plot/plotter
 	go get github.com/gonum/plot/plotutil
 	go get github.com/gonum/plot/vg
@@ -31,10 +31,11 @@ deps:
 	go get github.com/spf13/cobra
 	go get github.com/spf13/viper
 	go get golang.org/x/net/html/charset
+	go get -u github.com/spf13/cobra/cobra
 
 .PHONY: deploy
 deploy:
-	unzip -o lib/data/bindata.go.zip -d  lib/data/
+	unzip -o lib/dat/bindata.go.zip -d  lib/data/
 
 	unzip -o lib/ext/cdhit/unix/bindata.go.zip -d  lib/ext/cdhit/unix/
 	unzip -o lib/ext/cdhit/win/bindata.go.zip -d  lib/ext/cdhit/win/
@@ -58,18 +59,19 @@ deploy:
 
 .PHONY: install
 install:
-	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${VERSION}
-	mv philosopher-${VERSION} ${GOBIN}/philosopher;
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION} ${GOBIN}/philosopher;
+	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 
 .PHONY: linux
 linux:
-	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${VERSION}
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 
 .PHONY: windows
 windows:
-	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${VERSION}
-	cp philosopher-${VERSION}.exe /home/felipevl/Public/philosopher.exe
-	rm philosopher-${VERSION}.exe
+	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION}.exe /home/felipevl/Public/philosopher.exe
+	rm philosopher.${VERSION}.exe
 
 .PHONY: all
 all:

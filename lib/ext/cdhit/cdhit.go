@@ -9,13 +9,13 @@ import (
 
 	ucdhit "github.com/prvst/philosopher/lib/ext/cdhit/unix"
 	wcdhit "github.com/prvst/philosopher/lib/ext/cdhit/win"
-	"github.com/prvst/philosopher/lib/meta"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // CDhit represents the tool configuration
 type CDhit struct {
-	meta.Data
+	met.Data
 	OS           string
 	Arch         string
 	UnixBin      string
@@ -31,7 +31,7 @@ type CDhit struct {
 func New() CDhit {
 
 	var o CDhit
-	var m meta.Data
+	var m met.Data
 	m.Restore(sys.Meta())
 
 	o.UUID = m.UUID
