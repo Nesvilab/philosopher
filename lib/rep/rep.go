@@ -25,7 +25,6 @@ import (
 // Evidence ...
 type Evidence struct {
 	Decoys        bool
-	Meta          MetaEvidence
 	PSM           PSMEvidenceList
 	Ions          IonEvidenceList
 	Peptides      PeptideEvidenceList
@@ -33,21 +32,6 @@ type Evidence struct {
 	Mods          Modifications
 	Modifications ModificationEvidence
 	Combined      CombinedEvidenceList
-}
-
-// MetaEvidence contains information about the data and the analysis
-type MetaEvidence struct {
-	UUID      string
-	Distro    string
-	Home      string
-	MetaFile  string
-	MetaDir   string
-	DB        string
-	Temp      string
-	TimeStamp string
-	OS        string
-	Arch      string
-	DecoyTag  string
 }
 
 // Modifications ...
@@ -342,7 +326,7 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 }
 
 // PSMReport report all psms from study that passed the FDR filter
-func (e *Evidence) PSMReport() {
+func (e *Evidence) PSMReport(decoyTag string) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -362,7 +346,7 @@ func (e *Evidence) PSMReport() {
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
 		if e.Decoys == false {
-			if !cla.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+			if !cla.IsDecoy(i.Protein, decoyTag) {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -443,8 +427,8 @@ func (e *Evidence) PSMReport() {
 	return
 }
 
-// PSMQTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMQTMTReport() {
+// PSMTMTReport report all psms with TMT labels from study that passed the FDR filter
+func (e *Evidence) PSMTMTReport(decoyTag string) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -464,7 +448,7 @@ func (e *Evidence) PSMQTMTReport() {
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
 		if e.Decoys == false {
-			if !cla.IsDecoy(i.Protein, e.Meta.DecoyTag) {
+			if !cla.IsDecoy(i.Protein, decoyTag) {
 				printSet = append(printSet, i)
 			}
 		} else {
