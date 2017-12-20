@@ -8,6 +8,7 @@
 ### Build: 20171220.1144
 
 ### Added
+- Support to Slack! you can now do push notifications on Slack channels.
 - Now the Comet command checks for the extension of the mz files, it skips files that are not supported for indexing, Database search keeps working the same way.
 
 ### Changed
