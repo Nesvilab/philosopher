@@ -32,6 +32,7 @@ deps:
 	go get github.com/spf13/viper
 	go get golang.org/x/net/html/charset
 	go get -u github.com/spf13/cobra/cobra
+	go get -u github.com/nlopes/slack
 
 .PHONY: deploy
 deploy:
