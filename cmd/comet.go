@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
@@ -58,10 +59,22 @@ var cometCmd = &cobra.Command{
 		m.Comet.ParamFile = binFile
 
 		if m.Comet.NoIndex == false {
+			var extFlag = true
+
 			// the indexing will help later in case other commands are used for qunatification
 			// it will provide easy and fast access to mz data
-			logrus.Info("Indexing spectra: please wait, this can take a few minutes")
-			raw.IndexMz(args)
+			for _, i := range args {
+				if strings.Contains(i, "mzML") {
+					extFlag = false
+				}
+			}
+
+			if extFlag == false {
+				logrus.Info("Indexing spectra: please wait, this can take a few minutes")
+				raw.IndexMz(args)
+			} else {
+				logrus.Info("mz file format not supported for indexing, skipping the indexing")
+			}
 		}
 
 		// run comet

@@ -157,8 +157,6 @@ func Run(f met.Filter) error {
 		return cerr
 	}
 
-	e.Meta.DecoyTag = f.Tag
-
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return cerr

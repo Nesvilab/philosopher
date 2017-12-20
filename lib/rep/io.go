@@ -36,14 +36,8 @@ func (e *Evidence) Serialize() *err.Error {
 // SerializeGranular converts the whole structure into sevral small gob files
 func (e *Evidence) SerializeGranular() *err.Error {
 
-	// create EV Meta
-	er := SerializeEVMeta(e)
-	if er != nil {
-		return er
-	}
-
 	// create EV PSM
-	er = SerializeEVPSM(e)
+	er := SerializeEVPSM(e)
 	if er != nil {
 		return er
 	}
@@ -87,23 +81,6 @@ func (e *Evidence) SerializeGranular() *err.Error {
 	return nil
 }
 
-// SerializeEVMeta creates an ev serial with Evidence data
-func SerializeEVMeta(e *Evidence) *err.Error {
-
-	f, er := os.Create(sys.EvMetaBin())
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
-	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Meta)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
-	}
-	f.Close()
-
-	return nil
-}
-
 // SerializeEVPSM creates an ev serial with Evidence data
 func SerializeEVPSM(e *Evidence) *err.Error {
 
@@ -120,23 +97,6 @@ func SerializeEVPSM(e *Evidence) *err.Error {
 
 	return nil
 }
-
-// // SerializeEVPSM creates an ev serial with Evidence data
-// func SerializeEVPSM(e *Evidence) *err.Error {
-//
-// 	f, er := os.Create(sys.EvPSMBin())
-// 	if er != nil {
-// 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
-// 	}
-// 	de := msgpack.NewEncoder(f)
-// 	goberr := de.Encode(e.PSM)
-// 	if goberr != nil {
-// 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
-// 	}
-// 	f.Close()
-//
-// 	return nil
-// }
 
 // SerializeEVIon creates an ev serial with Evidence data
 func SerializeEVIon(e *Evidence) *err.Error {
@@ -257,14 +217,8 @@ func (e *Evidence) Restore() error {
 // RestoreGranular reads philosopher results files and restore the data sctructure
 func (e *Evidence) RestoreGranular() *err.Error {
 
-	// Meta
-	err := RestoreEVMeta(e)
-	if err != nil {
-		return err
-	}
-
 	// PSM
-	err = RestoreEVPSM(e)
+	err := RestoreEVPSM(e)
 	if err != nil {
 		return err
 	}
@@ -308,17 +262,6 @@ func (e *Evidence) RestoreGranular() *err.Error {
 	return nil
 }
 
-// RestoreEVMeta restores Ev PSM data
-func RestoreEVMeta(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvMetaBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Meta)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
-	}
-	return nil
-}
-
 // RestoreEVPSM restores Ev PSM data
 func RestoreEVPSM(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvPSMBin())
@@ -329,17 +272,6 @@ func RestoreEVPSM(e *Evidence) *err.Error {
 	}
 	return nil
 }
-
-// // RestoreEVPSM restores Ev PSM data
-// func RestoreEVPSM(e *Evidence) *err.Error {
-// 	f, _ := os.Open(sys.EvPSMBin())
-// 	d := msgpack.NewDecoder(f)
-// 	er := d.Decode(&e.PSM)
-// 	if er != nil {
-// 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
-// 	}
-// 	return nil
-// }
 
 // RestoreEVIon restores Ev Ion data
 func RestoreEVIon(e *Evidence) *err.Error {

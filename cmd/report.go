@@ -49,7 +49,7 @@ var reportCmd = &cobra.Command{
 		if len(m.Quantify.Plex) > 0 {
 
 			logrus.Info("Creating TMT PSM report")
-			repo.PSMQTMTReport()
+			repo.PSMTMTReport(m.Filter.Tag)
 
 			logrus.Info("Creating TMT peptide report")
 			repo.PeptideTMTReport()
@@ -60,7 +60,7 @@ var reportCmd = &cobra.Command{
 		} else {
 
 			logrus.Info("Creating PSM report")
-			repo.PSMReport()
+			repo.PSMReport(m.Filter.Tag)
 
 			logrus.Info("Creating peptide report")
 			repo.PeptideReport()
