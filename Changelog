@@ -1,7 +1,21 @@
-## [2.1] - ?
+## [2.2] - ?
 ### Added
 ### Changed
 ### Fixed
+
+## [2.1] - 2017-12-20
+
+### Version: 20171220
+### Build: 20171220.1144
+
+### Added
+- Now the Comet command checks for the extension of the mz files, it skips files that are not supported for indexing, Database search keeps working the same way.
+
+### Changed
+- The Protein column on the reports will be replaced by the Razor Protein when the option is added.
+
+### Fixed
+- Some reports were showing empty protein columns.
 
 ## [2.0] - 2017-12-14
 ### Added

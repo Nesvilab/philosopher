@@ -411,7 +411,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 			i.LocalizedMassDiff,
 			i.IsUnique,
 			i.IsURazor,
-			len(i.AlternativeProteins)+1, // Mapped Proteins
+			len(i.AlternativeProteins)+1, // Mapped Proteins (the + is for the mapped Protein)
 			i.Protein,
 			strings.Join(i.AlternativeProteins, ", "),
 		)
@@ -651,7 +651,6 @@ func (e *Evidence) UpdateIonStatus() {
 	for _, i := range e.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
-			//if j.IsNondegenerateEvidence == true {
 			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
 			}
@@ -683,20 +682,18 @@ func (e *Evidence) UpdateIonStatus() {
 			e.PSM[i].Protein = v
 			e.PSM[i].AlternativeProteins = ptIndiMap[v]
 		}
-
 	}
 
 	for i := range e.Ions {
 
 		_, uOK := uniqueMap[e.Ions[i].IonForm]
 		if uOK {
-			//e.Ions[i].IsNondegenerateEvidence = true
 			e.Ions[i].IsUnique = true
 		}
 
 		_, rOK := urazorMap[e.Ions[i].IonForm]
 		if rOK {
-			e.PSM[i].IsURazor = true
+			e.Ions[i].IsURazor = true
 		}
 
 	}
@@ -757,26 +754,28 @@ func (e *Evidence) UpdateIonModCount() {
 func (e *Evidence) UpdateProteinStatus() {
 
 	for i := range e.PSM {
+		if e.PSM[i].IsURazor == true && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 
-		var altProteins []string
+			var altProteins []string
 
-		// push the selected protein to the top fo the list
-		altProteins = append(altProteins, e.PSM[i].Protein)
+			// push the selected protein to the top fo the list
+			altProteins = append(altProteins, e.PSM[i].Protein)
 
-		// add all the other alternative proteins that do not mach to the razor protein
-		for _, j := range e.PSM[i].AlternativeProteins {
-			if j != e.PSM[i].RazorProtein {
-				altProteins = append(altProteins, j)
+			// add all the other alternative proteins that do not mach to the razor protein
+			for _, j := range e.PSM[i].AlternativeProteins {
+				if j != e.PSM[i].RazorProtein {
+					altProteins = append(altProteins, j)
+				}
 			}
+
+			// replace the selected protein by the razor one
+			e.PSM[i].Protein = e.PSM[i].RazorProtein
+
+			// replace the alternative proteins list
+			e.PSM[i].AlternativeProteins = nil
+			e.PSM[i].AlternativeProteins = altProteins
+
 		}
-
-		// replace the selected protein by the razor one
-		e.PSM[i].Protein = e.PSM[i].RazorProtein
-
-		// replace the alternative proteins list
-		e.PSM[i].AlternativeProteins = nil
-		e.PSM[i].AlternativeProteins = altProteins
-
 	}
 
 	return
