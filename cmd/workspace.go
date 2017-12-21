@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/jpillora/go-ogle-analytics"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -58,8 +61,26 @@ var workspaceCmd = &cobra.Command{
 }
 
 func init() {
+
+	if len(os.Args) > 1 && os.Args[1] == "workspace" {
+
+		// do not change this! This is for metric colletion, no user data is gatter, the software just reports back
+		// the number of people using it and the geo location, just like any other website does.
+		client, err := ga.NewClient("UA-111428141-1")
+		if err != nil {
+			panic(err)
+		}
+
+		err = client.Send(ga.NewEvent("Philosopher", "Workspace"))
+		if err != nil {
+			panic(err)
+		}
+
+	}
+
 	workspaceCmd.Flags().BoolVarP(&i, "init", "", false, "Initialize the workspace")
 	workspaceCmd.Flags().BoolVarP(&b, "backup", "", false, "create a backup of the experiment meta data")
 	workspaceCmd.Flags().BoolVarP(&c, "clean", "", false, "Remove the workspace and all meta data. Experimental file are kept intact")
+
 	RootCmd.AddCommand(workspaceCmd)
 }

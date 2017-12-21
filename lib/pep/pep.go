@@ -171,11 +171,12 @@ type EnzymaticSearchConstraint struct {
 
 // AminoacidModification tag
 type AminoacidModification struct {
-	XMLName   xml.Name `xml:"aminoacid_modification"`
-	AminoAcid []byte   `xml:"aminoacid,attr"`
-	MassDiff  float64  `xml:"massdiff,attr"`
-	Mass      float64  `xml:"mass,attr"`
-	Variable  []byte   `xml:"variable,attr"`
+	XMLName         xml.Name `xml:"aminoacid_modification"`
+	AminoAcid       []byte   `xml:"aminoacid,attr"`
+	MassDiff        float64  `xml:"massdiff,attr"`
+	ProteinTerminus []byte   `xml:"protein_terminus,attr"`
+	Mass            float64  `xml:"mass,attr"`
+	Variable        []byte   `xml:"variable,attr"`
 }
 
 // TerminalModification tag

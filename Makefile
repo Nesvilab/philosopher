@@ -15,24 +15,22 @@ $(BINARY): $(SOURCES)
 
 .PHONY: deps
 deps:
-	go get github.com/mitchellh/gox
-	go get github.com/inconshreveable/mousetrap
-	go get github.com/Sirupsen/logrus
-	go get github.com/gonum/plot/
-	go get github.com/gonum/plot/plotter
-	go get github.com/gonum/plot/plotutil
-	go get github.com/gonum/plot/vg
-	go get github.com/mattn/go-colorable
-	go get github.com/montanaflynn/stats
-	go get github.com/pierrre/archivefile/zip
-	go get github.com/rogpeppe/go-charset/charset
-	go get github.com/rogpeppe/go-charset/data
-	go get github.com/satori/go.uuid
-	go get github.com/spf13/cobra
-	go get github.com/spf13/viper
-	go get golang.org/x/net/html/charset
+	go get -u github.com/mitchellh/gox
+	go get -u github.com/inconshreveable/mousetrap
+	go get -u github.com/Sirupsen/logrus
+	go get -u gonum.org/v1/plot
+	go get -u github.com/mattn/go-colorable
+	go get -u github.com/montanaflynn/stats
+	go get -u github.com/pierrre/archivefile/zip
+	go get -u github.com/rogpeppe/go-charset/charset
+	go get -u github.com/rogpeppe/go-charset/data
+	go get -u github.com/satori/go.uuid
+	go get -u github.com/spf13/cobra
+	go get -u github.com/spf13/viper
+	go get -u golang.org/x/net/html/charset
 	go get -u github.com/spf13/cobra/cobra
 	go get -u github.com/nlopes/slack
+	go get -u github.com/sanity-io/litter
 
 .PHONY: deploy
 deploy:
