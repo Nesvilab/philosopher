@@ -14,7 +14,6 @@ import (
 var reportCmd = &cobra.Command{
 	Use:   "report",
 	Short: "Multi-level reporting for both narrow-searches and open-searches",
-	//Long:  `Creates peptide-level and protein-level reportsbased on the experimental results.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if len(m.UUID) < 1 && len(m.Home) < 1 {
