@@ -218,6 +218,9 @@ type CombinedEvidence struct {
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64
+	TotalLabels            map[string]tmt.Labels
+	UniqueLabels           map[string]tmt.Labels
+	URazorLabels           map[string]tmt.Labels // Unique + razor
 }
 
 // CombinedEvidenceList ...

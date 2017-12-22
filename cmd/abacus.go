@@ -46,6 +46,7 @@ func init() {
 
 		abacusCmd.Flags().StringVarP(&m.Abacus.Comb, "comb", "", "", "combined file")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates wether the data sets incluse TMT labels or not")
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimun protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimun peptide probability")
