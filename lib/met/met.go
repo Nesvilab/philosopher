@@ -220,6 +220,7 @@ type Abacus struct {
 	Comb     string
 	Tag      string
 	Razor    bool
+	Picked   bool
 	Labels   bool
 	ProtProb float64
 	PepProb  float64

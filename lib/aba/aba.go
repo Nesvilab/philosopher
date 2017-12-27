@@ -88,7 +88,12 @@ func Run(a met.Abacus, temp string, args []string) error {
 		evidences = getLabelIntensities(evidences, datasets)
 	}
 
-	saveCompareResults(temp, evidences, datasets, names)
+	// collect TMT labels
+	if a.Labels == true {
+		saveCompareTMTResults(temp, evidences, datasets, names)
+	} else {
+		saveCompareResults(temp, evidences, datasets, names)
+	}
 
 	return nil
 }
@@ -117,7 +122,7 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 			}
 		}
 
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, false, a.Razor)
+		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor)
 		if err != nil {
 			return nil, err
 		}
