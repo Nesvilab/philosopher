@@ -79,15 +79,10 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	sort.Strings(names)
 
-	// logrus.Info("Processing combined file")
-	// evidences, err := processCombinedFile(a, database)
-	// if err != nil {
-	// 	return err
-	// }
-
 	logrus.Info("Processing spectral counts")
 	evidences = getSpectralCounts(evidences, datasets)
 
+	logrus.Info("Processing intensities")
 	evidences = sumIntensities(evidences, datasets)
 
 	// collect TMT labels
