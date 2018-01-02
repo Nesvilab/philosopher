@@ -66,6 +66,12 @@ install:
 linux:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 
+.PHONY: castor
+castor:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/Downloads/philosopher
+	rm philosopher.${VERSION}
+
 .PHONY: windows
 windows:
 	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}

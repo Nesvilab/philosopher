@@ -40,6 +40,13 @@ func Run(a met.Abacus, temp string, args []string) error {
 	database = dat.Base{}
 	database.RestoreWithPath(args[0])
 
+	// restoring combined file
+	logrus.Info("Processing combined file")
+	evidences, err := processCombinedFile(a, database)
+	if err != nil {
+		return err
+	}
+
 	// recover all files
 	logrus.Info("Restoring results")
 
@@ -72,11 +79,11 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	sort.Strings(names)
 
-	logrus.Info("Processing combined file")
-	evidences, err := processCombinedFile(a, database)
-	if err != nil {
-		return err
-	}
+	// logrus.Info("Processing combined file")
+	// evidences, err := processCombinedFile(a, database)
+	// if err != nil {
+	// 	return err
+	// }
 
 	logrus.Info("Processing spectral counts")
 	evidences = getSpectralCounts(evidences, datasets)
@@ -113,6 +120,11 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
+
+		// applies pickedFDR algorithm
+		if a.Picked == true {
+			protxml = fil.PickedFDR(protxml)
+		}
 
 		// applies razor algorithm
 		if a.Razor == true {

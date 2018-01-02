@@ -552,7 +552,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 	// applies pickedFDR algorithm
 	if isPicked == true {
-		p = pickedFDR(p)
+		p = PickedFDR(p)
 	}
 
 	// applies razor algorithm
@@ -591,8 +591,8 @@ func proteinProfile(p id.ProtXML) (t, d int, err error) {
 	return t, d, err
 }
 
-// Picked employs the picked FDR strategy
-func pickedFDR(p id.ProtXML) id.ProtXML {
+// PickedFDR employs the picked FDR strategy
+func PickedFDR(p id.ProtXML) id.ProtXML {
 
 	// var appMap = make(map[string]int)
 	var targetMap = make(map[string]float64)
