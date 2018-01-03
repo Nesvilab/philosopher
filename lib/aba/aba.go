@@ -310,7 +310,8 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 	defer file.Close()
 
 	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -354,7 +355,7 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+		//line += fmt.Sprintf("%d\t", len(i.PeptideIons))
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
@@ -391,7 +392,8 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 	defer file.Close()
 
 	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -448,7 +450,7 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+		//line += fmt.Sprintf("%d\t", len(i.PeptideIons))
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
