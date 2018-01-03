@@ -1,6 +1,13 @@
 ## [2.2] - ?
+### Version:
+### Build:
+
 ### Added
+- PickedFDR option added to the Abacus report.
+
 ### Changed
+- Total Ions column removed from the Abacus report.
+
 ### Fixed
 
 ## [2.1] - 2017-12-20
