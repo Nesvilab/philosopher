@@ -27,8 +27,10 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Philosopher version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(met.GetVersion())
-		fmt.Printf(met.GetBuild())
+		version := fmt.Sprintf("Version: %s\n", met.GetVersion())
+		build := fmt.Sprintf("Build: %s\n", met.GetBuild())
+		fmt.Printf(version)
+		fmt.Printf(build)
 		return
 	},
 }
