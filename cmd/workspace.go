@@ -6,6 +6,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/jpillora/go-ogle-analytics"
 	"github.com/prvst/philosopher/lib/gth"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -78,7 +79,7 @@ func init() {
 			panic(err)
 		}
 
-		err = client.Send(ga.NewEvent("Philosopher", "Workspace"))
+		err = client.Send(ga.NewEvent(met.GetBuild(), met.GetVersion()))
 		if err != nil {
 			panic(err)
 		}
