@@ -1,23 +1,10 @@
-// Copyright © 2017 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/Sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/spf13/cobra"
 )
@@ -27,10 +14,14 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Philosopher version",
 	Run: func(cmd *cobra.Command, args []string) {
-		version := fmt.Sprintf("Version: %s\n", met.GetVersion())
-		build := fmt.Sprintf("Build: %s\n", met.GetBuild())
-		fmt.Printf(version)
-		fmt.Printf(build)
+
+		logrus.WithFields(logrus.Fields{
+			"version": met.GetVersion(),
+			"build":   met.GetBuild(),
+		}).Info("Current Philosopher build and version")
+
+		gth.UpdateChecker()
+
 		return
 	},
 }

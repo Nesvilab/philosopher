@@ -5,7 +5,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	colorable "github.com/mattn/go-colorable"
-	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
@@ -42,8 +41,6 @@ func init() {
 	}
 
 	logrus.SetFormatter(fmt)
-
-	gth.UpdateChecker()
 }
 
 // initConfig reads in config file and ENV variables if set.

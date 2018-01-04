@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/jpillora/go-ogle-analytics"
+	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -15,8 +16,9 @@ var a, b, c, i bool
 var workspaceCmd = &cobra.Command{
 	Use:   "workspace",
 	Short: "Manage the experiment workspace for the analysis",
-
 	Run: func(cmd *cobra.Command, args []string) {
+
+		gth.UpdateChecker()
 
 		if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
 			logrus.Fatal("this command accepts only one parameter")
