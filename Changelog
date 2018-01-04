@@ -1,6 +1,14 @@
-## [2.2] - ?
+## [20180104] - 2018-01-04
+### Build: 20180104.1600
+
 ### Added
+- PickedFDR option added to the Abacus report.
+
 ### Changed
+- Philosopher version changed to a time-based system.
+- An automatic update checker was added.
+- Total Ions column removed from the Abacus report.
+
 ### Fixed
 
 ## [2.1] - 2017-12-20

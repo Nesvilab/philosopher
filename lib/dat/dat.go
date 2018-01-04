@@ -295,13 +295,16 @@ func (d *Base) Restore() *err.Error {
 // RestoreWithPath reads philosopher results files and restore the data sctructure
 func (d *Base) RestoreWithPath(p string) *err.Error {
 
-	var path string
+	// var path string
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.DBBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.DBBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
+	path, _ = filepath.Abs(path)
 
 	file, _ := os.Open(path)
 

@@ -16,6 +16,7 @@ import (
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/prvst/philosopher/lib/tmt"
 )
 
 // ExperimentalData ...
@@ -39,6 +40,13 @@ func Run(a met.Abacus, temp string, args []string) error {
 	database = dat.Base{}
 	database.RestoreWithPath(args[0])
 
+	// restoring combined file
+	logrus.Info("Processing combined file")
+	evidences, err := processCombinedFile(a, database)
+	if err != nil {
+		return err
+	}
+
 	// recover all files
 	logrus.Info("Restoring results")
 
@@ -52,7 +60,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "pep.xml") {
-				interactFile := fmt.Sprintf("%s%s", i, f.Name())
+				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				absPath, _ := filepath.Abs(interactFile)
 				xmlFiles = append(xmlFiles, absPath)
 			}
@@ -61,7 +69,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 		// collect project names
 		prjName := i
 		if strings.Contains(prjName, string(filepath.Separator)) {
-			prjName = strings.Replace(prjName, string(filepath.Separator), "", -1)
+			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
 		}
 
 		// unique list and map of datasets
@@ -71,17 +79,23 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	sort.Strings(names)
 
-	logrus.Info("Processing combined file")
-	evidences, err := processCombinedFile(a, database)
-	if err != nil {
-		return err
-	}
-
+	logrus.Info("Processing spectral counts")
 	evidences = getSpectralCounts(evidences, datasets)
 
+	logrus.Info("Processing intensities")
 	evidences = sumIntensities(evidences, datasets)
 
-	saveCompareResults(temp, evidences, datasets, names)
+	// collect TMT labels
+	if a.Labels == true {
+		evidences = getLabelIntensities(evidences, datasets)
+	}
+
+	// collect TMT labels
+	if a.Labels == true {
+		saveCompareTMTResults(temp, evidences, datasets, names)
+	} else {
+		saveCompareResults(temp, evidences, datasets, names)
+	}
 
 	return nil
 }
@@ -102,6 +116,11 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
 
+		// applies pickedFDR algorithm
+		if a.Picked == true {
+			protxml = fil.PickedFDR(protxml)
+		}
+
 		// applies razor algorithm
 		if a.Razor == true {
 			protxml, err = fil.RazorFilter(protxml)
@@ -110,7 +129,7 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 			}
 		}
 
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, false, a.Razor)
+		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor)
 		if err != nil {
 			return nil, err
 		}
@@ -126,6 +145,10 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 			ce.TotalIntensity = make(map[string]float64)
 			ce.UniqueIntensity = make(map[string]float64)
 			ce.UrazorIntensity = make(map[string]float64)
+
+			ce.TotalLabels = make(map[string]tmt.Labels)
+			ce.UniqueLabels = make(map[string]tmt.Labels)
+			ce.URazorLabels = make(map[string]tmt.Labels)
 
 			ce.SupportingSpectra = make(map[string]string)
 			ce.ProteinName = j.ProteinName
@@ -190,6 +213,26 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 							exclusion[ion] = 0
 						}
 					}
+				}
+			}
+		}
+
+	}
+
+	return combined
+}
+
+func getLabelIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.Evidence) rep.CombinedEvidenceList {
+
+	for k, v := range datasets {
+
+		for _, i := range v.Proteins {
+			for j := range combined {
+				if i.ProteinID == combined[j].ProteinID {
+					combined[j].TotalLabels[k] = i.TotalLabels
+					combined[j].UniqueLabels[k] = i.UniqueLabels
+					combined[j].URazorLabels[k] = i.URazorLabels
+					break
 				}
 			}
 		}
@@ -267,7 +310,8 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 	defer file.Close()
 
 	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -311,7 +355,7 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+		//line += fmt.Sprintf("%d\t", len(i.PeptideIons))
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
@@ -348,7 +392,8 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 	defer file.Close()
 
 	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -405,7 +450,7 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+		//line += fmt.Sprintf("%d\t", len(i.PeptideIons))
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
@@ -414,11 +459,20 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 		ip := strings.Join(i.IndiProtein, ", ")
 		line += fmt.Sprintf("%s\t", ip)
 
-		// for _, j := range namesList {
-		// 	line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
-		// 		datasets[j].Proteins[i].URazorLabels.Channel1.Intensity,
-		// 	)
-		// }
+		for _, j := range namesList {
+			line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+				i.URazorLabels[j].Channel1.Intensity,
+				i.URazorLabels[j].Channel2.Intensity,
+				i.URazorLabels[j].Channel3.Intensity,
+				i.URazorLabels[j].Channel4.Intensity,
+				i.URazorLabels[j].Channel5.Intensity,
+				i.URazorLabels[j].Channel6.Intensity,
+				i.URazorLabels[j].Channel7.Intensity,
+				i.URazorLabels[j].Channel8.Intensity,
+				i.URazorLabels[j].Channel9.Intensity,
+				i.URazorLabels[j].Channel10.Intensity,
+			)
+		}
 
 		line += "\n"
 		n, err := io.WriteString(file, line)

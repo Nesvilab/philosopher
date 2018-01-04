@@ -17,8 +17,8 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"time"
 
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/spf13/cobra"
 )
 
@@ -27,9 +27,10 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Philosopher version",
 	Run: func(cmd *cobra.Command, args []string) {
-		t := time.Now()
-		fmt.Printf("Version: %d%02d%02d\n", t.Year(), t.Month(), t.Day())
-		fmt.Printf("Build: %d%02d%02d.%02d%02d\n", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+		version := fmt.Sprintf("Version: %s\n", met.GetVersion())
+		build := fmt.Sprintf("Build: %s\n", met.GetBuild())
+		fmt.Printf(version)
+		fmt.Printf(build)
 		return
 	},
 }

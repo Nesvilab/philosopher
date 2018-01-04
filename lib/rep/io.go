@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
@@ -390,13 +389,14 @@ func (e *Evidence) RestoreGranularWithPath(p string) *err.Error {
 // RestoreEVPSMWithPath restores Ev PSM data
 func RestoreEVPSMWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvPSMBin()
+	//path := sys.EvPSMBin()
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvPSMBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
-	}
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvPSMBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
+	// }
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -410,13 +410,15 @@ func RestoreEVPSMWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVIonWithPath restores Ev Ion data
 func RestoreEVIonWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvIonBin()
+	// path := sys.EvIonBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvIonBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvIonBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -430,13 +432,15 @@ func RestoreEVIonWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVPeptideWithPath restores Ev Ion data
 func RestoreEVPeptideWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvPeptideBin()
+	// path := sys.EvPeptideBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvPeptideBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvPeptideBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -450,13 +454,15 @@ func RestoreEVPeptideWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVProteinWithPath restores Ev Protein data
 func RestoreEVProteinWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvProteinBin()
+	// path := sys.EvProteinBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvProteinBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvProteinBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -470,13 +476,15 @@ func RestoreEVProteinWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVModsWithPath restores Ev Mods data
 func RestoreEVModsWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvModificationsBin()
+	// path := sys.EvModificationsBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvModificationsBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvModificationsBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -490,13 +498,15 @@ func RestoreEVModsWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVModificationsWithPath restores Ev Mods data
 func RestoreEVModificationsWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvModificationsEvBin()
+	// path := sys.EvModificationsEvBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvModificationsEvBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvModificationsEvBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
@@ -510,13 +520,15 @@ func RestoreEVModificationsWithPath(e *Evidence, p string) *err.Error {
 // RestoreEVCombinedWithPath restores Ev Mods data
 func RestoreEVCombinedWithPath(e *Evidence, p string) *err.Error {
 
-	path := sys.EvCombinedBin()
+	// path := sys.EvCombinedBin()
+	//
+	// if strings.Contains(p, string(filepath.Separator)) {
+	// 	path = fmt.Sprintf("%s%s", p, sys.EvCombinedBin())
+	// } else {
+	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
+	// }
 
-	if strings.Contains(p, string(filepath.Separator)) {
-		path = fmt.Sprintf("%s%s", p, sys.EvCombinedBin())
-	} else {
-		path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
-	}
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)

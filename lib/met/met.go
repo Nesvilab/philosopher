@@ -220,6 +220,8 @@ type Abacus struct {
 	Comb     string
 	Tag      string
 	Razor    bool
+	Picked   bool
+	Labels   bool
 	ProtProb float64
 	PepProb  float64
 }
@@ -275,6 +277,18 @@ func New(h string) Data {
 	d.TimeStamp = t.Format(time.RFC3339)
 
 	return d
+}
+
+// GetVersion returns the updated software version
+func GetVersion() string {
+	t := time.Now()
+	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
+}
+
+// GetBuild returns the updated software version and build
+func GetBuild() string {
+	t := time.Now()
+	return fmt.Sprintf("%d%02d%02d.%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
 }
 
 // Serialize converts the whole structure to a gob file

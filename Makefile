@@ -30,7 +30,7 @@ deps:
 	go get -u golang.org/x/net/html/charset
 	go get -u github.com/spf13/cobra/cobra
 	go get -u github.com/nlopes/slack
-	go get -u github.com/sanity-io/litter
+	go get -u github.com/google/go-github/github
 
 .PHONY: deploy
 deploy:
@@ -65,6 +65,12 @@ install:
 .PHONY: linux
 linux:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+
+.PHONY: castor
+castor:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/Downloads/philosopher
+	rm philosopher.${VERSION}
 
 .PHONY: windows
 windows:
