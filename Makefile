@@ -30,7 +30,7 @@ deps:
 	go get -u golang.org/x/net/html/charset
 	go get -u github.com/spf13/cobra/cobra
 	go get -u github.com/nlopes/slack
-	go get -u github.com/sanity-io/litter
+	go get -u github.com/google/go-github/github
 
 .PHONY: deploy
 deploy:

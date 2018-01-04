@@ -5,6 +5,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	colorable "github.com/mattn/go-colorable"
+	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
@@ -23,7 +24,7 @@ var RootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		logrus.Fatal("PING", err)
+		logrus.Fatal(err)
 	}
 }
 
@@ -41,6 +42,8 @@ func init() {
 	}
 
 	logrus.SetFormatter(fmt)
+
+	gth.UpdateChecker()
 }
 
 // initConfig reads in config file and ENV variables if set.
