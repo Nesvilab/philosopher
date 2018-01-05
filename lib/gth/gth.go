@@ -45,7 +45,7 @@ func UpdateChecker() {
 		logrus.Fatal(err)
 	}
 
-	if rel[0].TagName != met.GetVersion() {
+	if rel[0].TagName > met.GetVersion() {
 		logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
 	}
 
