@@ -30,8 +30,8 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal("You need to especify the experiment Plex")
 		}
 
-		logrus.Info("Executing label-based quantification")
 		// hardcoded tmt for now
+		logrus.Info("Executing label-based quantification")
 		m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
@@ -75,6 +75,7 @@ func init() {
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Plex, "plex", "", "", "number of channels")
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
+		//labelquantCmd.Flags().StringVarP(&m.Quantify.Annot, "annot", "", "", "annotation file with custom names for the tags")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 20, "m/z tolerance in ppm")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Purity, "purity", "", 0.5, "ion purity threshold")
 		labelquantCmd.Flags().BoolVarP(&m.Quantify.Unique, "uniqueonly", "", false, "report quantification based on only unique peptides")

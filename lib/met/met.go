@@ -207,6 +207,7 @@ type Quantify struct {
 	Brand    string
 	Plex     string
 	ChanNorm string
+	Annot    string
 	RTWin    float64
 	PTWin    float64
 	Tol      float64
