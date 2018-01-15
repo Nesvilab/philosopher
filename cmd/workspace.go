@@ -19,7 +19,7 @@ var workspaceCmd = &cobra.Command{
 	Short: "Manage the experiment workspace for the analysis",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		gth.UpdateChecker()
+		gth.UpdateChecker(Version, Build)
 
 		if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
 			logrus.Fatal("this command accepts only one parameter")

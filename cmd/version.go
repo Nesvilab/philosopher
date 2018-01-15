@@ -5,7 +5,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/gth"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/spf13/cobra"
 )
 
@@ -16,11 +15,11 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		logrus.WithFields(logrus.Fields{
-			"version": met.GetVersion(),
-			"build":   met.GetBuild(),
+			"version": Version,
+			"build":   Build,
 		}).Info("Current Philosopher build and version")
 
-		gth.UpdateChecker()
+		gth.UpdateChecker(Version, Build)
 
 		return
 	},

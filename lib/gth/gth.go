@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/met"
 )
 
 // Release information from GitHub
@@ -26,27 +25,29 @@ type Release struct {
 type Releases []Release
 
 // UpdateChecker reads GitHub API and reports if there is a new version available
-func UpdateChecker() {
+func UpdateChecker(v, b string) {
 
 	// GET request
 	res, err := http.Get("https://api.github.com/repos/prvst/philosopher/releases")
 	if err != nil {
-		logrus.Fatal(err)
-	}
+		logrus.Warning("Can't check for updates, server unreachable: ", err)
+	} else {
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 
-	var rel Releases
-	err = json.Unmarshal(body, &rel)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+		var rel Releases
+		err = json.Unmarshal(body, &rel)
+		if err != nil {
+			logrus.Fatal(err)
+		}
 
-	if rel[0].TagName > met.GetVersion() {
-		logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
+		if rel[0].TagName > v {
+			logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
+		}
+
 	}
 
 }

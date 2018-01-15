@@ -12,6 +12,13 @@ import (
 
 var m met.Data
 
+var (
+	// Version code
+	Version string
+	// Build code
+	Build string
+)
+
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "philosopher",
