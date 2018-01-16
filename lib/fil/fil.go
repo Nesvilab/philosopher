@@ -802,6 +802,14 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					}
 				}
 
+				// for debuging
+				// if strings.Contains(string(p.Groups[i].Proteins[j].ProteinName), "") {
+				// 	fmt.Println("PING")
+				// 	fmt.Println(p.Groups[i].Proteins[j].PeptideIons[k].Razor)
+				// 	fmt.Println(p.Groups[i].Proteins[j].HasRazor)
+				// 	os.Exit(1)
+				// }
+
 			}
 		}
 	}
