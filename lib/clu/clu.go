@@ -41,10 +41,10 @@ type Cluster struct {
 type List []Cluster
 
 // GenerateReport creates the protein report output
-func GenerateReport(c met.Cluster, home, temp string) error {
+func GenerateReport(c met.Cluster, uuid, home, temp string) error {
 
 	// create clean reference db for clustering
-	clusterFasta, err := createCleanDataBaseReference(c.UID, temp)
+	clusterFasta, err := createCleanDataBaseReference(uuid, temp)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func GenerateReport(c met.Cluster, home, temp string) error {
 	mappedClust := mapProtXML2Clusters(clusters)
 
 	// mapping to functional annotation and save to disk
-	savetoDisk(mappedClust, home, c.UID)
+	savetoDisk(mappedClust, home, uuid)
 
 	if err != nil {
 		return err
