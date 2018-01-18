@@ -136,32 +136,35 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 
 		for _, j := range proid {
 
-			var ce rep.CombinedEvidence
+			if !strings.Contains(j.ProteinName, a.Tag) {
 
-			ce.TotalSpc = make(map[string]int)
-			ce.UniqueSpc = make(map[string]int)
-			ce.UrazorSpc = make(map[string]int)
+				var ce rep.CombinedEvidence
 
-			ce.TotalIntensity = make(map[string]float64)
-			ce.UniqueIntensity = make(map[string]float64)
-			ce.UrazorIntensity = make(map[string]float64)
+				ce.TotalSpc = make(map[string]int)
+				ce.UniqueSpc = make(map[string]int)
+				ce.UrazorSpc = make(map[string]int)
 
-			ce.TotalLabels = make(map[string]tmt.Labels)
-			ce.UniqueLabels = make(map[string]tmt.Labels)
-			ce.URazorLabels = make(map[string]tmt.Labels)
+				ce.TotalIntensity = make(map[string]float64)
+				ce.UniqueIntensity = make(map[string]float64)
+				ce.UrazorIntensity = make(map[string]float64)
 
-			ce.SupportingSpectra = make(map[string]string)
-			ce.ProteinName = j.ProteinName
-			ce.Length = j.Length
-			ce.GroupNumber = j.GroupNumber
-			ce.SiblingID = j.GroupSiblingID
-			ce.IndiProtein = j.IndistinguishableProtein
-			ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
-			ce.PeptideIons = j.PeptideIons
-			ce.ProteinProbability = j.Probability
-			ce.TopPepProb = j.TopPepProb
+				ce.TotalLabels = make(map[string]tmt.Labels)
+				ce.UniqueLabels = make(map[string]tmt.Labels)
+				ce.URazorLabels = make(map[string]tmt.Labels)
 
-			list = append(list, ce)
+				ce.SupportingSpectra = make(map[string]string)
+				ce.ProteinName = j.ProteinName
+				ce.Length = j.Length
+				ce.GroupNumber = j.GroupNumber
+				ce.SiblingID = j.GroupSiblingID
+				ce.IndiProtein = j.IndistinguishableProtein
+				ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
+				ce.PeptideIons = j.PeptideIons
+				ce.ProteinProbability = j.Probability
+				ce.TopPepProb = j.TopPepProb
+
+				list = append(list, ce)
+			}
 		}
 
 	}
@@ -184,35 +187,13 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 
 	for k, v := range datasets {
 
-		var ions = make(map[string]int)
-		var exclusion = make(map[string]uint8)
-
-		for _, i := range v.PSM {
-			ions[i.IonForm]++
-		}
-
-		for _, i := range v.Proteins {
-			for j := range combined {
-				if i.ProteinID == combined[j].ProteinID {
-					combined[j].UniqueSpc[k] = i.UniqueSpC
-					combined[j].TotalSpc[k] = i.TotalSpC
-					break
-				}
-			}
-		}
-
 		for i := range combined {
-			for _, j := range combined[i].PeptideIons {
-				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
-				sum, ok := ions[ion]
-				if ok {
-					_, excl := exclusion[ion]
-					if !excl {
-						if j.Razor == 1 {
-							combined[i].UrazorSpc[k] += sum
-							exclusion[ion] = 0
-						}
-					}
+			for _, j := range v.Proteins {
+				if combined[i].ProteinID == j.ProteinID {
+					combined[i].UniqueSpc[k] = j.UniqueSpC
+					combined[i].TotalSpc[k] = j.TotalSpC
+					combined[i].UrazorSpc[k] = j.URazorSpC
+					break
 				}
 			}
 		}
@@ -221,6 +202,81 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 
 	return combined
 }
+
+// func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]rep.Evidence) rep.CombinedEvidenceList {
+//
+// 	for k, v := range datasets {
+//
+// 		//var ions = make(map[string]int)
+// 		//var exclusion = make(map[string]uint8)
+//
+// 		// for _, i := range v.PSM {
+// 		// 	ions[i.IonForm]++
+// 		// }
+//
+// 		for i := range combined {
+// 			for _, j := range v.Proteins {
+// 				if combined[i].ProteinID == j.ProteinID {
+// 					combined[i].UniqueSpc[k] = j.UniqueSpC
+// 					combined[i].TotalSpc[k] = j.TotalSpC
+// 					combined[i].UrazorSpc[k] = j.URazorSpC
+// 					break
+// 				}
+// 			}
+// 		}
+//
+// 		// for _, i := range v.Proteins {
+// 		// 	for j := range combined {
+// 		// 		if i.ProteinID == combined[j].ProteinID {
+// 		// 			combined[j].UniqueSpc[k] = i.UniqueSpC
+// 		// 			combined[j].TotalSpc[k] = i.TotalSpC
+// 		// 			combined[j].UrazorSpc[k] = i.URazorSpC
+// 		//
+// 		// 			if combined[j].ProteinID == "NP_078966" {
+// 		// 				fmt.Println("PING combined")
+// 		// 				os.Exit(1)
+// 		// 			}
+// 		//
+// 		// 			if i.ProteinID == "NP_078966" && combined[j].ProteinID == "NP_078966" {
+// 		// 				fmt.Println("PING")
+// 		// 				os.Exit(1)
+// 		// 			}
+// 		//
+// 		// 			break
+// 		// 		}
+// 		// 	}
+// 		// }
+//
+// 		// for i := range combined {
+// 		// 	for _, j := range combined[i].PeptideIons {
+// 		// 		ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
+// 		// 		sum, ok := ions[ion]
+// 		// 		if ok {
+// 		// 			_, excl := exclusion[ion]
+// 		// 			if !excl {
+// 		// 				if j.Razor == 1 {
+// 		// 					combined[i].UrazorSpc[k] += sum
+// 		// 					exclusion[ion] = 0
+// 		// 				}
+// 		// 			}
+// 		// 		}
+// 		// 	}
+// 		// }
+//
+// 	}
+//
+// 	// for _, i := range combined {
+// 	// 	if i.ProteinID == "" {
+// 	// 		litter.Dump(i.TotalSpc)
+// 	// 		litter.Dump(i.UniqueSpc)
+// 	// 		litter.Dump(i.UrazorSpc)
+// 	// 	}
+// 	// }
+//
+// 	fmt.Println(len(combined))
+//
+// 	return combined
+// }
 
 func getLabelIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.Evidence) rep.CombinedEvidenceList {
 

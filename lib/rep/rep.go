@@ -207,7 +207,6 @@ type CombinedEvidence struct {
 	Length                 int
 	Names                  []string
 	UniqueStrippedPeptides int
-	TotalIons              int
 	SupportingSpectra      map[string]string
 	ProteinProbability     float64
 	TopPepProb             float64
