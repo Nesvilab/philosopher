@@ -176,7 +176,6 @@ type PTMProphet struct {
 
 // Filter options and parameters
 type Filter struct {
-	Phi      string
 	Pex      string
 	Pox      string
 	Tag      string
@@ -203,7 +202,6 @@ type Filter struct {
 
 // Quantify options and parameters
 type Quantify struct {
-	Phi      string
 	Format   string
 	Dir      string
 	Brand    string
@@ -225,6 +223,7 @@ type Abacus struct {
 	Razor    bool
 	Picked   bool
 	Labels   bool
+	Unique   bool
 	ProtProb float64
 	PepProb  float64
 }
