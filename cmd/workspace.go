@@ -6,7 +6,6 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/jpillora/go-ogle-analytics"
 	"github.com/prvst/philosopher/lib/gth"
-	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +27,7 @@ var workspaceCmd = &cobra.Command{
 		if i == true {
 
 			logrus.Info("Creating workspace")
-			e := wrk.Init()
+			e := wrk.Init(Version, Build)
 			if e != nil {
 				if e.Class == "warning" {
 					logrus.Warn(e.Error())
@@ -79,7 +78,7 @@ func init() {
 			panic(err)
 		}
 
-		err = client.Send(ga.NewEvent(met.GetBuild(), met.GetVersion()))
+		err = client.Send(ga.NewEvent(Build, Version))
 		if err != nil {
 			panic(err)
 		}

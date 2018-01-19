@@ -10,7 +10,7 @@ import (
 )
 
 // Init creates a new workspace
-func Init() *err.Error {
+func Init(version, build string) *err.Error {
 
 	var m met.Data
 	m.Restore(sys.Meta())
@@ -25,6 +25,9 @@ func Init() *err.Error {
 	}
 
 	da := met.New(dir)
+
+	da.Version = version
+	da.Build = build
 
 	os.Mkdir(da.MetaDir, 0755)
 	os.Mkdir(da.Temp, 0755)

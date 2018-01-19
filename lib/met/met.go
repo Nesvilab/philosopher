@@ -26,6 +26,8 @@ type Data struct {
 	Arch           string
 	Distro         string
 	TimeStamp      string
+	Version        string
+	Build          string
 	ProjectName    string
 	Database       Database
 	Comet          Comet
@@ -281,16 +283,16 @@ func New(h string) Data {
 }
 
 // GetVersion returns the updated software version
-func GetVersion() string {
-	t := time.Now()
-	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
-}
+// func GetVersion() string {
+// 	t := time.Now()
+// 	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
+// }
 
 // GetBuild returns the updated software version and build
-func GetBuild() string {
-	t := time.Now()
-	return fmt.Sprintf("%d%02d%02d.%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
-}
+// func GetBuild() string {
+// 	t := time.Now()
+// 	return fmt.Sprintf("%d%02d%02d.%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
+// }
 
 // Serialize converts the whole structure to a gob file
 func (d *Data) Serialize() error {
