@@ -2,9 +2,10 @@ clean: true
 backup: true
 analytics: false
 commands:
-  workspace: yes
-  database: yes
+  workspace: no
+  database: no
   comet: no
+  peptideprophet: yes
 database:
   add: ''
   annotate: ''
@@ -18,3 +19,5 @@ database:
 comet:
   noindex: true
   param: ''
+  raw: 'mzML'
+peptideprophet:

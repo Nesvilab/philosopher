@@ -21,7 +21,7 @@ var pipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		logrus.Info("Executing the pipeline")
+		logrus.Info("Executing the pipeline on ", m.Pipeline.Dataset)
 
 		file, _ := filepath.Abs(m.Pipeline.Directives)
 
@@ -36,23 +36,22 @@ var pipelineCmd = &cobra.Command{
 			logrus.Fatal(e)
 		}
 
-		// Creating the Workspace
-		for _, i := range args {
-			localDir, _ := filepath.Abs(i)
-			os.Chdir(localDir)
-			//logrus.Info("Creating Workspace on ", i)
-			wrk.Run(Version, Build, false, false, false, true)
+		// getting inside de the dataset folder
+		localDir, _ := filepath.Abs(m.Pipeline.Dataset)
+		os.Chdir(localDir)
+
+		// Workspace
+		wrk.Run(Version, Build, false, false, false, true)
+
+		// Database
+		if p.Commands.Database == "yes" {
+			m.Database = p.Database
+			dat.Run(m)
 		}
 
-		// Annotating the database
-		if p.Commands.Database == "yes" {
-			for _, i := range args {
-				localDir, _ := filepath.Abs(i)
-				os.Chdir(localDir)
-				//logrus.Info("Creating Database on ", i)
-				m.Database = p.Database
-				dat.Run(m)
-			}
+		// Comet
+		if p.Commands.Comet == "yes" {
+			m.Comet = p.Comet
 		}
 
 		logrus.Info("Done")
@@ -67,6 +66,8 @@ func init() {
 		m.Restore(sys.Meta())
 
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
+		pipelineCmd.Flags().StringVarP(&m.Pipeline.Dataset, "dataset", "", "", "dataset directory")
+
 	}
 
 	RootCmd.AddCommand(pipelineCmd)

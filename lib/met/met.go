@@ -59,11 +59,11 @@ type Database struct {
 
 // Comet options and parameters
 type Comet struct {
-	Param     string
+	Param     string `yaml:"param"`
 	ParamFile []byte
 	RawFiles  []string
 	Print     bool
-	NoIndex   bool
+	NoIndex   bool `yaml:"noindex"`
 }
 
 // PeptideProphet options and parameters
@@ -248,6 +248,7 @@ type Index struct {
 // Pipeline options and parameters
 type Pipeline struct {
 	Directives string
+	Dataset    string
 }
 
 var err error
