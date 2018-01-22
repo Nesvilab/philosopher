@@ -1,3 +1,14 @@
+# Philosopher 20180119
+### Build: 201801191554
+
+### Added
+- TMT quantification based on unique peptides only for the Abacus report.
+
+### Changed
+
+### Fixed
+- Minor bugs fixed for the Abacus report generation.
+
 # Philosopher 20180115
 ### Build: 201801151336
 
