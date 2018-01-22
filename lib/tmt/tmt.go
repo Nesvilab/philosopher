@@ -29,79 +29,90 @@ type LabeledSpectra map[string]Labels
 
 // Channel1 TMT
 type Channel1 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel2 TMT
 type Channel2 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel3 TMT
 type Channel3 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel4 TMT
 type Channel4 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel5 TMT
 type Channel5 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel6 TMT
 type Channel6 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel7 TMT
 type Channel7 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel8 TMT
 type Channel8 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel9 TMT
 type Channel9 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel10 TMT
 type Channel10 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // Channel11 TMT
 type Channel11 struct {
-	Name      string
-	Mz        float64
-	Intensity float64
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
 }
 
 // New builds a new Labelled spectra object

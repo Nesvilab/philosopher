@@ -207,7 +207,6 @@ type CombinedEvidence struct {
 	Length                 int
 	Names                  []string
 	UniqueStrippedPeptides int
-	TotalIons              int
 	SupportingSpectra      map[string]string
 	ProteinProbability     float64
 	TopPepProb             float64
@@ -1409,6 +1408,9 @@ func (e *Evidence) ProteinReport() {
 
 		var urazorIons int
 		for _, j := range i.TotalPeptideIons {
+			if j.IsUnique == true {
+				urazorIons++
+			}
 			if j.IsURazor == true {
 				urazorIons++
 			}
@@ -1508,11 +1510,13 @@ func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
 			}
 		}
 
-		var razorIons int
+		var urazorIons int
 		for _, j := range i.TotalPeptideIons {
-			//if j.IsNondegenerateEvidence == true {
 			if j.IsUnique == true {
-				razorIons++
+				urazorIons++
+			}
+			if j.IsURazor == true {
+				urazorIons++
 			}
 		}
 
@@ -1558,7 +1562,7 @@ func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
 				i.UniqueStrippedPeptides, // Unique Stripped Peptides
 				len(i.TotalPeptideIons),  // Total peptide Ions
 				uniqIons,                 // Unique Peptide Ions
-				razorIons,                // Unique+Razor peptide Ions
+				urazorIons,               // Unique+Razor peptide Ions
 				i.TotalSpC,               // Total Spectral Count
 				i.UniqueSpC,              // Unique Spectral Count
 				i.URazorSpC,              // Unique+Razor Spectral Count

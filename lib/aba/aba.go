@@ -92,7 +92,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	// collect TMT labels
 	if a.Labels == true {
-		saveCompareTMTResults(temp, evidences, datasets, names)
+		saveCompareTMTResults(temp, evidences, datasets, names, a.Unique)
 	} else {
 		saveCompareResults(temp, evidences, datasets, names)
 	}
@@ -136,32 +136,35 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedEvidenceL
 
 		for _, j := range proid {
 
-			var ce rep.CombinedEvidence
+			if !strings.Contains(j.ProteinName, a.Tag) {
 
-			ce.TotalSpc = make(map[string]int)
-			ce.UniqueSpc = make(map[string]int)
-			ce.UrazorSpc = make(map[string]int)
+				var ce rep.CombinedEvidence
 
-			ce.TotalIntensity = make(map[string]float64)
-			ce.UniqueIntensity = make(map[string]float64)
-			ce.UrazorIntensity = make(map[string]float64)
+				ce.TotalSpc = make(map[string]int)
+				ce.UniqueSpc = make(map[string]int)
+				ce.UrazorSpc = make(map[string]int)
 
-			ce.TotalLabels = make(map[string]tmt.Labels)
-			ce.UniqueLabels = make(map[string]tmt.Labels)
-			ce.URazorLabels = make(map[string]tmt.Labels)
+				ce.TotalIntensity = make(map[string]float64)
+				ce.UniqueIntensity = make(map[string]float64)
+				ce.UrazorIntensity = make(map[string]float64)
 
-			ce.SupportingSpectra = make(map[string]string)
-			ce.ProteinName = j.ProteinName
-			ce.Length = j.Length
-			ce.GroupNumber = j.GroupNumber
-			ce.SiblingID = j.GroupSiblingID
-			ce.IndiProtein = j.IndistinguishableProtein
-			ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
-			ce.PeptideIons = j.PeptideIons
-			ce.ProteinProbability = j.Probability
-			ce.TopPepProb = j.TopPepProb
+				ce.TotalLabels = make(map[string]tmt.Labels)
+				ce.UniqueLabels = make(map[string]tmt.Labels)
+				ce.URazorLabels = make(map[string]tmt.Labels)
 
-			list = append(list, ce)
+				ce.SupportingSpectra = make(map[string]string)
+				ce.ProteinName = j.ProteinName
+				ce.Length = j.Length
+				ce.GroupNumber = j.GroupNumber
+				ce.SiblingID = j.GroupSiblingID
+				ce.IndiProtein = j.IndistinguishableProtein
+				ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
+				ce.PeptideIons = j.PeptideIons
+				ce.ProteinProbability = j.Probability
+				ce.TopPepProb = j.TopPepProb
+
+				list = append(list, ce)
+			}
 		}
 
 	}
@@ -184,35 +187,13 @@ func getSpectralCounts(combined rep.CombinedEvidenceList, datasets map[string]re
 
 	for k, v := range datasets {
 
-		var ions = make(map[string]int)
-		var exclusion = make(map[string]uint8)
-
-		for _, i := range v.PSM {
-			ions[i.IonForm]++
-		}
-
-		for _, i := range v.Proteins {
-			for j := range combined {
-				if i.ProteinID == combined[j].ProteinID {
-					combined[j].UniqueSpc[k] = i.UniqueSpC
-					combined[j].TotalSpc[k] = i.TotalSpC
-					break
-				}
-			}
-		}
-
 		for i := range combined {
-			for _, j := range combined[i].PeptideIons {
-				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
-				sum, ok := ions[ion]
-				if ok {
-					_, excl := exclusion[ion]
-					if !excl {
-						if j.Razor == 1 {
-							combined[i].UrazorSpc[k] += sum
-							exclusion[ion] = 0
-						}
-					}
+			for _, j := range v.Proteins {
+				if combined[i].ProteinID == j.ProteinID {
+					combined[i].UniqueSpc[k] = j.UniqueSpC
+					combined[i].TotalSpc[k] = j.TotalSpC
+					combined[i].UrazorSpc[k] = j.URazorSpC
+					break
 				}
 			}
 		}
@@ -226,12 +207,12 @@ func getLabelIntensities(combined rep.CombinedEvidenceList, datasets map[string]
 
 	for k, v := range datasets {
 
-		for _, i := range v.Proteins {
-			for j := range combined {
-				if i.ProteinID == combined[j].ProteinID {
-					combined[j].TotalLabels[k] = i.TotalLabels
-					combined[j].UniqueLabels[k] = i.UniqueLabels
-					combined[j].URazorLabels[k] = i.URazorLabels
+		for i := range combined {
+			for _, j := range v.Proteins {
+				if combined[i].ProteinID == j.ProteinID {
+					combined[i].TotalLabels[k] = j.TotalLabels
+					combined[i].UniqueLabels[k] = j.UniqueLabels
+					combined[i].URazorLabels[k] = j.URazorLabels
 					break
 				}
 			}
@@ -252,15 +233,25 @@ func sumIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.E
 			ions[i.IonForm] = i.Intensity
 		}
 
-		for _, i := range v.Proteins {
-			for j := range combined {
-				if i.ProteinID == combined[j].ProteinID {
-					combined[j].TotalIntensity[k] = i.TotalIntensity
-					combined[j].UniqueIntensity[k] = i.UniqueIntensity
+		for _, i := range combined {
+			for j := range v.Proteins {
+				if i.ProteinID == v.Proteins[j].ProteinID {
+					i.TotalIntensity[k] = v.Proteins[j].TotalIntensity
+					i.UniqueIntensity[k] = v.Proteins[j].UniqueIntensity
 					break
 				}
 			}
 		}
+
+		// for _, i := range v.Proteins {
+		// 	for j := range combined {
+		// 		if i.ProteinID == combined[j].ProteinID {
+		// 			combined[j].TotalIntensity[k] = i.TotalIntensity
+		// 			combined[j].UniqueIntensity[k] = i.UniqueIntensity
+		// 			break
+		// 		}
+		// 	}
+		// }
 
 		for i := range combined {
 
@@ -379,7 +370,7 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 }
 
 // saveCompareTMTResults creates a single report using 1 or more philosopher result files
-func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string) {
+func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly bool) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -404,8 +395,6 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 		line += fmt.Sprintf("%s Razor Intensity\t", i)
 	}
 
-	line += "Indistinguishable Proteins\t"
-
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s 126 Abundance\t", i)
 		line += fmt.Sprintf("%s 127N Abundance\t", i)
@@ -418,6 +407,8 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 		line += fmt.Sprintf("%s 130C Abundance\t", i)
 		line += fmt.Sprintf("%s 131N Abundance\t", i)
 	}
+
+	line += "Indistinguishable Proteins\t"
 
 	line += "\n"
 	n, err := io.WriteString(file, line)
@@ -456,23 +447,40 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
 		}
 
+		if uniqueOnly == true {
+			for _, j := range namesList {
+				line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+					i.UniqueLabels[j].Channel1.Intensity,
+					i.UniqueLabels[j].Channel2.Intensity,
+					i.UniqueLabels[j].Channel3.Intensity,
+					i.UniqueLabels[j].Channel4.Intensity,
+					i.UniqueLabels[j].Channel5.Intensity,
+					i.UniqueLabels[j].Channel6.Intensity,
+					i.UniqueLabels[j].Channel7.Intensity,
+					i.UniqueLabels[j].Channel8.Intensity,
+					i.UniqueLabels[j].Channel9.Intensity,
+					i.UniqueLabels[j].Channel10.Intensity,
+				)
+			}
+		} else {
+			for _, j := range namesList {
+				line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+					i.URazorLabels[j].Channel1.Intensity,
+					i.URazorLabels[j].Channel2.Intensity,
+					i.URazorLabels[j].Channel3.Intensity,
+					i.URazorLabels[j].Channel4.Intensity,
+					i.URazorLabels[j].Channel5.Intensity,
+					i.URazorLabels[j].Channel6.Intensity,
+					i.URazorLabels[j].Channel7.Intensity,
+					i.URazorLabels[j].Channel8.Intensity,
+					i.URazorLabels[j].Channel9.Intensity,
+					i.URazorLabels[j].Channel10.Intensity,
+				)
+			}
+		}
+
 		ip := strings.Join(i.IndiProtein, ", ")
 		line += fmt.Sprintf("%s\t", ip)
-
-		for _, j := range namesList {
-			line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
-				i.URazorLabels[j].Channel1.Intensity,
-				i.URazorLabels[j].Channel2.Intensity,
-				i.URazorLabels[j].Channel3.Intensity,
-				i.URazorLabels[j].Channel4.Intensity,
-				i.URazorLabels[j].Channel5.Intensity,
-				i.URazorLabels[j].Channel6.Intensity,
-				i.URazorLabels[j].Channel7.Intensity,
-				i.URazorLabels[j].Channel8.Intensity,
-				i.URazorLabels[j].Channel9.Intensity,
-				i.URazorLabels[j].Channel10.Intensity,
-			)
-		}
 
 		line += "\n"
 		n, err := io.WriteString(file, line)

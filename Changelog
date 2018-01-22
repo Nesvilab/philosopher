@@ -1,5 +1,22 @@
-## [20180104] - 2018-01-04
-### Build: 20180104.1600
+# Philosopher 20180122
+### Build: 201801221051
+
+### Added
+- TMT quantification based on unique peptides only for the Abacus report.
+
+### Changed
+
+### Fixed
+- Minor bugs fixed for the Abacus report generation.
+
+# Philosopher 20180115
+### Build: 201801151336
+
+### Changed
+- The Versioning system was updated
+
+# Philosopher 20180104
+### Build: 20180104.1659
 
 ### Added
 - PickedFDR option added to the Abacus report.

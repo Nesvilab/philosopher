@@ -5,13 +5,19 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	colorable "github.com/mattn/go-colorable"
-	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 
 var m met.Data
+
+var (
+	// Version code
+	Version string
+	// Build code
+	Build string
+)
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -42,8 +48,6 @@ func init() {
 	}
 
 	logrus.SetFormatter(fmt)
-
-	gth.UpdateChecker()
 }
 
 // initConfig reads in config file and ENV variables if set.

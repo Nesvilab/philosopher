@@ -1,0 +1,17 @@
+workspace:
+  execute: yes
+  initialize: yes
+  clean: no
+  backup: no
+  analytics: true
+database:
+  execute: yes
+  add: ''
+  annotate: ''
+  contam: false
+  custom: ''
+  enzyme: trypsin
+  id: ''
+  isoform: false
+  prefix: rev_
+  reviewed: true

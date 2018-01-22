@@ -6,7 +6,7 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
-LDFLAGS = -ldflags "-w -s"
+LDFLAGS = -ldflags "-w -s -X main.Version=${VERSION} -X main.Build=${BUILD}"
 
 .DEFAULT_GOAL: $(BINARY)
 
@@ -69,7 +69,7 @@ linux:
 .PHONY: castor
 castor:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/Downloads/philosopher
+	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/bin/philosopher
 	rm philosopher.${VERSION}
 
 .PHONY: windows
