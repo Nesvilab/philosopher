@@ -4,10 +4,55 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 )
+
+// Run is the workspace main entry point
+func Run(Version, Build string, a, b, c, i bool) {
+
+	gth.UpdateChecker(Version, Build)
+
+	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
+		logrus.Fatal("this command accepts only one parameter")
+	}
+
+	if i == true {
+
+		logrus.Info("Creating workspace")
+		e := Init(Version, Build)
+		if e != nil {
+			if e.Class == "warning" {
+				logrus.Warn(e.Error())
+			}
+		}
+		return
+
+	} else if b == true {
+
+		logrus.Info("Creating backup")
+		e := Backup()
+		if e != nil {
+			logrus.Warn(e.Error())
+		}
+		return
+
+	} else if c == true {
+
+		logrus.Info("Removing workspace")
+		e := Clean()
+		if e != nil {
+			logrus.Warn(e.Error())
+		}
+		return
+
+	}
+
+	return
+}
 
 // Init creates a new workspace
 func Init(version, build string) *err.Error {

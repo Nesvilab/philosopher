@@ -1,17 +1,20 @@
-workspace:
-  execute: yes
-  initialize: yes
-  clean: no
-  backup: no
-  analytics: true
+clean: true
+backup: true
+analytics: false
+commands:
+  workspace: yes
+  database: yes
+  comet: no
 database:
-  execute: yes
   add: ''
   annotate: ''
-  contam: false
+  contam: true
   custom: ''
   enzyme: trypsin
   id: ''
   isoform: false
   prefix: rev_
   reviewed: true
+comet:
+  noindex: true
+  param: ''

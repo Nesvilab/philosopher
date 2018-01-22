@@ -26,54 +26,10 @@ var databaseCmd = &cobra.Command{
 		// store paramters on meta data
 		m.Serialize()
 
-		var db = dat.New()
+		m = dat.Run(m)
 
-		if len(m.Database.Annot) > 0 {
-
-			logrus.Info("Processing database")
-
-			err := db.ProcessDB(m.Database.Annot, m.Database.Tag)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
-			err = db.Serialize()
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
-			logrus.Info("Done")
-			return
-
-		}
-
-		if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
-			logrus.Fatal("You need to provide a taxon ID or a custom FASTA file")
-		}
-
-		if m.Database.Crap == false {
-			logrus.Warning("Contaminants are not going to be added to database")
-		}
-
-		if len(m.Database.Custom) < 1 {
-
-			logrus.Info("Fetching database")
-			db.Fetch(m.Database.ID, m.Temp, m.Database.Iso, m.Database.Rev)
-
-		} else {
-			db.UniProtDB = m.Database.Custom
-		}
-
-		logrus.Info("Processing decoys")
-		db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
-
-		logrus.Info("Creating file")
-		db.Save(m.Home, m.Temp, m.Database.Tag)
-
-		err := db.Serialize()
-		if err != nil {
-			logrus.Fatal(err)
-		}
+		// store paramters on meta data
+		m.Serialize()
 
 		logrus.Info("Done")
 		return

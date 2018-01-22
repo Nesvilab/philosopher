@@ -41,19 +41,20 @@ type Data struct {
 	Abacus         Abacus
 	Report         Report
 	Index          Index
+	Pipeline       Pipeline
 }
 
 // Database options and parameters
 type Database struct {
-	ID     string
-	Annot  string
-	Enz    string
-	Tag    string
-	Add    string
-	Custom string
-	Crap   bool
-	Rev    bool
-	Iso    bool
+	ID     string `yaml:"id"`
+	Annot  string `yaml:"annotate"`
+	Enz    string `yaml:"enzyme"`
+	Tag    string `yaml:"prefix"`
+	Add    string `yaml:"add"`
+	Custom string `yaml:"custom"`
+	Crap   bool   `yaml:"contam"`
+	Rev    bool   `yaml:"reviewed"`
+	Iso    bool   `yaml:"isoform"`
 }
 
 // Comet options and parameters
@@ -242,6 +243,11 @@ type Report struct {
 // Index options and parameters
 type Index struct {
 	Spectra string
+}
+
+// Pipeline options and parameters
+type Pipeline struct {
+	Directives string
 }
 
 var err error

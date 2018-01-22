@@ -5,7 +5,6 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/jpillora/go-ogle-analytics"
-	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -18,46 +17,9 @@ var workspaceCmd = &cobra.Command{
 	Short: "Manage the experiment workspace for the analysis",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		gth.UpdateChecker(Version, Build)
+		wrk.Run(Version, Build, a, b, c, i)
 
-		if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
-			logrus.Fatal("this command accepts only one parameter")
-		}
-
-		if i == true {
-
-			logrus.Info("Creating workspace")
-			e := wrk.Init(Version, Build)
-			if e != nil {
-				if e.Class == "warning" {
-					logrus.Warn(e.Error())
-				}
-			}
-			logrus.Info("Done")
-			return
-
-		} else if b == true {
-
-			logrus.Info("Creating backup")
-			e := wrk.Backup()
-			if e != nil {
-				logrus.Warn(e.Error())
-			}
-			logrus.Info("Done")
-			return
-
-		} else if c == true {
-
-			logrus.Info("Removing workspace")
-			e := wrk.Clean()
-			if e != nil {
-				logrus.Warn(e.Error())
-			}
-			logrus.Info("Done")
-			return
-
-		}
-
+		logrus.Info("Done")
 		return
 	},
 }
