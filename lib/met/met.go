@@ -69,96 +69,95 @@ type Comet struct {
 // PeptideProphet options and parameters
 type PeptideProphet struct {
 	InputFiles   []string
-	Output       string
-	Database     string
-	Rtcat        string
-	Decoy        string
-	Minpiprob    float64
-	Minrtprob    float64
-	Minprob      float64
-	Masswidth    float64
-	MinPepLen    int
-	Clevel       int
-	Minpintt     int
-	Ignorechg    int
-	Minrtntt     int
-	Combine      bool
-	Exclude      bool
-	Leave        bool
-	Perfectlib   bool
-	Icat         bool
-	Noicat       bool
-	Zero         bool
-	Accmass      bool
-	Ppm          bool
-	Nomass       bool
-	Pi           bool
-	Rt           bool
-	Glyc         bool
-	Phospho      bool
-	Maldi        bool
-	Instrwarn    bool
-	Decoyprobs   bool
-	Nontt        bool
-	Nonmc        bool
-	Expectscore  bool
-	Nonparam     bool
-	Neggamma     bool
-	Forcedistr   bool
-	Optimizefval bool
+	Output       string  `yaml:"output"`
+	Database     string  `yaml:"database"`
+	Rtcat        string  `yaml:"rtcat"`
+	Decoy        string  `yaml:"decoy"`
+	Minpiprob    float64 `yaml:"minpiprob"`
+	Minrtprob    float64 `yaml:"minrtprob"`
+	Minprob      float64 `yaml:"minprob"`
+	Masswidth    float64 `yaml:"masswidth"`
+	MinPepLen    int     `yaml:"minpeplen"`
+	Clevel       int     `yaml:"clevel"`
+	Minpintt     int     `yaml:"minpintt"`
+	Minrtntt     int     `yaml:"minrtntt"`
+	Combine      bool    `yaml:"combine"`
+	Exclude      bool    `yaml:"exclude"`
+	Leave        bool    `yaml:"leave"`
+	Perfectlib   bool    `yaml:"perfectlib"`
+	Icat         bool    `yaml:"icat"`
+	Noicat       bool    `yaml:"noicat"`
+	Zero         bool    `yaml:"zero"`
+	Accmass      bool    `yaml:"accmass"`
+	Ppm          bool    `yaml:"ppm"`
+	Nomass       bool    `yaml:"nomass"`
+	Pi           bool    `yaml:"pi"`
+	Rt           bool    `yaml:"rt"`
+	Glyc         bool    `yaml:"glyc"`
+	Phospho      bool    `yaml:"phospho"`
+	Maldi        bool    `yaml:"maldi"`
+	Instrwarn    bool    `yaml:"instrwarn"`
+	Decoyprobs   bool    `yaml:"decoyprobs"`
+	Nontt        bool    `yaml:"nontt"`
+	Nonmc        bool    `yaml:"nonmc"`
+	Expectscore  bool    `yaml:"expectscore"`
+	Nonparam     bool    `yaml:"nonparam"`
+	Neggamma     bool    `yaml:"neggamma"`
+	Forcedistr   bool    `yaml:"forcedistr"`
+	Optimizefval bool    `yaml:"optimizefval"`
 }
 
 // InterProphet options and parameters
 type InterProphet struct {
 	InputFiles []string
-	Threads    int
-	Decoy      string
-	Cat        string
-	MinProb    float64
-	Output     string
-	Length     bool
-	Nofpkm     bool
-	Nonss      bool
-	Nonse      bool
-	Nonrs      bool
-	Nonsm      bool
-	Nonsp      bool
-	Sharpnse   bool
-	Nonsi      bool
+	Threads    int     `yaml:"threads"`
+	Decoy      string  `yaml:"decoy"`
+	Cat        string  `yaml:"cat"`
+	MinProb    float64 `yaml:"minprob"`
+	Output     string  `yaml:"output"`
+	Length     bool    `yaml:"length"`
+	Nofpkm     bool    `yaml:"nofpkm"`
+	Nonss      bool    `yaml:"nonss"`
+	Nonse      bool    `yaml:"nonse"`
+	Nonrs      bool    `yaml:"nonrs"`
+	Nonsm      bool    `yaml:"nonsm"`
+	Nonsp      bool    `yaml:"nonsp"`
+	Sharpnse   bool    `yaml:"sharpnse"`
+	Nonsi      bool    `yaml:"nonsi"`
 }
 
 // ProteinProphet options and parameters
 type ProteinProphet struct {
 	InputFiles  []string
-	Minprob     float64
-	Minindep    int
-	Mufactor    int
-	Output      string
-	Maxppmdiff  int
-	ExcludeZ    bool
-	Noplot      bool
-	Nooccam     bool
-	Softoccam   bool
-	Icat        bool
-	Glyc        bool
-	Nogroupwts  bool
-	NonSP       bool
-	Accuracy    bool
-	Asap        bool
-	Refresh     bool
-	Normprotlen bool
-	Logprobs    bool
-	Confem      bool
-	Allpeps     bool
-	Unmapped    bool
-	Noprotlen   bool
-	Instances   bool
-	Fpkm        bool
-	Protmw      bool
-	Iprophet    bool
-	Asapprophet bool
-	Delude      bool
-	Excludemods bool
+	Minprob     float64 `yaml:"minprob"`
+	Minindep    int     `yaml:"minidep"`
+	Mufactor    int     `yaml:"mufactor"`
+	Output      string  `yaml:"output"`
+	Maxppmdiff  int     `yaml:"maxppmdiff"`
+	ExcludeZ    bool    `yaml:"excludez"`
+	Noplot      bool    `yaml:"noplot"`
+	Nooccam     bool    `yaml:"noocam"`
+	Softoccam   bool    `yaml:"softocam"`
+	Icat        bool    `yaml:"icat"`
+	Glyc        bool    `yaml:"glyc"`
+	Nogroupwts  bool    `yaml:"nogroupwts"`
+	NonSP       bool    `yaml:"nonsp"`
+	Accuracy    bool    `yaml:"accuracy"`
+	Asap        bool    `yaml:"asap"`
+	Refresh     bool    `yaml:"refresh"`
+	Normprotlen bool    `yaml:"normprotlen"`
+	Logprobs    bool    `yaml:"logprobs"`
+	Confem      bool    `yaml:"confem"`
+	Allpeps     bool    `yaml:"allpeps"`
+	Unmapped    bool    `yaml:"unmapped"`
+	Noprotlen   bool    `yaml:"noprotlen"`
+	Instances   bool    `yaml:"instances"`
+	Fpkm        bool    `yaml:"fpkm"`
+	Protmw      bool    `yaml:"protmw"`
+	Iprophet    bool    `yaml:"iprophet"`
+	Asapprophet bool    `yaml:"asapprophet"`
+	Delude      bool    `yaml:"delude"`
+	Excludemods bool    `yaml:"excludemods"`
 }
 
 // PTMProphet options and parameters

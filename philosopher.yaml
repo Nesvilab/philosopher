@@ -21,3 +21,34 @@ comet:
   param: ''
   raw: 'mzML'
 peptideprophet:
+  accmass: false
+  combine: true
+  database: ''
+  decoy: ''
+  decoyprobs: false
+  exclude: false
+  expectscore: false
+  forcedistr: false
+  glyc: false
+  icat: false
+  instrwarn: false
+  leave: false
+  maldi: false
+  masswidth: 5
+  minpeplen: 7
+  minpintt: 2
+  minprob: 0.9
+  minrtntt: 2
+  minrtprob: 0.9
+  neggamma: false
+  noicat: false
+  nomass: false
+  nonmc: false
+  nonparam: false
+  nontt: false
+  optimizefval: false
+  phospho: false
+  pi: false
+  ppm: false
+  rt: false
+  zero: false

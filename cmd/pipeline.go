@@ -56,6 +56,13 @@ var pipelineCmd = &cobra.Command{
 			//comet.Run(m, )
 		}
 
+		// PeptideProphet
+		if p.Commands.PeptideProphet == "yes" {
+			m.PeptideProphet = p.PeptideProphet
+			m.PeptideProphet.Combine = true
+			//peptideprophet.Run(m, args)
+		}
+
 		logrus.Info("Done")
 		return
 	},

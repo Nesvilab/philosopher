@@ -23,64 +23,8 @@ var cometCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing Comet")
-		// var cmt = comet.New()
-		//
-		// if len(m.Comet.Param) < 1 {
-		// 	logrus.Fatal("No parameter file found. Run 'comet --help' for more information")
-		// }
-		//
-		// if m.Comet.Print == false && len(args) < 1 {
-		// 	logrus.Fatal("Missing parameter file or data file for analysis")
-		// }
-		//
-		// // deploy the binaries
-		// cmt.Deploy(m.OS, m.Arch)
-		//
-		// if m.Comet.Print == true {
-		// 	logrus.Info("Printing parameter file")
-		// 	sys.CopyFile(cmt.DefaultParam, filepath.Base(cmt.DefaultParam))
-		// 	return
-		// }
-		//
-		// // collect and store the mz files
-		// m.Comet.RawFiles = args
-		//
-		// // convert the param file to binary and store it in meta
-		// var binFile []byte
-		// paramAbs, _ := filepath.Abs(m.Comet.Param)
-		// binFile, e := ioutil.ReadFile(paramAbs)
-		// if e != nil {
-		// 	logrus.Fatal(e)
-		// }
-		// m.Comet.ParamFile = binFile
-		//
-		// if m.Comet.NoIndex == false {
-		// 	var extFlag = true
-		//
-		// 	// the indexing will help later in case other commands are used for qunatification
-		// 	// it will provide easy and fast access to mz data
-		// 	for _, i := range args {
-		// 		if strings.Contains(i, "mzML") {
-		// 			extFlag = false
-		// 		}
-		// 	}
-		//
-		// 	if extFlag == false {
-		// 		logrus.Info("Indexing spectra: please wait, this can take a few minutes")
-		// 		raw.IndexMz(args)
-		// 	} else {
-		// 		logrus.Info("mz file format not supported for indexing, skipping the indexing")
-		// 	}
-		// }
-		//
-		// // run comet
-		// e = cmt.Execute(args, m.Comet.Param)
-		// if e != nil {
-		// 	//logrus.Fatal(e)
-		// }
 
 		comet.Run(m, args)
-
 		m.Serialize()
 
 		logrus.Info("Done")
