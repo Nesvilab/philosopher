@@ -49,9 +49,11 @@ var pipelineCmd = &cobra.Command{
 			dat.Run(m)
 		}
 
+		// TODO find all files with raw extension and set the args list
 		// Comet
 		if p.Commands.Comet == "yes" {
 			m.Comet = p.Comet
+			//comet.Run(m, )
 		}
 
 		logrus.Info("Done")
