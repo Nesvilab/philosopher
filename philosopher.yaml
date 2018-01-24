@@ -19,13 +19,13 @@ database:
 comet:
   noindex: true
   param: ''
-  raw: 'mzML'
+  raw: mzML
 peptideprophet:
-  extension: 'pepxml'
+  extension: pepxml
   accmass: false
   combine: true
   database: ''
-  decoy: ''
+  decoy: rev_
   decoyprobs: false
   exclude: false
   expectscore: false

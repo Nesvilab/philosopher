@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -8,6 +9,8 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/ext/comet"
+	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/pip"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/wrk"
@@ -43,24 +46,43 @@ var pipelineCmd = &cobra.Command{
 		// Workspace
 		wrk.Run(Version, Build, false, false, false, true)
 
+		// reload the meta data
+		m.Restore(sys.Meta())
+
 		// Database
 		if p.Commands.Database == "yes" {
 			m.Database = p.Database
 			dat.Run(m)
 		}
 
-		// TODO find all files with raw extension and set the args list
 		// Comet
 		if p.Commands.Comet == "yes" {
 			m.Comet = p.Comet
-			//comet.Run(m, )
+
+			gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				logrus.Fatal(e)
+			}
+
+			comet.Run(m, files)
 		}
 
 		// PeptideProphet
 		if p.Commands.PeptideProphet == "yes" {
+			logrus.Info("Executing PeptideProphet")
+
 			m.PeptideProphet = p.PeptideProphet
+			m.PeptideProphet.Output = "interact"
 			m.PeptideProphet.Combine = true
-			//peptideprophet.Run(m, args)
+
+			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				logrus.Fatal(e)
+			}
+
+			peptideprophet.Run(m, files)
 		}
 
 		logrus.Info("Done")

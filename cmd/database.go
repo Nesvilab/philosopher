@@ -23,9 +23,6 @@ var databaseCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		// store paramters on meta data
-		m.Serialize()
-
 		m = dat.Run(m)
 
 		// store paramters on meta data

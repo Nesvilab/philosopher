@@ -59,52 +59,54 @@ type Database struct {
 
 // Comet options and parameters
 type Comet struct {
-	Param     string `yaml:"param"`
-	ParamFile []byte
-	RawFiles  []string
-	Print     bool
-	NoIndex   bool `yaml:"noindex"`
+	Param        string `yaml:"param"`
+	ParamFile    []byte
+	RawExtension string `yaml:"raw"`
+	RawFiles     []string
+	Print        bool
+	NoIndex      bool `yaml:"noindex"`
 }
 
 // PeptideProphet options and parameters
 type PeptideProphet struct {
-	InputFiles   []string
-	Output       string  `yaml:"output"`
-	Database     string  `yaml:"database"`
-	Rtcat        string  `yaml:"rtcat"`
-	Decoy        string  `yaml:"decoy"`
-	Minpiprob    float64 `yaml:"minpiprob"`
-	Minrtprob    float64 `yaml:"minrtprob"`
-	Minprob      float64 `yaml:"minprob"`
-	Masswidth    float64 `yaml:"masswidth"`
-	MinPepLen    int     `yaml:"minpeplen"`
-	Clevel       int     `yaml:"clevel"`
-	Minpintt     int     `yaml:"minpintt"`
-	Minrtntt     int     `yaml:"minrtntt"`
-	Combine      bool    `yaml:"combine"`
-	Exclude      bool    `yaml:"exclude"`
-	Leave        bool    `yaml:"leave"`
-	Perfectlib   bool    `yaml:"perfectlib"`
-	Icat         bool    `yaml:"icat"`
-	Noicat       bool    `yaml:"noicat"`
-	Zero         bool    `yaml:"zero"`
-	Accmass      bool    `yaml:"accmass"`
-	Ppm          bool    `yaml:"ppm"`
-	Nomass       bool    `yaml:"nomass"`
-	Pi           bool    `yaml:"pi"`
-	Rt           bool    `yaml:"rt"`
-	Glyc         bool    `yaml:"glyc"`
-	Phospho      bool    `yaml:"phospho"`
-	Maldi        bool    `yaml:"maldi"`
-	Instrwarn    bool    `yaml:"instrwarn"`
-	Decoyprobs   bool    `yaml:"decoyprobs"`
-	Nontt        bool    `yaml:"nontt"`
-	Nonmc        bool    `yaml:"nonmc"`
-	Expectscore  bool    `yaml:"expectscore"`
-	Nonparam     bool    `yaml:"nonparam"`
-	Neggamma     bool    `yaml:"neggamma"`
-	Forcedistr   bool    `yaml:"forcedistr"`
-	Optimizefval bool    `yaml:"optimizefval"`
+	InputFiles    []string
+	FileExtension string  `yaml:"extension"`
+	Output        string  `yaml:"output"`
+	Database      string  `yaml:"database"`
+	Rtcat         string  `yaml:"rtcat"`
+	Decoy         string  `yaml:"decoy"`
+	Minpiprob     float64 `yaml:"minpiprob"`
+	Minrtprob     float64 `yaml:"minrtprob"`
+	Minprob       float64 `yaml:"minprob"`
+	Masswidth     float64 `yaml:"masswidth"`
+	MinPepLen     int     `yaml:"minpeplen"`
+	Clevel        int     `yaml:"clevel"`
+	Minpintt      int     `yaml:"minpintt"`
+	Minrtntt      int     `yaml:"minrtntt"`
+	Combine       bool    `yaml:"combine"`
+	Exclude       bool    `yaml:"exclude"`
+	Leave         bool    `yaml:"leave"`
+	Perfectlib    bool    `yaml:"perfectlib"`
+	Icat          bool    `yaml:"icat"`
+	Noicat        bool    `yaml:"noicat"`
+	Zero          bool    `yaml:"zero"`
+	Accmass       bool    `yaml:"accmass"`
+	Ppm           bool    `yaml:"ppm"`
+	Nomass        bool    `yaml:"nomass"`
+	Pi            bool    `yaml:"pi"`
+	Rt            bool    `yaml:"rt"`
+	Glyc          bool    `yaml:"glyc"`
+	Phospho       bool    `yaml:"phospho"`
+	Maldi         bool    `yaml:"maldi"`
+	Instrwarn     bool    `yaml:"instrwarn"`
+	Decoyprobs    bool    `yaml:"decoyprobs"`
+	Nontt         bool    `yaml:"nontt"`
+	Nonmc         bool    `yaml:"nonmc"`
+	Expectscore   bool    `yaml:"expectscore"`
+	Nonparam      bool    `yaml:"nonparam"`
+	Neggamma      bool    `yaml:"neggamma"`
+	Forcedistr    bool    `yaml:"forcedistr"`
+	Optimizefval  bool    `yaml:"optimizefval"`
 }
 
 // InterProphet options and parameters
