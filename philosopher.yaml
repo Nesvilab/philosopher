@@ -7,7 +7,10 @@ commands:
   comet: no
   peptideprophet: no
   proteinprophet: no
-  filter: yes
+  filter: no
+  freequant: no
+  labelquant: no
+  report: yes
 database:
   add: ''
   annotate: ''
@@ -92,3 +95,14 @@ filter:
   mapMods: false
   models: false
   sequential: false
+freequant:
+  peakTimeWindow: 0.4
+  retentionTimeWindow: 3
+  tolerance: 10
+labelquant:
+  plex: 10
+  purity: 0.5
+  tolerance: 20
+  uniqueOnly: false
+report:
+  withDecoys: false

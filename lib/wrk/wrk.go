@@ -12,7 +12,7 @@ import (
 )
 
 // Run is the workspace main entry point
-func Run(Version, Build string, a, b, c, i bool) {
+func Run(Version, Build string, b, c, i bool) {
 
 	gth.UpdateChecker(Version, Build)
 

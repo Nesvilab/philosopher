@@ -197,18 +197,18 @@ type Filter struct {
 
 // Quantify options and parameters
 type Quantify struct {
-	Format   string
-	Dir      string
-	Brand    string
-	Plex     string
-	ChanNorm string
-	Annot    string
-	RTWin    float64
-	PTWin    float64
-	Tol      float64
-	Purity   float64
-	IntNorm  bool
-	Unique   bool
+	Format   string  `yaml:"format"`
+	Dir      string  `yaml:"dir"`
+	Brand    string  `yaml:"brand"`
+	Plex     string  `yaml:"plex"`
+	ChanNorm string  `yaml:"chanNorm"`
+	Annot    string  `yaml:"annot"`
+	RTWin    float64 `yaml:"retentionTimeWindow"`
+	PTWin    float64 `yaml:"peakTimeWindow"`
+	Tol      float64 `yaml:"tolerance"`
+	Purity   float64 `yaml:"purity"`
+	IntNorm  bool    `yaml:"intNorm"`
+	Unique   bool    `yaml:"uniqueOnly"`
 }
 
 // Abacus options ad parameters
@@ -231,7 +231,7 @@ type Cluster struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys bool
+	Decoys bool `yaml:"withDecoys"`
 }
 
 // Index options and parameters

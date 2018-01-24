@@ -16,6 +16,7 @@ import (
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
@@ -252,6 +253,67 @@ func New() Evidence {
 	var self Evidence
 
 	return self
+}
+
+// Run is the main entry poit for Report
+func Run(m met.Data) met.Data {
+
+	var repo = New()
+
+	err := repo.RestoreGranular()
+	if err != nil {
+		logrus.Fatal(err.Error())
+	}
+
+	if len(repo.Proteins) > 0 {
+
+		logrus.Info("Creating Protein FASTA report")
+		repo.ProteinFastaReport()
+
+		if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
+			logrus.Info("Creating Protein TMT report")
+			repo.ProteinTMTReport(m.Quantify.Unique)
+		} else {
+			logrus.Info("Creating Protein report")
+			repo.ProteinReport()
+		}
+
+	}
+
+	// verifying if there is any quantification on labels
+	if len(m.Quantify.Plex) > 0 {
+
+		logrus.Info("Creating TMT PSM report")
+		repo.PSMTMTReport(m.Filter.Tag)
+
+		logrus.Info("Creating TMT peptide report")
+		repo.PeptideTMTReport()
+
+		logrus.Info("Creating TMT peptide Ion report")
+		repo.PeptideIonTMTReport()
+
+	} else {
+
+		logrus.Info("Creating PSM report")
+		repo.PSMReport(m.Filter.Tag)
+
+		logrus.Info("Creating peptide report")
+		repo.PeptideReport()
+
+		logrus.Info("Creating peptide Ion report")
+		repo.PeptideIonReport()
+
+	}
+
+	if len(repo.Modifications.MassBins) > 0 {
+		logrus.Info("Creating modification reports")
+		repo.ModificationReport()
+
+		logrus.Info("Plotting mass distribution")
+		repo.PlotMassHist()
+	}
+
+	return m
 }
 
 // AssemblePSMReport ...

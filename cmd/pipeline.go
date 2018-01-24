@@ -14,6 +14,8 @@ import (
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/pip"
+	"github.com/prvst/philosopher/lib/qua"
+	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
@@ -46,7 +48,7 @@ var pipelineCmd = &cobra.Command{
 		os.Chdir(localDir)
 
 		// Workspace
-		wrk.Run(Version, Build, false, false, false, true)
+		wrk.Run(Version, Build, false, false, true)
 
 		// reload the meta data
 		m.Restore(sys.Meta())
@@ -87,6 +89,7 @@ var pipelineCmd = &cobra.Command{
 			peptideprophet.Run(m, files)
 		}
 
+		// ProteinProphet
 		if p.Commands.ProteinProphet == "yes" {
 			logrus.Info("Executing ProteinProphet")
 
@@ -99,6 +102,7 @@ var pipelineCmd = &cobra.Command{
 			proteinprophet.Run(m, files)
 		}
 
+		// Filter
 		if p.Commands.Filter == "yes" {
 			logrus.Info("Executing filter")
 
@@ -111,11 +115,58 @@ var pipelineCmd = &cobra.Command{
 
 			e := fil.Run(m.Filter)
 			if e != nil {
-				logrus.Fatal(e)
+				logrus.Fatal(e.Error())
 			}
 		}
 
+		// FreeQuant
+		if p.Commands.FreeQuant == "yes" {
+			logrus.Info("Executing label-free quantification")
+
+			m.Quantify = p.Freequant
+			m.Quantify.Dir = localDir
+			m.Quantify.Format = "mzML"
+
+			// run label-free quantification
+			e := qua.RunLabelFreeQuantification(m.Quantify)
+			if e != nil {
+				logrus.Fatal(e.Error())
+			}
+		}
+
+		// LabelQuant
+		if p.Commands.LabelQuant == "yes" {
+			logrus.Info("Executing label-based quantification")
+
+			m.Quantify = p.LabelQuant
+			m.Quantify.Dir = localDir
+			m.Quantify.Format = "mzML"
+			m.Quantify.Brand = "tmt"
+
+			err := qua.RunTMTQuantification(m.Quantify)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+		}
+
+		if p.Commands.Report == "yes" {
+			logrus.Info("Executing report")
+
+			rep.Run(m)
+		}
+
 		m.Serialize()
+
+		// Backup
+		if p.Backup == true {
+			wrk.Run(Version, Build, true, false, false)
+		}
+
+		// Clean
+		if p.Clean == true {
+			wrk.Run(Version, Build, false, true, false)
+		}
+
 		logrus.Info("Done")
 
 		return

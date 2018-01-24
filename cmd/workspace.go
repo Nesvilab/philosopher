@@ -17,7 +17,7 @@ var workspaceCmd = &cobra.Command{
 	Short: "Manage the experiment workspace for the analysis",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		wrk.Run(Version, Build, a, b, c, i)
+		wrk.Run(Version, Build, b, c, i)
 
 		logrus.Info("Done")
 		return

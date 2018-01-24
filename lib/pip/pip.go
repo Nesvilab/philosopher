@@ -14,6 +14,9 @@ type Directives struct {
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
 	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
 	Filter         met.Filter         `yaml:"filter"`
+	Freequant      met.Quantify       `yaml:"freequant"`
+	LabelQuant     met.Quantify       `yaml:"labelquant"`
+	Report         met.Report         `yaml:"report"`
 }
 
 // Commands struct {
@@ -23,4 +26,7 @@ type Commands struct {
 	PeptideProphet string `yaml:"peptideprophet"`
 	ProteinProphet string `yaml:"proteinprophet"`
 	Filter         string `yaml:"filter"`
+	FreeQuant      string `yaml:"freequant"`
+	LabelQuant     string `yaml:"labelquant"`
+	Report         string `yaml:"report"`
 }
