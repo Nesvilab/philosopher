@@ -41,11 +41,11 @@ func UpdateChecker(v, b string) {
 		var rel Releases
 		err = json.Unmarshal(body, &rel)
 		if err != nil {
-			logrus.Fatal(err)
-		}
-
-		if rel[0].TagName > v {
-			logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
+			logrus.Warning("GitHub unreachable for the moment, can't check for versions right now.")
+		} else {
+			if rel[0].TagName > v {
+				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
+			}
 		}
 
 	}

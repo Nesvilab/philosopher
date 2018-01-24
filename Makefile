@@ -78,8 +78,8 @@ windows:
 	cp philosopher.${VERSION}.exe /home/felipevl/Public/philosopher.exe
 	rm philosopher.${VERSION}.exe
 
-.PHONY: all
-all:
+.PHONY: release
+release:
 	gox ${LDFLAGS}
 
 .PHONY: clean
