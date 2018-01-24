@@ -11,6 +11,7 @@ import (
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
+	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/pip"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/wrk"
@@ -83,6 +84,18 @@ var pipelineCmd = &cobra.Command{
 			}
 
 			peptideprophet.Run(m, files)
+		}
+
+		if p.Commands.ProteinProphet == "yes" {
+			logrus.Info("Executing ProteinProphet")
+
+			m.ProteinProphet = p.ProteinProphet
+			m.ProteinProphet.Output = "interact"
+
+			var files []string
+			files = append(files, "interact.pep.xml")
+
+			proteinprophet.Run(m, files)
 		}
 
 		logrus.Info("Done")

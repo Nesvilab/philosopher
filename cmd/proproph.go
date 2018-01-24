@@ -23,32 +23,9 @@ var proprophCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing ProteinProphet")
-		var pop = proteinprophet.New()
 
-		if len(args) < 1 {
-			logrus.Fatal("No input file provided")
-		}
+		m = proteinprophet.Run(m, args)
 
-		// deploy the binaries
-		e := pop.Deploy(m.OS, m.Distro)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
-
-		// run ProteinProphet
-		xml, e := pop.Run(m.ProteinProphet, m.Home, m.Temp, args)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
-
-		_ = xml
-		// e = evi.NewInference()
-		// if e != nil {
-		// 	logrus.Fatal(e.Message)
-		// }
-		// evi.IndexProteinInference(xml)
-
-		m.ProteinProphet.InputFiles = args
 		m.Serialize()
 
 		logrus.Info("Done")

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
@@ -49,6 +50,33 @@ func New() ProteinProphet {
 	return self
 }
 
+// Run is the main entry point for ProteinProphet
+func Run(m met.Data, args []string) met.Data {
+
+	var pop = New()
+
+	if len(args) < 1 {
+		logrus.Fatal("No input file provided")
+	}
+
+	// deploy the binaries
+	e := pop.Deploy(m.OS, m.Distro)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+
+	// run ProteinProphet
+	xml, e := pop.Execute(m.ProteinProphet, m.Home, m.Temp, args)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+	_ = xml
+
+	m.ProteinProphet.InputFiles = args
+
+	return m
+}
+
 // Deploy generates comet binary on workdir bin directory
 func (p *ProteinProphet) Deploy(os, distro string) *err.Error {
 
@@ -84,8 +112,8 @@ func (p *ProteinProphet) Deploy(os, distro string) *err.Error {
 	return nil
 }
 
-// Run ProteinProphet executes peptideprophet
-func (p ProteinProphet) Run(params met.ProteinProphet, home, temp string, args []string) ([]string, *err.Error) {
+// Execute ProteinProphet executes peptideprophet
+func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	// run
 	bin := p.DefaultProteinProphet

@@ -53,3 +53,26 @@ peptideprophet:
   ppm: false
   rt: false
   zero: false
+proteinprophet:
+  accuracy: false
+  allpeps: false
+  confem: false
+  delude: false
+  excludezeros: false
+  fpkm: false
+  glyc: false
+  icat: false
+  instances: false
+  iprophet: false
+  logprobs: false
+  maxppmdiff: 20
+  minprob: 0.05
+  mufactor: 1
+  nogroupwts: false
+  nonsp: false
+  nooccam: false
+  noprotlen: false
+  normprotlen: false
+  protmw: false
+  softoccam: false
+  unmapped: false
