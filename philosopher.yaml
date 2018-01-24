@@ -5,7 +5,8 @@ commands:
   workspace: no
   database: no
   comet: no
-  peptideprophet: yes
+  peptideprophet: no
+  proteinprophet: yes
 database:
   add: ''
   annotate: ''

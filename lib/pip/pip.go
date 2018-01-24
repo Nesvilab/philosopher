@@ -12,7 +12,7 @@ type Directives struct {
 	Database       met.Database       `yaml:"database"`
 	Comet          met.Comet          `yaml:"comet"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
-	ProteinProphet met.ProteinProphet `yaml:"proteinrophet"`
+	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
 }
 
 // Commands struct {
