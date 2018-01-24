@@ -82,6 +82,15 @@ windows:
 release:
 	gox ${LDFLAGS}
 
+.PHONY: all
+all:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION} ${GOBIN}/philosopher;
+	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/bin/philosopher
+	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
+	gox ${LDFLAGS}
+
+
 .PHONY: clean
 clean:
 	if [ -f ${BINARY} ]; then rm ${BINARY} ; fi
