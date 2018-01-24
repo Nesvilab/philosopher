@@ -6,7 +6,8 @@ commands:
   database: no
   comet: no
   peptideprophet: no
-  proteinprophet: yes
+  proteinprophet: no
+  filter: yes
 database:
   add: ''
   annotate: ''
@@ -77,3 +78,17 @@ proteinprophet:
   protmw: false
   softoccam: false
   unmapped: false
+filter:
+  psmFDR: 0.01
+  peptideFDR: 0.01
+  ionFDR: 0.01
+  proteinFDR: 0.01
+  peptideProbability: 0.7
+  proteinProbability: 0.5
+  peptideWeight: 1
+  tag: rev_
+  razor: false
+  picked: false
+  mapMods: false
+  models: false
+  sequential: false

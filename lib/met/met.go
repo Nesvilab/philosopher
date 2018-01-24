@@ -182,18 +182,17 @@ type Filter struct {
 	Pox      string  `yaml:"protxml"`
 	Tag      string  `yaml:"tag"`
 	PsmFDR   float64 `yaml:"psmFDR"`
-	PepFDR   float64 `yaml:"pepFDR"`
+	PepFDR   float64 `yaml:"peptideFDR"`
 	IonFDR   float64 `yaml:"ionFDR"`
-	PtFDR    float64 `yaml:"ptFDR"`
-	ProtProb float64 `yaml:"protProb"`
-	PepProb  float64 `yaml:"pepProb"`
-	Weight   float64 `yaml:"Weight"`
-	TopPep   bool    `yaml:"TopPep"`
-	Model    bool    `yaml:"Model"`
-	Razor    bool    `yaml:"Razor"`
-	Picked   bool    `yaml:"Picked"`
-	Seq      bool    `yaml:"Seq"`
-	Mapmods  bool    `yaml:"MapMods"`
+	PtFDR    float64 `yaml:"proteinFDR"`
+	ProtProb float64 `yaml:"proteinProbability"`
+	PepProb  float64 `yaml:"peptideProbability"`
+	Weight   float64 `yaml:"peptideWeight"`
+	Model    bool    `yaml:"models"`
+	Razor    bool    `yaml:"razor"`
+	Picked   bool    `yaml:"picked"`
+	Seq      bool    `yaml:"sequential"`
+	Mapmods  bool    `yaml:"mapMods"`
 }
 
 // Quantify options and parameters

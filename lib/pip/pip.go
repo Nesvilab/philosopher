@@ -13,6 +13,7 @@ type Directives struct {
 	Comet          met.Comet          `yaml:"comet"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
 	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
+	Filter         met.Filter         `yaml:"filter"`
 }
 
 // Commands struct {
@@ -21,4 +22,5 @@ type Commands struct {
 	Comet          string `yaml:"comet"`
 	PeptideProphet string `yaml:"peptideprophet"`
 	ProteinProphet string `yaml:"proteinprophet"`
+	Filter         string `yaml:"filter"`
 }
