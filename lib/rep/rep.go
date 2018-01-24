@@ -1470,9 +1470,6 @@ func (e *Evidence) ProteinReport() {
 
 		var urazorIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
-				urazorIons++
-			}
 			if j.IsURazor == true {
 				urazorIons++
 			}
@@ -1574,9 +1571,6 @@ func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
 
 		var urazorIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
-				urazorIons++
-			}
 			if j.IsURazor == true {
 				urazorIons++
 			}
