@@ -238,6 +238,7 @@ func sumIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.E
 				if i.ProteinID == v.Proteins[j].ProteinID {
 					i.TotalIntensity[k] = v.Proteins[j].TotalIntensity
 					i.UniqueIntensity[k] = v.Proteins[j].UniqueIntensity
+					i.UrazorIntensity[k] = v.Proteins[j].URazorIntensity
 					break
 				}
 			}
@@ -253,34 +254,34 @@ func sumIntensities(combined rep.CombinedEvidenceList, datasets map[string]rep.E
 		// 	}
 		// }
 
-		for i := range combined {
-
-			var urazorInt []float64
-
-			for _, j := range combined[i].PeptideIons {
-
-				ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
-
-				intList, ok := ions[ion]
-				if ok {
-
-					if j.Razor == 1 {
-						urazorInt = append(urazorInt, intList)
-						sort.Float64s(urazorInt)
-
-						if len(urazorInt) >= 3 {
-							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2] + urazorInt[len(urazorInt)-3])
-						} else if len(urazorInt) >= 2 {
-							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2])
-						} else if len(urazorInt) == 1 {
-							combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1])
-						}
-					}
-
-				}
-
-			}
-		}
+		// for i := range combined {
+		//
+		// 	var urazorInt []float64
+		//
+		// 	for _, j := range combined[i].PeptideIons {
+		//
+		// 		ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
+		//
+		// 		intList, ok := ions[ion]
+		// 		if ok {
+		//
+		// 			if j.Razor == 1 {
+		// 				urazorInt = append(urazorInt, intList)
+		// 				sort.Float64s(urazorInt)
+		//
+		// 				if len(urazorInt) >= 3 {
+		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2] + urazorInt[len(urazorInt)-3])
+		// 				} else if len(urazorInt) >= 2 {
+		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2])
+		// 				} else if len(urazorInt) == 1 {
+		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1])
+		// 				}
+		// 			}
+		//
+		// 		}
+		//
+		// 	}
+		// }
 
 	}
 
