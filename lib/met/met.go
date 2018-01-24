@@ -163,41 +163,35 @@ type ProteinProphet struct {
 // PTMProphet options and parameters
 type PTMProphet struct {
 	InputFiles   []string
-	Output       string
-	EM           int
-	MzTol        float64
-	PPMTol       float64
-	MinProb      float64
-	NoUpdate     bool
-	KeepOld      bool
-	Verbose      bool
-	MassDiffMode bool
+	Output       string  `yaml:"output"`
+	EM           int     `yaml:"em"`
+	MzTol        float64 `yaml:"mztol"`
+	PPMTol       float64 `yaml:"ppmtol"`
+	MinProb      float64 `yaml:"minprob"`
+	NoUpdate     bool    `yaml:"noupdate"`
+	KeepOld      bool    `yaml:"keepold"`
+	Verbose      bool    `yaml:"verbose"`
+	MassDiffMode bool    `yaml:"massdiffmode"`
 }
 
 // Filter options and parameters
 type Filter struct {
-	Pex      string
-	Pox      string
-	Tag      string
-	Con      string
-	Ptconf   string
-	RepProt  string
-	Save     string
-	Database string
-	PsmFDR   float64
-	PepFDR   float64
-	IonFDR   float64
-	PtFDR    float64
-	ProtProb float64
-	PepProb  float64
-	Weight   float64
-	TopPep   bool
-	Model    bool
-	RepPSM   bool
-	Razor    bool
-	Picked   bool
-	Seq      bool
-	Mapmods  bool
+	Pex      string  `yaml:"pepxml"`
+	Pox      string  `yaml:"protxml"`
+	Tag      string  `yaml:"tag"`
+	PsmFDR   float64 `yaml:"psmFDR"`
+	PepFDR   float64 `yaml:"pepFDR"`
+	IonFDR   float64 `yaml:"ionFDR"`
+	PtFDR    float64 `yaml:"ptFDR"`
+	ProtProb float64 `yaml:"protProb"`
+	PepProb  float64 `yaml:"pepProb"`
+	Weight   float64 `yaml:"Weight"`
+	TopPep   bool    `yaml:"TopPep"`
+	Model    bool    `yaml:"Model"`
+	Razor    bool    `yaml:"Razor"`
+	Picked   bool    `yaml:"Picked"`
+	Seq      bool    `yaml:"Seq"`
+	Mapmods  bool    `yaml:"MapMods"`
 }
 
 // Quantify options and parameters

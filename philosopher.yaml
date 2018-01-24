@@ -21,6 +21,7 @@ comet:
   param: ''
   raw: 'mzML'
 peptideprophet:
+  extension: 'pepxml'
   accmass: false
   combine: true
   database: ''
