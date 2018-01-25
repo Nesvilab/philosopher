@@ -9,6 +9,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/aba"
+	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
@@ -29,7 +30,9 @@ var pipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		param, e := pip.DeployParameterFile(m.Temp)
+		paramTemp, _ := sys.GetTemp()
+
+		param, e := pip.DeployParameterFile(paramTemp)
 		if e != nil {
 			logrus.Fatal(e.Error())
 		}
@@ -170,24 +173,51 @@ var pipelineCmd = &cobra.Command{
 				rep.Run(m)
 			}
 
-			// Abacus
-			if p.Commands.Abacus == "yes" {
+			if p.Commands.Cluster == "yes" {
+				logrus.Info("Executing cluster")
 
-				if len(args) < 2 {
-					logrus.Fatal("The abacus combined analysis needs at least 2 result files to work")
-				}
+				m.Cluster = p.Cluster
 
-				logrus.Info("Executing abacus")
-
-				m.Abacus = p.Abacus
-
-				err := aba.Run(m.Abacus, m.Temp, args)
-				if err != nil {
-					logrus.Fatal(err)
-				}
+				clu.GenerateReport(m)
 			}
 
 			m.Serialize()
+		}
+
+		// Abacus
+		if p.Commands.Abacus == "yes" {
+
+			if len(args) < 2 {
+				logrus.Fatal("The abacus combined analysis needs at least 2 result files to work")
+			}
+
+			logrus.Info("Creating combined protein inference")
+			m.ProteinProphet = p.ProteinProphet
+			m.ProteinProphet.Output = "combined"
+
+			var files []string
+			for _, j := range args {
+				fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
+				fqn, _ = filepath.Abs(fqn)
+				files = append(files, fqn)
+			}
+
+			proteinprophet.Run(m, files)
+
+			logrus.Info("Executing abacus")
+			m.Abacus = p.Abacus
+
+			err := aba.Run(m.Abacus, m.Temp, args)
+			if err != nil {
+				logrus.Fatal(err)
+			}
+		}
+
+		for _, i := range args {
+
+			// getting inside de the dataset folder
+			localDir, _ := filepath.Abs(i)
+			os.Chdir(localDir)
 
 			// Backup
 			if p.Backup == true {

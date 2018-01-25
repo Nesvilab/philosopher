@@ -23,6 +23,7 @@ type Directives struct {
 	Freequant      met.Quantify       `yaml:"freequant"`
 	LabelQuant     met.Quantify       `yaml:"labelquant"`
 	Report         met.Report         `yaml:"report"`
+	Cluster        met.Cluster        `yaml:"cluster"`
 	Abacus         met.Abacus         `yaml:"abacus"`
 }
 
@@ -36,6 +37,7 @@ type Commands struct {
 	FreeQuant      string `yaml:"freequant"`
 	LabelQuant     string `yaml:"labelquant"`
 	Report         string `yaml:"report"`
+	Cluster        string `yaml:"cluster"`
 	Abacus         string `yaml:"abacus"`
 }
 

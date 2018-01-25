@@ -12,7 +12,8 @@ commands:
   freequant: no
   labelquant: no
   report: no
-  abacus: yes
+  cluster: yes
+  abacus: no
 database:
   add: ''
   annotate: ''
@@ -108,8 +109,11 @@ labelquant:
   uniqueOnly: false
 report:
   withDecoys: false
+cluster:
+  organismUniProtID: ''
+  level: 0.9
 abacus:
-  comb: interact.prot.xml
+  comb: combined.prot.xml
   tag: rev_
   proteinprobability: 0.9
   peptideProbability: 0.5

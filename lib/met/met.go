@@ -225,8 +225,8 @@ type Abacus struct {
 
 // Cluster options and parameters
 type Cluster struct {
-	UID   string
-	Level float64
+	UID   string  `yaml:"organismUniProtID"`
+	Level float64 `yaml:"level"`
 }
 
 // Report options and parameters
