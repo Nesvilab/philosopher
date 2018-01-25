@@ -56,6 +56,8 @@ deploy:
 
 	unzip -o lib/uni/bindata.go.zip -d  lib/uni/
 
+	unzip -o lib/pip/bindata.go.zip -d  lib/pip/
+
 .PHONY: install
 install:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}

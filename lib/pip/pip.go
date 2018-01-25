@@ -1,6 +1,12 @@
 package pip
 
-import "github.com/prvst/philosopher/lib/met"
+import (
+	"errors"
+	"io/ioutil"
+	"path/filepath"
+
+	"github.com/prvst/philosopher/lib/met"
+)
 
 // Directives contains the instructions to run a pipeline
 type Directives struct {
@@ -29,4 +35,22 @@ type Commands struct {
 	FreeQuant      string `yaml:"freequant"`
 	LabelQuant     string `yaml:"labelquant"`
 	Report         string `yaml:"report"`
+}
+
+// DeployParameterFile ...
+func DeployParameterFile(temp string) (string, error) {
+
+	file := temp + string(filepath.Separator) + "philosopher.yaml"
+
+	param, err := Asset("philosopher.yaml")
+	if err != nil {
+		return file, errors.New("Cannot deploy Comet parameter file")
+	}
+
+	err = ioutil.WriteFile(file, param, 0644)
+	if err != nil {
+		return file, errors.New("Cannot deploy pipeline parameter file")
+	}
+
+	return file, nil
 }

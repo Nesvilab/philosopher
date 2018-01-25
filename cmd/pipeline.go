@@ -28,6 +28,17 @@ var pipelineCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		param, e := pip.DeployParameterFile(m.Temp)
+		if e != nil {
+			logrus.Fatal(e.Error())
+		}
+
+		if m.Pipeline.Print == true {
+			logrus.Info("Printing parameter file")
+			sys.CopyFile(param, filepath.Base(param))
+			return
+		}
+
 		logrus.Info("Executing the pipeline on ", m.Pipeline.Dataset)
 
 		file, _ := filepath.Abs(m.Pipeline.Directives)
@@ -179,6 +190,7 @@ func init() {
 
 		m.Restore(sys.Meta())
 
+		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Dataset, "dataset", "", "", "dataset directory")
 

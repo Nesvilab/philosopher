@@ -935,45 +935,45 @@ func (e *Evidence) PeptideIonReport() {
 
 		if len(i.MappedProteins) > 0 {
 
-			if len(e.Proteins) > 1 {
+			//if len(e.Proteins) > 1 {
 
-				for k := range i.MappedProteins {
-					pts = append(pts, k)
-				}
-
-				var amods []string
-				for j := range i.AssignedModifications {
-					amods = append(amods, j)
-				}
-
-				var omods []string
-				for j := range i.ObservedModifications {
-					omods = append(omods, j)
-				}
-
-				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
-					i.Sequence,
-					i.ModifiedSequence,
-					i.MZ,
-					i.ChargeState,
-					i.PeptideMass,
-					i.Probability,
-					i.Expectation,
-					len(i.Spectra),
-					i.UnModifiedObservations,
-					i.ModifiedObservations,
-					i.Intensity,
-					strings.Join(amods, ", "),
-					strings.Join(omods, ", "),
-					i.Intensity,
-					len(i.MappedProteins),
-					strings.Join(pts, ", "),
-				)
-				_, err = io.WriteString(file, line)
-				if err != nil {
-					logrus.Fatal("Cannot print PSM to file")
-				}
+			for k := range i.MappedProteins {
+				pts = append(pts, k)
 			}
+
+			var amods []string
+			for j := range i.AssignedModifications {
+				amods = append(amods, j)
+			}
+
+			var omods []string
+			for j := range i.ObservedModifications {
+				omods = append(omods, j)
+			}
+
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
+				i.Sequence,
+				i.ModifiedSequence,
+				i.MZ,
+				i.ChargeState,
+				i.PeptideMass,
+				i.Probability,
+				i.Expectation,
+				len(i.Spectra),
+				i.UnModifiedObservations,
+				i.ModifiedObservations,
+				i.Intensity,
+				strings.Join(amods, ", "),
+				strings.Join(omods, ", "),
+				i.Intensity,
+				len(i.MappedProteins),
+				strings.Join(pts, ", "),
+			)
+			_, err = io.WriteString(file, line)
+			if err != nil {
+				logrus.Fatal("Cannot print PSM to file")
+			}
+			//}
 		}
 	}
 

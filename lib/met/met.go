@@ -243,6 +243,7 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Dataset    string
+	Print      bool
 }
 
 var err error
