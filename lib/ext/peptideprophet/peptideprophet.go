@@ -32,11 +32,11 @@ type PeptideProphet struct {
 }
 
 // New constructor
-func New() PeptideProphet {
+func New(temp string) PeptideProphet {
 
 	var self PeptideProphet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.UnixInteractParser = temp + string(filepath.Separator) + "InteractParser"
 	self.UnixRefreshParser = temp + string(filepath.Separator) + "RefreshParser"
@@ -54,7 +54,7 @@ func New() PeptideProphet {
 // Run is the main entry point for peptideprophet
 func Run(m met.Data, args []string) met.Data {
 
-	var pep = New()
+	var pep = New(m.Temp)
 
 	if len(m.PeptideProphet.Database) < 1 {
 		logrus.Fatal("You need to provide a protein database")
@@ -125,6 +125,11 @@ func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, ar
 		file, _ := filepath.Abs(i)
 		listedArgs = append(listedArgs, file)
 	}
+
+	// litter.Dump(p)
+	// fmt.Println(temp)
+	// fmt.Println(sys.Windows())
+	// os.Exit(1)
 
 	// run InteractParser
 	files, e := interactParser(p, params, home, temp, listedArgs)

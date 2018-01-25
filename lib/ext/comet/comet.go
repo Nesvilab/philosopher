@@ -29,11 +29,11 @@ type Comet struct {
 }
 
 // New constructor
-func New() Comet {
+func New(temp string) Comet {
 
 	var self Comet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.DefaultBin = ""
 	self.DefaultParam = ""
@@ -49,7 +49,7 @@ func New() Comet {
 // Run is the Comet main entry point
 func Run(m met.Data, args []string) met.Data {
 
-	var cmt = New()
+	var cmt = New(m.Temp)
 
 	if len(m.Comet.Param) < 1 {
 		logrus.Fatal("No parameter file found. Run 'comet --help' for more information")

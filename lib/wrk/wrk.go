@@ -12,7 +12,7 @@ import (
 )
 
 // Run is the workspace main entry point
-func Run(Version, Build string, b, c, i bool) {
+func Run(Version, Build string, b, c, i bool) *err.Error {
 
 	gth.UpdateChecker(Version, Build)
 
@@ -29,7 +29,7 @@ func Run(Version, Build string, b, c, i bool) {
 				logrus.Warn(e.Error())
 			}
 		}
-		return
+		return e
 
 	} else if b == true {
 
@@ -38,7 +38,7 @@ func Run(Version, Build string, b, c, i bool) {
 		if e != nil {
 			logrus.Warn(e.Error())
 		}
-		return
+		return e
 
 	} else if c == true {
 
@@ -47,11 +47,11 @@ func Run(Version, Build string, b, c, i bool) {
 		if e != nil {
 			logrus.Warn(e.Error())
 		}
-		return
+		return e
 
 	}
 
-	return
+	return nil
 }
 
 // Init creates a new workspace
@@ -75,14 +75,17 @@ func Init(version, build string) *err.Error {
 	da.Build = build
 
 	os.Mkdir(da.MetaDir, 0755)
+	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
+		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create meta directory; check folder permissions"}
+	}
+
 	os.Mkdir(da.Temp, 0755)
+	if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
+		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't find temporary directory; check folder permissions"}
+	}
 
 	da.Home = fmt.Sprintf("%s", da.Home)
 	da.MetaDir = fmt.Sprintf("%s", da.MetaDir)
-
-	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "check folder permissions"}
-	}
 
 	da.Serialize()
 

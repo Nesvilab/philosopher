@@ -32,11 +32,11 @@ type ProteinProphet struct {
 }
 
 // New constructor
-func New() ProteinProphet {
+func New(temp string) ProteinProphet {
 
 	var self ProteinProphet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.UnixBatchCoverage = temp + string(filepath.Separator) + "batchcoverage"
 	self.UnixDatabaseParser = temp + string(filepath.Separator) + "DatabaseParser"
@@ -53,7 +53,7 @@ func New() ProteinProphet {
 // Run is the main entry point for ProteinProphet
 func Run(m met.Data, args []string) met.Data {
 
-	var pop = New()
+	var pop = New(m.Temp)
 
 	if len(args) < 1 {
 		logrus.Fatal("No input file provided")

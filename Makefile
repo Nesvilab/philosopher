@@ -90,7 +90,6 @@ all:
 	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 	gox ${LDFLAGS}
 
-
 .PHONY: clean
 clean:
 	if [ -f ${BINARY} ]; then rm ${BINARY} ; fi
