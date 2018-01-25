@@ -213,14 +213,14 @@ type Quantify struct {
 
 // Abacus options ad parameters
 type Abacus struct {
-	Comb     string
-	Tag      string
-	Razor    bool
-	Picked   bool
-	Labels   bool
-	Unique   bool
-	ProtProb float64
-	PepProb  float64
+	Comb     string  `yaml:"comb"`
+	Tag      string  `yaml:"tag"`
+	Razor    bool    `yaml:"razor"`
+	Picked   bool    `yaml:"picked"`
+	Labels   bool    `yaml:"labels"`
+	Unique   bool    `yaml:"uniqueOnly"`
+	ProtProb float64 `yaml:"proteinProbability"`
+	PepProb  float64 `yaml:"peptideProbability"`
 }
 
 // Cluster options and parameters
@@ -242,8 +242,8 @@ type Index struct {
 // Pipeline options and parameters
 type Pipeline struct {
 	Directives string
-	Dataset    string
 	Print      bool
+	//Dataset    string
 }
 
 var err error

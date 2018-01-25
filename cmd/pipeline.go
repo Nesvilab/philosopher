@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/aba"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
@@ -39,8 +40,6 @@ var pipelineCmd = &cobra.Command{
 			return
 		}
 
-		logrus.Info("Executing the pipeline on ", m.Pipeline.Dataset)
-
 		file, _ := filepath.Abs(m.Pipeline.Directives)
 
 		y, e := ioutil.ReadFile(file)
@@ -54,128 +53,152 @@ var pipelineCmd = &cobra.Command{
 			logrus.Fatal(e)
 		}
 
-		// getting inside de the dataset folder
-		localDir, _ := filepath.Abs(m.Pipeline.Dataset)
-		os.Chdir(localDir)
+		// For each dataset ...
+		for _, i := range args {
 
-		// Workspace
-		wrk.Run(Version, Build, false, false, true)
+			logrus.Info("Executing the pipeline on ", i)
 
-		// reload the meta data
-		m.Restore(sys.Meta())
+			// getting inside de the dataset folder
+			localDir, _ := filepath.Abs(i)
+			os.Chdir(localDir)
 
-		// Database
-		if p.Commands.Database == "yes" {
-			m.Database = p.Database
-			dat.Run(m)
-		}
+			// Workspace
+			wrk.Run(Version, Build, false, false, true)
 
-		// Comet
-		if p.Commands.Comet == "yes" {
-			m.Comet = p.Comet
+			// reload the meta data
+			m.Restore(sys.Meta())
 
-			gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
-			files, e := filepath.Glob(gobExt)
-			if e != nil {
-				logrus.Fatal(e)
+			// Database
+			if p.Commands.Database == "yes" {
+				m.Database = p.Database
+				dat.Run(m)
 			}
 
-			comet.Run(m, files)
-		}
+			// Comet
+			if p.Commands.Comet == "yes" {
+				m.Comet = p.Comet
 
-		// PeptideProphet
-		if p.Commands.PeptideProphet == "yes" {
-			logrus.Info("Executing PeptideProphet")
+				gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+				files, e := filepath.Glob(gobExt)
+				if e != nil {
+					logrus.Fatal(e)
+				}
 
-			m.PeptideProphet = p.PeptideProphet
-			m.PeptideProphet.Output = "interact"
-			m.PeptideProphet.Combine = true
-
-			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-			files, e := filepath.Glob(gobExt)
-			if e != nil {
-				logrus.Fatal(e)
+				comet.Run(m, files)
 			}
 
-			peptideprophet.Run(m, files)
-		}
+			// PeptideProphet
+			if p.Commands.PeptideProphet == "yes" {
+				logrus.Info("Executing PeptideProphet")
 
-		// ProteinProphet
-		if p.Commands.ProteinProphet == "yes" {
-			logrus.Info("Executing ProteinProphet")
+				m.PeptideProphet = p.PeptideProphet
+				m.PeptideProphet.Output = "interact"
+				m.PeptideProphet.Combine = true
 
-			m.ProteinProphet = p.ProteinProphet
-			m.ProteinProphet.Output = "interact"
+				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+				files, e := filepath.Glob(gobExt)
+				if e != nil {
+					logrus.Fatal(e)
+				}
 
-			var files []string
-			files = append(files, "interact.pep.xml")
+				peptideprophet.Run(m, files)
+			}
 
-			proteinprophet.Run(m, files)
-		}
-
-		// Filter
-		if p.Commands.Filter == "yes" {
-			logrus.Info("Executing filter")
-
-			m.Filter = p.Filter
-			m.Filter.Pex = "interact.pep.xml"
-
+			// ProteinProphet
 			if p.Commands.ProteinProphet == "yes" {
-				m.Filter.Pox = "interact.prot.xml"
+				logrus.Info("Executing ProteinProphet")
+
+				m.ProteinProphet = p.ProteinProphet
+				m.ProteinProphet.Output = "interact"
+
+				var files []string
+				files = append(files, "interact.pep.xml")
+
+				proteinprophet.Run(m, files)
 			}
 
-			e := fil.Run(m.Filter)
-			if e != nil {
-				logrus.Fatal(e.Error())
+			// Filter
+			if p.Commands.Filter == "yes" {
+				logrus.Info("Executing filter")
+
+				m.Filter = p.Filter
+				m.Filter.Pex = "interact.pep.xml"
+
+				if p.Commands.ProteinProphet == "yes" {
+					m.Filter.Pox = "interact.prot.xml"
+				}
+
+				e := fil.Run(m.Filter)
+				if e != nil {
+					logrus.Fatal(e.Error())
+				}
 			}
-		}
 
-		// FreeQuant
-		if p.Commands.FreeQuant == "yes" {
-			logrus.Info("Executing label-free quantification")
+			// FreeQuant
+			if p.Commands.FreeQuant == "yes" {
+				logrus.Info("Executing label-free quantification")
 
-			m.Quantify = p.Freequant
-			m.Quantify.Dir = localDir
-			m.Quantify.Format = "mzML"
+				m.Quantify = p.Freequant
+				m.Quantify.Dir = localDir
+				m.Quantify.Format = "mzML"
 
-			// run label-free quantification
-			e := qua.RunLabelFreeQuantification(m.Quantify)
-			if e != nil {
-				logrus.Fatal(e.Error())
+				// run label-free quantification
+				e := qua.RunLabelFreeQuantification(m.Quantify)
+				if e != nil {
+					logrus.Fatal(e.Error())
+				}
 			}
-		}
 
-		// LabelQuant
-		if p.Commands.LabelQuant == "yes" {
-			logrus.Info("Executing label-based quantification")
+			// LabelQuant
+			if p.Commands.LabelQuant == "yes" {
+				logrus.Info("Executing label-based quantification")
 
-			m.Quantify = p.LabelQuant
-			m.Quantify.Dir = localDir
-			m.Quantify.Format = "mzML"
-			m.Quantify.Brand = "tmt"
+				m.Quantify = p.LabelQuant
+				m.Quantify.Dir = localDir
+				m.Quantify.Format = "mzML"
+				m.Quantify.Brand = "tmt"
 
-			err := qua.RunTMTQuantification(m.Quantify)
-			if err != nil {
-				logrus.Fatal(err)
+				err := qua.RunTMTQuantification(m.Quantify)
+				if err != nil {
+					logrus.Fatal(err)
+				}
 			}
-		}
 
-		if p.Commands.Report == "yes" {
-			logrus.Info("Executing report")
+			if p.Commands.Report == "yes" {
+				logrus.Info("Executing report")
 
-			rep.Run(m)
-		}
+				rep.Run(m)
+			}
 
-		m.Serialize()
+			// Abacus
+			if p.Commands.Abacus == "yes" {
 
-		// Backup
-		if p.Backup == true {
-			wrk.Run(Version, Build, true, false, false)
-		}
+				if len(args) < 2 {
+					logrus.Fatal("The abacus combined analysis needs at least 2 result files to work")
+				}
 
-		// Clean
-		if p.Clean == true {
-			wrk.Run(Version, Build, false, true, false)
+				logrus.Info("Executing abacus")
+
+				m.Abacus = p.Abacus
+
+				err := aba.Run(m.Abacus, m.Temp, args)
+				if err != nil {
+					logrus.Fatal(err)
+				}
+			}
+
+			m.Serialize()
+
+			// Backup
+			if p.Backup == true {
+				wrk.Run(Version, Build, true, false, false)
+			}
+
+			// Clean
+			if p.Clean == true {
+				wrk.Run(Version, Build, false, true, false)
+			}
+
 		}
 
 		logrus.Info("Done")
@@ -192,7 +215,7 @@ func init() {
 
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
-		pipelineCmd.Flags().StringVarP(&m.Pipeline.Dataset, "dataset", "", "", "dataset directory")
+		//pipelineCmd.Flags().StringVarP(&m.Pipeline.Dataset, "dataset", "", "", "dataset directory")
 
 	}
 

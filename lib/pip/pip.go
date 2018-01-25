@@ -23,6 +23,7 @@ type Directives struct {
 	Freequant      met.Quantify       `yaml:"freequant"`
 	LabelQuant     met.Quantify       `yaml:"labelquant"`
 	Report         met.Report         `yaml:"report"`
+	Abacus         met.Abacus         `yaml:"abacus"`
 }
 
 // Commands struct {
@@ -35,6 +36,7 @@ type Commands struct {
 	FreeQuant      string `yaml:"freequant"`
 	LabelQuant     string `yaml:"labelquant"`
 	Report         string `yaml:"report"`
+	Abacus         string `yaml:"abacus"`
 }
 
 // DeployParameterFile ...

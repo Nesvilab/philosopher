@@ -1,6 +1,7 @@
 clean: true
 backup: true
 analytics: false
+slack: ''
 commands:
   workspace: no
   database: no
@@ -10,7 +11,8 @@ commands:
   filter: no
   freequant: no
   labelquant: no
-  report: yes
+  report: no
+  abacus: yes
 database:
   add: ''
   annotate: ''
@@ -106,3 +108,12 @@ labelquant:
   uniqueOnly: false
 report:
   withDecoys: false
+abacus:
+  comb: interact.prot.xml
+  tag: rev_
+  proteinprobability: 0.9
+  peptideProbability: 0.5
+  razor: false
+  picked: false
+  uniqueOnly: false
+  labels: false
