@@ -18,12 +18,15 @@ import (
 	"github.com/prvst/philosopher/lib/ext/cdhit"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Cluster struct
 type Cluster struct {
 	Centroid                string
 	Description             string
+	Status                  string
+	Existence               string
 	GeneNames               string
 	Number                  int
 	TotalPeptideNumber      int
@@ -41,17 +44,17 @@ type Cluster struct {
 type List []Cluster
 
 // GenerateReport creates the protein report output
-func GenerateReport(c met.Cluster, uuid, home, temp string) error {
+func GenerateReport(c met.Data) error {
 
 	// create clean reference db for clustering
-	clusterFasta, err := createCleanDataBaseReference(uuid, temp)
+	clusterFasta, err := createCleanDataBaseReference(c.UUID, c.Temp)
 	if err != nil {
 		return err
 	}
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")
-	clusterFile, clusterFasta := execute(c.Level)
+	clusterFile, clusterFasta := execute(c.Cluster.Level)
 
 	// parse the cluster file
 	logrus.Info("Parsing clusters")
@@ -61,8 +64,11 @@ func GenerateReport(c met.Cluster, uuid, home, temp string) error {
 	logrus.Info("Mapping proteins to clusters")
 	mappedClust := mapProtXML2Clusters(clusters)
 
+	logrus.Info("Retrieving Proteome data")
+	//mappedClust = retrieveInfoFromUniProtDB(mappedClust)
+
 	// mapping to functional annotation and save to disk
-	savetoDisk(mappedClust, home, uuid)
+	savetoDisk(mappedClust, c.Temp, c.Cluster.UID)
 
 	if err != nil {
 		return err
@@ -200,94 +206,11 @@ func parseClusterFile(cls, database string) (List, error) {
 	return list, nil
 }
 
-// SavetoDisk saves functional inference result to disk
-func savetoDisk(list List, home, uid string) {
-
-	output := fmt.Sprintf(".%sclusters.tsv", string(filepath.Separator))
-
-	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		log.Println("[ERROR]:", err)
-		os.Exit(2)
-	}
-	defer file.Close()
-
-	var line string
-	line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n")
-
-	if len(uid) > 0 {
-		log.Println("Retrieving annotation from UniProt")
-		line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n")
-	}
-
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		log.Println("[ERROR]", n, err)
-		os.Exit(2)
-	}
-
-	var faMap = make(map[string][]string)
-	if len(uid) > 0 {
-		faMap = getFile(true, home, uid)
-	} else {
-		//faMap, _ = fasta.ParseFastaDescription(rep.DB)
-	}
-
-	for i := range list {
-
-		if list[i].TotalPeptideNumber > 0 {
-
-			var members []string
-			for k := range list[i].Members {
-				members = append(members, k)
-			}
-			membersString := strings.Join(members, ", ")
-
-			line := fmt.Sprintf("%d\t%s\t%d\t%s\t%.2f\t%d\t%d\t%d\t%s\t",
-				list[i].Number,
-				list[i].Centroid,
-				len(list[i].Members),
-				membersString,
-				list[i].Coverage,
-				list[i].TotalPeptideNumber,
-				len(list[i].UniqueClusterPeptides),
-				(list[i].TotalPeptideNumber - len(list[i].UniqueClusterPeptides)),
-				list[i].Description)
-
-			v, ok := faMap[list[i].Centroid]
-			if ok {
-				var index int
-				if len(uid) > 0 {
-					index = 1
-				} else {
-					index = 0
-				}
-				for i := index; i < len(v); i++ {
-					item := v[i] + "\t"
-					line += item
-				}
-			}
-
-			line += "\n"
-
-			n, err := io.WriteString(file, line)
-			if err != nil {
-				logrus.Println("[ERROR]", n, err)
-				os.Exit(2)
-			}
-		}
-
-	}
-
-	return
-}
-
 // MapProtXML2Clusters ...
 func mapProtXML2Clusters(clusters List) List {
 
 	var e rep.Evidence
-	e.Restore()
+	e.RestoreGranular()
 
 	for _, i := range e.Proteins {
 		if i.IsDecoy == false && i.IsContaminant == false {
@@ -368,14 +291,18 @@ func mapProtXML2Clusters(clusters List) List {
 	return clusters
 }
 
-func retrieveInfoFromUniProtDB(clusters List, db dat.Base) List {
+func retrieveInfoFromUniProtDB(clusters List) List {
+
+	// collect database information
+	var dtb dat.Base
+	dtb.Restore()
 
 	for i := range clusters {
-		for _, j := range db.Records {
-
+		for _, j := range dtb.Records {
 			if strings.EqualFold(clusters[i].Centroid, j.ID) && j.IsDecoy == false && j.IsContaminant == false {
 				clusters[i].Description = j.ProteinName
 				clusters[i].GeneNames = j.GeneNames
+				break
 			}
 
 		}
@@ -392,7 +319,7 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=organism:", organism, "&columns=id,protein%20names&format=tab")
 
 	if getAll == true {
-		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=organism:", organism, "&columns=id,reviewed,existence,genes,domains,pathway,go-id&format=tab")
+		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=organism:", organism, "&columns=id,reviewed,existence,genes,feature(DOMAIN%20EXTENT),comment(PATHWAY),go-id&format=tab")
 	}
 
 	outfile := fmt.Sprintf("%s/%s.tab", resultDir, organism)
@@ -449,4 +376,95 @@ func parseFastaFile(db dat.Base) map[string]string {
 	}
 
 	return fastaMap
+}
+
+// SavetoDisk saves functional inference result to disk
+func savetoDisk(list List, temp, uid string) {
+
+	output := fmt.Sprintf("%s%sclusters.tsv", temp, string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		log.Println("[ERROR]:", err)
+		os.Exit(2)
+	}
+	defer file.Close()
+
+	var line string
+	line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n")
+
+	if len(uid) > 0 {
+		logrus.Info("Retrieving annotation from UniProt")
+		line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n")
+	}
+
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		log.Println("[ERROR]", n, err)
+		os.Exit(2)
+	}
+
+	var faMap = make(map[string][]string)
+	if len(uid) > 0 {
+		faMap = getFile(true, temp, uid)
+	} else {
+		//faMap, _ = fasta.ParseFastaDescription(rep.DB)
+	}
+
+	for i := range list {
+
+		if list[i].TotalPeptideNumber > 0 {
+
+			var members []string
+			for k := range list[i].Members {
+				members = append(members, k)
+			}
+			membersString := strings.Join(members, ", ")
+
+			// var status string
+			// parts, ok := faMap[list[i].Centroid]
+			// if ok {
+			// 	status = parts[0]
+			// }
+
+			line := fmt.Sprintf("%d\t%s\t%d\t%s\t%.2f\t%d\t%d\t%d\t%s\t",
+				list[i].Number,
+				list[i].Centroid,
+				len(list[i].Members),
+				membersString,
+				list[i].Coverage,
+				list[i].TotalPeptideNumber,
+				len(list[i].UniqueClusterPeptides),
+				(list[i].TotalPeptideNumber - len(list[i].UniqueClusterPeptides)),
+				list[i].Description)
+
+			v, ok := faMap[list[i].Centroid]
+			if ok {
+				var index int
+				if len(uid) > 0 {
+					index = 1
+				} else {
+					index = 0
+				}
+				for i := index; i < len(v); i++ {
+					item := v[i] + "\t"
+					line += item
+				}
+			}
+
+			line += "\n"
+
+			n, err := io.WriteString(file, line)
+			if err != nil {
+				logrus.Println("[ERROR]", n, err)
+				os.Exit(2)
+			}
+		}
+
+	}
+
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
 }

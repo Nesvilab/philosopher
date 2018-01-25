@@ -22,7 +22,7 @@ var clusterCmd = &cobra.Command{
 		}
 
 		// run clustering
-		clu.GenerateReport(m.Cluster, m.UUID, m.Home, m.Temp)
+		clu.GenerateReport(m)
 
 		// store paramters on meta data
 		m.Serialize()
