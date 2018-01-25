@@ -47,16 +47,17 @@ func New(temp string) Comet {
 }
 
 // Run is the Comet main entry point
-func Run(m met.Data, args []string) met.Data {
+func Run(m met.Data, args []string) (met.Data, *err.Error) {
 
 	var cmt = New(m.Temp)
 
 	if len(m.Comet.Param) < 1 {
-		logrus.Fatal("No parameter file found. Run 'comet --help' for more information")
+		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "No parameter file found. Run 'comet --help' for more information"}
+		//logrus.Fatal("No parameter file found. Run 'comet --help' for more information")
 	}
 
 	if m.Comet.Print == false && len(args) < 1 {
-		logrus.Fatal("Missing parameter file or data file for analysis")
+		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "Missing parameter file or data file for analysis"}
 	}
 
 	// deploy the binaries
@@ -65,7 +66,7 @@ func Run(m met.Data, args []string) met.Data {
 	if m.Comet.Print == true {
 		logrus.Info("Printing parameter file")
 		sys.CopyFile(cmt.DefaultParam, filepath.Base(cmt.DefaultParam))
-		return m
+		return m, nil
 	}
 
 	// collect and store the mz files
@@ -105,7 +106,7 @@ func Run(m met.Data, args []string) met.Data {
 		//logrus.Fatal(e)
 	}
 
-	return m
+	return m, nil
 }
 
 // Deploy generates comet binary on workdir bin directory

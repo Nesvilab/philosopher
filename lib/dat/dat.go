@@ -41,7 +41,7 @@ func New() Base {
 }
 
 // Run is the main entry point for the databse command
-func Run(m met.Data) met.Data {
+func Run(m met.Data) (met.Data, *err.Error) {
 
 	var db = New()
 
@@ -49,19 +49,17 @@ func Run(m met.Data) met.Data {
 
 		logrus.Info("Processing database")
 
-		err := db.ProcessDB(m.Database.Annot, m.Database.Tag)
-		if err != nil {
-			logrus.Fatal(err)
+		e := db.ProcessDB(m.Database.Annot, m.Database.Tag)
+		if e != nil {
+			return m, e
 		}
 
-		err = db.Serialize()
-		if err != nil {
-			logrus.Fatal(err)
+		e = db.Serialize()
+		if e != nil {
+			return m, e
 		}
 
-		logrus.Info("Done")
-		return m
-
+		return m, e
 	}
 
 	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
@@ -92,7 +90,7 @@ func Run(m met.Data) met.Data {
 		logrus.Fatal(err)
 	}
 
-	return m
+	return m, nil
 }
 
 // ProcessDB ...

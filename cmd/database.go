@@ -23,7 +23,10 @@ var databaseCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		m = dat.Run(m)
+		m, e := dat.Run(m)
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		// store paramters on meta data
 		m.Serialize()
