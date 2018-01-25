@@ -1,7 +1,8 @@
 clean: true
 backup: true
 analytics: false
-slack: ''
+slackToken: ''
+slackChannel: ''
 commands:
   workspace: no
   database: no
@@ -12,7 +13,7 @@ commands:
   freequant: no
   labelquant: no
   report: no
-  cluster: yes
+  cluster: no
   abacus: no
 database:
   add: ''

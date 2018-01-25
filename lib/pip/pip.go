@@ -14,6 +14,8 @@ type Directives struct {
 	Clean          bool               `yaml:"clean"`
 	Backup         bool               `yaml:"backup"`
 	Analtics       bool               `yaml:"analytics"`
+	SlackToken     string             `yaml:"slackToken"`
+	SlackChannel   string             `yaml:"slackChannel"`
 	Commands       Commands           `yaml:"commands"`
 	Database       met.Database       `yaml:"database"`
 	Comet          met.Comet          `yaml:"comet"`

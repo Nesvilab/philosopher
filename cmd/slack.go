@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/nlopes/slack"
+	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -30,36 +29,7 @@ var slackCmd = &cobra.Command{
 			logrus.Fatal("You need to specify yout toke in order to push a notification.")
 		}
 
-		api := slack.New(token)
-		params := slack.PostMessageParameters{}
-		attachment := slack.Attachment{
-		//Pretext: "some pretext",
-		//Text:    "some text",
-		// Uncomment the following part to send a field too
-		/*
-			Fields: []slack.AttachmentField{
-				slack.AttachmentField{
-					Title: "a",
-					Value: "no",
-				},
-			},
-		*/
-		}
-
-		params.Attachments = []slack.Attachment{attachment}
-		params.Username = name
-
-		channelID, timestamp, err := api.PostMessage(channel, message, params)
-
-		_ = channelID
-		_ = timestamp
-
-		if err != nil {
-			fmt.Printf("%s\n", err)
-			return
-		}
-
-		//logrus.Info("Message successfully sent to channel %s at %s", channelID, timestamp)
+		sla.Run(name, token, message, channel)
 
 		return
 	},

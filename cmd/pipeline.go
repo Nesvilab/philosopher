@@ -18,6 +18,7 @@ import (
 	"github.com/prvst/philosopher/lib/pip"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
@@ -229,6 +230,10 @@ var pipelineCmd = &cobra.Command{
 				wrk.Run(Version, Build, false, true, false)
 			}
 
+		}
+
+		if len(p.SlackToken) > 0 {
+			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
 		}
 
 		logrus.Info("Done")
