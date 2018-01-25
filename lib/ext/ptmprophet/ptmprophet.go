@@ -22,11 +22,11 @@ type PTMProphet struct {
 }
 
 // New constructor
-func New() PTMProphet {
+func New(temp string) PTMProphet {
 
 	var self PTMProphet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.UnixPTMProphetParser = temp + string(filepath.Separator) + "PTMProphetParser"
 	self.WinPTMProphetParser = temp + string(filepath.Separator) + "PTMProphetParser.exe"

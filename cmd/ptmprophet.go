@@ -23,7 +23,7 @@ var ptmprophetCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing PTMProphet")
-		var ptm = ptmprophet.New()
+		var ptm = ptmprophet.New(m.Temp)
 
 		// deploy the binaries
 		e := ptm.Deploy(m.OS, m.Distro)

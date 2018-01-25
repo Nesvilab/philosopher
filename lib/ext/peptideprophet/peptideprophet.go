@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
@@ -31,11 +32,11 @@ type PeptideProphet struct {
 }
 
 // New constructor
-func New() PeptideProphet {
+func New(temp string) PeptideProphet {
 
 	var self PeptideProphet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.UnixInteractParser = temp + string(filepath.Separator) + "InteractParser"
 	self.UnixRefreshParser = temp + string(filepath.Separator) + "RefreshParser"
@@ -48,6 +49,33 @@ func New() PeptideProphet {
 	self.Zlib1DLL = temp + string(filepath.Separator) + "zlib1.dll"
 
 	return self
+}
+
+// Run is the main entry point for peptideprophet
+func Run(m met.Data, args []string) met.Data {
+
+	var pep = New(m.Temp)
+
+	if len(m.PeptideProphet.Database) < 1 {
+		logrus.Fatal("You need to provide a protein database")
+	}
+
+	// deploy the binaries
+	e := pep.Deploy(m.OS, m.Distro)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+
+	// run
+	xml, e := pep.Execute(m.PeptideProphet, m.Home, m.Temp, args)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+	_ = xml
+
+	m.PeptideProphet.InputFiles = args
+
+	return m
 }
 
 // Deploy PeptideProphet binaries on binary directory
@@ -86,8 +114,8 @@ func (p *PeptideProphet) Deploy(os, distro string) *err.Error {
 	return nil
 }
 
-// Run PeptideProphet
-func (p PeptideProphet) Run(params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
+// Execute PeptideProphet
+func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	// holds the finished pepXML file, we push this up to be indexed
 	var output []string
@@ -97,6 +125,11 @@ func (p PeptideProphet) Run(params met.PeptideProphet, home, temp string, args [
 		file, _ := filepath.Abs(i)
 		listedArgs = append(listedArgs, file)
 	}
+
+	// litter.Dump(p)
+	// fmt.Println(temp)
+	// fmt.Println(sys.Windows())
+	// os.Exit(1)
 
 	// run InteractParser
 	files, e := interactParser(p, params, home, temp, listedArgs)

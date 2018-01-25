@@ -1,17 +1,124 @@
-workspace:
-  execute: yes
-  initialize: yes
-  clean: no
-  backup: no
-  analytics: true
+clean: true
+backup: true
+analytics: false
+slackToken: ''
+slackChannel: ''
+commands:
+  workspace: no
+  database: no
+  comet: no
+  peptideprophet: no
+  proteinprophet: no
+  filter: no
+  freequant: no
+  labelquant: no
+  report: no
+  cluster: no
+  abacus: no
 database:
-  execute: yes
   add: ''
   annotate: ''
-  contam: false
+  contam: true
   custom: ''
   enzyme: trypsin
   id: ''
   isoform: false
   prefix: rev_
   reviewed: true
+comet:
+  noindex: true
+  param: ''
+  raw: mzML
+peptideprophet:
+  extension: pepxml
+  accmass: false
+  combine: true
+  database: ''
+  decoy: rev_
+  decoyprobs: false
+  exclude: false
+  expectscore: false
+  forcedistr: false
+  glyc: false
+  icat: false
+  instrwarn: false
+  leave: false
+  maldi: false
+  masswidth: 5
+  minpeplen: 7
+  minpintt: 2
+  minprob: 0.9
+  minrtntt: 2
+  minrtprob: 0.9
+  neggamma: false
+  noicat: false
+  nomass: false
+  nonmc: false
+  nonparam: false
+  nontt: false
+  optimizefval: false
+  phospho: false
+  pi: false
+  ppm: false
+  rt: false
+  zero: false
+proteinprophet:
+  accuracy: false
+  allpeps: false
+  confem: false
+  delude: false
+  excludezeros: false
+  fpkm: false
+  glyc: false
+  icat: false
+  instances: false
+  iprophet: false
+  logprobs: false
+  maxppmdiff: 20
+  minprob: 0.05
+  mufactor: 1
+  nogroupwts: false
+  nonsp: false
+  nooccam: false
+  noprotlen: false
+  normprotlen: false
+  protmw: false
+  softoccam: false
+  unmapped: false
+filter:
+  psmFDR: 0.01
+  peptideFDR: 0.01
+  ionFDR: 0.01
+  proteinFDR: 0.01
+  peptideProbability: 0.7
+  proteinProbability: 0.5
+  peptideWeight: 1
+  tag: rev_
+  razor: false
+  picked: false
+  mapMods: false
+  models: false
+  sequential: false
+freequant:
+  peakTimeWindow: 0.4
+  retentionTimeWindow: 3
+  tolerance: 10
+labelquant:
+  plex: 10
+  purity: 0.5
+  tolerance: 20
+  uniqueOnly: false
+report:
+  withDecoys: false
+cluster:
+  organismUniProtID: ''
+  level: 0.9
+abacus:
+  comb: combined.prot.xml
+  tag: rev_
+  proteinprobability: 0.9
+  peptideProbability: 0.5
+  razor: false
+  picked: false
+  uniqueOnly: false
+  labels: false

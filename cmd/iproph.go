@@ -23,7 +23,7 @@ var iprophCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing InterProphet")
-		var ipt = interprophet.New()
+		var ipt = interprophet.New(m.Temp)
 
 		if len(args) < 1 {
 			logrus.Fatal("No input file provided")

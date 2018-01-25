@@ -12,9 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fas"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 )
@@ -36,6 +38,59 @@ func New() Base {
 	self.Records = []Record{}
 
 	return self
+}
+
+// Run is the main entry point for the databse command
+func Run(m met.Data) (met.Data, *err.Error) {
+
+	var db = New()
+
+	if len(m.Database.Annot) > 0 {
+
+		logrus.Info("Processing database")
+
+		e := db.ProcessDB(m.Database.Annot, m.Database.Tag)
+		if e != nil {
+			return m, e
+		}
+
+		e = db.Serialize()
+		if e != nil {
+			return m, e
+		}
+
+		return m, e
+	}
+
+	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
+		logrus.Fatal("You need to provide a taxon ID or a custom FASTA file")
+	}
+
+	if m.Database.Crap == false {
+		logrus.Warning("Contaminants are not going to be added to database")
+	}
+
+	if len(m.Database.Custom) < 1 {
+
+		logrus.Info("Fetching database")
+		db.Fetch(m.Database.ID, m.Temp, m.Database.Iso, m.Database.Rev)
+
+	} else {
+		db.UniProtDB = m.Database.Custom
+	}
+
+	logrus.Info("Processing decoys")
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
+
+	logrus.Info("Creating file")
+	db.Save(m.Home, m.Temp, m.Database.Tag)
+
+	err := db.Serialize()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	return m, nil
 }
 
 // ProcessDB ...

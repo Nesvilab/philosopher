@@ -213,17 +213,9 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 			}
 		}
 
-		sort.Float64s(uniqueInt)
 		sort.Float64s(totalInt)
+		sort.Float64s(uniqueInt)
 		sort.Float64s(razorInt)
-
-		if len(uniqueInt) >= 3 {
-			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2] + uniqueInt[len(uniqueInt)-3])
-		} else if len(uniqueInt) == 2 {
-			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2])
-		} else if len(uniqueInt) == 1 {
-			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1])
-		}
 
 		if len(totalInt) >= 3 {
 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2] + totalInt[len(totalInt)-3])
@@ -231,6 +223,14 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1] + totalInt[len(totalInt)-2])
 		} else if len(totalInt) == 1 {
 			e.Proteins[i].TotalIntensity = (totalInt[len(totalInt)-1])
+		}
+
+		if len(uniqueInt) >= 3 {
+			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2] + uniqueInt[len(uniqueInt)-3])
+		} else if len(uniqueInt) == 2 {
+			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1] + uniqueInt[len(uniqueInt)-2])
+		} else if len(uniqueInt) == 1 {
+			e.Proteins[i].UniqueIntensity = (uniqueInt[len(uniqueInt)-1])
 		}
 
 		if len(razorInt) >= 3 {

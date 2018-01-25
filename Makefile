@@ -56,6 +56,8 @@ deploy:
 
 	unzip -o lib/uni/bindata.go.zip -d  lib/uni/
 
+	unzip -o lib/pip/bindata.go.zip -d  lib/pip/
+
 .PHONY: install
 install:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
@@ -78,8 +80,16 @@ windows:
 	cp philosopher.${VERSION}.exe /home/felipevl/Public/philosopher.exe
 	rm philosopher.${VERSION}.exe
 
+.PHONY: release
+release:
+	gox ${LDFLAGS}
+
 .PHONY: all
 all:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	cp philosopher.${VERSION} ${GOBIN}/philosopher;
+	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/bin/philosopher
+	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 	gox ${LDFLAGS}
 
 .PHONY: clean

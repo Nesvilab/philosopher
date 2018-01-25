@@ -41,207 +41,209 @@ type Data struct {
 	Abacus         Abacus
 	Report         Report
 	Index          Index
+	Pipeline       Pipeline
 }
 
 // Database options and parameters
 type Database struct {
-	ID     string
-	Annot  string
-	Enz    string
-	Tag    string
-	Add    string
-	Custom string
-	Crap   bool
-	Rev    bool
-	Iso    bool
+	ID     string `yaml:"id"`
+	Annot  string `yaml:"annotate"`
+	Enz    string `yaml:"enzyme"`
+	Tag    string `yaml:"prefix"`
+	Add    string `yaml:"add"`
+	Custom string `yaml:"custom"`
+	Crap   bool   `yaml:"contam"`
+	Rev    bool   `yaml:"reviewed"`
+	Iso    bool   `yaml:"isoform"`
 }
 
 // Comet options and parameters
 type Comet struct {
-	Param     string
-	ParamFile []byte
-	RawFiles  []string
-	Print     bool
-	NoIndex   bool
+	Param        string `yaml:"param"`
+	ParamFile    []byte
+	RawExtension string `yaml:"raw"`
+	RawFiles     []string
+	Print        bool
+	NoIndex      bool `yaml:"noindex"`
 }
 
 // PeptideProphet options and parameters
 type PeptideProphet struct {
-	InputFiles   []string
-	Output       string
-	Database     string
-	Rtcat        string
-	Decoy        string
-	Minpiprob    float64
-	Minrtprob    float64
-	Minprob      float64
-	Masswidth    float64
-	MinPepLen    int
-	Clevel       int
-	Minpintt     int
-	Ignorechg    int
-	Minrtntt     int
-	Combine      bool
-	Exclude      bool
-	Leave        bool
-	Perfectlib   bool
-	Icat         bool
-	Noicat       bool
-	Zero         bool
-	Accmass      bool
-	Ppm          bool
-	Nomass       bool
-	Pi           bool
-	Rt           bool
-	Glyc         bool
-	Phospho      bool
-	Maldi        bool
-	Instrwarn    bool
-	Decoyprobs   bool
-	Nontt        bool
-	Nonmc        bool
-	Expectscore  bool
-	Nonparam     bool
-	Neggamma     bool
-	Forcedistr   bool
-	Optimizefval bool
+	InputFiles    []string
+	FileExtension string  `yaml:"extension"`
+	Output        string  `yaml:"output"`
+	Database      string  `yaml:"database"`
+	Rtcat         string  `yaml:"rtcat"`
+	Decoy         string  `yaml:"decoy"`
+	Minpiprob     float64 `yaml:"minpiprob"`
+	Minrtprob     float64 `yaml:"minrtprob"`
+	Minprob       float64 `yaml:"minprob"`
+	Masswidth     float64 `yaml:"masswidth"`
+	MinPepLen     int     `yaml:"minpeplen"`
+	Clevel        int     `yaml:"clevel"`
+	Minpintt      int     `yaml:"minpintt"`
+	Minrtntt      int     `yaml:"minrtntt"`
+	Combine       bool    `yaml:"combine"`
+	Exclude       bool    `yaml:"exclude"`
+	Leave         bool    `yaml:"leave"`
+	Perfectlib    bool    `yaml:"perfectlib"`
+	Icat          bool    `yaml:"icat"`
+	Noicat        bool    `yaml:"noicat"`
+	Zero          bool    `yaml:"zero"`
+	Accmass       bool    `yaml:"accmass"`
+	Ppm           bool    `yaml:"ppm"`
+	Nomass        bool    `yaml:"nomass"`
+	Pi            bool    `yaml:"pi"`
+	Rt            bool    `yaml:"rt"`
+	Glyc          bool    `yaml:"glyc"`
+	Phospho       bool    `yaml:"phospho"`
+	Maldi         bool    `yaml:"maldi"`
+	Instrwarn     bool    `yaml:"instrwarn"`
+	Decoyprobs    bool    `yaml:"decoyprobs"`
+	Nontt         bool    `yaml:"nontt"`
+	Nonmc         bool    `yaml:"nonmc"`
+	Expectscore   bool    `yaml:"expectscore"`
+	Nonparam      bool    `yaml:"nonparam"`
+	Neggamma      bool    `yaml:"neggamma"`
+	Forcedistr    bool    `yaml:"forcedistr"`
+	Optimizefval  bool    `yaml:"optimizefval"`
 }
 
 // InterProphet options and parameters
 type InterProphet struct {
 	InputFiles []string
-	Threads    int
-	Decoy      string
-	Cat        string
-	MinProb    float64
-	Output     string
-	Length     bool
-	Nofpkm     bool
-	Nonss      bool
-	Nonse      bool
-	Nonrs      bool
-	Nonsm      bool
-	Nonsp      bool
-	Sharpnse   bool
-	Nonsi      bool
+	Threads    int     `yaml:"threads"`
+	Decoy      string  `yaml:"decoy"`
+	Cat        string  `yaml:"cat"`
+	MinProb    float64 `yaml:"minprob"`
+	Output     string  `yaml:"output"`
+	Length     bool    `yaml:"length"`
+	Nofpkm     bool    `yaml:"nofpkm"`
+	Nonss      bool    `yaml:"nonss"`
+	Nonse      bool    `yaml:"nonse"`
+	Nonrs      bool    `yaml:"nonrs"`
+	Nonsm      bool    `yaml:"nonsm"`
+	Nonsp      bool    `yaml:"nonsp"`
+	Sharpnse   bool    `yaml:"sharpnse"`
+	Nonsi      bool    `yaml:"nonsi"`
 }
 
 // ProteinProphet options and parameters
 type ProteinProphet struct {
 	InputFiles  []string
-	Minprob     float64
-	Minindep    int
-	Mufactor    int
-	Output      string
-	Maxppmdiff  int
-	ExcludeZ    bool
-	Noplot      bool
-	Nooccam     bool
-	Softoccam   bool
-	Icat        bool
-	Glyc        bool
-	Nogroupwts  bool
-	NonSP       bool
-	Accuracy    bool
-	Asap        bool
-	Refresh     bool
-	Normprotlen bool
-	Logprobs    bool
-	Confem      bool
-	Allpeps     bool
-	Unmapped    bool
-	Noprotlen   bool
-	Instances   bool
-	Fpkm        bool
-	Protmw      bool
-	Iprophet    bool
-	Asapprophet bool
-	Delude      bool
-	Excludemods bool
+	Minprob     float64 `yaml:"minprob"`
+	Minindep    int     `yaml:"minidep"`
+	Mufactor    int     `yaml:"mufactor"`
+	Output      string  `yaml:"output"`
+	Maxppmdiff  int     `yaml:"maxppmdiff"`
+	ExcludeZ    bool    `yaml:"excludez"`
+	Noplot      bool    `yaml:"noplot"`
+	Nooccam     bool    `yaml:"noocam"`
+	Softoccam   bool    `yaml:"softocam"`
+	Icat        bool    `yaml:"icat"`
+	Glyc        bool    `yaml:"glyc"`
+	Nogroupwts  bool    `yaml:"nogroupwts"`
+	NonSP       bool    `yaml:"nonsp"`
+	Accuracy    bool    `yaml:"accuracy"`
+	Asap        bool    `yaml:"asap"`
+	Refresh     bool    `yaml:"refresh"`
+	Normprotlen bool    `yaml:"normprotlen"`
+	Logprobs    bool    `yaml:"logprobs"`
+	Confem      bool    `yaml:"confem"`
+	Allpeps     bool    `yaml:"allpeps"`
+	Unmapped    bool    `yaml:"unmapped"`
+	Noprotlen   bool    `yaml:"noprotlen"`
+	Instances   bool    `yaml:"instances"`
+	Fpkm        bool    `yaml:"fpkm"`
+	Protmw      bool    `yaml:"protmw"`
+	Iprophet    bool    `yaml:"iprophet"`
+	Asapprophet bool    `yaml:"asapprophet"`
+	Delude      bool    `yaml:"delude"`
+	Excludemods bool    `yaml:"excludemods"`
 }
 
 // PTMProphet options and parameters
 type PTMProphet struct {
 	InputFiles   []string
-	Output       string
-	EM           int
-	MzTol        float64
-	PPMTol       float64
-	MinProb      float64
-	NoUpdate     bool
-	KeepOld      bool
-	Verbose      bool
-	MassDiffMode bool
+	Output       string  `yaml:"output"`
+	EM           int     `yaml:"em"`
+	MzTol        float64 `yaml:"mztol"`
+	PPMTol       float64 `yaml:"ppmtol"`
+	MinProb      float64 `yaml:"minprob"`
+	NoUpdate     bool    `yaml:"noupdate"`
+	KeepOld      bool    `yaml:"keepold"`
+	Verbose      bool    `yaml:"verbose"`
+	MassDiffMode bool    `yaml:"massdiffmode"`
 }
 
 // Filter options and parameters
 type Filter struct {
-	Pex      string
-	Pox      string
-	Tag      string
-	Con      string
-	Ptconf   string
-	RepProt  string
-	Save     string
-	Database string
-	PsmFDR   float64
-	PepFDR   float64
-	IonFDR   float64
-	PtFDR    float64
-	ProtProb float64
-	PepProb  float64
-	Weight   float64
-	TopPep   bool
-	Model    bool
-	RepPSM   bool
-	Razor    bool
-	Picked   bool
-	Seq      bool
-	Mapmods  bool
+	Pex      string  `yaml:"pepxml"`
+	Pox      string  `yaml:"protxml"`
+	Tag      string  `yaml:"tag"`
+	PsmFDR   float64 `yaml:"psmFDR"`
+	PepFDR   float64 `yaml:"peptideFDR"`
+	IonFDR   float64 `yaml:"ionFDR"`
+	PtFDR    float64 `yaml:"proteinFDR"`
+	ProtProb float64 `yaml:"proteinProbability"`
+	PepProb  float64 `yaml:"peptideProbability"`
+	Weight   float64 `yaml:"peptideWeight"`
+	Model    bool    `yaml:"models"`
+	Razor    bool    `yaml:"razor"`
+	Picked   bool    `yaml:"picked"`
+	Seq      bool    `yaml:"sequential"`
+	Mapmods  bool    `yaml:"mapMods"`
 }
 
 // Quantify options and parameters
 type Quantify struct {
-	Format   string
-	Dir      string
-	Brand    string
-	Plex     string
-	ChanNorm string
-	Annot    string
-	RTWin    float64
-	PTWin    float64
-	Tol      float64
-	Purity   float64
-	IntNorm  bool
-	Unique   bool
+	Format   string  `yaml:"format"`
+	Dir      string  `yaml:"dir"`
+	Brand    string  `yaml:"brand"`
+	Plex     string  `yaml:"plex"`
+	ChanNorm string  `yaml:"chanNorm"`
+	Annot    string  `yaml:"annot"`
+	RTWin    float64 `yaml:"retentionTimeWindow"`
+	PTWin    float64 `yaml:"peakTimeWindow"`
+	Tol      float64 `yaml:"tolerance"`
+	Purity   float64 `yaml:"purity"`
+	IntNorm  bool    `yaml:"intNorm"`
+	Unique   bool    `yaml:"uniqueOnly"`
 }
 
 // Abacus options ad parameters
 type Abacus struct {
-	Comb     string
-	Tag      string
-	Razor    bool
-	Picked   bool
-	Labels   bool
-	Unique   bool
-	ProtProb float64
-	PepProb  float64
+	Comb     string  `yaml:"comb"`
+	Tag      string  `yaml:"tag"`
+	Razor    bool    `yaml:"razor"`
+	Picked   bool    `yaml:"picked"`
+	Labels   bool    `yaml:"labels"`
+	Unique   bool    `yaml:"uniqueOnly"`
+	ProtProb float64 `yaml:"proteinProbability"`
+	PepProb  float64 `yaml:"peptideProbability"`
 }
 
 // Cluster options and parameters
 type Cluster struct {
-	UID   string
-	Level float64
+	UID   string  `yaml:"organismUniProtID"`
+	Level float64 `yaml:"level"`
 }
 
 // Report options and parameters
 type Report struct {
-	Decoys bool
+	Decoys bool `yaml:"withDecoys"`
 }
 
 // Index options and parameters
 type Index struct {
 	Spectra string
+}
+
+// Pipeline options and parameters
+type Pipeline struct {
+	Directives string
+	Print      bool
+	//Dataset    string
 }
 
 var err error

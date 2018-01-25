@@ -1,3 +1,24 @@
+# Philosopher ?
+### Build: ?
+
+### Added
+### Changed
+### Fixed
+
+# Philosopher 20180125
+### Build: 201801251604
+
+### Added
+- New command Pipeline for automated processing
+
+### Changed
+- Path definition for windows system got updated.
+
+### Fixed
+- Cluster command is appending UniProt data again to the final report.
+- Some programs were been deployed with the wrong path definition on some windows versions.
+- Minor bugs and issues.
+
 # Philosopher 20180122
 ### Build: 201801221051
 

@@ -23,32 +23,8 @@ var peprophCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing PeptideProphet")
-		var pep = peptideprophet.New()
 
-		if len(m.PeptideProphet.Database) < 1 {
-			logrus.Fatal("You need to provide a protein database")
-		}
-
-		// deploy the binaries
-		e := pep.Deploy(m.OS, m.Distro)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
-
-		// run
-		xml, e := pep.Run(m.PeptideProphet, m.Home, m.Temp, args)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
-
-		_ = xml
-		// e = evi.NewIdentification()
-		// if e != nil {
-		// 	logrus.Fatal(e.Message)
-		// }
-		//evi.IndexIdentification(xml, m.PeptideProphet.Decoy)
-
-		m.PeptideProphet.InputFiles = args
+		peptideprophet.Run(m, args)
 		m.Serialize()
 
 		logrus.Info("Done")

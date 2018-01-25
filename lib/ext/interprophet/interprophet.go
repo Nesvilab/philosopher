@@ -24,11 +24,11 @@ type InterProphet struct {
 }
 
 // New constructor
-func New() InterProphet {
+func New(temp string) InterProphet {
 
 	var self InterProphet
 
-	temp, _ := sys.GetTemp()
+	//temp, _ := sys.GetTemp()
 
 	self.UnixInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser"
 	self.WinInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser.exe"
