@@ -103,7 +103,7 @@ var pipelineCmd = &cobra.Command{
 
 			// PeptideProphet
 			if p.Commands.PeptideProphet == "yes" {
-				logrus.Info("Executing PeptideProphet")
+				logrus.Info("Executing PeptideProphet on ", i)
 				m.PeptideProphet = p.PeptideProphet
 				m.PeptideProphet.Output = "interact"
 				m.PeptideProphet.Combine = true
@@ -117,7 +117,7 @@ var pipelineCmd = &cobra.Command{
 
 			// ProteinProphet
 			if p.Commands.ProteinProphet == "yes" {
-				logrus.Info("Executing ProteinProphet")
+				logrus.Info("Executing ProteinProphet on ", i)
 				m.ProteinProphet = p.ProteinProphet
 				m.ProteinProphet.Output = "interact"
 				var files []string
@@ -145,7 +145,10 @@ var pipelineCmd = &cobra.Command{
 				files = append(files, fqn)
 			}
 			proteinprophet.Run(m, files)
-			combinedProtXML = fmt.Sprintf("%s%scombined.prot.xml", dir, string(filepath.Separator))
+			combinedProtXML = fmt.Sprintf("%s%scombined.prot.xml", m.Temp, string(filepath.Separator))
+
+			// copy to work directory
+			sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
 		}
 
 		for _, i := range args {
@@ -156,7 +159,7 @@ var pipelineCmd = &cobra.Command{
 
 			// Filter
 			if p.Commands.Filter == "yes" {
-				logrus.Info("Executing filter")
+				logrus.Info("Executing filter on ", i)
 				m.Filter = p.Filter
 				m.Filter.Pex = "interact.pep.xml"
 				if p.Commands.ProteinProphet == "yes" {
@@ -171,9 +174,12 @@ var pipelineCmd = &cobra.Command{
 				}
 			}
 
+			// getting inside de the dataset folder again
+			os.Chdir(dsAbs)
+
 			// FreeQuant
 			if p.Commands.FreeQuant == "yes" {
-				logrus.Info("Executing label-free quantification")
+				logrus.Info("Executing label-free quantification on ", i)
 				m.Quantify = p.Freequant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
@@ -185,7 +191,7 @@ var pipelineCmd = &cobra.Command{
 
 			// LabelQuant
 			if p.Commands.LabelQuant == "yes" {
-				logrus.Info("Executing label-based quantification")
+				logrus.Info("Executing label-based quantification on ", i)
 				m.Quantify = p.LabelQuant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
@@ -198,13 +204,13 @@ var pipelineCmd = &cobra.Command{
 
 			// Report
 			if p.Commands.Report == "yes" {
-				logrus.Info("Executing report")
+				logrus.Info("Executing report on", i)
 				rep.Run(m)
 			}
 
 			// Cluster
 			if p.Commands.Cluster == "yes" {
-				logrus.Info("Executing cluster")
+				logrus.Info("Executing cluster on ", i)
 				m.Cluster = p.Cluster
 				clu.GenerateReport(m)
 			}
