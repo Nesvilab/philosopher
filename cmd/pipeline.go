@@ -117,11 +117,12 @@ var pipelineCmd = &cobra.Command{
 				m.PeptideProphet = p.PeptideProphet
 				m.PeptideProphet.Output = "interact"
 				m.PeptideProphet.Combine = true
-				gobExt := fmt.Sprintf("%s%s*.%s", m.PeptideProphet.FilePath, string(filepath.Separator), p.PeptideProphet.FileExtension)
+				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
 					logrus.Fatal(e)
 				}
+
 				peptideprophet.Run(m, files)
 
 				m.Serialize()

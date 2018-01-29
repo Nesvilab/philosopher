@@ -70,7 +70,6 @@ type Comet struct {
 // PeptideProphet options and parameters
 type PeptideProphet struct {
 	InputFiles    []string
-	FilePath      string  `yaml:"pepXMLPath"`
 	FileExtension string  `yaml:"extension"`
 	Output        string  `yaml:"output"`
 	Database      string  `yaml:"database"`
