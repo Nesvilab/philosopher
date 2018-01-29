@@ -31,9 +31,7 @@ var pipelineCmd = &cobra.Command{
 	Short: "Automatic execution of consecutive analysis steps",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		paramTemp, _ := sys.GetTemp()
-
-		param, e := pip.DeployParameterFile(paramTemp)
+		param, e := pip.DeployParameterFile(".")
 		if e != nil {
 			logrus.Fatal(e.Error())
 		}
