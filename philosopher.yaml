@@ -30,7 +30,8 @@ comet:
   param: ''                  # comet parameter file (default "comet.params.txt")
   raw: mzML                  # format of the spectra file
 peptideprophet:
-  extension: pepxml
+  pepXMLPath: ''             # path to the pepXML files
+  extension: pepxml          # pepXML file extension
   accmass: false             # use Accurate Mass model binning
   combine: true              # combine the results from PeptideProphet into a single result file
   database: ''               # path to the database
@@ -101,10 +102,12 @@ filter:
   models: false
   sequential: false
 freequant:
+  dir: ''
   peakTimeWindow: 0.4
   retentionTimeWindow: 3
   tolerance: 10
 labelquant:
+  dir: ''
   plex: 10
   purity: 0.5
   tolerance: 20
