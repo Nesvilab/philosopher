@@ -31,12 +31,6 @@ var pipelineCmd = &cobra.Command{
 	Short: "Automatic execution of consecutive analysis steps",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(args) < 1 {
-			logrus.Fatal("You need to provide at least one dataset for the analysis.")
-		} else if len(args) < 2 {
-			logrus.Fatal("You need to provide at least two datasets for the abacus integrative analysis.")
-		}
-
 		paramTemp, _ := sys.GetTemp()
 
 		param, e := pip.DeployParameterFile(paramTemp)
@@ -69,6 +63,12 @@ var pipelineCmd = &cobra.Command{
 			logrus.Fatal(e)
 		}
 
+		if len(args) < 1 {
+			logrus.Fatal("You need to provide at least one dataset for the analysis.")
+		} else if p.Commands.Abacus == "true" && len(args) < 2 {
+			logrus.Fatal("You need to provide at least two datasets for the abacus integrative analysis.")
+		}
+
 		// For each dataset ...
 		for _, i := range args {
 
@@ -88,6 +88,8 @@ var pipelineCmd = &cobra.Command{
 			if p.Commands.Database == "yes" {
 				m.Database = p.Database
 				dat.Run(m)
+
+				m.Serialize()
 			}
 
 			// Comet
@@ -99,6 +101,8 @@ var pipelineCmd = &cobra.Command{
 					logrus.Fatal(e)
 				}
 				comet.Run(m, files)
+
+				m.Serialize()
 			}
 
 			// PeptideProphet
@@ -113,6 +117,8 @@ var pipelineCmd = &cobra.Command{
 					logrus.Fatal(e)
 				}
 				peptideprophet.Run(m, files)
+
+				m.Serialize()
 			}
 
 			// ProteinProphet
@@ -123,9 +129,10 @@ var pipelineCmd = &cobra.Command{
 				var files []string
 				files = append(files, "interact.pep.xml")
 				proteinprophet.Run(m, files)
+
+				m.Serialize()
 			}
 
-			m.Serialize()
 			// return to the top level directory
 			os.Chdir(dir)
 		}
@@ -149,11 +156,13 @@ var pipelineCmd = &cobra.Command{
 
 			// copy to work directory
 			sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
+
+			m.Serialize()
 		}
 
 		for _, i := range args {
 
-			// getting inside de the dataset folder
+			// getting inside  each dataset folder again
 			dsAbs, _ := filepath.Abs(i)
 			os.Chdir(dsAbs)
 
@@ -172,6 +181,8 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}
+
+				m.Serialize()
 			}
 
 			// getting inside de the dataset folder again
@@ -187,6 +198,8 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}
+
+				m.Serialize()
 			}
 
 			// LabelQuant
@@ -200,12 +213,16 @@ var pipelineCmd = &cobra.Command{
 				if err != nil {
 					logrus.Fatal(err)
 				}
+
+				m.Serialize()
 			}
 
 			// Report
 			if p.Commands.Report == "yes" {
 				logrus.Info("Executing report on", i)
 				rep.Run(m)
+
+				m.Serialize()
 			}
 
 			// Cluster
@@ -213,9 +230,10 @@ var pipelineCmd = &cobra.Command{
 				logrus.Info("Executing cluster on ", i)
 				m.Cluster = p.Cluster
 				clu.GenerateReport(m)
+
+				m.Serialize()
 			}
 
-			m.Serialize()
 			// return to the top level directory
 			os.Chdir(dir)
 		}
