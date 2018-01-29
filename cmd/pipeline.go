@@ -15,6 +15,7 @@ import (
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/fil"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/pip"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
@@ -31,7 +32,20 @@ var pipelineCmd = &cobra.Command{
 	Short: "Automatic execution of consecutive analysis steps",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		param, e := pip.DeployParameterFile(".")
+		// get current directory
+		dir, e := os.Getwd()
+		if e != nil {
+			logrus.Info("check folder permissions")
+		}
+
+		// create a virtual meta instance
+		var meta = met.New(dir)
+		os.Mkdir(meta.Temp, 0755)
+		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
+			logrus.Info("Can't find temporary directory; check folder permissions")
+		}
+
+		param, e := pip.DeployParameterFile(meta.Temp)
 		if e != nil {
 			logrus.Fatal(e.Error())
 		}
@@ -43,12 +57,6 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		file, _ := filepath.Abs(m.Pipeline.Directives)
-
-		// get current directory
-		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		y, e := ioutil.ReadFile(file)
 		if e != nil {

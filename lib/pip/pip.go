@@ -2,7 +2,6 @@ package pip
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -47,8 +46,7 @@ type Commands struct {
 // DeployParameterFile ...
 func DeployParameterFile(temp string) (string, error) {
 
-	//file := temp + string(filepath.Separator) + "philosopher.yaml"
-	file := "." + string(filepath.Separator) + "philosopher.yaml"
+	file := temp + string(filepath.Separator) + "philosopher.yaml"
 
 	param, err := Asset("philosopher.yaml")
 	if err != nil {
@@ -57,7 +55,6 @@ func DeployParameterFile(temp string) (string, error) {
 
 	err = ioutil.WriteFile(file, param, 0644)
 	if err != nil {
-		fmt.Println(err)
 		return file, errors.New("Cannot deploy pipeline parameter file")
 	}
 
