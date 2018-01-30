@@ -1,14 +1,19 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/sanity-io/litter"
+	"github.com/prvst/philosopher/lib/rep"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
 )
+
+var object string
 
 // inspectCmd represents the inspect command
 var inspectCmd = &cobra.Command{
@@ -17,17 +22,36 @@ var inspectCmd = &cobra.Command{
 	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var d met.Data
+		//file, _ := os.Open(os.Args[2])
 
-		file, _ := os.Open(os.Args[2])
+		if object == "meta" {
 
-		dec := msgpack.NewDecoder(file)
-		err := dec.Decode(&d)
-		if err != nil {
-			logrus.Fatal("Could not restore meta data:", err)
+			var o met.Data
+
+			target := fmt.Sprintf(".meta%smeta.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			err := dec.Decode(&o)
+			if err != nil {
+				logrus.Fatal("Could not restore meta data:", err)
+			}
+			spew.Dump(o)
+
+		} else if object == "psm" {
+
+			target := fmt.Sprintf(".meta%sev.psm.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			var o rep.PSMEvidenceList
+			dec := msgpack.NewDecoder(file)
+			err := dec.Decode(&o)
+			if err != nil {
+				logrus.Fatal("Could not restore meta data:", err)
+			}
+			spew.Dump(o)
+
 		}
-
-		litter.Dump(d)
 
 		return
 	},
@@ -36,6 +60,8 @@ var inspectCmd = &cobra.Command{
 func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "inspect" {
+		inspectCmd.Flags().StringVarP(&object, "object", "", "meta", "object to inspect")
+
 		RootCmd.AddCommand(inspectCmd)
 	}
 
