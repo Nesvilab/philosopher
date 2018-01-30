@@ -63,62 +63,62 @@ peptideprophet:
   rt: false                  # enable peptide RT model
   zero: false                # report results with minimum probability 0
 proteinprophet:
-  accuracy: false
-  allpeps: false
-  confem: false
-  delude: false
-  excludezeros: false
-  fpkm: false
-  glyc: false
-  icat: false
-  instances: false
-  iprophet: false
-  logprobs: false
-  maxppmdiff: 20
-  minprob: 0.05
-  mufactor: 1
-  nogroupwts: false
-  nonsp: false
-  nooccam: false
-  noprotlen: false
-  normprotlen: false
-  protmw: false
-  softoccam: false
-  unmapped: false
+  accuracy: false            # equivalent to --minprob 0
+  allpeps: false             # consider all possible peptides in the database in the confidence model
+  confem: false              # use the EM to compute probability given the confidence
+  delude: false              # do NOT use peptide degeneracy information when assessing proteins
+  excludezeros: false        # exclude zero prob entries
+  fpkm: false                # model protein FPKM values
+  glyc: false                # highlight peptide N-glycosylation motif
+  icat: false                # highlight peptide cysteines
+  instances: false           # use Expected Number of Ion Instances to adjust the peptide probabilities prior to NSP adjustment
+  iprophet: false            # input is from iProphet
+  logprobs: false            # use the log of the probabilities in the Confidence calculations
+  maxppmdiff: 20             # maximum peptide mass difference in PPM (default 20)
+  minprob: 0.05              # peptideProphet probabilty threshold (default 0.05)
+  mufactor: 1                # fudge factor to scale MU calculation (default 1)
+  nogroupwts: false          # check peptide's Protein weight against the threshold (default: check peptide's Protein Group weight against threshold)
+  nonsp: false               # do not use NSP model
+  nooccam: false             # non-conservative maximum protein list
+  noprotlen: false           # do not report protein length
+  normprotlen: false         # normalize NSP using Protein Length
+  protmw: false              # get protein mol weights
+  softoccam: false           # peptide weights are apportioned equally among proteins within each Protein Group (less conservative protein count estimate)
+  unmapped: false            # report results for UNMAPPED proteins
 filter:
-  psmFDR: 0.01
-  peptideFDR: 0.01
-  ionFDR: 0.01
-  proteinFDR: 0.01
-  peptideProbability: 0.7
-  proteinProbability: 0.5
-  peptideWeight: 1
-  tag: rev_
-  razor: false
-  picked: false
-  mapMods: false
-  models: false
-  sequential: false
+  psmFDR: 0.01               # psm FDR level (default 0.01)
+  peptideFDR: 0.01           # peptide FDR level (default 0.01)
+  ionFDR: 0.01               # peptide ion FDR level (default 0.01)
+  proteinFDR: 0.01           # protein FDR level (default 0.01)
+  peptideProbability: 0.7    # top peptide probability treshold for the FDR filtering (default 0.7)
+  proteinProbability: 0.5    # protein probability treshold for the FDR filtering (not used with the razor algorithm) (default 0.5)
+  peptideWeight: 1           # threshold for defining peptide uniqueness (default 1)
+  tag: rev_                  # decoy tag (default "rev_")
+  razor: false               # use razor peptides for protein FDR scoring
+  picked: false              # apply the picked FDR algorithm before the protein scoring
+  mapMods: false             # map modifications aquired by an open search
+  models: false              # print model distribution
+  sequential: false          # alternative algorithm that estimates FDR using both filtered PSM and Protein lists
 freequant:
-  peakTimeWindow: 0.4
-  retentionTimeWindow: 3
-  tolerance: 10
+  peakTimeWindow: 0.4        # specify the time windows for the peak (minute) (default 0.4)
+  retentionTimeWindow: 3     # specify the retention time window for xic (minute) (default 3)
+  tolerance: 10              # m/z tolerance in ppm (default 10)
 labelquant:
-  plex: 10
-  purity: 0.5
-  tolerance: 20
-  uniqueOnly: false
+  plex: 10                   # number of channels
+  purity: 0.5                # ion purity threshold (default 0.5)
+  tolerance: 20              # m/z tolerance in ppm (default 20)
+  uniqueOnly: false          # report quantification based on only unique peptides
 report:
-  withDecoys: false
+  withDecoys: false          # add decoy observations to reports
 cluster:
-  organismUniProtID: ''
-  level: 0.9
+  organismUniProtID:         # UniProt proteome ID
+  level: 0.9                 # cluster identity level (default 0.9)
 abacus:
-  comb: combined.prot.xml
-  tag: rev_
-  proteinprobability: 0.9
-  peptideProbability: 0.5
-  razor: false
-  picked: false
-  uniqueOnly: false
-  labels: false
+  comb: combined.prot.xml    # combined file
+  tag: rev_                  # decoy tag (default "rev_")
+  proteinprobability: 0.9    # minimun protein probability (default 0.9)
+  peptideProbability: 0.5    # minimun peptide probability (default 0.5)
+  razor: false               # use razor peptides for protein FDR scoring
+  picked: false              # apply the picked FDR algorithm before the protein scoring
+  uniqueOnly: false          # report TMT quantification based on only unique peptides
+  labels: false              # indicates wether the data sets incluse TMT labels or not
