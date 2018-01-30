@@ -5,6 +5,14 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20180130
+### Build: 201801301655
+
+### Fixed
+- Several minor bug fixes.
+- The Ion report was empty after filtering the data without protein inference.
+- Labeled PSMs were been reported with 0 abundances.
+
 # Philosopher 20180125
 ### Build: 201801251604
 

@@ -291,6 +291,36 @@ func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.P
 	return evi, nil
 }
 
+// func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
+//
+// 	for i := range evi.PSM {
+//
+// 		var flag = 0
+//
+// 		for _, j := range evi.PSM[i].AssignedMassDiffs {
+// 			if j == 229.162932 {
+// 				flag++
+// 			}
+//
+// 			if flag == 0 {
+// 				evi.PSM[i].Labels.Channel1.Intensity = 0
+// 				evi.PSM[i].Labels.Channel2.Intensity = 0
+// 				evi.PSM[i].Labels.Channel3.Intensity = 0
+// 				evi.PSM[i].Labels.Channel4.Intensity = 0
+// 				evi.PSM[i].Labels.Channel5.Intensity = 0
+// 				evi.PSM[i].Labels.Channel6.Intensity = 0
+// 				evi.PSM[i].Labels.Channel7.Intensity = 0
+// 				evi.PSM[i].Labels.Channel8.Intensity = 0
+// 				evi.PSM[i].Labels.Channel9.Intensity = 0
+// 				evi.PSM[i].Labels.Channel10.Intensity = 0
+// 			}
+//
+// 		}
+// 	}
+//
+// 	return evi
+// }
+
 func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 	for i := range evi.PSM {
@@ -310,7 +340,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel10.Intensity = 0
 		} else {
 			for _, j := range evi.PSM[i].AssignedMassDiffs {
-				if j == 229.162932 {
+				if j >= 229.1629 {
 					flag++
 				}
 			}

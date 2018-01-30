@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
@@ -16,11 +15,12 @@ var cometCmd = &cobra.Command{
 	Short: "Peptide spectrum matching with Comet",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// verify if the command is been executed on a workspace directory
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
-		}
+		// Removed because of the parameter printing
+		// // verify if the command is been executed on a workspace directory
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
 
 		logrus.Info("Executing Comet")
 

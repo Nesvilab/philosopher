@@ -42,16 +42,6 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal("Unknown file format")
 		}
 
-		// if len(lbl.ChanNorm) > 0 && lbl.IntNorm == true {
-		// 	i, err := strconv.Atoi(lbl.ChanNorm)
-		// 	if i > 10 || i < 1 || err != nil {
-		// 		logrus.Fatal("Inexisting channel number:", lbl.ChanNorm)
-		// 	}
-		// 	logrus.Fatal("You can choose only one method of normalization")
-		// } else if len(lbl.ChanNorm) == 0 && lbl.IntNorm == false {
-		// 	logrus.Fatal("Missing normalization method, type 'philosopher labelquant --help' for more information")
-		// }
-
 		//err := lbl.RunLabeledQuantification()
 		err := qua.RunTMTQuantification(m.Quantify)
 		if err != nil {

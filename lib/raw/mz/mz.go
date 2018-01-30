@@ -300,8 +300,17 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 	if len(rawSpec.PrecursorList.Precursor) > 0 {
 
 		// parent index and parent scan
-		ref := strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
-		precRef := strings.Split(ref[2], "=")
+		var ref []string
+		var precRef []string
+
+		ref = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
+		precRef = strings.Split(ref[2], "=")
+
+		// ABSCIEX has a different way of reporting the prcursor reference spectrum
+		if len(ref) < 1 || len(precRef) < 1 {
+			precRef = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
+		}
+
 		spec.Precursor.ParentScan = precRef[1]
 		pi, _ := strconv.Atoi(precRef[1])
 		pi = (pi - 1)
