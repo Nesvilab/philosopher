@@ -14,6 +14,7 @@ import (
 )
 
 var object string
+var key string
 
 // inspectCmd represents the inspect command
 var inspectCmd = &cobra.Command{
@@ -51,6 +52,30 @@ var inspectCmd = &cobra.Command{
 			}
 			spew.Dump(o)
 
+		} else if object == "protein" {
+
+			target := fmt.Sprintf(".meta%sev.pro.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			var o rep.ProteinEvidenceList
+			dec := msgpack.NewDecoder(file)
+			err := dec.Decode(&o)
+			if err != nil {
+				logrus.Fatal("Could not restore meta data:", err)
+			}
+
+			if len(key) > 0 {
+
+				for _, i := range o {
+					if i.ProteinID == key {
+						spew.Dump(i)
+					}
+				}
+
+			} else {
+				spew.Dump(o)
+			}
+
 		}
 
 		return
@@ -61,6 +86,7 @@ func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "inspect" {
 		inspectCmd.Flags().StringVarP(&object, "object", "", "meta", "object to inspect")
+		inspectCmd.Flags().StringVarP(&key, "key", "", "meta", "object to inspect")
 
 		RootCmd.AddCommand(inspectCmd)
 	}

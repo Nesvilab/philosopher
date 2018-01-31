@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -265,6 +266,11 @@ func Run(m met.Data) met.Data {
 		logrus.Fatal(err.Error())
 	}
 
+	var labels = make(map[string]string)
+	if len(m.Report.Annot) > 0 {
+		labels, _ = getLabelNames(m.Report.Annot)
+	}
+
 	if len(repo.Proteins) > 0 {
 
 		logrus.Info("Creating Protein FASTA report")
@@ -284,7 +290,7 @@ func Run(m met.Data) met.Data {
 	if len(m.Quantify.Plex) > 0 {
 
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(m.Filter.Tag)
+		repo.PSMTMTReport(m.Filter.Tag, labels)
 
 		logrus.Info("Creating TMT peptide report")
 		repo.PeptideTMTReport()
@@ -492,7 +498,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 }
 
 // PSMTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMTMTReport(decoyTag string) {
+func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -503,7 +509,15 @@ func (e *Evidence) PSMTMTReport(decoyTag string) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
+	var header string
+
+	if len(labels) > 0 {
+		header = fmt.Sprintf("Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\n", labels["126"], labels["127N"], labels["127C"], labels["128N"], labels["128C"], labels["129N"], labels["129C"], labels["130N"], labels["130C"], labels["131C"])
+	} else {
+		header = "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tMapped Proteins\tGene Name\tProtein\tAlternative Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	}
+
+	_, err = io.WriteString(file, header)
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -1988,4 +2002,28 @@ func (e *Evidence) PlotMassHist() error {
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
 	return nil
+}
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) (map[string]string, *err.Error) {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	return labels, nil
 }

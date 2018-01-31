@@ -40,6 +40,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		reportCmd.Flags().BoolVarP(&m.Report.Decoys, "decoys", "", false, "add decoy observations to reports")
+		reportCmd.Flags().StringVarP(&m.Report.Annot, "annot", "", "", "annotation file with custom names for the TMT tags")
 	}
 
 	RootCmd.AddCommand(reportCmd)
