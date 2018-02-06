@@ -41,6 +41,7 @@ type ProteinIdentification struct {
 	Confidence               float64
 	TopPepProb               float64
 	IndistinguishableProtein []string
+	TotalNumberPeptides      int
 	PeptideIons              []PeptideIonIdentification
 	HasRazor                 bool
 	Picked                   int
@@ -124,6 +125,7 @@ func (p *ProtXML) Read(f string) error {
 			ptid.PctSpectrumIDs = j.PctSpectrumIDs
 			ptid.TopPepProb = j.Peptide[0].InitialProbability
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
+			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 
 			if strings.EqualFold(string(j.Parameter.Name), "prot_length") {
 				ptid.Length = j.Parameter.Value

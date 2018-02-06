@@ -540,12 +540,12 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 
 	////////////////////////////////////////
 	///// TODO TEMP fix - NEEDS TO BE REMOVED
-	// var dtb dat.Base
-	// dtb.Restore()
-	// var dbMap = make(map[string]string)
-	// for _, j := range dtb.Records {
-	// 	dbMap[j.PartHeader] = j.GeneNames
-	// }
+	var dtb dat.Base
+	dtb.Restore()
+	var dbMap = make(map[string]string)
+	for _, j := range dtb.Records {
+		dbMap[j.PartHeader] = j.GeneNames
+	}
 	///// TODO TEMP fix - NEEDS TO BE REMOVED
 	////////////////////////////////////////
 
@@ -580,7 +580,7 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 		}
 
 		///// TEMP fix - NEEDS TO BE REMOVED
-		//geneName := dbMap[i.Protein]
+		geneName := dbMap[i.Protein]
 		///////////////
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
@@ -610,7 +610,7 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
-			i.GeneName, //geneName,
+			geneName, //i.GeneName,
 			i.Protein,
 			strings.Join(i.AlternativeProteins, ", "),
 			strings.Join(i.ParentProteinPeptide, ", "),

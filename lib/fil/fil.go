@@ -3,13 +3,14 @@ package fil
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
@@ -660,174 +661,264 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 }
 
 // RazorFilter classifies peptides as razor
+// func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
+//
+// 	//var razorMap = make(map[string]string)
+// 	var razorMap = make(map[string][]string)
+// 	var refMap = make(map[string][]string)
+// 	var pepMap = make(map[string]string)
+// 	var checkRazor = make(map[string]uint8)
+//
+// 	// create reference entries by collapsing into a single string all necessary information about the peptide-to-protein assignment
+// 	for i := range p.Groups {
+// 		for j := range p.Groups[i].Proteins {
+// 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+//
+// 				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
+// 					p.Groups[i].GroupNumber,
+// 					string(p.Groups[i].Proteins[j].GroupSiblingID),
+// 					string(p.Groups[i].Proteins[j].ProteinName),
+// 					string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
+// 					p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].Weight,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass,
+// 				)
+//
+// 				refMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)] = append(refMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)], ref)
+// 				pepMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)] = ""
+//
+// 			}
+// 		}
+// 	}
+//
+// 	// for each unique peptide sequence
+// 	for k := range pepMap {
+//
+// 		var gw float64
+// 		var w float64
+// 		var mgw []string
+//
+// 		// retrieve the list of references based on the peptide sequence
+// 		v, ok := refMap[k]
+// 		if ok {
+//
+// 			// for each reference in the list
+// 			for i := range v {
+//
+// 				pep := strings.Split(v[i], "#")
+//
+// 				weight, err := strconv.ParseFloat(pep[5], 64)
+// 				if err != nil {
+// 					return p, err
+// 				}
+//
+// 				groupWeight, err := strconv.ParseFloat(pep[6], 64)
+// 				if err != nil {
+// 					return p, err
+// 				}
+//
+// 				cnpm, err := strconv.ParseFloat(pep[8], 64)
+// 				if err != nil {
+// 					return p, err
+// 				}
+//
+// 				pepCheck := fmt.Sprintf("%s#%s#%.4f", pep[3], pep[7], cnpm)
+//
+// 				// references with weight > 0.5 are easy cases, and clearly assinged as razor
+// 				if weight > 0.5 {
+//
+// 					mgw = append(mgw, v[i])
+// 					_, ok := checkRazor[pepCheck]
+// 					if !ok {
+// 						mgw = append(mgw, v[i])
+// 						checkRazor[pepCheck] = 1
+// 					}
+//
+// 				} else {
+//
+// 					if groupWeight > gw {
+// 						gw = groupWeight
+// 						w = weight
+// 						_, ok := checkRazor[pepCheck]
+// 						if !ok {
+// 							mgw = append(mgw, v[i])
+// 							checkRazor[pepCheck] = 1
+// 						}
+//
+// 					} else if groupWeight == gw {
+// 						if weight > w {
+// 							w = weight
+//
+// 							_, ok := checkRazor[pepCheck]
+// 							if !ok {
+// 								mgw = append(mgw, v[i])
+// 								checkRazor[pepCheck] = 1
+// 							}
+//
+// 						} else if weight == w {
+// 							w = weight
+//
+// 							_, ok := checkRazor[pepCheck]
+// 							if !ok {
+// 								mgw = append(mgw, v[i])
+// 								checkRazor[pepCheck] = 1
+// 							}
+//
+// 						}
+// 					}
+//
+// 				}
+//
+// 			}
+// 		}
+// 		razorMap[k] = mgw
+// 	}
+//
+// 	for i := range p.Groups {
+// 		for j := range p.Groups[i].Proteins {
+// 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+//
+// 				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
+// 					p.Groups[i].GroupNumber,
+// 					string(p.Groups[i].Proteins[j].GroupSiblingID),
+// 					string(p.Groups[i].Proteins[j].ProteinName),
+// 					string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
+// 					p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].Weight,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
+// 					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass)
+//
+// 				v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
+// 				if ok {
+//
+// 					for _, l := range v {
+// 						if strings.EqualFold(ref, l) {
+// 							p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
+// 							p.Groups[i].Proteins[j].HasRazor = true
+// 							break
+// 						}
+// 					}
+// 				}
+//
+// 				// for debuging
+// 				// if strings.Contains(string(p.Groups[i].Proteins[j].ProteinName), "") {
+// 				// 	fmt.Println("PING")
+// 				// 	fmt.Println(p.Groups[i].Proteins[j].PeptideIons[k].Razor)
+// 				// 	fmt.Println(p.Groups[i].Proteins[j].HasRazor)
+// 				// 	os.Exit(1)
+// 				// }
+//
+// 			}
+// 		}
+// 	}
+//
+// 	// mark as razor all peptides in the reference map
+// 	for i := range p.Groups {
+// 		for j := range p.Groups[i].Proteins {
+// 			var r float64
+// 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+// 				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
+// 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
+// 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
+// 					}
+// 				}
+// 			}
+// 			p.Groups[i].Proteins[j].TopPepProb = r
+// 		}
+// 	}
+//
+// 	return p, nil
+// }
+
+// RazorCandidate is a peptide sequence to be evaluated as a razor
+type RazorCandidate struct {
+	Sequence          string
+	MappedProteinsW   map[string]float64
+	MappedProteinsGW  map[string]float64
+	MappedProteinsTNP map[string]int
+}
+
+// RazorCandidateMap is a list of razor candidates
+type RazorCandidateMap map[string]RazorCandidate
+
+// RazorFilter classifies peptides as razor
 func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
-	//var razorMap = make(map[string]string)
-	var razorMap = make(map[string][]string)
-	var refMap = make(map[string][]string)
-	var pepMap = make(map[string]string)
-	var checkRazor = make(map[string]uint8)
+	var r = make(map[string]RazorCandidate)
 
-	// create reference entries by collapsing into a single string all necessary information about the peptide-to-protein assignment
-	for i := range p.Groups {
-		for j := range p.Groups[i].Proteins {
-			for k := range p.Groups[i].Proteins[j].PeptideIons {
+	// for each peptide sequence, collapse oll parent protein peptides from ions originated from the same sequence
+	for _, i := range p.Groups {
+		for _, j := range i.Proteins {
+			for _, k := range j.PeptideIons {
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
-					p.Groups[i].GroupNumber,
-					string(p.Groups[i].Proteins[j].GroupSiblingID),
-					string(p.Groups[i].Proteins[j].ProteinName),
-					string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
-					p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
-					p.Groups[i].Proteins[j].PeptideIons[k].Weight,
-					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
-					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
-					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass,
-				)
+				v, ok := r[k.PeptideSequence]
+				if !ok {
 
-				refMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)] = append(refMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)], ref)
-				pepMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)] = ""
+					var rc RazorCandidate
+					rc.Sequence = k.PeptideSequence
+					rc.MappedProteinsW = make(map[string]float64)
+					rc.MappedProteinsGW = make(map[string]float64)
+					rc.MappedProteinsTNP = make(map[string]int)
 
-			}
-		}
-	}
+					rc.MappedProteinsW[j.ProteinName] = k.Weight
+					rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+					rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
 
-	// for each unique peptide sequence
-	for k := range pepMap {
-
-		var gw float64
-		var w float64
-		var mgw []string
-
-		// retrieve the list of references based on the peptide sequence
-		v, ok := refMap[k]
-		if ok {
-
-			// for each reference in the list
-			for i := range v {
-
-				pep := strings.Split(v[i], "#")
-
-				weight, err := strconv.ParseFloat(pep[5], 64)
-				if err != nil {
-					return p, err
-				}
-
-				groupWeight, err := strconv.ParseFloat(pep[6], 64)
-				if err != nil {
-					return p, err
-				}
-
-				cnpm, err := strconv.ParseFloat(pep[8], 64)
-				if err != nil {
-					return p, err
-				}
-
-				pepCheck := fmt.Sprintf("%s#%s#%.4f", pep[3], pep[7], cnpm)
-
-				// references with weight > 0.5 are easy cases, and clearly assinged as razor
-				if weight > 0.5 {
-
-					mgw = append(mgw, v[i])
-					_, ok := checkRazor[pepCheck]
-					if !ok {
-						mgw = append(mgw, v[i])
-						checkRazor[pepCheck] = 1
+					for _, i := range j.IndistinguishableProtein {
+						rc.MappedProteinsW[i] = -1
+						rc.MappedProteinsGW[i] = -1
+						rc.MappedProteinsTNP[i] = -1
 					}
+
+					for _, i := range k.PeptideParentProtein {
+						rc.MappedProteinsW[i] = -1
+						rc.MappedProteinsGW[i] = -1
+						rc.MappedProteinsTNP[i] = -1
+					}
+
+					r[k.PeptideSequence] = rc
 
 				} else {
+					var c = v
 
-					if groupWeight > gw {
-						gw = groupWeight
-						w = weight
-						_, ok := checkRazor[pepCheck]
-						if !ok {
-							mgw = append(mgw, v[i])
-							checkRazor[pepCheck] = 1
-						}
-
-					} else if groupWeight == gw {
-						if weight > w {
-							w = weight
-
-							_, ok := checkRazor[pepCheck]
-							if !ok {
-								mgw = append(mgw, v[i])
-								checkRazor[pepCheck] = 1
-							}
-
-						} else if weight == w {
-							w = weight
-
-							_, ok := checkRazor[pepCheck]
-							if !ok {
-								mgw = append(mgw, v[i])
-								checkRazor[pepCheck] = 1
-							}
-
-						}
+					if c.MappedProteinsW[j.ProteinName] == -1 {
+						c.MappedProteinsW[j.ProteinName] = k.Weight
 					}
+
+					if c.MappedProteinsGW[j.ProteinName] == -1 {
+						c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+					}
+
+					if c.MappedProteinsTNP[j.ProteinName] == -1 {
+						c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+					}
+
+					r[k.PeptideSequence] = c
 
 				}
 
 			}
 		}
-		razorMap[k] = mgw
 	}
 
-	for i := range p.Groups {
-		for j := range p.Groups[i].Proteins {
-			for k := range p.Groups[i].Proteins[j].PeptideIons {
+	var razorPair = make(map[string]string)
 
-				ref := fmt.Sprintf("%d#%s#%s#%s#%f#%f#%f#%d#%.4f",
-					p.Groups[i].GroupNumber,
-					string(p.Groups[i].Proteins[j].GroupSiblingID),
-					string(p.Groups[i].Proteins[j].ProteinName),
-					string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence),
-					p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability,
-					p.Groups[i].Proteins[j].PeptideIons[k].Weight,
-					p.Groups[i].Proteins[j].PeptideIons[k].GroupWeight,
-					p.Groups[i].Proteins[j].PeptideIons[k].Charge,
-					p.Groups[i].Proteins[j].PeptideIons[k].CalcNeutralPepMass)
+	// get the best protein candidate for each pepetide sequence and make the razor pair
+	for k, v := range r {
 
-				v, ok := razorMap[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
-				if ok {
-
-					for _, l := range v {
-						if strings.EqualFold(ref, l) {
-							p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
-							p.Groups[i].Proteins[j].HasRazor = true
-							break
-						}
-					}
-				}
-
-				// for debuging
-				// if strings.Contains(string(p.Groups[i].Proteins[j].ProteinName), "") {
-				// 	fmt.Println("PING")
-				// 	fmt.Println(p.Groups[i].Proteins[j].PeptideIons[k].Razor)
-				// 	fmt.Println(p.Groups[i].Proteins[j].HasRazor)
-				// 	os.Exit(1)
-				// }
-
+		for pt, w := range v.MappedProteinsW {
+			if w > 0.5 {
+				razorPair[k] = pt
 			}
 		}
+
 	}
 
-	// mark as razor all peptides in the reference map
-	for i := range p.Groups {
-		for j := range p.Groups[i].Proteins {
-			var r float64
-			for k := range p.Groups[i].Proteins[j].PeptideIons {
-				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
-					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
-						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
-					}
-				}
-			}
-			p.Groups[i].Proteins[j].TopPepProb = r
-		}
-	}
+	spew.Dump(razorPair)
+	os.Exit(1)
 
 	return p, nil
 }
