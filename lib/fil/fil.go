@@ -3,14 +3,12 @@ package fil
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
@@ -839,6 +837,7 @@ type RazorCandidate struct {
 	MappedProteinsW   map[string]float64
 	MappedProteinsGW  map[string]float64
 	MappedProteinsTNP map[string]int
+	MappedProtein     string
 }
 
 // RazorCandidateMap is a list of razor candidates
@@ -908,17 +907,67 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
 	// get the best protein candidate for each pepetide sequence and make the razor pair
 	for k, v := range r {
-
+		// 1st pass: mark all cases with weight > 0.5
 		for pt, w := range v.MappedProteinsW {
 			if w > 0.5 {
 				razorPair[k] = pt
 			}
 		}
+	}
+
+	// 2nd pass: mark all cases with highest group weight in the list
+	for k, v := range r {
+
+		_, ok := razorPair[k]
+		if !ok {
+
+			var topPT string
+			var topCount int
+
+			if len(v.MappedProteinsGW) == 1 {
+				for pt := range v.MappedProteinsGW {
+					razorPair[k] = pt
+				}
+			} else {
+				for pt, tnp := range v.MappedProteinsTNP {
+					if tnp >= topCount {
+						topCount = tnp
+						topPT = pt
+					}
+				}
+
+				razorPair[k] = topPT
+			}
+		}
 
 	}
 
-	spew.Dump(razorPair)
-	os.Exit(1)
+	for k, v := range r {
+		pt, ok := razorPair[k]
+		if ok {
+			razor := v
+			razor.MappedProtein = pt
+			r[k] = razor
+		}
+	}
+
+	for i := range p.Groups {
+		for j := range p.Groups[i].Proteins {
+			for k := range p.Groups[i].Proteins[j].PeptideIons {
+
+				v, ok := r[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
+				if ok {
+
+					if p.Groups[i].Proteins[j].ProteinName == v.MappedProtein {
+						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
+						p.Groups[i].Proteins[j].HasRazor = true
+					}
+
+				}
+
+			}
+		}
+	}
 
 	return p, nil
 }
