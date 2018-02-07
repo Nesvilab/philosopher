@@ -139,7 +139,8 @@ func Run(f met.Filter) error {
 
 	// ADD ERROR CASES
 	logrus.Info("Correcting PSM to Protein mappings")
-	e.UpdateIndistinguishableProteinLists()
+	//e.UpdateIndistinguishableProteinLists()
+	e.UpdateMappedProteins()
 
 	// ADD ERROR CASES
 	logrus.Info("Mapping Ion status to PSMs")
@@ -961,6 +962,11 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					if p.Groups[i].Proteins[j].ProteinName == v.MappedProtein {
 						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
 						p.Groups[i].Proteins[j].HasRazor = true
+						// get the updated list of mapped proteins
+						// p.Groups[i].Proteins[j].PeptideIons[k].PeptideParentProtein = nil
+						// for pt := range v.MappedProteinsW {
+						// 	p.Groups[i].Proteins[j].PeptideIons[k].PeptideParentProtein = append(p.Groups[i].Proteins[j].PeptideIons[k].PeptideParentProtein, pt)
+						// }
 					}
 
 				}

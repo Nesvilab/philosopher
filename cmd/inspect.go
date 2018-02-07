@@ -86,7 +86,7 @@ func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "inspect" {
 		inspectCmd.Flags().StringVarP(&object, "object", "", "meta", "object to inspect")
-		inspectCmd.Flags().StringVarP(&key, "key", "", "meta", "object to inspect")
+		inspectCmd.Flags().StringVarP(&key, "key", "", "", "individual ID to inspect")
 
 		RootCmd.AddCommand(inspectCmd)
 	}
