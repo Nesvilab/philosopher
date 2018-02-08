@@ -912,6 +912,8 @@ func (e *Evidence) UpdateProteinStatus() {
 			e.PSM[i].AlternativeProteins = nil
 			e.PSM[i].AlternativeProteins = altProteins
 
+		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
+			e.PSM[i].RazorProtein = e.PSM[i].Protein
 		}
 	}
 
@@ -919,74 +921,74 @@ func (e *Evidence) UpdateProteinStatus() {
 }
 
 // UpdateIndistinguishableProteinLists pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-// func (e *Evidence) UpdateIndistinguishableProteinLists() {
-//
-// 	var ptNetMap = make(map[string][]string)
-// 	var ptPepParentMap = make(map[string][]string)
-//
-// 	for _, i := range e.Proteins {
-//
-// 		// get all indistinguishable proteins
-// 		var list []string
-// 		for k := range i.IndiProtein {
-// 			list = append(list, k)
-// 		}
-//
-// 		ptNetMap[i.ProteinID] = list
-//
-// 		// get all parent protein peptides
-// 		for _, ionE := range i.TotalPeptideIons {
-//
-// 			ion := fmt.Sprintf("%s#%d#%.4f", ionE.Sequence, ionE.ChargeState, ionE.PrecursorNeutralMass)
-//
-// 			// for j := range ionE.PeptideParentProteins {
-// 			// 	ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
-// 			// }
-// 			for j := range ionE.MappedProteins {
-// 				ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
-// 			}
-//
-// 		}
-// 	}
-//
-// 	var dtb dat.Base
-// 	dtb.Restore()
-// 	var dbMap = make(map[string]string)
-// 	for _, j := range dtb.Records {
-// 		dbMap[j.PartHeader] = j.GeneNames
-// 	}
-//
-// 	for i := range e.PSM {
-//
-// 		var uniqMap = make(map[string]uint8)
-// 		var uniqList []string
-//
-// 		alt, ok := ptNetMap[e.PSM[i].ProteinID]
-// 		if ok {
-// 			e.PSM[i].AlternativeProteins = alt
-// 		}
-//
-// 		par, ok := ptPepParentMap[e.PSM[i].IonForm]
-// 		if ok {
-// 			for _, j := range par {
-// 				uniqMap[j] = 0
-// 			}
-// 			for j := range uniqMap {
-// 				uniqList = append(uniqList, j)
-// 			}
-//
-// 			sort.Strings(uniqList)
-// 			for _, j := range uniqList {
-// 				e.PSM[i].MappedProteins[j]++
-// 			}
-// 		}
-//
-// 		e.PSM[i].GeneName = dbMap[e.PSM[i].Protein]
-//
-// 	}
-//
-// 	return
-// }
+func (e *Evidence) UpdateIndistinguishableProteinLists() {
+
+	var ptNetMap = make(map[string][]string)
+	var ptPepParentMap = make(map[string][]string)
+
+	for _, i := range e.Proteins {
+
+		// get all indistinguishable proteins
+		var list []string
+		for k := range i.IndiProtein {
+			list = append(list, k)
+		}
+
+		ptNetMap[i.ProteinID] = list
+
+		// get all parent protein peptides
+		for _, ionE := range i.TotalPeptideIons {
+
+			ion := fmt.Sprintf("%s#%d#%.4f", ionE.Sequence, ionE.ChargeState, ionE.PrecursorNeutralMass)
+
+			// for j := range ionE.PeptideParentProteins {
+			// 	ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
+			// }
+			for j := range ionE.MappedProteins {
+				ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
+			}
+
+		}
+	}
+
+	var dtb dat.Base
+	dtb.Restore()
+	var dbMap = make(map[string]string)
+	for _, j := range dtb.Records {
+		dbMap[j.PartHeader] = j.GeneNames
+	}
+
+	for i := range e.PSM {
+
+		var uniqMap = make(map[string]uint8)
+		var uniqList []string
+
+		alt, ok := ptNetMap[e.PSM[i].ProteinID]
+		if ok {
+			e.PSM[i].AlternativeProteins = alt
+		}
+
+		par, ok := ptPepParentMap[e.PSM[i].IonForm]
+		if ok {
+			for _, j := range par {
+				uniqMap[j] = 0
+			}
+			for j := range uniqMap {
+				uniqList = append(uniqList, j)
+			}
+
+			sort.Strings(uniqList)
+			for _, j := range uniqList {
+				e.PSM[i].MappedProteins[j]++
+			}
+		}
+
+		e.PSM[i].GeneName = dbMap[e.PSM[i].Protein]
+
+	}
+
+	return
+}
 
 // PeptideMap struct
 type PeptideMap struct {
@@ -1025,6 +1027,12 @@ func (e *Evidence) UpdateMappedProteins() {
 				break
 			}
 		}
+
+		// if e.PSM[i].Spectrum == "01CPTAC_CCRCC_W_JHU_20171007_LUMOS_f05.08158.08158.3" {
+		// 	spew.Dump(e.PSM[i])
+		// 	os.Exit(1)
+		// }
+
 	}
 
 	return
@@ -1048,6 +1056,38 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 
 				break
 			}
+		}
+	}
+
+	return
+}
+
+// UpdateRecoveredPSMs brings the updated protein and mapped protein info to the recovered PSMs
+func (e *Evidence) UpdateRecoveredPSMs() {
+
+	var seqProtein = make(map[string]string)
+	var seqMappedProteins = make(map[string][]string)
+
+	for _, i := range e.PSM {
+		if i.Probability >= 0.9 {
+			seqProtein[i.Peptide] = i.Protein
+			for j := range i.MappedProteins {
+				seqMappedProteins[i.Peptide] = append(seqMappedProteins[i.Peptide], j)
+			}
+		}
+	}
+
+	for i := range e.PSM {
+		v, ok := seqProtein[e.PSM[i].Peptide]
+		if ok && e.PSM[i].Probability < 0.9 {
+
+			if e.PSM[i].Protein != v {
+				e.PSM[i].Protein = v
+				for _, j := range seqMappedProteins[e.PSM[i].Peptide] {
+					e.PSM[i].MappedProteins[j] = 0
+				}
+			}
+
 		}
 	}
 

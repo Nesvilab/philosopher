@@ -5,6 +5,21 @@
 ### Changed
 ### Fixed
 
+
+# Philosopher 20180207
+### Build: ?
+
+### Added
+-New column added to PSM table 'Mapped Proteins'
+
+### Changed
+- The algorithm behind the Razor assignment was updated.
+- The PSM report now shows only one column with all mapped proteins.
+
+### Fixed
+- Issues with the razor assignment when dealing with complex cases.
+- Minor bugs and issues.
+
 # Philosopher 20180130
 ### Build: 201801301655
 
