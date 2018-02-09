@@ -123,9 +123,10 @@ func (p *ProtXML) Read(f string) error {
 			ptid.Probability = j.Probability
 			ptid.PercentCoverage = j.PercentCoverage
 			ptid.PctSpectrumIDs = j.PctSpectrumIDs
-			ptid.TopPepProb = j.Peptide[0].InitialProbability
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
+			ptid.TopPepProb = 0
+			//ptid.TopPepProb = j.Peptide[0].InitialProbability
 
 			if strings.EqualFold(string(j.Parameter.Name), "prot_length") {
 				ptid.Length = j.Parameter.Value
@@ -164,6 +165,11 @@ func (p *ProtXML) Read(f string) error {
 				}
 
 				ptid.PeptideIons = append(ptid.PeptideIons, pepid)
+
+				// get hte highest initial probability from all peptides
+				if pepid.InitialProbability > ptid.TopPepProb {
+					ptid.TopPepProb = pepid.InitialProbability
+				}
 
 				pepid = PeptideIonIdentification{}
 			}
