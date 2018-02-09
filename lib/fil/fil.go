@@ -901,7 +901,6 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					r[k.PeptideSequence] = c
 
 				}
-
 			}
 		}
 	}
@@ -926,12 +925,47 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
 			var topPT string
 			var topCount int
+			var topGW float64
+			var topGWMap = make(map[float64]uint8)
 
 			if len(v.MappedProteinsGW) == 1 {
+
 				for pt := range v.MappedProteinsGW {
 					razorPair[k] = pt
 				}
+
+			} else if len(v.MappedProteinsGW) > 1 {
+
+				for pt, tnp := range v.MappedProteinsGW {
+					if tnp >= topGW {
+						topGW = tnp
+						topPT = pt
+						topGWMap[topGW]++
+					}
+				}
+
+				var tie bool
+				if topGWMap[topGW] >= 2 {
+					tie = true
+				}
+
+				if tie == false {
+					razorPair[k] = topPT
+
+				} else {
+
+					for pt, tnp := range v.MappedProteinsTNP {
+						if tnp >= topCount {
+							topCount = tnp
+							topPT = pt
+						}
+					}
+
+					razorPair[k] = topPT
+
+				}
 			} else {
+
 				for pt, tnp := range v.MappedProteinsTNP {
 					if tnp >= topCount {
 						topCount = tnp
@@ -940,6 +974,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 				}
 
 				razorPair[k] = topPT
+
 			}
 		}
 
@@ -957,18 +992,29 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
-
 				v, ok := r[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
 				if ok {
-
 					if p.Groups[i].Proteins[j].ProteinName == v.MappedProtein {
 						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
 						p.Groups[i].Proteins[j].HasRazor = true
 					}
-
 				}
-
 			}
+		}
+	}
+
+	// 	// mark as razor all peptides in the reference map
+	for i := range p.Groups {
+		for j := range p.Groups[i].Proteins {
+			var r float64
+			for k := range p.Groups[i].Proteins[j].PeptideIons {
+				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
+					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
+						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
+					}
+				}
+			}
+			p.Groups[i].Proteins[j].TopPepProb = r
 		}
 	}
 

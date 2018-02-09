@@ -658,31 +658,6 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 	return
 }
 
-// func fixGeneNamesOnRazoTEMPFIX(dtb dat.Base, protein string) string {
-//
-// 	var gene string
-//
-//
-//
-//
-// 		if strings.Contains(j.OriginalHeader, protein) {
-// 			gene = j.GeneNames
-// 			break
-// 		}
-//
-// 		// if strings.Contains(j.OriginalHeader, i) {
-// 		// 	altgenes = append(altgenes, j.GeneNames)
-// 		// }
-// 		//
-// 		// if len(altgenes) == len(alts) {
-// 		// 	break
-// 		// }
-//
-// 	}
-//
-// 	return gene
-// }
-
 // AssembleIonReport reports consist on ion reporting
 func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 
@@ -896,6 +871,7 @@ func (e *Evidence) UpdateIonModCount() {
 func (e *Evidence) UpdateProteinStatus() {
 
 	for i := range e.PSM {
+
 		if e.PSM[i].IsURazor == true && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 
 			var altProteins []string
@@ -903,19 +879,8 @@ func (e *Evidence) UpdateProteinStatus() {
 			// push the selected protein to the top fo the list
 			altProteins = append(altProteins, e.PSM[i].Protein)
 
-			// add all the other alternative proteins that do not mach to the razor protein
-			// for _, j := range e.PSM[i].AlternativeProteins {
-			// 	if j != e.PSM[i].RazorProtein {
-			// 		altProteins = append(altProteins, j)
-			// 	}
-			// }
-
 			// replace the selected protein by the razor one
 			e.PSM[i].Protein = e.PSM[i].RazorProtein
-
-			// replace the alternative proteins list
-			//e.PSM[i].AlternativeProteins = nil
-			//e.PSM[i].AlternativeProteins = altProteins
 
 		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 			e.PSM[i].RazorProtein = e.PSM[i].Protein
@@ -1030,24 +995,17 @@ func (e *Evidence) UpdateMappedProteins() {
 		}
 	}
 
-	// spew.Dump(list)
-	// os.Exit(1)
-
 	for i := range e.PSM {
 		for _, j := range list {
 			if e.PSM[i].Peptide == j.Sequence {
 				e.PSM[i].MappedProteins = j.Proteins
 				if len(e.PSM[i].RazorProtein) < 1 {
 					e.PSM[i].RazorProtein = j.RazorProtein
+					e.PSM[i].IsURazor = true
 				}
 				break
 			}
 		}
-
-		// if e.PSM[i].Spectrum == "01CPTAC_CCRCC_W_JHU_20171007_LUMOS_f11.07058.07058.2" {
-		// 	spew.Dump(e.PSM[i])
-		// 	os.Exit(1)
-		// }
 
 	}
 
