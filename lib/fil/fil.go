@@ -139,7 +139,7 @@ func Run(f met.Filter) error {
 
 	// ADD ERROR CASES
 	logrus.Info("Correcting PSM to Protein mappings")
-	e.UpdateIndistinguishableProteinLists()
+	//e.UpdateIndistinguishableProteinLists()
 	e.UpdateMappedProteins()
 
 	//	e.UpdateRecoveredPSMs()
