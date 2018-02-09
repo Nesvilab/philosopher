@@ -306,6 +306,9 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\t"
 
 	for _, i := range namesList {
+		line += fmt.Sprintf("Summarized Total Spectral Count\t")
+		line += fmt.Sprintf("Summarized Unique Spectral Count\t")
+		line += fmt.Sprintf("Summarized Razor Spectral Count\t")
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
 		line += fmt.Sprintf("%s Razor Spectral Count\t", i)
@@ -328,6 +331,9 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 	for _, i := range evidences {
 
 		var line string
+		var summTotalSpC = make(map[string]int)
+		var summUniqueSpC = make(map[string]int)
+		var summURazorSpC = make(map[string]int)
 
 		line += fmt.Sprintf("%d\t", i.GroupNumber)
 
@@ -347,10 +353,14 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 
 		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
-		//line += fmt.Sprintf("%d\t", len(i.PeptideIons))
+		for _, j := range namesList {
+			summTotalSpC[j] += i.TotalSpc[j]
+			summUniqueSpC[j] += i.UniqueSpc[j]
+			summURazorSpC[j] += i.UrazorSpc[j]
+		}
 
 		for _, j := range namesList {
-			line += fmt.Sprintf("%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
+			line += fmt.Sprintf("%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", summTotalSpC[j], summUniqueSpC[j], summURazorSpC[j], i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
 		}
 
 		ip := strings.Join(i.IndiProtein, ", ")
