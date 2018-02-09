@@ -15,6 +15,7 @@
 ### Changed
 - The algorithm behind the Razor assignment was updated.
 - The PSM report now shows only one column with all mapped proteins.
+- The PSM report no longer displays the razor status because all PSMs should be razors (when asked for).
 
 ### Fixed
 - Issues with the razor assignment when dealing with complex cases.
