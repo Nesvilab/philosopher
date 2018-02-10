@@ -352,7 +352,6 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
 		p.ModifiedPeptide = i.ModifiedPeptide
-		//p.AlternativeProteins = i.AlternativeProteins
 		p.ModPositions = i.ModPositions
 		p.AssignedModMasses = i.AssignedModMasses
 		p.AssignedMassDiffs = i.AssignedMassDiffs
@@ -1037,6 +1036,84 @@ func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 	return
 }
 
+// UpdateSupportingSpectra pushes back from SM to Protein the new supporting spectra from razor results
+func (e *Evidence) UpdateSupportingSpectra() {
+
+	var ptSupSpec = make(map[string][]string)
+	var uniqueSpec = make(map[string][]string)
+	var razorSpec = make(map[string][]string)
+
+	for _, i := range e.PSM {
+
+		_, ok := ptSupSpec[i.Protein]
+		if !ok {
+			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
+		} else {
+			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
+		}
+
+		if i.IsUnique == true {
+			_, ok := uniqueSpec[i.IonForm]
+			if !ok {
+				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
+			} else {
+				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
+			}
+		}
+
+		if i.IsURazor == true {
+			_, ok := razorSpec[i.IonForm]
+			if !ok {
+				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
+			} else {
+				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
+			}
+		}
+
+	}
+
+	for i := range e.Proteins {
+		for j := range e.Proteins[i].TotalPeptideIons {
+
+			for k := range e.Proteins[i].TotalPeptideIons[j].Spectra {
+				delete(e.Proteins[i].TotalPeptideIons[k].Spectra, k)
+			}
+
+		}
+	}
+
+	for i := range e.Proteins {
+
+		v, ok := ptSupSpec[e.Proteins[i].PartHeader]
+		if ok {
+			for _, j := range v {
+				e.Proteins[i].SupportingSpectra[j] = 0
+			}
+		}
+
+		for k := range e.Proteins[i].TotalPeptideIons {
+
+			Up, UOK := uniqueSpec[e.Proteins[i].TotalPeptideIons[k].IonForm]
+			if UOK && e.Proteins[i].TotalPeptideIons[k].IsUnique == true {
+				for _, l := range Up {
+					e.Proteins[i].TotalPeptideIons[k].Spectra[l] = 0
+				}
+			}
+
+			Rp, ROK := razorSpec[e.Proteins[i].TotalPeptideIons[k].IonForm]
+			if ROK && e.Proteins[i].TotalPeptideIons[k].IsURazor == true {
+				for _, l := range Rp {
+					e.Proteins[i].TotalPeptideIons[k].Spectra[l] = 0
+				}
+			}
+
+		}
+
+	}
+
+	return
+}
+
 // UpdateRecoveredPSMs brings the updated protein and mapped protein info to the recovered PSMs
 // func (e *Evidence) UpdateRecoveredPSMs() {
 //
@@ -1513,6 +1590,7 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 
 				var ref IonEvidence
 				ref.MappedProteins = make(map[string]int)
+				ref.Spectra = make(map[string]int)
 
 				ref.Sequence = k.PeptideSequence
 				ref.IonForm = ion

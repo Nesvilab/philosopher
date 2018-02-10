@@ -150,7 +150,9 @@ func Run(f met.Filter) error {
 
 	// reorganizes the selected proteins and the alternative proteins list
 	if f.Razor == true {
+		logrus.Info("Updating razor PSM assingment to Proteins")
 		e.UpdateProteinStatus()
+		e.UpdateSupportingSpectra()
 	}
 
 	logrus.Info("Calculating Spectral Counts")
