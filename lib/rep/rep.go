@@ -1711,12 +1711,14 @@ func (e *Evidence) ProteinReport() {
 	// building the printing set tat may or not contain decoys
 	var printSet ProteinEvidenceList
 	for _, i := range e.Proteins {
-		if e.Decoys == false {
-			if i.IsDecoy == false {
+		if len(i.TotalPeptideIons) > 0 && i.TotalSpC > 0 {
+			if e.Decoys == false {
+				if i.IsDecoy == false {
+					printSet = append(printSet, i)
+				}
+			} else {
 				printSet = append(printSet, i)
 			}
-		} else {
-			printSet = append(printSet, i)
 		}
 	}
 
