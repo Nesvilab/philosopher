@@ -10,7 +10,7 @@
 ### Build: 201802121049
 
 ### Added
--New column added to PSM table 'Mapped Proteins'
+- New column added to PSM table 'Mapped Proteins'
 
 ### Changed
 - The algorithm behind the Razor assignment was updated.
