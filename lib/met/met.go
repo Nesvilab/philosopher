@@ -202,7 +202,6 @@ type Quantify struct {
 	Brand    string  `yaml:"brand"`
 	Plex     string  `yaml:"plex"`
 	ChanNorm string  `yaml:"chanNorm"`
-	Annot    string  `yaml:"annot"`
 	RTWin    float64 `yaml:"retentionTimeWindow"`
 	PTWin    float64 `yaml:"peakTimeWindow"`
 	Tol      float64 `yaml:"tolerance"`
@@ -231,7 +230,8 @@ type Cluster struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys bool `yaml:"withDecoys"`
+	Decoys bool   `yaml:"withDecoys"`
+	Annot  string `yaml:"annot"`
 }
 
 // Index options and parameters

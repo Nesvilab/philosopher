@@ -1,14 +1,10 @@
 package qua
 
 import (
-	"bufio"
 	"fmt"
 	"math"
-	"os"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
@@ -216,45 +212,6 @@ func prepareLabelStructure(dir, format, plex string, tol float64, ms2 raw.MS2) (
 
 		labels[paddedScan] = tmt
 
-	}
-
-	return labels, nil
-}
-
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func addCustomNames(labels map[string]tmt.Labels, annot string) (map[string]tmt.Labels, error) {
-
-	file, e := os.Open(annot)
-	if e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-
-		names := strings.Split(scanner.Text(), " ")
-
-		if names[0] == "126" {
-		} else if names[0] == "127N" {
-		} else if names[0] == "127C" {
-		} else if names[0] == "128N" {
-		} else if names[0] == "128C" {
-		} else if names[0] == "129N" {
-		} else if names[0] == "129C" {
-		} else if names[0] == "130N" {
-		} else if names[0] == "130C" {
-		} else if names[0] == "131C" {
-
-		} else {
-			logrus.Warning("Unknown label", names[0])
-		}
-
-	}
-
-	if e = scanner.Err(); e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
 	return labels, nil

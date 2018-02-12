@@ -41,6 +41,7 @@ type ProteinIdentification struct {
 	Confidence               float64
 	TopPepProb               float64
 	IndistinguishableProtein []string
+	TotalNumberPeptides      int
 	PeptideIons              []PeptideIonIdentification
 	HasRazor                 bool
 	Picked                   int
@@ -59,6 +60,7 @@ type PeptideIonIdentification struct {
 	Razor                   int
 	IsNondegenerateEvidence bool
 	IsUnique                bool
+	PeptideParentProtein    []string
 	Labels                  tmt.Labels
 }
 
@@ -121,14 +123,16 @@ func (p *ProtXML) Read(f string) error {
 			ptid.Probability = j.Probability
 			ptid.PercentCoverage = j.PercentCoverage
 			ptid.PctSpectrumIDs = j.PctSpectrumIDs
-			ptid.TopPepProb = j.Peptide[0].InitialProbability
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
+			ptid.TotalNumberPeptides = j.TotalNumberPeptides
+			ptid.TopPepProb = 0
+			//ptid.TopPepProb = j.Peptide[0].InitialProbability
 
 			if strings.EqualFold(string(j.Parameter.Name), "prot_length") {
 				ptid.Length = j.Parameter.Value
 			}
 
-			// collect indistinguishable proteins
+			// collect indistinguishable proteins (Protein to Protein equivalency)
 			if len(j.IndistinguishableProtein) > 0 {
 				for _, k := range j.IndistinguishableProtein {
 					ptid.IndistinguishableProtein = append(ptid.IndistinguishableProtein, k.ProteinName)
@@ -149,20 +153,23 @@ func (p *ProtXML) Read(f string) error {
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Razor = -1
 
-				// // get the number of shared ions
-				// if pepid.Weight < 1 {
-				// 	pepid.IsUnique = false
-				// } else {
-				// 	pepid.IsUnique = true
-				// }
-
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
 					pepid.IsNondegenerateEvidence = true
 				} else {
 					pepid.IsNondegenerateEvidence = false
 				}
 
+				// collect other proteins where this paptide maps to (this is different from the indistinguishable proteins list)
+				for _, l := range k.PeptideParentProtein {
+					pepid.PeptideParentProtein = append(pepid.PeptideParentProtein, string(l.ProteinName))
+				}
+
 				ptid.PeptideIons = append(ptid.PeptideIons, pepid)
+
+				// get hte highest initial probability from all peptides
+				if pepid.InitialProbability > ptid.TopPepProb {
+					ptid.TopPepProb = pepid.InitialProbability
+				}
 
 				pepid = PeptideIonIdentification{}
 			}
