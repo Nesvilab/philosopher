@@ -425,7 +425,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 	for _, i := range e.PSM {
 		if i.IsURazor == true {
 			if e.Decoys == false {
-				if i.IsDecoy == false {
+				if i.IsDecoy == false || len(i.Protein) > 0 || !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {
@@ -544,7 +544,7 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 	for _, i := range e.PSM {
 		if i.IsURazor == true {
 			if e.Decoys == false {
-				if i.IsDecoy == false {
+				if i.IsDecoy == false || len(i.Protein) > 0 || !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {
