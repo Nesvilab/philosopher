@@ -425,7 +425,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 	for _, i := range e.PSM {
 		if i.IsURazor == true {
 			if e.Decoys == false {
-				if i.IsDecoy == false || len(i.Protein) > 0 || !strings.Contains(i.Protein, decoyTag) {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {
@@ -524,14 +524,12 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 	}
 	defer file.Close()
 
-	var header string
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tGene Name\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
 
 	if len(labels) > 0 {
-		//header = fmt.Sprintf("Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tGene Name\tProtein\tNumber of Alternative Proteins\tNumber of Mapped Proteins\tAlternative Proteins\tMapped Proteins\tPurity\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\n", labels["126"], labels["127N"], labels["127C"], labels["128N"], labels["128C"], labels["129N"], labels["129C"], labels["130N"], labels["130C"], labels["131C"])
-		header = fmt.Sprintf("Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tGene Name\tProtein\tMapped Proteins\tPurity\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\t%s Abundance\n", labels["126"], labels["127N"], labels["127C"], labels["128N"], labels["128C"], labels["129N"], labels["129C"], labels["130N"], labels["130C"], labels["131C"])
-	} else {
-		//header = "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Razor\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tGene Name\tProtein\tNumber of Alternative Proteins\tNumber of Mapped Proteins\tAlternative Proteins\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
-		header = "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tOberved Modifications\tObserved Mass Localization\tGene Name\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+		for k, v := range labels {
+			header = strings.Replace(header, k, v, -1)
+		}
 	}
 
 	_, err = io.WriteString(file, header)
@@ -539,12 +537,12 @@ func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
 		logrus.Fatal("Cannot print PSM to file")
 	}
 
-	//building the printing set tat may or not contain decoys
+	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
 		if i.IsURazor == true {
 			if e.Decoys == false {
-				if i.IsDecoy == false || len(i.Protein) > 0 || !strings.Contains(i.Protein, decoyTag) {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {
