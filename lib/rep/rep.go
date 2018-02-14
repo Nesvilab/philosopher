@@ -573,16 +573,16 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		}
 	}
 
-	////////////////////////////////////////
-	///// TODO TEMP fix - NEEDS TO BE REMOVED
-	var dtb dat.Base
-	dtb.Restore()
-	var dbMap = make(map[string]string)
-	for _, j := range dtb.Records {
-		dbMap[j.PartHeader] = j.GeneNames
-	}
-	///// TODO TEMP fix - NEEDS TO BE REMOVED
-	////////////////////////////////////////
+	// ////////////////////////////////////////
+	// ///// TODO TEMP fix - NEEDS TO BE REMOVED
+	// var dtb dat.Base
+	// dtb.Restore()
+	// var dbMap = make(map[string]string)
+	// for _, j := range dtb.Records {
+	// 	dbMap[j.PartHeader] = j.GeneNames
+	// }
+	// ///// TODO TEMP fix - NEEDS TO BE REMOVED
+	// ////////////////////////////////////////
 
 	for _, i := range printSet {
 
@@ -622,7 +622,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		}
 
 		///// TEMP fix - NEEDS TO BE REMOVED
-		geneName := dbMap[i.Protein]
+		//geneName := dbMap[i.Protein]
 		///////////////
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
@@ -651,7 +651,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
-			geneName, //i.GeneName,
+			i.GeneName, //geneName, //i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
 			i.Purity,
@@ -905,6 +905,23 @@ func (e *Evidence) UpdateProteinStatus() {
 		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 			e.PSM[i].RazorProtein = e.PSM[i].Protein
 		}
+	}
+
+	return
+}
+
+// UpdateGeneNames will fix the gene name assignment after razor assingment
+func (e *Evidence) UpdateGeneNames() {
+
+	var dtb dat.Base
+	dtb.Restore()
+	var dbMap = make(map[string]string)
+	for _, j := range dtb.Records {
+		dbMap[j.PartHeader] = j.GeneNames
+	}
+
+	for i := range e.PSM {
+		e.PSM[i].GeneName = dbMap[e.PSM[i].Protein]
 	}
 
 	return
