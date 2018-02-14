@@ -287,7 +287,7 @@ func Run(m met.Data) met.Data {
 	if len(m.Quantify.Plex) > 0 {
 
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(m.Quantify.LabelNames, m.Filter.Tag)
+		repo.PSMTMTReport(m.Quantify.LabelNames, m.Filter.Tag, m.Filter.Razor)
 
 		logrus.Info("Creating TMT peptide report")
 		repo.PeptideTMTReport(m.Quantify.LabelNames)
@@ -298,7 +298,7 @@ func Run(m met.Data) met.Data {
 	} else {
 
 		logrus.Info("Creating PSM report")
-		repo.PSMReport(m.Filter.Tag)
+		repo.PSMReport(m.Filter.Tag, m.Filter.Razor)
 
 		logrus.Info("Creating peptide report")
 		repo.PeptideReport()
@@ -398,7 +398,7 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 }
 
 // PSMReport report all psms from study that passed the FDR filter
-func (e *Evidence) PSMReport(decoyTag string) {
+func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -417,7 +417,20 @@ func (e *Evidence) PSMReport(decoyTag string) {
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
-		if i.IsURazor == true {
+		if hasRazor == true {
+
+			if i.IsURazor == true {
+				if e.Decoys == false {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+						printSet = append(printSet, i)
+					}
+				} else {
+					printSet = append(printSet, i)
+				}
+			}
+
+		} else {
+
 			if e.Decoys == false {
 				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
@@ -425,6 +438,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 			} else {
 				printSet = append(printSet, i)
 			}
+
 		}
 	}
 
@@ -507,7 +521,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 }
 
 // PSMTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string) {
+func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRazor bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -534,7 +548,20 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string) {
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range e.PSM {
-		if i.IsURazor == true {
+		if hasRazor == true {
+
+			if i.IsURazor == true {
+				if e.Decoys == false {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+						printSet = append(printSet, i)
+					}
+				} else {
+					printSet = append(printSet, i)
+				}
+			}
+
+		} else {
+
 			if e.Decoys == false {
 				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
@@ -542,6 +569,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string) {
 			} else {
 				printSet = append(printSet, i)
 			}
+
 		}
 	}
 
