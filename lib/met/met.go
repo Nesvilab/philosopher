@@ -75,6 +75,7 @@ type PeptideProphet struct {
 	Database      string  `yaml:"database"`
 	Rtcat         string  `yaml:"rtcat"`
 	Decoy         string  `yaml:"decoy"`
+	Enzyme        string  `yaml:"enzyme"`
 	Minpiprob     float64 `yaml:"minpiprob"`
 	Minrtprob     float64 `yaml:"minrtprob"`
 	Minprob       float64 `yaml:"minprob"`
@@ -283,18 +284,6 @@ func New(h string) Data {
 
 	return d
 }
-
-// GetVersion returns the updated software version
-// func GetVersion() string {
-// 	t := time.Now()
-// 	return fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
-// }
-
-// GetBuild returns the updated software version and build
-// func GetBuild() string {
-// 	t := time.Now()
-// 	return fmt.Sprintf("%d%02d%02d.%02d%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute())
-// }
 
 // Serialize converts the whole structure to a gob file
 func (d *Data) Serialize() error {

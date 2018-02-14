@@ -33,6 +33,7 @@ peptideprophet:
   database: ''               # path to the database
   decoy: rev_                # semi-supervised mode, protein name prefix to identify Decoy entries
   decoyprobs: false          # compute possible non-zero probabilities for Decoy entries on the last iteration
+  enzyme: ''                 # enzyme used in sample (optional)
   exclude: false             # exclude deltaCn*, Mascot*, and Comet* results from results (default Penalize * results)
   expectscore: false         # use expectation value as the only contributor to the f-value for modeling
   forcedistr: false          # bypass quality control checks, report model despite bad modelling
