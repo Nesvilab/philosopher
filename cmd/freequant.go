@@ -32,10 +32,14 @@ var freequant = &cobra.Command{
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
+			logrus.Fatal("Only the mzML format is supported")
 			m.Quantify.Format = "mzXML"
 		} else {
 			logrus.Fatal("Unknown file format")
 		}
+
+		//forcing the larger time window to be the same as the smaller one
+		m.Quantify.RTWin = m.Quantify.PTWin
 
 		// run label-free quantification
 		e := qua.RunLabelFreeQuantification(m.Quantify)
@@ -59,8 +63,8 @@ func init() {
 
 		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
 		freequant.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
-		freequant.Flags().StringVarP(&m.Quantify.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
-		freequant.Flags().Float64VarP(&m.Quantify.RTWin, "rtw", "", 3, "specify the retention time window for xic (minute)")
+		//freequant.Flags().StringVarP(&m.Quantify.Format, "ext", "", "", "spectra file extension (mzML, mzXML)")
+		//freequant.Flags().Float64VarP(&m.Quantify.RTWin, "rtw", "", 3, "specify the retention time window for xic (minute)")
 		freequant.Flags().Float64VarP(&m.Quantify.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
 	}
 
