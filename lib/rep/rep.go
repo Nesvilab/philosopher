@@ -372,7 +372,6 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.ObservedModifications = make(map[string]uint16)
 		p.MappedProteins = make(map[string]int)
 
-		// TODO find a better way to map gene names to the psm
 		gn, ok := genes[i.Protein]
 		if ok {
 			p.GeneName = gn
@@ -574,14 +573,14 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 	}
 
 	// ////////////////////////////////////////
-	// ///// TODO TEMP fix - NEEDS TO BE REMOVED
+	// ///// fix - NEEDS TO BE REMOVED
 	// var dtb dat.Base
 	// dtb.Restore()
 	// var dbMap = make(map[string]string)
 	// for _, j := range dtb.Records {
 	// 	dbMap[j.PartHeader] = j.GeneNames
 	// }
-	// ///// TODO TEMP fix - NEEDS TO BE REMOVED
+	// ///// fix - NEEDS TO BE REMOVED
 	// ////////////////////////////////////////
 
 	for _, i := range printSet {
@@ -621,7 +620,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			obs = append(obs, j)
 		}
 
-		///// TEMP fix - NEEDS TO BE REMOVED
+		///// fix - NEEDS TO BE REMOVED
 		//geneName := dbMap[i.Protein]
 		///////////////
 
@@ -926,76 +925,6 @@ func (e *Evidence) UpdateGeneNames() {
 
 	return
 }
-
-// UpdateIndistinguishableProteinLists pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-// func (e *Evidence) UpdateIndistinguishableProteinLists() {
-//
-// 	var ptNetMap = make(map[string][]string)
-// 	var ptPepParentMap = make(map[string][]string)
-//
-// 	for _, i := range e.Proteins {
-//
-// 		// get all indistinguishable proteins
-// 		var list []string
-// 		for k := range i.IndiProtein {
-// 			list = append(list, k)
-// 		}
-//
-// 		ptNetMap[i.ProteinID] = list
-//
-// 		// get all parent protein peptides
-// 		for _, ionE := range i.TotalPeptideIons {
-//
-// 			ion := fmt.Sprintf("%s#%d#%.4f", ionE.Sequence, ionE.ChargeState, ionE.PrecursorNeutralMass)
-//
-// 			// for j := range ionE.PeptideParentProteins {
-// 			// 	ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
-// 			// }
-// 			for j := range ionE.MappedProteins {
-// 				ptPepParentMap[ion] = append(ptPepParentMap[ion], j)
-// 			}
-//
-// 		}
-// 	}
-//
-// 	var dtb dat.Base
-// 	dtb.Restore()
-// 	var dbMap = make(map[string]string)
-// 	for _, j := range dtb.Records {
-// 		dbMap[j.PartHeader] = j.GeneNames
-// 	}
-//
-// 	for i := range e.PSM {
-//
-// 		var uniqMap = make(map[string]uint8)
-// 		var uniqList []string
-//
-// 		alt, ok := ptNetMap[e.PSM[i].ProteinID]
-// 		if ok {
-// 			e.PSM[i].AlternativeProteins = alt
-// 		}
-//
-// 		par, ok := ptPepParentMap[e.PSM[i].IonForm]
-// 		if ok {
-// 			for _, j := range par {
-// 				uniqMap[j] = 0
-// 			}
-// 			for j := range uniqMap {
-// 				uniqList = append(uniqList, j)
-// 			}
-//
-// 			sort.Strings(uniqList)
-// 			for _, j := range uniqList {
-// 				e.PSM[i].MappedProteins[j]++
-// 			}
-// 		}
-//
-// 		e.PSM[i].GeneName = dbMap[e.PSM[i].Protein]
-//
-// 	}
-//
-// 	return
-// }
 
 // PeptideMap struct
 type PeptideMap struct {
@@ -1396,7 +1325,6 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		pepInt[i.Peptide] = 0
 	}
 
-	// TODO review this method, Intensity quant is not working
 	for _, i := range e.PSM {
 		_, ok := pepSeqMap[i.Peptide]
 		if ok {
