@@ -216,9 +216,10 @@ var pipelineCmd = &cobra.Command{
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
 				m.Quantify.Brand = "tmt"
-				err := qua.RunTMTQuantification(m.Quantify)
-				if err != nil {
-					logrus.Fatal(err)
+				var e error
+				m.Quantify, e = qua.RunTMTQuantification(m.Quantify)
+				if e != nil {
+					logrus.Fatal(e)
 				}
 
 				m.Serialize()

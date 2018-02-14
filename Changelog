@@ -6,11 +6,26 @@
 ### Fixed
 
 
+# Philosopher 20180214
+### Build: 201802141500
+
+### Added
+- Enzyme option added to PeptideProphet command.
+- Support for annotated TMT channels added to labelquant.
+- Summary counts added to the abacus report.
+
+### Changed
+- Support for mzXML removed temporarily.
+- Pipeline configuration file was updated with new parameters.
+
+### Fixed
+- Minor bugs and issues.
+
 # Philosopher 20180212
 ### Build: 201802121049
 
 ### Added
--New column added to PSM table 'Mapped Proteins'
+- New column added to PSM table 'Mapped Proteins'
 
 ### Changed
 - The algorithm behind the Razor assignment was updated.

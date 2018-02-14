@@ -126,11 +126,6 @@ func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, ar
 		listedArgs = append(listedArgs, file)
 	}
 
-	// litter.Dump(p)
-	// fmt.Println(temp)
-	// fmt.Println(sys.Windows())
-	// os.Exit(1)
-
 	// run InteractParser
 	files, e := interactParser(p, params, home, temp, listedArgs)
 	if e != nil {
@@ -200,6 +195,11 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			// -L<min_peptide_len (default 7)>
 			if params.MinPepLen != 7 {
 				v := fmt.Sprintf("-L=%d", params.MinPepLen)
+				cmd.Args = append(cmd.Args, v)
+			}
+
+			if len(params.Enzyme) > 0 {
+				v := fmt.Sprintf("-E%s", params.Enzyme)
 				cmd.Args = append(cmd.Args, v)
 			}
 

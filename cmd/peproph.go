@@ -72,6 +72,7 @@ func init() {
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Output, "output", "", "interact", "Output name prefix")
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Combine, "combine", "", false, "combine the results from PeptideProphet into a single result file")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Database, "database", "", "", "path to the database")
+		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Enzyme, "enzyme", "", "", "enzyme used in sample")
 	}
 
 	RootCmd.AddCommand(peprophCmd)

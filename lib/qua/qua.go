@@ -1,6 +1,7 @@
 package qua
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -57,7 +58,7 @@ func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 }
 
 // RunTMTQuantification is the top function for label quantification
-func RunTMTQuantification(p met.Quantify) error {
+func RunTMTQuantification(p met.Quantify) (met.Quantify, error) {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
@@ -68,7 +69,7 @@ func RunTMTQuantification(p met.Quantify) error {
 	var evi rep.Evidence
 	e := evi.RestoreGranular()
 	if e != nil {
-		return e
+		return p, e
 	}
 
 	// removed all calculated defined bvalues from before
@@ -89,6 +90,15 @@ func RunTMTQuantification(p met.Quantify) error {
 		sort.Strings(sourceList)
 	}
 
+	// read the annotation file
+	p.LabelNames = make(map[string]string)
+	if len(p.Annot) > 0 {
+		p.LabelNames, e = getLabelNames(p.Annot)
+		if e != nil {
+			return p, e
+		}
+	}
+
 	logrus.Info("Calculating intensities and ion interference")
 
 	for i := range sourceList {
@@ -100,26 +110,28 @@ func RunTMTQuantification(p met.Quantify) error {
 
 		ms1, ms2, e = getSpectra(p.Dir, p.Format, sourceList[i])
 		if e != nil {
-			return e
+			return p, e
 		}
 
 		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, ms1, ms2, sourceMap[sourceList[i]])
 		if e != nil {
-			return e
+			return p, e
 		}
 
 		ms1 = raw.MS1{}
 
 		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, ms2)
 		if err != nil {
-			return err
+			return p, err
 		}
 
 		ms2 = raw.MS2{}
 
+		labels = assignLabelNames(labels, p.LabelNames)
+
 		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 		if err != nil {
-			return err
+			return p, err
 		}
 
 		for _, j := range mappedPurity {
@@ -176,10 +188,10 @@ func RunTMTQuantification(p met.Quantify) error {
 	logrus.Info("Saving")
 	e = evi.SerializeGranular()
 	if e != nil {
-		return e
+		return p, e
 	}
 
-	return nil
+	return p, nil
 }
 
 func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
@@ -264,4 +276,109 @@ func cleanPreviousData(plex string) *err.Error {
 	}
 
 	return nil
+}
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) (map[string]string, *err.Error) {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	return labels, nil
+}
+
+// checks for custom names and assign the normal channel or the custom name to the CustomName
+func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string) map[string]tmt.Labels {
+
+	for _, i := range labels {
+
+		switch chnl := i.Channel1.Name; chnl {
+		case "126":
+			i.Channel1.CustomName = labelNames["126"]
+
+			if len(i.Channel1.CustomName) < 1 {
+				i.Channel1.CustomName = "126"
+			}
+
+		case "127N":
+			i.Channel2.CustomName = labelNames["127N"]
+			if len(i.Channel2.CustomName) < 1 {
+				i.Channel2.CustomName = "127N"
+			}
+
+		case "127C":
+			i.Channel3.CustomName = labelNames["127C"]
+			if len(i.Channel3.CustomName) < 1 {
+				i.Channel3.CustomName = "127C"
+			}
+
+		case "128N":
+			i.Channel4.CustomName = labelNames["128N"]
+			if len(i.Channel4.CustomName) < 1 {
+				i.Channel4.CustomName = "128N"
+			}
+
+		case "128C":
+			i.Channel5.CustomName = labelNames["128C"]
+			if len(i.Channel5.CustomName) < 1 {
+				i.Channel5.CustomName = "128C"
+			}
+
+		case "129N":
+			i.Channel6.CustomName = labelNames["129N"]
+			if len(i.Channel6.CustomName) < 1 {
+				i.Channel6.CustomName = "129N"
+			}
+
+		case "129C":
+			i.Channel7.CustomName = labelNames["129C"]
+			if len(i.Channel7.CustomName) < 1 {
+				i.Channel7.CustomName = "129C"
+			}
+
+		case "130N":
+			i.Channel8.CustomName = labelNames["130N"]
+			if len(i.Channel8.CustomName) < 1 {
+				i.Channel8.CustomName = "130N"
+			}
+
+		case "130C":
+			i.Channel9.CustomName = labelNames["130C"]
+			if len(i.Channel9.CustomName) < 1 {
+				i.Channel9.CustomName = "130C"
+			}
+
+		case "131N":
+			i.Channel10.CustomName = labelNames["131N"]
+			if len(i.Channel10.CustomName) < 1 {
+				i.Channel10.CustomName = "131N"
+			}
+
+		case "131C":
+			i.Channel11.CustomName = labelNames["131C"]
+			if len(i.Channel11.CustomName) < 1 {
+				i.Channel11.CustomName = "131C"
+			}
+
+		default:
+
+		}
+	}
+
+	return labels
 }

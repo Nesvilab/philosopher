@@ -1,5 +1,3 @@
-clean: true                  # remove the workspace and all meta data. Experimental file are kept intact
-backup: true                 # create a backup of the experiment meta data
 analytics: false             # reports when a workspace is created for usage estimation (default true)
 slackToken: ''               # specify the Slack API token
 slackChannel: ''             # specify the channel name
@@ -35,6 +33,7 @@ peptideprophet:
   database: ''               # path to the database
   decoy: rev_                # semi-supervised mode, protein name prefix to identify Decoy entries
   decoyprobs: false          # compute possible non-zero probabilities for Decoy entries on the last iteration
+  enzyme: ''                 # enzyme used in sample (optional)
   exclude: false             # exclude deltaCn*, Mascot*, and Comet* results from results (default Penalize * results)
   expectscore: false         # use expectation value as the only contributor to the f-value for modeling
   forcedistr: false          # bypass quality control checks, report model despite bad modelling
@@ -108,10 +107,11 @@ labelquant:
   purity: 0.5                # ion purity threshold (default 0.5)
   tolerance: 20              # m/z tolerance in ppm (default 20)
   uniqueOnly: false          # report quantification based on only unique peptides
+  annotation: ''             # annotation file with custom names for the TMT channels
 report:
   withDecoys: false          # add decoy observations to reports
 cluster:
-  organismUniProtID:         # UniProt proteome ID
+  organismUniProtID: ''      # UniProt proteome ID
   level: 0.9                 # cluster identity level (default 0.9)
 abacus:
   comb: combined.prot.xml    # combined file

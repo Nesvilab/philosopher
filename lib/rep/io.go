@@ -14,8 +14,6 @@ import (
 // Serialize converts the whle structure to a gob file
 func (e *Evidence) Serialize() *err.Error {
 
-	//TODO fix error name convetion
-
 	// create a file
 	dataFile, er := os.Create(sys.EvBin())
 	if er != nil {
