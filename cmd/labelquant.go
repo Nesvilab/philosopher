@@ -42,10 +42,10 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal("Unknown file format")
 		}
 
-		//err := lbl.RunLabeledQuantification()
-		err := qua.RunTMTQuantification(m.Quantify)
-		if err != nil {
-			logrus.Fatal(err)
+		var e error
+		m.Quantify, e = qua.RunTMTQuantification(m.Quantify)
+		if e != nil {
+			logrus.Fatal(e)
 		}
 
 		// store paramters on meta data
@@ -68,6 +68,7 @@ func init() {
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 20, "m/z tolerance in ppm")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Purity, "purity", "", 0.5, "ion purity threshold")
 		labelquantCmd.Flags().BoolVarP(&m.Quantify.Unique, "uniqueonly", "", false, "report quantification based on only unique peptides")
+		labelquantCmd.Flags().StringVarP(&m.Quantify.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
 	}
 
 	RootCmd.AddCommand(labelquantCmd)

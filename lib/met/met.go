@@ -112,11 +112,11 @@ type PeptideProphet struct {
 // InterProphet options and parameters
 type InterProphet struct {
 	InputFiles []string
-	Threads    int     `yaml:"threads"`
+	Output     string  `yaml:"output"`
 	Decoy      string  `yaml:"decoy"`
 	Cat        string  `yaml:"cat"`
+	Threads    int     `yaml:"threads"`
 	MinProb    float64 `yaml:"minprob"`
-	Output     string  `yaml:"output"`
 	Length     bool    `yaml:"length"`
 	Nofpkm     bool    `yaml:"nofpkm"`
 	Nonss      bool    `yaml:"nonss"`
@@ -131,11 +131,11 @@ type InterProphet struct {
 // ProteinProphet options and parameters
 type ProteinProphet struct {
 	InputFiles  []string
-	Minprob     float64 `yaml:"minprob"`
+	Output      string  `yaml:"output"`
 	Minindep    int     `yaml:"minidep"`
 	Mufactor    int     `yaml:"mufactor"`
-	Output      string  `yaml:"output"`
 	Maxppmdiff  int     `yaml:"maxppmdiff"`
+	Minprob     float64 `yaml:"minprob"`
 	ExcludeZ    bool    `yaml:"excludez"`
 	Noplot      bool    `yaml:"noplot"`
 	Nooccam     bool    `yaml:"noocam"`
@@ -197,29 +197,31 @@ type Filter struct {
 
 // Quantify options and parameters
 type Quantify struct {
-	Format   string  `yaml:"format"`
-	Dir      string  `yaml:"dir"`
-	Brand    string  `yaml:"brand"`
-	Plex     string  `yaml:"plex"`
-	ChanNorm string  `yaml:"chanNorm"`
-	RTWin    float64 `yaml:"retentionTimeWindow"`
-	PTWin    float64 `yaml:"peakTimeWindow"`
-	Tol      float64 `yaml:"tolerance"`
-	Purity   float64 `yaml:"purity"`
-	IntNorm  bool    `yaml:"intNorm"`
-	Unique   bool    `yaml:"uniqueOnly"`
+	Format     string  `yaml:"format"`
+	Dir        string  `yaml:"dir"`
+	Brand      string  `yaml:"brand"`
+	Plex       string  `yaml:"plex"`
+	ChanNorm   string  `yaml:"chanNorm"`
+	Annot      string  `yaml:"annotation"`
+	RTWin      float64 `yaml:"retentionTimeWindow"`
+	PTWin      float64 `yaml:"peakTimeWindow"`
+	Tol        float64 `yaml:"tolerance"`
+	Purity     float64 `yaml:"purity"`
+	IntNorm    bool    `yaml:"intNorm"`
+	Unique     bool    `yaml:"uniqueOnly"`
+	LabelNames map[string]string
 }
 
 // Abacus options ad parameters
 type Abacus struct {
 	Comb     string  `yaml:"comb"`
 	Tag      string  `yaml:"tag"`
+	ProtProb float64 `yaml:"proteinProbability"`
+	PepProb  float64 `yaml:"peptideProbability"`
 	Razor    bool    `yaml:"razor"`
 	Picked   bool    `yaml:"picked"`
 	Labels   bool    `yaml:"labels"`
 	Unique   bool    `yaml:"uniqueOnly"`
-	ProtProb float64 `yaml:"proteinProbability"`
-	PepProb  float64 `yaml:"peptideProbability"`
 }
 
 // Cluster options and parameters
@@ -230,8 +232,7 @@ type Cluster struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys bool   `yaml:"withDecoys"`
-	Annot  string `yaml:"annot"`
+	Decoys bool `yaml:"withDecoys"`
 }
 
 // Index options and parameters

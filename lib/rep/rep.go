@@ -1,7 +1,6 @@
 package rep
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -269,11 +268,6 @@ func Run(m met.Data) met.Data {
 		logrus.Fatal(err.Error())
 	}
 
-	var labels = make(map[string]string)
-	if len(m.Report.Annot) > 0 {
-		labels, _ = getLabelNames(m.Report.Annot)
-	}
-
 	if len(repo.Proteins) > 0 {
 
 		logrus.Info("Creating Protein FASTA report")
@@ -281,7 +275,7 @@ func Run(m met.Data) met.Data {
 
 		if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
 			logrus.Info("Creating Protein TMT report")
-			repo.ProteinTMTReport(m.Quantify.Unique)
+			repo.ProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique)
 		} else {
 			logrus.Info("Creating Protein report")
 			repo.ProteinReport()
@@ -293,13 +287,13 @@ func Run(m met.Data) met.Data {
 	if len(m.Quantify.Plex) > 0 {
 
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(m.Filter.Tag, labels)
+		repo.PSMTMTReport(m.Quantify.LabelNames, m.Filter.Tag)
 
 		logrus.Info("Creating TMT peptide report")
-		repo.PeptideTMTReport()
+		repo.PeptideTMTReport(m.Quantify.LabelNames)
 
 		logrus.Info("Creating TMT peptide Ion report")
-		repo.PeptideIonTMTReport()
+		repo.PeptideIonTMTReport(m.Quantify.LabelNames)
 
 	} else {
 
@@ -513,7 +507,7 @@ func (e *Evidence) PSMReport(decoyTag string) {
 }
 
 // PSMTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMTMTReport(decoyTag string, labels map[string]string) {
+func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -1233,7 +1227,7 @@ func (e *Evidence) PeptideIonReport() {
 }
 
 // PeptideIonTMTReport reports the ion table with TMT quantification
-func (e *Evidence) PeptideIonTMTReport() {
+func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 
 	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -1243,7 +1237,15 @@ func (e *Evidence) PeptideIonTMTReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
+	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+
+	if len(labels) > 0 {
+		for k, v := range labels {
+			header = strings.Replace(header, k, v, -1)
+		}
+	}
+
+	_, err = io.WriteString(file, header)
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -1450,7 +1452,7 @@ func (e *Evidence) PeptideReport() {
 }
 
 // PeptideTMTReport reports consist on ion reporting
-func (e *Evidence) PeptideTMTReport() {
+func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 
 	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -1460,7 +1462,15 @@ func (e *Evidence) PeptideTMTReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n")
+	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+
+	if len(labels) > 0 {
+		for k, v := range labels {
+			header = strings.Replace(header, k, v, -1)
+		}
+	}
+
+	_, err = io.WriteString(file, header)
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1804,7 +1814,7 @@ func (e *Evidence) ProteinReport() {
 }
 
 // ProteinTMTReport ...
-func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
+func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
@@ -1817,6 +1827,12 @@ func (e *Evidence) ProteinTMTReport(uniqueOnly bool) {
 	defer file.Close()
 
 	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+
+	if len(labels) > 0 {
+		for k, v := range labels {
+			line = strings.Replace(line, k, v, -1)
+		}
+	}
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -2269,28 +2285,4 @@ func (e *Evidence) PlotMassHist() error {
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
 	return nil
-}
-
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) (map[string]string, *err.Error) {
-
-	var labels = make(map[string]string)
-
-	file, e := os.Open(annot)
-	if e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
-	}
-
-	if e = scanner.Err(); e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-	}
-
-	return labels, nil
 }
