@@ -1,6 +1,7 @@
 package aba
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
@@ -19,15 +21,13 @@ import (
 	"github.com/prvst/philosopher/lib/tmt"
 )
 
-// ExperimentalData ...
-type ExperimentalData struct {
-	Name        string
-	PeptideIons map[string]int
+// DataSetLabelNames maps all custom names to each TMT tags
+type DataSetLabelNames struct {
+	Name      string
+	LabelName map[string]string
 }
 
-// ExperimentalDataList ...
-type ExperimentalDataList []ExperimentalData
-
+// TODO update error methos on the abacus function
 // Run abacus
 func Run(a met.Abacus, temp string, args []string) error {
 
@@ -35,6 +35,8 @@ func Run(a met.Abacus, temp string, args []string) error {
 	var xmlFiles []string
 	var database dat.Base
 	var datasets = make(map[string]rep.Evidence)
+
+	var labelList []DataSetLabelNames
 
 	// restore database
 	database = dat.Base{}
@@ -56,6 +58,9 @@ func Run(a met.Abacus, temp string, args []string) error {
 		var e rep.Evidence
 		e.RestoreGranularWithPath(i)
 
+		var labels DataSetLabelNames
+		labels.LabelName = make(map[string]string)
+
 		// collect interact full file names
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
@@ -66,11 +71,22 @@ func Run(a met.Abacus, temp string, args []string) error {
 			}
 		}
 
+		var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
+		if strings.Contains(i, string(filepath.Separator)) {
+			i = strings.Replace(i, string(filepath.Separator), "", -1)
+			labels.Name = i
+		} else {
+			labels.Name = i
+		}
+		labels.LabelName, _ = getLabelNames(annot)
+
 		// collect project names
 		prjName := i
 		if strings.Contains(prjName, string(filepath.Separator)) {
 			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
 		}
+
+		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
 		datasets[prjName] = e
@@ -92,7 +108,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	// collect TMT labels
 	if a.Labels == true {
-		saveCompareTMTResults(temp, evidences, datasets, names, a.Unique)
+		saveCompareTMTResults(temp, evidences, datasets, names, a.Unique, labelList)
 	} else {
 		saveCompareResults(temp, evidences, datasets, names)
 	}
@@ -400,7 +416,7 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 }
 
 // saveCompareTMTResults creates a single report using 1 or more philosopher result files
-func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly bool) {
+func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -436,6 +452,17 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 		line += fmt.Sprintf("%s 130N Abundance\t", i)
 		line += fmt.Sprintf("%s 130C Abundance\t", i)
 		line += fmt.Sprintf("%s 131N Abundance\t", i)
+
+		for _, j := range labelsList {
+			if j.Name == i {
+				for k, v := range j.LabelName {
+					before := fmt.Sprintf("%s %s Abundance", i, k)
+					after := fmt.Sprintf("%s Abundance", v)
+					line = strings.Replace(line, before, after, -1)
+				}
+			}
+		}
+
 	}
 
 	line += "Indistinguishable Proteins\t"
@@ -542,3 +569,52 @@ func saveCompareTMTResults(session string, evidences rep.CombinedEvidenceList, d
 
 	return
 }
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) (map[string]string, *err.Error) {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	return labels, nil
+}
+
+// // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+// func getLabelNames(annot string) (map[string]string, *err.Error) {
+//
+// 	var labels = make(map[string]string)
+//
+// 	file, e := os.Open(annot)
+// 	if e != nil {
+// 		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+// 	}
+// 	defer file.Close()
+//
+// 	scanner := bufio.NewScanner(file)
+// 	for scanner.Scan() {
+// 		names := strings.Split(scanner.Text(), " ")
+// 		value := fmt.Sprintf("%s %s", names[1], names[2])
+// 		labels[names[0]] = value
+// 	}
+//
+// 	if e = scanner.Err(); e != nil {
+// 		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+// 	}
+//
+// 	return labels, nil
+// }

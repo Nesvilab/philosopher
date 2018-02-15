@@ -217,6 +217,7 @@ type Quantify struct {
 type Abacus struct {
 	Comb     string  `yaml:"comb"`
 	Tag      string  `yaml:"tag"`
+	Annot    string  `yaml:"annotation"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
 	Razor    bool    `yaml:"razor"`
