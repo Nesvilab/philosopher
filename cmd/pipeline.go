@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/aba"
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/dat"

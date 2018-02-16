@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 )

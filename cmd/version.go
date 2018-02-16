@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/gth"
 	"github.com/spf13/cobra"
 )

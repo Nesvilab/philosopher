@@ -17,7 +17,7 @@ $(BINARY): $(SOURCES)
 deps:
 	go get -u github.com/mitchellh/gox
 	go get -u github.com/inconshreveable/mousetrap
-	go get -u github.com/Sirupsen/logrus
+	go get -u github.com/sirupsen/logrus
 	go get -u gonum.org/v1/plot
 	go get -u github.com/mattn/go-colorable
 	go get -u github.com/montanaflynn/stats
