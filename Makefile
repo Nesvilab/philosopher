@@ -32,6 +32,8 @@ deps:
 	go get -u github.com/nlopes/slack
 	go get -u github.com/google/go-github/github
 	go get -u github.com/vmihailenco/msgpack
+	go get -u github.com/davecgh/go-spew/spew
+	go get -u github.com/jpillora/go-ogle-analytics
 
 .PHONY: deploy
 deploy:
