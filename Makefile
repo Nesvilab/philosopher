@@ -31,6 +31,7 @@ deps:
 	go get -u github.com/spf13/cobra/cobra
 	go get -u github.com/nlopes/slack
 	go get -u github.com/google/go-github/github
+	go get -u github.com/vmihailenco/msgpack
 
 .PHONY: deploy
 deploy:
