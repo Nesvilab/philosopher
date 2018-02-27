@@ -7,12 +7,11 @@
 
 
 # Philosopher 20180227
-### Build: ?
+### Build: 201802271552
 
 ### Added
 - PTMProphet added to Pipeline.
-
-### Changed
+- Support for new architectures.
 
 ### Fixed
 - Minor bugs and issues.
