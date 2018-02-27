@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 

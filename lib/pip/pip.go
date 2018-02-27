@@ -20,6 +20,7 @@ type Directives struct {
 	Database       met.Database       `yaml:"database"`
 	Comet          met.Comet          `yaml:"comet"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
+	PTMProphet     met.PTMProphet     `yaml:"ptmprophet"`
 	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
 	Filter         met.Filter         `yaml:"filter"`
 	Freequant      met.Quantify       `yaml:"freequant"`
@@ -34,6 +35,7 @@ type Commands struct {
 	Database       string `yaml:"database"`
 	Comet          string `yaml:"comet"`
 	PeptideProphet string `yaml:"peptideprophet"`
+	PTMProphet     string `yaml:"ptmprophet"`
 	ProteinProphet string `yaml:"proteinprophet"`
 	Filter         string `yaml:"filter"`
 	FreeQuant      string `yaml:"freequant"`

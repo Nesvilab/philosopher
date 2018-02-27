@@ -8,9 +8,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -217,6 +217,7 @@ type Quantify struct {
 type Abacus struct {
 	Comb     string  `yaml:"comb"`
 	Tag      string  `yaml:"tag"`
+	Annot    string  `yaml:"annotation"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
 	Razor    bool    `yaml:"razor"`
@@ -256,7 +257,7 @@ func New(h string) Data {
 
 	var d Data
 
-	var fmtuuid = uuid.NewV4()
+	var fmtuuid, _ = uuid.NewV4()
 	var uuid = fmt.Sprintf("%s", fmtuuid)
 	d.UUID = uuid
 

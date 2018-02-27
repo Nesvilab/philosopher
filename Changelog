@@ -6,6 +6,17 @@
 ### Fixed
 
 
+# Philosopher 20180227
+### Build: 201802271552
+
+### Added
+- PTMProphet added to Pipeline.
+- Support for new architectures.
+
+### Fixed
+- Minor bugs and issues.
+- Binary versioning is now working for all flavors.
+
 # Philosopher 20180214
 ### Build: 201802141500
 

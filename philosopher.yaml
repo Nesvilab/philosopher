@@ -6,6 +6,7 @@ commands:
   database: no               # target-decoy database formatting
   comet: no                  # peptide spectrum matching with Comet
   peptideprophet: no         # peptide assignment validation
+  ptmprophet: no             # PTM site localization
   proteinprophet: no         # protein identification validation
   filter: no                 # statistical filtering, validation and False Discovery Rates assessment
   freequant: no              # label-free Quantification
@@ -61,6 +62,14 @@ peptideprophet:
   ppm: false                 # use PPM mass error instead of Daltons for mass modeling
   rt: false                  # enable peptide RT model
   zero: false                # report results with minimum probability 0
+ptmprophet:
+  em: 1                      # set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)
+  keepold: false             # retain old PTMProphet results in the pepXML file
+  verbose: false             # produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
+  mztol: 0.1                 # use specified +/- MS2 mz tolerance on site specific ions
+  ppmtol: 1                  # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
+  minprob: 0                 # use specified minimum probability to evaluate peptides
+  massdiffmode: false        # use the Mass Difference and localize
 proteinprophet:
   accuracy: false            # equivalent to --minprob 0
   allpeps: false             # consider all possible peptides in the database in the confidence model
