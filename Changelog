@@ -11,9 +11,12 @@
 
 ### Added
 - PTMProphet added to Pipeline.
+
 ### Changed
+
 ### Fixed
 - Minor bugs and issues.
+- Binary versioning is now working for all flavors.
 
 # Philosopher 20180214
 ### Build: 201802141500
