@@ -7,13 +7,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/aba"
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
+	"github.com/prvst/philosopher/lib/ext/ptmprophet"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/pip"
@@ -22,6 +22,7 @@ import (
 	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/wrk"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -122,8 +123,17 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e)
 				}
-
 				peptideprophet.Run(m, files)
+
+				m.Serialize()
+			}
+
+			if p.Commands.PTMProphet == "yes" {
+				logrus.Info("Executing PTMProphet on ", i)
+				m.PTMProphet = p.PTMProphet
+				var files []string
+				files = append(files, "interact.pep.xml")
+				ptmprophet.Run(m, args)
 
 				m.Serialize()
 			}
@@ -293,7 +303,6 @@ func init() {
 
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
-		//pipelineCmd.Flags().StringVarP(&m.Pipeline.Dataset, "dataset", "", "", "dataset directory")
 
 	}
 

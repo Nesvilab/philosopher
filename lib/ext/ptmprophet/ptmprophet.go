@@ -34,6 +34,29 @@ func New(temp string) PTMProphet {
 	return self
 }
 
+func Run(m met.Data, args []string) met.Data {
+
+	var ptm = New(m.Temp)
+
+	// deploy the binaries
+	e := ptm.Deploy(m.OS, m.Distro)
+	if e != nil {
+		fmt.Println(e.Message)
+	}
+
+	// run
+	xml, e := ptm.Execute(m.PTMProphet, args)
+	if e != nil {
+		fmt.Println(e.Message)
+	}
+
+	_ = xml
+
+	m.PTMProphet.InputFiles = args
+
+	return m
+}
+
 // Deploy PTMProphet binaries on binary directory
 func (p *PTMProphet) Deploy(os, distro string) *err.Error {
 
@@ -55,8 +78,8 @@ func (p *PTMProphet) Deploy(os, distro string) *err.Error {
 	return nil
 }
 
-// Run PTMProphet
-func (p *PTMProphet) Run(params met.PTMProphet, args []string) ([]string, *err.Error) {
+// Execute PTMProphet
+func (p *PTMProphet) Execute(params met.PTMProphet, args []string) ([]string, *err.Error) {
 
 	// get the execution commands
 	bin := p.DefaultPTMProphetParser

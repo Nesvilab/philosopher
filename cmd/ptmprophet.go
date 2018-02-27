@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -23,24 +22,8 @@ var ptmprophetCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing PTMProphet")
-		var ptm = ptmprophet.New(m.Temp)
 
-		// deploy the binaries
-		e := ptm.Deploy(m.OS, m.Distro)
-		if e != nil {
-			fmt.Println(e.Message)
-		}
-
-		// run
-		xml, e := ptm.Run(m.PTMProphet, args)
-		if e != nil {
-			fmt.Println(e.Message)
-		}
-
-		_ = xml
-		//evi.IndexIdentification(xml, m.PeptideProphet.Decoy)
-
-		m.PTMProphet.InputFiles = args
+		ptmprophet.Run(m, args)
 
 		m.Serialize()
 		logrus.Info("Done")
