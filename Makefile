@@ -91,18 +91,18 @@ release:
 all:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 	cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	cp philosopher.${VERSION} /home/felipevl/Servers/z280/home/felipevl/bin/philosopher
+	cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
 	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
-	gox ${LDFLAGS}
+	gox ${LDFLAGS} .
 
 .PHONY: clean
 clean:
-	if [ -f ${BINARY} ]; then rm ${BINARY} ; fi
-	if [ -f ${BINARY}_linux_386 ]; then rm ${BINARY}_linux_386 ; fi
-	if [ -f ${BINARY}_linux_amd64 ]; then rm ${BINARY}_linux_amd64 ; fi
-	if [ -f ${BINARY}_linux_arm ]; then rm ${BINARY}_linux_arm ; fi
-	if [ -f ${BINARY}_windows_386.exe ]; then rm ${BINARY}_windows_386; fi
-	if [ -f ${BINARY}_windows_amd64.exe ]; then rm ${BINARY}_windows_amd64; fi
+	if [ -f ${BINARY} ]; then rm ${BINARY}; fi
+	if [ -f ${BINARY}_linux_386 ]; then rm ${BINARY}_linux_386; fi
+	if [ -f ${BINARY}_linux_amd64 ]; then rm ${BINARY}_linux_amd64; fi
+	if [ -f ${BINARY}_linux_arm ]; then rm ${BINARY}_linux_arm; fi
+	if [ -f ${BINARY}_windows_386.exe ]; then rm ${BINARY}_windows_386.exe; fi
+	if [ -f ${BINARY}_windows_amd64.exe ]; then rm ${BINARY}_windows_amd64.exe; fi
 	if [ -f ${BINARY}_darwin_amd64 ]; then rm ${BINARY}_darwin_amd64; fi
 	if [ -f ${BINARY}_darwin_386 ]; then rm ${BINARY}_darwin_386; fi
 	if [ -f ${BINARY}_freebsd_amd64 ]; then rm ${BINARY}_freebsd_amd64; fi
@@ -113,3 +113,8 @@ clean:
 	if [ -f ${BINARY}_netbsd_arm ]; then rm ${BINARY}_netbsd_arm; fi
 	if [ -f ${BINARY}_openbsd_amd64 ]; then rm ${BINARY}_openbsd_amd64; fi
 	if [ -f ${BINARY}_openbsd_386 ]; then rm ${BINARY}_openbsd_386; fi
+	if [ -f ${BINARY}_linux_mips ]; then rm ${BINARY}_linux_mips; fi
+	if [ -f ${BINARY}_linux_mips64 ]; then rm ${BINARY}_linux_mips64; fi
+	if [ -f ${BINARY}_linux_mips64le ]; then rm ${BINARY}_linux_mips64le; fi
+	if [ -f ${BINARY}_linux_mipsle ]; then rm ${BINARY}_linux_mipsle; fi
+	if [ -f ${BINARY}_linux_s390x ]; then rm ${BINARY}_linux_s390x; fi
