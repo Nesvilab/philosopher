@@ -49,7 +49,6 @@ func Run(m met.Data, args []string) met.Data {
 	if e != nil {
 		fmt.Println(e.Message)
 	}
-
 	_ = xml
 
 	m.PTMProphet.InputFiles = args

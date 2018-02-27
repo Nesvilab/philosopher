@@ -24,10 +24,9 @@ var ptmprophetCmd = &cobra.Command{
 		logrus.Info("Executing PTMProphet")
 
 		ptmprophet.Run(m, args)
-
 		m.Serialize()
-		logrus.Info("Done")
 
+		logrus.Info("Done")
 	},
 }
 
