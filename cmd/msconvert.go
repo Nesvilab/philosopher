@@ -39,12 +39,12 @@ func init() {
 		m.Restore(sys.Meta())
 
 		msconvertCmd.Flags().StringVarP(&m.Msconvert.Format, "format", "", "", "mzML, mzXML, mz5, mgf, text, ms1, cms1, ms2, cms2")
-		//msconvertCmd.Flags().StringVarP(&m.Msconvert.Input, "input", "", "", "override the name of output file")
-		msconvertCmd.Flags().StringVarP(&m.Msconvert.Output, "output", "", "", "override the name of output file")
 		msconvertCmd.Flags().BoolVarP(&m.Msconvert.Zlib, "zlib", "", false, "use zlib compression for binary data")
 		msconvertCmd.Flags().BoolVarP(&m.Msconvert.NoIndex, "noindex", "", false, "do not write index")
 		msconvertCmd.Flags().StringVarP(&m.Msconvert.MZBinaryEncoding, "mzenconding", "", "64", "MZ default binary encoding")
 		msconvertCmd.Flags().StringVarP(&m.Msconvert.IntensityBinaryEncoding, "intenconding", "", "64", "Intensity default binary encoding")
+		//msconvertCmd.Flags().StringVarP(&m.Msconvert.Output, "output", "", "", "override the name of output file")
+		//msconvertCmd.Flags().StringVarP(&m.Msconvert.Input, "input", "", "", "override the name of output file")
 
 	}
 	RootCmd.AddCommand(msconvertCmd)

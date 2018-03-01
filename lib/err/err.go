@@ -100,6 +100,9 @@ const (
 	// CannotRunComet is used when the comet search engine returns an error
 	CannotRunComet string = "cannot run Comet search"
 
+	// CannotRunProgram is used when a given binary fails to run
+	CannotRunProgram string = "cannot execute program"
+
 	// UnknownMultiplex is used when the TMT label setting does not exists
 	UnknownMultiplex string = "unknown multiplex setting"
 

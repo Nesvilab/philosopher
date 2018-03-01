@@ -36,15 +36,16 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 
 	var msc = New(m.Temp)
 
+	// TODO create an error class for msconvert
 	if len(args) < 1 {
-		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "Missing parameter file or data file for analysis"}
+		return m, &err.Error{Type: err.CannotRunProgram, Class: err.FATA, Argument: "[msconvert] Missing files for conversion"}
 	}
 
 	// deploy msconvert
 	msc.Deploy(m.OS, m.Arch)
 
 	// run msconvert
-	e := msc.Execute(args, m.Msconvert)
+	e := msc.Execute(m.Msconvert, m.Home, m.Temp, args)
 	if e != nil {
 		//logrus.Fatal(e)
 	}
@@ -74,17 +75,96 @@ func (c *Msconvert) Deploy(os, arch string) {
 }
 
 // Execute is the main fucntion to execute Msconvert
-func (c *Msconvert) Execute(cmdArgs []string, param met.Msconvert) *err.Error {
+func (c *Msconvert) Execute(params met.Msconvert, home, temp string, args []string) *err.Error {
 
-	run := exec.Command(c.DefaultBin)
-	run.Stdout = os.Stdout
-	run.Stderr = os.Stderr
-	e := run.Start()
-	if e != nil {
-		//return &err.Error{Type: err.CannotRunComet, Class: err.FATA}
-		return nil
+	bin := c.DefaultBin
+	cmd := exec.Command(bin)
+
+	// append files
+	for i := range args {
+		file, _ := filepath.Abs(args[i])
+		cmd.Args = append(cmd.Args, file)
 	}
-	_ = run.Wait()
+
+	cmd = c.appendParams(params, cmd)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	e := cmd.Start()
+	if e != nil {
+		return &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "ProteinProphet"}
+	}
+	_ = cmd.Wait()
 
 	return nil
+}
+
+func (c Msconvert) appendParams(params met.Msconvert, cmd *exec.Cmd) *exec.Cmd {
+
+	if params.NoIndex == true {
+		cmd.Args = append(cmd.Args, "--noindex")
+	}
+
+	if params.Zlib == true {
+		cmd.Args = append(cmd.Args, "--zlib")
+	}
+
+	if params.Format == "mzML" || params.Format == "mzml" {
+		cmd.Args = append(cmd.Args, "--mzML")
+	}
+
+	if params.Format == "mzXML" || params.Format == "mzxml" {
+		cmd.Args = append(cmd.Args, "--mzXML")
+	}
+
+	if params.Format == "mz5" {
+		cmd.Args = append(cmd.Args, "--mz5")
+	}
+
+	if params.Format == "mgf" {
+		cmd.Args = append(cmd.Args, "--mgf")
+	}
+
+	if params.Format == "text" {
+		cmd.Args = append(cmd.Args, "--text")
+	}
+
+	if params.Format == "ms1" {
+		cmd.Args = append(cmd.Args, "--ms1")
+	}
+
+	if params.Format == "cms1" {
+		cmd.Args = append(cmd.Args, "--cms1")
+	}
+
+	if params.Format == "ms2" {
+		cmd.Args = append(cmd.Args, "--ms2")
+	}
+
+	if params.Format == "cms2" {
+		cmd.Args = append(cmd.Args, "--cms2")
+	}
+
+	if params.MZBinaryEncoding == "64" {
+		cmd.Args = append(cmd.Args, "--64")
+	}
+
+	if params.MZBinaryEncoding == "32" {
+		cmd.Args = append(cmd.Args, "--32")
+	}
+
+	if params.IntensityBinaryEncoding == "64" {
+		cmd.Args = append(cmd.Args, "--inten64")
+	}
+
+	if params.IntensityBinaryEncoding == "32" {
+		cmd.Args = append(cmd.Args, "--inten32")
+	}
+
+	// if len(params.Output) > 0 {
+	// 	v := fmt.Sprintf("--outfile%s", params.Output)
+	// 	cmd.Args = append(cmd.Args, v)
+	// }
+
+	return cmd
 }

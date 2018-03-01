@@ -47,22 +47,12 @@ type Data struct {
 
 // Msconvert options and parameters
 type Msconvert struct {
-	Input                   string
 	Output                  string
 	Format                  string
 	MZBinaryEncoding        string
 	IntensityBinaryEncoding string
 	NoIndex                 bool
 	Zlib                    bool
-	// MzML  bool
-	// MzXML bool
-	// Mz5   bool
-	// Mgf   bool
-	// Text  bool
-	// Ms1   bool
-	// Cms1  bool
-	// Ms2   bool
-	// Cms2  bool
 }
 
 // Database options and parameters
