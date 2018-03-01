@@ -235,6 +235,11 @@ func Windows() string {
 	return "windows"
 }
 
+// MAC OS
+func Darwin() string {
+	return "darwin"
+}
+
 // Redhat OS
 func Redhat() string {
 	return "RedHat"
