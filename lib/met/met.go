@@ -30,6 +30,7 @@ type Data struct {
 	Build          string
 	ProjectName    string
 	Msconvert      Msconvert
+	Idconvert      Idconvert
 	Database       Database
 	Comet          Comet
 	PeptideProphet PeptideProphet
@@ -53,6 +54,11 @@ type Msconvert struct {
 	IntensityBinaryEncoding string
 	NoIndex                 bool
 	Zlib                    bool
+}
+
+// Idconvert optioons and parameters
+type Idconvert struct {
+	Format string
 }
 
 // Database options and parameters

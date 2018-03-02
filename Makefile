@@ -57,6 +57,12 @@ deploy:
 	unzip -o lib/ext/proteinprophet/unix/bindata.go.zip -d  lib/ext/proteinprophet/unix/
 	unzip -o lib/ext/proteinprophet/win/bindata.go.zip -d  lib/ext/proteinprophet/win/
 
+	unzip -o lib/ext/msconvert/unix/bindata.go.zip -d  lib/ext/msconvert/unix/
+	unzip -o lib/ext/msconvert/darwin/bindata.go.zip -d  lib/ext/msconvert/darwin/
+
+	unzip -o lib/ext/idconvert/unix/bindata.go.zip -d  lib/ext/idconvert/unix/
+	unzip -o lib/ext/idconvert/darwin/bindata.go.zip -d  lib/ext/idconvert/darwin/
+
 	unzip -o lib/uni/bindata.go.zip -d  lib/uni/
 
 	unzip -o lib/pip/bindata.go.zip -d  lib/pip/

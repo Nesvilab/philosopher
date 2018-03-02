@@ -6,6 +6,19 @@
 ### Fixed
 
 
+# Philosopher 20180302
+### Build: ?
+
+### Added
+- msconvert was added to Philosopher for spectra format conversion.
+- idconvert was added to Philosopher for identification format conversion.
+
+### Changed
+- Individual commands will now output the program version.
+
+### Fixed
+- New error messages added when malformed databases are detected.
+
 # Philosopher 20180227
 ### Build: 201802271552
 
