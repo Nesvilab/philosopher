@@ -268,7 +268,7 @@ func Run(m met.Data) met.Data {
 		logrus.Fatal(err.Error())
 	}
 
-	if len(repo.Proteins) > 0 {
+	if len(repo.Proteins) > 10 {
 
 		logrus.Info("Creating Protein FASTA report")
 		repo.ProteinFastaReport()
