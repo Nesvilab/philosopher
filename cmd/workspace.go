@@ -3,9 +3,9 @@ package cmd
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/jpillora/go-ogle-analytics"
 	"github.com/prvst/philosopher/lib/wrk"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -16,6 +16,8 @@ var workspaceCmd = &cobra.Command{
 	Use:   "workspace",
 	Short: "Manage the experiment workspace for the analysis",
 	Run: func(cmd *cobra.Command, args []string) {
+
+		logrus.Info("Executing Workspace ", Version)
 
 		e := wrk.Run(Version, Build, b, c, i)
 		if e != nil {

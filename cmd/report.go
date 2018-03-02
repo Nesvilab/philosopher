@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ var reportCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		logrus.Info("Executing report")
+		logrus.Info("Executing Report ", Version)
 
 		rep.Run(m)
 

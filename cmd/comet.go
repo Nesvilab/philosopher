@@ -22,7 +22,7 @@ var cometCmd = &cobra.Command{
 		// 	logrus.Fatal(e.Error())
 		// }
 
-		logrus.Info("Executing Comet")
+		logrus.Info("Executing Comet ", Version)
 
 		m, e := comet.Run(m, args)
 		if e != nil {

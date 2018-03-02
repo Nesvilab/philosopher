@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var filterCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		logrus.Info("Executing filter")
+		logrus.Info("Executing Filter ", Version)
 
 		/// clean, clean clean
 		os.RemoveAll(sys.EvBin())

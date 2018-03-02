@@ -181,6 +181,11 @@ func ProcessUniProtKB(k, v, decoyTag string) (Record, *err.Error) {
 	// Gene Names
 	var gnm []string
 	if strings.Contains(k, "GN=") && (strings.Contains(k, "PE=") || strings.Contains(k, "SV=")) {
+
+		if len(orn) < 2 {
+			return e, &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: "Check for formatting errors or malformed headers"}
+		}
+
 		gnReg := regexp.MustCompile(`GN=(.+?)(\s.+)`)
 		gnm = gnReg.FindStringSubmatch(orn[2])
 	} else if strings.Contains(k, "GN=") {

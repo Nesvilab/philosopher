@@ -29,6 +29,8 @@ type Data struct {
 	Version        string
 	Build          string
 	ProjectName    string
+	Msconvert      Msconvert
+	Idconvert      Idconvert
 	Database       Database
 	Comet          Comet
 	PeptideProphet PeptideProphet
@@ -42,6 +44,21 @@ type Data struct {
 	Report         Report
 	Index          Index
 	Pipeline       Pipeline
+}
+
+// Msconvert options and parameters
+type Msconvert struct {
+	Output                  string
+	Format                  string
+	MZBinaryEncoding        string
+	IntensityBinaryEncoding string
+	NoIndex                 bool
+	Zlib                    bool
+}
+
+// Idconvert optioons and parameters
+type Idconvert struct {
+	Format string
 }
 
 // Database options and parameters

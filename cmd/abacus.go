@@ -25,7 +25,7 @@ var abacusCmd = &cobra.Command{
 			logrus.Fatal("The combined analysis needs at least 2 result files to work")
 		}
 
-		logrus.Info("Combining and filtering data sets")
+		logrus.Info("Executing Abacus ", Version)
 		err := aba.Run(m.Abacus, m.Temp, args)
 		if err != nil {
 			logrus.Fatal(err)
@@ -53,7 +53,7 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates wether the data sets incluse TMT labels or not")
-		abacusCmd.Flags().StringVarP(&m.Abacus.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
+		//abacusCmd.Flags().StringVarP(&m.Abacus.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
 	}
 
 	RootCmd.AddCommand(abacusCmd)

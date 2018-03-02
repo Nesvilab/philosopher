@@ -33,6 +33,8 @@ var pipelineCmd = &cobra.Command{
 	Short: "Automatic execution of consecutive analysis steps",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		logrus.Info("Initializing the Pipeline ", Version)
+
 		// get current directory
 		dir, e := os.Getwd()
 		if e != nil {

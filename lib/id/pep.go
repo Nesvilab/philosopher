@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/pep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
+	"github.com/sirupsen/logrus"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
@@ -47,7 +47,14 @@ type PeptideIdentification struct {
 	AssignedMassDiffs    []float64
 	AssignedAminoAcid    []string
 	AssumedCharge        uint8
+	PrevAA               string
+	NextAA               string
 	HitRank              uint8
+	MissedCleavages      uint8
+	NumberTolTerm        uint8
+	NumberTotalProteins  uint16
+	TotalNumberIons      uint16
+	NumberMatchedIons    uint16
 	PrecursorNeutralMass float64
 	PrecursorExpMass     float64
 	RetentionTime        float64
@@ -66,6 +73,7 @@ type PeptideIdentification struct {
 	Nextscore            float64
 	DiscriminantValue    float64
 	Intensity            float64
+	IsRejected           uint8
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -98,7 +106,6 @@ func (p *PepXML) Read(f string) error {
 	var mpa = xml.MsmsPipelineAnalysis
 
 	if len(mpa.AnalysisSummary) > 0 {
-
 		p.FileName = f
 		p.Database = string(mpa.MsmsRunSummary.SearchSummary.SearchDatabase.LocalPath)
 		p.SpectraFile = fmt.Sprintf("%s%s", mpa.MsmsRunSummary.BaseName, mpa.MsmsRunSummary.RawData)
@@ -197,6 +204,15 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 	for _, i := range sq.SearchResult.SearchHit {
 
 		psm.HitRank = i.HitRank
+		psm.PrevAA = string(i.PrevAA)
+		psm.NextAA = string(i.NextAA)
+		psm.MissedCleavages = i.MissedCleavages
+		psm.NumberTolTerm = i.TotalTerm
+		psm.NumberTotalProteins = i.TotalProteins
+		psm.TotalNumberIons = i.TotalIons
+		psm.NumberMatchedIons = i.MatchedIons
+		psm.IsRejected = i.IsRejected
+
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass

@@ -23,6 +23,8 @@ var databaseCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		logrus.Info("Executing Database", Version)
+
 		m, e := dat.Run(m)
 		if e != nil {
 			logrus.Fatal(e)

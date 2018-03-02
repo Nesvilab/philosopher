@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var iprophCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		logrus.Info("Executing InterProphet")
+		logrus.Info("Executing InterProphet ", Version)
 		var ipt = interprophet.New(m.Temp)
 
 		if len(args) < 1 {

@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +31,7 @@ var labelquantCmd = &cobra.Command{
 		}
 
 		// hardcoded tmt for now
-		logrus.Info("Executing label-based quantification")
+		logrus.Info("Executing label-based quantification ", Version)
 		m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
