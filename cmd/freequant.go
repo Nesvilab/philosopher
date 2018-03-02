@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ var freequant = &cobra.Command{
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
 
-		logrus.Info("Executing label-free quantification")
+		logrus.Info("Executing label-free quantification ", Version)
 
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"

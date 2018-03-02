@@ -25,7 +25,7 @@ var abacusCmd = &cobra.Command{
 			logrus.Fatal("The combined analysis needs at least 2 result files to work")
 		}
 
-		logrus.Info("Combining and filtering data sets")
+		logrus.Info("Executing Abacus ", Version)
 		err := aba.Run(m.Abacus, m.Temp, args)
 		if err != nil {
 			logrus.Fatal(err)

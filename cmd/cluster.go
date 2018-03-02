@@ -21,6 +21,7 @@ var clusterCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		logrus.Info("Executing Cluster ", Version)
 		// run clustering
 		clu.GenerateReport(m)
 
