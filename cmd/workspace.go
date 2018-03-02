@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jpillora/go-ogle-analytics"
@@ -45,7 +46,10 @@ func init() {
 			panic(err)
 		}
 
-		err = client.Send(ga.NewEvent(Build, Version))
+		v := fmt.Sprintf("Version:%s", Version)
+		b := fmt.Sprintf("Build:%s", Build)
+		//err = client.Send(ga.NewEvent(b, v))
+		err = client.Send(ga.NewEvent("Philosopher", v).Label(b))
 		if err != nil {
 			panic(err)
 		}
