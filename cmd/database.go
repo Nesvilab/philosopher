@@ -23,7 +23,7 @@ var databaseCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
-		logrus.Info("Executing Database", Version)
+		logrus.Info("Executing Database ", Version)
 
 		m, e := dat.Run(m)
 		if e != nil {
@@ -47,7 +47,7 @@ func init() {
 		databaseCmd.Flags().StringVarP(&m.Database.ID, "id", "", "", "UniProt proteome ID")
 		databaseCmd.Flags().StringVarP(&m.Database.Annot, "annotate", "", "", "process a ready-to-use database")
 		databaseCmd.Flags().StringVarP(&m.Database.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, chymotrypsin)")
-		databaseCmd.Flags().StringVarP(&m.Database.Tag, "prefix", "", "rev_", "decoy prefix to be added")
+		databaseCmd.Flags().StringVarP(&m.Database.Tag, "prefix", "", "rev_", "define a decoy prefix")
 		databaseCmd.Flags().StringVarP(&m.Database.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
 		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre formatted custom database")
 		databaseCmd.Flags().BoolVarP(&m.Database.Crap, "contam", "", false, "add common contaminants")
