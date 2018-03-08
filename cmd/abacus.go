@@ -47,12 +47,12 @@ func init() {
 
 		abacusCmd.Flags().StringVarP(&m.Abacus.Comb, "comb", "", "", "combined file")
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
-		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimun protein probability")
-		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimun peptide probability")
+		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
+		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
-		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates wether the data sets incluse TMT labels or not")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
 		//abacusCmd.Flags().StringVarP(&m.Abacus.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
 	}
 
