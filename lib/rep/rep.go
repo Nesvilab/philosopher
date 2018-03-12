@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -286,14 +287,19 @@ func Run(m met.Data) met.Data {
 	// verifying if there is any quantification on labels
 	if len(m.Quantify.Plex) > 0 {
 
+		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
+		annotfile, _ = filepath.Abs(annotfile)
+
+		labelNames, _ := getLabelNames(annotfile)
+		fmt.Println(labelNames)
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(m.Quantify.LabelNames, m.Filter.Tag, m.Filter.Razor)
+		repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
 
 		logrus.Info("Creating TMT peptide report")
-		repo.PeptideTMTReport(m.Quantify.LabelNames)
+		repo.PeptideTMTReport(labelNames)
 
 		logrus.Info("Creating TMT peptide Ion report")
-		repo.PeptideIonTMTReport(m.Quantify.LabelNames)
+		repo.PeptideIonTMTReport(labelNames)
 
 	} else {
 
@@ -2258,4 +2264,28 @@ func (e *Evidence) PlotMassHist() error {
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
 	return nil
+}
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) (map[string]string, *err.Error) {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	return labels, nil
 }
