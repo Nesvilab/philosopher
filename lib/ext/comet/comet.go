@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // Comet represents the tool configuration
@@ -32,8 +32,6 @@ type Comet struct {
 func New(temp string) Comet {
 
 	var self Comet
-
-	//temp, _ := sys.GetTemp()
 
 	self.DefaultBin = ""
 	self.DefaultParam = ""

@@ -18,6 +18,7 @@ type Directives struct {
 	SlackChannel   string             `yaml:"slackChannel"`
 	Commands       Commands           `yaml:"commands"`
 	Database       met.Database       `yaml:"database"`
+	MSFragger      met.MSFragger      `yaml:"msfragger"`
 	Comet          met.Comet          `yaml:"comet"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
 	PTMProphet     met.PTMProphet     `yaml:"ptmprophet"`
@@ -33,6 +34,7 @@ type Directives struct {
 // Commands struct {
 type Commands struct {
 	Database       string `yaml:"database"`
+	MSFragger      string `yaml:"msfragger"`
 	Comet          string `yaml:"comet"`
 	PeptideProphet string `yaml:"peptideprophet"`
 	PTMProphet     string `yaml:"ptmprophet"`

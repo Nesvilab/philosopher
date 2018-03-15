@@ -33,6 +33,7 @@ type Data struct {
 	Msconvert      Msconvert
 	Idconvert      Idconvert
 	Database       Database
+	MSFragger      MSFragger
 	Comet          Comet
 	PeptideProphet PeptideProphet
 	InterProphet   InterProphet
@@ -83,6 +84,16 @@ type Comet struct {
 	RawFiles     []string
 	Print        bool
 	NoIndex      bool `yaml:"noindex"`
+}
+
+// MSFragger options and parameters
+type MSFragger struct {
+	JarPath      string `yaml:"path"`
+	Memmory      string `yaml:"memmory"`
+	Param        string `yaml:"param"`
+	RawExtension string `yaml:"raw"`
+	ParamFile    []byte
+	RawFiles     []string
 }
 
 // PeptideProphet options and parameters
