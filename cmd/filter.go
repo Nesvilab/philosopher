@@ -45,7 +45,7 @@ var filterCmd = &cobra.Command{
 		}
 
 		//stat.Run(fp, psmFDR, pepFDR, ionFDR, prtFDR, pepProb, prtProb)
-		e := fil.Run(m.Filter)
+		m, e := fil.Run(m)
 		if e != nil {
 			logrus.Fatal(e.Error())
 		}

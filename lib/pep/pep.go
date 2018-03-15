@@ -148,6 +148,7 @@ type SearchSummary struct {
 	SearchID                  uint16                      `xml:"search_id,attr"`
 	BaseName                  []byte                      `xml:"base_name,attr"`
 	SearchEngine              []byte                      `xml:"search_engine,attr"`
+	SearchEngineVersion       []byte                      `xml:"search_engine_version,attr"`
 	SearchDatabase            SearchDatabase              `xml:"search_database"`
 	EnzymaticSearchConstraint []EnzymaticSearchConstraint `xml:"enzymatic_search_constraint"`
 	AminoAcidModifications    []AminoacidModification     `xml:"aminoacid_modification"`

@@ -5,6 +5,7 @@ commands:
   workspace: no              # manage the experiment workspace for the analysis
   database: no               # target-decoy database formatting
   comet: no                  # peptide spectrum matching with Comet
+  msfragger: no              # peptide spectrum matching with MSFragger
   peptideprophet: no         # peptide assignment validation
   ptmprophet: no             # PTM site localization
   proteinprophet: no         # protein identification validation
@@ -27,6 +28,11 @@ database:
 comet:
   noindex: true              # skip raw file indexing
   param: ''                  # comet parameter file (default "comet.params.txt")
+  raw: mzML                  # format of the spectra file
+msfragger:
+  path: ''                   # path to MSFragger java file
+  memmory: 8                 # how much memmory in GB to use
+  param: ''                  # MSFragger parameter file
   raw: mzML                  # format of the spectra file
 peptideprophet:
   extension: pepxml          # pepXML file extension

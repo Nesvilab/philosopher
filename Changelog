@@ -7,10 +7,15 @@
 
 
 # Philosopher 20180315
-### Build: 201803151300
+### Build: 201803151623
+
+### Added
+- MSFragger compatible reports.
+- MSFragger support for pipeline.
 
 ### Changed
 - Gene column added back to PSM report.
+- Philospher now detects the search engine that was used.
 
 ### fixed
 - Minor issues and bugs.

@@ -11,6 +11,7 @@ import (
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
+	"github.com/prvst/philosopher/lib/ext/fragger"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
@@ -101,6 +102,10 @@ var pipelineCmd = &cobra.Command{
 				m.Serialize()
 			}
 
+			if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
+				logrus.Fatal("You can only specify one search engine at a time")
+			}
+
 			// Comet
 			if p.Commands.Comet == "yes" {
 				m.Comet = p.Comet
@@ -110,6 +115,19 @@ var pipelineCmd = &cobra.Command{
 					logrus.Fatal(e)
 				}
 				comet.Run(m, files)
+
+				m.Serialize()
+			}
+
+			// MSFragger
+			if p.Commands.MSFragger == "yes" {
+				m.MSFragger = p.MSFragger
+				gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
+				files, e := filepath.Glob(gobExt)
+				if e != nil {
+					logrus.Fatal(e)
+				}
+				fragger.Run(m, files)
 
 				m.Serialize()
 			}
@@ -196,7 +214,7 @@ var pipelineCmd = &cobra.Command{
 				if p.Commands.Abacus == "yes" {
 					m.Filter.Pox = combinedProtXML
 				}
-				e := fil.Run(m.Filter)
+				m, e := fil.Run(m)
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}
