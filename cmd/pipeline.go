@@ -196,7 +196,7 @@ var pipelineCmd = &cobra.Command{
 				if p.Commands.Abacus == "yes" {
 					m.Filter.Pox = combinedProtXML
 				}
-				e := fil.Run(m.Filter)
+				m, e := fil.Run(m)
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}

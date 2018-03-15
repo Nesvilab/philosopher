@@ -29,6 +29,7 @@ type Data struct {
 	Version        string
 	Build          string
 	ProjectName    string
+	SearchEngine   string
 	Msconvert      Msconvert
 	Idconvert      Idconvert
 	Database       Database

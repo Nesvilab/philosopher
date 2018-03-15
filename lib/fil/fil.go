@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
@@ -17,11 +16,12 @@ import (
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
+	"github.com/sirupsen/logrus"
 )
 
 // Run executes the Filter processing
 //func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, isPicked, isRazor, mapmod bool) error {
-func Run(f met.Filter) error {
+func Run(f met.Data) (met.Data, error) {
 
 	e := rep.New()
 	var pepxml id.PepXML
@@ -31,38 +31,40 @@ func Run(f met.Filter) error {
 
 	logrus.Info("Processing peptide identification files")
 
-	pepid, err := readPepXMLInput(f.Pex, f.Tag, f.Model)
+	pepid, searchEngine, err := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Filter.Model)
 	if err != nil {
-		return err
+		return f, err
 	}
 
-	err = processPeptideIdentifications(pepid, f.Tag, f.PsmFDR, f.PepFDR, f.IonFDR)
+	f.SearchEngine = searchEngine
+
+	err = processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 	if err != nil {
-		return err
+		return f, err
 	}
 
-	if len(f.Pox) > 0 {
+	if len(f.Filter.Pox) > 0 {
 
-		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Pox, f.Tag, f.Weight)
+		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 		if proerr != nil {
-			return proerr
+			return f, proerr
 		}
 
-		err = processProteinIdentifications(protXML, f.PtFDR, f.PepFDR, f.ProtProb, f.Picked, f.Razor)
+		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor)
 		if err != nil {
-			return err
+			return f, err
 		}
 		//protXML = id.ProtXML{}
 
-		if f.Seq == true {
+		if f.Filter.Seq == true {
 
 			// sequential analysis
 			// filtered psm list and filtered prot list
 			pep.Restore("psm")
 			pro.Restore()
-			err = sequentialFDRControl(pep, pro, f.PsmFDR, f.PepFDR, f.IonFDR, f.Tag)
+			err = sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
 			if err != nil {
-				return err
+				return f, err
 			}
 			pep = nil
 			pro = nil
@@ -73,9 +75,9 @@ func Run(f met.Filter) error {
 			// complete pep list and filtered mirror-image prot list
 			pepxml.Restore()
 			pro.Restore()
-			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, f.PsmFDR, f.PepFDR, f.IonFDR, f.Tag)
+			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
 			if err != nil {
-				return err
+				return f, err
 			}
 			pepxml = id.PepXML{}
 			pro = nil
@@ -87,7 +89,7 @@ func Run(f met.Filter) error {
 	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
-		return errors.New("Database data not available, interrupting processing")
+		return f, errors.New("Database data not available, interrupting processing")
 	}
 
 	logrus.Info("Post processing identifications")
@@ -101,11 +103,11 @@ func Run(f met.Filter) error {
 
 	var psm id.PepIDList
 	psm.Restore("psm")
-	e.AssemblePSMReport(psm, f.Tag)
+	e.AssemblePSMReport(psm, f.Filter.Tag)
 	psm = nil
 
 	// evaluate modifications in data set
-	if f.Mapmods == true {
+	if f.Filter.Mapmods == true {
 		logrus.Info("Mapping modifications")
 		e.MapMassDiffToUniMod()
 
@@ -115,25 +117,25 @@ func Run(f met.Filter) error {
 
 	var ion id.PepIDList
 	ion.Restore("ion")
-	e.AssembleIonReport(ion, f.Tag)
+	e.AssembleIonReport(ion, f.Filter.Tag)
 	ion = nil
 
 	var pept id.PepIDList
 	pept.Restore("pep")
-	e.AssemblePeptideReport(pept, f.Tag)
+	e.AssemblePeptideReport(pept, f.Filter.Tag)
 	pept = nil
 
 	// evaluate modifications in data set
-	if f.Mapmods == true {
+	if f.Filter.Mapmods == true {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
 
 	logrus.Info("Processing Protein Inference")
 	pro.Restore()
-	err = e.AssembleProteinReport(pro, f.Tag)
+	err = e.AssembleProteinReport(pro, f.Filter.Tag)
 	if err != nil {
-		return err
+		return f, err
 	}
 	pro = nil
 
@@ -145,7 +147,7 @@ func Run(f met.Filter) error {
 	e.UpdateIonStatus()
 
 	// reorganizes the selected proteins and the alternative proteins list
-	if f.Razor == true {
+	if f.Filter.Razor == true {
 		logrus.Info("Updating razor PSM assingment to Proteins")
 		e.UpdateProteinStatus()
 		e.UpdateGeneNames()
@@ -155,24 +157,25 @@ func Run(f met.Filter) error {
 	logrus.Info("Calculating Spectral Counts")
 	e, cerr := qua.CalculateSpectralCounts(e)
 	if cerr != nil {
-		return cerr
+		return f, cerr
 	}
 
 	cerr = e.SerializeGranular()
 	if cerr != nil {
-		return cerr
+		return f, cerr
 	}
 
-	return nil
+	return f, nil
 }
 
 // readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error) {
+func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, string, error) {
 
 	var files []string
 	var pepIdent id.PepIDList
 	var definedModMassDiff = make(map[float64]float64)
 	var definedModAminoAcid = make(map[float64]string)
+	var searchEngine string
 
 	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
 		files = append(files, xmlFile)
@@ -181,7 +184,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error
 		list, _ := filepath.Glob(glob)
 
 		if len(list) == 0 {
-			return pepIdent, errors.New("No pepXML files found, check your files and try again")
+			return pepIdent, "", errors.New("No pepXML files found, check your files and try again")
 		}
 
 		for _, i := range list {
@@ -196,7 +199,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error
 		p.DecoyTag = decoyTag
 		e := p.Read(i)
 		if e != nil {
-			return nil, e
+			return nil, "", e
 		}
 
 		// print models
@@ -221,6 +224,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error
 			definedModMassDiff[k] = v
 		}
 
+		searchEngine = p.SearchEngine
 	}
 
 	// create a "fake" global pepXML comprising all data
@@ -237,7 +241,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, error
 	sort.Sort(pepXML.PeptideIdentification)
 	pepXML.Serialize()
 
-	return pepIdent, nil
+	return pepIdent, searchEngine, nil
 }
 
 // processPeptideIdentifications reads and process pepXML

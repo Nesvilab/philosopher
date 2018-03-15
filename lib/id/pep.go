@@ -24,6 +24,7 @@ import (
 type PepXML struct {
 	FileName              string
 	SpectraFile           string
+	SearchEngine          string
 	DecoyTag              string
 	Database              string
 	Prophet               string
@@ -145,6 +146,12 @@ func (p *PepXML) Read(f string) error {
 		if len(p.DefinedModMassDiff) == 0 {
 			p.DefinedModMassDiff = make(map[float64]float64)
 			p.DefinedModAminoAcid = make(map[float64]string)
+		}
+
+		// get the search engine
+		p.SearchEngine = string(mpa.MsmsRunSummary.SearchSummary.SearchEngine)
+		if strings.Contains(string(mpa.MsmsRunSummary.SearchSummary.SearchEngineVersion), "MSFragger") {
+			p.SearchEngine = "MSFragger"
 		}
 
 		// internal modifications (variable only)
