@@ -293,7 +293,12 @@ func Run(m met.Data) met.Data {
 		labelNames, _ := getLabelNames(annotfile)
 		fmt.Println(labelNames)
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
+
+		if m.SearchEngine == "MSFragger" {
+			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor)
+		} else {
+			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
+		}
 
 		logrus.Info("Creating TMT peptide report")
 		repo.PeptideTMTReport(labelNames)
@@ -304,7 +309,11 @@ func Run(m met.Data) met.Data {
 	} else {
 
 		logrus.Info("Creating PSM report")
-		repo.PSMReport(m.Filter.Tag, m.Filter.Razor)
+		if m.SearchEngine == "MSFragger" {
+			repo.PSMFraggerReport(m.Filter.Tag, m.Filter.Razor)
+		} else {
+			repo.PSMReport(m.Filter.Tag, m.Filter.Razor)
+		}
 
 		logrus.Info("Creating peptide report")
 		repo.PeptideReport()
@@ -648,6 +657,278 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.DeltaCNStar,
 			i.SPScore,
 			i.SPRank,
+			i.Expectation,
+			i.Hyperscore,
+			i.Nextscore,
+			i.Probability,
+			i.Intensity,
+			i.IsUnique,
+			strings.Join(assL, ", "),
+			strings.Join(obs, ", "),
+			i.LocalizedMassDiff,
+			i.GeneName, //geneName, //i.GeneName,
+			i.Protein,
+			strings.Join(mappedProteins, ", "),
+			i.Purity,
+			i.Labels.Channel1.Intensity,
+			i.Labels.Channel2.Intensity,
+			i.Labels.Channel3.Intensity,
+			i.Labels.Channel4.Intensity,
+			i.Labels.Channel5.Intensity,
+			i.Labels.Channel6.Intensity,
+			i.Labels.Channel7.Intensity,
+			i.Labels.Channel8.Intensity,
+			i.Labels.Channel9.Intensity,
+			i.Labels.Channel10.Intensity,
+		)
+		_, err = io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal("Cannot print PSM to file")
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// PSMFraggerReport report all psms from study that passed the FDR filter
+func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
+
+	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	if err != nil {
+		logrus.Fatal("Cannot print PSM to file")
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet PSMEvidenceList
+	for _, i := range e.PSM {
+		if hasRazor == true {
+
+			if i.IsURazor == true {
+				if e.Decoys == false {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+						printSet = append(printSet, i)
+					}
+				} else {
+					printSet = append(printSet, i)
+				}
+			}
+
+		} else {
+
+			if e.Decoys == false {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+					printSet = append(printSet, i)
+				}
+			} else {
+				printSet = append(printSet, i)
+			}
+
+		}
+	}
+
+	for _, i := range printSet {
+
+		var assL []string
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
+				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein {
+				mappedProteins = append(mappedProteins, j)
+			}
+		}
+
+		var obs []string
+		for j := range i.ObservedModifications {
+			obs = append(obs, j)
+		}
+
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
+			i.Spectrum,
+			i.Peptide,
+			i.ModifiedPeptide,
+			i.AssumedCharge,
+			i.RetentionTime,
+			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			i.RawMassdiff,
+			i.Massdiff,
+			i.PrecursorNeutralMass,
+			i.CalcNeutralPepMass,
+			i.Expectation,
+			i.Hyperscore,
+			i.Nextscore,
+			i.Probability,
+			i.Intensity,
+			strings.Join(assL, ", "),
+			strings.Join(obs, ", "),
+			i.LocalizedMassDiff,
+			i.IsUnique,
+			i.GeneName,
+			i.Protein,
+			strings.Join(mappedProteins, ", "),
+		)
+		_, err = io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal("Cannot print PSM to file")
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// PSMTMTFraggerReport report all psms with TMT labels from study that passed the FDR filter
+func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string, hasRazor bool) {
+
+	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+
+	if len(labels) > 0 {
+		for k, v := range labels {
+			header = strings.Replace(header, k, v, -1)
+		}
+	}
+
+	_, err = io.WriteString(file, header)
+	if err != nil {
+		logrus.Fatal("Cannot print PSM to file")
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet PSMEvidenceList
+	for _, i := range e.PSM {
+		if hasRazor == true {
+
+			if i.IsURazor == true {
+				if e.Decoys == false {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+						printSet = append(printSet, i)
+					}
+				} else {
+					printSet = append(printSet, i)
+				}
+			}
+
+		} else {
+
+			if e.Decoys == false {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+					printSet = append(printSet, i)
+				}
+			} else {
+				printSet = append(printSet, i)
+			}
+
+		}
+	}
+
+	// ////////////////////////////////////////
+	// ///// fix - NEEDS TO BE REMOVED
+	// var dtb dat.Base
+	// dtb.Restore()
+	// var dbMap = make(map[string]string)
+	// for _, j := range dtb.Records {
+	// 	dbMap[j.PartHeader] = j.GeneNames
+	// }
+	// ///// fix - NEEDS TO BE REMOVED
+	// ////////////////////////////////////////
+
+	for _, i := range printSet {
+
+		var assL []string
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
+				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				assL = append(assL, loc)
+			}
+		}
+
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein {
+				mappedProteins = append(mappedProteins, j)
+			}
+		}
+
+		var obs []string
+		for j := range i.ObservedModifications {
+			obs = append(obs, j)
+		}
+
+		///// fix - NEEDS TO BE REMOVED
+		//geneName := dbMap[i.Protein]
+		///////////////
+
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+			i.Spectrum,
+			i.Peptide,
+			i.ModifiedPeptide,
+			i.AssumedCharge,
+			i.RetentionTime,
+			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			i.RawMassdiff,
+			i.Massdiff,
+			i.PrecursorNeutralMass,
+			i.CalcNeutralPepMass,
 			i.Expectation,
 			i.Hyperscore,
 			i.Nextscore,
