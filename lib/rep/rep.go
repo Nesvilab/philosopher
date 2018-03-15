@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -286,14 +287,19 @@ func Run(m met.Data) met.Data {
 	// verifying if there is any quantification on labels
 	if len(m.Quantify.Plex) > 0 {
 
+		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
+		annotfile, _ = filepath.Abs(annotfile)
+
+		labelNames, _ := getLabelNames(annotfile)
+		fmt.Println(labelNames)
 		logrus.Info("Creating TMT PSM report")
-		repo.PSMTMTReport(m.Quantify.LabelNames, m.Filter.Tag, m.Filter.Razor)
+		repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
 
 		logrus.Info("Creating TMT peptide report")
-		repo.PeptideTMTReport(m.Quantify.LabelNames)
+		repo.PeptideTMTReport(labelNames)
 
 		logrus.Info("Creating TMT peptide Ion report")
-		repo.PeptideIonTMTReport(m.Quantify.LabelNames)
+		repo.PeptideIonTMTReport(labelNames)
 
 	} else {
 
@@ -408,7 +414,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tIs Unique\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -478,7 +484,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 			obs = append(obs, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -504,6 +510,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 			strings.Join(obs, ", "),
 			i.LocalizedMassDiff,
 			i.IsUnique,
+			i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
 		)
@@ -531,7 +538,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 	}
 	defer file.Close()
 
-	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tGene Name\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -2258,4 +2265,28 @@ func (e *Evidence) PlotMassHist() error {
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
 	return nil
+}
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) (map[string]string, *err.Error) {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	return labels, nil
 }

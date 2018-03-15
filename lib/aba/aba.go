@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fil"
@@ -19,6 +18,7 @@ import (
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/sirupsen/logrus"
 )
 
 // DataSetLabelNames maps all custom names to each TMT tags
@@ -322,9 +322,6 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
 
 	for _, i := range namesList {
-		line += fmt.Sprintf("Summarized Total Spectral Count\t")
-		line += fmt.Sprintf("Summarized Unique Spectral Count\t")
-		line += fmt.Sprintf("Summarized Razor Spectral Count\t")
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
 		line += fmt.Sprintf("%s Unique Spectral Count\t", i)
 		line += fmt.Sprintf("%s Razor Spectral Count\t", i)
@@ -387,12 +384,6 @@ func saveCompareResults(session string, evidences rep.CombinedEvidenceList, data
 		line += fmt.Sprintf("%d\t", summUniqueSpC[i.ProteinID])
 
 		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
-
-		for _, j := range namesList {
-			summTotalSpC[j] += i.TotalSpc[j]
-			summUniqueSpC[j] += i.UniqueSpc[j]
-			summURazorSpC[j] += i.UrazorSpc[j]
-		}
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t", summTotalSpC[j], summUniqueSpC[j], summURazorSpC[j], i.TotalSpc[j], i.UniqueSpc[j], i.UrazorSpc[j], i.TotalIntensity[j], i.UniqueIntensity[j], i.UrazorIntensity[j])
