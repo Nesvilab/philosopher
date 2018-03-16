@@ -51,7 +51,6 @@ func init() {
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Pi, "pi", "", false, "enable peptide pI model")
 		peprophCmd.Flags().IntVarP(&m.PeptideProphet.Minpintt, "minpintt", "", 2, "minimum number of NTT in a peptide used for positive pI model")
 		peprophCmd.Flags().Float64VarP(&m.PeptideProphet.Minpiprob, "minpiprob", "", 0.9, "minimum probability after first pass of a peptide used for positive pI model")
-		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Rt, "rt", "", false, "enable peptide RT model")
 		peprophCmd.Flags().Float64VarP(&m.PeptideProphet.Minrtprob, "minrtprob", "", 0.9, "minimum probability after first pass of a peptide used for positive RT model")
 		peprophCmd.Flags().IntVarP(&m.PeptideProphet.Minrtntt, "minrtntt", "", 2, "minimum number of NTT in a peptide used for positive RT model")
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Glyc, "glyc", "", false, "enable peptide Glyco motif model")
@@ -73,6 +72,7 @@ func init() {
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Combine, "combine", "", false, "combine the results from PeptideProphet into a single result file")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Database, "database", "", "", "path to the database")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Enzyme, "enzyme", "", "", "enzyme used in sample")
+		//peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Rt, "rt", "", false, "enable peptide RT model")
 	}
 
 	RootCmd.AddCommand(peprophCmd)
