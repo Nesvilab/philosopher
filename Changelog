@@ -6,6 +6,12 @@
 ### Fixed
 
 
+# Philosopher 20180317
+### Build: 201803172202
+
+### Fixed
+- The razor assignment was not consistent between runs, a change was introduced to make it deterministic.
+
 # Philosopher 20180315
 ### Build: 201803151623
 
