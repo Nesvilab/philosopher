@@ -291,7 +291,6 @@ func Run(m met.Data) met.Data {
 		annotfile, _ = filepath.Abs(annotfile)
 
 		labelNames, _ := getLabelNames(annotfile)
-		fmt.Println(labelNames)
 		logrus.Info("Creating TMT PSM report")
 
 		if m.SearchEngine == "MSFragger" {
