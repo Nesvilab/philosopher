@@ -37,6 +37,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Output, "output", "", "", "output prefix file name")
+		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Mods, "mods", "", "", "specify modifications. <amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN>,<amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN> (overrides the modifications from the interact.pep.xml file)")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.EM, "em", "", 1, "Set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.KeepOld, "keepold", "", false, "retain old PTMProphet results in the pepXML file")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Verbose, "verbose", "", false, "produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues")

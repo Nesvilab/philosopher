@@ -160,5 +160,9 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, v)
 	}
 
+	if len(params.Mods) > 0 {
+		cmd.Args = append(cmd.Args, params.Mods)
+	}
+
 	return cmd
 }

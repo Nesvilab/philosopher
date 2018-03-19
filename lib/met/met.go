@@ -196,6 +196,7 @@ type ProteinProphet struct {
 type PTMProphet struct {
 	InputFiles   []string
 	Output       string  `yaml:"output"`
+	Mods         string  `yaml:"mods"`
 	EM           int     `yaml:"em"`
 	MzTol        float64 `yaml:"mztol"`
 	PPMTol       float64 `yaml:"ppmtol"`
