@@ -149,10 +149,6 @@ Enable peptide pI model.
 
 Use ppm mass error instead of Dalton for mass modeling.
 
-`--rt`
-
-Enable peptide RT model.
-
 `--rtcat`
 
 Enable peptide RT model, use <rtcatalog_file> peptide RTs when available as the theoretical value.
