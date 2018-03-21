@@ -257,7 +257,7 @@ var pipelineCmd = &cobra.Command{
 
 			// Report
 			if p.Commands.Report == "yes" {
-				logrus.Info("Executing report on", i)
+				logrus.Info("Executing report on ", i)
 				rep.Run(m)
 
 				m.Serialize()
