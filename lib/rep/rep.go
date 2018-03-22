@@ -72,7 +72,7 @@ type PSMEvidence struct {
 	Massdiff              float64
 	LocalizedMassDiff     []string
 	LocalizedPTM          []string
-	LocalizedModSites     int
+	LocalizedModSites     []int
 	Probability           float64
 	Expectation           float64
 	Xcorr                 float64
@@ -192,6 +192,9 @@ type ProteinEvidence struct {
 	TotalLabels                  tmt.Labels
 	UniqueLabels                 tmt.Labels
 	URazorLabels                 tmt.Labels // Unique + razor
+	PhosphoTotalLabels           tmt.Labels
+	PhosphoUniqueLabels          tmt.Labels
+	PhosphoURazorLabels          tmt.Labels // Unique + razor
 }
 
 // ProteinEvidenceList list
@@ -1027,7 +1030,7 @@ func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor bool) {
 				i.AssumedCharge,
 				i.RetentionTime,
 				i.LocalizedPTM[j],
-				i.LocalizedModSites,
+				i.LocalizedModSites[j],
 				i.LocalizedMassDiff[j],
 			)
 			_, err = io.WriteString(file, line)

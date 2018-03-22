@@ -44,7 +44,7 @@ var labelquantCmd = &cobra.Command{
 		}
 
 		var e error
-		m.Quantify, e = qua.RunTMTQuantification(m.Quantify)
+		m.Quantify, e = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
 		if e != nil {
 			logrus.Fatal(e)
 		}

@@ -8,13 +8,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/sirupsen/logrus"
 )
 
 // Pair struct
@@ -58,7 +58,7 @@ func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 }
 
 // RunTMTQuantification is the top function for label quantification
-func RunTMTQuantification(p met.Quantify) (met.Quantify, error) {
+func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)

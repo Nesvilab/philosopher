@@ -247,7 +247,7 @@ var pipelineCmd = &cobra.Command{
 				m.Quantify.Format = "mzML"
 				m.Quantify.Brand = "tmt"
 				var e error
-				m.Quantify, e = qua.RunTMTQuantification(m.Quantify)
+				m.Quantify, e = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
 				if e != nil {
 					logrus.Fatal(e)
 				}
