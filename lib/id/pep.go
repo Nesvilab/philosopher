@@ -62,21 +62,23 @@ type PeptideIdentification struct {
 	CalcNeutralPepMass   float64
 	RawMassDiff          float64
 	Massdiff             float64
-	LocalizedPTM         []string
-	LocalizedMassDiff    []string
-	LocalizedSites       []int
-	Probability          float64
-	Expectation          float64
-	Xcorr                float64
-	DeltaCN              float64
-	DeltaCNStar          float64
-	SPScore              float64
-	SPRank               float64
-	Hyperscore           float64
-	Nextscore            float64
-	DiscriminantValue    float64
-	Intensity            float64
-	IsRejected           uint8
+	LocalizedPTMSites    map[string]int
+	LocalizedPTMMassDiff map[string]string
+	// LocalizedPTM         []string
+	// LocalizedMassDiff    []string
+	// LocalizedSites       []int
+	Probability       float64
+	Expectation       float64
+	Xcorr             float64
+	DeltaCN           float64
+	DeltaCNStar       float64
+	SPScore           float64
+	SPRank            float64
+	Hyperscore        float64
+	Nextscore         float64
+	DiscriminantValue float64
+	Intensity         float64
+	IsRejected        uint8
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -235,10 +237,14 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.Probability = j.InterProphetResult.Probability
 			}
 			if string(j.Analysis) == "ptmprophet" {
+				psm.LocalizedPTMSites = make(map[string]int)
+				psm.LocalizedPTMMassDiff = make(map[string]string)
 				for _, k := range j.PTMProphetResult {
-					psm.LocalizedMassDiff = append(psm.LocalizedMassDiff, string(k.PTMPeptide))
-					psm.LocalizedPTM = append(psm.LocalizedPTM, string(k.PTM))
-					psm.LocalizedSites = append(psm.LocalizedSites, len(k.ModAminoAcidProbability))
+					psm.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
+					psm.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
+					//psm.LocalizedMassDiff = append(psm.LocalizedMassDiff, string(k.PTMPeptide))
+					//psm.LocalizedPTM = append(psm.LocalizedPTM, string(k.PTM))
+					//psm.LocalizedSites = append(psm.LocalizedSites, len(k.ModAminoAcidProbability))
 				}
 				//psm.LocalizedMassDiff = string(j.PTMProphetResult.PTMPeptide)
 			}

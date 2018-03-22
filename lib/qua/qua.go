@@ -166,20 +166,27 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	psmMap = nil
 
 	var spectrumMap = make(map[string]tmt.Labels)
+	var phosphoSpectrumMap = make(map[string]tmt.Labels)
 	for _, i := range evi.PSM {
 		if i.Purity >= p.Purity {
 			spectrumMap[i.Spectrum] = i.Labels
+			if mods == true {
+				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				if ok {
+					phosphoSpectrumMap[i.Spectrum] = i.Labels
+				}
+			}
 		}
 	}
 
 	// forces psms with no label to have 0 intensities
 	evi = correctUnlabelledSpectra(evi)
 
-	evi = rollUpPeptides(evi, spectrumMap)
+	evi = rollUpPeptides(evi, spectrumMap, phosphoSpectrumMap)
 
-	evi = rollUpPeptideIons(evi, spectrumMap)
+	evi = rollUpPeptideIons(evi, spectrumMap, phosphoSpectrumMap)
 
-	evi = rollUpProteins(evi, spectrumMap)
+	evi = rollUpProteins(evi, spectrumMap, phosphoSpectrumMap)
 
 	// normalize to the total protein levels
 	logrus.Info("Calculating normalized protein levels")

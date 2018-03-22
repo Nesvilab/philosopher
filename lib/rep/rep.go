@@ -44,17 +44,16 @@ type Modifications struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Index           uint32
-	Spectrum        string
-	Scan            int
-	Peptide         string
-	IonForm         string
-	Protein         string
-	RazorProtein    string
-	ProteinID       string
-	GeneName        string
-	ModifiedPeptide string
-	//AlternativeProteins   []string
+	Index                 uint32
+	Spectrum              string
+	Scan                  int
+	Peptide               string
+	IonForm               string
+	Protein               string
+	RazorProtein          string
+	ProteinID             string
+	GeneName              string
+	ModifiedPeptide       string
 	MappedProteins        map[string]int
 	ModPositions          []string
 	AssignedModMasses     []float64
@@ -70,9 +69,8 @@ type PSMEvidence struct {
 	CalcNeutralPepMass    float64
 	RawMassdiff           float64
 	Massdiff              float64
-	LocalizedMassDiff     []string
-	LocalizedPTM          []string
-	LocalizedModSites     []int
+	LocalizedPTMSites     map[string]int
+	LocalizedPTMMassDiff  map[string]string
 	Probability           float64
 	Expectation           float64
 	Xcorr                 float64
@@ -124,7 +122,7 @@ type IonEvidence struct {
 	IsURazor               bool
 	IsDecoy                bool
 	Labels                 tmt.Labels
-	//IsNondegenerateEvidence bool
+	PhosphoLabels          tmt.Labels
 }
 
 // IonEvidenceList ...
@@ -146,6 +144,7 @@ type PeptideEvidence struct {
 	UnModifiedObservations int
 	IsDecoy                bool
 	Labels                 tmt.Labels
+	PhosphoLabels          tmt.Labels
 }
 
 // PeptideEvidenceList ...
@@ -336,6 +335,11 @@ func Run(m met.Data) met.Data {
 			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
 		}
 
+		if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
+			logrus.Info("Creating phospho protein report")
+			repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique)
+		}
+
 		logrus.Info("Plotting mass distribution")
 		repo.PlotMassHist()
 	}
@@ -382,9 +386,8 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.CalcNeutralPepMass = i.CalcNeutralPepMass
 		p.RawMassdiff = i.RawMassDiff
 		p.Massdiff = i.Massdiff
-		p.LocalizedMassDiff = i.LocalizedMassDiff
-		p.LocalizedPTM = i.LocalizedPTM
-		p.LocalizedModSites = i.LocalizedSites
+		p.LocalizedPTMSites = i.LocalizedPTMSites
+		p.LocalizedPTMMassDiff = i.LocalizedPTMMassDiff
 		p.Probability = i.Probability
 		p.Expectation = i.Expectation
 		p.Xcorr = i.Xcorr
@@ -434,7 +437,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -504,6 +507,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 			obs = append(obs, j)
 		}
 
+		//TODO FIX MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
@@ -528,7 +532,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedMassDiff,
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"], //i.LocalizedMassDiff,
 			i.IsUnique,
 			i.GeneName,
 			i.Protein,
@@ -651,6 +655,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		//geneName := dbMap[i.Protein]
 		///////////////
 
+		//TODO FIX MDOS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
@@ -676,7 +681,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.IsUnique,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedMassDiff,
+			"",         // i.LocalizedMassDiff,
 			i.GeneName, //geneName, //i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
@@ -716,7 +721,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -786,6 +791,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 			obs = append(obs, j)
 		}
 
+		//TODO FIX MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
@@ -805,7 +811,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedMassDiff,
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"], //i.LocalizedMassDiff,
 			i.IsUnique,
 			i.GeneName,
 			i.Protein,
@@ -928,6 +934,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		//geneName := dbMap[i.Protein]
 		///////////////
 
+		// TODO FIZ MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
@@ -948,7 +955,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			i.IsUnique,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedMassDiff,
+			"",         //i.LocalizedMassDiff,
 			i.GeneName, //geneName, //i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
@@ -1022,16 +1029,16 @@ func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor bool) {
 	}
 
 	for _, i := range printSet {
-		for j := range i.LocalizedPTM {
+		for j := range i.LocalizedPTMMassDiff {
 			line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%s\t%d\t%s\n",
 				i.Spectrum,
 				i.Peptide,
 				i.ModifiedPeptide,
 				i.AssumedCharge,
 				i.RetentionTime,
-				i.LocalizedPTM[j],
-				i.LocalizedModSites[j],
-				i.LocalizedMassDiff[j],
+				j,
+				i.LocalizedPTMSites[j],
+				i.LocalizedPTMMassDiff[j],
 			)
 			_, err = io.WriteString(file, line)
 			if err != nil {
@@ -2239,6 +2246,141 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 			reportIntensities[7] = i.URazorLabels.Channel8.Intensity
 			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
 			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
+		}
+
+		if len(i.TotalPeptideIons) > 0 {
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+				i.ProteinGroup,           // Group
+				i.ProteinSubGroup,        // SubGroup
+				i.ProteinID,              // Protein ID
+				i.EntryName,              // EntryName
+				i.Length,                 // Length
+				i.Coverage,               // Percent Coverage
+				i.Description,            // Description
+				i.ProteinExistence,       // Protein Existence
+				i.GeneNames,              // Genes
+				i.Probability,            // Protein Probability
+				i.TopPepProb,             // Top peptide Probability
+				i.UniqueStrippedPeptides, // Unique Stripped Peptides
+				len(i.TotalPeptideIons),  // Total peptide Ions
+				uniqIons,                 // Unique Peptide Ions
+				urazorIons,               // Unique+Razor peptide Ions
+				i.TotalSpC,               // Total Spectral Count
+				i.UniqueSpC,              // Unique Spectral Count
+				i.URazorSpC,              // Unique+Razor Spectral Count
+				i.TotalIntensity,         // Total Intensity
+				i.UniqueIntensity,        // Unique Intensity
+				i.URazorIntensity,        // Razor Intensity
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				strings.Join(ip, ", "))
+
+			//			line += "\n"
+			n, err := io.WriteString(file, line)
+			if err != nil {
+				logrus.Fatal(n, err)
+			}
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// PhosphoProteinTMTReport ...
+func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly bool) {
+
+	// create result file
+	output := fmt.Sprintf("%s%sphospho_report.tsv", sys.MetaDir(), string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+
+	if len(labels) > 0 {
+		for k, v := range labels {
+			line = strings.Replace(line, k, v, -1)
+		}
+	}
+
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		logrus.Fatal(n, err)
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet ProteinEvidenceList
+	for _, i := range e.Proteins {
+		if e.Decoys == false {
+			if i.IsDecoy == false {
+				printSet = append(printSet, i)
+			}
+		} else {
+			printSet = append(printSet, i)
+		}
+	}
+
+	for _, i := range printSet {
+
+		var ip []string
+		for k := range i.IndiProtein {
+			ip = append(ip, k)
+		}
+
+		var uniqIons int
+		for _, j := range i.TotalPeptideIons {
+			//if j.IsNondegenerateEvidence == true {
+			if j.IsUnique == true {
+				uniqIons++
+			}
+		}
+
+		var urazorIons int
+		for _, j := range i.TotalPeptideIons {
+			if j.IsURazor == true {
+				urazorIons++
+			}
+		}
+
+		// change between Unique+Razor and Unique only based on paramter defined on labelquant
+		var reportIntensities [10]float64
+		if uniqueOnly == true {
+			reportIntensities[0] = i.PhosphoUniqueLabels.Channel1.Intensity
+			reportIntensities[1] = i.PhosphoUniqueLabels.Channel2.Intensity
+			reportIntensities[2] = i.PhosphoUniqueLabels.Channel3.Intensity
+			reportIntensities[3] = i.PhosphoUniqueLabels.Channel4.Intensity
+			reportIntensities[4] = i.PhosphoUniqueLabels.Channel5.Intensity
+			reportIntensities[5] = i.PhosphoUniqueLabels.Channel6.Intensity
+			reportIntensities[6] = i.PhosphoUniqueLabels.Channel7.Intensity
+			reportIntensities[7] = i.PhosphoUniqueLabels.Channel8.Intensity
+			reportIntensities[8] = i.PhosphoUniqueLabels.Channel9.Intensity
+			reportIntensities[9] = i.PhosphoUniqueLabels.Channel10.Intensity
+		} else {
+			reportIntensities[0] = i.PhosphoURazorLabels.Channel1.Intensity
+			reportIntensities[1] = i.PhosphoURazorLabels.Channel2.Intensity
+			reportIntensities[2] = i.PhosphoURazorLabels.Channel3.Intensity
+			reportIntensities[3] = i.PhosphoURazorLabels.Channel4.Intensity
+			reportIntensities[4] = i.PhosphoURazorLabels.Channel5.Intensity
+			reportIntensities[5] = i.PhosphoURazorLabels.Channel6.Intensity
+			reportIntensities[6] = i.PhosphoURazorLabels.Channel7.Intensity
+			reportIntensities[7] = i.PhosphoURazorLabels.Channel8.Intensity
+			reportIntensities[8] = i.PhosphoURazorLabels.Channel9.Intensity
+			reportIntensities[9] = i.PhosphoURazorLabels.Channel10.Intensity
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
