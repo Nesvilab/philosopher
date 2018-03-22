@@ -70,7 +70,9 @@ type PSMEvidence struct {
 	CalcNeutralPepMass    float64
 	RawMassdiff           float64
 	Massdiff              float64
-	LocalizedMassDiff     string
+	LocalizedMassDiff     []string
+	LocalizedPTM          []string
+	LocalizedModSites     int
 	Probability           float64
 	Expectation           float64
 	Xcorr                 float64
@@ -326,6 +328,11 @@ func Run(m met.Data) met.Data {
 		logrus.Info("Creating modification reports")
 		repo.ModificationReport()
 
+		repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
+		if len(m.PTMProphet.InputFiles) > 0 {
+			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
+		}
+
 		logrus.Info("Plotting mass distribution")
 		repo.PlotMassHist()
 	}
@@ -373,6 +380,8 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.RawMassdiff = i.RawMassDiff
 		p.Massdiff = i.Massdiff
 		p.LocalizedMassDiff = i.LocalizedMassDiff
+		p.LocalizedPTM = i.LocalizedPTM
+		p.LocalizedModSites = i.LocalizedSites
 		p.Probability = i.Probability
 		p.Expectation = i.Expectation
 		p.Xcorr = i.Xcorr
@@ -955,6 +964,76 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		_, err = io.WriteString(file, line)
 		if err != nil {
 			logrus.Fatal("Cannot print PSM to file")
+		}
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// PSMLocalizationReport report ptm localization based on PTMProphet outputs
+func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor bool) {
+
+	output := fmt.Sprintf("%s%slocalization.tsv", sys.MetaDir(), string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tModification\tNumber of Sites\tObserved Mass Localization\n")
+	if err != nil {
+		logrus.Fatal("Cannot print PSM to file")
+	}
+
+	// building the printing set tat may or not contain decoys
+	var printSet PSMEvidenceList
+	for _, i := range e.PSM {
+		if hasRazor == true {
+
+			if i.IsURazor == true {
+				if e.Decoys == false {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+						printSet = append(printSet, i)
+					}
+				} else {
+					printSet = append(printSet, i)
+				}
+			}
+
+		} else {
+
+			if e.Decoys == false {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+					printSet = append(printSet, i)
+				}
+			} else {
+				printSet = append(printSet, i)
+			}
+
+		}
+	}
+
+	for _, i := range printSet {
+		for j := range i.LocalizedPTM {
+			line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%s\t%d\t%s\n",
+				i.Spectrum,
+				i.Peptide,
+				i.ModifiedPeptide,
+				i.AssumedCharge,
+				i.RetentionTime,
+				i.LocalizedPTM[j],
+				i.LocalizedModSites,
+				i.LocalizedMassDiff[j],
+			)
+			_, err = io.WriteString(file, line)
+			if err != nil {
+				logrus.Fatal("Cannot print PSM to file")
+			}
 		}
 	}
 
