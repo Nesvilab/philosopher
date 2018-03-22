@@ -328,7 +328,7 @@ func Run(m met.Data) met.Data {
 		logrus.Info("Creating modification reports")
 		repo.ModificationReport()
 
-		repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
+		logrus.Info("Creating ptm localization report")
 		if len(m.PTMProphet.InputFiles) > 0 {
 			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
 		}
