@@ -75,6 +75,7 @@ ptmprophet:
   ppmtol: 1                  # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
   minprob: 0                 # use specified minimum probability to evaluate peptides
   massdiffmode: false        # use the Mass Difference and localize
+  mods: ''                   # specify modifications
 proteinprophet:
   accuracy: false            # equivalent to --minprob 0
   allpeps: false             # consider all possible peptides in the database in the confidence model
