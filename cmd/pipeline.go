@@ -153,7 +153,8 @@ var pipelineCmd = &cobra.Command{
 				m.PTMProphet = p.PTMProphet
 				var files []string
 				files = append(files, "interact.pep.xml")
-				ptmprophet.Run(m, args)
+				m.PTMProphet.InputFiles = files
+				ptmprophet.Run(m, files)
 
 				m.Serialize()
 			}

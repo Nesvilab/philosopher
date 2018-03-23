@@ -24,7 +24,6 @@ var ptmprophetCmd = &cobra.Command{
 		logrus.Info("Executing PTMProphet ", Version)
 
 		m.PTMProphet.InputFiles = args
-
 		ptmprophet.Run(m, args)
 		m.Serialize()
 
