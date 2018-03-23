@@ -153,7 +153,8 @@ var pipelineCmd = &cobra.Command{
 				m.PTMProphet = p.PTMProphet
 				var files []string
 				files = append(files, "interact.pep.xml")
-				ptmprophet.Run(m, args)
+				m.PTMProphet.InputFiles = files
+				ptmprophet.Run(m, files)
 
 				m.Serialize()
 			}
@@ -247,7 +248,7 @@ var pipelineCmd = &cobra.Command{
 				m.Quantify.Format = "mzML"
 				m.Quantify.Brand = "tmt"
 				var e error
-				m.Quantify, e = qua.RunTMTQuantification(m.Quantify)
+				m.Quantify, e = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
 				if e != nil {
 					logrus.Fatal(e)
 				}
@@ -257,7 +258,7 @@ var pipelineCmd = &cobra.Command{
 
 			// Report
 			if p.Commands.Report == "yes" {
-				logrus.Info("Executing report on", i)
+				logrus.Info("Executing report on ", i)
 				rep.Run(m)
 
 				m.Serialize()

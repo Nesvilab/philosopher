@@ -8,13 +8,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/sirupsen/logrus"
 )
 
 // Pair struct
@@ -58,7 +58,7 @@ func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 }
 
 // RunTMTQuantification is the top function for label quantification
-func RunTMTQuantification(p met.Quantify) (met.Quantify, error) {
+func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
@@ -166,20 +166,27 @@ func RunTMTQuantification(p met.Quantify) (met.Quantify, error) {
 	psmMap = nil
 
 	var spectrumMap = make(map[string]tmt.Labels)
+	var phosphoSpectrumMap = make(map[string]tmt.Labels)
 	for _, i := range evi.PSM {
 		if i.Purity >= p.Purity {
 			spectrumMap[i.Spectrum] = i.Labels
+			if mods == true {
+				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				if ok {
+					phosphoSpectrumMap[i.Spectrum] = i.Labels
+				}
+			}
 		}
 	}
 
 	// forces psms with no label to have 0 intensities
 	evi = correctUnlabelledSpectra(evi)
 
-	evi = rollUpPeptides(evi, spectrumMap)
+	evi = rollUpPeptides(evi, spectrumMap, phosphoSpectrumMap)
 
-	evi = rollUpPeptideIons(evi, spectrumMap)
+	evi = rollUpPeptideIons(evi, spectrumMap, phosphoSpectrumMap)
 
-	evi = rollUpProteins(evi, spectrumMap)
+	evi = rollUpProteins(evi, spectrumMap, phosphoSpectrumMap)
 
 	// normalize to the total protein levels
 	logrus.Info("Calculating normalized protein levels")

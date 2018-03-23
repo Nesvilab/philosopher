@@ -62,7 +62,8 @@ type PeptideIdentification struct {
 	CalcNeutralPepMass   float64
 	RawMassDiff          float64
 	Massdiff             float64
-	LocalizedMassDiff    string
+	LocalizedPTMSites    map[string]int
+	LocalizedPTMMassDiff map[string]string
 	Probability          float64
 	Expectation          float64
 	Xcorr                float64
@@ -233,7 +234,12 @@ func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]f
 				psm.Probability = j.InterProphetResult.Probability
 			}
 			if string(j.Analysis) == "ptmprophet" {
-				psm.LocalizedMassDiff = string(j.PTMProphetResult.PTMPeptide)
+				psm.LocalizedPTMSites = make(map[string]int)
+				psm.LocalizedPTMMassDiff = make(map[string]string)
+				for _, k := range j.PTMProphetResult {
+					psm.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
+					psm.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
+				}
 			}
 		}
 

@@ -273,7 +273,7 @@ type AnalysisResult struct {
 	Analysis             []byte               `xml:"analysis,attr"`
 	PeptideProphetResult PeptideProphetResult `xml:"peptideprophet_result"`
 	InterProphetResult   InterProphetResult   `xml:"interprophet_result"`
-	PTMProphetResult     PTMProphetResult     `xml:"ptmprophet_result"`
+	PTMProphetResult     []PTMProphetResult   `xml:"ptmprophet_result"`
 	SearchScoreSummary   SearchScoreSummary   `xml:"search_score_summary"`
 }
 
