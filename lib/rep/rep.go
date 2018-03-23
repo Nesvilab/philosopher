@@ -401,6 +401,10 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.ObservedModifications = make(map[string]uint16)
 		p.MappedProteins = make(map[string]int)
 
+		for _, j := range i.AlternativeProteins {
+			p.MappedProteins[j]++
+		}
+
 		gn, ok := genes[i.Protein]
 		if ok {
 			p.GeneName = gn
@@ -437,7 +441,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -508,7 +512,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 		}
 
 		//TODO FIX MODS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -532,7 +536,8 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"], //i.LocalizedMassDiff,
+			i.LocalizedPTMSites["PTMProphet_STY79.9663"],
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"],
 			i.IsUnique,
 			i.GeneName,
 			i.Protein,
@@ -562,7 +567,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 	}
 	defer file.Close()
 
-	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -656,7 +661,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		///////////////
 
 		//TODO FIX MDOS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -681,8 +686,9 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.IsUnique,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			"",         // i.LocalizedMassDiff,
-			i.GeneName, //geneName, //i.GeneName,
+			i.LocalizedPTMSites["PTMProphet_STY79.9663"],
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"],
+			i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
 			i.Purity,
@@ -721,7 +727,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -792,7 +798,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 		}
 
 		//TODO FIX MODS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\t%t\t%s\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -811,7 +817,8 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"], //i.LocalizedMassDiff,
+			i.LocalizedPTMSites["PTMProphet_STY79.9663"],
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"],
 			i.IsUnique,
 			i.GeneName,
 			i.Protein,
@@ -841,7 +848,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 	}
 	defer file.Close()
 
-	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tObserved Mass Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -935,7 +942,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		///////////////
 
 		// TODO FIZ MODS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -955,8 +962,9 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			i.IsUnique,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
-			"",         //i.LocalizedMassDiff,
-			i.GeneName, //geneName, //i.GeneName,
+			i.LocalizedPTMSites["PTMProphet_STY79.9663"],
+			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"],
+			i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
 			i.Purity,
@@ -1178,6 +1186,10 @@ func (e *Evidence) UpdateIonStatus() {
 
 	for i := range e.PSM {
 
+		if len(e.PSM[i].MappedProteins) == 0 {
+			e.PSM[i].IsUnique = true
+		}
+
 		_, uOK := uniqueMap[e.PSM[i].IonForm]
 		if uOK {
 			e.PSM[i].IsUnique = true
@@ -1340,7 +1352,12 @@ func (e *Evidence) UpdateMappedProteins() {
 	for i := range e.PSM {
 		for _, j := range list {
 			if e.PSM[i].Peptide == j.Sequence {
-				e.PSM[i].MappedProteins = j.Proteins
+
+				for k := range j.Proteins {
+					e.PSM[i].MappedProteins[k]++
+				}
+
+				//e.PSM[i].MappedProteins = j.Proteins
 				if len(e.PSM[i].RazorProtein) < 1 {
 					e.PSM[i].RazorProtein = j.RazorProtein
 					e.PSM[i].IsURazor = true

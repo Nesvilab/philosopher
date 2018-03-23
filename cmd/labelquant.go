@@ -22,6 +22,8 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal(e.Error())
 		}
 
+		m.Quantify.Format = "mzML"
+
 		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
