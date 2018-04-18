@@ -165,7 +165,11 @@ var pipelineCmd = &cobra.Command{
 				m.ProteinProphet = p.ProteinProphet
 				m.ProteinProphet.Output = "interact"
 				var files []string
-				files = append(files, "interact.pep.xml")
+				if p.Commands.PTMProphet == "yes" {
+					files = append(files, "interact.mod.pep.xml")
+				} else {
+					files = append(files, "interact.pep.xml")
+				}
 				proteinprophet.Run(m, files)
 
 				m.Serialize()
@@ -186,6 +190,9 @@ var pipelineCmd = &cobra.Command{
 			var files []string
 			for _, j := range args {
 				fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
+				if p.Commands.PTMProphet == "yes" {
+					fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
+				}
 				fqn, _ = filepath.Abs(fqn)
 				files = append(files, fqn)
 			}
@@ -209,6 +216,9 @@ var pipelineCmd = &cobra.Command{
 				logrus.Info("Executing filter on ", i)
 				m.Filter = p.Filter
 				m.Filter.Pex = "interact.pep.xml"
+				if p.Commands.PTMProphet == "yes" {
+					m.Filter.Pex = "interact.mod.pep.xml"
+				}
 				if p.Commands.ProteinProphet == "yes" {
 					m.Filter.Pox = "interact.prot.xml"
 				}
