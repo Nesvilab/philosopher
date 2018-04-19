@@ -1034,7 +1034,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 	var r = make(map[string]RazorCandidate)
 	var rList []string
 
-	// for each peptide sequence, collapse oll parent protein peptides from ions originated from the same sequence
+	// for each peptide sequence, collapse all parent protein peptides from ions originated from the same sequence
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
 			for _, k := range j.PeptideIons {
@@ -1069,17 +1069,22 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 				} else {
 					var c = v
 
-					if c.MappedProteinsW[j.ProteinName] == -1 {
-						c.MappedProteinsW[j.ProteinName] = k.Weight
-					}
+					// doing like this will allow proteins that map to shared peptidesto be considered
+					c.MappedProteinsW[j.ProteinName] = k.Weight
+					c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+					c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
 
-					if c.MappedProteinsGW[j.ProteinName] == -1 {
-						c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-					}
-
-					if c.MappedProteinsTNP[j.ProteinName] == -1 {
-						c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-					}
+					// if c.MappedProteinsW[j.ProteinName] == -1 {
+					// 	c.MappedProteinsW[j.ProteinName] = k.Weight
+					// }
+					//
+					// if c.MappedProteinsGW[j.ProteinName] == -1 {
+					// 	c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+					// }
+					//
+					// if c.MappedProteinsTNP[j.ProteinName] == -1 {
+					// 	c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+					// }
 
 					r[k.PeptideSequence] = c
 
@@ -1087,6 +1092,9 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 			}
 		}
 	}
+
+	// spew.Dump(r)
+	// os.Exit(1)
 
 	// this will make the assignment more deterministic
 	for k := range r {

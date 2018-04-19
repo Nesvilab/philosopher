@@ -423,10 +423,6 @@ INFO[15:43:40] Done
 
 PeptideProphet output contains a lot of log information that we don't need to focus right now. Pay attention to the number of peptides found within the charge state distribution and the number of target and decoys matches, if they are not the same I'm showing up here they should be at least very close to that. The output from this command is a new filed called `interact.pep.xml`, it contains the combined validation from all your `pepXML` files and that's what we are going to use from now on.
 
-This is what our workspace looks so fragger
-
-```
-```
 
 ## Inferring proteins from peptide matches
 For the protein inference and validation we will use the [ProteinProphet](proteinprophet.md) command as follows:
