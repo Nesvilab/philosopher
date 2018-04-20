@@ -1161,6 +1161,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 						if r[k].MappedProteinsTNP[pt] >= topCount {
 							topCount = r[k].MappedProteinsTNP[pt]
 							topPT = pt
+							break
 						}
 					}
 
@@ -1179,6 +1180,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					if r[k].MappedProteinsTNP[pt] >= topCount {
 						topCount = r[k].MappedProteinsTNP[pt]
 						topPT = pt
+						break
 					}
 				}
 
@@ -1197,6 +1199,9 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 			r[k] = razor
 		}
 	}
+
+	// spew.Dump(r)
+	// os.Exit(1)
 
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
