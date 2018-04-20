@@ -217,7 +217,7 @@ func prepareLabelStructure(dir, format, plex string, tol float64, ms2 raw.MS2) (
 	return labels, nil
 }
 
-// mapLabeledSpectra maps all labeled spectra to ions
+// mapLabeledSpectra maps all labeled spectra to PSMs
 func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	for i := range evi {

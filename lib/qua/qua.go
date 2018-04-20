@@ -17,19 +17,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Pair struct
-type Pair struct {
-	Key   rep.IonEvidence
-	Value float64
-}
-
-// PairList struict
-type PairList []Pair
-
-func (p PairList) Len() int           { return len(p) }
-func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
-func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
 // RunLabelFreeQuantification is the top function for label free quantification
 func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 
@@ -165,19 +152,9 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	}
 	psmMap = nil
 
-	var spectrumMap = make(map[string]tmt.Labels)
-	var phosphoSpectrumMap = make(map[string]tmt.Labels)
-	for _, i := range evi.PSM {
-		if i.Purity >= p.Purity {
-			spectrumMap[i.Spectrum] = i.Labels
-			if mods == true {
-				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
-				if ok {
-					phosphoSpectrumMap[i.Spectrum] = i.Labels
-				}
-			}
-		}
-	}
+	// classification and filtering based on quality filters
+	logrus.Info("Filtering spectra for label quantification")
+	spectrumMap, phosphoSpectrumMap := classification(evi, mods, p.BestPSM, p.Purity)
 
 	// forces psms with no label to have 0 intensities
 	evi = correctUnlabelledSpectra(evi)
@@ -388,4 +365,96 @@ func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string
 	}
 
 	return labels
+}
+
+func classification(evi rep.Evidence, mods, best bool, purity float64) (map[string]tmt.Labels, map[string]tmt.Labels) {
+
+	var spectrumMap = make(map[string]tmt.Labels)
+	var phosphoSpectrumMap = make(map[string]tmt.Labels)
+
+	// 1st check: Purity score level and Phospho map
+	for _, i := range evi.PSM {
+		if i.Purity >= purity {
+			spectrumMap[i.Spectrum] = i.Labels
+			if mods == true {
+				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				if ok {
+					phosphoSpectrumMap[i.Spectrum] = i.Labels
+				}
+			}
+		}
+	}
+
+	// 2nd check: best PSM
+	// collect all ion-related spectra from the each fraction/file
+	if best == true {
+		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
+		for _, i := range evi.PSM {
+			specName := strings.Split(i.Spectrum, ".")
+			fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm)
+			groupedPSMMap[fqn] = append(groupedPSMMap[fqn], i)
+		}
+
+		var bestMap = make(map[string]uint8)
+		for _, v := range groupedPSMMap {
+			if len(v) == 1 {
+				bestMap[v[0].Spectrum] = 0
+			} else {
+
+				var bestPSM string
+				var bestPSMInt float64
+				for _, i := range v {
+					tmtSum := i.Labels.Channel1.Intensity +
+						i.Labels.Channel2.Intensity +
+						i.Labels.Channel3.Intensity +
+						i.Labels.Channel4.Intensity +
+						i.Labels.Channel5.Intensity +
+						i.Labels.Channel6.Intensity +
+						i.Labels.Channel7.Intensity +
+						i.Labels.Channel8.Intensity +
+						i.Labels.Channel9.Intensity +
+						i.Labels.Channel10.Intensity
+
+					if tmtSum > bestPSMInt {
+						bestPSM = i.Spectrum
+						bestPSMInt = tmtSum
+					}
+
+				}
+
+				bestMap[bestPSM] = 0
+
+			}
+		}
+
+		var toDelete []string
+		for k := range spectrumMap {
+			_, ok := bestMap[k]
+			if !ok {
+				toDelete = append(toDelete, k)
+			}
+		}
+
+		for _, i := range toDelete {
+			delete(spectrumMap, i)
+		}
+
+		var toDeletePhospho []string
+		for k := range phosphoSpectrumMap {
+			_, ok := bestMap[k]
+			if !ok {
+				toDelete = append(toDeletePhospho, k)
+			}
+		}
+
+		for _, i := range toDeletePhospho {
+			delete(phosphoSpectrumMap, i)
+		}
+
+	}
+
+	//spew.Dump(bestMap)
+	//os.Exit(1)
+
+	return spectrumMap, phosphoSpectrumMap
 }

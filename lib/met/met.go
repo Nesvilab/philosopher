@@ -240,6 +240,7 @@ type Quantify struct {
 	Purity     float64 `yaml:"purity"`
 	IntNorm    bool    `yaml:"intNorm"`
 	Unique     bool    `yaml:"uniqueOnly"`
+	BestPSM    bool    `yaml:"bestPSM"`
 	LabelNames map[string]string
 }
 
