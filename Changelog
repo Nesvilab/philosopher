@@ -10,6 +10,7 @@
 ### Build: ?
 
 ### Added
+- new parameter bestPSM added to TMT quantification.
 ### Changed
 ### Fixed
 - Razor assignment for isoforms
