@@ -335,8 +335,9 @@ func Run(m met.Data) met.Data {
 			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor)
 		}
 
-		if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
-			logrus.Info("Creating phospho protein report")
+		if len(m.Quantify.Plex) > 0 {
+			//if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
+			logrus.Info("Creating TMT phospho protein report")
 			repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique)
 		}
 
