@@ -11,7 +11,7 @@ import (
 	"github.com/vmihailenco/msgpack"
 )
 
-// Serialize converts the whle structure to a gob file
+// Serialize converts the whole structure to a gob file
 func (e *Evidence) Serialize() *err.Error {
 
 	// create a file

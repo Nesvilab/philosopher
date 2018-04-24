@@ -59,8 +59,11 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 		return p, e
 	}
 
-	// removed all calculated defined bvalues from before
-	cleanPreviousData(p.Plex)
+	// removed all calculated defined values from before
+	evi, e = cleanPreviousData(evi, p.Plex)
+	if e != nil {
+		return p, e
+	}
 
 	// collect all used source file names
 	for _, i := range evi.PSM {
@@ -170,13 +173,171 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	evi = NormToTotalProteins(evi)
 
 	logrus.Info("Saving")
-	e = evi.SerializeGranular()
+
+	// create EV PSM
+	e = rep.SerializeEVPSM(&evi)
 	if e != nil {
 		return p, e
 	}
 
+	// create EV Ion
+	e = rep.SerializeEVIon(&evi)
+	if e != nil {
+		return p, e
+	}
+
+	// create EV Peptides
+	e = rep.SerializeEVPeptides(&evi)
+	if e != nil {
+		return p, e
+	}
+	// create EV Ion
+	e = rep.SerializeEVProteins(&evi)
+	if e != nil {
+		return p, e
+	}
+
+	// e = evi.SerializeGranular()
+	// if e != nil {
+	// 	return p, e
+	// }
+
 	return p, nil
 }
+
+// // RunTMTQuantification is the top function for label quantification
+// func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
+//
+// 	var psmMap = make(map[string]rep.PSMEvidence)
+// 	var sourceMap = make(map[string][]rep.PSMEvidence)
+// 	var sourceList []string
+//
+// 	logrus.Info("Restoring data")
+//
+// 	var evi rep.Evidence
+// 	e := evi.RestoreGranular()
+// 	if e != nil {
+// 		return p, e
+// 	}
+//
+// 	// removed all calculated defined values from before
+// 	cleanPreviousData(p.Plex)
+//
+// 	// collect all used source file names
+// 	for _, i := range evi.PSM {
+// 		specName := strings.Split(i.Spectrum, ".")
+// 		sourceMap[specName[0]] = append(sourceMap[specName[0]], i)
+// 		psmMap[i.Spectrum] = i
+// 	}
+//
+// 	for i := range sourceMap {
+// 		sourceList = append(sourceList, i)
+// 	}
+//
+// 	if len(sourceMap) > 1 {
+// 		sort.Strings(sourceList)
+// 	}
+//
+// 	// read the annotation file
+// 	p.LabelNames = make(map[string]string)
+// 	if len(p.Annot) > 0 {
+// 		p.LabelNames, e = getLabelNames(p.Annot)
+// 		if e != nil {
+// 			return p, e
+// 		}
+// 	}
+//
+// 	logrus.Info("Calculating intensities and ion interference")
+//
+// 	for i := range sourceList {
+//
+// 		var ms1 raw.MS1
+// 		var ms2 raw.MS2
+//
+// 		logrus.Info("Reading ", sourceList[i])
+//
+// 		ms1, ms2, e = getSpectra(p.Dir, p.Format, sourceList[i])
+// 		if e != nil {
+// 			return p, e
+// 		}
+//
+// 		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, ms1, ms2, sourceMap[sourceList[i]])
+// 		if e != nil {
+// 			return p, e
+// 		}
+//
+// 		ms1 = raw.MS1{}
+//
+// 		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, ms2)
+// 		if err != nil {
+// 			return p, err
+// 		}
+//
+// 		ms2 = raw.MS2{}
+//
+// 		labels = assignLabelNames(labels, p.LabelNames)
+//
+// 		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
+// 		if err != nil {
+// 			return p, err
+// 		}
+//
+// 		for _, j := range mappedPurity {
+// 			v, ok := psmMap[j.Spectrum]
+// 			if ok {
+// 				psm := v
+// 				psm.Purity = j.Purity
+// 				psmMap[j.Spectrum] = psm
+// 			}
+// 		}
+// 		mappedPurity = nil
+//
+// 		for _, j := range mappedPSM {
+// 			v, ok := psmMap[j.Spectrum]
+// 			if ok {
+// 				psm := v
+// 				psm.Labels = j.Labels
+// 				psmMap[j.Spectrum] = psm
+// 			}
+// 		}
+// 		mappedPSM = nil
+//
+// 	}
+//
+// 	for i := range evi.PSM {
+// 		v, ok := psmMap[evi.PSM[i].Spectrum]
+// 		if ok {
+// 			evi.PSM[i].Purity = v.Purity
+// 			evi.PSM[i].Labels = v.Labels
+// 		}
+// 	}
+// 	psmMap = nil
+//
+// 	// classification and filtering based on quality filters
+// 	logrus.Info("Filtering spectra for label quantification")
+// 	spectrumMap, phosphoSpectrumMap := classification(evi, mods, p.BestPSM, p.Purity)
+//
+// 	// forces psms with no label to have 0 intensities
+// 	evi = correctUnlabelledSpectra(evi)
+//
+// 	evi = rollUpPeptides(evi, spectrumMap, phosphoSpectrumMap)
+//
+// 	evi = rollUpPeptideIons(evi, spectrumMap, phosphoSpectrumMap)
+//
+// 	evi = rollUpProteins(evi, spectrumMap, phosphoSpectrumMap)
+//
+// 	// normalize to the total protein levels
+// 	logrus.Info("Calculating normalized protein levels")
+// 	evi = NormToTotalProteins(evi)
+//
+// 	logrus.Info("Saving")
+// 	e = evi.SerializeGranular()
+// 	if e != nil {
+// 		return p, e
+// 	}
+//
+// 	return p, nil
+// }
 
 func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
 
@@ -214,52 +375,54 @@ func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
 }
 
 // cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(plex string) *err.Error {
+func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {
 
-	var evi rep.Evidence
-	e := evi.RestoreGranular()
-	if e != nil {
-		return e
-	}
+	// var evi rep.Evidence
+	// e := evi.RestoreGranular()
+	// if e != nil {
+	// 	return e
+	// }
+
+	var e *err.Error
 
 	for i := range evi.PSM {
 		evi.PSM[i].Labels, e = tmt.New(plex)
 		if e != nil {
-			return e
+			return evi, e
 		}
 	}
 
 	for i := range evi.Ions {
 		evi.Ions[i].Labels, e = tmt.New(plex)
 		if e != nil {
-			return e
+			return evi, e
 		}
 	}
 
 	for i := range evi.Proteins {
 		evi.Proteins[i].TotalLabels, e = tmt.New(plex)
 		if e != nil {
-			return e
+			return evi, e
 		}
 
 		evi.Proteins[i].UniqueLabels, e = tmt.New(plex)
 		if e != nil {
-			return e
+			return evi, e
 		}
 
 		evi.Proteins[i].URazorLabels, e = tmt.New(plex)
 		if e != nil {
-			return e
+			return evi, e
 		}
 
 	}
 
-	e = evi.SerializeGranular()
-	if e != nil {
-		return e
-	}
+	// e = evi.SerializeGranular()
+	// if e != nil {
+	// 	return evi, e
+	// }
 
-	return nil
+	return evi, nil
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
