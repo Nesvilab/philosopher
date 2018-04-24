@@ -10,10 +10,14 @@
 ### Build: ?
 
 ### Added
-- new parameter bestPSM added to TMT quantification.
+- New parameter bestPSM added to TMT quantification.
+
 ### Changed
+- Improved speed when processing TMT data.
+
 ### Fixed
 - Razor assignment for isoforms
+- Reports doesn't try to create phospho reports all the time anymore.
 
 # Philosopher 20180323
 ### Build: 201803231722
