@@ -1,4 +1,4 @@
-analytics: false             # reports when a workspace is created for usage estimation (default true)
+analytics: true             # reports when a workspace is created for usage estimation (default true)
 slackToken: ''               # specify the Slack API token
 slackChannel: ''             # specify the channel name
 commands:
