@@ -238,9 +238,11 @@ type Quantify struct {
 	PTWin      float64 `yaml:"peakTimeWindow"`
 	Tol        float64 `yaml:"tolerance"`
 	Purity     float64 `yaml:"purity"`
+	MinProb    float64 `yaml:"minprob"`
 	IntNorm    bool    `yaml:"intNorm"`
 	Unique     bool    `yaml:"uniqueOnly"`
 	BestPSM    bool    `yaml:"bestPSM"`
+	RemoveLow  bool    `yaml:"removeLow"`
 	LabelNames map[string]string
 }
 
