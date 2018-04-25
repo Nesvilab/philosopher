@@ -23,7 +23,10 @@ var clusterCmd = &cobra.Command{
 
 		logrus.Info("Executing Cluster ", Version)
 		// run clustering
-		clu.GenerateReport(m)
+		e := clu.GenerateReport(m)
+		if e != nil {
+			logrus.Fatal(e.Error())
+		}
 
 		// store paramters on meta data
 		m.Serialize()

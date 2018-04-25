@@ -60,6 +60,10 @@ func GenerateReport(c met.Data) error {
 	logrus.Info("Parsing clusters")
 	clusters, err := parseClusterFile(clusterFile, clusterFasta)
 
+	if err != nil {
+		return err
+	}
+
 	// maps all proteins from the db against the clusters
 	logrus.Info("Mapping proteins to clusters")
 	mappedClust := mapProtXML2Clusters(clusters)
@@ -171,6 +175,9 @@ func parseClusterFile(cls, database string) (List, error) {
 			if strings.Contains(scanner.Text(), "*") {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
+				if len(centroid) < 2 {
+					return nil, errors.New("FASTA file contains non-formatted sequence headers")
+				}
 				centroidmap[clusterNumber] = centroid[1]
 			}
 
