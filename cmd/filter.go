@@ -44,6 +44,11 @@ var filterCmd = &cobra.Command{
 			logrus.Fatal("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information")
 		}
 
+		if len(m.Filter.Pox) == 0 && m.Filter.Razor == true {
+			logrus.Warning("Razor option will be disabled because there is no protein inference data")
+			m.Filter.Razor = false
+		}
+
 		//stat.Run(fp, psmFDR, pepFDR, ionFDR, prtFDR, pepProb, prtProb)
 		m, e := fil.Run(m)
 		if e != nil {
