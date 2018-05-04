@@ -171,6 +171,9 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	logrus.Info("Filtering spectra for label quantification")
 	spectrumMap, phosphoSpectrumMap := classification(evi, mods, p.BestPSM, p.RemoveLow, p.Purity, p.MinProb)
 
+	// assignment happens only for general PSMs
+	evi = assignUsage(evi, spectrumMap)
+
 	// forces psms with no label to have 0 intensities
 	evi = correctUnlabelledSpectra(evi)
 

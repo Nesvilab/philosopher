@@ -248,6 +248,19 @@ func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.P
 	return evi, nil
 }
 
+// the assignment of usage is only done for general PSM, not for phosphoPSMs
+func assignUsage(evi rep.Evidence, spectrumMap map[string]tmt.Labels) rep.Evidence {
+
+	for i := range evi.PSM {
+		_, ok := spectrumMap[evi.PSM[i].Spectrum]
+		if ok {
+			evi.PSM[i].Labels.IsUsed = true
+		}
+	}
+
+	return evi
+}
+
 // func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 //
 // 	for i := range evi.PSM {
