@@ -16,7 +16,6 @@ type Directives struct {
 	Analtics       bool               `yaml:"analytics"`
 	SlackToken     string             `yaml:"slackToken"`
 	SlackChannel   string             `yaml:"slackChannel"`
-	FASTADatabase  string             `yaml:"database"`
 	Commands       Commands           `yaml:"commands"`
 	Database       met.Database       `yaml:"database"`
 	MSFragger      met.MSFragger      `yaml:"msfragger"`
