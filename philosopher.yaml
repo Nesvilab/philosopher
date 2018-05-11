@@ -123,7 +123,7 @@ labelquant:
   tolerance: 20              # m/z tolerance in ppm (default 20)
   uniqueOnly: false          # report quantification based on only unique peptides
   bestPSM: false             # select the best PSMs for protein quantification
-  removeLow: false           # ignore the lower 5% PSMs based on their summed abundances
+  removeLow: false           # ignore the lower 3% PSMs based on their summed abundances
   minProb: 0.7               # only use PSMs with a minimun probability score
   annotation: ''             # annotation file with custom names for the TMT channels
 report:

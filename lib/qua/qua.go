@@ -629,7 +629,7 @@ func classification(evi rep.Evidence, mods, best, remove bool, purity, probabili
 	// Ignore all PSMs that fall under the lower 5% based on their summed TMT labels
 	if remove == true {
 		sort.Sort(psmLabelSumList)
-		lowerFive := float64(len(psmLabelSumList)) * 0.05
+		lowerFive := float64(len(psmLabelSumList)) * 0.03
 		lowerFiveInt := int(uti.Round(lowerFive, 5, 0))
 
 		for i := 0; i <= lowerFiveInt; i++ {
