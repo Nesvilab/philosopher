@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/pro"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/sirupsen/logrus"
 )
 
 // ProtXML struct
@@ -111,6 +111,7 @@ func (p *ProtXML) Read(f string) error {
 			if jindex == 0 {
 				if i.Probability == 1 && j.Probability == 0 {
 					j.Probability = float64(i.Probability)
+					break
 				}
 			}
 
