@@ -3,7 +3,7 @@ package bio_test
 import (
 	"errors"
 
-	. "github.com/prvst/cmsl/bio"
+	. "github.com/prvst/philosopher/lib/bio"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -245,6 +245,14 @@ var _ = Describe("Bio", func() {
 				e.Synth("Chymotrypsin")
 				Expect(e.Name).To(Equal("chymotrypsin"))
 				Expect(e.Pattern).To(Equal("FWYL[^P]"))
+				Expect(e.Join).To(Equal("K"))
+			})
+
+			It("Glu_c", func() {
+				var e Enzyme
+				e.Synth("Glu_c")
+				Expect(e.Name).To(Equal("glu_c"))
+				Expect(e.Pattern).To(Equal("DE[^P]"))
 				Expect(e.Join).To(Equal("K"))
 			})
 

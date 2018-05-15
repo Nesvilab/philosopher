@@ -31,6 +31,10 @@ func (e *Enzyme) Synth(t string) error {
 		e.Name = "chymotrypsin"
 		e.Pattern = "FWYL[^P]"
 		e.Join = "K"
+	} else if strings.EqualFold(strings.ToLower(t), "glu_c") {
+		e.Name = "glu_c"
+		e.Pattern = "DE[^P]"
+		e.Join = "K"
 	} else {
 		return errors.New("Enzyme not supported")
 	}

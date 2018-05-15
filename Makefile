@@ -34,6 +34,8 @@ deps:
 	go get -u github.com/vmihailenco/msgpack
 	go get -u github.com/davecgh/go-spew/spew
 	go get -u github.com/jpillora/go-ogle-analytics
+	go get -u github.com/onsi/ginkgo
+	go get -u github.com/onsi/gomega
 
 .PHONY: deploy
 deploy:
