@@ -843,6 +843,7 @@ type RazorCandidate struct {
 	MappedProteinsW   map[string]float64
 	MappedProteinsGW  map[string]float64
 	MappedProteinsTNP map[string]int
+	MappedproteinsSID map[string]string
 	MappedProtein     string
 }
 
@@ -1235,6 +1236,194 @@ type RazorCandidateMap map[string]RazorCandidate
 // 	return p, nil
 // }
 
+// // RazorFilter classifies peptides as razor
+// func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
+//
+// 	var r = make(map[string]RazorCandidate)
+// 	var rList []string
+//
+// 	// for each peptide sequence, collapse all parent protein peptides from ions originated from the same sequence
+// 	for _, i := range p.Groups {
+// 		for _, j := range i.Proteins {
+// 			for _, k := range j.PeptideIons {
+//
+// 				v, ok := r[k.PeptideSequence]
+// 				if !ok {
+//
+// 					var rc RazorCandidate
+// 					rc.Sequence = k.PeptideSequence
+// 					rc.MappedProteinsW = make(map[string]float64)
+// 					rc.MappedProteinsGW = make(map[string]float64)
+// 					rc.MappedProteinsTNP = make(map[string]int)
+//
+// 					rc.MappedProteinsW[j.ProteinName] = k.Weight
+// 					rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+// 					rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+//
+// 					for _, i := range j.IndistinguishableProtein {
+// 						rc.MappedProteinsW[i] = -1
+// 						rc.MappedProteinsGW[i] = -1
+// 						rc.MappedProteinsTNP[i] = -1
+// 					}
+//
+// 					for _, i := range k.PeptideParentProtein {
+// 						rc.MappedProteinsW[i] = -1
+// 						rc.MappedProteinsGW[i] = -1
+// 						rc.MappedProteinsTNP[i] = -1
+// 					}
+//
+// 					r[k.PeptideSequence] = rc
+//
+// 				} else {
+// 					var c = v
+//
+// 					// doing like this will allow proteins that map to shared peptidesto be considered
+// 					c.MappedProteinsW[j.ProteinName] = k.Weight
+// 					c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+// 					c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+//
+// 					// if c.MappedProteinsW[j.ProteinName] == -1 {
+// 					// 	c.MappedProteinsW[j.ProteinName] = k.Weight
+// 					// }
+// 					//
+// 					// if c.MappedProteinsGW[j.ProteinName] == -1 {
+// 					// 	c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+// 					// }
+// 					//
+// 					// if c.MappedProteinsTNP[j.ProteinName] == -1 {
+// 					// 	c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+// 					// }
+//
+// 					r[k.PeptideSequence] = c
+//
+// 				}
+// 			}
+// 		}
+// 	}
+//
+// 	// spew.Dump(r)
+// 	// os.Exit(1)
+//
+// 	// this will make the assignment more deterministic
+// 	for k := range r {
+// 		rList = append(rList, k)
+// 	}
+// 	sort.Strings(rList)
+//
+// 	var razorPair = make(map[string]string)
+//
+// 	// get the best protein candidate for each pepetide sequence and make the razor pair
+// 	for _, k := range rList {
+// 		// 1st pass: mark all cases with weight > 0.5
+// 		for pt, w := range r[k].MappedProteinsW {
+// 			if w > 0.5 {
+// 				razorPair[k] = pt
+// 			}
+// 		}
+// 	}
+//
+// 	// 2nd pass: mark all cases with highest group weight in the list
+// 	for _, k := range rList {
+//
+// 		_, ok := razorPair[k]
+// 		if !ok {
+//
+// 			var topPT string
+// 			var topCount int
+// 			var topGW float64
+// 			var topGWMap = make(map[float64]uint8)
+//
+// 			if len(r[k].MappedProteinsGW) == 1 {
+//
+// 				for pt := range r[k].MappedProteinsGW {
+// 					razorPair[k] = pt
+// 				}
+//
+// 			} else if len(r[k].MappedProteinsGW) > 1 {
+//
+// 				for pt, tnp := range r[k].MappedProteinsGW {
+// 					if tnp >= topGW {
+// 						topGW = tnp
+// 						topPT = pt
+// 						topGWMap[topGW]++
+// 					}
+// 				}
+//
+// 				var tie bool
+// 				if topGWMap[topGW] >= 2 {
+// 					tie = true
+// 				}
+//
+// 				if tie == false {
+// 					razorPair[k] = topPT
+//
+// 				} else {
+//
+// 					var mplist []string
+// 					for pt, _ := range r[k].MappedProteinsTNP {
+// 						mplist = append(mplist, pt)
+// 					}
+// 					sort.Strings(mplist)
+//
+// 					for _, pt := range mplist {
+// 						if r[k].MappedProteinsTNP[pt] >= topCount {
+// 							topCount = r[k].MappedProteinsTNP[pt]
+// 							topPT = pt
+// 							//break
+// 						}
+// 					}
+//
+// 					razorPair[k] = topPT
+// 				}
+//
+// 			}
+// 		}
+// 	}
+//
+// 	for _, k := range rList {
+// 		pt, ok := razorPair[k]
+// 		if ok {
+// 			razor := r[k]
+// 			razor.MappedProtein = pt
+// 			r[k] = razor
+// 		}
+// 	}
+//
+// 	// spew.Dump(r)
+// 	// os.Exit(1)
+//
+// 	for i := range p.Groups {
+// 		for j := range p.Groups[i].Proteins {
+// 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+// 				v, ok := r[string(p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence)]
+// 				if ok {
+// 					if p.Groups[i].Proteins[j].ProteinName == v.MappedProtein {
+// 						p.Groups[i].Proteins[j].PeptideIons[k].Razor = 1
+// 						p.Groups[i].Proteins[j].HasRazor = true
+// 					}
+// 				}
+// 			}
+// 		}
+// 	}
+//
+// 	// 	// mark as razor all peptides in the reference map
+// 	for i := range p.Groups {
+// 		for j := range p.Groups[i].Proteins {
+// 			var r float64
+// 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+// 				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
+// 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
+// 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
+// 					}
+// 				}
+// 			}
+// 			p.Groups[i].Proteins[j].TopPepProb = r
+// 		}
+// 	}
+//
+// 	return p, nil
+// }
+
 // RazorFilter classifies peptides as razor
 func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
@@ -1254,21 +1443,25 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					rc.MappedProteinsW = make(map[string]float64)
 					rc.MappedProteinsGW = make(map[string]float64)
 					rc.MappedProteinsTNP = make(map[string]int)
+					rc.MappedproteinsSID = make(map[string]string)
 
 					rc.MappedProteinsW[j.ProteinName] = k.Weight
 					rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
 					rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+					rc.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
 
 					for _, i := range j.IndistinguishableProtein {
 						rc.MappedProteinsW[i] = -1
 						rc.MappedProteinsGW[i] = -1
 						rc.MappedProteinsTNP[i] = -1
+						rc.MappedproteinsSID[i] = "zzz"
 					}
 
 					for _, i := range k.PeptideParentProtein {
 						rc.MappedProteinsW[i] = -1
 						rc.MappedProteinsGW[i] = -1
 						rc.MappedProteinsTNP[i] = -1
+						rc.MappedproteinsSID[i] = "zzz"
 					}
 
 					r[k.PeptideSequence] = rc
@@ -1280,22 +1473,11 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					c.MappedProteinsW[j.ProteinName] = k.Weight
 					c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
 					c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-
-					// if c.MappedProteinsW[j.ProteinName] == -1 {
-					// 	c.MappedProteinsW[j.ProteinName] = k.Weight
-					// }
-					//
-					// if c.MappedProteinsGW[j.ProteinName] == -1 {
-					// 	c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-					// }
-					//
-					// if c.MappedProteinsTNP[j.ProteinName] == -1 {
-					// 	c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-					// }
-
+					c.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
 					r[k.PeptideSequence] = c
 
 				}
+
 			}
 		}
 	}
@@ -1330,7 +1512,9 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 			var topPT string
 			var topCount int
 			var topGW float64
+			var topTNP int
 			var topGWMap = make(map[float64]uint8)
+			var topTNPMap = make(map[int]uint8)
 
 			if len(r[k].MappedProteinsGW) == 1 {
 
@@ -1358,23 +1542,55 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 
 				} else {
 
-					var mplist []string
-					for pt, _ := range r[k].MappedProteinsTNP {
-						mplist = append(mplist, pt)
-					}
-					sort.Strings(mplist)
-
-					for _, pt := range mplist {
-						if r[k].MappedProteinsTNP[pt] >= topCount {
-							topCount = r[k].MappedProteinsTNP[pt]
+					for pt, tnp := range r[k].MappedProteinsTNP {
+						if tnp >= topTNP {
+							topTNP = tnp
 							topPT = pt
-							//break
+							topTNPMap[topTNP]++
 						}
 					}
 
-					razorPair[k] = topPT
-				}
+					var tie bool
+					if topTNPMap[topTNP] >= 2 {
+						tie = true
+					}
 
+					if tie == false {
+
+						var mplist []string
+						for pt, _ := range r[k].MappedProteinsTNP {
+							mplist = append(mplist, pt)
+						}
+						sort.Strings(mplist)
+
+						for _, pt := range mplist {
+							if r[k].MappedProteinsTNP[pt] >= topCount {
+								topCount = r[k].MappedProteinsTNP[pt]
+								topPT = pt
+								//break
+							}
+						}
+
+						razorPair[k] = topPT
+
+					} else {
+
+						var idList []string
+						for _, id := range r[k].MappedproteinsSID {
+							idList = append(idList, id)
+						}
+
+						sort.Strings(idList)
+
+						for key, val := range r[k].MappedproteinsSID {
+							if val == idList[0] {
+								razorPair[k] = key
+							}
+						}
+
+					}
+
+				}
 			}
 		}
 	}
