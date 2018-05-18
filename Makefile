@@ -99,8 +99,8 @@ release:
 all:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 	cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	#cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
-	#cp philosopher.${VERSION} /home/felipevl/Servers/pathbio/bin/philosopher
+	cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
+	cp philosopher.${VERSION} /home/felipevl/Servers/pathbio/bin/philosopher
 	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 	gox ${LDFLAGS} .
 
