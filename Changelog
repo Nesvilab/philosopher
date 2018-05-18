@@ -6,13 +6,14 @@
 ### Fixed
 
 
-# Philosopher 20180514
+# Philosopher 20180518
 ### Build: ?
 
 ### Added
 ### Changed
 ### Fixed
 - Razor assignment prevents low level proteins to be selected.
+- Empty PSM tables when using only peptide validation.
 
 # Philosopher 20180424
 ### Build: 201804241534
