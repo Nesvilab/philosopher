@@ -34,6 +34,8 @@ deps:
 	go get -u github.com/vmihailenco/msgpack
 	go get -u github.com/davecgh/go-spew/spew
 	go get -u github.com/jpillora/go-ogle-analytics
+	go get -u github.com/onsi/ginkgo
+	go get -u github.com/onsi/gomega
 
 .PHONY: deploy
 deploy:
@@ -97,7 +99,8 @@ release:
 all:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 	cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
+	#cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
+	#cp philosopher.${VERSION} /home/felipevl/Servers/pathbio/bin/philosopher
 	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 	gox ${LDFLAGS} .
 

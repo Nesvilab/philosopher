@@ -13,12 +13,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/cdhit"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // Cluster struct
@@ -59,6 +59,10 @@ func GenerateReport(c met.Data) error {
 	// parse the cluster file
 	logrus.Info("Parsing clusters")
 	clusters, err := parseClusterFile(clusterFile, clusterFasta)
+
+	if err != nil {
+		return err
+	}
 
 	// maps all proteins from the db against the clusters
 	logrus.Info("Mapping proteins to clusters")
@@ -171,6 +175,9 @@ func parseClusterFile(cls, database string) (List, error) {
 			if strings.Contains(scanner.Text(), "*") {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
+				if len(centroid) < 2 {
+					return nil, errors.New("FASTA file contains non-formatted sequence headers")
+				}
 				centroidmap[clusterNumber] = centroid[1]
 			}
 

@@ -11,6 +11,7 @@ type Labels struct {
 	Scan          string
 	RetentionTime float64
 	ChargeState   int
+	IsUsed        bool
 	Channel1      Channel1
 	Channel2      Channel2
 	Channel3      Channel3

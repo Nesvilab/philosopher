@@ -53,7 +53,6 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
-		//abacusCmd.Flags().StringVarP(&m.Abacus.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
 	}
 
 	RootCmd.AddCommand(abacusCmd)
