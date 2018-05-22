@@ -6,6 +6,12 @@
 ### Fixed
 
 
+# Philosopher 20180522
+### Build: 201805221309
+
+### Fixed
+- An error was creating malformed abacus reports.
+
 # Philosopher 20180518
 ### Build: 201805181025
 
