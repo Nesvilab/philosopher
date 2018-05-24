@@ -9,10 +9,8 @@
 # Philosopher 20180524
 ### Build: ?
 
-### Added
 ### Changed
 - Labelquant removeLow value is now passed as a parameter.
-### Fixed
 
 # Philosopher 20180522
 ### Build: 201805221309
