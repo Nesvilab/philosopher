@@ -27,6 +27,7 @@ var freequant = &cobra.Command{
 		// 	logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		// }
 
+		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {
 			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
 		}
