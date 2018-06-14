@@ -13,7 +13,7 @@ We will need:
 * The data set from [Gygi's](https://www.nature.com/articles/nbt.3267) publication about mass tolerant database search.
 * A [computer](https://image.stern.de/4238042/uncropped-620-413/f569ddaca2f32214083a9acf32009af2/Wy/mac-plus-jpg--727f7573cf759135-.jpg) running GNU/Linux or Windows with at least 8GB of RAM.
 
-I'm running this example on a Linux Mint 18.3, it means that the commands I use below for the ananlysis will be "Linux compatible", if you are trying to reproduce this on a Windows machine, you will need to adjust the folder separators ('\\' for windows and '/' for linux).
+I'm running this example on a Linux Mint 18.3, it means that the commands I use below for the analysis will be "Linux compatible", if you are trying to reproduce this on a Windows machine, you will need to adjust the folder separators ('\\' for windows and '/' for Linux).
 
 
 ## Downloading the data set
@@ -99,7 +99,7 @@ INFO[12:09:59] Done
 
 The `database` command connects to [UniProt](https://www.uniprot.org) and fetches a bleeding edge snapshot of an organism proteome and it uses the downloaded file to create a target-decoy database. The parameter that tells Philosopher whats the organism you want is the `--id`, that code you see there is called [Proteome Identifier](https://www.uniprot.org/help/proteome_id), to find it you have to go to the [Proteomes](http://www.uniprot.org/proteomes/) page on [UniProt](https://www.uniprot.org) and query your organism ([UP000005640](http://www.uniprot.org/proteomes/UP000005640) is for _Homo sapiens_).
 
-In our example we are fethcing the _Homo sapiens_ proteome containing only reviewed entries (`--reviewed`) and we are adding common contaminants (`--contam`). Our workspace now contains a protein FASTA database file.
+In our example we are fetching the _Homo sapiens_ proteome containing only reviewed entries (`--reviewed`) and we are adding common contaminants (`--contam`). Our workspace now contains a protein FASTA database file.
 
 ```
 .
@@ -581,3 +581,5 @@ This will create different reports based on the processed layers plus reports re
 ```
 
 ## Wrapping up
+
+We just reviewed the basics steps on how to process open search results using Philospher and MSFragger.  
