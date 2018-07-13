@@ -587,7 +587,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 	// 2nd check: best PSM
 	// collect all ion-related spectra from the each fraction/file
-	//var bestMap = make(map[string]uint8)
+	// var bestMap = make(map[string]uint8)
 	if best == true {
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
