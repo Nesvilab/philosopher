@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fas"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 

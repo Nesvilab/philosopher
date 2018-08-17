@@ -6,6 +6,18 @@
 ### Fixed
 
 
+# Philosopher 20180530
+### Build: 201805301634
+
+### Fixed
+- Fixed an error when trying to run label free quantification.
+
+# Philosopher 20180524
+### Build: 201805241056
+
+### Changed
+- Labelquant removeLow value is now passed as a parameter.
+
 # Philosopher 20180522
 ### Build: 201805221309
 

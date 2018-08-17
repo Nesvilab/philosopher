@@ -5,10 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
 )
@@ -45,6 +46,19 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			var o rep.PSMEvidenceList
+			dec := msgpack.NewDecoder(file)
+			err := dec.Decode(&o)
+			if err != nil {
+				logrus.Fatal("Could not restore meta data:", err)
+			}
+			spew.Dump(o)
+
+		} else if object == "db" {
+
+			target := fmt.Sprintf(".meta%sdb.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			var o dat.Record
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {

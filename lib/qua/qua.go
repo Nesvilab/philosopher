@@ -545,7 +545,7 @@ func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string
 	return labels
 }
 
-func classification(evi rep.Evidence, mods, best, remove bool, purity, probability float64) (map[string]tmt.Labels, map[string]tmt.Labels) {
+func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[string]tmt.Labels, map[string]tmt.Labels) {
 
 	var spectrumMap = make(map[string]tmt.Labels)
 	var phosphoSpectrumMap = make(map[string]tmt.Labels)
@@ -570,7 +570,7 @@ func classification(evi rep.Evidence, mods, best, remove bool, purity, probabili
 
 		}
 
-		if remove == true {
+		if remove != 0 {
 			sum := i.Labels.Channel1.Intensity +
 				i.Labels.Channel2.Intensity +
 				i.Labels.Channel3.Intensity +
@@ -587,7 +587,7 @@ func classification(evi rep.Evidence, mods, best, remove bool, purity, probabili
 
 	// 2nd check: best PSM
 	// collect all ion-related spectra from the each fraction/file
-	//var bestMap = make(map[string]uint8)
+	// var bestMap = make(map[string]uint8)
 	if best == true {
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
@@ -633,9 +633,9 @@ func classification(evi rep.Evidence, mods, best, remove bool, purity, probabili
 
 	// 3rd check: remove the lower 3%
 	// Ignore all PSMs that fall under the lower 3% based on their summed TMT labels
-	if remove == true {
+	if remove != 0 {
 		sort.Sort(psmLabelSumList)
-		lowerFive := float64(len(psmLabelSumList)) * 0.03
+		lowerFive := float64(len(psmLabelSumList)) * remove
 		lowerFiveInt := int(uti.Round(lowerFive, 5, 0))
 
 		for i := 0; i <= lowerFiveInt; i++ {
@@ -666,9 +666,6 @@ func classification(evi rep.Evidence, mods, best, remove bool, purity, probabili
 	for i := range toDeletePhospho {
 		delete(phosphoSpectrumMap, i)
 	}
-
-	//spew.Dump(bestMap)
-	//os.Exit(1)
 
 	return spectrumMap, phosphoSpectrumMap
 }

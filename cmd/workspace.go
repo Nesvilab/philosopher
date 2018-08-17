@@ -43,7 +43,7 @@ func init() {
 		// the number of people using it and the geo location, just like any other website does.
 		client, err := ga.NewClient("UA-111428141-1")
 		if err != nil {
-			panic(err)
+			_ = err
 		}
 
 		v := fmt.Sprintf("Version:%s", Version)
@@ -51,7 +51,7 @@ func init() {
 		//err = client.Send(ga.NewEvent(b, v))
 		err = client.Send(ga.NewEvent("Philosopher", v).Label(b))
 		if err != nil {
-			panic(err)
+			_ = err
 		}
 
 	}
