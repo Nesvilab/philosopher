@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
@@ -27,6 +28,9 @@ var reportCmd = &cobra.Command{
 
 		// store parameters on meta data
 		m.Serialize()
+
+		// clean tmp
+		met.CleanTemp(m.Temp)
 
 		logrus.Info("Done")
 		return

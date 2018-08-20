@@ -5,6 +5,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -27,6 +28,9 @@ var proprophCmd = &cobra.Command{
 		m = proteinprophet.Run(m, args)
 
 		m.Serialize()
+
+		// clean tmp
+		met.CleanTemp(m.Temp)
 
 		logrus.Info("Done")
 		return

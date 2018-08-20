@@ -319,6 +319,14 @@ func New(h string) Data {
 	return d
 }
 
+// CleanTemp removes all files from the given temp directory
+func CleanTemp(tmp string) error {
+
+	os.RemoveAll(tmp)
+
+	return nil
+}
+
 // Serialize converts the whole structure to a gob file
 func (d *Data) Serialize() error {
 

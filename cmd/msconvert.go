@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/ext/msconvert"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -25,6 +26,9 @@ var msconvertCmd = &cobra.Command{
 		}
 
 		m.Serialize()
+
+		// clean tmp
+		met.CleanTemp(m.Temp)
 
 		logrus.Info("Done")
 		return
