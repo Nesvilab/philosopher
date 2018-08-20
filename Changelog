@@ -5,6 +5,13 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20180820
+### Build: ?
+
+### Added
+### Changed
+- Background temporary data now is removed after the program is done with the analysis.
+### Fixed
 
 # Philosopher 20180530
 ### Build: 201805301634
