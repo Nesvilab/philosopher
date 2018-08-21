@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/prvst/philosopher/lib/aba"
 	"github.com/prvst/philosopher/lib/clu"
@@ -339,16 +340,34 @@ func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []st
 		metArray = append(metArray, m)
 	}
 
-	fmt.Println(metArray)
+	os.Chdir(dir)
 
-	// // Database
-	// if p.Commands.Database == "yes" {
-	// 	m.Database = p.Database
-	// 	dat.Run(m)
-	//
-	// 	m.Serialize()
-	// 	met.CleanTemp(m.Temp)
-	// }
+	// Database
+	if p.Commands.Database == "yes" {
+
+		var wg sync.WaitGroup
+		wg.Add(len(metArray))
+		for _, i := range metArray {
+
+			go func(i met.Data) {
+				defer wg.Done()
+
+				pwd, err := os.Getwd()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+				fmt.Println(pwd)
+
+				i.Database = p.Database
+				dat.Run(i)
+				i.Serialize()
+				met.CleanTemp(i.Temp)
+			}(i)
+
+		}
+		wg.Wait()
+	}
 
 	return nil
 }
