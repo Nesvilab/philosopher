@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // PeptideProphet is the main tool data configuration structure
