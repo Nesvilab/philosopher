@@ -66,7 +66,7 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		if m.Pipeline.Parallel == true {
-			//m = pip.ParallelRun(m, p, dir, Version, Build, args)
+			pip.ParallelRun(m, p, dir, Version, Build, args)
 		} else {
 			m = pip.Run(m, p, dir, Version, Build, args)
 		}

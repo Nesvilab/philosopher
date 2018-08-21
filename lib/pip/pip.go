@@ -63,102 +63,6 @@ type Commands struct {
 	Abacus         string `yaml:"abacus"`
 }
 
-//
-// func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []string) met.Data {
-//
-// 	var wg sync.WaitGroup
-// 	wg.Add(len(args))
-// 	go func(args []string) {
-// 		for _, arg := range args {
-// 			// getting inside de the dataset folder
-// 			os.Chdir(dir)
-// 			dsAbs, _ := filepath.Abs(arg)
-// 			os.Chdir(dsAbs)
-//
-// 			// Workspace
-// 			wrk.Run(Version, Build, false, false, true)
-//
-// 			// reload the meta data
-// 			m.Restore(sys.Meta())
-//
-// 			// Database
-// 			if p.Commands.Database == "yes" {
-// 				m.Database = p.Database
-// 				dat.Run(m)
-// 				m.Serialize()
-// 			}
-//
-// 			_ = m
-// 			wg.Done()
-// 		}
-// 	}(args)
-// 	wg.Wait()
-//
-// 	// returning to the pipeline root directory
-// 	os.Chdir(dir)
-//
-// 	// PeptideProphet
-// 	if p.Commands.PeptideProphet == "yes" {
-//
-// 		// For each dataset ...
-// 		var wg sync.WaitGroup
-// 		for _, i := range args {
-// 			wg.Add(1)
-//
-// 			os.Chdir(dir)
-//
-// 			// getting inside de the dataset folder
-// 			dsAbs, _ := filepath.Abs(i)
-// 			os.Chdir(dsAbs)
-// 			fmt.Println(dsAbs)
-//
-// 			// reload the meta data
-// 			m.Restore(sys.Meta())
-// 			fmt.Println(m.ProjectName)
-//
-// 			logrus.Info("Executing PeptideProphet on ", i)
-// 			m.PeptideProphet = p.PeptideProphet
-// 			m.PeptideProphet.Output = "interact"
-// 			m.PeptideProphet.Combine = true
-// 			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-// 			files, e := filepath.Glob(gobExt)
-// 			if e != nil {
-// 				logrus.Fatal(e)
-// 			}
-//
-// 			go func(m met.Data, files []string) {
-// 				defer wg.Done()
-// 				//fmt.Println(m.ProjectName)
-// 				//peptideprophet.Run(m, files)
-// 				m.Serialize()
-// 				met.CleanTemp(m.Temp)
-// 			}(m, files)
-//
-// 		}
-// 		wg.Wait()
-//
-// 	}
-//
-// 	fmt.Println("finished all")
-//
-// 	return m
-// }
-
-// func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []string) met.Data {
-//
-// 	// workspace
-// 	wg := sync.WaitGroup{}
-// 	for _, i := range args {
-// 		wg.Add(1)
-// 		go parallelWorkspace(wg, dir, i, Version, Build)
-// 	}
-// 	wg.Wait()
-//
-// 	fmt.Println("finished all")
-//
-// 	return m
-// }
-
 func Run(m met.Data, p Directives, dir, Version, Build string, args []string) met.Data {
 
 	// For each dataset ...
@@ -413,6 +317,121 @@ func Run(m met.Data, p Directives, dir, Version, Build string, args []string) me
 
 	return m
 }
+
+func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []string) error {
+
+	var metArray []met.Data
+
+	// For each dataset ...
+	for _, i := range args {
+		logrus.Info("Executing the pipeline on ", i)
+
+		// getting inside de the dataset folder
+		os.Chdir(dir)
+		dsAbs, _ := filepath.Abs(i)
+		os.Chdir(dsAbs)
+
+		// Workspace
+		wrk.Run(Version, Build, false, false, true)
+
+		// reload the meta data
+		m.Restore(sys.Meta())
+		metArray = append(metArray, m)
+	}
+
+	fmt.Println(metArray)
+
+	// // Database
+	// if p.Commands.Database == "yes" {
+	// 	m.Database = p.Database
+	// 	dat.Run(m)
+	//
+	// 	m.Serialize()
+	// 	met.CleanTemp(m.Temp)
+	// }
+
+	return nil
+}
+
+// func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []string) met.Data {
+//
+// 	var wg sync.WaitGroup
+// 	wg.Add(len(args))
+// 	go func(args []string) {
+// 		for _, arg := range args {
+// 			// getting inside de the dataset folder
+// 			os.Chdir(dir)
+// 			dsAbs, _ := filepath.Abs(arg)
+// 			os.Chdir(dsAbs)
+//
+// 			// Workspace
+// 			wrk.Run(Version, Build, false, false, true)
+//
+// 			// reload the meta data
+// 			m.Restore(sys.Meta())
+//
+// 			// Database
+// 			if p.Commands.Database == "yes" {
+// 				m.Database = p.Database
+// 				dat.Run(m)
+// 				m.Serialize()
+// 			}
+//
+// 			_ = m
+// 			wg.Done()
+// 		}
+// 	}(args)
+// 	wg.Wait()
+//
+// 	// returning to the pipeline root directory
+// 	os.Chdir(dir)
+//
+// 	// PeptideProphet
+// 	if p.Commands.PeptideProphet == "yes" {
+//
+// 		// For each dataset ...
+// 		var wg sync.WaitGroup
+// 		for _, i := range args {
+// 			wg.Add(1)
+//
+// 			os.Chdir(dir)
+//
+// 			// getting inside de the dataset folder
+// 			dsAbs, _ := filepath.Abs(i)
+// 			os.Chdir(dsAbs)
+// 			fmt.Println(dsAbs)
+//
+// 			// reload the meta data
+// 			m.Restore(sys.Meta())
+// 			fmt.Println(m.ProjectName)
+//
+// 			logrus.Info("Executing PeptideProphet on ", i)
+// 			m.PeptideProphet = p.PeptideProphet
+// 			m.PeptideProphet.Output = "interact"
+// 			m.PeptideProphet.Combine = true
+// 			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+// 			files, e := filepath.Glob(gobExt)
+// 			if e != nil {
+// 				logrus.Fatal(e)
+// 			}
+//
+// 			go func(m met.Data, files []string) {
+// 				defer wg.Done()
+// 				//fmt.Println(m.ProjectName)
+// 				//peptideprophet.Run(m, files)
+// 				m.Serialize()
+// 				met.CleanTemp(m.Temp)
+// 			}(m, files)
+//
+// 		}
+// 		wg.Wait()
+//
+// 	}
+//
+// 	fmt.Println("finished all")
+//
+// 	return m
+// }
 
 // func ParallelRun(m met.Data, args []string, dir, Version, Build string) met.Data {
 //
