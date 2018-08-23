@@ -5,13 +5,15 @@
 ### Changed
 ### Fixed
 
-# Philosopher 20180820
+# Philosopher 20180823
 ### Build: ?
 
 ### Added
+- Glu-C enzyme was added to database formatting. 
 ### Changed
 - Background temporary data now is removed after the program is done with the analysis.
 ### Fixed
+- A problem introduced in the last release with the protein to gene razor assignment was fixed.
 
 # Philosopher 20180530
 ### Build: 201805301634
