@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/prvst/philosopher/lib/aba"
 	"github.com/prvst/philosopher/lib/clu"
@@ -325,10 +324,10 @@ func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []st
 
 	// For each dataset ...
 	for _, i := range args {
+
 		logrus.Info("Executing the pipeline on ", i)
 
 		// getting inside de the dataset folder
-		os.Chdir(dir)
 		dsAbs, _ := filepath.Abs(i)
 		os.Chdir(dsAbs)
 
@@ -338,36 +337,101 @@ func ParallelRun(m met.Data, p Directives, dir, Version, Build string, args []st
 		// reload the meta data
 		m.Restore(sys.Meta())
 		metArray = append(metArray, m)
-	}
 
-	os.Chdir(dir)
+		// Database
+		if p.Commands.Database == "yes" {
+			m.Database = p.Database
+			dat.Run(m)
 
-	// Database
-	if p.Commands.Database == "yes" {
-
-		var wg sync.WaitGroup
-		wg.Add(len(metArray))
-		for _, i := range metArray {
-
-			go func(i met.Data) {
-				defer wg.Done()
-
-				pwd, err := os.Getwd()
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
-				}
-				fmt.Println(pwd)
-
-				i.Database = p.Database
-				dat.Run(i)
-				i.Serialize()
-				met.CleanTemp(i.Temp)
-			}(i)
-
+			m.Serialize()
+			met.CleanTemp(m.Temp)
 		}
-		wg.Wait()
+
+		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
+			logrus.Fatal("You can only specify one search engine at a time")
+		}
+
+		// Comet
+		if p.Commands.Comet == "yes" {
+			m.Comet = p.Comet
+			gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				logrus.Fatal(e)
+			}
+			comet.Run(m, files)
+
+			m.Serialize()
+			met.CleanTemp(m.Temp)
+		}
+
+		// MSFragger
+		if p.Commands.MSFragger == "yes" {
+			m.MSFragger = p.MSFragger
+			gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				logrus.Fatal(e)
+			}
+			fragger.Run(m, files)
+
+			m.Serialize()
+			met.CleanTemp(m.Temp)
+		}
+
+		os.Chdir(dir)
 	}
+
+	for _, i := range metArray {
+		// PeptideProphet
+		if p.Commands.PeptideProphet == "yes" {
+			logrus.Info("Executing PeptideProphet on ", i.ProjectName)
+			i.PeptideProphet = p.PeptideProphet
+			i.PeptideProphet.Output = "interact"
+			i.PeptideProphet.Combine = true
+			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				logrus.Fatal(e)
+			}
+			peptideprophet.Run(i, files)
+
+			i.Serialize()
+			met.CleanTemp(i.Temp)
+		}
+	}
+
+	// if p.Commands.PTMProphet == "yes" {
+	// 	logrus.Info("Executing PTMProphet on ", i)
+	// 	m.PTMProphet = p.PTMProphet
+	// 	var files []string
+	// 	files = append(files, "interact.pep.xml")
+	// 	m.PTMProphet.InputFiles = files
+	// 	ptmprophet.Run(m, files)
+	//
+	// 	m.Serialize()
+	// 	met.CleanTemp(m.Temp)
+	// }
+	//
+	// // ProteinProphet
+	// if p.Commands.ProteinProphet == "yes" {
+	// 	logrus.Info("Executing ProteinProphet on ", i)
+	// 	m.ProteinProphet = p.ProteinProphet
+	// 	m.ProteinProphet.Output = "interact"
+	// 	var files []string
+	// 	if p.Commands.PTMProphet == "yes" {
+	// 		files = append(files, "interact.mod.pep.xml")
+	// 	} else {
+	// 		files = append(files, "interact.pep.xml")
+	// 	}
+	// 	proteinprophet.Run(m, files)
+	//
+	// 	m.Serialize()
+	// 	met.CleanTemp(m.Temp)
+	// }
+
+	// return to the top level directory
+	os.Chdir(dir)
 
 	return nil
 }
