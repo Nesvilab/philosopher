@@ -6,10 +6,10 @@
 ### Fixed
 
 # Philosopher 20180823
-### Build: ?
+### Build: 201808231104
 
 ### Added
-- Glu-C enzyme was added to database formatting. 
+- Glu-C enzyme was added to database formatting.
 ### Changed
 - Background temporary data now is removed after the program is done with the analysis.
 ### Fixed
