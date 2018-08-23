@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
@@ -53,6 +54,9 @@ var labelquantCmd = &cobra.Command{
 
 		// store paramters on meta data
 		m.Serialize()
+
+		// clean tmp
+		met.CleanTemp(m.Temp)
 
 		logrus.Info("Done")
 		return

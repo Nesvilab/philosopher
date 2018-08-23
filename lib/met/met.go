@@ -279,6 +279,7 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Print      bool
+	Parallel   bool
 	//Dataset    string
 }
 
@@ -317,6 +318,14 @@ func New(h string) Data {
 	d.TimeStamp = t.Format(time.RFC3339)
 
 	return d
+}
+
+// CleanTemp removes all files from the given temp directory
+func CleanTemp(tmp string) error {
+
+	os.RemoveAll(tmp)
+
+	return nil
 }
 
 // Serialize converts the whole structure to a gob file

@@ -21,7 +21,7 @@ database:
   annotate: ''               # process a ready-to-use database
   contam: true               # add common contaminants
   custom: ''                 # use a pre formatted custom database
-  enzyme: trypsin            # enzyme for digestion (trypsin, lys_c, lys_n, chymotrypsin) (default "trypsin")
+  enzyme: trypsin            # enzyme for digestion (trypsin, lys_c, lys_n, glu_c, chymotrypsin) (default "trypsin")
   id: ''                     # UniProt proteome ID
   isoform: false             # add isoform sequences
   prefix: rev_               # decoy prefix to be added (default "rev_")

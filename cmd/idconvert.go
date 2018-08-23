@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/ext/idconvert"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -26,6 +27,9 @@ var idconvertCmd = &cobra.Command{
 		}
 
 		m.Serialize()
+
+		// clean tmp
+		met.CleanTemp(m.Temp)
 
 		logrus.Info("Done")
 		return

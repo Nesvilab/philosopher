@@ -5,6 +5,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -33,6 +34,9 @@ var databaseCmd = &cobra.Command{
 		// store paramters on meta data
 		m.Serialize()
 
+		// clean tmp
+		met.CleanTemp(m.Temp)
+
 		logrus.Info("Done")
 		return
 	},
@@ -46,7 +50,7 @@ func init() {
 
 		databaseCmd.Flags().StringVarP(&m.Database.ID, "id", "", "", "UniProt proteome ID")
 		databaseCmd.Flags().StringVarP(&m.Database.Annot, "annotate", "", "", "process a ready-to-use database")
-		databaseCmd.Flags().StringVarP(&m.Database.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, chymotrypsin)")
+		databaseCmd.Flags().StringVarP(&m.Database.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, glu_c, chymotrypsin)")
 		databaseCmd.Flags().StringVarP(&m.Database.Tag, "prefix", "", "rev_", "define a decoy prefix")
 		databaseCmd.Flags().StringVarP(&m.Database.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
 		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre formatted custom database")
