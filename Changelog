@@ -5,6 +5,17 @@
 ### Changed
 ### Fixed
 
+
+# Philosopher 20180905
+### Build: 201809051532
+
+### Added
+- Support for MS3 isobaric tagging.
+- Support for TMT 11 plex.
+
+### Fixed
+- Minor bug fixes.
+
 # Philosopher 20180823
 ### Build: 201808231104
 
