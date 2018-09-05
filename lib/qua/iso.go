@@ -239,6 +239,7 @@ func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, ms3 raw
 
 		// left-pad the spectrum scan
 		paddedScan := fmt.Sprintf("%05s", i.Scan)
+		precPaddedScan := fmt.Sprintf("%05s", i.Precursor.ParentScan)
 
 		tmt.Index = i.Index
 		tmt.Scan = paddedScan
@@ -318,7 +319,7 @@ func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, ms3 raw
 
 		}
 
-		labels[paddedScan] = tmt
+		labels[precPaddedScan] = tmt
 
 	}
 

@@ -224,11 +224,6 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 		return p, e
 	}
 
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return p, e
-	// }
-
 	return p, nil
 }
 
@@ -411,12 +406,6 @@ func getSpectra(dir, format string, level int, k string) (raw.MS1, raw.MS2, raw.
 // cleanPreviousData cleans previous label quantifications
 func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {
 
-	// var evi rep.Evidence
-	// e := evi.RestoreGranular()
-	// if e != nil {
-	// 	return e
-	// }
-
 	var e *err.Error
 
 	for i := range evi.PSM {
@@ -450,11 +439,6 @@ func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error)
 		}
 
 	}
-
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return evi, e
-	// }
 
 	return evi, nil
 }

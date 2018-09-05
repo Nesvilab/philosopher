@@ -13,10 +13,6 @@ import (
 	"github.com/vmihailenco/msgpack"
 )
 
-const (
-	mzDeltaWindow float64 = 0.5
-)
-
 // Data represents parsed and processed MZ data from mz files
 type Data struct {
 	Raw *mz.Raw
@@ -257,29 +253,8 @@ func GetMS3(ms2 MS2, d *Data) MS3 {
 
 	var indexedMS2 = make(map[string]Ms2Scan)
 	for i := range ms2.Ms2Scan {
-
-		if ms2.Ms2Scan[i].Precursor.IsolationWindowLowerOffset == 0 && ms2.Ms2Scan[i].Precursor.IsolationWindowUpperOffset == 0 {
-			ms2.Ms2Scan[i].Precursor.IsolationWindowLowerOffset = mzDeltaWindow
-			ms2.Ms2Scan[i].Precursor.IsolationWindowUpperOffset = mzDeltaWindow
-		}
-
-		// left-pad the spectrum index
-		paddedIndex := fmt.Sprintf("%05s", ms2.Ms2Scan[i].Index)
-
 		// left-pad the spectrum scan
 		paddedScan := fmt.Sprintf("%05s", ms2.Ms2Scan[i].Scan)
-
-		// left-pad the precursor spectrum index
-		paddedPI := fmt.Sprintf("%05s", ms2.Ms2Scan[i].Precursor.ParentIndex)
-
-		// left-pad the precursor spectrum scan
-		paddedPS := fmt.Sprintf("%05s", ms2.Ms2Scan[i].Precursor.ParentScan)
-
-		ms2.Ms2Scan[i].Index = paddedIndex
-		ms2.Ms2Scan[i].Scan = paddedScan
-		ms2.Ms2Scan[i].Precursor.ParentIndex = paddedPI
-		ms2.Ms2Scan[i].Precursor.ParentScan = paddedPS
-
 		indexedMS2[paddedScan] = ms2.Ms2Scan[i]
 	}
 
@@ -289,7 +264,7 @@ func GetMS3(ms2 MS2, d *Data) MS3 {
 			var scan Ms3Scan
 
 			// left-pad the spectrum scan
-			paddedScan := fmt.Sprintf("%05s", i.Scan)
+			paddedScan := fmt.Sprintf("%05s", i.Precursor.ParentScan)
 
 			v, ok := indexedMS2[paddedScan]
 			if ok {
@@ -297,6 +272,7 @@ func GetMS3(ms2 MS2, d *Data) MS3 {
 				scan.Precursor.IsolationWindowLowerOffset = v.Precursor.IsolationWindowLowerOffset
 				scan.Precursor.IsolationWindowUpperOffset = v.Precursor.IsolationWindowUpperOffset
 				scan.Precursor.TargetIon = v.Precursor.TargetIon
+				//scan.Precursor.SelectedIon = v.Precursor.SelectedIon
 			}
 
 			scan.Index = i.Index
