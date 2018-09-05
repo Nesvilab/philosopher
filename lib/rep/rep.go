@@ -51,6 +51,7 @@ type PSMEvidence struct {
 	IonForm               string
 	Protein               string
 	RazorProtein          string
+	ProteinDescription    string
 	ProteinID             string
 	GeneName              string
 	ModifiedPeptide       string
@@ -568,7 +569,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 	}
 	defer file.Close()
 
-	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Used\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Used\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tMapped Proteins\tProtein Description\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -662,7 +663,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		///////////////
 
 		//TODO FIX MDOS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -693,6 +694,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.GeneName,
 			i.Protein,
 			strings.Join(mappedProteins, ", "),
+			i.ProteinDescription,
 			i.Purity,
 			i.Labels.Channel1.Intensity,
 			i.Labels.Channel2.Intensity,
@@ -704,6 +706,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.Labels.Channel8.Intensity,
 			i.Labels.Channel9.Intensity,
 			i.Labels.Channel10.Intensity,
+			i.Labels.Channel11.Intensity,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -729,7 +732,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tGene\tProtein\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tGene\tProtein\tProtein Description\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -800,7 +803,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 		}
 
 		//TODO FIX MODS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -824,6 +827,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 			i.IsUnique,
 			i.GeneName,
 			i.Protein,
+			i.ProteinDescription,
 			strings.Join(mappedProteins, ", "),
 		)
 		_, err = io.WriteString(file, line)
@@ -850,7 +854,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 	}
 	defer file.Close()
 
-	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Used\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tIs Unique\tIs Used\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tGene\tProtein\tProtein Description\tMapped Proteins\tPurity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -944,7 +948,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		///////////////
 
 		// TODO FIZ MODS
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
@@ -969,6 +973,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			i.LocalizedPTMMassDiff["PTMProphet_STY79.9663"],
 			i.GeneName,
 			i.Protein,
+			i.ProteinDescription,
 			strings.Join(mappedProteins, ", "),
 			i.Purity,
 			i.Labels.Channel1.Intensity,
@@ -981,6 +986,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			i.Labels.Channel8.Intensity,
 			i.Labels.Channel9.Intensity,
 			i.Labels.Channel10.Intensity,
+			i.Labels.Channel11.Intensity,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -1305,13 +1311,20 @@ func (e *Evidence) UpdateGeneNames() {
 
 	var dtb dat.Base
 	dtb.Restore()
+
 	var dbMap = make(map[string]string)
 	for _, j := range dtb.Records {
 		dbMap[j.PartHeader] = j.GeneNames
 	}
 
+	var descMap = make(map[string]string)
+	for _, j := range dtb.Records {
+		descMap[j.PartHeader] = j.ProteinName
+	}
+
 	for i := range e.PSM {
 		e.PSM[i].GeneName = dbMap[e.PSM[i].Protein]
+		e.PSM[i].ProteinDescription = descMap[e.PSM[i].Protein]
 	}
 
 	return
@@ -1607,7 +1620,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1660,7 +1673,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 					omods = append(omods, j)
 				}
 
-				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 					i.Sequence,
 					i.ModifiedSequence,
 					i.MZ,
@@ -1687,6 +1700,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 					i.Labels.Channel8.Intensity,
 					i.Labels.Channel9.Intensity,
 					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
 				)
 				_, err = io.WriteString(file, line)
 				if err != nil {
@@ -1831,7 +1845,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\n"
+	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1864,7 +1878,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 		}
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
@@ -1880,6 +1894,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 			i.Labels.Channel8.Intensity,
 			i.Labels.Channel9.Intensity,
 			i.Labels.Channel10.Intensity,
+			i.Labels.Channel11.Intensity,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -2195,7 +2210,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\tIndistinguishableProteins\n")
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -2243,7 +2258,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 		}
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
-		var reportIntensities [10]float64
+		var reportIntensities [11]float64
 		if uniqueOnly == true {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
@@ -2255,6 +2270,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 			reportIntensities[7] = i.UniqueLabels.Channel8.Intensity
 			reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
 			reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
+			reportIntensities[10] = i.UniqueLabels.Channel11.Intensity
 		} else {
 			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
 			reportIntensities[1] = i.URazorLabels.Channel2.Intensity
@@ -2266,10 +2282,11 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 			reportIntensities[7] = i.URazorLabels.Channel8.Intensity
 			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
 			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
+			reportIntensities[10] = i.URazorLabels.Channel11.Intensity
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -2301,6 +2318,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 				reportIntensities[7],
 				reportIntensities[8],
 				reportIntensities[9],
+				reportIntensities[10],
 				strings.Join(ip, ", "))
 
 			//			line += "\n"
@@ -2330,7 +2348,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly 
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\tIndistinguishableProteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundancet\t131C Abundance\tIndistinguishableProteins\n")
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -2378,7 +2396,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly 
 		}
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
-		var reportIntensities [10]float64
+		var reportIntensities [11]float64
 		if uniqueOnly == true {
 			reportIntensities[0] = i.PhosphoUniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.PhosphoUniqueLabels.Channel2.Intensity
@@ -2390,6 +2408,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly 
 			reportIntensities[7] = i.PhosphoUniqueLabels.Channel8.Intensity
 			reportIntensities[8] = i.PhosphoUniqueLabels.Channel9.Intensity
 			reportIntensities[9] = i.PhosphoUniqueLabels.Channel10.Intensity
+			reportIntensities[10] = i.PhosphoUniqueLabels.Channel11.Intensity
 		} else {
 			reportIntensities[0] = i.PhosphoURazorLabels.Channel1.Intensity
 			reportIntensities[1] = i.PhosphoURazorLabels.Channel2.Intensity
@@ -2401,10 +2420,11 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly 
 			reportIntensities[7] = i.PhosphoURazorLabels.Channel8.Intensity
 			reportIntensities[8] = i.PhosphoURazorLabels.Channel9.Intensity
 			reportIntensities[9] = i.PhosphoURazorLabels.Channel10.Intensity
+			reportIntensities[10] = i.PhosphoURazorLabels.Channel11.Intensity
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
 				i.ProteinID,              // Protein ID
@@ -2436,6 +2456,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly 
 				reportIntensities[7],
 				reportIntensities[8],
 				reportIntensities[9],
+				reportIntensities[10],
 				strings.Join(ip, ", "))
 
 			//			line += "\n"

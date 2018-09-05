@@ -73,6 +73,7 @@ func init() {
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Plex, "plex", "", "", "number of channels")
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 20, "m/z tolerance in ppm")
+		labelquantCmd.Flags().IntVarP(&m.Quantify.Level, "level", "", 2, "ms level for the quantification")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Purity, "purity", "", 0.5, "ion purity threshold")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.MinProb, "minprob", "", 0.7, "only use PSMs with a minimun probability score")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.RemoveLow, "removelow", "", 0.0, "ignore the lower % of PSMs based on their summed abundances. 0 Means no removal, entry value must be decimal")

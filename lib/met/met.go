@@ -234,6 +234,7 @@ type Quantify struct {
 	Plex       string  `yaml:"plex"`
 	ChanNorm   string  `yaml:"chanNorm"`
 	Annot      string  `yaml:"annotation"`
+	Level      int     `yaml:"level"`
 	RTWin      float64 `yaml:"retentionTimeWindow"`
 	PTWin      float64 `yaml:"peakTimeWindow"`
 	Tol        float64 `yaml:"tolerance"`

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/raw/mz"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -31,11 +31,6 @@ func IndexMz(f []string) *err.Error {
 
 			raw := &mz.Raw{}
 			raw.FileName = i
-
-			// e := raw.Read(i)
-			// if e != nil {
-			// 	return e
-			// }
 
 			e := raw.ParRead(i)
 			if e != nil {
@@ -244,6 +239,63 @@ func GetMS2(d *Data) MS2 {
 
 			scan.Spectrum = stream
 			list.Ms2Scan = append(list.Ms2Scan, scan)
+
+		}
+	}
+
+	return list
+}
+
+// GetMS3 from Spectral Data
+func GetMS3(ms2 MS2, d *Data) MS3 {
+
+	var list MS3
+
+	var indexedMS2 = make(map[string]Ms2Scan)
+	for i := range ms2.Ms2Scan {
+		// left-pad the spectrum scan
+		paddedScan := fmt.Sprintf("%05s", ms2.Ms2Scan[i].Scan)
+		indexedMS2[paddedScan] = ms2.Ms2Scan[i]
+	}
+
+	for _, i := range d.Raw.Spectra {
+		if string(i.Level) == "3" {
+
+			var scan Ms3Scan
+
+			// left-pad the spectrum scan
+			paddedScan := fmt.Sprintf("%05s", i.Precursor.ParentScan)
+
+			v, ok := indexedMS2[paddedScan]
+			if ok {
+				scan.Precursor.ChargeState = v.Precursor.ChargeState
+				scan.Precursor.IsolationWindowLowerOffset = v.Precursor.IsolationWindowLowerOffset
+				scan.Precursor.IsolationWindowUpperOffset = v.Precursor.IsolationWindowUpperOffset
+				scan.Precursor.TargetIon = v.Precursor.TargetIon
+				//scan.Precursor.SelectedIon = v.Precursor.SelectedIon
+			}
+
+			scan.Index = i.Index
+			scan.Scan = i.Scan
+
+			time := i.StartTime
+			scan.ScanStartTime = time
+
+			scan.Precursor.ParentIndex = i.Precursor.ParentIndex
+			scan.Precursor.ParentScan = i.Precursor.ParentScan
+			scan.Precursor.PeakIntensity = i.Precursor.PeakIntensity
+			scan.Precursor.SelectedIon = i.Precursor.SelectedIon
+
+			var stream Spectrum
+			for m := 0; m <= len(i.Peaks.DecodedStream)-1; m++ {
+				var peak Peak
+				peak.Mz = i.Peaks.DecodedStream[m]
+				peak.Intensity = i.Intensities.DecodedStream[m]
+				stream = append(stream, peak)
+			}
+
+			scan.Spectrum = stream
+			list.Ms3Scan = append(list.Ms3Scan, scan)
 
 		}
 	}

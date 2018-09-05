@@ -1,12 +1,12 @@
 package raw
 
-// MS2 top struct
-type MS2 struct {
-	Ms2Scan []Ms2Scan
+// MS3 top struct
+type MS3 struct {
+	Ms3Scan []Ms3Scan
 }
 
-// Ms2Scan tag
-type Ms2Scan struct {
+// Ms3Scan tag
+type Ms3Scan struct {
 	Index         string
 	Scan          string
 	SpectrumName  string

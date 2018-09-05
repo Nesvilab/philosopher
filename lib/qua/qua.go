@@ -107,10 +107,11 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 		var ms1 raw.MS1
 		var ms2 raw.MS2
+		var ms3 raw.MS3
 
 		logrus.Info("Reading ", sourceList[i])
 
-		ms1, ms2, e = getSpectra(p.Dir, p.Format, sourceList[i])
+		ms1, ms2, ms3, e = getSpectra(p.Dir, p.Format, p.Level, sourceList[i])
 		if e != nil {
 			return p, e
 		}
@@ -122,12 +123,23 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 		ms1 = raw.MS1{}
 
-		labels, err := prepareLabelStructure(p.Dir, p.Format, p.Plex, p.Tol, ms2)
-		if err != nil {
-			return p, err
+		var labels = make(map[string]tmt.Labels)
+		if p.Level == 3 {
+			var labE error
+			labels, labE = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, ms3)
+			if labE != nil {
+				return p, labE
+			}
+		} else {
+			var labE error
+			labels, labE = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, ms2)
+			if labE != nil {
+				return p, labE
+			}
 		}
 
 		ms2 = raw.MS2{}
+		ms3 = raw.MS3{}
 
 		labels = assignLabelNames(labels, p.LabelNames)
 
@@ -211,11 +223,6 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	if e != nil {
 		return p, e
 	}
-
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return p, e
-	// }
 
 	return p, nil
 }
@@ -354,10 +361,11 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 // 	return p, nil
 // }
 
-func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
+func getSpectra(dir, format string, level int, k string) (raw.MS1, raw.MS2, raw.MS3, *err.Error) {
 
 	var ms1 raw.MS1
 	var ms2 raw.MS2
+	var ms3 raw.MS3
 
 	// get the clean name, remove the extension
 	var extension = filepath.Ext(filepath.Base(k))
@@ -369,34 +377,34 @@ func getSpectra(dir, format string, k string) (raw.MS1, raw.MS2, *err.Error) {
 
 		spec, e := raw.Restore(k)
 		if e != nil {
-			return ms1, ms2, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
+			return ms1, ms2, ms3, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
 		}
 
 		ms1 = raw.GetMS1(spec)
 		ms2 = raw.GetMS2(spec)
+		if level == 3 {
+			ms3 = raw.GetMS3(ms2, spec)
+		}
 
 	} else {
 
 		spec, rer := raw.RestoreFromFile(dir, k, format)
 		if rer != nil {
-			return ms1, ms2, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
+			return ms1, ms2, ms3, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
 		}
 
 		ms1 = raw.GetMS1(spec)
 		ms2 = raw.GetMS2(spec)
+		if level == 3 {
+			ms3 = raw.GetMS3(ms2, spec)
+		}
 	}
 
-	return ms1, ms2, nil
+	return ms1, ms2, ms3, nil
 }
 
 // cleanPreviousData cleans previous label quantifications
 func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {
-
-	// var evi rep.Evidence
-	// e := evi.RestoreGranular()
-	// if e != nil {
-	// 	return e
-	// }
 
 	var e *err.Error
 
@@ -431,11 +439,6 @@ func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error)
 		}
 
 	}
-
-	// e = evi.SerializeGranular()
-	// if e != nil {
-	// 	return evi, e
-	// }
 
 	return evi, nil
 }
@@ -580,7 +583,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel7.Intensity +
 				i.Labels.Channel8.Intensity +
 				i.Labels.Channel9.Intensity +
-				i.Labels.Channel10.Intensity
+				i.Labels.Channel10.Intensity +
+				i.Labels.Channel11.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
 		}
 	}
@@ -613,7 +617,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel7.Intensity +
 						i.Labels.Channel8.Intensity +
 						i.Labels.Channel9.Intensity +
-						i.Labels.Channel10.Intensity
+						i.Labels.Channel10.Intensity +
+						i.Labels.Channel11.Intensity
 
 					if tmtSum > bestPSMInt {
 						bestPSM = i.Spectrum

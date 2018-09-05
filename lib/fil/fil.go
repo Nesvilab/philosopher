@@ -146,6 +146,7 @@ func Run(f met.Data) (met.Data, error) {
 	logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
 
+	e.UpdateGeneNames()
 	// reorganizes the selected proteins and the alternative proteins list
 	if f.Filter.Razor == true {
 		logrus.Info("Updating razor PSM assingment to Proteins")
