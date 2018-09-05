@@ -599,7 +599,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel7.Intensity +
 				i.Labels.Channel8.Intensity +
 				i.Labels.Channel9.Intensity +
-				i.Labels.Channel10.Intensity
+				i.Labels.Channel10.Intensity +
+				i.Labels.Channel11.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
 		}
 	}
@@ -632,7 +633,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel7.Intensity +
 						i.Labels.Channel8.Intensity +
 						i.Labels.Channel9.Intensity +
-						i.Labels.Channel10.Intensity
+						i.Labels.Channel10.Intensity +
+						i.Labels.Channel11.Intensity
 
 					if tmtSum > bestPSMInt {
 						bestPSM = i.Spectrum

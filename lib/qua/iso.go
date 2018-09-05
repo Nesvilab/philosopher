@@ -204,6 +204,12 @@ func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, ms2 raw
 				}
 			}
 
+			if i.Spectrum[j].Mz <= (tmt.Channel11.Mz+(ppmPrecision*tmt.Channel11.Mz)) && i.Spectrum[j].Mz >= (tmt.Channel11.Mz-(ppmPrecision*tmt.Channel11.Mz)) {
+				if i.Spectrum[j].Intensity > tmt.Channel11.Intensity {
+					tmt.Channel11.Intensity = i.Spectrum[j].Intensity
+				}
+			}
+
 			if i.Spectrum[j].Mz > 135 {
 				break
 			}
@@ -300,6 +306,12 @@ func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, ms3 raw
 				}
 			}
 
+			if i.Spectrum[j].Mz <= (tmt.Channel11.Mz+(ppmPrecision*tmt.Channel11.Mz)) && i.Spectrum[j].Mz >= (tmt.Channel11.Mz-(ppmPrecision*tmt.Channel11.Mz)) {
+				if i.Spectrum[j].Intensity > tmt.Channel11.Intensity {
+					tmt.Channel11.Intensity = i.Spectrum[j].Intensity
+				}
+			}
+
 			if i.Spectrum[j].Mz > 135 {
 				break
 			}
@@ -337,6 +349,7 @@ func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.P
 			evi[i].Labels.Channel8.Intensity = v.Channel8.Intensity
 			evi[i].Labels.Channel9.Intensity = v.Channel9.Intensity
 			evi[i].Labels.Channel10.Intensity = v.Channel10.Intensity
+			evi[i].Labels.Channel11.Intensity = v.Channel11.Intensity
 
 		}
 	}
@@ -374,6 +387,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel8.Intensity = 0
 			evi.PSM[i].Labels.Channel9.Intensity = 0
 			evi.PSM[i].Labels.Channel10.Intensity = 0
+			evi.PSM[i].Labels.Channel11.Intensity = 0
 		} else {
 			for _, j := range evi.PSM[i].AssignedMassDiffs {
 				if j >= 229.1629 {
@@ -392,6 +406,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 				evi.PSM[i].Labels.Channel8.Intensity = 0
 				evi.PSM[i].Labels.Channel9.Intensity = 0
 				evi.PSM[i].Labels.Channel10.Intensity = 0
+				evi.PSM[i].Labels.Channel11.Intensity = 0
 			}
 
 		}
@@ -914,8 +929,8 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]tmt.Labels, phospho
 func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 
 	var topValue float64
-	var channelSum = [10]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	var normFactors = [10]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	var channelSum = [11]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	var normFactors = [11]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 	// sum TMT singal for each column
 	for _, i := range evi.Proteins {
@@ -929,6 +944,7 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		channelSum[7] += i.URazorLabels.Channel8.Intensity
 		channelSum[8] += i.URazorLabels.Channel9.Intensity
 		channelSum[9] += i.URazorLabels.Channel10.Intensity
+		channelSum[10] += i.URazorLabels.Channel11.Intensity
 	}
 
 	// find the higest value amongst channels
@@ -955,6 +971,7 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		i.URazorLabels.Channel8.Intensity *= normFactors[7]
 		i.URazorLabels.Channel9.Intensity *= normFactors[8]
 		i.URazorLabels.Channel10.Intensity *= normFactors[9]
+		i.URazorLabels.Channel11.Intensity *= normFactors[10]
 	}
 
 	return evi
@@ -977,6 +994,7 @@ func calculateRatios(evi rep.Evidence) rep.Evidence {
 		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel8.Intensity
 		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel9.Intensity
 		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel10.Intensity
+		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel11.Intensity
 
 		psmLog2[evi.PSM[i].Spectrum] = math.Log2(psmSum[evi.PSM[i].Spectrum])
 	}
