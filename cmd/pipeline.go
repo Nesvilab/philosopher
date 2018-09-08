@@ -100,7 +100,7 @@ var pipelineCmd = &cobra.Command{
 				dat.Run(m)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
@@ -118,7 +118,7 @@ var pipelineCmd = &cobra.Command{
 				comet.Run(m, files)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// MSFragger
@@ -132,7 +132,7 @@ var pipelineCmd = &cobra.Command{
 				fragger.Run(m, files)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// PeptideProphet
@@ -144,13 +144,13 @@ var pipelineCmd = &cobra.Command{
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
-					fmt.Println("!")
 					logrus.Fatal(e.Error())
 				}
+
 				peptideprophet.Run(m, files)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			if p.Commands.PTMProphet == "yes" {
@@ -179,7 +179,7 @@ var pipelineCmd = &cobra.Command{
 				proteinprophet.Run(m, files)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// return to the top level directory
@@ -210,7 +210,7 @@ var pipelineCmd = &cobra.Command{
 			sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
 
 			m.Serialize()
-			met.CleanTemp(m.Temp)
+			//met.CleanTemp(m.Temp)
 		}
 
 		for _, i := range args {
@@ -239,7 +239,7 @@ var pipelineCmd = &cobra.Command{
 				}
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// getting inside de the dataset folder again
@@ -257,7 +257,7 @@ var pipelineCmd = &cobra.Command{
 				}
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// LabelQuant
@@ -274,7 +274,7 @@ var pipelineCmd = &cobra.Command{
 				}
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// Report
@@ -283,7 +283,7 @@ var pipelineCmd = &cobra.Command{
 				rep.Run(m)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// Cluster
@@ -293,7 +293,7 @@ var pipelineCmd = &cobra.Command{
 				clu.GenerateReport(m)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// return to the top level directory
