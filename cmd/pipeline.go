@@ -162,7 +162,7 @@ var pipelineCmd = &cobra.Command{
 				ptmprophet.Run(m, files)
 
 				m.Serialize()
-				met.CleanTemp(m.Temp)
+				//met.CleanTemp(m.Temp)
 			}
 
 			// ProteinProphet
