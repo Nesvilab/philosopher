@@ -280,7 +280,7 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Print      bool
-	Parallel   bool
+	//Parallel   bool
 	//Dataset    string
 }
 
