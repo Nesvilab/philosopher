@@ -223,16 +223,23 @@ var pipelineCmd = &cobra.Command{
 			if p.Commands.Filter == "yes" {
 				logrus.Info("Executing filter on ", i)
 				m.Filter = p.Filter
-				m.Filter.Pex = "interact.pep.xml"
-				if p.Commands.PTMProphet == "yes" {
-					m.Filter.Pex = "interact.mod.pep.xml"
+
+				if len(m.Filter.Pex) == 0 {
+					m.Filter.Pex = "interact.pep.xml"
+					if p.Commands.PTMProphet == "yes" {
+						m.Filter.Pex = "interact.mod.pep.xml"
+					}
+					if p.Commands.ProteinProphet == "yes" {
+						m.Filter.Pox = "interact.prot.xml"
+					}
 				}
-				if p.Commands.ProteinProphet == "yes" {
-					m.Filter.Pox = "interact.prot.xml"
+
+				if len(m.Filter.Pox) == 0 {
+					if p.Commands.Abacus == "yes" {
+						m.Filter.Pox = combinedProtXML
+					}
 				}
-				if p.Commands.Abacus == "yes" {
-					m.Filter.Pox = combinedProtXML
-				}
+
 				m, e := fil.Run(m)
 				if e != nil {
 					logrus.Fatal(e.Error())

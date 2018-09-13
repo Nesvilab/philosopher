@@ -101,6 +101,8 @@ proteinprophet:
   softoccam: false           # peptide weights are apportioned equally among proteins within each Protein Group (less conservative protein count estimate)
   unmapped: false            # report results for UNMAPPED proteins
 filter:
+  pepxml:                    # overwrites pepXML file name (needs to be the same in all directories)
+  protxml:                   # overwrites protxml file name (needs to be the same in all directories or combined)
   psmFDR: 0.01               # psm FDR level (default 0.01)
   peptideFDR: 0.01           # peptide FDR level (default 0.01)
   ionFDR: 0.01               # peptide ion FDR level (default 0.01)
