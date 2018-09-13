@@ -94,11 +94,22 @@ var pipelineCmd = &cobra.Command{
 			// reload the meta data
 			m.Restore(sys.Meta())
 
+			// load configuration
+			m.Filter = p.Filter
+			m.Database = p.Database
+			m.Comet = p.Comet
+			m.PeptideProphet = p.PeptideProphet
+			m.PTMProphet = p.PTMProphet
+			m.ProteinProphet = p.ProteinProphet
+			m.Filter = p.Filter
+			m.Quantify = p.Freequant
+			m.Quantify = p.LabelQuant
+			m.Cluster = p.Cluster
+
 			// Database
 			if p.Commands.Database == "yes" {
-				m.Database = p.Database
+				//m.Database = p.Database
 				dat.Run(m)
-
 				m.Serialize()
 				//met.CleanTemp(m.Temp)
 			}
@@ -109,7 +120,6 @@ var pipelineCmd = &cobra.Command{
 
 			// Comet
 			if p.Commands.Comet == "yes" {
-				m.Comet = p.Comet
 				gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
@@ -123,7 +133,6 @@ var pipelineCmd = &cobra.Command{
 
 			// MSFragger
 			if p.Commands.MSFragger == "yes" {
-				m.MSFragger = p.MSFragger
 				gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
@@ -138,7 +147,6 @@ var pipelineCmd = &cobra.Command{
 			// PeptideProphet
 			if p.Commands.PeptideProphet == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
-				m.PeptideProphet = p.PeptideProphet
 				m.PeptideProphet.Output = "interact"
 				m.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -155,7 +163,6 @@ var pipelineCmd = &cobra.Command{
 
 			if p.Commands.PTMProphet == "yes" {
 				logrus.Info("Executing PTMProphet on ", i)
-				m.PTMProphet = p.PTMProphet
 				var files []string
 				files = append(files, "interact.pep.xml")
 				m.PTMProphet.InputFiles = files
@@ -188,11 +195,10 @@ var pipelineCmd = &cobra.Command{
 
 		// Abacus
 		var combinedProtXML string
-		if p.Commands.Abacus == "yes" {
+		if p.Commands.Abacus == "yes" && len(p.Filter.Pox) == 0 {
 			logrus.Info("Creating combined protein inference")
 			// return to the top level directory
 			os.Chdir(dir)
-			m.ProteinProphet = p.ProteinProphet
 			m.ProteinProphet.Output = "combined"
 			var files []string
 			for _, j := range args {
@@ -222,7 +228,6 @@ var pipelineCmd = &cobra.Command{
 			// Filter
 			if p.Commands.Filter == "yes" {
 				logrus.Info("Executing filter on ", i)
-				m.Filter = p.Filter
 
 				if len(m.Filter.Pex) == 0 {
 					m.Filter.Pex = "interact.pep.xml"
@@ -255,7 +260,6 @@ var pipelineCmd = &cobra.Command{
 			// FreeQuant
 			if p.Commands.FreeQuant == "yes" {
 				logrus.Info("Executing label-free quantification on ", i)
-				m.Quantify = p.Freequant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
 				e := qua.RunLabelFreeQuantification(m.Quantify)
@@ -270,7 +274,6 @@ var pipelineCmd = &cobra.Command{
 			// LabelQuant
 			if p.Commands.LabelQuant == "yes" {
 				logrus.Info("Executing label-based quantification on ", i)
-				m.Quantify = p.LabelQuant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
 				m.Quantify.Brand = "tmt"
@@ -296,7 +299,6 @@ var pipelineCmd = &cobra.Command{
 			// Cluster
 			if p.Commands.Cluster == "yes" {
 				logrus.Info("Executing cluster on ", i)
-				m.Cluster = p.Cluster
 				clu.GenerateReport(m)
 
 				m.Serialize()
