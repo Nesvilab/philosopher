@@ -175,7 +175,6 @@ var pipelineCmd = &cobra.Command{
 			// ProteinProphet
 			if p.Commands.ProteinProphet == "yes" {
 				logrus.Info("Executing ProteinProphet on ", i)
-				m.ProteinProphet = p.ProteinProphet
 				m.ProteinProphet.Output = "interact"
 				var files []string
 				if p.Commands.PTMProphet == "yes" {
