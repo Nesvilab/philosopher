@@ -13,7 +13,7 @@ We will need:
 * The data set from [Gygi's](https://www.nature.com/articles/nbt.3267) publication about mass tolerant database search.
 * A [computer](https://image.stern.de/4238042/uncropped-620-413/f569ddaca2f32214083a9acf32009af2/Wy/mac-plus-jpg--727f7573cf759135-.jpg) running GNU/Linux or Windows with at least 8GB of RAM.
 
-I'm running this example on a Linux Mint 18.3, it means that the commands I use below for the ananlysis will be "Linux compatible", if you are trying to reproduce this on a Windows machine, you will need to adjust the folder separators ('\\' for windows and '/' for linux).
+I'm running this example on a Linux Mint 18.3, it means that the commands I use below for the analysis will be "Linux compatible", if you are trying to reproduce this on a Windows machine, you will need to adjust the folder separators ('\\' for windows and '/' for linux).
 
 
 ## Downloading the data set
@@ -25,7 +25,7 @@ You can download all the necessary software using the links provided above, make
 
 
 ## Converting the raw files
-We need to convert all 24 files to mzML format. The reason for not using the mzXML is the because Philosopher uses the Precursor Target Ion tag for quantifying peptides, mzXML files do not have that information available by default. When converting the files make sure to use the `peak picking` option for centroiding the peakss.
+We need to convert all 24 files to mzML format. The reason for not using the mzXML is the because Philosopher uses the Precursor Target Ion tag for quantifying peptides, mzXML files do not have that information available by default. When converting the files make sure to use the `peak picking` option for centroiding the peaks.
 
 
 ## Organizing our directory
