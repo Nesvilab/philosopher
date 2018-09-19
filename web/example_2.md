@@ -581,3 +581,5 @@ This will create different reports based on the processed layers plus reports re
 ```
 
 ## Wrapping up
+
+By the time your analysis is done, you should have different .tsv files in your workspace, those contains the filtered identifications and sequences like PSMs, peptides, ions and proteins.
