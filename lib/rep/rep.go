@@ -298,7 +298,7 @@ func Run(m met.Data) met.Data {
 		labelNames, _ := getLabelNames(annotfile)
 		logrus.Info("Creating TMT PSM report")
 
-		if m.SearchEngine == "MSFragger" {
+		if strings.Contains(m.SearchEngine, "MSFragger") {
 			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor)
 		} else {
 			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
@@ -313,7 +313,7 @@ func Run(m met.Data) met.Data {
 	} else {
 
 		logrus.Info("Creating PSM report")
-		if m.SearchEngine == "MSFragger" {
+		if strings.Contains(m.SearchEngine, "MSFragger") {
 			repo.PSMFraggerReport(m.Filter.Tag, m.Filter.Razor)
 		} else {
 			repo.PSMReport(m.Filter.Tag, m.Filter.Razor)

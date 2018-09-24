@@ -25,7 +25,7 @@ You can download all the necessary software using the links provided above, make
 
 
 ## Converting the raw files
-We need to convert all 24 files to mzML format. The reason for not using the mzXML is the because Philosopher uses the Precursor Target Ion tag for quantifying peptides, mzXML files do not have that information available by default. When converting the files make sure to use the `peak picking` option for centroiding the peakss.
+We need to convert all 24 files to mzML format. The reason for not using the mzXML is the because Philosopher uses the Precursor Target Ion tag for quantifying peptides, mzXML files do not have that information available by default. When converting the files make sure to use the `peak picking` option for centroiding the peaks.
 
 
 ## Organizing our directory
@@ -413,7 +413,7 @@ INFO: Processing standard MixtureModel ...
 
  PeptideProphet  (TPP v5.0.1 Post-Typhoon dev, Build 201705191541-exported (Linux-x86_64)) AKeller@ISB
  read in 0 1+, 597664 2+, 347529 3+, 80435 4+, 8775 5+, 2169 6+, and 86 7+ spectra.
-Initialising statistical models ...
+Initializing statistical models ...
 Found 136993 Decoys, and 899665 Non-Decoys
 Iterations: .........10.........20......
 WARNING: Mixture model quality test failed for charge (1+).

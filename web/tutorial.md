@@ -67,3 +67,5 @@ Some commands they expect to find processed data, some expect "raw" information,
 ### Examples
 
 [Example of a simple data analysis](example_1.md)
+
+[Processing, Filtering and Analyzing Open Search results using Philosopher](example_2.md)
