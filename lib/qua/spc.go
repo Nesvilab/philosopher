@@ -9,7 +9,7 @@ import (
 func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	if len(e.PSM) < 1 && len(e.Ions) < 1 {
-		return e, &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		return e, &err.Error{Type: err.NoPSMFound, Class: err.FATA}
 	}
 
 	var uniqueIonPSM = make(map[string]string)
