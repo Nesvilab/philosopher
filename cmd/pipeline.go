@@ -156,7 +156,6 @@ var pipelineCmd = &cobra.Command{
 				}
 
 				peptideprophet.Run(m, files)
-
 				m.Serialize()
 				//met.CleanTemp(m.Temp)
 			}
@@ -254,7 +253,7 @@ var pipelineCmd = &cobra.Command{
 			}
 
 			// getting inside de the dataset folder again
-			os.Chdir(dsAbs)
+			//os.Chdir(dsAbs)
 
 			// FreeQuant
 			if p.Commands.FreeQuant == "yes" {
@@ -289,6 +288,7 @@ var pipelineCmd = &cobra.Command{
 			// Report
 			if p.Commands.Report == "yes" {
 				logrus.Info("Executing report on ", i)
+
 				rep.Run(m)
 
 				m.Serialize()

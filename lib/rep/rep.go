@@ -298,7 +298,7 @@ func Run(m met.Data) met.Data {
 		labelNames, _ := getLabelNames(annotfile)
 		logrus.Info("Creating TMT PSM report")
 
-		if strings.Contains(m.SearchEngine, "MSFragger") {
+		if strings.Contains(m.SearchEngine, "MSFragger") && (repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0) {
 			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor)
 		} else {
 			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
@@ -450,6 +450,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
+
 	for _, i := range e.PSM {
 		if hasRazor == true {
 

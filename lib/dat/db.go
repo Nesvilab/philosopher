@@ -25,6 +25,59 @@ type Record struct {
 	IsContaminant    bool
 }
 
+func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
+
+	var e Record
+
+	idReg1 := regexp.MustCompile(`(ENSP\w+)`)
+	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
+	desReg := regexp.MustCompile(`ENSP\w+(.*)`)
+
+	e.OriginalHeader = k
+
+	part := strings.Split(k, " ")
+	e.PartHeader = part[0]
+
+	// ID and version
+	idm := idReg1.FindStringSubmatch(k)
+	if idm == nil {
+		idm = idReg2.FindStringSubmatch(k)
+		e.ID = idm[1]
+	} else {
+		e.ID = idm[1]
+	}
+
+	// Description
+	desc := desReg.FindStringSubmatch(k)
+	if desc == nil {
+		e.Description = ""
+	} else {
+		e.Description = desc[1]
+	}
+
+	e.EntryName = ""
+	e.ProteinName = ""
+	e.Organism = ""
+	e.GeneNames = ""
+	e.ProteinExistence = ""
+	e.SequenceVersion = ""
+	e.Description = ""
+
+	// Sequence
+	e.Sequence = v
+
+	// Length
+	e.Length = len(v)
+
+	if strings.Contains(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	return e, nil
+}
+
 // ProcessNCBI parses UniProt like FASTA records
 func ProcessNCBI(k, v, decoyTag string) (Record, *err.Error) {
 
@@ -290,6 +343,8 @@ func Classify(s, decoyTag string) (string, *err.Error) {
 		return "uniprot", nil
 	} else if strings.HasPrefix(seq, "AP_") || strings.HasPrefix(seq, "NP_") || strings.HasPrefix(seq, "YP_") || strings.HasPrefix(seq, "XP_") || strings.HasPrefix(seq, "ZP") || strings.HasPrefix(seq, "WP_") {
 		return "ncbi", nil
+	} else if strings.HasPrefix(seq, "ENSP") {
+		return "ensembl", nil
 	}
 
 	return "generic", nil

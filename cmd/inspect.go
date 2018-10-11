@@ -58,13 +58,13 @@ var inspectCmd = &cobra.Command{
 			target := fmt.Sprintf(".meta%sdb.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
-			var o dat.Record
+			var o dat.Base
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
 				logrus.Fatal("Could not restore meta data:", err)
 			}
-			spew.Dump(o)
+			spew.Dump(o.Records)
 
 		} else if object == "protein" {
 
