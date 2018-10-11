@@ -83,10 +83,10 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
 
 	logrus.Info("Creating file")
-	customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
+	//customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
 
-	err := db.ProcessDB(customDB, m.Database.Tag)
-	if e != nil {
+	err := db.ProcessDB(m.Database.Custom, m.Database.Tag)
+	if err != nil {
 		logrus.Fatal(err)
 	}
 
