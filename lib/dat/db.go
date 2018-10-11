@@ -29,15 +29,23 @@ func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
 
 	var e Record
 
-	idReg := regexp.MustCompile(`(ENSP\w+)`)
+	idReg1 := regexp.MustCompile(`(ENSP\w+)`)
+	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
 	desReg := regexp.MustCompile(`ENSP\w+(.*)`)
 
 	e.OriginalHeader = k
 
+	part := strings.Split(k, " ")
+	e.PartHeader = part[0]
+
 	// ID and version
-	idm := idReg.FindStringSubmatch(k)
-	e.ID = idm[1]
-	e.PartHeader = idm[1]
+	idm := idReg1.FindStringSubmatch(k)
+	if idm == nil {
+		idm = idReg2.FindStringSubmatch(k)
+		e.ID = idm[1]
+	} else {
+		e.ID = idm[1]
+	}
 
 	// Description
 	desc := desReg.FindStringSubmatch(k)
@@ -335,6 +343,8 @@ func Classify(s, decoyTag string) (string, *err.Error) {
 		return "uniprot", nil
 	} else if strings.HasPrefix(seq, "AP_") || strings.HasPrefix(seq, "NP_") || strings.HasPrefix(seq, "YP_") || strings.HasPrefix(seq, "XP_") || strings.HasPrefix(seq, "ZP") || strings.HasPrefix(seq, "WP_") {
 		return "ncbi", nil
+	} else if strings.HasPrefix(seq, "ENSP") {
+		return "ensembl", nil
 	}
 
 	return "generic", nil

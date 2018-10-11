@@ -83,9 +83,14 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
 
 	logrus.Info("Creating file")
-	db.Save(m.Home, m.Temp, m.Database.Tag)
+	customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
 
-	err := db.Serialize()
+	err := db.ProcessDB(customDB, m.Database.Tag)
+	if e != nil {
+		logrus.Fatal(err)
+	}
+
+	err = db.Serialize()
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -119,6 +124,14 @@ func (d *Base) ProcessDB(file, decoyTag string) *err.Error {
 		} else if class == "ncbi" {
 
 			db, e := ProcessNCBI(k, v, decoyTag)
+			if e != nil {
+				return e
+			}
+			d.Records = append(d.Records, db)
+
+		} else if class == "ensembl" {
+
+			db, e := ProcessENSEMBL(k, v, decoyTag)
 			if e != nil {
 				return e
 			}
@@ -270,7 +283,7 @@ func (d *Base) Deploy(temp string) *err.Error {
 }
 
 // Save fasta file to disk
-func (d *Base) Save(home, temp, tag string) *err.Error {
+func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
 
 	base := filepath.Base(d.UniProtDB)
 
@@ -283,7 +296,7 @@ func (d *Base) Save(home, temp, tag string) *err.Error {
 	// create decoy db file
 	file, e := os.Create(workfile)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the decoy database"}
+		return "", &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the decoy database"}
 	}
 	defer file.Close()
 
@@ -298,20 +311,23 @@ func (d *Base) Save(home, temp, tag string) *err.Error {
 		line := i + "\n" + d.TaDeDB[i] + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the database file"}
+			return "", &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "there was an error trying to create the database file"}
 		}
 	}
 
 	sys.CopyFile(workfile, outfile)
 
-	d.ProcessDB(outfile, tag)
+	// err := d.ProcessDB(outfile, tag)
+	// if e != nil {
+	// 	return err
+	// }
+	//
+	// err = d.Serialize()
+	// if err != nil {
+	// 	return err
+	// }
 
-	err := d.Serialize()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return outfile, nil
 }
 
 // Serialize saves to disk a msgpack verison of the database data structure
