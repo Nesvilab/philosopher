@@ -25,6 +25,51 @@ type Record struct {
 	IsContaminant    bool
 }
 
+func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
+
+	var e Record
+
+	idReg := regexp.MustCompile(`(ENSP\w+)`)
+	desReg := regexp.MustCompile(`ENSP\w+(.*)`)
+
+	e.OriginalHeader = k
+
+	// ID and version
+	idm := idReg.FindStringSubmatch(k)
+	e.ID = idm[1]
+	e.PartHeader = idm[1]
+
+	// Description
+	desc := desReg.FindStringSubmatch(k)
+	if desc == nil {
+		e.Description = ""
+	} else {
+		e.Description = desc[1]
+	}
+
+	e.EntryName = ""
+	e.ProteinName = ""
+	e.Organism = ""
+	e.GeneNames = ""
+	e.ProteinExistence = ""
+	e.SequenceVersion = ""
+	e.Description = ""
+
+	// Sequence
+	e.Sequence = v
+
+	// Length
+	e.Length = len(v)
+
+	if strings.Contains(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	return e, nil
+}
+
 // ProcessNCBI parses UniProt like FASTA records
 func ProcessNCBI(k, v, decoyTag string) (Record, *err.Error) {
 
