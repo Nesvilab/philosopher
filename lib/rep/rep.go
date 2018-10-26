@@ -26,14 +26,14 @@ import (
 
 // Evidence ...
 type Evidence struct {
-	Decoys        bool
-	PSM           PSMEvidenceList
-	Ions          IonEvidenceList
-	Peptides      PeptideEvidenceList
-	Proteins      ProteinEvidenceList
-	Mods          Modifications
-	Modifications ModificationEvidence
-	Combined      CombinedEvidenceList
+	Decoys          bool
+	PSM             PSMEvidenceList
+	Ions            IonEvidenceList
+	Peptides        PeptideEvidenceList
+	Proteins        ProteinEvidenceList
+	Mods            Modifications
+	Modifications   ModificationEvidence
+	CombinedProtein CombinedProteinEvidenceList
 }
 
 // Modifications ...
@@ -206,7 +206,7 @@ func (a ProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[j].ProteinGroup }
 
 // CombinedEvidence represents all combined proteins detected
-type CombinedEvidence struct {
+type CombinedProteinEvidence struct {
 	GroupNumber            uint32
 	SiblingID              string
 	ProteinName            string
@@ -234,11 +234,11 @@ type CombinedEvidence struct {
 }
 
 // CombinedEvidenceList ...
-type CombinedEvidenceList []CombinedEvidence
+type CombinedProteinEvidenceList []CombinedProteinEvidence
 
-func (a CombinedEvidenceList) Len() int           { return len(a) }
-func (a CombinedEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a CombinedEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
+func (a CombinedProteinEvidenceList) Len() int           { return len(a) }
+func (a CombinedProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
