@@ -8,12 +8,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // peakIntensity collects PSM intensities from the apex peak
@@ -130,6 +130,7 @@ func xic(v []raw.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]f
 
 func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
+	var intPepKeyMap = make(map[string]float64)
 	var intPepMap = make(map[string]float64)
 	var intIonMap = make(map[string]float64)
 
@@ -139,17 +140,34 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	for i := range e.PSM {
 
-		// global intensity map for Peptides, getting the most intense
-		_, okPep := intPepMap[e.PSM[i].Peptide]
+		// global intensity map for Peptides, getting the sum of all intensities
+		// pepetide intensity is calculated by grouping PSM by sequence and calculted MZ
+
+		pepKey := fmt.Sprintf("%s#%f", e.PSM[i].Peptide, e.PSM[i].CalcNeutralPepMass)
+		_, okPep := intPepKeyMap[pepKey]
 		if okPep {
-			if e.PSM[i].Intensity > intPepMap[e.PSM[i].Peptide] {
-				intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
+			if e.PSM[i].Intensity > intPepKeyMap[pepKey] {
+				intPepKeyMap[pepKey] = e.PSM[i].Intensity
 			}
 		} else {
-			intPepMap[e.PSM[i].Peptide] = e.PSM[i].Intensity
+			intPepKeyMap[pepKey] = e.PSM[i].Intensity
 		}
 
-		// global intensity map for Ions, getting the most intense
+		for k, v := range intPepKeyMap {
+			key := strings.Split(k, "#")
+
+			_, okPep := intPepMap[key[0]]
+			if okPep {
+				if e.PSM[i].Intensity > intPepMap[key[0]] {
+					intPepMap[key[0]] = v
+				}
+			} else {
+				intPepMap[key[0]] = v
+			}
+
+		}
+
+		// global intensity map for Ions, getting the most intense ion
 		_, okIon := intIonMap[e.PSM[i].IonForm]
 		if okIon {
 			if e.PSM[i].Intensity > intIonMap[e.PSM[i].IonForm] {
@@ -165,7 +183,7 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 	for i := range e.Peptides {
 		v, ok := intPepMap[e.Peptides[i].Sequence]
 		if ok {
-			e.Peptides[i].Intensity = v
+			e.Peptides[i].Intensity += v
 		}
 	}
 
@@ -177,7 +195,7 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 		}
 	}
 
-	// attribute intensities to protein evidences
+	// attribute intensities to protein evidences: getting the top 3 most intense ions
 	for i := range e.Proteins {
 
 		var totalInt []float64

@@ -138,7 +138,8 @@ type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
 	Spectra                map[string]uint8
-	MappedProteins         map[string]uint16
+	Protein                string
+	ProteinDescription     string
 	Spc                    int
 	Intensity              float64
 	ModifiedObservations   int
@@ -1724,6 +1725,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var pepSeqMap = make(map[string]bool) //is this a decoy
 	var pepCSMap = make(map[string][]uint8)
 	var pepInt = make(map[string]float64)
+	var pepProt = make(map[string]string)
 	var spectra = make(map[string][]string)
 	var err error
 
@@ -1733,7 +1735,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		} else {
 			pepSeqMap[i.Peptide] = true
 		}
-		pepInt[i.Peptide] = 0
+		//pepInt[i.Peptide] = 0
 	}
 
 	for _, i := range e.PSM {
@@ -1742,10 +1744,12 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 
 			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
 			spectra[i.Peptide] = append(spectra[i.Peptide], i.Spectrum)
+			pepProt[i.Peptide] = i.Protein
 
 			if i.Intensity > pepInt[i.Peptide] {
 				pepInt[i.Peptide] = i.Intensity
 			}
+
 		}
 	}
 
@@ -1754,7 +1758,6 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		var pep PeptideEvidence
 		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
-		pep.MappedProteins = make(map[string]uint16)
 		pep.Sequence = k
 
 		for _, i := range spectra[k] {
@@ -1764,6 +1767,12 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		for _, i := range pepCSMap[k] {
 			pep.ChargeState[i] = 0
 		}
+
+		d, ok := pepProt[k]
+		if ok {
+			pep.Protein = d
+		}
+
 		pep.Spc = len(spectra[k])
 		pep.Intensity = pepInt[k]
 
@@ -1790,7 +1799,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tMapped Protein\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1815,13 +1824,14 @@ func (e *Evidence) PeptideReport() {
 		}
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%f\t%d\t%d\t%s\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
+			i.Intensity,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
-			//i.Intensity,
+			i.Protein,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
