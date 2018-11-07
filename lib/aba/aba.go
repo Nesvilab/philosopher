@@ -31,14 +31,12 @@ type DataSetLabelNames struct {
 // Run abacus
 func Run(a met.Abacus, temp string, args []string) error {
 
-	e := peptideLevelAbacus(a, temp, args)
-	if e != nil {
-		return e
-	}
+	// e := peptideLevelAbacus(a, temp, args)
+	// if e != nil {
+	// 	return e
+	// }
 
-	os.Exit(1)
-
-	e = proteinLevelAbacus(a, temp, args)
+	e := proteinLevelAbacus(a, temp, args)
 	if e != nil {
 		return e
 	}
@@ -208,6 +206,11 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
 	} else {
 		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+	}
+
+	if a.Reprint == true {
+		logrus.Info("Creating Reprint report")
+		saveReprintResults(temp, evidences, datasets, names, a.Unique, false, labelList)
 	}
 
 	return nil
@@ -523,7 +526,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreprint.tsv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreprint.csv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -567,14 +570,9 @@ func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceLis
 
 		line += fmt.Sprintf("%s\t", i.ProteinID)
 
-		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
-
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
 		}
-
-		ip := strings.Join(i.IndiProtein, ", ")
-		line += fmt.Sprintf("%s\t", ip)
 
 		line += "\n"
 		n, err := io.WriteString(file, line)

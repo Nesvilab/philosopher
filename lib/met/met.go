@@ -258,6 +258,7 @@ type Abacus struct {
 	Picked   bool    `yaml:"picked"`
 	Labels   bool    `yaml:"labels"`
 	Unique   bool    `yaml:"uniqueOnly"`
+	Reprint  bool    `yaml:"reprint"`
 }
 
 // Cluster options and parameters
