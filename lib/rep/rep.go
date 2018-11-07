@@ -34,6 +34,7 @@ type Evidence struct {
 	Mods            Modifications
 	Modifications   ModificationEvidence
 	CombinedProtein CombinedProteinEvidenceList
+	CombinedPeptide CombinedPeptideEvidenceList
 }
 
 // Modifications ...
@@ -233,12 +234,26 @@ type CombinedProteinEvidence struct {
 	URazorLabels           map[string]tmt.Labels // Unique + razor
 }
 
-// CombinedEvidenceList ...
+// CombinedEvidenceList is a list of Combined Protein Evidences
 type CombinedProteinEvidenceList []CombinedProteinEvidence
 
 func (a CombinedProteinEvidenceList) Len() int           { return len(a) }
 func (a CombinedProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
+
+// CombinedPeptideEvidence represents all combined peptides detected
+type CombinedPeptideEvidence struct {
+	Sequence  string
+	Spc       map[string]int
+	Intensity map[string]float64
+}
+
+// CombinedPeptideEvidenceList is a list of Combined Peptide Evidences
+type CombinedPeptideEvidenceList []CombinedPeptideEvidence
+
+func (a CombinedPeptideEvidenceList) Len() int           { return len(a) }
+func (a CombinedPeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedPeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {

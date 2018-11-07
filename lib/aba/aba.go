@@ -31,6 +31,104 @@ type DataSetLabelNames struct {
 // Run abacus
 func Run(a met.Abacus, temp string, args []string) error {
 
+	e := peptideLevelAbacus(a, temp, args)
+	if e != nil {
+		return e
+	}
+
+	os.Exit(1)
+
+	e = proteinLevelAbacus(a, temp, args)
+	if e != nil {
+		return e
+	}
+
+	return nil
+}
+
+// Create peptide combined report
+func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
+
+	var names []string
+	var xmlFiles []string
+	var database dat.Base
+	var datasets = make(map[string]rep.Evidence)
+
+	var labelList []DataSetLabelNames
+
+	// restore database
+	database = dat.Base{}
+	database.RestoreWithPath(args[0])
+
+	// recover all files
+	logrus.Info("Restoring results")
+
+	for _, i := range args {
+
+		// restoring the database
+		var e rep.Evidence
+		e.RestoreGranularWithPath(i)
+
+		var labels DataSetLabelNames
+		labels.LabelName = make(map[string]string)
+
+		// collect interact full file names
+		files, _ := ioutil.ReadDir(i)
+		for _, f := range files {
+			if strings.Contains(f.Name(), "pep.xml") {
+				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
+				absPath, _ := filepath.Abs(interactFile)
+				xmlFiles = append(xmlFiles, absPath)
+			}
+		}
+
+		var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
+		if strings.Contains(i, string(filepath.Separator)) {
+			i = strings.Replace(i, string(filepath.Separator), "", -1)
+			labels.Name = i
+		} else {
+			labels.Name = i
+		}
+		labels.LabelName, _ = getLabelNames(annot)
+
+		// collect project names
+		prjName := i
+		if strings.Contains(prjName, string(filepath.Separator)) {
+			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
+		}
+
+		labelList = append(labelList, labels)
+
+		// unique list and map of datasets
+		datasets[prjName] = e
+		names = append(names, prjName)
+	}
+
+	sort.Strings(names)
+
+	// logrus.Info("Processing spectral counts")
+	// evidences = getProteinSpectralCounts(evidences, datasets)
+	//
+	// logrus.Info("Processing intensities")
+	// evidences = sumProteinIntensities(evidences, datasets)
+	//
+	// // collect TMT labels
+	// if a.Labels == true {
+	// 	evidences = getProteinLabelIntensities(evidences, datasets)
+	// }
+	//
+	// if a.Labels == true {
+	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
+	// } else {
+	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+	// }
+
+	return nil
+}
+
+// Create protein combined report
+func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
+
 	var names []string
 	var xmlFiles []string
 	var database dat.Base
@@ -44,7 +142,7 @@ func Run(a met.Abacus, temp string, args []string) error {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	evidences, err := processCombinedFile(a, database)
+	evidences, err := processProteinCombinedFile(a, database)
 	if err != nil {
 		return err
 	}
@@ -96,31 +194,27 @@ func Run(a met.Abacus, temp string, args []string) error {
 	sort.Strings(names)
 
 	logrus.Info("Processing spectral counts")
-	evidences = getSpectralCounts(evidences, datasets)
+	evidences = getProteinSpectralCounts(evidences, datasets)
 
 	logrus.Info("Processing intensities")
-	evidences = sumIntensities(evidences, datasets)
+	evidences = sumProteinIntensities(evidences, datasets)
 
 	// collect TMT labels
 	if a.Labels == true {
-		evidences = getLabelIntensities(evidences, datasets)
+		evidences = getProteinLabelIntensities(evidences, datasets)
 	}
 
-	// collect TMT labels
-
 	if a.Labels == true {
-		//aveCompareTMTResults(temp, evidences, datasets, names, a.Unique, labelList)
-		saveAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
+		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
 	} else {
-		//saveCompareResults(temp, evidences, datasets, names)
-		saveAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
 	}
 
 	return nil
 }
 
 // processCombinedFile reads the combined protXML and creates a unique protein list as a reference fo all counts
-func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedProteinEvidenceList, error) {
+func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedProteinEvidenceList, error) {
 
 	var list rep.CombinedProteinEvidenceList
 
@@ -202,7 +296,7 @@ func processCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedProteinEv
 	return list, nil
 }
 
-func getSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
+func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
 
@@ -222,7 +316,7 @@ func getSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[st
 	return combined
 }
 
-func getLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
+func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
 
@@ -243,7 +337,7 @@ func getLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[
 }
 
 // sumIntensities calculates the protein intensity
-func sumIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
+func sumProteinIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
 
@@ -263,52 +357,13 @@ func sumIntensities(combined rep.CombinedProteinEvidenceList, datasets map[strin
 			}
 		}
 
-		// for _, i := range v.Proteins {
-		// 	for j := range combined {
-		// 		if i.ProteinID == combined[j].ProteinID {
-		// 			combined[j].TotalIntensity[k] = i.TotalIntensity
-		// 			combined[j].UniqueIntensity[k] = i.UniqueIntensity
-		// 			break
-		// 		}
-		// 	}
-		// }
-
-		// for i := range combined {
-		//
-		// 	var urazorInt []float64
-		//
-		// 	for _, j := range combined[i].PeptideIons {
-		//
-		// 		ion := fmt.Sprintf("%s#%d#%.4f", j.PeptideSequence, j.Charge, j.CalcNeutralPepMass)
-		//
-		// 		intList, ok := ions[ion]
-		// 		if ok {
-		//
-		// 			if j.Razor == 1 {
-		// 				urazorInt = append(urazorInt, intList)
-		// 				sort.Float64s(urazorInt)
-		//
-		// 				if len(urazorInt) >= 3 {
-		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2] + urazorInt[len(urazorInt)-3])
-		// 				} else if len(urazorInt) >= 2 {
-		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1] + urazorInt[len(urazorInt)-2])
-		// 				} else if len(urazorInt) == 1 {
-		// 					combined[i].UrazorIntensity[k] = (urazorInt[len(urazorInt)-1])
-		// 				}
-		// 			}
-		//
-		// 		}
-		//
-		// 	}
-		// }
-
 	}
 
 	return combined
 }
 
-// saveCompareTMTResults creates a single report using 1 or more philosopher result files
-func saveAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+// saveProteinAbacusResult creates a single report using 1 or more philosopher result files
+func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
@@ -320,8 +375,6 @@ func saveAbacusResult(session string, evidences rep.CombinedProteinEvidenceList,
 	}
 	defer file.Close()
 
-	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tDescription\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tIndistinguishable Proteins\t"
-	//line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\t"
 	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
 
 	for _, i := range namesList {
@@ -447,6 +500,77 @@ func saveAbacusResult(session string, evidences rep.CombinedProteinEvidenceList,
 					)
 				}
 			}
+		}
+
+		ip := strings.Join(i.IndiProtein, ", ")
+		line += fmt.Sprintf("%s\t", ip)
+
+		line += "\n"
+		n, err := io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal(n, err)
+		}
+
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// saveReprintResults creates a single report using 1 or more philosopher result files using the Reprint format
+func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+
+	// create result file
+	output := fmt.Sprintf("%s%sreprint.tsv", session, string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	line := "PROTID\t"
+
+	for _, i := range namesList {
+		line += fmt.Sprintf("%s_SPC\t", i)
+	}
+
+	line += "\n"
+	line += "na\n"
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		logrus.Fatal(n, err)
+	}
+
+	// organize by group number
+	sort.Sort(evidences)
+
+	var summTotalSpC = make(map[string]int)
+	var summUniqueSpC = make(map[string]int)
+	var summURazorSpC = make(map[string]int)
+
+	// collect and sum all evidences from all data sets for each protein
+	for _, i := range evidences {
+		for _, j := range namesList {
+			summTotalSpC[i.ProteinID] += i.TotalSpc[j]
+			summUniqueSpC[i.ProteinID] += i.UniqueSpc[j]
+			summURazorSpC[i.ProteinID] += i.UrazorSpc[j]
+		}
+	}
+
+	for _, i := range evidences {
+
+		var line string
+
+		line += fmt.Sprintf("%s\t", i.ProteinID)
+
+		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
+
+		for _, j := range namesList {
+			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
 		}
 
 		ip := strings.Join(i.IndiProtein, ", ")
