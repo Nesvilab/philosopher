@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"github.com/prvst/philosopher/lib/err"
 	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // ProteinProphet is tool configuration
@@ -35,8 +35,6 @@ type ProteinProphet struct {
 func New(temp string) ProteinProphet {
 
 	var self ProteinProphet
-
-	//temp, _ := sys.GetTemp()
 
 	self.UnixBatchCoverage = temp + string(filepath.Separator) + "batchcoverage"
 	self.UnixDatabaseParser = temp + string(filepath.Separator) + "DatabaseParser"
