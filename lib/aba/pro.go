@@ -118,12 +118,12 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 
 	var list rep.CombinedProteinEvidenceList
 
-	if _, err := os.Stat(a.Comb); os.IsNotExist(err) {
+	if _, err := os.Stat(a.CombPro); os.IsNotExist(err) {
 		logrus.Fatal("Cannot find combined.prot.xml file")
 	} else {
 
 		var protxml id.ProtXML
-		protxml.Read(a.Comb)
+		protxml.Read(a.CombPro)
 		protxml.DecoyTag = a.Tag
 
 		// promote decoy proteins with indistinguishable target proteins
@@ -168,6 +168,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 				ce.SupportingSpectra = make(map[string]string)
 				ce.ProteinName = j.ProteinName
 				ce.Length = j.Length
+				ce.Coverage = j.PercentCoverage
 				ce.GroupNumber = j.GroupNumber
 				ce.SiblingID = j.GroupSiblingID
 				ce.IndiProtein = j.IndistinguishableProtein
@@ -188,6 +189,9 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 				list[i].ProteinID = j.ID
 				list[i].EntryName = j.EntryName
 				list[i].GeneNames = j.GeneNames
+				list[i].Organism = j.Organism
+				list[i].Description = j.Description
+				list[i].ProteinExistence = j.ProteinExistence
 				break
 			}
 		}
@@ -275,7 +279,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
+	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -351,6 +355,14 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		line += fmt.Sprintf("%s\t", i.GeneNames)
 
 		line += fmt.Sprintf("%d\t", i.Length)
+
+		line += fmt.Sprintf("%d\t", int(i.Coverage))
+
+		line += fmt.Sprintf("%s\t", i.Organism)
+
+		line += fmt.Sprintf("%s\t", i.ProteinExistence)
+
+		line += fmt.Sprintf("%s\t", i.Description)
 
 		line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
 

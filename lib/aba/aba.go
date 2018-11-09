@@ -2,6 +2,7 @@ package aba
 
 import (
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/sirupsen/logrus"
 )
 
 // DataSetLabelNames maps all custom names to each TMT tags
@@ -14,14 +15,22 @@ type DataSetLabelNames struct {
 // Run abacus
 func Run(a met.Abacus, temp string, args []string) error {
 
-	// e := peptideLevelAbacus(a, temp, args)
-	// if e != nil {
-	// 	return e
-	// }
+	if len(a.CombPep) == 0 && len(a.CombPro) == 0 {
+		logrus.Fatal("You need to specify a peptide or protein combined file for the Abacus analysis")
+	}
 
-	e := proteinLevelAbacus(a, temp, args)
-	if e != nil {
-		return e
+	if len(a.CombPep) > 0 {
+		e := peptideLevelAbacus(a, temp, args)
+		if e != nil {
+			return e
+		}
+	}
+
+	if len(a.CombPro) > 0 {
+		e := proteinLevelAbacus(a, temp, args)
+		if e != nil {
+			return e
+		}
 	}
 
 	return nil

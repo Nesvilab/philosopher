@@ -214,9 +214,12 @@ type CombinedProteinEvidence struct {
 	ProteinID              string
 	IndiProtein            []string
 	EntryName              string
-	GeneNames              string
-	Description            string
+	Organism               string
 	Length                 int
+	Coverage               float32
+	GeneNames              string
+	ProteinExistence       string
+	Description            string
 	Names                  []string
 	UniqueStrippedPeptides int
 	SupportingSpectra      map[string]string
@@ -1505,38 +1508,6 @@ func (e *Evidence) UpdateSupportingSpectra() {
 
 	return
 }
-
-// UpdateRecoveredPSMs brings the updated protein and mapped protein info to the recovered PSMs
-// func (e *Evidence) UpdateRecoveredPSMs() {
-//
-// 	var seqProtein = make(map[string]string)
-// 	var seqMappedProteins = make(map[string][]string)
-//
-// 	for _, i := range e.PSM {
-// 		if i.Probability >= 0.9 {
-// 			seqProtein[i.Peptide] = i.Protein
-// 			for j := range i.MappedProteins {
-// 				seqMappedProteins[i.Peptide] = append(seqMappedProteins[i.Peptide], j)
-// 			}
-// 		}
-// 	}
-//
-// 	for i := range e.PSM {
-// 		v, ok := seqProtein[e.PSM[i].Peptide]
-// 		if ok && e.PSM[i].Probability < 0.9 {
-//
-// 			if e.PSM[i].Protein != v {
-// 				e.PSM[i].Protein = v
-// 				for _, j := range seqMappedProteins[e.PSM[i].Peptide] {
-// 					e.PSM[i].MappedProteins[j] = 0
-// 				}
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return
-// }
 
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {

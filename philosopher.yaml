@@ -136,7 +136,8 @@ cluster:
   organismUniProtID: ''      # UniProt proteome ID
   level: 0.9                 # cluster identity level (default 0.9)
 abacus:
-  comb: combined.prot.xml    # combined file
+  protein: combined.prot.xml # combined protein file
+  peptide: combined.pep.xml  # combined peptide file
   tag: rev_                  # decoy tag (default "rev_")
   proteinprobability: 0.9    # minimun protein probability (default 0.9)
   peptideProbability: 0.5    # minimun peptide probability (default 0.5)

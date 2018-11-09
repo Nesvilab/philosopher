@@ -49,7 +49,8 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		abacusCmd.Flags().StringVarP(&m.Abacus.Comb, "comb", "", "", "combined file")
+		abacusCmd.Flags().StringVarP(&m.Abacus.CombPro, "protein", "", "", "combined protein file")
+		abacusCmd.Flags().StringVarP(&m.Abacus.CombPep, "peptide", "", "", "combined peptide file")
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
