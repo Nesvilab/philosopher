@@ -2,14 +2,18 @@ package aba
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
+	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,17 +22,23 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	var names []string
 	var xmlFiles []string
-	var database dat.Base
 	var datasets = make(map[string]rep.Evidence)
 
 	var labelList []DataSetLabelNames
 
-	// restore database
-	database = dat.Base{}
-	database.RestoreWithPath(args[0])
+	// TODO: create a combined pepXML file by running Interprophet on all data sets
+
+	// restoring combined file
+	logrus.Info("Processing combined file")
+	seqMap, chargeMap, err := processPeptideCombinedFile(a)
+	if err != nil {
+		return err
+	}
 
 	// recover all files
 	logrus.Info("Restoring results")
+
+	fmt.Println(len(args))
 
 	for _, i := range args {
 
@@ -73,22 +83,242 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	sort.Strings(names)
 
-	// logrus.Info("Processing spectral counts")
-	// evidences = getProteinSpectralCounts(evidences, datasets)
-	//
-	// logrus.Info("Processing intensities")
-	// evidences = sumProteinIntensities(evidences, datasets)
-	//
-	// // collect TMT labels
-	// if a.Labels == true {
-	// 	evidences = getProteinLabelIntensities(evidences, datasets)
-	// }
-	//
-	// if a.Labels == true {
-	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
-	// } else {
-	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
-	// }
+	logrus.Info("Collecting data from individual experiments")
+	evidences, err := collectPeptideDatafromExperiments(datasets, seqMap, chargeMap)
+
+	logrus.Info("Processing spectral counts")
+	evidences = getPeptideSpectralCounts(evidences, datasets)
+
+	savePeptideAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
 
 	return nil
 }
+
+func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]int, error) {
+
+	//var list rep.CombinedPeptideEvidenceList
+	var seqMap = make(map[string]int8)
+	var chargeMap = make(map[string][]int)
+
+	if _, err := os.Stat(a.CombPep); os.IsNotExist(err) {
+		logrus.Fatal("Cannot find combined.pep.xml file")
+	} else {
+
+		var pep id.PepXML
+		pep.Read(a.CombPep)
+		pep.DecoyTag = a.Tag
+
+		// get all peptide sequences from combined file and collapse them
+		for _, i := range pep.PeptideIdentification {
+			if !strings.Contains(i.Protein, a.Tag) {
+				seqMap[i.Peptide] = 0
+				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], int(i.AssumedCharge))
+			}
+		}
+
+		// for k, _ := range seqMap {
+		//
+		// 	var ce rep.CombinedPeptideEvidence
+		//
+		// 	ce.Spc = make(map[string]int)
+		// 	var uniqCharges = make(map[int]uint8)
+		//
+		// 	ce.Sequence = k
+		//
+		// 	for _, i := range chargeMap[k] {
+		// 		uniqCharges[i] = 0
+		// 	}
+		//
+		// 	for k, _ := range uniqCharges {
+		// 		ce.ChargeStates = append(ce.ChargeStates, k)
+		// 	}
+		//
+		// 	sort.Ints(ce.ChargeStates)
+		//
+		// 	list = append(list, ce)
+		// }
+
+	}
+
+	return seqMap, chargeMap, nil
+}
+
+func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap map[string]int8, chargeMap map[string][]int) (rep.CombinedPeptideEvidenceList, error) {
+
+	var evidences rep.CombinedPeptideEvidenceList
+	var uniqPeptides = make(map[string]uint8)
+
+	for _, v := range datasets {
+
+		for _, i := range v.PSM {
+
+			var keys []string
+			keys = append(keys, i.Peptide)
+
+			for _, j := range i.AssignedMassDiffs {
+				mass := strconv.FormatFloat(j, 'f', 6, 64)
+				keys = append(keys, mass)
+			}
+
+			key := strings.Join(keys, "#")
+			uniqPeptides[key] = 0
+
+		}
+
+	}
+
+	return evidences, nil
+}
+
+func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
+
+	for k, v := range datasets {
+
+		for i := range combined {
+			for _, j := range v.Peptides {
+				if combined[i].Sequence == j.Sequence {
+					combined[i].Spc[k] = j.Spc
+					break
+				}
+			}
+		}
+
+	}
+
+	return combined
+}
+
+// savePeptideAbacusResult creates a single report using 1 or more philosopher result files
+func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+
+	// create result file
+	output := fmt.Sprintf("%s%scombined_peptide.csv", session, string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	line := "Sequence\tCharge States\t"
+
+	for _, i := range namesList {
+		line += fmt.Sprintf("%s Spectral Count\t", i)
+	}
+
+	line += "\n"
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		logrus.Fatal(n, err)
+	}
+
+	// organize by group number
+	sort.Sort(evidences)
+
+	for _, i := range evidences {
+
+		var line string
+
+		line += fmt.Sprintf("%s\t", i.Sequence)
+
+		line += fmt.Sprintf("%v\t", i.ChargeStates)
+
+		for _, j := range namesList {
+			line += fmt.Sprintf("%d\t", i.Spc[j])
+		}
+
+		line += "\n"
+		n, err := io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal(n, err)
+		}
+
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// Create peptide combined report
+// func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
+//
+// 	var names []string
+// 	var xmlFiles []string
+// 	var database dat.Base
+// 	var datasets = make(map[string]rep.Evidence)
+//
+// 	var labelList []DataSetLabelNames
+//
+// 	// restore database
+// 	database = dat.Base{}
+// 	database.RestoreWithPath(args[0])
+//
+// 	// recover all files
+// 	logrus.Info("Restoring results")
+//
+// 	for _, i := range args {
+//
+// 		// restoring the database
+// 		var e rep.Evidence
+// 		e.RestoreGranularWithPath(i)
+//
+// 		var labels DataSetLabelNames
+// 		labels.LabelName = make(map[string]string)
+//
+// 		// collect interact full file names
+// 		files, _ := ioutil.ReadDir(i)
+// 		for _, f := range files {
+// 			if strings.Contains(f.Name(), "pep.xml") {
+// 				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
+// 				absPath, _ := filepath.Abs(interactFile)
+// 				xmlFiles = append(xmlFiles, absPath)
+// 			}
+// 		}
+//
+// 		var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
+// 		if strings.Contains(i, string(filepath.Separator)) {
+// 			i = strings.Replace(i, string(filepath.Separator), "", -1)
+// 			labels.Name = i
+// 		} else {
+// 			labels.Name = i
+// 		}
+// 		labels.LabelName, _ = getLabelNames(annot)
+//
+// 		// collect project names
+// 		prjName := i
+// 		if strings.Contains(prjName, string(filepath.Separator)) {
+// 			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
+// 		}
+//
+// 		labelList = append(labelList, labels)
+//
+// 		// unique list and map of datasets
+// 		datasets[prjName] = e
+// 		names = append(names, prjName)
+// 	}
+//
+// 	sort.Strings(names)
+//
+// 	// logrus.Info("Processing spectral counts")
+// 	// evidences = getProteinSpectralCounts(evidences, datasets)
+// 	//
+// 	// logrus.Info("Processing intensities")
+// 	// evidences = sumProteinIntensities(evidences, datasets)
+// 	//
+// 	// // collect TMT labels
+// 	// if a.Labels == true {
+// 	// 	evidences = getProteinLabelIntensities(evidences, datasets)
+// 	// }
+// 	//
+// 	// if a.Labels == true {
+// 	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
+// 	// } else {
+// 	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+// 	// }
+//
+// 	return nil
+// }
+//

@@ -270,7 +270,7 @@ func sumProteinIntensities(combined rep.CombinedProteinEvidenceList, datasets ma
 func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%scombined.tsv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%scombined_protein.csv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
