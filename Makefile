@@ -39,7 +39,7 @@ deps:
 
 .PHONY: deploy
 deploy:
-	unzip -o lib/dat/bindata.go.zip -d  lib/data/
+	unzip -o lib/dat/bindata.go.zip -d  lib/dat/
 
 	unzip -o lib/ext/cdhit/unix/bindata.go.zip -d  lib/ext/cdhit/unix/
 	unzip -o lib/ext/cdhit/win/bindata.go.zip -d  lib/ext/cdhit/win/
