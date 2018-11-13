@@ -251,7 +251,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Key\tSequence\tCharge States\tAssigned Massdiffs\t"
+	line := "Sequence\tCharge States\tAssigned Massdiffs\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
@@ -269,8 +269,6 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	for _, i := range evidences {
 
 		var line string
-
-		line += fmt.Sprintf("%s\t", i.Key)
 
 		line += fmt.Sprintf("%s\t", i.Sequence)
 
