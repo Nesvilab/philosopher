@@ -123,6 +123,8 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 	var evidences rep.CombinedPeptideEvidenceList
 	var uniqPeptides = make(map[string]uint8)
+	var proteinMap = make(map[string]string)
+	var proteinDesc = make(map[string]string)
 
 	for _, v := range datasets {
 		for _, i := range v.PSM {
@@ -148,6 +150,9 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				key := strings.Join(keys, "#")
 				uniqPeptides[key] = 0
+
+				proteinMap[i.Peptide] = i.Protein
+				proteinDesc[i.Peptide] = i.ProteinDescription
 
 			}
 		}
@@ -179,6 +184,12 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 				e.ChargeStates = append(e.ChargeStates, ch)
 			}
 			sort.Strings(e.ChargeStates)
+		}
+
+		v, ok := proteinMap[parts[0]]
+		if ok {
+			e.Protein = v
+			e.ProteinDescription = proteinDesc[parts[0]]
 		}
 
 		evidences = append(evidences, e)
@@ -251,7 +262,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Sequence\tCharge States\tAssigned Massdiffs\t"
+	line := "Sequence\tCharge States\tAssigned Massdiffs\tProtein\tProtein Description\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
@@ -275,6 +286,10 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		line += fmt.Sprintf("%v\t", strings.Join(i.ChargeStates, ","))
 
 		line += fmt.Sprintf("%v\t", strings.Join(i.AssignedMassDiffs, ","))
+
+		line += fmt.Sprintf("%s\t", i.Protein)
+
+		line += fmt.Sprintf("%s\t", i.ProteinDescription)
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t", i.Spc[j])
