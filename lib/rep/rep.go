@@ -246,10 +246,12 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	Sequence     string
-	ChargeStates []int
-	Spc          map[string]int
-	Intensity    map[string]float64
+	Key               string
+	Sequence          string
+	ChargeStates      []string
+	AssignedMassDiffs []string
+	Spc               map[string]int
+	Intensity         map[string]float64
 }
 
 // CombinedPeptideEvidenceList is a list of Combined Peptide Evidences
