@@ -142,6 +142,13 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 					uniqMds[mass] = 0
 				}
 
+				// this forces the unmodified pepes to collapse with peps containing +16
+				if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+					uniqMds["15.994900"] = 0
+					delete(uniqMds, "0")
+					delete(uniqMds, "0.000000")
+				}
+
 				for j, _ := range uniqMds {
 					keys = append(keys, j)
 				}
@@ -215,6 +222,13 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			for _, k := range j.AssignedMassDiffs {
 				mass := strconv.FormatFloat(k, 'f', 6, 64)
 				uniqMds[mass] = 0
+			}
+
+			// this forces the unmodified pepes to collapse with peps containing +16
+			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+				uniqMds["15.994900"] = 0
+				delete(uniqMds, "0")
+				delete(uniqMds, "0.000000")
 			}
 
 			for k, _ := range uniqMds {
