@@ -79,18 +79,26 @@ func Run(m met.Data) (met.Data, *err.Error) {
 		db.UniProtDB = m.Database.Custom
 	}
 
+	// logrus.Info("Processing decoys")
+	// db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
+	//
+	// logrus.Info("Creating file")
+	// customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
+	//
+	// fmt.Println(customDB, m.Database.Tag)
+	//
+	// err := db.ProcessDB(m.Database.Custom, m.Database.Tag)
+	// if err != nil {
+	// 	logrus.Fatal(err)
+	// }
+
 	logrus.Info("Processing decoys")
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
 
 	logrus.Info("Creating file")
-	//customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
+	db.Save(m.Home, m.Temp, m.Database.Tag)
 
-	err := db.ProcessDB(m.Database.Custom, m.Database.Tag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	err = db.Serialize()
+	err := db.Serialize()
 	if err != nil {
 		logrus.Fatal(err)
 	}
