@@ -125,6 +125,8 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 	var uniqPeptides = make(map[string]uint8)
 	var proteinMap = make(map[string]string)
 	var proteinDesc = make(map[string]string)
+	var geneMap = make(map[string]string)
+	var probMap = make(map[string]float64)
 
 	for _, v := range datasets {
 		for _, i := range v.PSM {
@@ -134,6 +136,10 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				var keys []string
 				keys = append(keys, i.Peptide)
+
+				if i.Probability > probMap[i.Peptide] {
+					probMap[i.Peptide] = i.Probability
+				}
 
 				var uniqMds = make(map[string]uint8)
 
@@ -160,6 +166,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				proteinMap[i.Peptide] = i.Protein
 				proteinDesc[i.Peptide] = i.ProteinDescription
+				geneMap[i.Peptide] = i.GeneName
 
 			}
 		}
@@ -175,6 +182,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 		e.Key = k
 		e.Sequence = parts[0]
+		e.BestPSM = probMap[parts[0]]
 
 		sort.Strings(parts[1:])
 		e.AssignedMassDiffs = parts[1:]
@@ -197,6 +205,8 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 		if ok {
 			e.Protein = v
 			e.ProteinDescription = proteinDesc[parts[0]]
+
+			e.Gene = geneMap[parts[0]]
 		}
 
 		evidences = append(evidences, e)
@@ -276,7 +286,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Sequence\tCharge States\tAssigned Massdiffs\tProtein\tProtein Description\t"
+	line := "Sequence\tCharge States\tProbability\tAssigned Massdiffs\tGene\tProtein\tProtein Description\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
@@ -299,7 +309,11 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 
 		line += fmt.Sprintf("%v\t", strings.Join(i.ChargeStates, ","))
 
+		line += fmt.Sprintf("%f\t", i.BestPSM)
+
 		line += fmt.Sprintf("%v\t", strings.Join(i.AssignedMassDiffs, ","))
+
+		line += fmt.Sprintf("%s\t", i.Gene)
 
 		line += fmt.Sprintf("%s\t", i.Protein)
 
