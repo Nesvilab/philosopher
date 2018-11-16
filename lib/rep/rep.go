@@ -26,14 +26,15 @@ import (
 
 // Evidence ...
 type Evidence struct {
-	Decoys        bool
-	PSM           PSMEvidenceList
-	Ions          IonEvidenceList
-	Peptides      PeptideEvidenceList
-	Proteins      ProteinEvidenceList
-	Mods          Modifications
-	Modifications ModificationEvidence
-	Combined      CombinedEvidenceList
+	Decoys          bool
+	PSM             PSMEvidenceList
+	Ions            IonEvidenceList
+	Peptides        PeptideEvidenceList
+	Proteins        ProteinEvidenceList
+	Mods            Modifications
+	Modifications   ModificationEvidence
+	CombinedProtein CombinedProteinEvidenceList
+	CombinedPeptide CombinedPeptideEvidenceList
 }
 
 // Modifications ...
@@ -138,7 +139,8 @@ type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
 	Spectra                map[string]uint8
-	MappedProteins         map[string]uint16
+	Protein                string
+	ProteinDescription     string
 	Spc                    int
 	Intensity              float64
 	ModifiedObservations   int
@@ -205,16 +207,19 @@ func (a ProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[j].ProteinGroup }
 
 // CombinedEvidence represents all combined proteins detected
-type CombinedEvidence struct {
+type CombinedProteinEvidence struct {
 	GroupNumber            uint32
 	SiblingID              string
 	ProteinName            string
 	ProteinID              string
 	IndiProtein            []string
 	EntryName              string
-	GeneNames              string
-	Description            string
+	Organism               string
 	Length                 int
+	Coverage               float32
+	GeneNames              string
+	ProteinExistence       string
+	Description            string
 	Names                  []string
 	UniqueStrippedPeptides int
 	SupportingSpectra      map[string]string
@@ -232,12 +237,33 @@ type CombinedEvidence struct {
 	URazorLabels           map[string]tmt.Labels // Unique + razor
 }
 
-// CombinedEvidenceList ...
-type CombinedEvidenceList []CombinedEvidence
+// CombinedEvidenceList is a list of Combined Protein Evidences
+type CombinedProteinEvidenceList []CombinedProteinEvidence
 
-func (a CombinedEvidenceList) Len() int           { return len(a) }
-func (a CombinedEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a CombinedEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
+func (a CombinedProteinEvidenceList) Len() int           { return len(a) }
+func (a CombinedProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumber < a[j].GroupNumber }
+
+// CombinedPeptideEvidence represents all combined peptides detected
+type CombinedPeptideEvidence struct {
+	Key                string
+	BestPSM            float64
+	Sequence           string
+	Protein            string
+	Gene               string
+	ProteinDescription string
+	ChargeStates       []string
+	AssignedMassDiffs  []string
+	Spc                map[string]int
+	Intensity          map[string]float64
+}
+
+// CombinedPeptideEvidenceList is a list of Combined Peptide Evidences
+type CombinedPeptideEvidenceList []CombinedPeptideEvidence
+
+func (a CombinedPeptideEvidenceList) Len() int           { return len(a) }
+func (a CombinedPeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedPeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
@@ -1490,38 +1516,6 @@ func (e *Evidence) UpdateSupportingSpectra() {
 	return
 }
 
-// UpdateRecoveredPSMs brings the updated protein and mapped protein info to the recovered PSMs
-// func (e *Evidence) UpdateRecoveredPSMs() {
-//
-// 	var seqProtein = make(map[string]string)
-// 	var seqMappedProteins = make(map[string][]string)
-//
-// 	for _, i := range e.PSM {
-// 		if i.Probability >= 0.9 {
-// 			seqProtein[i.Peptide] = i.Protein
-// 			for j := range i.MappedProteins {
-// 				seqMappedProteins[i.Peptide] = append(seqMappedProteins[i.Peptide], j)
-// 			}
-// 		}
-// 	}
-//
-// 	for i := range e.PSM {
-// 		v, ok := seqProtein[e.PSM[i].Peptide]
-// 		if ok && e.PSM[i].Probability < 0.9 {
-//
-// 			if e.PSM[i].Protein != v {
-// 				e.PSM[i].Protein = v
-// 				for _, j := range seqMappedProteins[e.PSM[i].Peptide] {
-// 					e.PSM[i].MappedProteins[j] = 0
-// 				}
-// 			}
-//
-// 		}
-// 	}
-//
-// 	return
-// }
-
 // PeptideIonReport reports consist on ion reporting
 func (e *Evidence) PeptideIonReport() {
 
@@ -1724,6 +1718,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var pepSeqMap = make(map[string]bool) //is this a decoy
 	var pepCSMap = make(map[string][]uint8)
 	var pepInt = make(map[string]float64)
+	var pepProt = make(map[string]string)
 	var spectra = make(map[string][]string)
 	var err error
 
@@ -1733,7 +1728,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		} else {
 			pepSeqMap[i.Peptide] = true
 		}
-		pepInt[i.Peptide] = 0
+		//pepInt[i.Peptide] = 0
 	}
 
 	for _, i := range e.PSM {
@@ -1742,10 +1737,12 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 
 			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
 			spectra[i.Peptide] = append(spectra[i.Peptide], i.Spectrum)
+			pepProt[i.Peptide] = i.Protein
 
 			if i.Intensity > pepInt[i.Peptide] {
 				pepInt[i.Peptide] = i.Intensity
 			}
+
 		}
 	}
 
@@ -1754,7 +1751,6 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		var pep PeptideEvidence
 		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
-		pep.MappedProteins = make(map[string]uint16)
 		pep.Sequence = k
 
 		for _, i := range spectra[k] {
@@ -1764,6 +1760,12 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		for _, i := range pepCSMap[k] {
 			pep.ChargeState[i] = 0
 		}
+
+		d, ok := pepProt[k]
+		if ok {
+			pep.Protein = d
+		}
+
 		pep.Spc = len(spectra[k])
 		pep.Intensity = pepInt[k]
 
@@ -1790,7 +1792,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tMapped Protein\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1815,13 +1817,14 @@ func (e *Evidence) PeptideReport() {
 		}
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%f\t%d\t%d\t%s\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
+			i.Intensity,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
-			//i.Intensity,
+			i.Protein,
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {

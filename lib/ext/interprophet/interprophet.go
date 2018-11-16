@@ -28,8 +28,6 @@ func New(temp string) InterProphet {
 
 	var self InterProphet
 
-	//temp, _ := sys.GetTemp()
-
 	self.UnixInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser"
 	self.WinInterProphetParser = temp + string(filepath.Separator) + "InterProphetParser.exe"
 	self.LibgccDLL = temp + string(filepath.Separator) + "libgcc_s_dw2-1.dll"
@@ -72,6 +70,52 @@ func (i InterProphet) Run(params met.InterProphet, home, temp string, args []str
 		file, _ := filepath.Abs(args[i])
 		cmd.Args = append(cmd.Args, file)
 	}
+
+	// append output file
+	output := fmt.Sprintf("%s%s%s.pep.xml", temp, string(filepath.Separator), params.Output)
+	output, _ = filepath.Abs(output)
+
+	cmd = i.appendParams(params, cmd)
+	cmd.Args = append(cmd.Args, output)
+	cmd.Dir = filepath.Dir(output)
+
+	env := os.Environ()
+	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
+	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
+	for i := range env {
+		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
+			env[i] = env[i] + ";" + temp
+		}
+	}
+	cmd.Env = env
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	e := cmd.Start()
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "InterProphet"}
+	}
+	_ = cmd.Wait()
+
+	// copy to work directory
+	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))
+	e = sys.CopyFile(output, dest)
+	if e != nil {
+		return nil, &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "IprophXML"}
+	}
+
+	// collect all resulting files
+	var processedOutput []string
+	for _, i := range cmd.Args {
+		if strings.Contains(i, params.Output) || i == params.Output {
+			processedOutput = append(processedOutput, i)
+		}
+	}
+
+	return processedOutput, nil
+}
+
+func (p InterProphet) appendParams(params met.InterProphet, cmd *exec.Cmd) *exec.Cmd {
 
 	if params.Length == true {
 		cmd.Args = append(cmd.Args, "LENGTH")
@@ -129,35 +173,5 @@ func (i InterProphet) Run(params met.InterProphet, home, temp string, args []str
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	cmd.Args = append(cmd.Args, params.Output)
-
-	cmd.Dir = filepath.Dir(args[0])
-
-	env := os.Environ()
-	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
-	env = append(env, fmt.Sprintf("WEBSERVER_ROOT=%s", temp))
-	for i := range env {
-		if strings.HasPrefix(strings.ToUpper(env[i]), "PATH=") {
-			env[i] = env[i] + ";" + temp
-		}
-	}
-	cmd.Env = env
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	e := cmd.Start()
-	if e != nil {
-		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "InterProphet"}
-	}
-	_ = cmd.Wait()
-
-	// collect all resulting files
-	var output []string
-	for _, i := range cmd.Args {
-		if strings.Contains(i, "iproph") || i == params.Output {
-			output = append(output, i)
-		}
-	}
-
-	return output, nil
+	return cmd
 }

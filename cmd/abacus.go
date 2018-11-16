@@ -49,7 +49,8 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		abacusCmd.Flags().StringVarP(&m.Abacus.Comb, "comb", "", "", "combined file")
+		abacusCmd.Flags().StringVarP(&m.Abacus.CombPro, "protein", "", "", "combined protein file")
+		abacusCmd.Flags().StringVarP(&m.Abacus.CombPep, "peptide", "", "", "combined peptide file")
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
@@ -57,6 +58,7 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Reprint, "reprint", "", false, "create abacus reports using the Reprint format")
 	}
 
 	RootCmd.AddCommand(abacusCmd)

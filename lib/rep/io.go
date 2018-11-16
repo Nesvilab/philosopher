@@ -188,7 +188,7 @@ func SerializeEVCombined(e *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Combined)
+	goberr := de.Encode(e.CombinedProtein)
 	if goberr != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
 	}
@@ -329,7 +329,7 @@ func RestoreEVModifications(e *Evidence) *err.Error {
 func RestoreEVCombined(e *Evidence) *err.Error {
 	f, _ := os.Open(sys.EvCombinedBin())
 	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Combined)
+	er := d.Decode(&e.CombinedProtein)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
 	}
@@ -530,7 +530,7 @@ func RestoreEVCombinedWithPath(e *Evidence, p string) *err.Error {
 
 	f, _ := os.Open(path)
 	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Combined)
+	er := d.Decode(&e.CombinedProtein)
 	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
 	}
