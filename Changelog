@@ -5,6 +5,21 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20181116
+### Build: 201811161414
+
+### Added
+- Combined peptide report added to Abacus.
+
+### Changed
+- The Abacus command now supports both peptide and protein combined reports by using the flags --peptide and --protein.
+- Abacus combined protein report now is called combined_protein.tsv.
+- Peptide reports now have mapped protein information.
+- Dependency libraries were updated.
+
+### Fixed
+- A problem was not allowing recently downloaded databases to be processed.
+- Minor bugs and issues.
 
 # Philosopher 20181011
 ### Build: 201810111533
