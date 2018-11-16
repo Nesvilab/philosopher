@@ -277,7 +277,7 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%scombined_peptide.csv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%scombined_peptide.tsv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
