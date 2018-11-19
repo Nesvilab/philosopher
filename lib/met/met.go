@@ -270,7 +270,8 @@ type Cluster struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys bool `yaml:"withDecoys"`
+	Decoys  bool `yaml:"withDecoys"`
+	MSstats bool `yaml:"msstats"`
 }
 
 // Index options and parameters

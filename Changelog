@@ -5,6 +5,15 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20181119
+### Build: ?
+
+### Added
+- MSstats and MSstatsTMT compatibel reports added to the report command.
+- Reprint / CRApome compatible report added to the abacus command.
+### Changed
+### Fixed
+
 # Philosopher 20181116
 ### Build: 201811161414
 
