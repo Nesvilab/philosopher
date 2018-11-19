@@ -86,6 +86,18 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 		names = append(names, prjName)
 	}
 
+	// collect gene labels
+	var reprintLabels []string
+	if a.Reprint == true {
+		for _, i := range names {
+			parts := strings.Split(i, "_")
+			label := fmt.Sprintf("%s_%s", parts[0], parts[1])
+			reprintLabels = append(reprintLabels, label)
+		}
+	}
+
+	fmt.Println(reprintLabels)
+
 	sort.Strings(names)
 
 	logrus.Info("Processing spectral counts")
@@ -107,7 +119,7 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	if a.Reprint == true {
 		logrus.Info("Creating Reprint report")
-		saveReprintResults(temp, evidences, datasets, names, a.Unique, false, labelList)
+		saveReprintResults(temp, evidences, datasets, names, reprintLabels, a.Unique, false, labelList)
 	}
 
 	return nil
@@ -432,7 +444,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 }
 
 // saveReprintResults creates a single report using 1 or more philosopher result files using the Reprint format
-func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreprint.csv", session, string(filepath.Separator))
@@ -451,7 +463,14 @@ func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceLis
 	}
 
 	line += "\n"
-	line += "na\n"
+	line += "na\t"
+
+	for _, i := range labelList {
+		line += fmt.Sprintf("%s\t", i)
+	}
+
+	line += "\n"
+
 	n, err := io.WriteString(file, line)
 	if err != nil {
 		logrus.Fatal(n, err)

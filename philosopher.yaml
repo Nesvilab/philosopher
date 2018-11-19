@@ -132,6 +132,7 @@ labelquant:
   annotation: ''             # annotation file with custom names for the TMT channels
 report:
   withDecoys: false          # add decoy observations to reports
+  msstats: false             # create an output compatible to MSstats
 cluster:
   organismUniProtID: ''      # UniProt proteome ID
   level: 0.9                 # cluster identity level (default 0.9)
