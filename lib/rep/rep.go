@@ -2980,7 +2980,7 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 		parts := strings.Split(i.Spectrum, ".")
 		fileName = fmt.Sprintf("%s.raw", parts[0])
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\tt%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			fileName,
 			i.Peptide,
 			i.AssumedCharge,
