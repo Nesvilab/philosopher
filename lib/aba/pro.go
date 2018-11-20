@@ -471,7 +471,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreprint.csv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreprint.tsv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
