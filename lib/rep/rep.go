@@ -336,8 +336,10 @@ func Run(m met.Data) met.Data {
 		logrus.Info("Creating TMT peptide Ion report")
 		repo.PeptideIonTMTReport(labelNames)
 
-		logrus.Info("Creating TMT MSstats report")
-		repo.MSstatsTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
+		if m.Report.MSstats == true {
+			logrus.Info("Creating TMT MSstats report")
+			repo.MSstatsTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
+		}
 
 	} else {
 
@@ -354,8 +356,10 @@ func Run(m met.Data) met.Data {
 		logrus.Info("Creating peptide Ion report")
 		repo.PeptideIonReport()
 
-		logrus.Info("Creating MSstats report")
-		repo.MSstatsReport(m.Filter.Tag, m.Filter.Razor)
+		if m.Report.MSstats == true {
+			logrus.Info("Creating MSstats report")
+			repo.MSstatsReport(m.Filter.Tag, m.Filter.Razor)
+		}
 
 	}
 
