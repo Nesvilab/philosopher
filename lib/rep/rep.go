@@ -2098,16 +2098,16 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 func (e *Evidence) ProteinReport() {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
 	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+		logrus.Fatal("Cannot create protein report:", err)
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
 
 	n, err := io.WriteString(file, line)
 	if err != nil {
@@ -2168,17 +2168,18 @@ func (e *Evidence) ProteinReport() {
 		// in most cases proteins with one small peptide shared with a decoy
 		//if len(i.TotalPeptideIons) > 0 {
 
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
+		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
 			i.ProteinGroup,            // Group
 			i.ProteinSubGroup,         // SubGroup
+			i.PartHeader,              // Protein
 			i.ProteinID,               // Protein ID
 			i.EntryName,               // Entry Name
+			i.GeneNames,               // Genes
 			i.Length,                  // Length
 			i.Coverage,                // Percent Coverage
 			i.Organism,                // Organism
 			i.Description,             // Description
 			i.ProteinExistence,        // Protein Existence
-			i.GeneNames,               // Genes
 			i.Probability,             // Protein Probability
 			i.TopPepProb,              // Top Peptide Probability
 			i.UniqueStrippedPeptides,  // Stripped Peptides
@@ -2215,7 +2216,7 @@ func (e *Evidence) ProteinReport() {
 func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreport.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -2224,7 +2225,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein ID\tEntry Name\tLength\tPercent Coverage\tDescription\tProtein Existence\tGenes\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\tIndistinguishableProteins\n")
+	line := fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\tIndistinguishable Proteins\n")
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -2300,16 +2301,18 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly bool) {
 		}
 
 		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
+			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\n",
 				i.ProteinGroup,           // Group
 				i.ProteinSubGroup,        // SubGroup
+				i.PartHeader,             // Protein
 				i.ProteinID,              // Protein ID
-				i.EntryName,              // EntryName
+				i.EntryName,              // Entry Name
+				i.GeneNames,              // Genes
 				i.Length,                 // Length
 				i.Coverage,               // Percent Coverage
+				i.Organism,               // Organism
 				i.Description,            // Description
 				i.ProteinExistence,       // Protein Existence
-				i.GeneNames,              // Genes
 				i.Probability,            // Protein Probability
 				i.TopPepProb,             // Top peptide Probability
 				i.UniqueStrippedPeptides, // Unique Stripped Peptides
