@@ -224,7 +224,7 @@ type Filter struct {
 	Picked   bool    `yaml:"picked"`
 	Seq      bool    `yaml:"sequential"`
 	Mapmods  bool    `yaml:"mapMods"`
-	Fasta 	 bool
+	Fo       bool
 }
 
 // Quantify options and parameters

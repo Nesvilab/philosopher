@@ -3,12 +3,12 @@ package fil
 import (
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
-	"os"
-	"io"
 
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
@@ -52,7 +52,7 @@ func Run(f met.Data) (met.Data, error) {
 			return f, proerr
 		}
 
-		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fasta)
+		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo)
 		if err != nil {
 			return f, err
 		}
@@ -546,7 +546,7 @@ func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXM
 
 // processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fasta bool) error {
+func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool) error {
 
 	var err error
 	var pid id.ProtIDList
@@ -577,8 +577,8 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 		return err
 	}
 
-	if fasta == true {
-		output := fmt.Sprintf("%s%sproteins.fas", sys.MetaDir(), string(filepath.Separator))
+	if fo == true {
+		output := fmt.Sprintf("%s%spep_pro_mappings.tsv", sys.MetaDir(), string(filepath.Separator))
 
 		file, err := os.Create(output)
 		if err != nil {
@@ -588,15 +588,25 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 		for _, i := range pid {
 			if !strings.Contains(i.ProteinName, "rev_") {
-			header := i.ProteinName
-			line := header + "\n"
-			_, err = io.WriteString(file, line)
-			if err != nil {
-				return errors.New("Cannot print PSM to file")
+
+				var line []string
+
+				line = append(line, i.ProteinName)
+
+				for _, j := range i.PeptideIons {
+					if j.Razor == 1 {
+						line = append(line, j.PeptideSequence)
+					}
+				}
+
+				mapping := strings.Join(line, "\t")
+				_, err = io.WriteString(file, mapping)
+				if err != nil {
+					return errors.New("Cannot print PSM to file")
+				}
+
 			}
 		}
-		}
-
 	}
 
 	// save results on meta folder
