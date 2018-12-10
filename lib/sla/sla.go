@@ -9,9 +9,9 @@ func Run(name, token, message, channel string) {
 
 	//api := slack.New(token)
 	params := slack.PostMessageParameters{}
-	attachment := slack.Attachment{}
+	//attachment := slack.Attachment{}
 
-	params.Attachments = []slack.Attachment{attachment}
+	//params.Attachments = []slack.Attachment{attachment}
 	params.Username = name
 
 	//channelID, timestamp, err := api.PostMessage(channel, message, params)
