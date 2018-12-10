@@ -124,6 +124,11 @@ type IonEvidence struct {
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
+	Protein                string
+	ProteinID              string
+	GeneName               string
+	EntryName              string
+	ProteinDescription     string
 	Labels                 tmt.Labels
 	PhosphoLabels          tmt.Labels
 }
@@ -141,7 +146,11 @@ type PeptideEvidence struct {
 	ChargeState            map[uint8]uint8
 	Spectra                map[string]uint8
 	Protein                string
+	ProteinID              string
+	GeneName               string
+	EntryName              string
 	ProteinDescription     string
+	MappedProteins         map[string]int
 	Spc                    int
 	Intensity              float64
 	ModifiedObservations   int
@@ -1175,7 +1184,7 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
 		pr.Probability = i.Probability
 		pr.Expectation = i.Expectation
-
+		pr.Protein = i.Protein
 		pr.MappedProteins[i.Protein] = 0
 
 		// get he list of indi proteins from pepXML data
@@ -1386,6 +1395,20 @@ func (e *Evidence) UpdateGeneNames() {
 		e.PSM[i].EntryName = entryMap[e.PSM[i].Protein]
 	}
 
+	for i := range e.Ions {
+		e.Ions[i].GeneName = dbMap[e.Ions[i].Protein]
+		e.Ions[i].ProteinDescription = descMap[e.Ions[i].Protein]
+		e.Ions[i].ProteinID = idMap[e.Ions[i].Protein]
+		e.Ions[i].EntryName = entryMap[e.Ions[i].Protein]
+	}
+
+	for i := range e.Peptides {
+		e.Peptides[i].GeneName = dbMap[e.Peptides[i].Protein]
+		e.Peptides[i].ProteinDescription = descMap[e.Peptides[i].Protein]
+		e.Peptides[i].ProteinID = idMap[e.Peptides[i].Protein]
+		e.Peptides[i].EntryName = entryMap[e.Peptides[i].Protein]
+	}
+
 	return
 }
 
@@ -1559,7 +1582,7 @@ func (e *Evidence) PeptideIonReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein IDs\tEntryName\tGene\tProtein Description\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -1583,15 +1606,13 @@ func (e *Evidence) PeptideIonReport() {
 	// original proteins. These cases should be rare to find.
 	for _, i := range printSet {
 
-		var pts []string
-		//var ipts []string
-
 		if len(i.MappedProteins) > 0 {
 
-			//if len(e.Proteins) > 1 {
-
-			for k := range i.MappedProteins {
-				pts = append(pts, k)
+			var mappedProteins []string
+			for j := range i.MappedProteins {
+				if j != i.Protein {
+					mappedProteins = append(mappedProteins, j)
+				}
 			}
 
 			var amods []string
@@ -1604,7 +1625,7 @@ func (e *Evidence) PeptideIonReport() {
 				omods = append(omods, j)
 			}
 
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\n",
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\n",
 				i.Sequence,
 				i.ModifiedSequence,
 				i.MZ,
@@ -1619,8 +1640,12 @@ func (e *Evidence) PeptideIonReport() {
 				strings.Join(amods, ", "),
 				strings.Join(omods, ", "),
 				i.Intensity,
-				len(i.MappedProteins),
-				strings.Join(pts, ", "),
+				i.Protein,
+				i.ProteinID,
+				i.EntryName,
+				i.GeneName,
+				i.ProteinDescription,
+				strings.Join(mappedProteins, ","),
 			)
 			_, err = io.WriteString(file, line)
 			if err != nil {
@@ -1647,7 +1672,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tMapped Proteins\tProtein IDs\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein IDs\tEntryName\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1679,15 +1704,15 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 	// original proteins. These cases should be rare to find.
 	for _, i := range printSet {
 
-		var pts []string
-		//var ipts []string
-
 		if len(i.MappedProteins) > 0 {
 
 			if len(e.Proteins) > 1 {
 
-				for k := range i.MappedProteins {
-					pts = append(pts, k)
+				var mappedProteins []string
+				for j := range i.MappedProteins {
+					if j != i.Protein {
+						mappedProteins = append(mappedProteins, j)
+					}
 				}
 
 				var amods []string
@@ -1700,7 +1725,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 					omods = append(omods, j)
 				}
 
-				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%d\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 					i.Sequence,
 					i.ModifiedSequence,
 					i.MZ,
@@ -1715,8 +1740,12 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 					strings.Join(amods, ", "),
 					strings.Join(omods, ", "),
 					i.Intensity,
-					len(i.MappedProteins),
-					strings.Join(pts, ", "),
+					i.Protein,
+					i.ProteinID,
+					i.EntryName,
+					i.GeneName,
+					i.ProteinDescription,
+					strings.Join(mappedProteins, ","),
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -1752,6 +1781,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var pepInt = make(map[string]float64)
 	var pepProt = make(map[string]string)
 	var spectra = make(map[string][]string)
+	var mappedProts = make(map[string][]string)
 	var err error
 
 	for _, i := range pep {
@@ -1775,6 +1805,10 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 				pepInt[i.Peptide] = i.Intensity
 			}
 
+			for j := range i.MappedProteins {
+				mappedProts[i.Peptide] = append(mappedProts[i.Peptide], j)
+			}
+
 		}
 	}
 
@@ -1783,6 +1817,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		var pep PeptideEvidence
 		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
+		pep.MappedProteins = make(map[string]int)
 		pep.Sequence = k
 
 		for _, i := range spectra[k] {
@@ -1791,6 +1826,10 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 
 		for _, i := range pepCSMap[k] {
 			pep.ChargeState[i] = 0
+		}
+
+		for _, i := range mappedProts[k] {
+			pep.MappedProteins[i] = 0
 		}
 
 		d, ok := pepProt[k]
@@ -1824,7 +1863,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tMapped Protein\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tProtein\tProtein IDs\tEntryName\tGene\tProtein Description\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1849,7 +1888,14 @@ func (e *Evidence) PeptideReport() {
 		}
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%f\t%d\t%d\t%s\n",
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein {
+				mappedProteins = append(mappedProteins, j)
+			}
+		}
+
+		line := fmt.Sprintf("%s\t%s\t%d\t%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
@@ -1857,6 +1903,11 @@ func (e *Evidence) PeptideReport() {
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
 			i.Protein,
+			i.ProteinID,
+			i.EntryName,
+			i.GeneName,
+			i.ProteinDescription,
+			strings.Join(mappedProteins, ","),
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
@@ -1881,7 +1932,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\tProtein\tProtein IDs\tEntryName\tGene\tProtein Description\tMapped Proteins\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1914,12 +1965,25 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 		}
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein {
+				mappedProteins = append(mappedProteins, j)
+			}
+		}
+
+		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Spc,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
+			i.Protein,
+			i.ProteinID,
+			i.EntryName,
+			i.GeneName,
+			i.ProteinDescription,
+			strings.Join(mappedProteins, ","),
 			i.Labels.Channel1.Intensity,
 			i.Labels.Channel2.Intensity,
 			i.Labels.Channel3.Intensity,
