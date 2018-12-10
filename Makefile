@@ -17,6 +17,7 @@ $(BINARY): $(SOURCES)
 deps:
 	go get -u github.com/mitchellh/gox
 	go get -u github.com/inconshreveable/mousetrap
+	go get -u github.com/go-windows-terminal-sequences
 	go get -u github.com/sirupsen/logrus
 	go get -u gonum.org/v1/plot
 	go get -u github.com/mattn/go-colorable
@@ -83,7 +84,6 @@ linux:
 windows:
 	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
 	cp philosopher.${VERSION}.exe /home/felipevl/Public/philosopher.exe
-	rm philosopher.${VERSION}.exe
 
 .PHONY: release
 release:
