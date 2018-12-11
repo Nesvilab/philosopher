@@ -6,6 +6,19 @@
 ### Fixed
 
 
+# Philosopher 20181211
+### Build: ?
+
+### Added
+- All different reports now show the protein identifications.
+
+### Changed
+- Report file is now called protein.tsv.
+- Columns names were fixed to become synchronized.
+
+### Fixed
+- Minor bug fixes.
+
 # Philosopher 20181128
 ### Build: 201811281548
 

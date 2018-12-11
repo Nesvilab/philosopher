@@ -153,8 +153,11 @@ type PeptideEvidence struct {
 	MappedProteins         map[string]int
 	Spc                    int
 	Intensity              float64
+	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	AssignedModifications  map[string]uint16
+	ObservedModifications  map[string]uint16
 	IsDecoy                bool
 	Labels                 tmt.Labels
 	PhosphoLabels          tmt.Labels
@@ -468,6 +471,27 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 			p.IsDecoy = true
 		}
 
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				p.AssignedModifications[loc] = 0
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
+				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
+				p.AssignedModifications[loc] = 0
+			}
+		}
+
+		for j := 0; j <= len(i.ModPositions)-1; j++ {
+			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
+				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
+				p.AssignedModifications[loc] = 0
+			}
+		}
+
 		list = append(list, p)
 	}
 
@@ -525,34 +549,16 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor bool) {
 
 	for _, i := range printSet {
 
-		var assL []string
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
-				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
 		var mappedProteins []string
 		for j := range i.MappedProteins {
 			if j != i.Protein {
 				mappedProteins = append(mappedProteins, j)
 			}
+		}
+
+		var assL []string
+		for j := range i.AssignedModifications {
+			assL = append(assL, j)
 		}
 
 		var obs []string
@@ -660,40 +666,11 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		}
 	}
 
-	// ////////////////////////////////////////
-	// ///// fix - NEEDS TO BE REMOVED
-	// var dtb dat.Base
-	// dtb.Restore()
-	// var dbMap = make(map[string]string)
-	// for _, j := range dtb.Records {
-	// 	dbMap[j.PartHeader] = j.GeneNames
-	// }
-	// ///// fix - NEEDS TO BE REMOVED
-	// ////////////////////////////////////////
-
 	for _, i := range printSet {
 
 		var assL []string
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
-				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
+		for j := range i.AssignedModifications {
+			assL = append(assL, j)
 		}
 
 		var mappedProteins []string
@@ -708,11 +685,6 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			obs = append(obs, j)
 		}
 
-		///// fix - NEEDS TO BE REMOVED
-		//geneName := dbMap[i.Protein]
-		///////////////
-
-		//TODO FIX MDOS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
@@ -820,26 +792,8 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 	for _, i := range printSet {
 
 		var assL []string
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
-				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
+		for j := range i.AssignedModifications {
+			assL = append(assL, j)
 		}
 
 		var mappedProteins []string
@@ -854,7 +808,6 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor bool) {
 			obs = append(obs, j)
 		}
 
-		//TODO FIX MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
@@ -949,40 +902,11 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		}
 	}
 
-	// ////////////////////////////////////////
-	// ///// fix - NEEDS TO BE REMOVED
-	// var dtb dat.Base
-	// dtb.Restore()
-	// var dbMap = make(map[string]string)
-	// for _, j := range dtb.Records {
-	// 	dbMap[j.PartHeader] = j.GeneNames
-	// }
-	// ///// fix - NEEDS TO BE REMOVED
-	// ////////////////////////////////////////
-
 	for _, i := range printSet {
 
 		var assL []string
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
-				loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
-		}
-
-		for j := 0; j <= len(i.ModPositions)-1; j++ {
-			if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
-				loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-				assL = append(assL, loc)
-			}
+		for j := range i.AssignedModifications {
+			assL = append(assL, j)
 		}
 
 		var mappedProteins []string
@@ -997,11 +921,6 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			obs = append(obs, j)
 		}
 
-		///// fix - NEEDS TO BE REMOVED
-		//geneName := dbMap[i.Protein]
-		///////////////
-
-		// TODO FIZ MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%t\t%t\t%s\t%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Spectrum,
 			i.Peptide,
@@ -1134,15 +1053,14 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 	var psmIonMap = make(map[string][]string)
 	var assignedModMap = make(map[string][]string)
 	var observedModMap = make(map[string][]string)
+	var bestProb = make(map[string]float64)
 	var err error
 
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range e.PSM {
 
 		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Spectrum)
-
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
-		//psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.AlternativeProteins...)
 
 		// get the list of all assigned modifications
 		if len(i.AssignedModifications) > 0 {
@@ -1157,6 +1075,11 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 				observedModMap[i.Spectrum] = append(observedModMap[i.Spectrum], k)
 			}
 		}
+
+		if i.Probability > bestProb[i.IonForm] {
+			bestProb[i.IonForm] = i.Probability
+		}
+
 	}
 
 	for _, i := range ion {
@@ -1182,10 +1105,12 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 		pr.ChargeState = i.AssumedCharge
 		pr.PeptideMass = i.CalcNeutralPepMass
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
-		pr.Probability = i.Probability
+		//pr.Probability = i.Probability
 		pr.Expectation = i.Expectation
 		pr.Protein = i.Protein
 		pr.MappedProteins[i.Protein] = 0
+
+		pr.Probability = bestProb[pr.IonForm]
 
 		// get he list of indi proteins from pepXML data
 		v, ok = psmPtMap[i.Spectrum]
@@ -1473,19 +1398,33 @@ func (e *Evidence) UpdateMappedProteins() {
 // individual PSM and assign them to ions
 func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 
+	var aMap = make(map[string][]string)
+	var aPepMap = make(map[string][]string)
+
+	// collect the assigned modifications from the PSM data
+	for _, i := range e.PSM {
+		for j := range i.AssignedModifications {
+			aMap[i.IonForm] = append(aMap[i.IonForm], j)
+			aPepMap[i.Peptide] = append(aPepMap[i.Peptide], j)
+		}
+	}
+
+	// forward it to the Ion data
 	for i := range e.Ions {
+		v, ok := aMap[e.Ions[i].IonForm]
+		if ok {
+			for _, j := range v {
+				e.Ions[i].AssignedModifications[j] = 0
+			}
+		}
+	}
 
-		for _, j := range e.PSM {
-
-			if e.Ions[i].IonForm == j.IonForm {
-				for k := range j.AssignedModifications {
-					e.Ions[i].AssignedModifications[k]++
-				}
-				for k := range j.ObservedModifications {
-					e.Ions[i].ObservedModifications[k]++
-				}
-
-				break
+	// forward it to the peptide data
+	for i := range e.Peptides {
+		v, ok := aPepMap[e.Peptides[i].Sequence]
+		if ok {
+			for _, j := range v {
+				e.Peptides[i].AssignedModifications[j] = 0
 			}
 		}
 	}
@@ -1672,7 +1611,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein IDs\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1782,6 +1721,9 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var pepProt = make(map[string]string)
 	var spectra = make(map[string][]string)
 	var mappedProts = make(map[string][]string)
+	var bestProb = make(map[string]float64)
+	var assignedModMap = make(map[string][]string)
+	var observedModMap = make(map[string][]string)
 	var err error
 
 	for _, i := range pep {
@@ -1790,7 +1732,6 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		} else {
 			pepSeqMap[i.Peptide] = true
 		}
-		//pepInt[i.Peptide] = 0
 	}
 
 	for _, i := range e.PSM {
@@ -1809,7 +1750,26 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 				mappedProts[i.Peptide] = append(mappedProts[i.Peptide], j)
 			}
 
+			// get the list of all assigned modifications
+			if len(i.AssignedModifications) > 0 {
+				for k := range i.AssignedModifications {
+					assignedModMap[i.Peptide] = append(assignedModMap[i.Peptide], k)
+				}
+			}
+
+			// get the list of all observed modifications
+			if len(i.ObservedModifications) > 0 {
+				for k := range i.ObservedModifications {
+					observedModMap[i.Peptide] = append(observedModMap[i.Peptide], k)
+				}
+			}
+
 		}
+
+		if i.Probability > bestProb[i.Peptide] {
+			bestProb[i.Peptide] = i.Probability
+		}
+
 	}
 
 	for k, v := range pepSeqMap {
@@ -1818,7 +1778,11 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
 		pep.MappedProteins = make(map[string]int)
+		pep.ObservedModifications = make(map[string]uint16)
+		pep.AssignedModifications = make(map[string]uint16)
 		pep.Sequence = k
+
+		pep.Probability = bestProb[k]
 
 		for _, i := range spectra[k] {
 			pep.Spectra[i] = 0
@@ -1835,6 +1799,22 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 		d, ok := pepProt[k]
 		if ok {
 			pep.Protein = d
+		}
+
+		va, oka := assignedModMap[k]
+		if oka {
+			for _, j := range va {
+				pep.AssignedModifications[j] = 0
+			}
+		}
+
+		vo, oko := observedModMap[k]
+		if oko {
+			for _, j := range vo {
+				pep.ObservedModifications[j] = 0
+			}
+		} else {
+			pep.UnModifiedObservations++
 		}
 
 		pep.Spc = len(spectra[k])
@@ -1863,7 +1843,7 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tProtein\tProtein IDs\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1895,13 +1875,26 @@ func (e *Evidence) PeptideReport() {
 			}
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		var amods []string
+		for j := range i.AssignedModifications {
+			amods = append(amods, j)
+		}
+
+		var omods []string
+		for j := range i.ObservedModifications {
+			omods = append(omods, j)
+		}
+
+		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
+			i.Probability,
 			i.Spc,
 			i.Intensity,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
+			strings.Join(amods, ", "),
+			strings.Join(omods, ", "),
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,
@@ -1932,7 +1925,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide\tCharges\tSpectral Count\tUnmodified Observations\tModified Observations\t126 Abundance\tProtein\tProtein IDs\tEntry Name\tGene\tProtein Description\tMapped Proteins\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide\tCharges\tProbability\tSpectral Count\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\t126 Abundance\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1972,12 +1965,25 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 			}
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		var amods []string
+		for j := range i.AssignedModifications {
+			amods = append(amods, j)
+		}
+
+		var omods []string
+		for j := range i.ObservedModifications {
+			omods = append(omods, j)
+		}
+
+		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
+			i.Probability,
 			i.Spc,
 			i.UnModifiedObservations,
 			i.ModifiedObservations,
+			strings.Join(amods, ", "),
+			strings.Join(omods, ", "),
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,
