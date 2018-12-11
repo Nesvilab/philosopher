@@ -11,6 +11,7 @@
 
 ### Added
 - All different reports now show the protein identifications.
+- All reports now include information about assigned and observed modifications.
 
 ### Changed
 - Report file is now called protein.tsv.

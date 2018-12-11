@@ -259,15 +259,6 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			}
 		}
 
-		// for i := range combined {
-		// 	for _, j := range v.Peptides {
-		// 		if combined[i].Sequence == j.Sequence {
-		// 			combined[i].Spc[k] = j.Spc
-		// 			break
-		// 		}
-		// 	}
-		// }
-
 	}
 
 	return combined
@@ -286,7 +277,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Sequence\tCharge States\tProbability\tAssigned Massdiffs\tGene\tProtein\tProtein Description\t"
+	line := "Sequence\tCharge States\tProbability\tAssigned Modifications\tGene\tProtein\tProtein Description\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)

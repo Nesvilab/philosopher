@@ -1380,7 +1380,6 @@ func (e *Evidence) UpdateMappedProteins() {
 					e.PSM[i].MappedProteins[k]++
 				}
 
-				//e.PSM[i].MappedProteins = j.Proteins
 				if len(e.PSM[i].RazorProtein) < 1 {
 					e.PSM[i].RazorProtein = j.RazorProtein
 					e.PSM[i].IsURazor = true
