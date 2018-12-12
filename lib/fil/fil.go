@@ -40,7 +40,7 @@ func Run(f met.Data) (met.Data, error) {
 
 	f.SearchEngine = searchEngine
 
-	err = processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	psmT, pepT, ionT, err := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 	if err != nil {
 		return f, err
 	}
@@ -65,6 +65,19 @@ func Run(f met.Data) (met.Data, error) {
 			pep.Restore("psm")
 			pro.Restore()
 			err = sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+			if err != nil {
+				return f, err
+			}
+			pep = nil
+			pro = nil
+
+		} else if f.Filter.Cap == true {
+
+			// sequential analysis
+			// filtered psm list and filtered prot list
+			pep.Restore("psm")
+			pro.Restore()
+			err = cappedSequentialControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, psmT, pepT, ionT, f.Filter.Tag)
 			if err != nil {
 				return f, err
 			}
@@ -252,7 +265,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) error {
+func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) (float64, float64, float64, error) {
 
 	var err error
 
@@ -305,25 +318,25 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, psmThreshold, err := pepXMLFDRFilter(uniqPsms, psm, -1, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, peptideThreshold, err := pepXMLFDRFilter(uniqPeps, peptide, -1, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, ionThreshold, err := pepXMLFDRFilter(uniqIons, ion, -1, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredIons.Serialize("ion")
 
-	return nil
+	return psmThreshold, peptideThreshold, ionThreshold, nil
 }
 
 // chargeProfile ...
@@ -402,7 +415,7 @@ func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 }
 
 // pepXMLFDRFilter applies FDR filtering at the PSM level
-func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, error) {
+func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR, cap float64, level, decoyTag string) (id.PepIDList, float64, error) {
 
 	//var msg string
 	var targets float64
@@ -463,16 +476,29 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 		err = errors.New("Error applying FDR score; unknown level")
 	}
 
-	sort.Sort(list)
+	var filtList id.PepIDList
+	if cap > 0 {
+		for _, i := range list {
+			if i.Probability >= cap {
+				filtList = append(filtList, i)
+			}
+		}
+	} else {
+		for _, i := range list {
+			filtList = append(filtList, i)
+		}
+	}
+
+	sort.Sort(filtList)
 
 	var scoreMap = make(map[float64]float64)
-	limit := (len(list) - 1)
+	limit := (len(filtList) - 1)
 	for j := limit; j >= 0; j-- {
-		_, ok := scoreMap[list[j].Probability]
+		_, ok := scoreMap[filtList[j].Probability]
 		if !ok {
-			scoreMap[list[j].Probability] = (decoys / targets)
+			scoreMap[filtList[j].Probability] = (decoys / targets)
 		}
-		if cla.IsDecoyPSM(list[j], decoyTag) {
+		if cla.IsDecoyPSM(filtList[j], decoyTag) {
 			decoys--
 		} else {
 			targets--
@@ -505,11 +531,11 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 	decoys = 0
 	targets = 0
 
-	for i := range list {
-		_, ok := probList[list[i].Probability]
+	for i := range filtList {
+		_, ok := probList[filtList[i].Probability]
 		if ok {
-			cleanlist = append(cleanlist, list[i])
-			if cla.IsDecoyPSM(list[i], decoyTag) {
+			cleanlist = append(cleanlist, filtList[i])
+			if cla.IsDecoyPSM(filtList[i], decoyTag) {
 				decoys++
 			} else {
 				targets++
@@ -524,8 +550,133 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 		"threshold": minProb,
 	}).Info(msg)
 
-	return cleanlist, err
+	return cleanlist, minProb, err
 }
+
+// func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, error) {
+//
+// 	//var msg string
+// 	var targets float64
+// 	var decoys float64
+// 	var calcFDR float64
+// 	var list id.PepIDList
+// 	var peplist id.PepIDList
+// 	var minProb float64 = 10
+// 	var err error
+//
+// 	if strings.EqualFold(level, "PSM") {
+//
+// 		// move all entries to list and count the number of targets and decoys
+// 		for _, i := range input {
+// 			for _, j := range i {
+// 				if cla.IsDecoyPSM(j, decoyTag) {
+// 					decoys++
+// 				} else {
+// 					targets++
+// 				}
+// 				list = append(list, j)
+// 			}
+// 		}
+//
+// 	} else if strings.EqualFold(level, "Peptide") {
+//
+// 		// 0 index means the one with highest score
+// 		for _, i := range input {
+// 			peplist = append(peplist, i[0])
+// 		}
+//
+// 		for i := range peplist {
+// 			if cla.IsDecoyPSM(peplist[i], decoyTag) {
+// 				decoys++
+// 			} else {
+// 				targets++
+// 			}
+// 			list = append(list, peplist[i])
+// 		}
+//
+// 	} else if strings.EqualFold(level, "Ion") {
+//
+// 		// 0 index means the one with highest score
+// 		for _, i := range input {
+// 			peplist = append(peplist, i[0])
+// 		}
+//
+// 		for i := range peplist {
+// 			if cla.IsDecoyPSM(peplist[i], decoyTag) {
+// 				decoys++
+// 			} else {
+// 				targets++
+// 			}
+// 			list = append(list, peplist[i])
+// 		}
+//
+// 	} else {
+// 		err = errors.New("Error applying FDR score; unknown level")
+// 	}
+//
+// 	sort.Sort(list)
+//
+// 	var scoreMap = make(map[float64]float64)
+// 	limit := (len(list) - 1)
+// 	for j := limit; j >= 0; j-- {
+// 		_, ok := scoreMap[list[j].Probability]
+// 		if !ok {
+// 			scoreMap[list[j].Probability] = (decoys / targets)
+// 		}
+// 		if cla.IsDecoyPSM(list[j], decoyTag) {
+// 			decoys--
+// 		} else {
+// 			targets--
+// 		}
+// 	}
+//
+// 	var keys []float64
+// 	for k := range scoreMap {
+// 		keys = append(keys, k)
+// 	}
+//
+// 	sort.Sort(sort.Reverse(sort.Float64Slice(keys)))
+//
+// 	var probList = make(map[float64]uint8)
+// 	for i := range keys {
+//
+// 		//f := fmt.Sprintf("%.2f", scoreMap[keys[i]]*100)
+// 		//f := uti.Round(scoreMap[keys[i]]*100, 5, 2)
+// 		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
+//
+// 		if uti.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
+// 			probList[keys[i]] = 0
+// 			minProb = keys[i]
+// 			calcFDR = uti.ToFixed(scoreMap[keys[i]], 4)
+// 		}
+//
+// 	}
+//
+// 	var cleanlist id.PepIDList
+// 	decoys = 0
+// 	targets = 0
+//
+// 	for i := range list {
+// 		_, ok := probList[list[i].Probability]
+// 		if ok {
+// 			cleanlist = append(cleanlist, list[i])
+// 			if cla.IsDecoyPSM(list[i], decoyTag) {
+// 				decoys++
+// 			} else {
+// 				targets++
+// 			}
+// 		}
+// 	}
+//
+// 	msg := fmt.Sprintf("Converged to %.2f %% FDR with %0.f %ss", (calcFDR * 100), targets, level)
+// 	logrus.WithFields(logrus.Fields{
+// 		"decoy":     decoys,
+// 		"total":     (targets + decoys),
+// 		"threshold": minProb,
+// 	}).Info(msg)
+//
+// 	return cleanlist, err
+// }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
 func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXML, error) {
@@ -1114,19 +1265,19 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 		"ions":     len(uniqIons),
 	}).Info("Applying sequential FDR estimation")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, -1, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, -1, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, -1, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -1167,19 +1318,60 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 		"ions":     len(uniqIons),
 	}).Info("Second filtering results")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, -1, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, -1, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, -1, "Ion", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredIons.Serialize("ion")
+
+	return nil
+}
+
+// cappedSequentialControl estimates FDR levels by applying a second filter where all
+// proteins from the protein filtered list are matched against filtered PSMs
+// It will use the threshold of the first pass as a cap for the second pass
+func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion, psmT, pepT, ionT float64, decoyTag string) error {
+
+	extPep := extractPSMfromPepXML(pep, pro)
+
+	// organize enties by score (probability or expectation)
+	sort.Sort(extPep)
+
+	uniqPsms := getUniquePSMs(extPep)
+	uniqPeps := getUniquePeptides(extPep)
+	uniqIons := getUniquePeptideIons(extPep)
+
+	logrus.WithFields(logrus.Fields{
+		"psms":     len(uniqPsms),
+		"peptides": len(uniqPeps),
+		"ions":     len(uniqIons),
+	}).Info("Applying capped sequential FDR estimation")
+
+	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, psmT, "PSM", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredPSM.Serialize("psm")
+
+	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, pepT, "Peptide", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredPeptides.Serialize("pep")
+
+	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, ionT, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
