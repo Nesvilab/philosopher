@@ -37,6 +37,7 @@ deps:
 	go get -u github.com/jpillora/go-ogle-analytics
 	go get -u github.com/onsi/ginkgo
 	go get -u github.com/onsi/gomega
+	go get -u github.com/konsorten/go-windows-terminal-sequences
 
 .PHONY: deploy
 deploy:
@@ -83,7 +84,7 @@ linux:
 .PHONY: windows
 windows:
 	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	cp philosopher.${VERSION}.exe /home/felipevl/Public/philosopher.exe
+	#cp philosopher.${VERSION}.exe /home/prvst/Public/philosopher.exe
 
 .PHONY: release
 release:
