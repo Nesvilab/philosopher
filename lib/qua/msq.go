@@ -58,7 +58,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 		for i := range evi.PSM {
 
-			// process pepXML information
+			// process pepXML information using the experimental mass to calculate the mz
 			ppmPrecision := tol / math.Pow(10, 6)
 			mz := ((evi.PSM[i].PrecursorNeutralMass + (float64(evi.PSM[i].AssumedCharge) * bio.Proton)) / float64(evi.PSM[i].AssumedCharge))
 			minRT := (evi.PSM[i].RetentionTime / 60) - rTWin
