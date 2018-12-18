@@ -1842,7 +1842,9 @@ func (e *Evidence) PeptideReport() {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	//_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+
 	if err != nil {
 		logrus.Fatal("Cannot create peptide report header")
 	}
@@ -1884,14 +1886,14 @@ func (e *Evidence) PeptideReport() {
 			omods = append(omods, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%f\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Probability,
 			i.Spc,
 			i.Intensity,
-			i.UnModifiedObservations,
-			i.ModifiedObservations,
+			//i.UnModifiedObservations,
+			//i.ModifiedObservations,
 			strings.Join(amods, ", "),
 			strings.Join(omods, ", "),
 			i.Protein,
@@ -1924,7 +1926,8 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 	}
 	defer file.Close()
 
-	header := "Peptide\tCharges\tProbability\tSpectral Count\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\t126 Abundance\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	//header := "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -1974,13 +1977,14 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string) {
 			omods = append(omods, j)
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%d\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 			i.Sequence,
 			strings.Join(cs, ", "),
 			i.Probability,
 			i.Spc,
-			i.UnModifiedObservations,
-			i.ModifiedObservations,
+			i.Intensity,
+			//i.UnModifiedObservations,
+			//i.ModifiedObservations,
 			strings.Join(amods, ", "),
 			strings.Join(omods, ", "),
 			i.Protein,

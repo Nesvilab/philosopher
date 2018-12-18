@@ -102,8 +102,24 @@ var pipelineCmd = &cobra.Command{
 			m.PTMProphet = p.PTMProphet
 			m.ProteinProphet = p.ProteinProphet
 			m.Filter = p.Filter
-			m.Quantify = p.Freequant
-			m.Quantify = p.LabelQuant
+
+			// freequant
+			m.Quantify.Tol = p.Freequant.Tol
+			m.Quantify.Dir = p.Freequant.Dir
+			m.Quantify.PTWin = p.Freequant.PTWin
+
+			// labelquant
+			m.Quantify.Annot = p.LabelQuant.Annot
+			m.Quantify.Plex = p.LabelQuant.Plex
+			m.Quantify.Dir = p.LabelQuant.Dir
+			m.Quantify.Tol = p.LabelQuant.Tol
+			m.Quantify.Level = p.LabelQuant.Level
+			m.Quantify.Purity = p.LabelQuant.Purity
+			m.Quantify.MinProb = p.LabelQuant.MinProb
+			m.Quantify.RemoveLow = p.LabelQuant.RemoveLow
+			m.Quantify.Unique = p.LabelQuant.Unique
+			m.Quantify.BestPSM = p.LabelQuant.BestPSM
+
 			m.Cluster = p.Cluster
 
 			// Database
