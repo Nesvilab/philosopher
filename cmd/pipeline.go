@@ -95,39 +95,39 @@ var pipelineCmd = &cobra.Command{
 			m.Restore(sys.Meta())
 
 			// load configuration
-			m.Filter = p.Filter
-			m.Database = p.Database
-			m.Comet = p.Comet
-			m.PeptideProphet = p.PeptideProphet
-			m.PTMProphet = p.PTMProphet
-			m.ProteinProphet = p.ProteinProphet
-			m.Filter = p.Filter
-
-			// freequant
-			m.Quantify.Tol = p.Freequant.Tol
-			m.Quantify.Dir = p.Freequant.Dir
-			m.Quantify.PTWin = p.Freequant.PTWin
-
-			// labelquant
-			m.Quantify.Annot = p.LabelQuant.Annot
-			m.Quantify.Plex = p.LabelQuant.Plex
-			m.Quantify.Dir = p.LabelQuant.Dir
-			m.Quantify.Tol = p.LabelQuant.Tol
-			m.Quantify.Level = p.LabelQuant.Level
-			m.Quantify.Purity = p.LabelQuant.Purity
-			m.Quantify.MinProb = p.LabelQuant.MinProb
-			m.Quantify.RemoveLow = p.LabelQuant.RemoveLow
-			m.Quantify.Unique = p.LabelQuant.Unique
-			m.Quantify.BestPSM = p.LabelQuant.BestPSM
-
-			m.Cluster = p.Cluster
+			// m.Filter = p.Filter
+			// m.Database = p.Database
+			// m.Comet = p.Comet
+			// m.PeptideProphet = p.PeptideProphet
+			// m.PTMProphet = p.PTMProphet
+			// m.ProteinProphet = p.ProteinProphet
+			// m.Filter = p.Filter
+			//
+			// // freequant
+			// m.Quantify.Tol = p.Freequant.Tol
+			// m.Quantify.Dir = p.Freequant.Dir
+			// m.Quantify.PTWin = p.Freequant.PTWin
+			//
+			// // labelquant
+			// m.Quantify.Annot = p.LabelQuant.Annot
+			// m.Quantify.Plex = p.LabelQuant.Plex
+			// m.Quantify.Dir = p.LabelQuant.Dir
+			// m.Quantify.Tol = p.LabelQuant.Tol
+			// m.Quantify.Level = p.LabelQuant.Level
+			// m.Quantify.Purity = p.LabelQuant.Purity
+			// m.Quantify.MinProb = p.LabelQuant.MinProb
+			// m.Quantify.RemoveLow = p.LabelQuant.RemoveLow
+			// m.Quantify.Unique = p.LabelQuant.Unique
+			// m.Quantify.BestPSM = p.LabelQuant.BestPSM
+			//
+			// m.Cluster = p.Cluster
+			// m.Report = p.Report
 
 			// Database
 			if p.Commands.Database == "yes" {
-				//m.Database = p.Database
+				m.Database = p.Database
 				dat.Run(m)
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
@@ -136,33 +136,32 @@ var pipelineCmd = &cobra.Command{
 
 			// Comet
 			if p.Commands.Comet == "yes" {
+				m.Comet = p.Comet
 				gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
 					logrus.Fatal(e)
 				}
 				comet.Run(m, files)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// MSFragger
 			if p.Commands.MSFragger == "yes" {
+				m.MSFragger = p.MSFragger
 				gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
 					logrus.Fatal(e)
 				}
 				fragger.Run(m, files)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// PeptideProphet
 			if p.Commands.PeptideProphet == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
+				m.PeptideProphet = p.PeptideProphet
 				m.PeptideProphet.Output = "interact"
 				m.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -170,26 +169,24 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}
-
 				peptideprophet.Run(m, files)
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			if p.Commands.PTMProphet == "yes" {
 				logrus.Info("Executing PTMProphet on ", i)
+				m.PTMProphet = p.PTMProphet
 				var files []string
 				files = append(files, "interact.pep.xml")
 				m.PTMProphet.InputFiles = files
 				ptmprophet.Run(m, files)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// ProteinProphet
 			if p.Commands.ProteinProphet == "yes" {
 				logrus.Info("Executing ProteinProphet on ", i)
+				m.ProteinProphet = p.ProteinProphet
 				m.ProteinProphet.Output = "interact"
 				var files []string
 				if p.Commands.PTMProphet == "yes" {
@@ -198,9 +195,7 @@ var pipelineCmd = &cobra.Command{
 					files = append(files, "interact.pep.xml")
 				}
 				proteinprophet.Run(m, files)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// return to the top level directory
@@ -211,8 +206,8 @@ var pipelineCmd = &cobra.Command{
 		var combinedProtXML string
 		if p.Commands.Abacus == "yes" && len(p.Filter.Pox) == 0 {
 			logrus.Info("Creating combined protein inference")
-			// return to the top level directory
 			os.Chdir(dir)
+			m.ProteinProphet = p.ProteinProphet
 			m.ProteinProphet.Output = "combined"
 			var files []string
 			for _, j := range args {
@@ -242,6 +237,7 @@ var pipelineCmd = &cobra.Command{
 			// Filter
 			if p.Commands.Filter == "yes" {
 				logrus.Info("Executing filter on ", i)
+				m.Filter = p.Filter
 
 				if len(m.Filter.Pex) == 0 {
 					m.Filter.Pex = "interact.pep.xml"
@@ -265,29 +261,25 @@ var pipelineCmd = &cobra.Command{
 				}
 
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
-
-			// getting inside de the dataset folder again
-			//os.Chdir(dsAbs)
 
 			// FreeQuant
 			if p.Commands.FreeQuant == "yes" {
 				logrus.Info("Executing label-free quantification on ", i)
+				m.Quantify = p.Freequant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
 				e := qua.RunLabelFreeQuantification(m.Quantify)
 				if e != nil {
 					logrus.Fatal(e.Error())
 				}
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// LabelQuant
 			if p.Commands.LabelQuant == "yes" {
 				logrus.Info("Executing label-based quantification on ", i)
+				m.Quantify = p.LabelQuant
 				m.Quantify.Dir = dsAbs
 				m.Quantify.Format = "mzML"
 				m.Quantify.Brand = "tmt"
@@ -296,28 +288,24 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e)
 				}
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// Report
 			if p.Commands.Report == "yes" {
 				logrus.Info("Executing report on ", i)
-
+				m.Report = p.Report
 				rep.Run(m)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
 			}
 
 			// Cluster
 			if p.Commands.Cluster == "yes" {
 				logrus.Info("Executing cluster on ", i)
+				m.Cluster = p.Cluster
 				clu.GenerateReport(m)
-
 				m.Serialize()
-				//met.CleanTemp(m.Temp)
+
 			}
 
 			// return to the top level directory
@@ -327,7 +315,6 @@ var pipelineCmd = &cobra.Command{
 		// Abacus
 		if p.Commands.Abacus == "yes" {
 			logrus.Info("Executing abacus")
-			// return to the top level directory
 			os.Chdir(dir)
 			m.Abacus = p.Abacus
 			err := aba.Run(m.Abacus, m.Temp, args)
