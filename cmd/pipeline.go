@@ -94,35 +94,6 @@ var pipelineCmd = &cobra.Command{
 			// reload the meta data
 			m.Restore(sys.Meta())
 
-			// load configuration
-			// m.Filter = p.Filter
-			// m.Database = p.Database
-			// m.Comet = p.Comet
-			// m.PeptideProphet = p.PeptideProphet
-			// m.PTMProphet = p.PTMProphet
-			// m.ProteinProphet = p.ProteinProphet
-			// m.Filter = p.Filter
-			//
-			// // freequant
-			// m.Quantify.Tol = p.Freequant.Tol
-			// m.Quantify.Dir = p.Freequant.Dir
-			// m.Quantify.PTWin = p.Freequant.PTWin
-			//
-			// // labelquant
-			// m.Quantify.Annot = p.LabelQuant.Annot
-			// m.Quantify.Plex = p.LabelQuant.Plex
-			// m.Quantify.Dir = p.LabelQuant.Dir
-			// m.Quantify.Tol = p.LabelQuant.Tol
-			// m.Quantify.Level = p.LabelQuant.Level
-			// m.Quantify.Purity = p.LabelQuant.Purity
-			// m.Quantify.MinProb = p.LabelQuant.MinProb
-			// m.Quantify.RemoveLow = p.LabelQuant.RemoveLow
-			// m.Quantify.Unique = p.LabelQuant.Unique
-			// m.Quantify.BestPSM = p.LabelQuant.BestPSM
-			//
-			// m.Cluster = p.Cluster
-			// m.Report = p.Report
-
 			// Database
 			if p.Commands.Database == "yes" {
 				m.Database = p.Database
