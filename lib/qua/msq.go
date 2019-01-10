@@ -130,6 +130,11 @@ func xic(v []raw.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64) (map[float64]f
 
 func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
+	// PSM intensities are collected direclty from spectra.
+	// Peptide intensity is the sum of all spectra.
+	// Ion intensity is the most intense.
+	// Protein intensity is the sum of the top 3.
+
 	var intPepKeyMap = make(map[string]float64)
 	var intPepMap = make(map[string]float64)
 	var intIonMap = make(map[string]float64)
@@ -141,7 +146,7 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 	for i := range e.PSM {
 
 		// global intensity map for Peptides, getting the sum of all intensities
-		// pepetide intensity is calculated by grouping PSM by sequence and calculted MZ
+		// peptide intensity is calculated by grouping PSM by sequence and calculted MZ
 
 		pepKey := fmt.Sprintf("%s#%f", e.PSM[i].Peptide, e.PSM[i].CalcNeutralPepMass)
 		_, okPep := intPepKeyMap[pepKey]

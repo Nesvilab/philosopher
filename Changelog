@@ -17,6 +17,7 @@
 ### Changed
 - Report file is now called protein.tsv.
 - Columns names were fixed to become synchronized.
+- Updated mzML mapping function.
 
 ### Fixed
 - Minor bug fixes.

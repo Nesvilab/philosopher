@@ -86,16 +86,6 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 		names = append(names, prjName)
 	}
 
-	// collect gene labels
-	// var reprintLabels []string
-	// if a.Reprint == true {
-	// 	for _, i := range names {
-	// 		parts := strings.Split(i, "_")
-	// 		label := fmt.Sprintf("%s_%s", parts[0], parts[1])
-	// 		reprintLabels = append(reprintLabels, label)
-	// 	}
-	// }
-
 	// If the name starts with CONTROL_  or Control_ then we put CONTROL (regardless of what follows after first '_')
 	// If the name starts with something else, then we first determine, for each experiment, if the annotation
 	// follows GENE_condition_replicate format (meaning there are two '_' in the name) or just GENE_replicate
