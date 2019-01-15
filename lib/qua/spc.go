@@ -41,33 +41,5 @@ func CalculateSpectralCounts(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	}
 
-	// var ptUniqueSpCMap = make(map[string]int)
-	// var ptRazorSpCMap = make(map[string]int)
-	//
-	// for _, i := range e.PSM {
-	// 	if i.IsUnique {
-	// 		ptUniqueSpCMap[i.ProteinID]++
-	// 	}
-	// 	if i.IsURazor {
-	// 		ptRazorSpCMap[i.ProteinID]++
-	// 	}
-	// }
-	//
-	// for i := range e.Proteins {
-	//
-	// 	e.Proteins[i].TotalSpC = len(e.Proteins[i].SupportingSpectra)
-	//
-	// 	unique, Uok := ptUniqueSpCMap[e.Proteins[i].ProteinID]
-	// 	if Uok {
-	// 		e.Proteins[i].UniqueSpC = unique
-	// 	}
-	//
-	// 	razor, Uok := ptRazorSpCMap[e.Proteins[i].ProteinID]
-	// 	if Uok {
-	// 		e.Proteins[i].URazorSpC = razor
-	// 	}
-	//
-	// }
-
 	return e, nil
 }
