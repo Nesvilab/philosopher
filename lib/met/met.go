@@ -3,6 +3,7 @@ package met
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -334,23 +335,21 @@ func CleanTemp(tmp string) error {
 	return nil
 }
 
+// TODO: figure out why this is not accpeting the err library
 // Serialize converts the whole structure to a gob file
 func (d *Data) Serialize() error {
 
-	output := fmt.Sprintf("%s", sys.Meta())
+	//output := fmt.Sprintf("%s", sys.Meta())
 
-	// create a file
-	dataFile, err := os.Create(output)
-	if err != nil {
-		return err
+	b, e := msgpack.Marshal(&d)
+	if e != nil {
+		return errors.New("Cannot serialize data")
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	err = dataEncoder.Encode(d)
-	if err != nil {
-		return err
+	e = ioutil.WriteFile(sys.Meta(), b, 0644)
+	if e != nil {
+		return errors.New("Cannot create file")
 	}
-	dataFile.Close()
 
 	return nil
 }

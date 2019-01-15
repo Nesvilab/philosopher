@@ -341,18 +341,15 @@ func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
 // Serialize saves to disk a msgpack verison of the database data structure
 func (d *Base) Serialize() *err.Error {
 
-	// create a file
-	dataFile, e := os.Create(sys.DBBin())
-	if e != nil {
+	b, er := msgpack.Marshal(&d)
+	if er != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	e = dataEncoder.Encode(d)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	er = ioutil.WriteFile(sys.DBBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }

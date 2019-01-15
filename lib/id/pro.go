@@ -3,13 +3,16 @@ package id
 import (
 	"encoding/gob"
 	"errors"
+	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/pro"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 )
 
 // ProtXML struct
@@ -247,22 +250,17 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *ProtXML) Serialize() error {
+func (p *ProtXML) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.ProtxmlBin())
-	if err != nil {
-		return err
+	b, er := msgpack.Marshal(&p)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(p)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	er = ioutil.WriteFile(sys.ProtxmlBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }

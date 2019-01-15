@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
@@ -509,22 +511,17 @@ func tdclassifier(p PeptideIdentification, tag string) bool {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *PepXML) Serialize() error {
+func (p *PepXML) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.PepxmlBin())
-	if err != nil {
-		return err
+	b, er := msgpack.Marshal(&p)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(p)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	er = ioutil.WriteFile(sys.PepxmlBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
@@ -544,9 +541,8 @@ func (p *PepXML) Restore() error {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *PepIDList) Serialize(level string) error {
+func (p *PepIDList) Serialize(level string) *err.Error {
 
-	var err error
 	var dest string
 
 	if level == "psm" {
@@ -556,21 +552,18 @@ func (p *PepIDList) Serialize(level string) error {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		return errors.New("Cannot seralize Peptide identifications")
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
 
-	// create a file
-	dataFile, err := os.Create(dest)
-	if err != nil {
-		return err
+	b, er := msgpack.Marshal(&p)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(p)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	er = ioutil.WriteFile(dest, b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
