@@ -1362,7 +1362,7 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 	}).Info("Applying capped sequential FDR estimation")
 
 	var cappedPSMMap = make(map[string]id.PepIDList)
-	for k,v := range uniqPsms {
+	for k, v := range uniqPsms {
 		for _, i := range v {
 			if i.Probability >= psmT {
 				cappedPSMMap[k] = append(cappedPSMMap[k], i)
@@ -1371,7 +1371,7 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 	}
 
 	var cappedPepMap = make(map[string]id.PepIDList)
-	for k,v := range uniqPeps {
+	for k, v := range uniqPeps {
 		for _, i := range v {
 			if i.Probability >= pepT {
 				cappedPepMap[k] = append(cappedPepMap[k], i)
@@ -1380,7 +1380,7 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 	}
 
 	var cappedIonMap = make(map[string]id.PepIDList)
-	for k,v := range uniqIons {
+	for k, v := range uniqIons {
 		for _, i := range v {
 			if i.Probability >= ionT {
 				cappedIonMap[k] = append(cappedIonMap[k], i)
