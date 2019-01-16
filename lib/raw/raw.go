@@ -2,7 +2,7 @@ package raw
 
 import (
 	"fmt"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 
@@ -73,30 +73,40 @@ func IndexMz(f []string) *err.Error {
 }
 
 // Serialize mz data structure to binary format
-func (data *Data) Serialize() *err.Error {
+func (d *Data) Serialize() *err.Error {
 
 	// remove the extension
-	var extension = filepath.Ext(filepath.Base(data.Raw.FileName))
-	var name = data.Raw.FileName[0 : len(data.Raw.FileName)-len(extension)]
+	var extension = filepath.Ext(filepath.Base(d.Raw.FileName))
+	var name = d.Raw.FileName[0 : len(d.Raw.FileName)-len(extension)]
 
 	// overwrite raw file
-	data.Raw.FileName = filepath.Base(name)
+	d.Raw.FileName = filepath.Base(name)
 
 	output := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), filepath.Base(name))
 
-	b, err := msgpack.Marshal(&data)
-	if err != nil {
-		panic(err)
+	b, er := msgpack.Marshal(&d)
+	if er != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	f, err := os.Create(output)
-	if err != nil {
-		return nil
+	er = ioutil.WriteFile(output, b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	defer f.Close()
 
-	f.Write(b)
-	_ = b
+	// b, err := msgpack.Marshal(&data)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	//
+	// f, err := os.Create(output)
+	// if err != nil {
+	// 	return nil
+	// }
+	// defer f.Close()
+	//
+	// f.Write(b)
+	// _ = b
 
 	return nil
 }
@@ -104,7 +114,7 @@ func (data *Data) Serialize() *err.Error {
 // Restore reads philosopher results files and restore the data sctructure
 func Restore(f string) (*Data, *err.Error) {
 
-	var data Data
+	var d Data
 
 	// remove the extension
 	var extension = filepath.Ext(filepath.Base(f))
@@ -112,15 +122,25 @@ func Restore(f string) (*Data, *err.Error) {
 
 	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
 
-	file, _ := os.Open(input)
-
-	dec := msgpack.NewDecoder(file)
-	e := dec.Decode(&data)
+	b, e := ioutil.ReadFile(input)
 	if e != nil {
-		return &data, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		return &d, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
 
-	return &data, nil
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &d, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
+	// file, _ := os.Open(input)
+	//
+	// dec := msgpack.NewDecoder(file)
+	// e := dec.Decode(&data)
+	// if e != nil {
+	// 	return &data, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	// }
+
+	return &d, nil
 }
 
 // RestoreFromFile reads the mz information directly from a mz file, not from indxed binaries

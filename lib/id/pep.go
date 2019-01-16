@@ -1,12 +1,10 @@
 package id
 
 import (
-	"encoding/gob"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -513,14 +511,14 @@ func tdclassifier(p PeptideIdentification, tag string) bool {
 // Serialize converts the whle structure to a gob file
 func (p *PepXML) Serialize() *err.Error {
 
-	b, er := msgpack.Marshal(&p)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&p)
+	if e != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	er = ioutil.WriteFile(sys.PepxmlBin(), b, 0644)
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.PepxmlBin(), b, 0644)
+	if e != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
 
 	return nil
@@ -529,12 +527,14 @@ func (p *PepXML) Serialize() *err.Error {
 // Restore reads philosopher results files and restore the data sctructure
 func (p *PepXML) Restore() error {
 
-	file, _ := os.Open(sys.PepxmlBin())
+	b, e := ioutil.ReadFile(sys.PepxmlBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+	}
 
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&p)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &p)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
 
 	return nil
@@ -583,12 +583,14 @@ func (p *PepIDList) Restore(level string) error {
 		return errors.New("Cannot seralize Peptide identifications")
 	}
 
-	file, _ := os.Open(dest)
+	b, e := ioutil.ReadFile(dest)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Cannot seralize Peptide identifications"}
+	}
 
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&p)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &p)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Cannot seralize Peptide identifications"}
 	}
 
 	return nil

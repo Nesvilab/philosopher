@@ -346,7 +346,7 @@ func (d *Base) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	er = ioutil.WriteFile(sys.DBBin(), b, 0644)
+	er = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
 	if er != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
@@ -357,12 +357,14 @@ func (d *Base) Serialize() *err.Error {
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Base) Restore() *err.Error {
 
-	file, _ := os.Open(sys.DBBin())
-
-	dec := msgpack.NewDecoder(file)
-	e := dec.Decode(&d)
+	b, e := ioutil.ReadFile(sys.DBBin())
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+	}
+
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil

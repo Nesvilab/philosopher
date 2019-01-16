@@ -1,7 +1,6 @@
 package met
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +8,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -290,13 +290,12 @@ type Pipeline struct {
 	//Dataset    string
 }
 
-var err error
-
 // New initializes the structure with the system information needed
 // to run all the follwing commands
 func New(h string) Data {
 
 	var d Data
+	var err error
 
 	var fmtuuid, _ = uuid.NewV4()
 	var uuid = fmt.Sprintf("%s", fmtuuid)
@@ -337,40 +336,41 @@ func CleanTemp(tmp string) error {
 
 // TODO: figure out why this is not accpeting the err library
 // Serialize converts the whole structure to a gob file
-func (d *Data) Serialize() error {
-
-	//output := fmt.Sprintf("%s", sys.Meta())
+func (d *Data) Serialize() *err.Error {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		return errors.New("Cannot serialize data")
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, 0644)
 	if e != nil {
-		return errors.New("Cannot create file")
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *Data) Restore(f string) error {
+func (d *Data) Restore(f string) *err.Error {
 
-	file, _ := os.Open(f)
+	b, e := ioutil.ReadFile(f)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
+	}
 
-	dec := msgpack.NewDecoder(file)
-	err := dec.Decode(&d)
-	if err != nil {
-		return errors.New("Could not restore meta data")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
 	}
 
 	if len(d.UUID) < 1 {
-		return errors.New("Could not restore meta data")
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
 	}
 
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
-		os.Mkdir(d.Temp, 0755)
+		os.Mkdir(d.Temp, sys.FilePermission())
+		//0755
 	}
 
 	return nil
