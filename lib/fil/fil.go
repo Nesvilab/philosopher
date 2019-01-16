@@ -3,6 +3,8 @@ package fil
 import (
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -38,7 +40,7 @@ func Run(f met.Data) (met.Data, error) {
 
 	f.SearchEngine = searchEngine
 
-	err = processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	psmT, pepT, ionT, err := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 	if err != nil {
 		return f, err
 	}
@@ -50,7 +52,7 @@ func Run(f met.Data) (met.Data, error) {
 			return f, proerr
 		}
 
-		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor)
+		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo)
 		if err != nil {
 			return f, err
 		}
@@ -63,6 +65,19 @@ func Run(f met.Data) (met.Data, error) {
 			pep.Restore("psm")
 			pro.Restore()
 			err = sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+			if err != nil {
+				return f, err
+			}
+			pep = nil
+			pro = nil
+
+		} else if f.Filter.Cap == true {
+
+			// sequential analysis
+			// filtered psm list and filtered prot list
+			pep.Restore("psm")
+			pro.Restore()
+			err = cappedSequentialControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, psmT, pepT, ionT, f.Filter.Tag)
 			if err != nil {
 				return f, err
 			}
@@ -146,6 +161,10 @@ func Run(f met.Data) (met.Data, error) {
 	logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
 
+	logrus.Info("Propagating modifications to layers")
+	e.UpdateIonAssignedAndObservedMods()
+
+	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
 	// reorganizes the selected proteins and the alternative proteins list
 	if f.Filter.Razor == true {
@@ -161,6 +180,7 @@ func Run(f met.Data) (met.Data, error) {
 		return f, cerr
 	}
 
+	logrus.Info("Saving")
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return f, cerr
@@ -246,7 +266,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) error {
+func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) (float64, float64, float64, error) {
 
 	var err error
 
@@ -299,25 +319,25 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, psmThreshold, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, peptideThreshold, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, ionThreshold, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredIons.Serialize("ion")
 
-	return nil
+	return psmThreshold, peptideThreshold, ionThreshold, nil
 }
 
 // chargeProfile ...
@@ -395,8 +415,7 @@ func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-// pepXMLFDRFilter applies FDR filtering at the PSM level
-func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, error) {
+func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64, error) {
 
 	//var msg string
 	var targets float64
@@ -518,7 +537,7 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 		"threshold": minProb,
 	}).Info(msg)
 
-	return cleanlist, err
+	return cleanlist, minProb, err
 }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
@@ -544,7 +563,7 @@ func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXM
 
 // processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor bool) error {
+func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool) error {
 
 	var err error
 	var pid id.ProtIDList
@@ -573,6 +592,38 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	pid, err = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor)
 	if err != nil {
 		return err
+	}
+
+	if fo == true {
+		output := fmt.Sprintf("%s%spep_pro_mappings.tsv", sys.MetaDir(), string(filepath.Separator))
+
+		file, err := os.Create(output)
+		if err != nil {
+			logrus.Fatal("Could not create output file")
+		}
+		defer file.Close()
+
+		for _, i := range pid {
+			if !strings.Contains(i.ProteinName, "rev_") {
+
+				var line []string
+
+				line = append(line, i.ProteinName)
+
+				for _, j := range i.PeptideIons {
+					if j.Razor == 1 {
+						line = append(line, j.PeptideSequence)
+					}
+				}
+
+				mapping := strings.Join(line, "\t")
+				_, err = io.WriteString(file, mapping)
+				if err != nil {
+					return errors.New("Cannot print PSM to file")
+				}
+
+			}
+		}
 	}
 
 	// save results on meta folder
@@ -1076,19 +1127,19 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 		"ions":     len(uniqIons),
 	}).Info("Applying sequential FDR estimation")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -1129,19 +1180,87 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 		"ions":     len(uniqIons),
 	}).Info("Second filtering results")
 
-	filteredPSM, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredIons.Serialize("ion")
+
+	return nil
+}
+
+// cappedSequentialControl estimates FDR levels by applying a second filter where all
+// proteins from the protein filtered list are matched against filtered PSMs
+// It will use the threshold of the first pass as a cap for the second pass
+func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion, psmT, pepT, ionT float64, decoyTag string) error {
+
+	extPep := extractPSMfromPepXML(pep, pro)
+
+	// organize enties by score (probability or expectation)
+	sort.Sort(extPep)
+
+	uniqPsms := getUniquePSMs(extPep)
+	uniqPeps := getUniquePeptides(extPep)
+	uniqIons := getUniquePeptideIons(extPep)
+
+	logrus.WithFields(logrus.Fields{
+		"psms":     len(uniqPsms),
+		"peptides": len(uniqPeps),
+		"ions":     len(uniqIons),
+	}).Info("Applying capped sequential FDR estimation")
+
+	var cappedPSMMap = make(map[string]id.PepIDList)
+	for k, v := range uniqPsms {
+		for _, i := range v {
+			if i.Probability >= psmT {
+				cappedPSMMap[k] = append(cappedPSMMap[k], i)
+			}
+		}
+	}
+
+	var cappedPepMap = make(map[string]id.PepIDList)
+	for k, v := range uniqPeps {
+		for _, i := range v {
+			if i.Probability >= pepT {
+				cappedPepMap[k] = append(cappedPepMap[k], i)
+			}
+		}
+	}
+
+	var cappedIonMap = make(map[string]id.PepIDList)
+	for k, v := range uniqIons {
+		for _, i := range v {
+			if i.Probability >= ionT {
+				cappedIonMap[k] = append(cappedIonMap[k], i)
+			}
+		}
+	}
+
+	filteredPSM, _, err := pepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredPSM.Serialize("psm")
+
+	filteredPeptides, _, err := pepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filteredPeptides.Serialize("pep")
+
+	filteredIons, _, err := pepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -1164,22 +1283,41 @@ func extractPSMfromPepXML(peplist id.PepIDList, pro id.ProtIDList) id.PepIDList 
 	}
 
 	for _, i := range peplist {
-
-		_, ptTag := protmap[string(i.Protein)]
-		if ptTag {
+		_, ok := protmap[string(i.Protein)]
+		if ok {
 			filterMap[string(i.Spectrum)] = i
-			protmap[string(i.Protein)]++
 		} else {
 			for _, j := range i.AlternativeProteins {
-				_, altTag := protmap[j]
-				if altTag {
+				_, ap := protmap[string(j)]
+				if ap {
 					filterMap[string(i.Spectrum)] = i
-					protmap[string(j)]++
 				}
 			}
 		}
-
 	}
+
+	// // get all protein names from protxml
+	// for _, i := range pro {
+	// 	protmap[string(i.ProteinName)] = 0
+	// }
+	//
+	// for _, i := range peplist {
+	//
+	// 	_, ptTag := protmap[string(i.Protein)]
+	// 	if ptTag {
+	// 		filterMap[string(i.Spectrum)] = i
+	// 		protmap[string(i.Protein)]++
+	// 	} else {
+	// 		for _, j := range i.AlternativeProteins {
+	// 			_, altTag := protmap[j]
+	// 			if altTag {
+	// 				filterMap[string(i.Spectrum)] = i
+	// 				protmap[string(j)]++
+	// 			}
+	// 		}
+	// 	}
+	//
+	// }
 
 	// // match protein names to <protein> tag on pepxml
 	// for j := range peplist {

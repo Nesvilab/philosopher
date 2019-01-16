@@ -341,18 +341,15 @@ func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
 // Serialize saves to disk a msgpack verison of the database data structure
 func (d *Base) Serialize() *err.Error {
 
-	// create a file
-	dataFile, e := os.Create(sys.DBBin())
-	if e != nil {
+	b, er := msgpack.Marshal(&d)
+	if er != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: "database structure"}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	e = dataEncoder.Encode(d)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	er = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
@@ -360,12 +357,14 @@ func (d *Base) Serialize() *err.Error {
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Base) Restore() *err.Error {
 
-	file, _ := os.Open(sys.DBBin())
-
-	dec := msgpack.NewDecoder(file)
-	e := dec.Decode(&d)
+	b, e := ioutil.ReadFile(sys.DBBin())
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+	}
+
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil

@@ -1,13 +1,14 @@
 package met
 
 import (
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -223,7 +224,9 @@ type Filter struct {
 	Razor    bool    `yaml:"razor"`
 	Picked   bool    `yaml:"picked"`
 	Seq      bool    `yaml:"sequential"`
+	Cap      bool    `yaml:"cappedsequential"`
 	Mapmods  bool    `yaml:"mapMods"`
+	Fo       bool
 }
 
 // Quantify options and parameters
@@ -287,13 +290,12 @@ type Pipeline struct {
 	//Dataset    string
 }
 
-var err error
-
 // New initializes the structure with the system information needed
 // to run all the follwing commands
 func New(h string) Data {
 
 	var d Data
+	var err error
 
 	var fmtuuid, _ = uuid.NewV4()
 	var uuid = fmt.Sprintf("%s", fmtuuid)
@@ -332,44 +334,43 @@ func CleanTemp(tmp string) error {
 	return nil
 }
 
+// TODO: figure out why this is not accpeting the err library
 // Serialize converts the whole structure to a gob file
-func (d *Data) Serialize() error {
+func (d *Data) Serialize() *err.Error {
 
-	output := fmt.Sprintf("%s", sys.Meta())
-
-	// create a file
-	dataFile, err := os.Create(output)
-	if err != nil {
-		return err
+	b, e := msgpack.Marshal(&d)
+	if e != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	err = dataEncoder.Encode(d)
-	if err != nil {
-		return err
+	e = ioutil.WriteFile(sys.Meta(), b, 0644)
+	if e != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
-	dataFile.Close()
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *Data) Restore(f string) error {
+func (d *Data) Restore(f string) *err.Error {
 
-	file, _ := os.Open(f)
+	b, e := ioutil.ReadFile(f)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
+	}
 
-	dec := msgpack.NewDecoder(file)
-	err := dec.Decode(&d)
-	if err != nil {
-		return errors.New("Could not restore meta data")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
 	}
 
 	if len(d.UUID) < 1 {
-		return errors.New("Could not restore meta data")
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
 	}
 
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
-		os.Mkdir(d.Temp, 0755)
+		os.Mkdir(d.Temp, sys.FilePermission())
+		//0755
 	}
 
 	return nil

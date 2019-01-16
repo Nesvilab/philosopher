@@ -5,6 +5,31 @@
 ### Changed
 ### Fixed
 
+
+# Philosopher 20181211
+### Build: ?
+
+### Added
+- All different reports now show the protein identifications.
+- All reports now include information about assigned and observed modifications.
+- New filter option called cappedsequential with threshold control on the second step filtering.
+
+### Changed
+- Report file is now called protein.tsv.
+- Columns names were fixed to become synchronized.
+- Updated mzML mapping function.
+- Major improvements with the processing speed.
+
+### Fixed
+- Minor bug fixes.
+
+# Philosopher 20181128
+### Build: 201811281548
+
+### Fixed
+- Fixed an issue with the MSstats report.
+- Minor bug fixes.
+
 # Philosopher 20181119
 ### Build: 201811191306
 

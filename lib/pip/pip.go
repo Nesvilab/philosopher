@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Directives contains the instructions to run a pipeline
@@ -57,7 +58,7 @@ func DeployParameterFile(temp string) (string, error) {
 		return file, errors.New("Cannot deploy Comet parameter file")
 	}
 
-	err = ioutil.WriteFile(file, param, 0644)
+	err = ioutil.WriteFile(file, param, sys.FilePermission())
 	if err != nil {
 		return file, errors.New("Cannot deploy pipeline parameter file")
 	}

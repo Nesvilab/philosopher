@@ -259,14 +259,53 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			}
 		}
 
-		// for i := range combined {
-		// 	for _, j := range v.Peptides {
-		// 		if combined[i].Sequence == j.Sequence {
-		// 			combined[i].Spc[k] = j.Spc
-		// 			break
-		// 		}
-		// 	}
-		// }
+	}
+
+	return combined
+}
+
+func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
+
+	for k, v := range datasets {
+
+		var keyMaps = make(map[string]int)
+
+		for _, j := range v.PSM {
+
+			var keys []string
+			keys = append(keys, j.Peptide)
+
+			var uniqMds = make(map[string]uint8)
+
+			for _, k := range j.AssignedMassDiffs {
+				mass := strconv.FormatFloat(k, 'f', 6, 64)
+				uniqMds[mass] = 0
+			}
+
+			// this forces the unmodified pepes to collapse with peps containing +16
+			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+				uniqMds["15.994900"] = 0
+				delete(uniqMds, "0")
+				delete(uniqMds, "0.000000")
+			}
+
+			for k, _ := range uniqMds {
+				keys = append(keys, k)
+			}
+
+			sort.Strings(keys[1:])
+
+			key := strings.Join(keys, "#")
+
+			keyMaps[key]++
+		}
+
+		for i, _ := range combined {
+			count, ok := keyMaps[combined[i].Key]
+			if ok {
+				combined[i].Spc[k] = count
+			}
+		}
 
 	}
 
@@ -286,7 +325,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Sequence\tCharge States\tProbability\tAssigned Massdiffs\tGene\tProtein\tProtein Description\t"
+	line := "Sequence\tCharge States\tProbability\tAssigned Modifications\tGene\tProtein\tProtein Description\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
@@ -336,84 +375,3 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 
 	return
 }
-
-// Create peptide combined report
-// func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
-//
-// 	var names []string
-// 	var xmlFiles []string
-// 	var database dat.Base
-// 	var datasets = make(map[string]rep.Evidence)
-//
-// 	var labelList []DataSetLabelNames
-//
-// 	// restore database
-// 	database = dat.Base{}
-// 	database.RestoreWithPath(args[0])
-//
-// 	// recover all files
-// 	logrus.Info("Restoring results")
-//
-// 	for _, i := range args {
-//
-// 		// restoring the database
-// 		var e rep.Evidence
-// 		e.RestoreGranularWithPath(i)
-//
-// 		var labels DataSetLabelNames
-// 		labels.LabelName = make(map[string]string)
-//
-// 		// collect interact full file names
-// 		files, _ := ioutil.ReadDir(i)
-// 		for _, f := range files {
-// 			if strings.Contains(f.Name(), "pep.xml") {
-// 				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-// 				absPath, _ := filepath.Abs(interactFile)
-// 				xmlFiles = append(xmlFiles, absPath)
-// 			}
-// 		}
-//
-// 		var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
-// 		if strings.Contains(i, string(filepath.Separator)) {
-// 			i = strings.Replace(i, string(filepath.Separator), "", -1)
-// 			labels.Name = i
-// 		} else {
-// 			labels.Name = i
-// 		}
-// 		labels.LabelName, _ = getLabelNames(annot)
-//
-// 		// collect project names
-// 		prjName := i
-// 		if strings.Contains(prjName, string(filepath.Separator)) {
-// 			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
-// 		}
-//
-// 		labelList = append(labelList, labels)
-//
-// 		// unique list and map of datasets
-// 		datasets[prjName] = e
-// 		names = append(names, prjName)
-// 	}
-//
-// 	sort.Strings(names)
-//
-// 	// logrus.Info("Processing spectral counts")
-// 	// evidences = getProteinSpectralCounts(evidences, datasets)
-// 	//
-// 	// logrus.Info("Processing intensities")
-// 	// evidences = sumProteinIntensities(evidences, datasets)
-// 	//
-// 	// // collect TMT labels
-// 	// if a.Labels == true {
-// 	// 	evidences = getProteinLabelIntensities(evidences, datasets)
-// 	// }
-// 	//
-// 	// if a.Labels == true {
-// 	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
-// 	// } else {
-// 	// 	saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
-// 	// }
-//
-// 	return nil
-// }
-//

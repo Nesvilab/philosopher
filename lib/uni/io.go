@@ -1,44 +1,40 @@
 package uni
 
 import (
-	"errors"
-	"os"
+	"io/ioutil"
 
-	"github.com/sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 )
 
 // Serialize UniMod data structure
-func (u *MOD) Serialize() error {
+func (d *MOD) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.MODBin())
-	if err != nil {
-		return err
+	b, er := msgpack.Marshal(&d)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(u)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	er = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (u *MOD) Restore() error {
+func (d *MOD) Restore() *err.Error {
 
-	file, _ := os.Open(sys.MODBin())
+	b, e := ioutil.ReadFile(sys.MODBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+	}
 
-	dec := msgpack.NewDecoder(file)
-	err := dec.Decode(&u)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil

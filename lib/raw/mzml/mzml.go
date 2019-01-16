@@ -145,6 +145,7 @@ type Spectrum struct {
 	Index               string              `xml:"index,attr"`
 	ID                  string              `xml:"id,attr"`
 	DefaultArrayLength  float64             `xml:"defaultArrayLength,attr"`
+	DataProcessingRef   string              `xml:"dataProcessingRef,att"`
 	CVParam             []CVParam           `xml:"cvParam"`
 	ScanList            ScanList            `xml:"scanList"`
 	PrecursorList       PrecursorList       `xml:"precursorList"`
@@ -255,7 +256,6 @@ type BinaryDataArray struct {
 	EncodedLength float64   `xml:"encodedLength,attr"`
 	CVParam       []CVParam `xml:"cvParam"`
 	Binary        Binary    `xml:"binary"`
-	//ConvertedBinary []float64
 }
 
 // Binary tag

@@ -269,3 +269,8 @@ func Centos() string {
 func Arch386() string {
 	return "386"
 }
+
+// FilePermission sets the default permission for every file written to disk
+func FilePermission() os.FileMode {
+	return 0644
+}

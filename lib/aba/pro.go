@@ -86,17 +86,31 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 		names = append(names, prjName)
 	}
 
-	// collect gene labels
+	// If the name starts with CONTROL_  or Control_ then we put CONTROL (regardless of what follows after first '_')
+	// If the name starts with something else, then we first determine, for each experiment, if the annotation
+	// follows GENE_condition_replicate format (meaning there are two '_' in the name) or just GENE_replicate
+	// format (meaning there is only one '_')
+
+	// If two '_', then we put in the second row GENE_condition (i.e. remove the second _ and what follows)
+	// If only one '_', then we put in the second row just GENE (i.e. remove the first _ and what follows after)
+
 	var reprintLabels []string
 	if a.Reprint == true {
 		for _, i := range names {
-			parts := strings.Split(i, "_")
-			label := fmt.Sprintf("%s_%s", parts[0], parts[1])
-			reprintLabels = append(reprintLabels, label)
+			if strings.Contains(strings.ToUpper(i), "CONTROL") {
+				reprintLabels = append(reprintLabels, "CONTROL")
+			} else {
+				parts := strings.Split(i, "_")
+				if len(parts) == 3 {
+					label := fmt.Sprintf("%s_%s", parts[0], parts[1])
+					reprintLabels = append(reprintLabels, label)
+				} else if len(parts) == 2 {
+					label := fmt.Sprintf("%s", parts[0])
+					reprintLabels = append(reprintLabels, label)
+				}
+			}
 		}
 	}
-
-	fmt.Println(reprintLabels)
 
 	sort.Strings(names)
 
@@ -447,7 +461,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreprint.csv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreprint.tsv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)

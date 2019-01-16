@@ -49,7 +49,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
-				logrus.Fatal("Could not restore meta data:", err)
+				logrus.Fatal("Could not restore PSM data:", err)
 			}
 			spew.Dump(o)
 
@@ -62,20 +62,20 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
-				logrus.Fatal("Could not restore meta data:", err)
+				logrus.Fatal("Could not restore database data:", err)
 			}
 			spew.Dump(o.Records)
 
 		} else if object == "protein" {
 
-			target := fmt.Sprintf(".meta%sev.pro.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%spro.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			var o rep.ProteinEvidenceList
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
-				logrus.Fatal("Could not restore meta data:", err)
+				logrus.Fatal("Could not restore protein data:", err)
 			}
 
 			if len(key) > 0 {

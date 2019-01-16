@@ -140,8 +140,6 @@ func (u *MOD) Read(f string) error {
 
 	for _, i := range xml.UniMOD.Modifications.Mods {
 
-		//if !strings.Contains(i.FullName, "substitution") {
-
 		var u MODElement
 
 		u.Title = i.Title
@@ -177,7 +175,6 @@ func (u *MOD) Read(f string) error {
 		}
 
 		list = append(list, u)
-		//}
 	}
 
 	u.Modifications = list

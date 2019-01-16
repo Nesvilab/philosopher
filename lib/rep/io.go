@@ -1,9 +1,8 @@
 package rep
 
 import (
-	"errors"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/prvst/philosopher/lib/err"
@@ -14,18 +13,15 @@ import (
 // Serialize converts the whole structure to a gob file
 func (e *Evidence) Serialize() *err.Error {
 
-	// create a file
-	dataFile, er := os.Create(sys.EvBin())
+	b, er := msgpack.Marshal(&e)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(e)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+	er = ioutil.WriteFile(sys.EvBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
@@ -81,16 +77,15 @@ func (e *Evidence) SerializeGranular() *err.Error {
 // SerializeEVPSM creates an ev serial with Evidence data
 func SerializeEVPSM(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvPSMBin())
+	b, er := msgpack.Marshal(&e.PSM)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.PSM)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvPSMBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -98,16 +93,15 @@ func SerializeEVPSM(e *Evidence) *err.Error {
 // SerializeEVIon creates an ev serial with Evidence data
 func SerializeEVIon(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvIonBin())
+	b, er := msgpack.Marshal(&e.Ions)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Ions)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvIonBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -115,16 +109,15 @@ func SerializeEVIon(e *Evidence) *err.Error {
 // SerializeEVPeptides creates an ev serial with Evidence data
 func SerializeEVPeptides(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvPeptideBin())
+	b, er := msgpack.Marshal(&e.Peptides)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Peptides)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvPeptideBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -132,16 +125,15 @@ func SerializeEVPeptides(e *Evidence) *err.Error {
 // SerializeEVProteins creates an ev serial with Evidence data
 func SerializeEVProteins(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvProteinBin())
+	b, er := msgpack.Marshal(&e.Proteins)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Proteins)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvProteinBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -149,16 +141,15 @@ func SerializeEVProteins(e *Evidence) *err.Error {
 // SerializeEVMods creates an ev serial with Evidence data
 func SerializeEVMods(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvModificationsBin())
+	b, er := msgpack.Marshal(&e.Mods)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Mods)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -166,16 +157,15 @@ func SerializeEVMods(e *Evidence) *err.Error {
 // SerializeEVModifications creates an ev serial with Evidence data
 func SerializeEVModifications(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvModificationsEvBin())
+	b, er := msgpack.Marshal(&e.Modifications)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Modifications)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvModificationsEvBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -183,29 +173,30 @@ func SerializeEVModifications(e *Evidence) *err.Error {
 // SerializeEVCombined creates an ev serial with Evidence data
 func SerializeEVCombined(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvCombinedBin())
+	b, er := msgpack.Marshal(&e.CombinedProtein)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.CombinedProtein)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvCombinedBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (e *Evidence) Restore() error {
+func (d *Evidence) Restore() *err.Error {
 
-	file, _ := os.Open(sys.EvBin())
+	b, e := ioutil.ReadFile(sys.EvBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+	}
 
-	dec := msgpack.NewDecoder(file)
-	err := dec.Decode(&e)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
 	return nil
@@ -260,79 +251,113 @@ func (e *Evidence) RestoreGranular() *err.Error {
 }
 
 // RestoreEVPSM restores Ev PSM data
-func RestoreEVPSM(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvPSMBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.PSM)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVPSM(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvPSMBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	e = msgpack.Unmarshal(b, &d.PSM)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
 	return nil
 }
 
 // RestoreEVIon restores Ev Ion data
-func RestoreEVIon(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvIonBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Ions)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVIon(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvIonBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Ions)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVPeptide restores Ev Ion data
-func RestoreEVPeptide(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvPeptideBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Peptides)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVPeptide(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvPeptideBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Peptides)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVProtein restores Ev Protein data
-func RestoreEVProtein(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvProteinBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Proteins)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVProtein(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvProteinBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Proteins)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVMods restores Ev Mods data
-func RestoreEVMods(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvModificationsBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Mods)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVMods(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvModificationsBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Mods)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVModifications restores Ev Mods data
-func RestoreEVModifications(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvModificationsEvBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Modifications)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVModifications(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvModificationsEvBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Modifications)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVCombined restores Ev Mods data
-func RestoreEVCombined(e *Evidence) *err.Error {
-	f, _ := os.Open(sys.EvCombinedBin())
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.CombinedProtein)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+func RestoreEVCombined(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvCombinedBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.CombinedProtein)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
@@ -385,154 +410,127 @@ func (e *Evidence) RestoreGranularWithPath(p string) *err.Error {
 }
 
 // RestoreEVPSMWithPath restores Ev PSM data
-func RestoreEVPSMWithPath(e *Evidence, p string) *err.Error {
+func RestoreEVPSMWithPath(d *Evidence, p string) *err.Error {
 
-	//path := sys.EvPSMBin()
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
 
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvPSMBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
-	// }
-
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.PSM)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.PSM)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVIonWithPath restores Ev Ion data
-func RestoreEVIonWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvIonBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvIonBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
-	// }
+func RestoreEVIonWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Ions)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Ions)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVPeptideWithPath restores Ev Ion data
-func RestoreEVPeptideWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvPeptideBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvPeptideBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
-	// }
+func RestoreEVPeptideWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Peptides)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Peptides)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVProteinWithPath restores Ev Protein data
-func RestoreEVProteinWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvProteinBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvProteinBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
-	// }
+func RestoreEVProteinWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Proteins)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Proteins)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVModsWithPath restores Ev Mods data
-func RestoreEVModsWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvModificationsBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvModificationsBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
-	// }
+func RestoreEVModsWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Mods)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Mods)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVModificationsWithPath restores Ev Mods data
-func RestoreEVModificationsWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvModificationsEvBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvModificationsEvBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
-	// }
+func RestoreEVModificationsWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.Modifications)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.Modifications)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }
 
 // RestoreEVCombinedWithPath restores Ev Mods data
-func RestoreEVCombinedWithPath(e *Evidence, p string) *err.Error {
-
-	// path := sys.EvCombinedBin()
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.EvCombinedBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
-	// }
+func RestoreEVCombinedWithPath(d *Evidence, p string) *err.Error {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
 
-	f, _ := os.Open(path)
-	d := msgpack.NewDecoder(f)
-	er := d.Decode(&e.CombinedProtein)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: er.Error()}
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
+
+	e = msgpack.Unmarshal(b, &d.CombinedProtein)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
+
 	return nil
 }

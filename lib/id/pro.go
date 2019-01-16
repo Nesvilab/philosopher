@@ -1,15 +1,15 @@
 package id
 
 import (
-	"encoding/gob"
 	"errors"
-	"os"
+	"io/ioutil"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/pro"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
-	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 )
 
 // ProtXML struct
@@ -247,70 +247,64 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *ProtXML) Serialize() error {
+func (d *ProtXML) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.ProtxmlBin())
-	if err != nil {
-		return err
+	b, e := msgpack.Marshal(&d)
+	if e != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(p)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
+	if e != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *ProtXML) Restore() error {
+func (d *ProtXML) Restore() error {
 
-	file, _ := os.Open(sys.ProtxmlBin())
+	b, e := ioutil.ReadFile(sys.ProtxmlBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+	}
 
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&p)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
 
 	return nil
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *ProtIDList) Serialize() error {
+func (d *ProtIDList) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.ProBin())
-	if err != nil {
-		return err
+	b, e := msgpack.Marshal(&d)
+	if e != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
 
-	dataEncoder := gob.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(p)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
+	if e != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *ProtIDList) Restore() error {
+func (d *ProtIDList) Restore() *err.Error {
 
-	file, _ := os.Open(sys.ProBin())
+	b, e := ioutil.ReadFile(sys.ProBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+	}
 
-	dec := gob.NewDecoder(file)
-	err := dec.Decode(&p)
-	if err != nil {
-		return errors.New("Could not restore Philosopher result. Please check file path")
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
 
 	return nil
