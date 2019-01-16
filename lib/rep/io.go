@@ -258,11 +258,10 @@ func RestoreEVPSM(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.PSM)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
-
 	return nil
 }
 
@@ -274,7 +273,7 @@ func RestoreEVIon(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Ions)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -290,7 +289,7 @@ func RestoreEVPeptide(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Peptides)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -306,7 +305,7 @@ func RestoreEVProtein(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Proteins)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -322,7 +321,7 @@ func RestoreEVMods(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Mods)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -338,7 +337,7 @@ func RestoreEVModifications(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Modifications)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -354,7 +353,7 @@ func RestoreEVCombined(d *Evidence) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.CombinedProtein)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -420,7 +419,7 @@ func RestoreEVPSMWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.PSM)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -438,7 +437,7 @@ func RestoreEVIonWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Ions)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -456,7 +455,7 @@ func RestoreEVPeptideWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Peptides)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -474,7 +473,7 @@ func RestoreEVProteinWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Proteins)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -492,7 +491,7 @@ func RestoreEVModsWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Mods)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -510,7 +509,7 @@ func RestoreEVModificationsWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.Modifications)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
@@ -528,7 +527,7 @@ func RestoreEVCombinedWithPath(d *Evidence, p string) *err.Error {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &d.CombinedProtein)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
