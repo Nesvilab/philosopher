@@ -2,30 +2,26 @@ package uni
 
 import (
 	"errors"
+	"io/ioutil"
 	"os"
 
-	"github.com/sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 )
 
 // Serialize UniMod data structure
-func (u *MOD) Serialize() error {
+func (u *MOD) Serialize() *err.Error {
 
-	var err error
-
-	// create a file
-	dataFile, err := os.Create(sys.MODBin())
-	if err != nil {
-		return err
+	b, er := msgpack.Marshal(&u)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(u)
-	if goberr != nil {
-		logrus.Fatal("Cannot save results, Bad format", goberr)
+	er = ioutil.WriteFile(sys.MODBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }

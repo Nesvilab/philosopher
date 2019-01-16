@@ -385,13 +385,13 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	var peptideIntMap = make(map[string]float64)
 	var ionIntMap = make(map[string]float64)
-	
+
 	for _, i := range e.PSM {
 
 		// peptide intensity : sum of all
 		_, ok := peptideIntMap[i.Peptide]
 		if ok {
-				peptideIntMap[i.Peptide] += i.Intensity
+			peptideIntMap[i.Peptide] += i.Intensity
 		} else {
 			peptideIntMap[i.Peptide] += i.Intensity
 		}

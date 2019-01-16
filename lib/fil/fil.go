@@ -180,6 +180,7 @@ func Run(f met.Data) (met.Data, error) {
 		return f, cerr
 	}
 
+	logrus.Info("Saving")
 	cerr = e.SerializeGranular()
 	if cerr != nil {
 		return f, cerr

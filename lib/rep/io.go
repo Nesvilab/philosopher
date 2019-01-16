@@ -3,6 +3,7 @@ package rep
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -14,18 +15,15 @@ import (
 // Serialize converts the whole structure to a gob file
 func (e *Evidence) Serialize() *err.Error {
 
-	// create a file
-	dataFile, er := os.Create(sys.EvBin())
+	b, er := msgpack.Marshal(&e)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	dataEncoder := msgpack.NewEncoder(dataFile)
-	goberr := dataEncoder.Encode(e)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+	er = ioutil.WriteFile(sys.EvBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	dataFile.Close()
 
 	return nil
 }
@@ -81,16 +79,15 @@ func (e *Evidence) SerializeGranular() *err.Error {
 // SerializeEVPSM creates an ev serial with Evidence data
 func SerializeEVPSM(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvPSMBin())
+	b, er := msgpack.Marshal(&e.PSM)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.PSM)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvPSMBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -98,16 +95,15 @@ func SerializeEVPSM(e *Evidence) *err.Error {
 // SerializeEVIon creates an ev serial with Evidence data
 func SerializeEVIon(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvIonBin())
+	b, er := msgpack.Marshal(&e.Ions)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Ions)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvIonBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -115,16 +111,15 @@ func SerializeEVIon(e *Evidence) *err.Error {
 // SerializeEVPeptides creates an ev serial with Evidence data
 func SerializeEVPeptides(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvPeptideBin())
+	b, er := msgpack.Marshal(&e.Peptides)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Peptides)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvPeptideBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -132,16 +127,15 @@ func SerializeEVPeptides(e *Evidence) *err.Error {
 // SerializeEVProteins creates an ev serial with Evidence data
 func SerializeEVProteins(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvProteinBin())
+	b, er := msgpack.Marshal(&e.Proteins)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Proteins)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvProteinBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -149,16 +143,15 @@ func SerializeEVProteins(e *Evidence) *err.Error {
 // SerializeEVMods creates an ev serial with Evidence data
 func SerializeEVMods(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvModificationsBin())
+	b, er := msgpack.Marshal(&e.Mods)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Mods)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvModificationsBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -166,16 +159,15 @@ func SerializeEVMods(e *Evidence) *err.Error {
 // SerializeEVModifications creates an ev serial with Evidence data
 func SerializeEVModifications(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvModificationsEvBin())
+	b, er := msgpack.Marshal(&e.Modifications)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.Modifications)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvModificationsEvBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
@@ -183,16 +175,15 @@ func SerializeEVModifications(e *Evidence) *err.Error {
 // SerializeEVCombined creates an ev serial with Evidence data
 func SerializeEVCombined(e *Evidence) *err.Error {
 
-	f, er := os.Create(sys.EvCombinedBin())
+	b, er := msgpack.Marshal(&e.CombinedProtein)
 	if er != nil {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
-	de := msgpack.NewEncoder(f)
-	goberr := de.Encode(e.CombinedProtein)
-	if goberr != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: goberr.Error()}
+
+	er = ioutil.WriteFile(sys.EvCombinedBin(), b, 0644)
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
-	f.Close()
 
 	return nil
 }
