@@ -41,7 +41,6 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 - Mass spec identification file conversion with idconvert.
 
 
-
 ## How to Download
 Download the latest version [here](https://github.com/Nesvilab/philosopher/releases/latest)
 
@@ -57,18 +56,20 @@ Check the [documentation](documentation.md) for more details about the available
 ## Questions, requests and bug reports
 If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/Nesvilab/philosopher/issues).
 
+
 ## Analytics
 Check the [analytics](analytics.md) session for more information on the program usage report.
 
+
 ## How to cite
 Still in progress!
+
+
+## License
+Since Philosopher is not officially released, the binaries provided here have no license. Once released, the software will be licensed under the GPL 3 license.
 
 
 ## About the developers
 [Felipe da Veiga leprevost](http://www.leprevost.com.br)
 
 Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
-
-
-## License
-Since Philosopher is not officially released, the binaries provided here have no license. Once released, the software will be licensed under the GPL 3 license.
