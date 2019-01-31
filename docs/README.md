@@ -28,6 +28,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
   - Sequential FDR estimation for large data sets using filtered PSM and proteins lists.
   - PickedFDR for scalable estimations.
   - Razor peptide assignment for better quantification and interpretation.
+  
 
 - Label-free quantification via Spectral counting and MS1 Quantification.
 
@@ -40,4 +41,34 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 - Mass spec identification file conversion with idconvert.
 
 
-Access [Philosopher website](https://prvst.github.io/philosopher/) for more information on how to use and download the program.
+
+## How to Download
+Download the latest version [here](https://github.com/prvst/philosopher/releases/latest)
+
+
+## How to Use
+A simple [tutorial](tutorial.md) is also provided with an extensive example on how to use Philosopher.
+
+
+## Documentation
+Check the [documentation](documentation.md) for more details about the available commands.
+
+
+## Questions, requests and bug reports
+If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/prvst/philosopher/issues).
+
+## Analytics
+Check the [analytics](analytics.md) session for more information on the program usage report.
+
+## How to cite
+Still in progress!
+
+
+## About the developers
+[Felipe da Veiga leprevost](http://www.leprevost.com.br)
+
+Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
+
+
+## License
+Since Philosopher is not officially released, the binaries provided here have no license. Once released, the software will be licensed under the GPL 3 license.
