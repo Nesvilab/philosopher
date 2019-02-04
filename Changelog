@@ -6,6 +6,12 @@
 ### Fixed
 
 
+# Philosopher 20190204
+### Build: 201902041330
+
+### Fixed
+- Fixed an error when trying to execute the prophets after the database command.
+
 # Philosopher 20190116
 ### Build: 201901161554
 
@@ -68,7 +74,7 @@
 
 ### Added
 - Minor bug fixes.
-- New tutorail added to website.
+- New tutorial added to website.
 
 # Philosopher 20180905
 ### Build: 201809051532
