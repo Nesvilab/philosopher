@@ -17,7 +17,6 @@ $(BINARY): $(SOURCES)
 deps:
 	go get -u github.com/mitchellh/gox
 	go get -u github.com/inconshreveable/mousetrap
-	go get -u github.com/go-windows-terminal-sequences
 	go get -u github.com/sirupsen/logrus
 	go get -u gonum.org/v1/plot
 	go get -u github.com/mattn/go-colorable
@@ -37,7 +36,7 @@ deps:
 	go get -u github.com/jpillora/go-ogle-analytics
 	go get -u github.com/onsi/ginkgo
 	go get -u github.com/onsi/gomega
-	go get -u github.com/konsorten/go-windows-terminal-sequences
+	#go get -u github.com/konsorten/go-windows-terminal-sequences
 
 .PHONY: deploy
 deploy:
