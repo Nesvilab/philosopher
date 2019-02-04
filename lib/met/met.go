@@ -315,7 +315,7 @@ func New(h string) Data {
 	d.MetaFile = d.Home + string(filepath.Separator) + sys.Meta()
 	d.MetaDir = d.Home + string(filepath.Separator) + sys.MetaDir()
 
-	d.DB = d.MetaDir + string(filepath.Separator) + sys.DBBin()
+	d.DB = d.Home + string(filepath.Separator) + sys.DBBin()
 
 	d.Temp, err = sys.GetTemp()
 	d.Temp += string(filepath.Separator) + uuid
