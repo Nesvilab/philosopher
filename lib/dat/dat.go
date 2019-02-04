@@ -54,10 +54,10 @@ func Run(m met.Data) (met.Data, *err.Error) {
 			return m, e
 		}
 
-		// e = db.Serialize()
-		// if e != nil {
-		// 	return m, e
-		// }
+		e = db.Serialize()
+		if e != nil {
+			return m, e
+		}
 
 		return m, e
 	}
@@ -323,17 +323,17 @@ func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
 		}
 	}
 
-	sys.CopyFile(workfile, outfile)
-
-	// err := d.ProcessDB(outfile, tag)
+	// e = d.ProcessDB(outfile, tag)
 	// if e != nil {
-	// 	return err
+	// 	return outfile, &err.Error{Type: err.CannotParseDataBase, Class: err.FATA}
 	// }
 	//
-	// err = d.Serialize()
-	// if err != nil {
-	// 	return err
+	// e = d.Serialize()
+	// if e != nil {
+	// 	return outfile, &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	// }
+
+	sys.CopyFile(workfile, outfile)
 
 	return outfile, nil
 }

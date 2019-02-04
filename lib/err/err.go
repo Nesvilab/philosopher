@@ -34,6 +34,9 @@ const (
 	// CannotDeleteMetaDirectory indicates a missing Meta folder
 	CannotDeleteMetaDirectory string = "cannot remove the meta data"
 
+	// CannotParseDataBase indicates a problem when reading the database file
+	CannotParseDataBase string = "cannot read or parse the database file"
+
 	// CannotZipMetaDirectory indicates a problem trying to zip the metadata
 	CannotZipMetaDirectory string = "there was a problem zipping the meta data"
 
