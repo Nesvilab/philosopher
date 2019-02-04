@@ -11,6 +11,7 @@
 
 ### Fixed
 - Fixed an error when trying to execute the prophets after the database command.
+- Fixed an error when trying to execute the filter command (missing database).
 
 # Philosopher 20190116
 ### Build: 201901161554
