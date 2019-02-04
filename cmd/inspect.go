@@ -38,7 +38,12 @@ var inspectCmd = &cobra.Command{
 			if err != nil {
 				logrus.Fatal("Could not restore meta data:", err)
 			}
-			spew.Dump(o)
+
+			if key == "session" {
+				fmt.Println(o.UUID)
+			} else {
+				spew.Dump(o)
+			}
 
 		} else if object == "psm" {
 

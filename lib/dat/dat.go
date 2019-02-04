@@ -54,10 +54,10 @@ func Run(m met.Data) (met.Data, *err.Error) {
 			return m, e
 		}
 
-		e = db.Serialize()
-		if e != nil {
-			return m, e
-		}
+		// e = db.Serialize()
+		// if e != nil {
+		// 	return m, e
+		// }
 
 		return m, e
 	}
