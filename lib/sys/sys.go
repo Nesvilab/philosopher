@@ -235,7 +235,7 @@ func Windows() string {
 	return "windows"
 }
 
-// MAC OS
+// Darwin OS
 func Darwin() string {
 	return "darwin"
 }

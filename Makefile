@@ -36,6 +36,7 @@ deps:
 	go get -u github.com/jpillora/go-ogle-analytics
 	go get -u github.com/onsi/ginkgo
 	go get -u github.com/onsi/gomega
+	go get -u github.com/onsi/ginkgo/ginkgo
 	#go get -u github.com/konsorten/go-windows-terminal-sequences
 
 .PHONY: deploy
@@ -71,6 +72,10 @@ deploy:
 	unzip -o lib/pip/bindata.go.zip -d  lib/pip/
 
 	unzip -o lib/dat/bindata.go.zip -d  lib/dat/
+
+.PHONY: test
+test:
+	ginkgo -r lib
 
 .PHONY: install
 install:
