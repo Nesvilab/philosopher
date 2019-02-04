@@ -1,9 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -18,9 +18,14 @@ var peprophCmd = &cobra.Command{
 	//Long:  "Statistical validation of peptide assignments for MS/MS Proteomics data\nPeptidProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
+
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			fmt.Println(e.Error())
 		}
 
 		logrus.Info("Executing PeptideProphet ", Version)

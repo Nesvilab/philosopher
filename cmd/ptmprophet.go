@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -17,10 +16,12 @@ var ptmprophetCmd = &cobra.Command{
 	Short: "PTM site localization",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
-		}
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
+
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing PTMProphet ", Version)
 

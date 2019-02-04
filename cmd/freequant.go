@@ -4,7 +4,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
@@ -19,10 +18,12 @@ var freequant = &cobra.Command{
 	//Long:  `Provides methods for MS1 Peak Intensity calculation based on XIC`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
-		}
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
+
+		m.FunctionInitCheckUp()
 
 		// if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
 		// 	logrus.Fatal("You need to provide the path to the mz files and the correct extension.")

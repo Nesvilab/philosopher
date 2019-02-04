@@ -327,14 +327,24 @@ func New(h string) Data {
 }
 
 // CleanTemp removes all files from the given temp directory
-func CleanTemp(tmp string) error {
+func CleanTemp(dir string) error {
 
-	os.RemoveAll(tmp)
+	//os.RemoveAll(tmp)
+
+	files, err := filepath.Glob(filepath.Join(dir, "*"))
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		err = os.RemoveAll(file)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-// TODO: figure out why this is not accpeting the err library
 // Serialize converts the whole structure to a gob file
 func (d *Data) Serialize() *err.Error {
 
@@ -371,6 +381,22 @@ func (d *Data) Restore(f string) *err.Error {
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
 		os.Mkdir(d.Temp, sys.FilePermission())
 		//0755
+	}
+
+	return nil
+}
+
+// FunctionInitCheckUp does initilization checkup and verification if meta and temp folders are up.
+// In case not, meta troews an error and folder is created.
+func (d Data) FunctionInitCheckUp() *err.Error {
+
+	if len(d.UUID) < 1 && len(d.Home) < 1 {
+		return &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+	}
+
+	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
+		os.Mkdir(d.Temp, sys.FilePermission())
+		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create temporary directory; check folder permissions"}
 	}
 
 	return nil

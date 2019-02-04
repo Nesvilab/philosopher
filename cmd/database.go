@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -17,11 +16,12 @@ var databaseCmd = &cobra.Command{
 	//provides options for downloading a fresh snapshot from UniProt`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// verify if the command is been executed on a workspace directory
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
-		}
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
+
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Database ", Version)
 

@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -18,10 +17,12 @@ var filterCmd = &cobra.Command{
 	//Long:  `Custom algorithms for multi-level False Discovery Rates scoring and evaluation`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if len(m.UUID) < 1 && len(m.Home) < 1 {
-			e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-			logrus.Fatal(e.Error())
-		}
+		// if len(m.UUID) < 1 && len(m.Home) < 1 {
+		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		// 	logrus.Fatal(e.Error())
+		// }
+
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Filter ", Version)
 
