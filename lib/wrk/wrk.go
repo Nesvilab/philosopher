@@ -73,9 +73,9 @@ func Init(version, build string) *err.Error {
 	}
 
 	da, e := met.New(dir)
-	if e != nil {
-		logrus.Fatal(e.Error())
-	}
+	// if e != nil {
+	// 	logrus.Fatal(e.Error())
+	// }
 
 	da.Version = version
 	da.Build = build
