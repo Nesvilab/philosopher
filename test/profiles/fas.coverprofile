@@ -1,0 +1,24 @@
+mode: atomic
+github.com/prvst/philosopher/lib/fas/fas.go:13.65,20.32 5 1
+github.com/prvst/philosopher/lib/fas/fas.go:23.2,29.21 4 0
+github.com/prvst/philosopher/lib/fas/fas.go:41.2,41.22 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:20.32,22.3 1 1
+github.com/prvst/philosopher/lib/fas/fas.go:29.21,30.45 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:30.45,34.4 3 0
+github.com/prvst/philosopher/lib/fas/fas.go:34.9,38.4 3 0
+github.com/prvst/philosopher/lib/fas/fas.go:45.79,54.22 4 0
+github.com/prvst/philosopher/lib/fas/fas.go:60.2,60.8 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:54.22,58.3 3 0
+github.com/prvst/philosopher/lib/fas/fas.go:64.77,73.25 4 0
+github.com/prvst/philosopher/lib/fas/fas.go:78.2,78.8 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:73.25,76.3 2 0
+github.com/prvst/philosopher/lib/fas/fas.go:82.79,85.32 2 0
+github.com/prvst/philosopher/lib/fas/fas.go:88.2,95.21 5 0
+github.com/prvst/philosopher/lib/fas/fas.go:105.2,105.22 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:85.32,87.3 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:95.21,96.45 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:96.45,102.4 5 0
+github.com/prvst/philosopher/lib/fas/fas.go:109.96,113.23 2 0
+github.com/prvst/philosopher/lib/fas/fas.go:119.2,119.17 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:113.23,114.69 1 0
+github.com/prvst/philosopher/lib/fas/fas.go:114.69,116.4 1 0

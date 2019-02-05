@@ -25,6 +25,7 @@ type Record struct {
 	IsContaminant    bool
 }
 
+// ProcessENSEMBL parses ENSEMBL like FASTA records
 func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
 
 	var e Record
