@@ -111,6 +111,9 @@ const (
 
 	// MethodNotImplemented is used when a incomplete or empty method is called
 	MethodNotImplemented string = "method is non-existent"
+
+	// CannotGetLinuxFlavor is used when the LInux falvor cannot be determined
+	CannotGetLinuxFlavor string = "cannot determine Linux distribution"
 )
 
 // Error is the base struct for all errors

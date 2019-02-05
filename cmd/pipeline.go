@@ -43,7 +43,11 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		// create a virtual meta instance
-		var meta = met.New(dir)
+		meta, e := met.New(dir)
+		if e != nil {
+			logrus.Fatal(e.Error())
+		}
+
 		os.Mkdir(meta.Temp, 0755)
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
 			logrus.Info("Can't find temporary directory; check folder permissions")

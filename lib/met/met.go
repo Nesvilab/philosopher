@@ -11,7 +11,6 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -292,10 +291,9 @@ type Pipeline struct {
 
 // New initializes the structure with the system information needed
 // to run all the follwing commands
-func New(h string) Data {
+func New(h string) (Data, *err.Error) {
 
 	var d Data
-	var err error
 
 	var fmtuuid, _ = uuid.NewV4()
 	var uuid = fmt.Sprintf("%s", fmtuuid)
@@ -304,10 +302,11 @@ func New(h string) Data {
 	d.OS = runtime.GOOS
 	d.Arch = runtime.GOARCH
 
-	d.Distro, err = sys.GetLinuxFlavor()
-	if err != nil {
-		logrus.Fatal(err)
+	distro, e := sys.GetLinuxFlavor()
+	if e != nil {
+		return d, &err.Error{Type: err.CannotGetLinuxFlavor, Class: err.FATA}
 	}
+	d.Distro = distro
 
 	d.Home = h
 	d.ProjectName = string(filepath.Base(h))
@@ -317,13 +316,14 @@ func New(h string) Data {
 
 	d.DB = d.Home + string(filepath.Separator) + sys.DBBin()
 
-	d.Temp, err = sys.GetTemp()
-	d.Temp += string(filepath.Separator) + uuid
+	temp, e := sys.GetTemp()
+	temp += string(filepath.Separator) + uuid
+	d.Temp = temp
 
 	t := time.Now()
 	d.TimeStamp = t.Format(time.RFC3339)
 
-	return d
+	return d, nil
 }
 
 // CleanTemp removes all files from the given temp directory
