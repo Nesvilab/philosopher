@@ -72,7 +72,7 @@ func Init(version, build string) *err.Error {
 		return &err.Error{Type: err.CannotStatLocalDirectory, Class: err.FATA, Argument: "check folder permissions"}
 	}
 
-	da, e := met.New(dir)
+	da := met.New(dir)
 	// if e != nil {
 	// 	logrus.Fatal(e.Error())
 	// }

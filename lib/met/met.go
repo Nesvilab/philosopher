@@ -11,6 +11,7 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -291,7 +292,7 @@ type Pipeline struct {
 
 // New initializes the structure with the system information needed
 // to run all the follwing commands
-func New(h string) (Data, *err.Error) {
+func New(h string) Data {
 
 	var d Data
 
@@ -304,7 +305,7 @@ func New(h string) (Data, *err.Error) {
 
 	distro, e := sys.GetLinuxFlavor()
 	if e != nil {
-		return d, &err.Error{Type: err.CannotGetLinuxFlavor, Class: err.FATA}
+		logrus.Fatal(e)
 	}
 	d.Distro = distro
 
@@ -323,7 +324,7 @@ func New(h string) (Data, *err.Error) {
 	t := time.Now()
 	d.TimeStamp = t.Format(time.RFC3339)
 
-	return d, nil
+	return d
 }
 
 // CleanTemp removes all files from the given temp directory

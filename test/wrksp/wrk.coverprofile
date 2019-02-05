@@ -16,11 +16,11 @@ github.com/prvst/philosopher/lib/wrk/wrk.go:46.22,50.15 3 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:53.3,53.11 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:50.15,52.4 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:61.45,66.40 3 1
-github.com/prvst/philosopher/lib/wrk/wrk.go:70.2,71.14 2 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:75.2,84.54 5 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:88.2,89.48 2 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:93.2,98.12 4 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:66.40,68.3 1 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:70.2,71.14 2 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:75.2,84.54 5 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:88.2,89.48 2 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:93.2,98.12 4 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:66.40,68.3 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:71.14,73.3 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:84.54,86.3 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:89.48,91.3 1 0
@@ -34,6 +34,6 @@ github.com/prvst/philosopher/lib/wrk/wrk.go:112.27,114.3 1 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:114.8,118.3 3 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:121.40,122.3 0 0
 github.com/prvst/philosopher/lib/wrk/wrk.go:125.14,127.3 1 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:133.25,136.14 2 0
-github.com/prvst/philosopher/lib/wrk/wrk.go:140.2,140.12 1 0
+github.com/prvst/philosopher/lib/wrk/wrk.go:133.25,136.14 2 1
+github.com/prvst/philosopher/lib/wrk/wrk.go:140.2,140.12 1 1
 github.com/prvst/philosopher/lib/wrk/wrk.go:136.14,138.3 1 0

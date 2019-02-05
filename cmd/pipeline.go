@@ -43,10 +43,10 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		// create a virtual meta instance
-		meta, e := met.New(dir)
-		if e != nil {
-			logrus.Fatal(e.Error())
-		}
+		meta := met.New(dir)
+		// if e != nil {
+		// 	logrus.Fatal(e.Error())
+		// }
 
 		os.Mkdir(meta.Temp, 0755)
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {

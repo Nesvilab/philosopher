@@ -23,7 +23,7 @@ var _ = Describe("Met", func() {
 		It("New", func() {
 			dir, e = os.Getwd()
 			Expect(e).NotTo(HaveOccurred())
-			d, e = New(dir)
+			d = New(dir)
 			Expect(e).NotTo(HaveOccurred())
 		})
 

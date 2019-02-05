@@ -1,0 +1,7 @@
+mode: atomic
+github.com/prvst/philosopher/lib/uti/uti.go:7.71,18.22 7 1
+github.com/prvst/philosopher/lib/uti/uti.go:24.2,26.8 2 1
+github.com/prvst/philosopher/lib/uti/uti.go:18.22,20.3 1 0
+github.com/prvst/philosopher/lib/uti/uti.go:20.8,22.3 1 1
+github.com/prvst/philosopher/lib/uti/uti.go:30.50,33.2 2 1
+github.com/prvst/philosopher/lib/uti/uti.go:35.36,37.2 1 1
