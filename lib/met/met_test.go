@@ -14,14 +14,6 @@ import (
 
 var _ = Describe("Met", func() {
 
-	BeforeEach(func() {
-		By("Settig the workspace at the test directory")
-
-		e := os.Chdir("../../test/wrksp")
-		Expect(e).NotTo(HaveOccurred())
-
-	})
-
 	Context("Testing the meta data structure", func() {
 
 		var dir string

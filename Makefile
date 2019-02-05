@@ -75,7 +75,7 @@ deploy:
 
 .PHONY: test
 test:
-	ginkgo -r -cover lib
+	ginkgo -r -cover -outputdir test/profiles
 
 .PHONY: install
 install:

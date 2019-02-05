@@ -1,8 +1,6 @@
 package wrk_test
 
 import (
-	"os"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -11,14 +9,6 @@ import (
 )
 
 var _ = Describe("Wrk", func() {
-
-	BeforeEach(func() {
-		By("Settig the workspace at the test directory")
-
-		e := os.Chdir("../../test/wrksp")
-		Expect(e).NotTo(HaveOccurred())
-
-	})
 
 	Context("Testing workspace management", func() {
 

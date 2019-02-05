@@ -11,195 +11,191 @@ import (
 
 var _ = Describe("Bio", func() {
 
-	Describe("Bio::aa", func() {
+	Context("Amino acid instantiation", func() {
 
-		Context("Amino acid instantiation", func() {
+		It("Alanine", func() {
+			a, _ := New("Alanine")
+			Expect(a.Code).To(Equal("A"))
+			Expect(a.ShortName).To(Equal("Ala"))
+			Expect(a.Name).To(Equal("Alanine"))
+			Expect(a.MonoIsotopeMass).To(Equal(71.037113805))
+			Expect(a.AverageMass).To(Equal(71.0779))
+		})
 
-			It("Alanine", func() {
-				a, _ := New("Alanine")
-				Expect(a.Code).To(Equal("A"))
-				Expect(a.ShortName).To(Equal("Ala"))
-				Expect(a.Name).To(Equal("Alanine"))
-				Expect(a.MonoIsotopeMass).To(Equal(71.037113805))
-				Expect(a.AverageMass).To(Equal(71.0779))
-			})
+		It("Arginine", func() {
+			a, _ := New("Arginine")
+			Expect(a.Code).To(Equal("R"))
+			Expect(a.ShortName).To(Equal("Arg"))
+			Expect(a.Name).To(Equal("Arginine"))
+			Expect(a.MonoIsotopeMass).To(Equal(156.101111050))
+			Expect(a.AverageMass).To(Equal(156.18568))
+		})
 
-			It("Arginine", func() {
-				a, _ := New("Arginine")
-				Expect(a.Code).To(Equal("R"))
-				Expect(a.ShortName).To(Equal("Arg"))
-				Expect(a.Name).To(Equal("Arginine"))
-				Expect(a.MonoIsotopeMass).To(Equal(156.101111050))
-				Expect(a.AverageMass).To(Equal(156.18568))
-			})
+		It("Asparagine", func() {
+			a, _ := New("Asparagine")
+			Expect(a.Code).To(Equal("N"))
+			Expect(a.ShortName).To(Equal("Asn"))
+			Expect(a.Name).To(Equal("Asparagine"))
+			Expect(a.MonoIsotopeMass).To(Equal(114.042927470))
+			Expect(a.AverageMass).To(Equal(114.10264))
+		})
 
-			It("Asparagine", func() {
-				a, _ := New("Asparagine")
-				Expect(a.Code).To(Equal("N"))
-				Expect(a.ShortName).To(Equal("Asn"))
-				Expect(a.Name).To(Equal("Asparagine"))
-				Expect(a.MonoIsotopeMass).To(Equal(114.042927470))
-				Expect(a.AverageMass).To(Equal(114.10264))
-			})
+		It("Aspartic Acid", func() {
+			a, _ := New("Aspartic Acid")
+			Expect(a.Code).To(Equal("D"))
+			Expect(a.ShortName).To(Equal("Asp"))
+			Expect(a.Name).To(Equal("Aspartic Acid"))
+			Expect(a.MonoIsotopeMass).To(Equal(115.026943065))
+			Expect(a.AverageMass).To(Equal(115.0874))
+		})
 
-			It("Aspartic Acid", func() {
-				a, _ := New("Aspartic Acid")
-				Expect(a.Code).To(Equal("D"))
-				Expect(a.ShortName).To(Equal("Asp"))
-				Expect(a.Name).To(Equal("Aspartic Acid"))
-				Expect(a.MonoIsotopeMass).To(Equal(115.026943065))
-				Expect(a.AverageMass).To(Equal(115.0874))
-			})
+		It("Cysteine", func() {
+			a, _ := New("Cysteine")
+			Expect(a.Code).To(Equal("C"))
+			Expect(a.ShortName).To(Equal("Cys"))
+			Expect(a.Name).To(Equal("Cysteine"))
+			Expect(a.MonoIsotopeMass).To(Equal(103.009184505))
+			Expect(a.AverageMass).To(Equal(103.1429))
+		})
 
-			It("Cysteine", func() {
-				a, _ := New("Cysteine")
-				Expect(a.Code).To(Equal("C"))
-				Expect(a.ShortName).To(Equal("Cys"))
-				Expect(a.Name).To(Equal("Cysteine"))
-				Expect(a.MonoIsotopeMass).To(Equal(103.009184505))
-				Expect(a.AverageMass).To(Equal(103.1429))
-			})
+		It("Glutamine", func() {
+			a, _ := New("Glutamine")
+			Expect(a.Code).To(Equal("E"))
+			Expect(a.ShortName).To(Equal("Glu"))
+			Expect(a.Name).To(Equal("Glutamine"))
+			Expect(a.MonoIsotopeMass).To(Equal(129.042593135))
+			Expect(a.AverageMass).To(Equal(129.11398))
+		})
 
-			It("Glutamine", func() {
-				a, _ := New("Glutamine")
-				Expect(a.Code).To(Equal("E"))
-				Expect(a.ShortName).To(Equal("Glu"))
-				Expect(a.Name).To(Equal("Glutamine"))
-				Expect(a.MonoIsotopeMass).To(Equal(129.042593135))
-				Expect(a.AverageMass).To(Equal(129.11398))
-			})
+		It("Glutamic Acid", func() {
+			a, _ := New("Glutamic Acid")
+			Expect(a.Code).To(Equal("Q"))
+			Expect(a.ShortName).To(Equal("Gln"))
+			Expect(a.Name).To(Equal("Glutamic Acid"))
+			Expect(a.MonoIsotopeMass).To(Equal(128.058577540))
+			Expect(a.AverageMass).To(Equal(128.12922))
+		})
 
-			It("Glutamic Acid", func() {
-				a, _ := New("Glutamic Acid")
-				Expect(a.Code).To(Equal("Q"))
-				Expect(a.ShortName).To(Equal("Gln"))
-				Expect(a.Name).To(Equal("Glutamic Acid"))
-				Expect(a.MonoIsotopeMass).To(Equal(128.058577540))
-				Expect(a.AverageMass).To(Equal(128.12922))
-			})
+		It("Glycine", func() {
+			a, _ := New("Glycine")
+			Expect(a.Code).To(Equal("G"))
+			Expect(a.ShortName).To(Equal("Gly"))
+			Expect(a.Name).To(Equal("Glycine"))
+			Expect(a.MonoIsotopeMass).To(Equal(57.021463735))
+			Expect(a.AverageMass).To(Equal(57.05132))
+		})
 
-			It("Glycine", func() {
-				a, _ := New("Glycine")
-				Expect(a.Code).To(Equal("G"))
-				Expect(a.ShortName).To(Equal("Gly"))
-				Expect(a.Name).To(Equal("Glycine"))
-				Expect(a.MonoIsotopeMass).To(Equal(57.021463735))
-				Expect(a.AverageMass).To(Equal(57.05132))
-			})
+		It("Histidine", func() {
+			a, _ := New("Histidine")
+			Expect(a.Code).To(Equal("H"))
+			Expect(a.ShortName).To(Equal("His"))
+			Expect(a.Name).To(Equal("Histidine"))
+			Expect(a.MonoIsotopeMass).To(Equal(137.058911875))
+			Expect(a.AverageMass).To(Equal(137.13928))
+		})
 
-			It("Histidine", func() {
-				a, _ := New("Histidine")
-				Expect(a.Code).To(Equal("H"))
-				Expect(a.ShortName).To(Equal("His"))
-				Expect(a.Name).To(Equal("Histidine"))
-				Expect(a.MonoIsotopeMass).To(Equal(137.058911875))
-				Expect(a.AverageMass).To(Equal(137.13928))
-			})
+		It("Isoleucine", func() {
+			a, _ := New("Isoleucine")
+			Expect(a.Code).To(Equal("I"))
+			Expect(a.ShortName).To(Equal("Ile"))
+			Expect(a.Name).To(Equal("Isoleucine"))
+			Expect(a.MonoIsotopeMass).To(Equal(113.084064015))
+			Expect(a.AverageMass).To(Equal(113.15764))
+		})
 
-			It("Isoleucine", func() {
-				a, _ := New("Isoleucine")
-				Expect(a.Code).To(Equal("I"))
-				Expect(a.ShortName).To(Equal("Ile"))
-				Expect(a.Name).To(Equal("Isoleucine"))
-				Expect(a.MonoIsotopeMass).To(Equal(113.084064015))
-				Expect(a.AverageMass).To(Equal(113.15764))
-			})
+		It("Leucine", func() {
+			a, _ := New("Leucine")
+			Expect(a.Code).To(Equal("L"))
+			Expect(a.ShortName).To(Equal("Leu"))
+			Expect(a.Name).To(Equal("Leucine"))
+			Expect(a.MonoIsotopeMass).To(Equal(113.084064015))
+			Expect(a.AverageMass).To(Equal(113.15764))
+		})
 
-			It("Leucine", func() {
-				a, _ := New("Leucine")
-				Expect(a.Code).To(Equal("L"))
-				Expect(a.ShortName).To(Equal("Leu"))
-				Expect(a.Name).To(Equal("Leucine"))
-				Expect(a.MonoIsotopeMass).To(Equal(113.084064015))
-				Expect(a.AverageMass).To(Equal(113.15764))
-			})
+		It("Lysine", func() {
+			a, _ := New("Lysine")
+			Expect(a.Code).To(Equal("K"))
+			Expect(a.ShortName).To(Equal("Lys"))
+			Expect(a.Name).To(Equal("Lysine"))
+			Expect(a.MonoIsotopeMass).To(Equal(128.094963050))
+			Expect(a.AverageMass).To(Equal(128.17228))
+		})
 
-			It("Lysine", func() {
-				a, _ := New("Lysine")
-				Expect(a.Code).To(Equal("K"))
-				Expect(a.ShortName).To(Equal("Lys"))
-				Expect(a.Name).To(Equal("Lysine"))
-				Expect(a.MonoIsotopeMass).To(Equal(128.094963050))
-				Expect(a.AverageMass).To(Equal(128.17228))
-			})
+		It("Methionine", func() {
+			a, _ := New("Methionine")
+			Expect(a.Code).To(Equal("M"))
+			Expect(a.ShortName).To(Equal("Met"))
+			Expect(a.Name).To(Equal("Methionine"))
+			Expect(a.MonoIsotopeMass).To(Equal(131.040484645))
+			Expect(a.AverageMass).To(Equal(131.19606))
+		})
 
-			It("Methionine", func() {
-				a, _ := New("Methionine")
-				Expect(a.Code).To(Equal("M"))
-				Expect(a.ShortName).To(Equal("Met"))
-				Expect(a.Name).To(Equal("Methionine"))
-				Expect(a.MonoIsotopeMass).To(Equal(131.040484645))
-				Expect(a.AverageMass).To(Equal(131.19606))
-			})
+		It("Phenylalanine", func() {
+			a, _ := New("Phenylalanine")
+			Expect(a.Code).To(Equal("F"))
+			Expect(a.ShortName).To(Equal("Phe"))
+			Expect(a.Name).To(Equal("Phenylalanine"))
+			Expect(a.MonoIsotopeMass).To(Equal(147.068413945))
+			Expect(a.AverageMass).To(Equal(147.17386))
+		})
 
-			It("Phenylalanine", func() {
-				a, _ := New("Phenylalanine")
-				Expect(a.Code).To(Equal("F"))
-				Expect(a.ShortName).To(Equal("Phe"))
-				Expect(a.Name).To(Equal("Phenylalanine"))
-				Expect(a.MonoIsotopeMass).To(Equal(147.068413945))
-				Expect(a.AverageMass).To(Equal(147.17386))
-			})
+		It("Proline", func() {
+			a, _ := New("Proline")
+			Expect(a.Code).To(Equal("P"))
+			Expect(a.ShortName).To(Equal("Pro"))
+			Expect(a.Name).To(Equal("Proline"))
+			Expect(a.MonoIsotopeMass).To(Equal(97.052763875))
+			Expect(a.AverageMass).To(Equal(97.11518))
+		})
 
-			It("Proline", func() {
-				a, _ := New("Proline")
-				Expect(a.Code).To(Equal("P"))
-				Expect(a.ShortName).To(Equal("Pro"))
-				Expect(a.Name).To(Equal("Proline"))
-				Expect(a.MonoIsotopeMass).To(Equal(97.052763875))
-				Expect(a.AverageMass).To(Equal(97.11518))
-			})
+		It("Serine", func() {
+			a, _ := New("Serine")
+			Expect(a.Code).To(Equal("S"))
+			Expect(a.ShortName).To(Equal("Ser"))
+			Expect(a.Name).To(Equal("Serine"))
+			Expect(a.MonoIsotopeMass).To(Equal(87.032028435))
+			Expect(a.AverageMass).To(Equal(87.0773))
+		})
 
-			It("Serine", func() {
-				a, _ := New("Serine")
-				Expect(a.Code).To(Equal("S"))
-				Expect(a.ShortName).To(Equal("Ser"))
-				Expect(a.Name).To(Equal("Serine"))
-				Expect(a.MonoIsotopeMass).To(Equal(87.032028435))
-				Expect(a.AverageMass).To(Equal(87.0773))
-			})
+		It("Threonine", func() {
+			a, _ := New("Threonine")
+			Expect(a.Code).To(Equal("T"))
+			Expect(a.ShortName).To(Equal("Thr"))
+			Expect(a.Name).To(Equal("Threonine"))
+			Expect(a.MonoIsotopeMass).To(Equal(101.047678505))
+			Expect(a.AverageMass).To(Equal(101.10388))
+		})
 
-			It("Threonine", func() {
-				a, _ := New("Threonine")
-				Expect(a.Code).To(Equal("T"))
-				Expect(a.ShortName).To(Equal("Thr"))
-				Expect(a.Name).To(Equal("Threonine"))
-				Expect(a.MonoIsotopeMass).To(Equal(101.047678505))
-				Expect(a.AverageMass).To(Equal(101.10388))
-			})
+		It("Tryptophan", func() {
+			a, _ := New("Tryptophan")
+			Expect(a.Code).To(Equal("W"))
+			Expect(a.ShortName).To(Equal("Trp"))
+			Expect(a.Name).To(Equal("Tryptophan"))
+			Expect(a.MonoIsotopeMass).To(Equal(186.079312980))
+			Expect(a.AverageMass).To(Equal(186.2099))
+		})
 
-			It("Tryptophan", func() {
-				a, _ := New("Tryptophan")
-				Expect(a.Code).To(Equal("W"))
-				Expect(a.ShortName).To(Equal("Trp"))
-				Expect(a.Name).To(Equal("Tryptophan"))
-				Expect(a.MonoIsotopeMass).To(Equal(186.079312980))
-				Expect(a.AverageMass).To(Equal(186.2099))
-			})
+		It("Tyrosine", func() {
+			a, _ := New("Tyrosine")
+			Expect(a.Code).To(Equal("Y"))
+			Expect(a.ShortName).To(Equal("Tyr"))
+			Expect(a.Name).To(Equal("Tyrosine"))
+			Expect(a.MonoIsotopeMass).To(Equal(163.063328575))
+			Expect(a.AverageMass).To(Equal(163.17326))
+		})
 
-			It("Tyrosine", func() {
-				a, _ := New("Tyrosine")
-				Expect(a.Code).To(Equal("Y"))
-				Expect(a.ShortName).To(Equal("Tyr"))
-				Expect(a.Name).To(Equal("Tyrosine"))
-				Expect(a.MonoIsotopeMass).To(Equal(163.063328575))
-				Expect(a.AverageMass).To(Equal(163.17326))
-			})
+		It("Valine", func() {
+			a, _ := New("Valine")
+			Expect(a.Code).To(Equal("V"))
+			Expect(a.ShortName).To(Equal("Val"))
+			Expect(a.Name).To(Equal("Valine"))
+			Expect(a.MonoIsotopeMass).To(Equal(99.068413945))
+			Expect(a.AverageMass).To(Equal(99.13106))
+		})
 
-			It("Valine", func() {
-				a, _ := New("Valine")
-				Expect(a.Code).To(Equal("V"))
-				Expect(a.ShortName).To(Equal("Val"))
-				Expect(a.Name).To(Equal("Valine"))
-				Expect(a.MonoIsotopeMass).To(Equal(99.068413945))
-				Expect(a.AverageMass).To(Equal(99.13106))
-			})
-
-			It("Invalid", func() {
-				_, err := New("Foobar")
-				Expect(err).To(Equal(errors.New("Amino acid not found")))
-			})
-
+		It("Invalid", func() {
+			_, err := New("Foobar")
+			Expect(err).To(Equal(errors.New("Amino acid not found")))
 		})
 	})
 
