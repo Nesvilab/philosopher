@@ -6,6 +6,15 @@
 ### Fixed
 
 
+# Philosopher 20190206
+### Build: 201902061307
+
+### Added
+- Started adding unit tests to modules.
+
+### Fixed
+- Fixed a bug with a missing database after fetching from UniProt.
+
 # Philosopher 20190204
 ### Build: 201902041330
 
