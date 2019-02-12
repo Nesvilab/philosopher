@@ -337,7 +337,7 @@ func Run(m met.Data) met.Data {
 		labelNames, _ := getLabelNames(annotfile)
 		logrus.Info("Creating TMT PSM report")
 
-		if strings.Contains(m.SearchEngine, "MSFragger") && (repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0) {
+		if strings.Contains(m.SearchEngine, "MSFragger") && (repo.PSM[0].Labels.Channel1.Intensity > 0 || repo.PSM[100].Labels.Channel1.Intensity > 0) {
 			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor)
 		} else {
 			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
@@ -1673,62 +1673,59 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string) {
 
 		if len(i.MappedProteins) > 0 {
 
-			if len(e.Proteins) > 1 {
-
-				var mappedProteins []string
-				for j := range i.MappedProteins {
-					if j != i.Protein {
-						mappedProteins = append(mappedProteins, j)
-					}
+			var mappedProteins []string
+			for j := range i.MappedProteins {
+				if j != i.Protein {
+					mappedProteins = append(mappedProteins, j)
 				}
+			}
 
-				var amods []string
-				for j := range i.AssignedModifications {
-					amods = append(amods, j)
-				}
+			var amods []string
+			for j := range i.AssignedModifications {
+				amods = append(amods, j)
+			}
 
-				var omods []string
-				for j := range i.ObservedModifications {
-					omods = append(omods, j)
-				}
+			var omods []string
+			for j := range i.ObservedModifications {
+				omods = append(omods, j)
+			}
 
-				line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
-					i.Sequence,
-					i.ModifiedSequence,
-					i.MZ,
-					i.ChargeState,
-					i.PeptideMass,
-					i.Probability,
-					i.Expectation,
-					len(i.Spectra),
-					i.UnModifiedObservations,
-					i.ModifiedObservations,
-					i.Intensity,
-					strings.Join(amods, ", "),
-					strings.Join(omods, ", "),
-					i.Intensity,
-					i.Protein,
-					i.ProteinID,
-					i.EntryName,
-					i.GeneName,
-					i.ProteinDescription,
-					strings.Join(mappedProteins, ","),
-					i.Labels.Channel1.Intensity,
-					i.Labels.Channel2.Intensity,
-					i.Labels.Channel3.Intensity,
-					i.Labels.Channel4.Intensity,
-					i.Labels.Channel5.Intensity,
-					i.Labels.Channel6.Intensity,
-					i.Labels.Channel7.Intensity,
-					i.Labels.Channel8.Intensity,
-					i.Labels.Channel9.Intensity,
-					i.Labels.Channel10.Intensity,
-					i.Labels.Channel11.Intensity,
-				)
-				_, err = io.WriteString(file, line)
-				if err != nil {
-					logrus.Fatal("Cannot print PSM to file")
-				}
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+				i.Sequence,
+				i.ModifiedSequence,
+				i.MZ,
+				i.ChargeState,
+				i.PeptideMass,
+				i.Probability,
+				i.Expectation,
+				len(i.Spectra),
+				i.UnModifiedObservations,
+				i.ModifiedObservations,
+				i.Intensity,
+				strings.Join(amods, ", "),
+				strings.Join(omods, ", "),
+				i.Intensity,
+				i.Protein,
+				i.ProteinID,
+				i.EntryName,
+				i.GeneName,
+				i.ProteinDescription,
+				strings.Join(mappedProteins, ","),
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+				i.Labels.Channel3.Intensity,
+				i.Labels.Channel4.Intensity,
+				i.Labels.Channel5.Intensity,
+				i.Labels.Channel6.Intensity,
+				i.Labels.Channel7.Intensity,
+				i.Labels.Channel8.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
+				i.Labels.Channel11.Intensity,
+			)
+			_, err = io.WriteString(file, line)
+			if err != nil {
+				logrus.Fatal("Cannot print PSM to file")
 			}
 		}
 	}
