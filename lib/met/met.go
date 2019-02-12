@@ -244,6 +244,7 @@ type Quantify struct {
 	Purity     float64 `yaml:"purity"`
 	MinProb    float64 `yaml:"minprob"`
 	RemoveLow  float64 `yaml:"removeLow"`
+	Isolated   bool    `yaml:"isolated"`
 	IntNorm    bool    `yaml:"intNorm"`
 	Unique     bool    `yaml:"uniqueOnly"`
 	BestPSM    bool    `yaml:"bestPSM"`

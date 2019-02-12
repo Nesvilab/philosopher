@@ -38,7 +38,7 @@ func RunLabelFreeQuantification(p met.Quantify) *err.Error {
 		return e
 	}
 
-	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol)
+	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 	if e != nil {
 		return e
 	}
