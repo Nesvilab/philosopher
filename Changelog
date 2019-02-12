@@ -13,6 +13,7 @@
 ### Changed
 ### Fixed
 - Bug on the propagation of the razor protein from PSMs to other data structures.
+- Bug when trying to report PSMs with TMT after filtering with only peptide identifications.
 
 # Philosopher 20190206
 ### Build: 201902061307
