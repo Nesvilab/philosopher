@@ -6,6 +6,14 @@
 ### Fixed
 
 
+# Philosopher 20190212
+### Build: ?
+
+### Added
+### Changed
+### Fixed
+- Bug on the propagation of the razor protein from PSMs to other data structures.
+
 # Philosopher 20190206
 ### Build: 201902061307
 
