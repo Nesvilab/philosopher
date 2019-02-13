@@ -29,10 +29,6 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	var retentionTime = make(map[string]float64)
 	var intensity = make(map[string]float64)
 
-	var isolatedMz = make(map[string]float64)
-	var isolatedUW = make(map[string]float64)
-	var isolatedLW = make(map[string]float64)
-
 	for _, i := range evi.PSM {
 
 		partName := strings.Split(i.Spectrum, ".")
@@ -88,17 +84,10 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		}
 
 		for _, i := range ms2.Ms2Scan {
-			fmt.Println(source, "\t", i.Index, "\t", i.Scan, "\t", i.Precursor.ParentIndex, "\t", i.Precursor.ParentScan, "\t", i.Precursor.SelectedIon, "\t", i.Precursor.TargetIon)
-		}
-
-		if isIso == true {
-			for _, i := range ms2.Ms2Scan {
-				_, ok := isolatedMz[i.Precursor.ParentScan]
-				if !ok {
-					isolatedMz[i.Precursor.ParentScan] = i.Precursor.TargetIon
-					isolatedUW[i.Precursor.ParentScan] = i.Precursor.IsolationWindowUpperOffset
-					isolatedLW[i.Precursor.ParentScan] = i.Precursor.IsolationWindowLowerOffset
-				}
+			spectrum := fmt.Sprintf("%s.%05s.%05s.%d", source, i.Scan, i.Scan, i.Precursor.ChargeState)
+			_, ok := mz[spectrum]
+			if ok {
+				mz[spectrum] = i.Precursor.TargetIon
 			}
 		}
 
@@ -109,7 +98,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				var measured = make(map[float64]float64)
 				var retrieved bool
 
-				measured, retrieved = xic(ms1.Ms1Scan, isolatedMz, isolatedUW, isolatedLW, minRT[j], maxRT[j], ppmPrecision[j], mz[j], isIso)
+				measured, retrieved = xic(ms1.Ms1Scan, minRT[j], maxRT[j], ppmPrecision[j], mz[j], isIso)
 
 				if retrieved == true {
 					var timeW = retentionTime[j] / 60
@@ -142,15 +131,11 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 }
 
 // xic extract ion chomatograms
-func xic(ms1 []raw.Ms1Scan, isolatedIMz, isolatedUW, isolatedLW map[string]float64, minRT, maxRT, ppmPrecision, mz float64, isIso bool) (map[float64]float64, bool) {
+func xic(ms1 []raw.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64, isIso bool) (map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
 
 	for j := range ms1 {
-
-		if isIso == true {
-			mz = isolatedIMz[ms1[j].Scan]
-		}
 
 		if ms1[j].ScanStartTime >= minRT && ms1[j].ScanStartTime <= maxRT {
 

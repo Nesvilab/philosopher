@@ -151,7 +151,7 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 			precRef = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
 		}
 
-		spec.Precursor.ParentScan = precRef[1]
+		spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
 		pi, _ := strconv.Atoi(precRef[1])
 		pi = (pi - 1)
 		spec.Precursor.ParentIndex = strconv.Itoa(pi)
