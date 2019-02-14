@@ -1,6 +1,6 @@
-# Philosopher
+<!--# Philosopher
 A data processing toolkit for shotgun proteomics.
-
+-->
 ![Golang](https://img.shields.io/badge/Go-1.11.2-blue.svg)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?style=flat)
 
