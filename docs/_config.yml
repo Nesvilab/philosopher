@@ -1,1 +1,5 @@
 theme: jekyll-theme-slate
+title: [Philosopher]
+description: [A complete toolkit for shotgun proteomics data analysis]
+show_downloads: ["true"]
+google_analytics: [UA-111428141-2]
