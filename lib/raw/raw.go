@@ -9,7 +9,6 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/raw/mz"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -27,7 +26,7 @@ func IndexMz(f []string) *err.Error {
 
 		if strings.Contains(i, "mzml") || strings.Contains(i, "mzML") {
 
-			logrus.Info("Indexing ", i)
+			//logrus.Info("Indexing ", i)
 
 			raw := &mz.Raw{}
 			raw.FileName = i

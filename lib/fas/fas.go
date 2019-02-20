@@ -23,7 +23,6 @@ func ParseFile(filename string) (map[string]string, *err.Error) {
 	defer f.Close()
 
 	reHeader, _ := regexp.Compile("^>(.*)")
-	//reHeader, _ := regexp.Compile("^>(.*)")
 	scanner := bufio.NewScanner(f)
 
 	for scanner.Scan() {
