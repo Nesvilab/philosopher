@@ -23,6 +23,13 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: make deps
+
       - run: make deploy
+
+      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/Nesvilab/philosopher/releases/download/Test-data/01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/Nesvilab/philosopher/releases/download/Test-data/02_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/Nesvilab/philosopher/releases/download/Test-data/03_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+
       - run: make test
+
       - run: make all
