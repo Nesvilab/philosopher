@@ -46,10 +46,6 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 Download the latest version [here](https://github.com/Nesvilab/philosopher/releases/latest)
 
 
-## How to Use
-A simple [tutorial](tutorial.md) is also provided with an extensive example on how to use Philosopher.
-
-
 ## Documentation
 For documentation on Philosopher itself, see Philosopher Documentation [Wiki page](https://github.com/Nesvilab/philosopher/wiki).
 
