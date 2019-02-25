@@ -51,15 +51,11 @@ A simple [tutorial](tutorial.md) is also provided with an extensive example on h
 
 
 ## Documentation
-Check the [documentation](documentation.md) for more details about the available commands.
+For documentation on Philosopher itself, see Philosopher Documentation [Wiki page](https://github.com/Nesvilab/philosopher/wiki).
 
 
 ## Questions, requests and bug reports
 If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/Nesvilab/philosopher/issues).
-
-
-## Analytics
-Check the [analytics](analytics.md) session for more information on the program usage report.
 
 
 ## How to cite
