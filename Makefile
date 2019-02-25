@@ -37,7 +37,7 @@ deps:
 	go get -u github.com/onsi/ginkgo
 	go get -u github.com/onsi/gomega
 	go get -u github.com/onsi/ginkgo/ginkgo
-	go get -u github.com/konsorten/go-windows-terminal-sequences
+	#go get -u github.com/konsorten/go-windows-terminal-sequences
 
 .PHONY: deploy
 deploy:
