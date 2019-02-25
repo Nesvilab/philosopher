@@ -1,5 +1,3 @@
-### Available Software
-
 Philosopher provides easy access to the following third-party software:
 
 * [ProteoWizard msconvert](https://www.nature.com/articles/nbt.2377)
@@ -17,7 +15,7 @@ Philosopher provides easy access to the following third-party software:
 * [PTMProphet](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4506239/)
 
 
-### Available Implementations
+## Available Implementations
 
 The following algorithms are available as complete or partial *native* implementations:
 

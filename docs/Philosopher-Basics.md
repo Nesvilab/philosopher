@@ -62,10 +62,3 @@ Some commands they expect to find processed data, some expect "raw" information,
   * Freequant, Labelquant, Abacus, CLuster, Report
 * No Dependency
   * Workspace, Database, Comet
-
-
-### Examples
-
-[Example of a simple data analysis](example_1.md)
-
-[Processing, Filtering and Analyzing Open Search results using Philosopher](example_2.md)

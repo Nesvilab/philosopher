@@ -10,7 +10,7 @@ Philosopher works with the concept of workspaces, all processed and parsed data 
 
 `--analytics`
 
-reports when a workspace is created for usage estimation (default true). See the [analytics page](analytics.md) for more information.
+reports when a workspace is created for usage estimation (default true). See the [analytics page](Analytics.md) for more information.
 
 `--init`
 
