@@ -39,9 +39,9 @@ var _ = Describe("Met", func() {
 			Expect(d.Arch).To(Equal(runtime.GOARCH))
 		})
 
-		It("Distro", func() {
-			Expect(d.Distro).To(Equal("Debian"))
-		})
+		// It("Distro", func() {
+		// 	Expect(d.Distro).To(Equal("Debian"))
+		// })
 
 		It("Home", func() {
 			//home := fmt.Sprintf("%s%swrksp", dir, string(filepath.Separator))
