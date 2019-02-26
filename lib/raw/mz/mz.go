@@ -152,12 +152,21 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 		var ref []string
 		var precRef []string
 
-		ref = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
-		precRef = strings.Split(ref[2], "=")
+		if len(rawSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
 
-		// ABSCIEX has a different way of reporting the prcursor reference spectrum
-		if len(ref) < 1 || len(precRef) < 1 {
-			precRef = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
+			precRef = append(precRef, "-1")
+			precRef = append(precRef, "-1")
+
+		} else {
+
+			ref = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
+			precRef = strings.Split(ref[2], "=")
+
+			// ABSCIEX has a different way of reporting the prcursor reference spectrum
+			if len(ref) < 1 || len(precRef) < 1 {
+				precRef = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
+			}
+
 		}
 
 		spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
@@ -281,6 +290,13 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 		spec.IonMobility.DecodedStream, _ = Decode("im", rawSpec.BinaryDataArrayList.BinaryDataArray[2])
 		spec.IonMobility.Stream = nil
 	}
+
+	// for y := 0; y < 28; y++ {
+	// 	s := strconv.Itoa(y)
+	// 	if spec.Index == s && spec.Level == "1" {
+	// 		spew.Dump(spec)
+	// 	}
+	// }
 
 	r.RefSpectra.Store(spec.Scan, spec)
 
