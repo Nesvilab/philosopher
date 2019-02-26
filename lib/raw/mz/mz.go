@@ -38,6 +38,7 @@ type Spectrum struct {
 	Precursor   Precursor
 	Peaks       Peaks
 	Intensities Intensities
+	IonMobility IonMobility
 }
 
 // Peaks struct
@@ -50,6 +51,14 @@ type Peaks struct {
 
 // Intensities struct
 type Intensities struct {
+	Stream        []byte
+	DecodedStream []float64
+	Precision     string
+	Compression   string
+}
+
+// IonMobility struct
+type IonMobility struct {
 	Stream        []byte
 	DecodedStream []float64
 	Precision     string
@@ -225,11 +234,11 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 		} else if string(j.Accession) == "MS:1000576" {
 			binPeak.Compression = "0"
 		}
-	}
 
-	spec.Peaks = binPeak
-	spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
-	spec.Peaks.Stream = nil
+		spec.Peaks = binPeak
+		spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
+		spec.Peaks.Stream = nil
+	}
 
 	var binInt Intensities
 	binInt.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
@@ -250,6 +259,28 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 	spec.Intensities = binInt
 	spec.Intensities.DecodedStream, _ = Decode("int", rawSpec.BinaryDataArrayList.BinaryDataArray[1])
 	spec.Intensities.Stream = nil
+
+	if rawSpec.BinaryDataArrayList.Count == 3 {
+		var binIM IonMobility
+		binIM.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[2].Binary.Value
+		for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[2].CVParam {
+			if string(j.Accession) == "MS:1000523" {
+				binPeak.Precision = "64"
+			} else if string(j.Accession) == "MS:1000521" {
+				binPeak.Precision = "32"
+			}
+
+			if string(j.Accession) == "MS:1000574" {
+				binPeak.Compression = "1"
+			} else if string(j.Accession) == "MS:1000576" {
+				binPeak.Compression = "0"
+			}
+		}
+
+		spec.IonMobility = binIM
+		spec.IonMobility.DecodedStream, _ = Decode("im", rawSpec.BinaryDataArrayList.BinaryDataArray[2])
+		spec.IonMobility.Stream = nil
+	}
 
 	r.RefSpectra.Store(spec.Scan, spec)
 
@@ -323,13 +354,14 @@ func readEncoded(class string, bin mzml.BinaryDataArray, precision string, isCom
 				bits := binary.LittleEndian.Uint32(stream)
 				converted := math.Float32frombits(bits)
 
-				if class == "mz" {
-					//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-					floatArray = append(floatArray, float64(converted))
-				} else if class == "int" {
-					//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-					floatArray = append(floatArray, float64(converted))
-				}
+				floatArray = append(floatArray, float64(converted))
+				// if class == "mz" {
+				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
+				// 	floatArray = append(floatArray, float64(converted))
+				// } else if class == "int" {
+				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
+				// 	floatArray = append(floatArray, float64(converted))
+				// }
 
 				stream = nil
 				counter = 0
@@ -343,13 +375,14 @@ func readEncoded(class string, bin mzml.BinaryDataArray, precision string, isCom
 				bits := binary.LittleEndian.Uint64(stream)
 				converted := math.Float64frombits(bits)
 
-				if class == "mz" {
-					//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-					floatArray = append(floatArray, float64(converted))
-				} else if class == "int" {
-					//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-					floatArray = append(floatArray, float64(converted))
-				}
+				floatArray = append(floatArray, float64(converted))
+				// if class == "mz" {
+				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
+				// 	floatArray = append(floatArray, float64(converted))
+				// } else if class == "int" {
+				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
+				// 	floatArray = append(floatArray, float64(converted))
+				// }
 
 				stream = nil
 				counter = 0
