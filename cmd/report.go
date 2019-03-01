@@ -16,11 +16,6 @@ var reportCmd = &cobra.Command{
 	Short: "Multi-level reporting for both narrow-searches and open-searches",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
 		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Report ", Version)
