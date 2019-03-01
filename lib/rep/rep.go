@@ -219,7 +219,7 @@ func (a ProteinEvidenceList) Len() int           { return len(a) }
 func (a ProteinEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[j].ProteinGroup }
 
-// CombinedEvidence represents all combined proteins detected
+// CombinedProteinEvidence represents all combined proteins detected
 type CombinedProteinEvidence struct {
 	GroupNumber            uint32
 	SiblingID              string
@@ -250,7 +250,7 @@ type CombinedProteinEvidence struct {
 	URazorLabels           map[string]tmt.Labels // Unique + razor
 }
 
-// CombinedEvidenceList is a list of Combined Protein Evidences
+// CombinedProteinEvidenceList is a list of Combined Protein Evidences
 type CombinedProteinEvidenceList []CombinedProteinEvidence
 
 func (a CombinedProteinEvidenceList) Len() int           { return len(a) }

@@ -29,9 +29,9 @@ func (e *Evidence) UpdateMappedProteins() {
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
 
-				if v.IsURazor == true {
-					pm.RazorProtein = i.PartHeader
-				}
+				//if v.IsURazor == true {
+				pm.RazorProtein = i.PartHeader
+				//}
 
 				list = append(list, pm)
 				checkup[v.Sequence] = 0

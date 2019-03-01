@@ -166,9 +166,10 @@ func Run(f met.Data) (met.Data, error) {
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
+
 	// reorganizes the selected proteins and the alternative proteins list
+	logrus.Info("Updating razor PSM assingment to Proteins")
 	if f.Filter.Razor == true {
-		logrus.Info("Updating razor PSM assingment to Proteins")
 		e.UpdateProteinStatus()
 		e.UpdateGeneNames()
 		e.UpdateSupportingSpectra()
