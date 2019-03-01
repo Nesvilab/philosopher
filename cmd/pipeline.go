@@ -93,7 +93,7 @@ var pipelineCmd = &cobra.Command{
 			os.Chdir(dsAbs)
 
 			// Workspace
-			wrk.Run(Version, Build, false, false, true)
+			wrk.Run(Version, Build, false, false, true, false)
 
 			// reload the meta data
 			m.Restore(sys.Meta())
@@ -306,12 +306,12 @@ var pipelineCmd = &cobra.Command{
 
 			// Backup
 			if p.Backup == true {
-				wrk.Run(Version, Build, true, false, false)
+				wrk.Run(Version, Build, true, false, false, true)
 			}
 
 			// Clean
 			if p.Clean == true {
-				wrk.Run(Version, Build, false, true, false)
+				wrk.Run(Version, Build, false, true, false, true)
 			}
 
 		}

@@ -15,9 +15,11 @@ import (
 )
 
 // Run is the workspace main entry point
-func Run(Version, Build string, b, c, i bool) *err.Error {
+func Run(Version, Build string, b, c, i, n bool) *err.Error {
 
-	gth.UpdateChecker(Version, Build)
+	if n == false {
+		gth.UpdateChecker(Version, Build)
+	}
 
 	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
 		logrus.Fatal("this command accepts only one parameter")
