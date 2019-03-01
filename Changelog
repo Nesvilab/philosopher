@@ -5,6 +5,20 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20190301
+### Build: 201903011453
+
+### Added
+- Workspace flag for not checking if there is a new version available.
+
+### Changed
+- Modifications in the output tables are now sorted.
+
+### Fixed
+- Decoys were not being printed on the output as requested.
+- Reprint tables some times had the second line in a wrong order.
+- Some output tables were missing protein IDS and other features when not using the razor flag.
+
 # Philosopher 20190226
 ### Build: 201902261041
 
@@ -18,11 +32,13 @@
 ### Fixed
 - Slack integration was updated.
 
+
 # Philosopher 20190219
 ### Build: 201902191458
 
 ### Fixed
 - Fixed dependency for windows terminals
+
 
 # Philosopher 20190218
 ### Build: 201902181338
@@ -32,12 +48,14 @@
 
 ### Changed
 
+
 # Philosopher 20190212
 ### Build: 201902121518
 
 ### Fixed
 - Bug on the propagation of the razor protein from PSMs to other data structures.
 - Bug when trying to report PSMs with TMT after filtering with only peptide identifications.
+
 
 # Philosopher 20190206
 ### Build: 201902061307
@@ -48,12 +66,14 @@
 ### Fixed
 - Fixed a bug with a missing database after fetching from UniProt.
 
+
 # Philosopher 20190204
 ### Build: 201902041330
 
 ### Fixed
 - Fixed an error when trying to execute the prophets after the database command.
 - Fixed an error when trying to execute the filter command (missing database).
+
 
 # Philosopher 20190116
 ### Build: 201901161554
@@ -78,6 +98,7 @@
 ### Fixed
 - Fixed an issue with the MSstats report.
 - Minor bug fixes.
+
 
 # Philosopher 20181119
 ### Build: 201811191306
