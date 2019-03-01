@@ -113,6 +113,7 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 	}
 
 	sort.Strings(names)
+	sort.Strings(reprintLabels)
 
 	logrus.Info("Processing spectral counts")
 	evidences = getProteinSpectralCounts(evidences, datasets)
