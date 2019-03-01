@@ -13,7 +13,7 @@ type PeptideMap struct {
 }
 
 // UpdateMappedProteins updates the list of mapped proteins on the data structures
-func (e *Evidence) UpdateMappedProteins(hasRazor bool) {
+func (e *Evidence) UpdateMappedProteins() {
 
 	var list []PeptideMap
 	var checkup = make(map[string]int)
@@ -28,9 +28,8 @@ func (e *Evidence) UpdateMappedProteins(hasRazor bool) {
 				pm.Sequence = v.Sequence
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
-				pm.Protein = v.Protein
 
-				if hasRazor == true {
+				if v.IsURazor == true {
 					pm.RazorProtein = i.PartHeader
 				}
 
@@ -49,8 +48,7 @@ func (e *Evidence) UpdateMappedProteins(hasRazor bool) {
 					e.PSM[i].MappedProteins[k]++
 				}
 
-				if hasRazor == true {
-					e.PSM[i].Protein = j.Protein
+				if len(e.PSM[i].RazorProtein) < 1 {
 					e.PSM[i].RazorProtein = j.RazorProtein
 					e.PSM[i].IsURazor = true
 				}
@@ -67,12 +65,7 @@ func (e *Evidence) UpdateMappedProteins(hasRazor bool) {
 					e.Peptides[i].MappedProteins[k]++
 				}
 
-				if hasRazor == true {
-					e.Peptides[i].Protein = j.RazorProtein
-				} else {
-					e.Peptides[i].Protein = j.Protein
-				}
-				//e.Peptides[i].RazorProtein = j.RazorProtein
+				e.Peptides[i].Protein = j.RazorProtein
 
 				break
 			}
@@ -87,12 +80,7 @@ func (e *Evidence) UpdateMappedProteins(hasRazor bool) {
 					e.Ions[i].MappedProteins[k]++
 				}
 
-				if hasRazor == true {
-					e.Ions[i].Protein = j.RazorProtein
-				} else {
-					e.Ions[i].Protein = j.Protein
-				}
-				//e.Ions[i].Protein = j.RazorProtein
+				e.Ions[i].Protein = j.RazorProtein
 
 				break
 			}
@@ -152,11 +140,11 @@ func (e *Evidence) UpdateIonModCount() {
 
 // UpdateProteinStatus assignes the razor protein to THE protein column and removes it form the alt Protein
 // it basically swiches places with the current protein assignment from pepXML
-func (e *Evidence) UpdateProteinStatus(hasRazor bool) {
+func (e *Evidence) UpdateProteinStatus() {
 
 	for i := range e.PSM {
 
-		if hasRazor == true {
+		if e.PSM[i].IsURazor == true && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 
 			var altProteins []string
 
@@ -166,37 +154,13 @@ func (e *Evidence) UpdateProteinStatus(hasRazor bool) {
 			// replace the selected protein by the razor one
 			e.PSM[i].Protein = e.PSM[i].RazorProtein
 
-		} else {
-
-			// if razor was not executed, assign the default protein to the razor attribute
+		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
 			e.PSM[i].RazorProtein = e.PSM[i].Protein
 		}
 	}
 
 	return
 }
-
-// func (e *Evidence) UpdateProteinStatus() {
-//
-// 	for i := range e.PSM {
-//
-// 		if e.PSM[i].IsURazor == true && e.PSM[i].Protein != e.PSM[i].RazorProtein {
-//
-// 			var altProteins []string
-//
-// 			// push the selected protein to the top fo the list
-// 			altProteins = append(altProteins, e.PSM[i].Protein)
-//
-// 			// replace the selected protein by the razor one
-// 			e.PSM[i].Protein = e.PSM[i].RazorProtein
-//
-// 		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
-// 			e.PSM[i].RazorProtein = e.PSM[i].Protein
-// 		}
-// 	}
-//
-// 	return
-// }
 
 // UpdateGeneNames will fix the gene name assignment after razor assingment
 func (e *Evidence) UpdateGeneNames() {
