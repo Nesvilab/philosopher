@@ -12,7 +12,6 @@ import (
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/raw"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
@@ -91,8 +90,8 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 		}
 
 		if extFlag == false {
-			logrus.Info("Indexing spectra: please wait, this can take a few minutes")
-			raw.IndexMz(args)
+			//logrus.Info("Indexing spectra: please wait, this can take a few minutes")
+			//raw.IndexMz(args)
 		} else {
 			logrus.Info("mz file format not supported for indexing, skipping the indexing")
 		}

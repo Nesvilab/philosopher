@@ -1,4 +1,4 @@
-package raw_test
+package mzn_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestRaw(t *testing.T) {
+func TestMzn(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Raw Suite")
+	RunSpecs(t, "Mzn Suite")
 }

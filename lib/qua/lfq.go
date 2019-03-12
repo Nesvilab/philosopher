@@ -3,16 +3,14 @@ package qua
 import (
 	"fmt"
 	"math"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/raw"
+	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,10 +18,11 @@ import (
 func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) (rep.Evidence, *err.Error) {
 
 	logrus.Info("Indexing PSM information")
+
 	var sourceMap = make(map[string]uint8)
 	var spectra = make(map[string][]string)
 	var ppmPrecision = make(map[string]float64)
-	var mz = make(map[string]float64)
+	var mzMap = make(map[string]float64)
 	var minRT = make(map[string]float64)
 	var maxRT = make(map[string]float64)
 	var retentionTime = make(map[string]float64)
@@ -36,69 +35,51 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
 
 		ppmPrecision[i.Spectrum] = tol / math.Pow(10, 6)
-		mz[i.Spectrum] = ((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge))
+		mzMap[i.Spectrum] = ((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge))
 		minRT[i.Spectrum] = (i.RetentionTime / 60) - rTWin
 		maxRT[i.Spectrum] = (i.RetentionTime / 60) + rTWin
 		retentionTime[i.Spectrum] = i.RetentionTime
 	}
 
-	logrus.Info("Reading spectra and tracing peaks")
+	var sourceMapList []string
 	for source := range sourceMap {
+		sourceMapList = append(sourceMapList, source)
+	}
 
-		logrus.Info("Processing ", source)
-		var ms1 raw.MS1
-		var ms2 raw.MS2
+	sort.Strings(sourceMapList)
 
-		// get the clean name, remove the extension
-		var extension = filepath.Ext(filepath.Base(source))
-		var name = source[0 : len(source)-len(extension)]
-		input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
+	logrus.Info("Reading spectra and tracing peaks")
+	for _, s := range sourceMapList {
 
-		// get all MS1 spectra (and MS2 if necessary)
-		if _, e := os.Stat(input); e == nil {
+		logrus.Info("Processing ", s)
+		var mz mzn.MsData
 
-			spec, e := raw.Restore(source)
-			if e != nil {
-				return evi, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
-			}
+		fileName, _ := filepath.Abs(s)
+		fileName = fmt.Sprintf("%s.mzML", fileName)
 
-			ms1 = raw.GetMS1(spec)
-
-			if isIso == true {
-				ms2 = raw.GetMS2(spec)
-			}
-
-		} else {
-
-			spec, rer := raw.RestoreFromFile(dir, source, format)
-			if rer != nil {
-				return evi, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
-			}
-
-			ms1 = raw.GetMS1(spec)
-
-			if isIso == true {
-				ms2 = raw.GetMS2(spec)
-			}
-
+		e := mz.Read(fileName, false, true, true)
+		if e != nil {
+			return evi, e
 		}
 
-		for _, i := range ms2.Ms2Scan {
-			spectrum := fmt.Sprintf("%s.%05s.%05s.%d", source, i.Scan, i.Scan, i.Precursor.ChargeState)
-			_, ok := mz[spectrum]
-			if ok {
-				mz[spectrum] = i.Precursor.TargetIon
+		for _, i := range mz.Spectra {
+			if i.Level == "2" {
+				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, i.Scan, i.Scan, i.Precursor.ChargeState)
+				_, ok := mzMap[spectrum]
+				if ok {
+					mzMap[spectrum] = i.Precursor.TargetIon
+				}
 			}
 		}
 
-		v, ok := spectra[source]
+		v, ok := spectra[s]
 		if ok {
 			for _, j := range v {
 
 				var measured = make(map[float64]float64)
 				var retrieved bool
 
-				measured, retrieved = xic(ms1.Ms1Scan, minRT[j], maxRT[j], ppmPrecision[j], mz[j], isIso)
+				measured, retrieved = xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j], isIso)
 
 				if retrieved == true {
 					var timeW = retentionTime[j] / 60
@@ -131,29 +112,31 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 }
 
 // xic extract ion chomatograms
-func xic(ms1 []raw.Ms1Scan, minRT, maxRT, ppmPrecision, mz float64, isIso bool) (map[float64]float64, bool) {
+func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64, isIso bool) (map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
 
-	for j := range ms1 {
+	for j := range mz {
+		if mz[j].Level == "1" {
 
-		if ms1[j].ScanStartTime >= minRT && ms1[j].ScanStartTime <= maxRT {
+			if mz[j].ScanStartTime >= minRT && mz[j].ScanStartTime <= maxRT {
 
-			lowi := sort.Search(len(ms1[j].Spectrum), func(i int) bool { return ms1[j].Spectrum[i].Mz >= mz-ppmPrecision*mz })
-			highi := sort.Search(len(ms1[j].Spectrum), func(i int) bool { return ms1[j].Spectrum[i].Mz >= mz+ppmPrecision*mz })
+				lowi := sort.Search(len(mz[j].Mz.DecodedStream), func(i int) bool { return mz[j].Mz.DecodedStream[i] >= mzValue-ppmPrecision*mzValue })
+				highi := sort.Search(len(mz[j].Mz.DecodedStream), func(i int) bool { return mz[j].Mz.DecodedStream[i] >= mzValue+ppmPrecision*mzValue })
 
-			var maxI = 0.0
+				var maxI = 0.0
 
-			for _, k := range ms1[j].Spectrum[lowi:highi] {
-				if k.Intensity > maxI {
-					maxI = k.Intensity
+				for _, k := range mz[j].Intensity.DecodedStream[lowi:highi] {
+					if k > maxI {
+						maxI = k
+					}
 				}
-			}
 
-			if maxI > 0 {
-				list[ms1[j].ScanStartTime] = maxI
-			}
+				if maxI > 0 {
+					list[mz[j].ScanStartTime] = maxI
+				}
 
+			}
 		}
 	}
 

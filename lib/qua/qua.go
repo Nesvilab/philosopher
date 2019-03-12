@@ -10,9 +10,8 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/raw"
+	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
@@ -105,41 +104,45 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 	for i := range sourceList {
 
-		var ms1 raw.MS1
-		var ms2 raw.MS2
-		var ms3 raw.MS3
+		var mz mzn.MsData
 
-		logrus.Info("Reading ", sourceList[i])
+		logrus.Info("Processing ", sourceList[i])
+		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		ms1, ms2, ms3, e = getSpectra(p.Dir, p.Format, p.Level, sourceList[i])
+		e = mz.Read(fileName, false, false, false)
 		if e != nil {
 			return p, e
 		}
 
-		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, ms1, ms2, sourceMap[sourceList[i]])
+		// mz, e := getSpectra(p.Dir, p.Format, p.Level, sourceList[i])
+		// if e != nil {
+		// 	return p, e
+		// }
+
+		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 		if e != nil {
 			return p, e
 		}
 
-		ms1 = raw.MS1{}
+		//ms1 = raw.MS1{}
 
 		var labels = make(map[string]tmt.Labels)
 		if p.Level == 3 {
 			var labE error
-			labels, labE = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, ms3)
+			labels, labE = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, mz)
 			if labE != nil {
 				return p, labE
 			}
 		} else {
 			var labE error
-			labels, labE = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, ms2)
+			labels, labE = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, mz)
 			if labE != nil {
 				return p, labE
 			}
 		}
 
-		ms2 = raw.MS2{}
-		ms3 = raw.MS3{}
+		//ms2 = raw.MS2{}
+		//ms3 = raw.MS3{}
 
 		labels = assignLabelNames(labels, p.LabelNames)
 
@@ -227,47 +230,19 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	return p, nil
 }
 
-func getSpectra(dir, format string, level int, k string) (raw.MS1, raw.MS2, raw.MS3, *err.Error) {
-
-	var ms1 raw.MS1
-	var ms2 raw.MS2
-	var ms3 raw.MS3
-
-	// get the clean name, remove the extension
-	var extension = filepath.Ext(filepath.Base(k))
-	var name = k[0 : len(k)-len(extension)]
-	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
-
-	// get all MS1 spectra
-	if _, e := os.Stat(input); e == nil {
-
-		spec, e := raw.Restore(k)
-		if e != nil {
-			return ms1, ms2, ms3, &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: "error restoring indexed mz"}
-		}
-
-		ms1 = raw.GetMS1(spec)
-		ms2 = raw.GetMS2(spec)
-		if level == 3 {
-			ms3 = raw.GetMS3(ms2, spec)
-		}
-
-	} else {
-
-		spec, rer := raw.RestoreFromFile(dir, k, format)
-		if rer != nil {
-			return ms1, ms2, ms3, &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: "cant read mz file"}
-		}
-
-		ms1 = raw.GetMS1(spec)
-		ms2 = raw.GetMS2(spec)
-		if level == 3 {
-			ms3 = raw.GetMS3(ms2, spec)
-		}
-	}
-
-	return ms1, ms2, ms3, nil
-}
+// func getSpectra(dir, format string, level int, k string) (mzn.MsData, *err.Error) {
+//
+// 	var mz mzn.MsData
+//
+// 	// get the clean name, remove the extension
+// 	var extension = filepath.Ext(filepath.Base(k))
+// 	var name = k[0 : len(k)-len(extension)]
+// 	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
+//
+// 	mz.Read(input, false, false, false)
+//
+// 	return mz, nil
+// }
 
 // cleanPreviousData cleans previous label quantifications
 func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {

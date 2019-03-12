@@ -1,20 +1,27 @@
-package mzml
+package mz
 
 import (
+	"bytes"
 	"encoding/xml"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/err"
+	"github.com/rogpeppe/go-charset/charset"
 	// anon charset
 	_ "github.com/rogpeppe/go-charset/data"
 )
 
 // IndexedMzML is the root level tag
 type IndexedMzML struct {
+	Name    string
 	XMLName xml.Name `xml:"indexedmzML"`
-	MzML    MzML     `xml:"mzML"`
+	MzML    ML       `xml:"mzML"`
 }
 
-// MzML is the root level tag
-type MzML struct {
+// ML is the root level tag
+type ML struct {
 	XMLName           xml.Name          `xml:"mzML"`
 	Accession         string            `xml:"accession,attr"`
 	Version           string            `xml:"version,attr"`
@@ -262,4 +269,30 @@ type BinaryDataArray struct {
 type Binary struct {
 	XMLName xml.Name `xml:"binary"`
 	Value   []byte   `xml:",chardata"`
+}
+
+// Parse is the main function for parsing pepxml data
+func (p *IndexedMzML) Parse(f string) error {
+
+	xmlFile, e := os.Open(f)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
+	}
+	defer xmlFile.Close()
+	b, _ := ioutil.ReadAll(xmlFile)
+
+	var mzml IndexedMzML
+
+	reader := bytes.NewReader(b)
+	decoder := xml.NewDecoder(reader)
+	decoder.CharsetReader = charset.NewReader
+
+	if e = decoder.Decode(&mzml); e != nil {
+		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
+	}
+
+	p.MzML = mzml.MzML
+	p.Name = filepath.Base(f)
+
+	return nil
 }

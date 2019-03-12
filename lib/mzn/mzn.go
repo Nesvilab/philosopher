@@ -1,56 +1,65 @@
-package mz
+package mzn
 
 import (
-	"bufio"
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
 	"encoding/binary"
-	"encoding/xml"
 	"errors"
 	"io"
 	"math"
-	"os"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/raw/mzml"
+	"github.com/prvst/philosopher/lib/mz"
 )
 
-// Raw struct
-type Raw struct {
-	FileName   string
-	RefSpectra sync.Map
-	Spectra    Spectra
+// MsData top struct
+type MsData struct {
+	FileName string
+	//	RefSpectra sync.Map
+	Spectra Spectra
 }
 
-// Spectra is a list of Spetrum
+// Spectra struct
 type Spectra []Spectrum
 
-// Spectrum struct
+// Spectrum tag
 type Spectrum struct {
-	Index       string
-	Scan        string
-	Level       string
-	StartTime   float64
-	Precursor   Precursor
-	Peaks       Peaks
-	Intensities Intensities
-	IonMobility IonMobility
+	Index         string
+	Scan          string
+	Level         string
+	SpectrumName  string
+	ScanStartTime float64
+	Precursor     Precursor
+	Mz            Mz
+	Intensity     Intensity
+	IonMobility   IonMobility
 }
 
-// Peaks struct
-type Peaks struct {
+// Precursor struct
+type Precursor struct {
+	ParentIndex                string
+	ParentScan                 string
+	ChargeState                int
+	SelectedIon                float64
+	TargetIon                  float64
+	PeakIntensity              float64
+	IsolationWindowLowerOffset float64
+	IsolationWindowUpperOffset float64
+}
+
+// Mz struct
+type Mz struct {
 	Stream        []byte
 	DecodedStream []float64
 	Precision     string
 	Compression   string
 }
 
-// Intensities struct
-type Intensities struct {
+// Intensity struct
+type Intensity struct {
 	Stream        []byte
 	DecodedStream []float64
 	Precision     string
@@ -65,106 +74,105 @@ type IonMobility struct {
 	Compression   string
 }
 
-// Precursor struct
-type Precursor struct {
-	ParentIndex                string
-	ParentScan                 string
-	ChargeState                int
-	SelectedIon                float64
-	TargetIon                  float64
-	IsolationWindowLowerOffset float64
-	IsolationWindowUpperOffset float64
-	PeakIntensity              float64
-}
+func (a Spectra) Len() int           { return len(a) }
+func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
-// ParRead is a parallel reader implementing sync.Map
-func (r *Raw) ParRead(f string) *err.Error {
+// Read is the main function for parsing mzML data
+func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) *err.Error {
 
-	xmlFile, e := os.Open(f)
+	var xml mz.IndexedMzML
+	e := xml.Parse(f)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
 	}
-	defer xmlFile.Close()
 
-	decoder := xml.NewDecoder((bufio.NewReader(xmlFile)))
+	p.FileName = f
 
-	var inElement string
-	for {
+	var spectra Spectra
+	sl := xml.MzML.Run.SpectrumList
 
-		t, _ := decoder.Token()
-		if t == nil {
-			break
-		}
+	for _, i := range sl.Spectrum {
 
-		switch se := t.(type) {
-		case xml.StartElement:
-
-			inElement = se.Name.Local
-
-			if inElement == "spectrum" {
-				var rawSpec mzml.Spectrum
-				decoder.DecodeElement(&rawSpec, &se)
-				//				_ = decoder.Decode(&se)
-				go procSpectra(r, rawSpec)
+		var level string
+		for _, j := range i.CVParam {
+			if string(j.Accession) == "MS:1000511" {
+				level = j.Value
 			}
-
-		default:
-
 		}
 
+		if skipMS1 == true && level == "1" {
+			continue
+		} else if skipMS2 == true && level == "2" {
+			continue
+		} else if skipMS3 == true && level == "3" {
+			continue
+		}
+
+		spectrum, e := processSpectrum(i)
+		if e != nil {
+			return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
+		}
+
+		spectra = append(spectra, spectrum)
 	}
 
-	decoder = nil
+	if len(spectra) == 0 {
+		return &err.Error{Type: err.NoPSMFound, Class: err.FATA}
+	}
+
+	p.Spectra = spectra
 
 	return nil
 }
 
-func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
+func processSpectrum(mzSpec mz.Spectrum) (Spectrum, *err.Error) {
 
 	var spec Spectrum
-	spec.Index = string(rawSpec.Index)
 
-	indexStr := string(rawSpec.Index)
+	spec.Index = string(mzSpec.Index)
+
+	indexStr := string(mzSpec.Index)
 	indexInt, _ := strconv.Atoi(indexStr)
 	indexInt++
 	spec.Scan = string(strconv.Itoa(indexInt))
 
-	for _, j := range rawSpec.CVParam {
+	for _, j := range mzSpec.CVParam {
 		if string(j.Accession) == "MS:1000511" {
-			spec.Level = string(j.Value)
+			spec.Level = j.Value
 		}
 	}
 
-	for _, j := range rawSpec.ScanList.Scan[0].CVParam {
+	for _, j := range mzSpec.ScanList.Scan[0].CVParam {
 		if string(j.Accession) == "MS:1000016" {
 			val, e := strconv.ParseFloat(j.Value, 64)
 			if e != nil {
-				return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+				return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 			}
-			spec.StartTime = val
+			spec.ScanStartTime = val
 		}
 	}
 
 	spec.Precursor = Precursor{}
-	if len(rawSpec.PrecursorList.Precursor) > 0 {
+	if len(mzSpec.PrecursorList.Precursor) > 0 {
 
 		// parent index and parent scan
 		var ref []string
 		var precRef []string
 
-		if len(rawSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
+		if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
 
 			precRef = append(precRef, "-1")
 			precRef = append(precRef, "-1")
 
 		} else {
 
-			ref = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
+			ref = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
 			precRef = strings.Split(ref[2], "=")
 
 			// ABSCIEX has a different way of reporting the prcursor reference spectrum
 			if len(ref) < 1 || len(precRef) < 1 {
-				precRef = strings.Split(rawSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
+				precRef = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
 			}
 
 		}
@@ -174,12 +182,12 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 		pi = (pi - 1)
 		spec.Precursor.ParentIndex = strconv.Itoa(pi)
 
-		for _, j := range rawSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
+		for _, j := range mzSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
 
 			if string(j.Accession) == "MS:1000827" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.TargetIon = val
 			}
@@ -187,7 +195,7 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 			if string(j.Accession) == "MS:1000828" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.IsolationWindowLowerOffset = val
 			}
@@ -195,18 +203,18 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 			if string(j.Accession) == "MS:1000829" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return nil
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.IsolationWindowUpperOffset = val
 			}
 
 		}
 
-		for _, j := range rawSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
+		for _, j := range mzSpec.PrecursorList.Precursor[0].SelectedIonList.SelectedIon[0].CVParam {
 			if string(j.Accession) == "MS:1000744" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return nil
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.SelectedIon = val
 			}
@@ -214,7 +222,7 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 			if string(j.Accession) == "MS:1000041" {
 				val, e := strconv.Atoi(j.Value)
 				if e != nil {
-					return nil
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.ChargeState = val
 			}
@@ -222,93 +230,74 @@ func procSpectra(r *Raw, rawSpec mzml.Spectrum) *err.Error {
 			if string(j.Accession) == "MS:1000042" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return nil
+					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
 				}
 				spec.Precursor.PeakIntensity = val
 			}
 		}
 	}
 
-	var binPeak Peaks
-	binPeak.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
-	for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[0].CVParam {
+	spec.Mz.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[0].Binary.Value
+	for _, j := range mzSpec.BinaryDataArrayList.BinaryDataArray[0].CVParam {
 		if string(j.Accession) == "MS:1000523" {
-			binPeak.Precision = "64"
+			spec.Mz.Precision = "64"
 		} else if string(j.Accession) == "MS:1000521" {
-			binPeak.Precision = "32"
+			spec.Mz.Precision = "32"
 		}
 
 		if string(j.Accession) == "MS:1000574" {
-			binPeak.Compression = "1"
+			spec.Mz.Compression = "1"
 		} else if string(j.Accession) == "MS:1000576" {
-			binPeak.Compression = "0"
+			spec.Mz.Compression = "0"
 		}
 
-		spec.Peaks = binPeak
-		spec.Peaks.DecodedStream, _ = Decode("mz", rawSpec.BinaryDataArrayList.BinaryDataArray[0])
-		spec.Peaks.Stream = nil
+		spec.Mz.DecodedStream, _ = Decode("mz", mzSpec.BinaryDataArrayList.BinaryDataArray[0])
+		spec.Mz.Stream = nil
 	}
 
-	var binInt Intensities
-	binInt.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
-	for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[1].CVParam {
+	spec.Intensity.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
+	for _, j := range mzSpec.BinaryDataArrayList.BinaryDataArray[1].CVParam {
 		if string(j.Accession) == "MS:1000523" {
-			binInt.Precision = "64"
+			spec.Intensity.Precision = "64"
 		} else if string(j.Accession) == "MS:1000521" {
-			binInt.Precision = "32"
+			spec.Intensity.Precision = "32"
 		}
 
 		if string(j.Accession) == "MS:1000574" {
-			binInt.Compression = "1"
+			spec.Intensity.Compression = "1"
 		} else if string(j.Accession) == "MS:1000576" {
-			binInt.Compression = "0"
+			spec.Intensity.Compression = "0"
 		}
 	}
 
-	spec.Intensities = binInt
-	spec.Intensities.DecodedStream, _ = Decode("int", rawSpec.BinaryDataArrayList.BinaryDataArray[1])
-	spec.Intensities.Stream = nil
+	spec.Intensity.DecodedStream, _ = Decode("int", mzSpec.BinaryDataArrayList.BinaryDataArray[1])
+	spec.Intensity.Stream = nil
 
-	if rawSpec.BinaryDataArrayList.Count == 3 {
-		var binIM IonMobility
-		binIM.Stream = rawSpec.BinaryDataArrayList.BinaryDataArray[2].Binary.Value
-		for _, j := range rawSpec.BinaryDataArrayList.BinaryDataArray[2].CVParam {
+	if mzSpec.BinaryDataArrayList.Count == 3 {
+		spec.IonMobility.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[2].Binary.Value
+		for _, j := range mzSpec.BinaryDataArrayList.BinaryDataArray[2].CVParam {
 			if string(j.Accession) == "MS:1000523" {
-				binPeak.Precision = "64"
+				spec.IonMobility.Precision = "64"
 			} else if string(j.Accession) == "MS:1000521" {
-				binPeak.Precision = "32"
+				spec.IonMobility.Precision = "32"
 			}
 
 			if string(j.Accession) == "MS:1000574" {
-				binPeak.Compression = "1"
+				spec.IonMobility.Compression = "1"
 			} else if string(j.Accession) == "MS:1000576" {
-				binPeak.Compression = "0"
+				spec.IonMobility.Compression = "0"
 			}
 		}
 
-		spec.IonMobility = binIM
-		spec.IonMobility.DecodedStream, _ = Decode("im", rawSpec.BinaryDataArrayList.BinaryDataArray[2])
+		spec.IonMobility.DecodedStream, _ = Decode("im", mzSpec.BinaryDataArrayList.BinaryDataArray[2])
 		spec.IonMobility.Stream = nil
 	}
 
-	// for y := 0; y < 28; y++ {
-	// 	s := strconv.Itoa(y)
-	// 	if spec.Index == s && spec.Level == "1" {
-	// 		spew.Dump(spec)
-	// 	}
-	// }
-
-	r.RefSpectra.Store(spec.Scan, spec)
-
-	//nil
-	spec = Spectrum{}
-	rawSpec = mzml.Spectrum{}
-
-	return nil
+	return spec, nil
 }
 
 // Decode processes the binary data
-func Decode(class string, bin mzml.BinaryDataArray) ([]float64, error) {
+func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
 
 	var compression bool
 	var precision string
@@ -339,7 +328,7 @@ func Decode(class string, bin mzml.BinaryDataArray) ([]float64, error) {
 }
 
 // readEncoded transforms the binary data into float64 values
-func readEncoded(class string, bin mzml.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
+func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
 
 	var stream []uint8
 	var floatArray []float64
