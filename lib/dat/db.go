@@ -33,6 +33,7 @@ func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
 	idReg1 := regexp.MustCompile(`(ENSP\w+)`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
 	desReg := regexp.MustCompile(`ENSP\w+(.*)`)
+	geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
 
 	e.OriginalHeader = k
 
@@ -56,10 +57,16 @@ func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
 		e.Description = desc[1]
 	}
 
+	gene := geneReg.FindStringSubmatch(k)
+	if gene == nil {
+		e.GeneNames = ""
+	} else {
+		e.GeneNames = gene[1]
+	}
+
 	e.EntryName = ""
 	e.ProteinName = ""
 	e.Organism = ""
-	e.GeneNames = ""
 	e.ProteinExistence = ""
 	e.SequenceVersion = ""
 	e.Description = ""
