@@ -5,6 +5,17 @@
 ### Changed
 ### Fixed
 
+# Philosopher 20190313
+### Build: 201903131612
+
+
+### Changed
+- Golang version updated to 1.12
+
+### Fixed
+- A problem with the label-free quantification was introduced in the last version and fixed.
+- Minor bugs and typos
+
 # Philosopher 20190301
 ### Build: 201903011453
 
