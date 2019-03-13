@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.10-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.12-blue.svg)
 [![https://philosopher-toolkit.slack.com](https://img.shields.io/badge/slack-channel-blue.svg)](https://philosopher-toolkit.slack.com?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Features
@@ -29,7 +29,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
   - Sequential FDR estimation for large data sets using filtered PSM and proteins lists.
   - PickedFDR for scalable estimations.
   - Razor peptide assignment for better quantification and interpretation.
-  
+
 
 - Label-free quantification via Spectral counting and MS1 Quantification.
 
