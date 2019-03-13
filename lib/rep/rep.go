@@ -313,17 +313,21 @@ func Run(m met.Data) met.Data {
 		logrus.Fatal(err.Error())
 	}
 
-	if len(repo.Proteins) > 10 {
+	if len(m.Filter.Pox) > 0 {
 
 		logrus.Info("Creating Protein FASTA report")
 		repo.ProteinFastaReport(m.Report.Decoys)
 
-		if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
+		if len(m.Quantify.Plex) > 0 {
+
 			logrus.Info("Creating Protein TMT report")
 			repo.ProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
+
 		} else {
+
 			logrus.Info("Creating Protein report")
 			repo.ProteinReport(m.Report.Decoys)
+
 		}
 
 	}
@@ -337,7 +341,7 @@ func Run(m met.Data) met.Data {
 		labelNames, _ := getLabelNames(annotfile)
 		logrus.Info("Creating TMT PSM report")
 
-		if strings.Contains(m.SearchEngine, "MSFragger") && (repo.PSM[0].Labels.Channel1.Intensity > 0 || repo.PSM[100].Labels.Channel1.Intensity > 0) {
+		if strings.Contains(m.SearchEngine, "MSFragger") && len(m.Quantify.Plex) > 0 {
 			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
 		} else {
 			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
@@ -386,7 +390,6 @@ func Run(m met.Data) met.Data {
 		}
 
 		if len(m.Quantify.Plex) > 0 {
-			//if repo.Proteins[0].TotalLabels.Channel1.Intensity > 0 || repo.Proteins[10].TotalLabels.Channel1.Intensity > 0 {
 			logrus.Info("Creating TMT phospho protein report")
 			repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
 		}

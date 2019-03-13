@@ -358,16 +358,7 @@ func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompr
 			if counter == 4 {
 				bits := binary.LittleEndian.Uint32(stream)
 				converted := math.Float32frombits(bits)
-
 				floatArray = append(floatArray, float64(converted))
-				// if class == "mz" {
-				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-				// 	floatArray = append(floatArray, float64(converted))
-				// } else if class == "int" {
-				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-				// 	floatArray = append(floatArray, float64(converted))
-				// }
-
 				stream = nil
 				counter = 0
 			}
@@ -379,16 +370,7 @@ func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompr
 			if counter == 8 {
 				bits := binary.LittleEndian.Uint64(stream)
 				converted := math.Float64frombits(bits)
-
 				floatArray = append(floatArray, float64(converted))
-				// if class == "mz" {
-				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-				// 	floatArray = append(floatArray, float64(converted))
-				// } else if class == "int" {
-				// 	//floatArray = append(floatArray, utils.Round(float64(converted), 5, 6))
-				// 	floatArray = append(floatArray, float64(converted))
-				// }
-
 				stream = nil
 				counter = 0
 			}
