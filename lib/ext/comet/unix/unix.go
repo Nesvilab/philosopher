@@ -24,7 +24,7 @@ func UnixParameterFile(unixParam string) error {
 // Unix64 ...
 func Unix64(unix64 string) error {
 
-	bin, err := Asset("comet.2017012.linux.exe")
+	bin, err := Asset("comet.2018014.linux.exe")
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")
 	}

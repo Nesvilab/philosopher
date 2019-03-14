@@ -34,9 +34,9 @@ func New(temp string) Comet {
 
 	self.DefaultBin = ""
 	self.DefaultParam = ""
-	self.Win32 = temp + string(filepath.Separator) + "comet.2017012.win32.exe"
-	self.Win64 = temp + string(filepath.Separator) + "comet.2017012.win64.exe"
-	self.Unix64 = temp + string(filepath.Separator) + "comet.2017012.linux.exe"
+	self.Win32 = temp + string(filepath.Separator) + "comet.2018014.win32.exe"
+	self.Win64 = temp + string(filepath.Separator) + "comet.2018014.win64.exe"
+	self.Unix64 = temp + string(filepath.Separator) + "comet.2018014.linux.exe"
 	self.WinParam = temp + string(filepath.Separator) + "comet.params.txt"
 	self.UnixParam = temp + string(filepath.Separator) + "comet.params"
 
