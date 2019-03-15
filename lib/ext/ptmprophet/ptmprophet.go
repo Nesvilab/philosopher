@@ -136,12 +136,53 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, "VERBOSE")
 	}
 
+	if params.Lability == true {
+		cmd.Args = append(cmd.Args, "LABILITY")
+	}
+
+	if params.Ifrags == true {
+		cmd.Args = append(cmd.Args, "IFRAGS")
+	}
+
+	if params.Autodirect == true {
+		cmd.Args = append(cmd.Args, "AUTORIDECT")
+	}
+
 	if params.MassDiffMode == true {
 		cmd.Args = append(cmd.Args, "MASSDIFFMODE")
 	}
 
+	if params.NoMinoFactor == true {
+		cmd.Args = append(cmd.Args, "NOMINOFACTOR")
+	}
+
 	if params.EM != 1 {
 		v := fmt.Sprintf("EM=%d", params.EM)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.FragPPMTol != 15 {
+		v := fmt.Sprintf("FRAGPPMTOL=%d", params.FragPPMTol)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.MaxThreads != 1 {
+		v := fmt.Sprintf("MAXTHREADS=%d", params.MaxThreads)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.MaxFragZ != 0 {
+		v := fmt.Sprintf("MAXFRAGZ=%d", params.MaxFragZ)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.Mino != 0 {
+		v := fmt.Sprintf("MINO=%d", params.Mino)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.MassOffset != 0 {
+		v := fmt.Sprintf("MASSOFFSET=%d", params.MassOffset)
 		cmd.Args = append(cmd.Args, v)
 	}
 
@@ -155,13 +196,21 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if params.MinProb != 0 {
+	if params.MinProb != 0.9 {
 		v := fmt.Sprintf("MINPROB=%.4f", params.MinProb)
 		cmd.Args = append(cmd.Args, v)
 	}
 
 	if len(params.Mods) > 0 {
 		cmd.Args = append(cmd.Args, params.Mods)
+	}
+
+	if len(params.NIons) > 0 {
+		cmd.Args = append(cmd.Args, params.NIons)
+	}
+
+	if len(params.CIons) > 0 {
+		cmd.Args = append(cmd.Args, params.CIons)
 	}
 
 	return cmd

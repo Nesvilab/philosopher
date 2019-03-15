@@ -36,8 +36,6 @@ func New(temp string) PeptideProphet {
 
 	var self PeptideProphet
 
-	//temp, _ := sys.GetTemp()
-
 	self.UnixInteractParser = temp + string(filepath.Separator) + "InteractParser"
 	self.UnixRefreshParser = temp + string(filepath.Separator) + "RefreshParser"
 	self.UnixPeptideProphetParser = temp + string(filepath.Separator) + "PeptideProphetParser"
