@@ -54,8 +54,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		logrus.Info("Processing ", s)
 		var mz mzn.MsData
 
-		fileName, _ := filepath.Abs(s)
-		fileName = fmt.Sprintf("%s.mzML", fileName)
+		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
 		e := mz.Read(fileName, false, true, true)
 		if e != nil {
