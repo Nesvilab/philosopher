@@ -5,15 +5,30 @@
 ### Changed
 ### Fixed
 
+
+# Philosopher ?
+### Build: ?
+
+### Added
+
+### Changed
+- Prophets updated to 5.2.0
+- Comet updated to 2018014
+
+### Fixed
+- Freequant error when reading files was corrected.
+
+
 # Philosopher 20190313
 ### Build: 201903131612
 
 ### Changed
-- Golang version updated to 1.12
+- Go version updated to 1.12
 
 ### Fixed
 - A problem with the label-free quantification was introduced in the last version and fixed.
 - Minor bugs and typos
+
 
 # Philosopher 20190301
 ### Build: 201903011453
@@ -28,6 +43,7 @@
 - Decoys were not being printed on the output as requested.
 - Reprint tables some times had the second line in a wrong order.
 - Some output tables were missing protein IDS and other features when not using the razor flag.
+
 
 # Philosopher 20190226
 ### Build: 201902261041
