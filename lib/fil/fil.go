@@ -45,6 +45,10 @@ func Run(f met.Data) (met.Data, error) {
 		return f, err
 	}
 
+	if len(pepid) == 0 {
+		return f, errors.New("No PSMs were found in data set")
+	}
+
 	if len(f.Filter.Pox) > 0 {
 
 		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)

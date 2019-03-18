@@ -75,9 +75,9 @@ func (i InterProphet) Run(params met.InterProphet, home, temp string, args []str
 	output := fmt.Sprintf("%s%s%s.pep.xml", temp, string(filepath.Separator), params.Output)
 	output, _ = filepath.Abs(output)
 
-	cmd = i.appendParams(params, cmd)
 	cmd.Args = append(cmd.Args, output)
 	cmd.Dir = filepath.Dir(output)
+	cmd = i.appendParams(params, cmd)
 
 	env := os.Environ()
 	env = append(env, fmt.Sprintf("XML_ONLY=%d", 1))
