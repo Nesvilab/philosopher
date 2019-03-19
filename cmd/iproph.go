@@ -68,7 +68,7 @@ func init() {
 		iprophCmd.Flags().IntVarP(&m.InterProphet.Threads, "threads", "", 1, "specify threads to use")
 		iprophCmd.Flags().StringVarP(&m.InterProphet.Decoy, "decoy", "", "", "specify the decoy tag")
 		iprophCmd.Flags().Float64VarP(&m.InterProphet.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
-		iprophCmd.Flags().StringVarP(&m.InterProphet.Output, "output", "", "iproph.pep.xml", "specify output name")
+		iprophCmd.Flags().StringVarP(&m.InterProphet.Output, "output", "", "interact.iproph", "specify output name prefix")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Length, "length", "", false, "use Peptide Length model")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nofpkm, "nofpkm", "", false, "do not use FPKM model")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonss, "nonss", "", false, "do not use NSS model")
