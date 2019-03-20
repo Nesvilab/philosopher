@@ -7,12 +7,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
 
-	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/fas"
 	"github.com/prvst/philosopher/lib/met"
@@ -80,7 +78,7 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	}
 
 	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
 	customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
@@ -94,7 +92,7 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	}
 
 	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.Tag)
@@ -203,7 +201,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) *err.Error {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap bool) *err.Error {
+func (d *Base) Create(temp, add, enz, tag string, crap, noD bool) *err.Error {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -247,31 +245,43 @@ func (d *Base) Create(temp, add, enz, tag string, crap bool) *err.Error {
 
 	}
 
-	var en bio.Enzyme
-	en.Synth(enz)
-	reg := regexp.MustCompile(en.Pattern)
-
 	for h, s := range db {
 
 		th := ">" + h
 		d.TaDeDB[th] = s
 
-		var revPeptides []string
-		split := reg.Split(s, -1)
-		if len(split) > 1 {
-			for i := range split {
-				r := reverseSeq(split[i])
-				revPeptides = append(revPeptides, r)
-			}
-		} else {
-			r := reverseSeq(s)
-			revPeptides = append(revPeptides, r)
+		if noD == false {
+			dh := ">" + tag + h
+			d.TaDeDB[dh] = reverseSeq(s)
 		}
 
-		rev := strings.Join(revPeptides, en.Join)
-		dh := ">" + tag + h
-		d.TaDeDB[dh] = rev
 	}
+
+	// var en bio.Enzyme
+	// en.Synth(enz)
+	// reg := regexp.MustCompile(en.Pattern)
+	//
+	// for h, s := range db {
+	//
+	// 	th := ">" + h
+	// 	d.TaDeDB[th] = s
+	//
+	// 	var revPeptides []string
+	// 	split := reg.Split(s, -1)
+	// 	if len(split) > 1 {
+	// 		for i := range split {
+	// 			r := reverseSeq(split[i])
+	// 			revPeptides = append(revPeptides, r)
+	// 		}
+	// 	} else {
+	// 		r := reverseSeq(s)
+	// 		revPeptides = append(revPeptides, r)
+	// 	}
+	//
+	// 	rev := strings.Join(revPeptides, en.Join)
+	// 	dh := ">" + tag + h
+	// 	d.TaDeDB[dh] = rev
+	// }
 
 	return nil
 }
@@ -324,16 +334,6 @@ func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
 		}
 	}
 
-	// e = d.ProcessDB(outfile, tag)
-	// if e != nil {
-	// 	return outfile, &err.Error{Type: err.CannotParseDataBase, Class: err.FATA}
-	// }
-	//
-	// e = d.Serialize()
-	// if e != nil {
-	// 	return outfile, &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
-	// }
-
 	sys.CopyFile(workfile, outfile)
 
 	return outfile, nil
@@ -373,14 +373,6 @@ func (d *Base) Restore() *err.Error {
 
 // RestoreWithPath reads philosopher results files and restore the data sctructure
 func (d *Base) RestoreWithPath(p string) *err.Error {
-
-	// var path string
-	//
-	// if strings.Contains(p, string(filepath.Separator)) {
-	// 	path = fmt.Sprintf("%s%s", p, sys.DBBin())
-	// } else {
-	// 	path = fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
-	// }
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
 	path, _ = filepath.Abs(path)

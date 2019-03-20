@@ -75,6 +75,7 @@ type Database struct {
 	Crap   bool   `yaml:"contam"`
 	Rev    bool   `yaml:"reviewed"`
 	Iso    bool   `yaml:"isoform"`
+	NoD    bool   `yaml:"nodecoys"`
 }
 
 // Comet options and parameters

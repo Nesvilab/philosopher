@@ -12,14 +12,7 @@ import (
 var databaseCmd = &cobra.Command{
 	Use:   "database",
 	Short: "Target-Decoy database formatting",
-	//Long: `The database command alows the creation and formatting of a Target-Decoy database. It also
-	//provides options for downloading a fresh snapshot from UniProt`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
 
 		m.FunctionInitCheckUp()
 
@@ -53,6 +46,7 @@ func init() {
 		databaseCmd.Flags().BoolVarP(&m.Database.Crap, "contam", "", false, "add common contaminants")
 		databaseCmd.Flags().BoolVarP(&m.Database.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
 		databaseCmd.Flags().BoolVarP(&m.Database.Iso, "isoform", "", false, "add isoform sequences")
+		databaseCmd.Flags().BoolVarP(&m.Database.NoD, "nodecoys", "", false, "don't add decoys to the database")
 	}
 
 	RootCmd.AddCommand(databaseCmd)
