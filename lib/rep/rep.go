@@ -2262,7 +2262,7 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	var massWindow = float64(0.5)
 	var binsize = float64(0.1)
-	var amplitude = float64(500)
+	var amplitude = float64(1000)
 
 	var bins []MassBin
 

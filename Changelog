@@ -6,11 +6,12 @@
 ### Fixed
 
 
-# Philosopher 20190321
-### Build: 201903212309
+# Philosopher 20190322
+### Build: 201903221254
 
 ### Changed
 - MSconvert was temporarily disabled after a scary bug that ended up removing the user home folder!
+- Delta mass amplitude increased to 1000.
 
 # Philosopher 20190319
 ### Build: 201903191601
