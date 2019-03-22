@@ -14,13 +14,7 @@ import (
 var filterCmd = &cobra.Command{
 	Use:   "filter",
 	Short: "Statistical filtering, validation and False Discovery Rates assessment",
-	//Long:  `Custom algorithms for multi-level False Discovery Rates scoring and evaluation`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
 
 		m.FunctionInitCheckUp()
 

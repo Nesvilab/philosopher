@@ -18,6 +18,8 @@ var msconvertCmd = &cobra.Command{
 	Short: "Convert mass spec data file formats",
 	Run: func(cmd *cobra.Command, args []string) {
 
+		m.FunctionInitCheckUp()
+
 		logrus.Info("Executing Msconvert ", Version)
 
 		m, e := msconvert.Run(m, args)

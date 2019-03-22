@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jpillora/go-ogle-analytics"
+	ga "github.com/jpillora/go-ogle-analytics"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

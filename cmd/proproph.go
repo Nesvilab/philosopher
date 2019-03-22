@@ -17,11 +17,6 @@ var proprophCmd = &cobra.Command{
 	//Long:  "Statistical validation of protein identification based on peptide assignment to MS/MS spectra\nProteinProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
 		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing ProteinProphet ", Version)

@@ -16,11 +16,6 @@ var abacusCmd = &cobra.Command{
 	Short: "Combined analysis of LC-MS/MS results",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
 		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {

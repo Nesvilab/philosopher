@@ -15,19 +15,9 @@ import (
 var freequant = &cobra.Command{
 	Use:   "freequant",
 	Short: "Label-free Quantification ",
-	//Long:  `Provides methods for MS1 Peak Intensity calculation based on XIC`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
 		m.FunctionInitCheckUp()
-
-		// if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
-		// 	logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
-		// }
 
 		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {

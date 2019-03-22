@@ -16,8 +16,9 @@ import (
 var idconvertCmd = &cobra.Command{
 	Use:   "idconvert",
 	Short: "Convert mass spec identification file formats",
-
 	Run: func(cmd *cobra.Command, args []string) {
+
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Idconvert ", Version)
 
