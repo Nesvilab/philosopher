@@ -20,7 +20,7 @@ var filterCmd = &cobra.Command{
 
 		logrus.Info("Executing Filter ", Version)
 
-		/// clean, clean clean
+		// clean, clean clean
 		os.RemoveAll(sys.EvBin())
 		os.RemoveAll(sys.EvIonBin())
 		os.RemoveAll(sys.EvModificationsBin())
@@ -45,7 +45,6 @@ var filterCmd = &cobra.Command{
 			m.Filter.Razor = false
 		}
 
-		//stat.Run(fp, psmFDR, pepFDR, ionFDR, prtFDR, pepProb, prtProb)
 		m, e := fil.Run(m)
 		if e != nil {
 			logrus.Fatal(e.Error())
@@ -69,7 +68,7 @@ func init() {
 
 		filterCmd.Flags().StringVarP(&m.Filter.Pex, "pepxml", "", "", "pepXML file or directory containing a set of pepXML files")
 		filterCmd.Flags().StringVarP(&m.Filter.Pox, "protxml", "", "", "protXML file path")
-		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "rev_", "decoy tag")
+		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "", "decoy tag")
 		filterCmd.Flags().Float64VarP(&m.Filter.IonFDR, "ion", "", 0.01, "peptide ion FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PepFDR, "pep", "", 0.01, "peptide FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PsmFDR, "psm", "", 0.01, "psm FDR level")

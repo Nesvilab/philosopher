@@ -31,6 +31,11 @@ func Run(f met.Data) (met.Data, error) {
 	var pro id.ProtIDList
 	var err error
 
+	// get the database tag from database command
+	if len(f.Filter.Tag) == 0 {
+		f.Filter.Tag = f.Database.Tag
+	}
+
 	logrus.Info("Processing peptide identification files")
 
 	pepid, searchEngine, err := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Filter.Model)

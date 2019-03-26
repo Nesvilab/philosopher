@@ -58,6 +58,11 @@ func Run(m met.Data, args []string) met.Data {
 		logrus.Fatal("You need to provide a protein database")
 	}
 
+	// get the database tag from database command
+	if len(m.PeptideProphet.Decoy) == 0 {
+		m.PeptideProphet.Decoy = m.Database.Tag
+	}
+
 	// deploy the binaries
 	e := pep.Deploy(m.OS, m.Distro)
 	if e != nil {
