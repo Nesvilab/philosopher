@@ -6,6 +6,15 @@
 ### Fixed
 
 
+# Philosopher ?
+### Build: ?
+
+### Added
+### Changed
+- The Decoys tags are automatically acquired from the database command, not necessary anymore for the Filter and PeptideProphet.
+### Fixed
+
+
 # Philosopher 20190322
 ### Build: 201903221254
 
