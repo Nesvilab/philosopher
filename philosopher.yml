@@ -1,9 +1,21 @@
-# version 20180524
+# Philosopher pipeline configuration file.
+#
+# The pipeline mode automates the processing done by Philosopher. First, check
+# the steps you want to execute in the commands section and change them to
+# 'yes'. For each selected command, go to its section and adjust the parameters
+# accordingly to your analysis.
+#
+# Usage:
+# philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
+
+version: 20190322
+
 analytics: true              # reports when a workspace is created for usage estimation (default true)
 slackToken: ''               # specify the Slack API token
 slackChannel: ''             # specify the channel name
+
 commands:
-  workspace: no              # manage the experiment workspace for the analysis
+  workspace: yes             # manage the experiment workspace for the analysis
   database: no               # target-decoy database formatting
   comet: no                  # peptide spectrum matching with Comet
   msfragger: no              # peptide spectrum matching with MSFragger
@@ -16,6 +28,7 @@ commands:
   report: no                 # multi-level reporting for both narrow-searches and open-searches
   cluster: no                # protein report based on protein clusters
   abacus: no                 # combined analysis of LC-MS/MS results
+
 database:
   add: ''                    # add custom sequences (UniProt FASTA format only)
   annotate: ''               # process a ready-to-use database
@@ -26,15 +39,18 @@ database:
   isoform: false             # add isoform sequences
   prefix: rev_               # decoy prefix to be added (default "rev_")
   reviewed: true             # use only reviewed sequences from Swiss-Prot
+
 comet:
   noindex: true              # skip raw file indexing
   param: ''                  # comet parameter file (default "comet.params.txt")
   raw: mzML                  # format of the spectra file
+
 msfragger:
   path: ''                   # path to MSFragger java file
   memmory: 8                 # how much memory in GB to use
   param: ''                  # MSFragger parameter file
-  raw: mzML                  # format of the spectra file
+  raw: mzML                  # spectra format
+
 peptideprophet:
   extension: pepxml          # pepXML file extension
   accmass: false             # use Accurate Mass model binning
@@ -68,6 +84,7 @@ peptideprophet:
   pi: false                  # enable peptide pI model
   ppm: false                 # use PPM mass error instead of Dalton for mass modeling
   zero: false                # report results with minimum probability 0
+
 ptmprophet:
   autodirect: false          # use direct evidence when the lability is high, use in combination with LABILITY
   cions: ''                  # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
@@ -89,6 +106,7 @@ ptmprophet:
   nominofactor: false        # disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)
   ppmtol: 1                  # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
   verbose: false             # produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
+
 proteinprophet:
   accuracy: false            # equivalent to --minprob 0
   allpeps: false             # consider all possible peptides in the database in the confidence model
@@ -112,6 +130,7 @@ proteinprophet:
   protmw: false              # get protein mol weights
   softoccam: false           # peptide weights are apportioned equally among proteins within each Protein Group (less conservative protein count estimate)
   unmapped: false            # report results for UNMAPPED proteins
+
 filter:
   pepxml:                    # overwrites pepXML file NAME (needs to be the same in all directories)
   protxml:                   # overwrites protxml file PATH (needs to be the same in all directories or combined)
@@ -128,33 +147,38 @@ filter:
   mapMods: false             # map modifications acquired by an open search
   models: false              # print model distribution
   sequential: false          # alternative algorithm that estimates FDR using both filtered PSM and Protein lists
+
 freequant:
   peakTimeWindow: 0.4        # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3     # specify the retention time window for xic (minute) (default 3)
   tolerance: 10              # m/z tolerance in ppm (default 10)
+
 labelquant:
+  annotation: ''             # annotation file with custom names for the TMT channels
+  bestPSM: false             # select the best PSMs for protein quantification
+  level: 2                   # ms level for the quantification
+  minProb: 0.7               # only use PSMs with a minimum probability score
   plex:                      # number of channels
   purity: 0.5                # ion purity threshold (default 0.5)
-  tolerance: 20              # m/z tolerance in ppm (default 20)
-  level: 2                   # ms level for the quantification
-  uniqueOnly: false          # report quantification based on only unique peptides
-  bestPSM: false             # select the best PSMs for protein quantification
   removeLow: 0.0             # ignore the lower 3% PSMs based on their summed abundances
-  minProb: 0.7               # only use PSMs with a minimum probability score
-  annotation: ''             # annotation file with custom names for the TMT channels
+  tolerance: 20              # m/z tolerance in ppm (default 20)
+  uniqueOnly: false          # report quantification based on only unique peptides
+
 report:
-  withDecoys: false          # add decoy observations to reports
   msstats: false             # create an output compatible to MSstats
+  withDecoys: false          # add decoy observations to reports
+
 cluster:
   organismUniProtID: ''      # UniProt proteome ID
   level: 0.9                 # cluster identity level (default 0.9)
+
 abacus:
+  labels: false              # indicates whether the data sets include TMT labels or not
   protein: combined.prot.xml # combined protein file
   peptide: combined.pep.xml  # combined peptide file
-  tag: rev_                  # decoy tag (default "rev_")
   proteinprobability: 0.9    # minimum protein probability (default 0.9)
   peptideProbability: 0.5    # minimum peptide probability (default 0.5)
-  razor: false               # use razor peptides for protein FDR scoring
   picked: false              # apply the picked FDR algorithm before the protein scoring
+  razor: false               # use razor peptides for protein FDR scoring
+  tag: rev_                  # decoy tag (default "rev_")
   uniqueOnly: false          # report TMT quantification based on only unique peptides
-  labels: false              # indicates whether the data sets include TMT labels or not

@@ -51,16 +51,16 @@ type Commands struct {
 // DeployParameterFile ...
 func DeployParameterFile(temp string) (string, error) {
 
-	file := temp + string(filepath.Separator) + "philosopher.yaml"
+	file := temp + string(filepath.Separator) + "philosopher.yml"
 
-	param, err := Asset("philosopher.yaml")
+	param, err := Asset("philosopher.yml")
 	if err != nil {
-		return file, errors.New("Cannot deploy Comet parameter file")
+		return file, errors.New("Cannot deploy pipeline configuration file")
 	}
 
 	err = ioutil.WriteFile(file, param, sys.FilePermission())
 	if err != nil {
-		return file, errors.New("Cannot deploy pipeline parameter file")
+		return file, errors.New("Cannot write pipeline parameter file")
 	}
 
 	return file, nil

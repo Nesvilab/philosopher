@@ -200,7 +200,6 @@ var pipelineCmd = &cobra.Command{
 			sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
 
 			m.Serialize()
-			//met.CleanTemp(m.Temp)
 		}
 
 		for _, i := range args {
