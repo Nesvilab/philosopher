@@ -312,6 +312,57 @@ func ProcessUniProtKB(k, v, decoyTag string) (Record, *err.Error) {
 	return e, nil
 }
 
+// ProcessUniRef parses UniProt like FASTA records
+func ProcessUniRef(k, v, decoyTag string) (Record, *err.Error) {
+
+	var e Record
+
+	pnReg := regexp.MustCompile(`UniRef.+?\s(.+?)n\=`)
+	orReg := regexp.MustCompile(`UniRef.+?\s.+?n\=\d{1,}\sTax=(.+)TaxID`)
+
+	// PartHeader
+	part := strings.Split(k, " ")
+	e.PartHeader = part[0]
+
+	// ID
+	e.ID = part[0]
+
+	// Entry Name
+	e.EntryName = part[0]
+
+	// Protein Name
+	pnm := pnReg.FindStringSubmatch(k)
+	if pnm == nil {
+		e.ProteinName = ""
+	} else {
+		e.ProteinName = pnm[1]
+	}
+
+	// Organism
+	orn := orReg.FindStringSubmatch(k)
+	if orn == nil {
+		e.Organism = ""
+	} else {
+		e.Organism = orn[1]
+	}
+
+	// Gene Names
+	e.GeneNames = ""
+
+	e.Sequence = v
+	e.Length = len(v)
+
+	if strings.Contains(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	e.OriginalHeader = k
+
+	return e, nil
+}
+
 // ProcessGeneric parses generci and uknown database headers
 func ProcessGeneric(k, v, decoyTag string) (Record, *err.Error) {
 
@@ -353,6 +404,8 @@ func Classify(s, decoyTag string) (string, *err.Error) {
 		return "ncbi", nil
 	} else if strings.HasPrefix(seq, "ENSP") {
 		return "ensembl", nil
+	} else if strings.HasPrefix(seq, "UniRef") {
+		return "uniref", nil
 	}
 
 	return "generic", nil
