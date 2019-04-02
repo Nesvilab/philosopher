@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/mz"
+	"github.com/prvst/philosopher/lib/psi"
 )
 
 // MsData top struct
@@ -81,7 +81,7 @@ func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 // Read is the main function for parsing mzML data
 func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) *err.Error {
 
-	var xml mz.IndexedMzML
+	var xml psi.IndexedMzML
 	e := xml.Parse(f)
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
@@ -126,7 +126,7 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) *err.Error {
 	return nil
 }
 
-func processSpectrum(mzSpec mz.Spectrum) (Spectrum, *err.Error) {
+func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 
 	var spec Spectrum
 
@@ -327,7 +327,7 @@ func (s *Spectrum) Decode() error {
 }
 
 // // Decode processes the binary data
-// func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
+// func Decode(class string, bin psi.BinaryDataArray) ([]float64, error) {
 //
 // 	var compression bool
 // 	var precision string
@@ -412,7 +412,7 @@ func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) 
 	return floatArray, nil
 }
 
-// func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
+// func readEncoded(class string, bin psi.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
 //
 // 	var stream []uint8
 // 	var floatArray []float64

@@ -1,4 +1,4 @@
-package mz
+package psi
 
 import (
 	"bytes"
@@ -17,11 +17,11 @@ import (
 type IndexedMzML struct {
 	Name    string
 	XMLName xml.Name `xml:"indexedmzML"`
-	MzML    ML       `xml:"mzML"`
+	MzML    MzML     `xml:"mzML"`
 }
 
-// ML is the root level tag
-type ML struct {
+// MzML is the root level tag
+type MzML struct {
 	XMLName           xml.Name          `xml:"mzML"`
 	Accession         string            `xml:"accession,attr"`
 	Version           string            `xml:"version,attr"`
@@ -29,34 +29,6 @@ type ML struct {
 	RefParamGroupList RefParamGroupList `xml:"referenceableParamGroupList"`
 	SoftwareList      SoftwareList      `xml:"softwareList"`
 	Run               Run               `xml:"run"`
-}
-
-// CvList tag
-type CvList struct {
-	XMLName xml.Name `xml:"cvList"`
-	Count   int      `xml:"count,attr"`
-	CV      []CV     `xml:"cv"`
-}
-
-// CV tag
-type CV struct {
-	XMLName  xml.Name `xml:"cv"`
-	ID       string   `xml:"id,attr"`
-	Version  string   `xml:"version,attr"`
-	URI      string   `xml:"URI,attr"`
-	FullName string   `xml:"fullName,attr"`
-}
-
-// CVParam tag
-type CVParam struct {
-	XMLName       xml.Name `xml:"cvParam"`
-	CVRef         string   `xml:"cvRef,attr"`
-	Accession     string   `xml:"accession,attr"`
-	Name          string   `xml:"name,attr"`
-	Value         string   `xml:"value,attr"`
-	UnitCvRef     string   `xml:"unitCvRef,attr"`
-	UnitAccession string   `xml:"unitAccession,attr"`
-	UnitName      string   `xml:"unitName,attr"`
 }
 
 // UserParam tag
