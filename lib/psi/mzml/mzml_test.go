@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/prvst/philosopher/lib/mzml"
+	. "github.com/prvst/philosopher/lib/psi/mzml"
 )
 
 var _ = Describe("MzML", func() {
@@ -18,7 +18,7 @@ var _ = Describe("MzML", func() {
 		var e error
 
 		It("Accessing workspace", func() {
-			e = os.Chdir("../../test/wrksp/")
+			e = os.Chdir("../../../test/wrksp/")
 			Expect(e).NotTo(HaveOccurred())
 		})
 
