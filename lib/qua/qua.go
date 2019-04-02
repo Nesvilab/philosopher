@@ -10,7 +10,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/psi/mzml"
+	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uti"
@@ -104,7 +104,7 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 	for i := range sourceList {
 
-		var mz mzml.MsData
+		var mz mzn.MsData
 
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])

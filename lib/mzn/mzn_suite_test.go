@@ -1,4 +1,4 @@
-package mzml_test
+package mzn_test
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestMzn(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "MzML Suite")
+	RunSpecs(t, "Mzn Suite")
 }

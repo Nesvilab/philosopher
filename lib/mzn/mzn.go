@@ -1,4 +1,4 @@
-package mzml
+package mzn
 
 import (
 	"bytes"
@@ -327,7 +327,7 @@ func (s *Spectrum) Decode() error {
 }
 
 // // Decode processes the binary data
-// func Decode(class string, bin psi.BinaryDataArray) ([]float64, error) {
+// func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
 //
 // 	var compression bool
 // 	var precision string
@@ -412,7 +412,7 @@ func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) 
 	return floatArray, nil
 }
 
-// func readEncoded(class string, bin psi.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
+// func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
 //
 // 	var stream []uint8
 // 	var floatArray []float64

@@ -1,4 +1,4 @@
-package mzml_test
+package mzn_test
 
 import (
 	"os"
@@ -6,10 +6,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/prvst/philosopher/lib/psi/mzml"
+	. "github.com/prvst/philosopher/lib/mzn"
 )
 
-var _ = Describe("MzML", func() {
+var _ = Describe("Mzn", func() {
 
 	Context("Testing Raw file parsing", func() {
 
@@ -18,7 +18,7 @@ var _ = Describe("MzML", func() {
 		var e error
 
 		It("Accessing workspace", func() {
-			e = os.Chdir("../../../test/wrksp/")
+			e = os.Chdir("../../test/wrksp/")
 			Expect(e).NotTo(HaveOccurred())
 		})
 
