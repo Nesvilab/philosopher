@@ -119,6 +119,10 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 		// 	return p, e
 		// }
 
+		for i := range mz.Spectra {
+			mz.Spectra[i].Decode()
+		}
+
 		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 		if e != nil {
 			return p, e

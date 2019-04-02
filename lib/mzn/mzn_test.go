@@ -13,11 +13,6 @@ var _ = Describe("Mzn", func() {
 
 	Context("Testing Raw file parsing", func() {
 
-		// var spec *raw.Data
-		// var ms1 raw.MS1
-		// var ms2 raw.MS2
-		// var spec1 raw.Ms1Scan
-		// var spec2 raw.Ms2Scan
 		var msd MsData
 		var spec Spectrum
 		var e error
@@ -36,6 +31,7 @@ var _ = Describe("Mzn", func() {
 			for _, i := range msd.Spectra {
 				if i.Index == "0" && i.Scan == "1" {
 					spec = i
+					spec.Decode()
 					break
 				}
 			}
@@ -71,6 +67,7 @@ var _ = Describe("Mzn", func() {
 			for _, i := range msd.Spectra {
 				if i.Index == "2" && i.Scan == "3" {
 					spec = i
+					spec.Decode()
 					break
 				}
 			}
