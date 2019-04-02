@@ -251,8 +251,8 @@ func processSpectrum(mzSpec mz.Spectrum) (Spectrum, *err.Error) {
 			spec.Mz.Compression = "0"
 		}
 
-		spec.Mz.DecodedStream, _ = Decode("mz", mzSpec.BinaryDataArrayList.BinaryDataArray[0])
-		spec.Mz.Stream = nil
+		//spec.Mz.DecodedStream, _ = Decode("mz", mzSpec.BinaryDataArrayList.BinaryDataArray[0])
+		//spec.Mz.Stream = nil
 	}
 
 	spec.Intensity.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
@@ -270,8 +270,8 @@ func processSpectrum(mzSpec mz.Spectrum) (Spectrum, *err.Error) {
 		}
 	}
 
-	spec.Intensity.DecodedStream, _ = Decode("int", mzSpec.BinaryDataArrayList.BinaryDataArray[1])
-	spec.Intensity.Stream = nil
+	//spec.Intensity.DecodedStream, _ = Decode("int", mzSpec.BinaryDataArrayList.BinaryDataArray[1])
+	//spec.Intensity.Stream = nil
 
 	if mzSpec.BinaryDataArrayList.Count == 3 {
 		spec.IonMobility.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[2].Binary.Value
@@ -289,55 +289,85 @@ func processSpectrum(mzSpec mz.Spectrum) (Spectrum, *err.Error) {
 			}
 		}
 
-		spec.IonMobility.DecodedStream, _ = Decode("im", mzSpec.BinaryDataArrayList.BinaryDataArray[2])
-		spec.IonMobility.Stream = nil
+		//spec.IonMobility.DecodedStream, _ = Decode("im", mzSpec.BinaryDataArrayList.BinaryDataArray[2])
+		//spec.IonMobility.Stream = nil
 	}
+
+	//spec.Decode()
 
 	return spec, nil
 }
 
 // Decode processes the binary data
-func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
+func (s *Spectrum) Decode() error {
 
-	var compression bool
-	var precision string
 	var err error
 
-	for i := range bin.CVParam {
-
-		if string(bin.CVParam[i].Accession) == "MS:1000523" {
-			precision = "64"
-		} else if string(bin.CVParam[i].Accession) == "MS:1000521" {
-			precision = "32"
-		}
-
-		if string(bin.CVParam[i].Accession) == "MS:1000574" {
-			compression = true
-		} else if string(bin.CVParam[i].Accession) == "MS:1000576" {
-			compression = false
-		}
-
-	}
-
-	f, err := readEncoded(class, bin, precision, compression)
+	s.Mz.DecodedStream, err = readEncoded(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
+	s.Mz.Stream = nil
 	if err != nil {
-		return f, err
+		return err
 	}
 
-	return f, nil
+	s.Intensity.DecodedStream, err = readEncoded(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
+	s.Intensity.Stream = nil
+	if err != nil {
+		return err
+	}
+
+	if len(s.IonMobility.Stream) > 0 {
+		s.IonMobility.DecodedStream, err = readEncoded(s.IonMobility.Stream, s.IonMobility.Precision, s.IonMobility.Compression)
+		s.IonMobility.Stream = nil
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
+// // Decode processes the binary data
+// func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
+//
+// 	var compression bool
+// 	var precision string
+// 	var err error
+//
+// 	for i := range bin.CVParam {
+//
+// 		if string(bin.CVParam[i].Accession) == "MS:1000523" {
+// 			precision = "64"
+// 		} else if string(bin.CVParam[i].Accession) == "MS:1000521" {
+// 			precision = "32"
+// 		}
+//
+// 		if string(bin.CVParam[i].Accession) == "MS:1000574" {
+// 			compression = true
+// 		} else if string(bin.CVParam[i].Accession) == "MS:1000576" {
+// 			compression = false
+// 		}
+//
+// 	}
+//
+// 	f, err := readEncoded(class, bin, precision, compression)
+// 	if err != nil {
+// 		return f, err
+// 	}
+//
+// 	return f, nil
+// }
+
 // readEncoded transforms the binary data into float64 values
-func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
+func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) {
 
 	var stream []uint8
 	var floatArray []float64
 
-	b := bytes.NewReader(bin.Binary.Value)
+	b := bytes.NewReader(bin)
 	b64 := base64.NewDecoder(base64.StdEncoding, b)
 
 	var bytestream bytes.Buffer
-	if isCompressed == true {
+	if isCompressed == "1" {
 		r, err := zlib.NewReader(b64)
 		if err != nil {
 			return floatArray, err
@@ -381,3 +411,57 @@ func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompr
 
 	return floatArray, nil
 }
+
+// func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
+//
+// 	var stream []uint8
+// 	var floatArray []float64
+//
+// 	b := bytes.NewReader(bin.Binary.Value)
+// 	b64 := base64.NewDecoder(base64.StdEncoding, b)
+//
+// 	var bytestream bytes.Buffer
+// 	if isCompressed == true {
+// 		r, err := zlib.NewReader(b64)
+// 		if err != nil {
+// 			return floatArray, err
+// 		}
+// 		io.Copy(&bytestream, r)
+// 	} else {
+// 		io.Copy(&bytestream, b64)
+// 	}
+//
+// 	dataArray := bytestream.Bytes()
+//
+// 	var counter int
+//
+// 	if precision == "32" {
+// 		for i := range dataArray {
+// 			counter++
+// 			stream = append(stream, dataArray[i])
+// 			if counter == 4 {
+// 				bits := binary.LittleEndian.Uint32(stream)
+// 				converted := math.Float32frombits(bits)
+// 				floatArray = append(floatArray, float64(converted))
+// 				stream = nil
+// 				counter = 0
+// 			}
+// 		}
+// 	} else if precision == "64" {
+// 		for i := range dataArray {
+// 			counter++
+// 			stream = append(stream, dataArray[i])
+// 			if counter == 8 {
+// 				bits := binary.LittleEndian.Uint64(stream)
+// 				converted := math.Float64frombits(bits)
+// 				floatArray = append(floatArray, float64(converted))
+// 				stream = nil
+// 				counter = 0
+// 			}
+// 		}
+// 	} else {
+// 		return floatArray, errors.New("Undefined binary precision")
+// 	}
+//
+// 	return floatArray, nil
+// }

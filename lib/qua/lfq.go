@@ -61,15 +61,27 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 			return evi, e
 		}
 
-		for _, i := range mz.Spectra {
-			if i.Level == "2" {
-				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, i.Scan, i.Scan, i.Precursor.ChargeState)
+		for i := range mz.Spectra {
+			if mz.Spectra[i].Level == "1" {
+				mz.Spectra[i].Decode()
+			} else if mz.Spectra[i].Level == "2" {
+				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
 				if ok {
-					mzMap[spectrum] = i.Precursor.TargetIon
+					mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
 				}
 			}
 		}
+
+		// for _, i := range mz.Spectra {
+		// 	if i.Level == "2" {
+		// 		spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, i.Scan, i.Scan, i.Precursor.ChargeState)
+		// 		_, ok := mzMap[spectrum]
+		// 		if ok {
+		// 			mzMap[spectrum] = i.Precursor.TargetIon
+		// 		}
+		// 	}
+		// }
 
 		v, ok := spectra[s]
 		if ok {
