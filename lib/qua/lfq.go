@@ -9,7 +9,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/mzn"
+	"github.com/prvst/philosopher/lib/psi/mzml"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/sirupsen/logrus"
 )
@@ -52,7 +52,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	for _, s := range sourceMapList {
 
 		logrus.Info("Processing ", s)
-		var mz mzn.MsData
+		var mz mzml.MsData
 
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
@@ -123,7 +123,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 }
 
 // xic extract ion chomatograms
-func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64, isIso bool) (map[float64]float64, bool) {
+func xic(mz mzml.Spectra, minRT, maxRT, ppmPrecision, mzValue float64, isIso bool) (map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
 
