@@ -230,20 +230,6 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	return p, nil
 }
 
-// func getSpectra(dir, format string, level int, k string) (mzn.MsData, *err.Error) {
-//
-// 	var mz mzn.MsData
-//
-// 	// get the clean name, remove the extension
-// 	var extension = filepath.Ext(filepath.Base(k))
-// 	var name = k[0 : len(k)-len(extension)]
-// 	input := fmt.Sprintf("%s%s%s.bin", sys.MetaDir(), string(filepath.Separator), name)
-//
-// 	mz.Read(input, false, false, false)
-//
-// 	return mz, nil
-// }
-
 // cleanPreviousData cleans previous label quantifications
 func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {
 
