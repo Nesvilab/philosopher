@@ -1,4 +1,4 @@
-package mzn
+package mzml
 
 import (
 	"bytes"

@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/mzn"
+	"github.com/prvst/philosopher/lib/psi/mzml"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uti"
@@ -16,11 +16,11 @@ const (
 )
 
 // calculateIonPurity verifies how much interference there is on the precursor scans for each fragment
-func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+func calculateIonPurity(d, f string, mz mzml.MsData, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
 
 	// index MS1 and MS2 spectra in a dictionary
-	var indexedMS1 = make(map[string]mzn.Spectrum)
-	var indexedMS2 = make(map[string]mzn.Spectrum)
+	var indexedMS1 = make(map[string]mzml.Spectrum)
+	var indexedMS2 = make(map[string]mzml.Spectrum)
 
 	for i := range mz.Spectra {
 
@@ -127,7 +127,7 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) ([]re
 }
 
 // prepareLabelStructureWithMS2 instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
-func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.MsData) (map[string]tmt.Labels, error) {
+func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzml.MsData) (map[string]tmt.Labels, error) {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
@@ -231,7 +231,7 @@ func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.
 }
 
 // prepareLabelStructureWithMS3 instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
-func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzn.MsData) (map[string]tmt.Labels, error) {
+func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzml.MsData) (map[string]tmt.Labels, error) {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
