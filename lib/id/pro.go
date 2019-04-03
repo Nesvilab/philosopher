@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/pro"
+	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/vmihailenco/msgpack"
@@ -88,7 +88,7 @@ func (p ProtIDList) Swap(i, j int) {
 // Read ...
 func (p *ProtXML) Read(f string) error {
 
-	var xml pro.XML
+	var xml spc.ProtXML
 	err := xml.Parse(f)
 	if err != nil {
 		return err

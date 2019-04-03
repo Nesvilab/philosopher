@@ -1,20 +1,11 @@
-package pro
+package spc
 
 import (
-	"bytes"
 	"encoding/xml"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	"github.com/prvst/philosopher/lib/err"
-	"github.com/rogpeppe/go-charset/charset"
-	// anon charset
-	_ "github.com/rogpeppe/go-charset/data"
 )
 
-// XML is the root tag
-type XML struct {
+// ProtXML is the root tag
+type ProtXML struct {
 	Name           string
 	ProteinSummary ProteinSummary
 }
@@ -95,19 +86,6 @@ type Protein struct {
 	//Confidence                      float64                    `xml:"confidence,attr"`
 }
 
-// Parameter tag
-type Parameter struct {
-	XMLName xml.Name `xml:"parameter"`
-	Name    []byte   `xml:"name,attr"`
-	Value   int      `xml:"value,attr"`
-}
-
-// Annotation tag
-type Annotation struct {
-	XMLName            xml.Name `xml:"annotation"`
-	ProteinDescription []byte   `xml:"protein_description,attr"`
-}
-
 // IndistinguishableProtein tag
 type IndistinguishableProtein struct {
 	XMLName     xml.Name   `xml:"indistinguishable_protein"`
@@ -152,44 +130,4 @@ type IndistinguishablePeptide struct {
 	PeptideSequence    []byte   `xml:"peptide_sequence,attr"`
 	Charge             uint8    `xml:"charge,attr"`
 	CalcNeutralPepMass float32  `xml:"calc_neutral_pep_mass,attr"`
-}
-
-// ModificationInfo tag
-type ModificationInfo struct {
-	XMLName          xml.Name         `xml:"modification_info"`
-	ModifiedPeptide  []byte           `xml:"modified_peptide,attr"`
-	ModAminoacidMass ModAminoacidMass `xml:"mod_aminoacid_mass"`
-}
-
-// ModAminoacidMass tag
-type ModAminoacidMass struct {
-	XMLName  xml.Name `xml:"mod_aminoacid_mass"`
-	Position uint8    `xml:"position,attr"`
-	Mass     float32  `xml:"mass,attr"`
-}
-
-// Parse is the main function for parsing pepxml data
-func (p *XML) Parse(f string) error {
-
-	xmlFile, e := os.Open(f)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
-	}
-	defer xmlFile.Close()
-	b, _ := ioutil.ReadAll(xmlFile)
-
-	var ps ProteinSummary
-
-	reader := bytes.NewReader(b)
-	decoder := xml.NewDecoder(reader)
-	decoder.CharsetReader = charset.NewReader
-
-	if e = decoder.Decode(&ps); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: filepath.Base(f)}
-	}
-
-	p.ProteinSummary = ps
-	p.Name = filepath.Base(f)
-
-	return nil
 }

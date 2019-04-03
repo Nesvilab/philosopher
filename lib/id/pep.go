@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
-	"github.com/prvst/philosopher/lib/pep"
+	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
@@ -30,7 +30,7 @@ type PepXML struct {
 	Prophet               string
 	DefinedModMassDiff    map[float64]float64
 	DefinedModAminoAcid   map[float64]string
-	Models                []pep.DistributionPoint
+	Models                []spc.DistributionPoint
 	PeptideIdentification PepIDList
 }
 
@@ -99,7 +99,7 @@ func (p PepIDList) Swap(i, j int) {
 // Read is the main function for parsing pepxml data
 func (p *PepXML) Read(f string) error {
 
-	var xml pep.XML
+	var xml spc.PepXML
 	e := xml.Parse(f)
 	if e != nil {
 		return e
@@ -112,12 +112,12 @@ func (p *PepXML) Read(f string) error {
 		p.Database = string(mpa.MsmsRunSummary.SearchSummary.SearchDatabase.LocalPath)
 		p.SpectraFile = fmt.Sprintf("%s%s", mpa.MsmsRunSummary.BaseName, mpa.MsmsRunSummary.RawData)
 
-		var models []pep.DistributionPoint
+		var models []spc.DistributionPoint
 		pps := mpa.AnalysisSummary[0].PeptideprophetSummary
 
 		// collect distribution points from meta
 		for _, i := range pps.DistributionPoint {
-			var m pep.DistributionPoint
+			var m spc.DistributionPoint
 			m.Fvalue = i.Fvalue
 			m.Obs1Distr = i.Obs1Distr
 			m.Model1PosDistr = i.Model1PosDistr
@@ -198,7 +198,7 @@ func (p *PepXML) Read(f string) error {
 	return nil
 }
 
-func processSpectrumQuery(sq pep.SpectrumQuery, definedModMassDiff map[float64]float64, definedModAminoAcid map[float64]string, decoyTag string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, definedModMassDiff map[float64]float64, definedModAminoAcid map[float64]string, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
 

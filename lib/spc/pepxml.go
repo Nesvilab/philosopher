@@ -1,22 +1,11 @@
-// Package pep represents the PepXML file structure in memory and also provides acessory methods
-// for manipulating them and calculating statitical analysis.
-package pep
+package spc
 
 import (
-	"bytes"
 	"encoding/xml"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	"github.com/prvst/philosopher/lib/err"
-	"github.com/rogpeppe/go-charset/charset"
-	// anon charset
-	_ "github.com/rogpeppe/go-charset/data"
 )
 
-// XML is the root tag
-type XML struct {
+// PepXML is the root tag
+type PepXML struct {
 	Name                 string
 	MsmsPipelineAnalysis MsmsPipelineAnalysis
 }
@@ -190,13 +179,6 @@ type TerminalModification struct {
 	Variable        []byte   `xml:"variable,attr"`
 }
 
-// Parameter tag
-type Parameter struct {
-	XMLName xml.Name `xml:"parameter"`
-	Name    []byte   `xml:"name,attr"`
-	Value   []byte   `xml:"value,attr"`
-}
-
 // SpectrumQuery tag
 type SpectrumQuery struct {
 	XMLName              xml.Name     `xml:"spectrum_query"`
@@ -249,22 +231,6 @@ type AlternativeProtein struct {
 	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
 	PepPrevAA   []byte   `xml:"peptide_prev_aa,attr"`
 	PepNextAA   []byte   `xml:"peptide_next_aa,attr"`
-}
-
-// ModificationInfo tag
-type ModificationInfo struct {
-	XMLName          xml.Name           `xml:"modification_info"`
-	ModNTermMass     float64            `xml:"mod_nterm_mass,attr"`
-	ModCTermMass     float64            `xml:"mod_cterm_mass,attr"`
-	ModifiedPeptide  []byte             `xml:"modified_peptide,attr"`
-	ModAminoacidMass []ModAminoacidMass `xml:"mod_aminoacid_mass"`
-}
-
-// ModAminoacidMass tag
-type ModAminoacidMass struct {
-	XMLName  xml.Name `xml:"mod_aminoacid_mass"`
-	Position uint16   `xml:"position,attr"`
-	Mass     float64  `xml:"mass,attr"`
 }
 
 // AnalysisResult tag
@@ -324,30 +290,4 @@ type SearchScore struct {
 type ProphetModel struct {
 	Charge uint8
 	Points map[string]uint8
-}
-
-// Parse is the main function for parsing pepxml data
-func (p *XML) Parse(f string) error {
-
-	xmlFile, e := os.Open(f)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
-	}
-	defer xmlFile.Close()
-	b, _ := ioutil.ReadAll(xmlFile)
-
-	var mpa MsmsPipelineAnalysis
-
-	reader := bytes.NewReader(b)
-	decoder := xml.NewDecoder(reader)
-	decoder.CharsetReader = charset.NewReader
-
-	if e = decoder.Decode(&mpa); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
-	}
-
-	p.MsmsPipelineAnalysis = mpa
-	p.Name = filepath.Base(f)
-
-	return nil
 }
