@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/cla"
@@ -17,6 +18,7 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/psi"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/prvst/philosopher/lib/uni"
@@ -397,6 +399,8 @@ func Run(m met.Data) met.Data {
 		logrus.Info("Plotting mass distribution")
 		repo.PlotMassHist()
 	}
+
+	repo.MzIdentMLReport(m.Version)
 
 	return m
 }
@@ -2700,4 +2704,176 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
+}
+
+// MzIdentMLReport creates a MzIdentML structure to be encoded
+func (e Evidence) MzIdentMLReport(version string) error {
+
+	var mzid psi.MzIdentML
+
+	t := time.Now()
+
+	// Header
+	mzid.Name = "foo"
+	mzid.ID = "Philosopher toolkit"
+	mzid.Version = version
+	mzid.CreationDate = t.Format(time.ANSIC)
+
+	// CVlist
+	mzid.CvList.CV = append(mzid.CvList.CV, psi.CV{ID: "PSI-MS", URI: "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", FullName: "PSI-MS"})
+	mzid.CvList.CV = append(mzid.CvList.CV, psi.CV{ID: "UNIMOD", URI: "http://www.unimod.org/obo/unimod.obo", FullName: "UNIMOD"})
+	mzid.CvList.CV = append(mzid.CvList.CV, psi.CV{ID: "UO", URI: "https://raw.githubusercontent.com/bio-ontology-research-group/unit-ontology/master/unit.obo", FullName: "UNIT-ONTOLOGY"})
+	mzid.CvList.CV = append(mzid.CvList.CV, psi.CV{ID: "PRIDE", URI: "https://github.com/PRIDE-Utilities/pride-ontology/blob/master/pride_cv.obo", FullName: "PRIDE"})
+	mzid.CvList.Count = len(mzid.CvList.CV)
+
+	// AnalysisSoftwareList
+	aa := &psi.AnalysisSoftware{
+		ID:      "Philosopher",
+		Name:    "Philosopher toolkit",
+		URI:     "https://philosopher.nesvilab.org",
+		Version: version,
+		ContactRole: psi.ContactRole{
+			ContactRef: "PS_DEV",
+			Role: psi.Role{
+				CVParam: psi.CVParam{
+					CVRef:     "PSI-MS",
+					Accession: "MS:1001267",
+					Name:      "software vendor",
+				},
+			},
+		},
+		SoftwareName: psi.SoftwareName{
+			CVParam: psi.CVParam{
+				CVRef:     "PSI-MS",
+				Accession: "XXXX",
+				Name:      "Philosopher",
+			},
+		},
+		Customizations: psi.Customizations{
+			Value: "No customizations",
+		},
+	}
+	mzid.AnalysisSoftwareList.AnalysisSoftware = append(mzid.AnalysisSoftwareList.AnalysisSoftware, *aa)
+
+	//Provider
+	provider := &psi.Provider{
+		ID: "PROVIDER",
+		ContactRole: psi.ContactRole{
+			ContactRef: "Philosopher_Author_FVL",
+			Role: psi.Role{
+				CVParam: psi.CVParam{
+					CVRef:     "PSI-MS",
+					Accession: "MS:1001271",
+					Name:      "researcher",
+				},
+			},
+		},
+	}
+	mzid.Provider = *provider
+
+	// AuditCollection
+
+	auditCol := &psi.AuditCollection{
+		Person: psi.Person{
+			ID:        "Philosopher_Author_FVL",
+			LastName:  "da Veiga Leprevost",
+			FirstName: "Felipe",
+			CVParam: []psi.CVParam{
+				psi.CVParam{
+					Name:      "contact email",
+					Value:     "felipevl@umich.edu",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000589",
+				},
+				psi.CVParam{
+					Name:      "contact URL",
+					Value:     "http://nesvilab.org",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000588",
+				},
+			},
+			Affiliation: []psi.Affiliation{
+				psi.Affiliation{
+					OrganizationRef: "University of Michigan",
+				},
+			},
+		},
+		Organization: psi.Organization{
+			ID:   "Nesvilab",
+			Name: "Proteomics and Integrative Bioinformatics Lab",
+			CVParam: []psi.CVParam{
+				psi.CVParam{
+					Name:      "contact name",
+					Value:     "Alexey I. Nesvizhskii",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000586",
+				},
+				psi.CVParam{
+					Name:      "contact address",
+					Value:     "1301 Catherinse St., Ann Arbor, MI",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000587",
+				},
+				psi.CVParam{
+					Name:      "contact URL",
+					Value:     "http://nesvilab.org",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000588",
+				},
+				psi.CVParam{
+					Name:      "contact email",
+					Value:     "nesvi@med.umich.edu",
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000589",
+				},
+			},
+		},
+	}
+	mzid.AuditCollection = *auditCol
+
+	// SequenceCollection - DBSequence
+	var dtb dat.Base
+	dtb.Restore()
+	// if len(dtb.Records) < 1 {
+	// 	return f, errors.New("Database data not available, interrupting processing")
+	// }
+
+	var seqs []psi.DBSequence
+	for _, i := range dtb.Records {
+
+		db := &psi.DBSequence{
+			ID:                i.ID,
+			Accession:         i.ID,
+			SearchDatabaseRef: "",
+			CVParam: []psi.CVParam{
+				psi.CVParam{
+					CVRef:     "PSI-MS",
+					Accession: "MS:1001088",
+					Name:      "protein description",
+					Value:     i.Description,
+				},
+				psi.CVParam{
+					CVRef:     "PSI-MS",
+					Accession: "MS:1001344",
+					Name:      "AA sequence",
+				},
+			},
+			Seq: psi.Seq{
+				Value: i.Sequence,
+			},
+		}
+
+		seqs = append(seqs, *db)
+	}
+	mzid.SequenceCollection.DBSequence = seqs
+
+	// SequenceCollection - Peptide
+
+	// Burn!
+	err := mzid.Write()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	return nil
 }

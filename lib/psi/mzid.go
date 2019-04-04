@@ -7,10 +7,10 @@ import "encoding/xml"
 // identifications or protein detection results)
 type MzIdentML struct {
 	XMLName                    xml.Name                   `xml:"MzIdentML"`
-	CreationDate               string                     `xml:"creationDate,attr"`
-	Name                       string                     `xml:"name,attr"`
-	ID                         string                     `xml:"id,attr"`
-	Version                    string                     `xml:"version,attr"`
+	CreationDate               string                     `xml:"creationDate,attr,omitempty"`
+	Name                       string                     `xml:"name,attr,omitempty"`
+	ID                         string                     `xml:"id,attr,omitempty"`
+	Version                    string                     `xml:"version,attr,omitempty"`
 	CvList                     CvList                     `xml:"cvList"`
 	AnalysisSoftwareList       AnalysisSoftwareList       `xml:"AnalysisSoftwareList"`
 	Provider                   Provider                   `xml:"Provider"`
@@ -32,10 +32,10 @@ type AnalysisSoftwareList struct {
 // AnalysisSoftware is the software used for performing the analysis
 type AnalysisSoftware struct {
 	XMLName        xml.Name       `xml:"AnalysisSoftware"`
-	ID             string         `xml:"id,attr"`
-	Name           string         `xml:"name,attr"`
-	URI            string         `xml:"uri,attr"`
-	Version        string         `xml:"version,attr"`
+	ID             string         `xml:"id,attr,omitempty"`
+	Name           string         `xml:"name,attr,omitempty"`
+	URI            string         `xml:"uri,attr,omitempty"`
+	Version        string         `xml:"version,attr,omitempty"`
 	ContactRole    ContactRole    `xml:"ContactRole"`
 	SoftwareName   SoftwareName   `xml:"SoftwareName"`
 	Customizations Customizations `xml:"Customizations"`
@@ -44,7 +44,7 @@ type AnalysisSoftware struct {
 // ContactRole is the Contact that provided the document instance
 type ContactRole struct {
 	XMLName    xml.Name `xml:"ContactRole"`
-	ContactRef string   `xml:"contact_ref,attr"`
+	ContactRef string   `xml:"contact_ref,attr,omitempty"`
 	Role       Role     `xml:"Role"`
 }
 
@@ -66,16 +66,16 @@ type SoftwareName struct {
 // scoring mechanisms implemented, should be documented here as free text
 type Customizations struct {
 	XMLName xml.Name `xml:"Customizations"`
-	Value   []byte   `xml:",chardata"`
+	Value   string   `xml:",chardata"`
 }
 
 // Provider is the Provider of the mzIdentML record in terms of the contact and
 // software
 type Provider struct {
 	XMLName             xml.Name    `xml:"Provider"`
-	AnalysisSoftwareRef string      `xml:"analysisSoftware_ref,attr"`
-	ID                  string      `xml:"id,attr"`
-	Name                string      `xml:"name,attr"`
+	AnalysisSoftwareRef string      `xml:"analysisSoftware_ref,attr,omitempty"`
+	ID                  string      `xml:"id,attr,omitempty"`
+	Name                string      `xml:"name,attr,omitempty"`
 	ContactRole         ContactRole `xml:"ContactRole"`
 }
 
@@ -91,21 +91,21 @@ type AuditCollection struct {
 // such as the address, contact email etc. should be supplied using CV
 // parameters or user parameters
 type Person struct {
-	XMLName     xml.Name    `xml:"Person"`
-	FirstName   string      `xml:"firstName,attr"`
-	ID          string      `xml:"id,attr"`
-	LastName    string      `xml:"lastName,attr"`
-	MidInitials string      `xml:"midInitials,attr"`
-	Name        string      `xml:"name,attr"`
-	CVParam     CVParam     `xml:"cvParam"`
-	UserParam   UserParam   `xml:"userParam"`
-	Affiliation Affiliation `xml:"Affiliation"`
+	XMLName     xml.Name      `xml:"Person"`
+	FirstName   string        `xml:"firstName,attr,omitempty"`
+	ID          string        `xml:"id,attr,omitempty"`
+	LastName    string        `xml:"lastName,attr,omitempty"`
+	MidInitials string        `xml:"midInitials,attr,omitempty"`
+	Name        string        `xml:"name,attr,omitempty"`
+	CVParam     []CVParam     `xml:"cvParam"`
+	UserParam   []UserParam   `xml:"userParam"`
+	Affiliation []Affiliation `xml:"Affiliation"`
 }
 
 // Affiliation is the organization a person belongs to
 type Affiliation struct {
 	XMLName         xml.Name `xml:"Affiliation"`
-	OrganizationRef string   `xml:"organization_ref,attr"`
+	OrganizationRef string   `xml:"organization_ref,attr,omitempty"`
 }
 
 // Organization are entities like companies, universities, government agencies.
@@ -113,8 +113,8 @@ type Affiliation struct {
 // either as CV parameters or as user parameters.
 type Organization struct {
 	XMLName   xml.Name    `xml:"Organization"`
-	ID        string      `xml:"id,attr"`
-	Name      string      `xml:"name,attr"`
+	ID        string      `xml:"id,attr,omitempty"`
+	Name      string      `xml:"name,attr,omitempty"`
 	CVParam   []CVParam   `xml:"cvParam"`
 	UserParam []UserParam `xml:"userParam"`
 	Parent    Parent      `xml:"Parent"`
@@ -124,7 +124,7 @@ type Organization struct {
 // belongs to, etc.)
 type Parent struct {
 	XMLName         xml.Name `xml:"Parent"`
-	OrganizationRef string   `xml:"organization_ref,attr"`
+	OrganizationRef string   `xml:"organization_ref,attr,omitempty"`
 }
 
 // AnalysisSampleCollection is the samples analysed can optionally be recorded
@@ -143,8 +143,8 @@ type AnalysisSampleCollection struct {
 // (gels, arrays etc.)
 type Sample struct {
 	XMLName     xml.Name      `xml:"Sample"`
-	ID          string        `xml:"id,attr"`
-	Name        string        `xml:"name,attr"`
+	ID          string        `xml:"id,attr,omitempty"`
+	Name        string        `xml:"name,attr,omitempty"`
 	ContactRole []ContactRole `xml:"ContactRole"`
 	SubSample   []SubSample   `xml:"SubSample"`
 	CVParam     []CVParam     `xml:"cvParam"`
@@ -155,7 +155,7 @@ type Sample struct {
 // mixed parent sample
 type SubSample struct {
 	XMLName   xml.Name `xml:"SubSample"`
-	SampleRef string   `xml:"sample_ref,attr"`
+	SampleRef string   `xml:"sample_ref,attr,omitempty"`
 }
 
 // SequenceCollection is the collection of sequences (DBSequence or Peptide)
@@ -174,11 +174,11 @@ type SequenceCollection struct {
 // translated sequence
 type DBSequence struct {
 	XMLName           xml.Name    `xml:"DBSequence"`
-	Accession         string      `xml:"accession,attr"`
-	ID                string      `xml:"id,attr"`
-	Length            string      `xml:"length,attr"`
-	Name              string      `xml:"name,attr"`
-	SearchDatabaseRef string      `xml:"searchDatabase_ref,attr"`
+	Accession         string      `xml:"accession,attr,omitempty"`
+	ID                string      `xml:"id,attr,omitempty"`
+	Length            string      `xml:"length,attr,omitempty"`
+	Name              string      `xml:"name,attr,omitempty"`
+	SearchDatabaseRef string      `xml:"searchDatabase_ref,attr,omitempty"`
 	Seq               Seq         `xml:"Seq"`
 	CVParam           []CVParam   `xml:"cvParam"`
 	UserParam         []UserParam `xml:"userParam"`
@@ -187,15 +187,15 @@ type DBSequence struct {
 // Seq is the actual sequence of amino acids or nucleic acid
 type Seq struct {
 	XMLName xml.Name `xml:"Seq"`
-	Value   []byte   `xml:",chardata"`
+	Value   string   `xml:",chardata"`
 }
 
 // Peptide is One (poly)peptide (a sequence with modifications). The combination
 // of Peptide sequence and modifications MUST be unique in the file
 type Peptide struct {
 	XMLName                  xml.Name                   `xml:"Peptide"`
-	ID                       string                     `xml:"id,attr"`
-	Name                     string                     `xml:"name,attr"`
+	ID                       string                     `xml:"id,attr,omitempty"`
+	Name                     string                     `xml:"name,attr,omitempty"`
 	PeptideSequence          PeptideSequence            `xml:"PeptideSequence"`
 	Modification             []Modification             `xml:"Modification"`
 	SubstitutionModification []SubstitutionModification `xml:"SubstitutionModification"`
@@ -225,9 +225,9 @@ type PeptideSequence struct {
 // encoded within the FragmentationArray
 type Modification struct {
 	XMLName      xml.Name  `xml:"Modification"`
-	AvgMassDelta float64   `xml:"avgMassDelta,attr"`
-	Location     int       `xml:"location,attr"`
-	Residues     string    `xml:"residues,attr"`
+	AvgMassDelta float64   `xml:"avgMassDelta,attr,omitempty"`
+	Location     int       `xml:"location,attr,omitempty"`
+	Residues     string    `xml:"residues,attr,omitempty"`
 	CVParam      []CVParam `xml:"cvParam"`
 }
 
@@ -235,11 +235,11 @@ type Modification struct {
 // by another (amino acid change)
 type SubstitutionModification struct {
 	XMLName               xml.Name `xml:"SubstitutionModification"`
-	AvgMassDelta          float64  `xml:"avgMassDelta,attr"`
-	Location              int      `xml:"location,attr"`
-	MonoisotopicMassDelta float64  `xml:"monoisotopicMassDelta,attr"`
-	OriginalResidue       string   `xml:"originalResidue,attr"`
-	ReplacementResidue    string   `xml:"replacementResidue,attr"`
+	AvgMassDelta          float64  `xml:"avgMassDelta,attr,omitempty"`
+	Location              int      `xml:"location,attr,omitempty"`
+	MonoisotopicMassDelta float64  `xml:"monoisotopicMassDelta,attr,omitempty"`
+	OriginalResidue       string   `xml:"originalResidue,attr,omitempty"`
+	ReplacementResidue    string   `xml:"replacementResidue,attr,omitempty"`
 }
 
 // PeptideEvidence  links a specific Peptide element to a specific position in a
@@ -247,17 +247,17 @@ type SubstitutionModification struct {
 // Peptide-to-DBSequence-position
 type PeptideEvidence struct {
 	XMLName             xml.Name    `xml:"PeptideEvidence"`
-	DBSequenceRef       string      `xml:"dBSequence_ref,attr"`
-	End                 int         `xml:"end,attr"`
-	Frame               string      `xml:"frame,attr"`
-	ID                  string      `xml:"id,attr"`
-	IsDecoy             bool        `xml:"isDecoy,attr"`
-	Name                string      `xml:"name,attr"`
-	PeptideRef          string      `xml:"peptide_ref,attr"`
-	Post                string      `xml:"post,attr"`
-	Pre                 string      `xml:"pre,attr"`
-	Start               string      `xml:"start,attr"`
-	TranslationTableRef string      `xml:"translationTable_ref,attr"`
+	DBSequenceRef       string      `xml:"dBSequence_ref,attr,omitempty"`
+	End                 int         `xml:"end,attr,omitempty"`
+	Frame               string      `xml:"frame,attr,omitempty"`
+	ID                  string      `xml:"id,attr,omitempty"`
+	IsDecoy             bool        `xml:"isDecoy,attr,omitempty"`
+	Name                string      `xml:"name,attr,omitempty"`
+	PeptideRef          string      `xml:"peptide_ref,attr,omitempty"`
+	Post                string      `xml:"post,attr,omitempty"`
+	Pre                 string      `xml:"pre,attr,omitempty"`
+	Start               string      `xml:"start,attr,omitempty"`
+	TranslationTableRef string      `xml:"translationTable_ref,attr,omitempty"`
 	CVParam             []CVParam   `xml:"cvParam"`
 	UserParam           []UserParam `xml:"userParam"`
 }
@@ -277,11 +277,11 @@ type AnalysisCollection struct {
 // the output results and the protocol that is run
 type SpectrumIdentification struct {
 	XMLName                           xml.Name            `xml:"SpectrumIdentification"`
-	ActivityDate                      string              `xml:"activityDate,attr"`
-	ID                                string              `xml:"id,attr"`
-	Name                              string              `xml:"name,attr"`
-	SpectrumIdentificationListRef     string              `xml:"spectrumIdentificationList_ref,attr"`
-	SpectrumIdentificationProtocolRef string              `xml:"spectrumIdentificationProtocol_ref,attr"`
+	ActivityDate                      string              `xml:"activityDate,attr,omitempty"`
+	ID                                string              `xml:"id,attr,omitempty"`
+	Name                              string              `xml:"name,attr,omitempty"`
+	SpectrumIdentificationListRef     string              `xml:"spectrumIdentificationList_ref,attr,omitempty"`
+	SpectrumIdentificationProtocolRef string              `xml:"spectrumIdentificationProtocol_ref,attr,omitempty"`
 	InputSpectra                      []InputSpectra      `xml:"InputSpectra"`
 	SearchDatabaseRef                 []SearchDatabaseRef `xml:"SearchDatabaseRef"`
 }
@@ -289,31 +289,31 @@ type SpectrumIdentification struct {
 // InputSpectra is one of the spectra data sets used
 type InputSpectra struct {
 	XMLName        xml.Name `xml:"InputSpectra"`
-	SpectraDataRef string   `xml:"spectraData_ref,attr"`
+	SpectraDataRef string   `xml:"spectraData_ref,attr,omitempty"`
 }
 
 // SearchDatabaseRef is one of the search databases used
 type SearchDatabaseRef struct {
 	XMLName           xml.Name `xml:"SearchDatabaseRef"`
-	SearchDatabaseRef string   `xml:"searchDatabase_ref,attr"`
+	SearchDatabaseRef string   `xml:"searchDatabase_ref,attr,omitempty"`
 }
 
 // ProteinDetection is an Analysis which assembles a set of peptides
 // (e.g. from a spectra search analysis) to proteins
 type ProteinDetection struct {
 	XMLName                      xml.Name                       `xml:"ProteinDetection"`
-	ActivityDate                 string                         `xml:"activityDate,attr"`
-	ID                           string                         `xml:"id,attr"`
-	Name                         string                         `xml:"name,attr"`
-	ProteinDetectionListRef      string                         `xml:"proteinDetectionList_ref,attr"`
-	ProteinDetectionProtocolRef  string                         `xml:"proteinDetectionProtocol_ref,attr"`
+	ActivityDate                 string                         `xml:"activityDate,attr,omitempty"`
+	ID                           string                         `xml:"id,attr,omitempty"`
+	Name                         string                         `xml:"name,attr,omitempty"`
+	ProteinDetectionListRef      string                         `xml:"proteinDetectionList_ref,attr,omitempty"`
+	ProteinDetectionProtocolRef  string                         `xml:"proteinDetectionProtocol_ref,attr,omitempty"`
 	InputSpectrumIdentifications []InputSpectrumIdentifications `xml:"InputSpectrumIdentifications"`
 }
 
 // InputSpectrumIdentifications is the lists of spectrum identifications that are input to the protein detection process
 type InputSpectrumIdentifications struct {
 	XMLName                       xml.Name `xml:"InputSpectrumIdentifications"`
-	SpectrumIdentificationListRef string   `xml:"spectrumIdentificationList_ref,attr"`
+	SpectrumIdentificationListRef string   `xml:"spectrumIdentificationList_ref,attr,omitempty"`
 }
 
 // AnalysisProtocolCollection is the collection of protocols which include the
@@ -328,9 +328,9 @@ type AnalysisProtocolCollection struct {
 // SpectrumIdentification analysis
 type SpectrumIdentificationProtocol struct {
 	XMLName                xml.Name               `xml:"SpectrumIdentificationProtocol"`
-	AnalysisSoftwareRef    string                 `xml:"analysisSoftware_ref,attr"`
-	ID                     string                 `xml:"id,attr"`
-	Name                   string                 `xml:"name,attr"`
+	AnalysisSoftwareRef    string                 `xml:"analysisSoftware_ref,attr,omitempty"`
+	ID                     string                 `xml:"id,attr,omitempty"`
+	Name                   string                 `xml:"name,attr,omitempty"`
 	SearchType             SearchType             `xml:"SearchType"`
 	AdditionalSearchParams AdditionalSearchParams `xml:"AdditionalSearchParams"`
 	ModificationParams     ModificationParams     `xml:"ModificationParams"`
@@ -347,9 +347,9 @@ type SpectrumIdentificationProtocol struct {
 // ProteinDetection process
 type ProteinDetectionProtocol struct {
 	XMLName             xml.Name       `xml:"ProteinDetectionProtocol"`
-	AnalysisSoftwareRef string         `xml:"analysisSoftware_ref,attr"`
-	ID                  string         `xml:"id,attr"`
-	Name                string         `xml:"name,attr"`
+	AnalysisSoftwareRef string         `xml:"analysisSoftware_ref,attr,omitempty"`
+	ID                  string         `xml:"id,attr,omitempty"`
+	Name                string         `xml:"name,attr,omitempty"`
 	AnalysisParams      AnalysisParams `xml:"AnalysisParams"`
 	Threshold           Threshold      `xml:"Threshold"`
 }
@@ -390,9 +390,9 @@ type ModificationParams struct {
 // whether it is a static modification
 type SearchModification struct {
 	XMLName          xml.Name           `xml:"SearchModification"`
-	FixedMod         string             `xml:"fixedMod,attr"`
-	MassDelta        float64            `xml:"massDelta,attr"`
-	Residues         string             `xml:"residues,attr"`
+	FixedMod         string             `xml:"fixedMod,attr,omitempty"`
+	MassDelta        float64            `xml:"massDelta,attr,omitempty"`
+	Residues         string             `xml:"residues,attr,omitempty"`
 	SpecificityRules []SpecificityRules `xml:"SpecificityRules"`
 	CVParam          []CVParam          `xml:"cvParam"`
 }
@@ -410,7 +410,7 @@ type SpecificityRules struct {
 // Enzymes is the list of enzymes used in experiment
 type Enzymes struct {
 	XMLName     xml.Name `xml:"Enzymes"`
-	Independent bool     `xml:"independent,attr"`
+	Independent bool     `xml:"independent,attr,omitempty"`
 	Enzyme      []Enzyme `xml:"Enzyme"`
 }
 
@@ -419,13 +419,13 @@ type Enzymes struct {
 // been performed
 type Enzyme struct {
 	XMLName         xml.Name   `xml:"Enzyme"`
-	CTermGain       string     `xml:"cTermGain,attr"`
-	ID              string     `xml:"id,attr"`
-	MinDistance     int        `xml:"minDistance,attr"`
-	MissedCleavages int        `xml:"missedCleavages,attr"`
-	NTermGain       string     `xml:"nTermGain,attr"`
-	Name            string     `xml:"name,attr"`
-	SemiSpecific    bool       `xml:"semiSpecific,attr"`
+	CTermGain       string     `xml:"cTermGain,attr,omitempty"`
+	ID              string     `xml:"id,attr,omitempty"`
+	MinDistance     int        `xml:"minDistance,attr,omitempty"`
+	MissedCleavages int        `xml:"missedCleavages,attr,omitempty"`
+	NTermGain       string     `xml:"nTermGain,attr,omitempty"`
+	Name            string     `xml:"name,attr,omitempty"`
+	SemiSpecific    bool       `xml:"semiSpecific,attr,omitempty"`
 	SiteRegexp      SiteRegexp `xml:"SiteRegexp"`
 	EnzymeName      EnzymeName `xml:"EnzymeName"`
 }
@@ -446,9 +446,9 @@ type EnzymeName struct {
 // MassTable is the masses of residues used in the search
 type MassTable struct {
 	XMLName          xml.Name           `xml:"MassTable"`
-	ID               string             `xml:"id,attr"`
-	MSLevel          []int              `xml:"msLevel,attr"`
-	Name             string             `xml:"Name,attr"`
+	ID               string             `xml:"id,attr,omitempty"`
+	MSLevel          []int              `xml:"msLevel,attr,omitempty"`
+	Name             string             `xml:"Name,attr,omitempty"`
 	Residue          []Residue          `xml:"Residue"`
 	AmbiguousResidue []AmbiguousResidue `xml:"AmbiguousResidue"`
 	CVParam          []CVParam          `xml:"cvParam"`
@@ -458,15 +458,15 @@ type MassTable struct {
 // Residue is the specification of a single residue within the mass table
 type Residue struct {
 	XMLName xml.Name `xml:"Residue"`
-	Code    string   `xml:"code,attr"`
-	Mass    float64  `xml:"mass,attr"`
+	Code    string   `xml:"code,attr,omitempty"`
+	Mass    float64  `xml:"mass,attr,omitempty"`
 }
 
 // AmbiguousResidue is the specification of a single residue within the mass
 // table
 type AmbiguousResidue struct {
 	XMLName   xml.Name    `xml:"AmbiguousResidue"`
-	Code      string      `xml:"code,attr"`
+	Code      string      `xml:"code,attr,omitempty"`
 	CVParam   []CVParam   `xml:"cvParam"`
 	UserParam []UserParam `xml:"userParam"`
 }
@@ -539,7 +539,7 @@ type Exclude struct {
 // database was translated for searching
 type DatabaseTranslation struct {
 	XMLName          xml.Name           `xml:"DatabaseTranslation"`
-	Frames           string             `xml:"frames,attr"`
+	Frames           string             `xml:"frames,attr,omitempty"`
 	TranslationTable []TranslationTable `xml:"TranslationTable"`
 }
 
@@ -572,13 +572,13 @@ type Inputs struct {
 // translated) or annotated spectra libraries
 type SearchDatabase struct {
 	XMLName                     xml.Name                    `xml:"SearchDatabase"`
-	ID                          string                      `xml:"id,attr"`
-	Location                    string                      `xml:"location,attr"`
-	Name                        string                      `xml:"name,attr"`
-	NumDatabaseSequences        string                      `xml:"numDatabaseSequences,attr"`
-	NumResidues                 string                      `xml:"numResidues,attr"`
-	ReleaseDate                 string                      `xml:"releaseDate,attr"`
-	Version                     string                      `xml:"version,attr"`
+	ID                          string                      `xml:"id,attr,omitempty"`
+	Location                    string                      `xml:"location,attr,omitempty"`
+	Name                        string                      `xml:"name,attr,omitempty"`
+	NumDatabaseSequences        string                      `xml:"numDatabaseSequences,attr,omitempty"`
+	NumResidues                 string                      `xml:"numResidues,attr,omitempty"`
+	ReleaseDate                 string                      `xml:"releaseDate,attr,omitempty"`
+	Version                     string                      `xml:"version,attr,omitempty"`
 	ExternalFormatDocumentation ExternalFormatDocumentation `xml:"ExternalFormatDocumentation"`
 	FileFormat                  FileFormat                  `xml:"FileFormat"`
 	DatabaseName                DatabaseName                `xml:"DatabaseName"`
@@ -612,9 +612,9 @@ type DatabaseName struct {
 // SpectraData should be used
 type SpectraData struct {
 	XMLName                     xml.Name                    `xml:"SpectraData"`
-	ID                          string                      `xml:"id,attr"`
-	Location                    string                      `xml:"location,attr"`
-	Name                        string                      `xml:"name,attr"`
+	ID                          string                      `xml:"id,attr,omitempty"`
+	Location                    string                      `xml:"location,attr,omitempty"`
+	Name                        string                      `xml:"name,attr,omitempty"`
 	ExternalFormatDocumentation ExternalFormatDocumentation `xml:"ExternalFormatDocumentation"`
 	FileFormat                  FileFormat                  `xml:"FileFormat"`
 	SpectrumIDFormat            SpectrumIDFormat            `xml:"SpectrumIDFormat"`
@@ -639,9 +639,9 @@ type AnalysisData struct {
 // SpectrumIdentification
 type SpectrumIdentificationList struct {
 	XMLName                      xml.Name                       `xml:"SpectrumIdentificationList"`
-	ID                           string                         `xml:"id,attr"`
-	Name                         string                         `xml:"name,attr"`
-	NumSequencesSearched         float64                        `xml:"numSequencesSearched,attr"`
+	ID                           string                         `xml:"id,attr,omitempty"`
+	Name                         string                         `xml:"name,attr,omitempty"`
+	NumSequencesSearched         float64                        `xml:"numSequencesSearched,attr,omitempty"`
 	FragmentationTable           FragmentationTable             `xml:"FragmentationTable"`
 	SpectrumIdentificationResult []SpectrumIdentificationResult `xml:"SpectrumIdentificationResult"`
 	CVParam                      []CVParam                      `xml:"cvParam"`
@@ -660,8 +660,8 @@ type FragmentationTable struct {
 // reported in SpectrumIdentificationItem
 type Measure struct {
 	XMLName xml.Name  `xml:"Measure"`
-	ID      string    `xml:"id,attr"`
-	Name    string    `xml:"name,attr"`
+	ID      string    `xml:"id,attr,omitempty"`
+	Name    string    `xml:"name,attr,omitempty"`
 	CVParam []CVParam `xml:"cvParam"`
 }
 
@@ -671,10 +671,10 @@ type Measure struct {
 // SpectrumIdentificationItems corresponding to possible different peptide IDs
 type SpectrumIdentificationResult struct {
 	XMLName                    xml.Name                     `xml:"SpectrumIdentificationResult"`
-	ID                         string                       `xml:"id,attr"`
-	Name                       string                       `xml:"name,attr"`
-	SpectraDataRef             string                       `xml:"spectraData_ref,attr"`
-	SpectrumID                 string                       `xml:"spectrumID,attr"`
+	ID                         string                       `xml:"id,attr,omitempty"`
+	Name                       string                       `xml:"name,attr,omitempty"`
+	SpectraDataRef             string                       `xml:"spectraData_ref,attr,omitempty"`
+	SpectrumID                 string                       `xml:"spectrumID,attr,omitempty"`
 	SpectrumIdentificationItem []SpectrumIdentificationItem `xml:"SpectrumIdentificationItem"`
 }
 
@@ -685,17 +685,17 @@ type SpectrumIdentificationResult struct {
 // sequences
 type SpectrumIdentificationItem struct {
 	XMLName                  xml.Name             `xml:"SpectrumIdentificationItem"`
-	CalculatedMassToCharge   float64              `xml:"calculatedMassToCharge,attr"`
-	CalculatedPI             float64              `xml:"calculatedPI,attr"`
-	ChargeState              int                  `xml:"chargeState,attr"`
-	ExperimentalMassToCharge float64              `xml:"experimentalMassToCharge,attr"`
-	ID                       string               `xml:"id,attr"`
-	MassTableRef             string               `xml:"massTable_ref,attr"`
-	Name                     string               `xml:"name,attr"`
-	PassThreshold            bool                 `xml:"passThreshold,attr"`
-	PeptideRef               string               `xml:"peptide_ref,attr"`
-	Rank                     int                  `xml:"rank,attr"`
-	SampleRef                string               `xml:"sample_ref,attr"`
+	CalculatedMassToCharge   float64              `xml:"calculatedMassToCharge,attr,omitempty"`
+	CalculatedPI             float64              `xml:"calculatedPI,attr,omitempty"`
+	ChargeState              int                  `xml:"chargeState,attr,omitempty"`
+	ExperimentalMassToCharge float64              `xml:"experimentalMassToCharge,attr,omitempty"`
+	ID                       string               `xml:"id,attr,omitempty"`
+	MassTableRef             string               `xml:"massTable_ref,attr,omitempty"`
+	Name                     string               `xml:"name,attr,omitempty"`
+	PassThreshold            bool                 `xml:"passThreshold,attr,omitempty"`
+	PeptideRef               string               `xml:"peptide_ref,attr,omitempty"`
+	Rank                     int                  `xml:"rank,attr,omitempty"`
+	SampleRef                string               `xml:"sample_ref,attr,omitempty"`
 	PeptideEvidenceRef       []PeptideEvidenceRef `xml:"PeptideEvidenceRef"`
 	Fragmentation            Fragmentation        `xml:"Fragmentation"`
 	CVParam                  []CVParam            `xml:"cvParam"`
@@ -706,7 +706,7 @@ type SpectrumIdentificationItem struct {
 // in a protein all possible PeptideEvidence elements should be referenced here
 type PeptideEvidenceRef struct {
 	XMLName            xml.Name `xml:"PeptideEvidenceRef"`
-	PeptideEvidenceRef string   `xml:"peptideEvidence_ref,attr"`
+	PeptideEvidenceRef string   `xml:"peptideEvidence_ref,attr,omitempty"`
 }
 
 // Fragmentation is the product ions identified in this result
@@ -721,8 +721,8 @@ type Fragmentation struct {
 // corresponding values will be reported in parallel arrays below
 type IonType struct {
 	XMLName       xml.Name        `xml:"IonType"`
-	Charge        int             `xml:"charge,attr"`
-	Index         []string        `xml:"index,attr"`
+	Charge        int             `xml:"charge,attr,omitempty"`
+	Index         []string        `xml:"index,attr,omitempty"`
 	FragmentArray []FragmentArray `xml:"FragmentArray"`
 	CVParam       []CVParam       `xml:"cvParam"`
 	UserParam     []UserParam     `xml:"userParam"`
@@ -732,16 +732,16 @@ type IonType struct {
 // particular ion type, in parallel to the index of ions identified
 type FragmentArray struct {
 	XMLName    xml.Name `xml:"FragmentArray"`
-	MeasureRef string   `xml:"measure_ref,attr"`
-	Values     []string `xml:"values,attr"`
+	MeasureRef string   `xml:"measure_ref,attr,omitempty"`
+	Values     []string `xml:"values,attr,omitempty"`
 }
 
 // ProteinDetectionList is the protein list resulting from a protein detection
 // process
 type ProteinDetectionList struct {
 	XMLName               xml.Name                `xml:"ProteinDetectionList"`
-	ID                    string                  `xml:"id,attr"`
-	Name                  string                  `xml:"name,attr"`
+	ID                    string                  `xml:"id,attr,omitempty"`
+	Name                  string                  `xml:"name,attr,omitempty"`
 	ProteinAmbiguityGroup []ProteinAmbiguityGroup `xml:"ProteinAmbiguityGroup"`
 	CVParam               []CVParam               `xml:"cvParam"`
 	UserParam             []UserParam             `xml:"userParam"`
@@ -752,8 +752,8 @@ type ProteinDetectionList struct {
 // proteins
 type ProteinAmbiguityGroup struct {
 	XMLName                    xml.Name                     `xml:"ProteinAmbiguityGroup"`
-	ID                         string                       `xml:"id,attr"`
-	Name                       string                       `xml:"name,attr"`
+	ID                         string                       `xml:"id,attr,omitempty"`
+	Name                       string                       `xml:"name,attr,omitempty"`
 	ProteinDetectionHypothesis []ProteinDetectionHypothesis `xml:"ProteinDetectionHypothesis"`
 	CVParam                    []CVParam                    `xml:"cvParam"`
 	UserParam                  []UserParam                  `xml:"userParam"`
@@ -763,10 +763,10 @@ type ProteinAmbiguityGroup struct {
 // analysis (i.e. a protein)
 type ProteinDetectionHypothesis struct {
 	XMLName           xml.Name            `xml:"ProteinDetectionHypothesis"`
-	DBSquenceRef      string              `xml:"dBSequence_ref,attr"`
-	ID                string              `xml:"id,attr"`
-	Name              string              `xml:"name,attr"`
-	PassThreshold     bool                `xml:"passThreasold,attr"`
+	DBSquenceRef      string              `xml:"dBSequence_ref,attr,omitempty"`
+	ID                string              `xml:"id,attr,omitempty"`
+	Name              string              `xml:"name,attr,omitempty"`
+	PassThreshold     bool                `xml:"passThreasold,attr,omitempty"`
 	PeptideHypothesis []PeptideHypothesis `xml:"PeptideHypothesis"`
 	CVParam           []CVParam           `xml:"cvParam"`
 	UserParam         []UserParam         `xml:"userParam"`
@@ -776,8 +776,8 @@ type ProteinDetectionHypothesis struct {
 // reference to a PeptideEvidence element
 type PeptideHypothesis struct {
 	XMLName                       xml.Name                        `xml:"PeptideHypothesis"`
-	PeptideEvidenceRef            string                          `xml:"peptideEvidence_ref,attr"`
-	SpectrumIdentificationItemRef []SpectrumIdentificationItemRef `xml:"SpectrumIdentificationItemRef,attr"`
+	PeptideEvidenceRef            string                          `xml:"peptideEvidence_ref,attr,omitempty"`
+	SpectrumIdentificationItemRef []SpectrumIdentificationItemRef `xml:"SpectrumIdentificationItemRef,attr,omitempty"`
 }
 
 // SpectrumIdentificationItemRef Reference(s) to the SpectrumIdentificationItem
@@ -786,23 +786,23 @@ type PeptideHypothesis struct {
 // evidence for this peptide identification in the given protein
 type SpectrumIdentificationItemRef struct {
 	XMLName                       xml.Name `xml:"SpectrumIdentificationItemRef"`
-	SpectrumIdentificationItemRef string   `xml:"spectrumIdentificationItem_ref,attr"`
+	SpectrumIdentificationItemRef string   `xml:"spectrumIdentificationItem_ref,attr,omitempty"`
 }
 
 // BibliographicReference is any bibliographic references associated with the
 // file
 type BibliographicReference struct {
 	XMLName     xml.Name `xml:"BibliographicReference"`
-	Authors     string   `xml:"authors,attr"`
-	DOI         string   `xml:"doi,attr"`
-	Editor      string   `xml:"editor,attr"`
-	ID          string   `xml:"id,attr"`
-	Issue       string   `xml:"issue,attr"`
-	Name        string   `xml:"name,attr"`
-	Pages       string   `xml:"pages,attr"`
-	Publication string   `xml:"publication,attr"`
-	Publisher   string   `xml:"publisher,attr"`
-	Title       string   `xml:"title,attr"`
-	Volume      string   `xml:"volume,attr"`
-	Year        string   `xml:"year,attr"`
+	Authors     string   `xml:"authors,attr,omitempty"`
+	DOI         string   `xml:"doi,attr,omitempty"`
+	Editor      string   `xml:"editor,attr,omitempty"`
+	ID          string   `xml:"id,attr,omitempty"`
+	Issue       string   `xml:"issue,attr,omitempty"`
+	Name        string   `xml:"name,attr,omitempty"`
+	Pages       string   `xml:"pages,attr,omitempty"`
+	Publication string   `xml:"publication,attr,omitempty"`
+	Publisher   string   `xml:"publisher,attr,omitempty"`
+	Title       string   `xml:"title,attr,omitempty"`
+	Volume      string   `xml:"volume,attr,omitempty"`
+	Year        string   `xml:"year,attr,omitempty"`
 }
