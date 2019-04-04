@@ -6,9 +6,9 @@ import (
 
 // IndexedMzML is the root level tag
 type IndexedMzML struct {
-	Name    string
 	XMLName xml.Name `xml:"indexedmzML"`
-	MzML    MzML     `xml:"mzML"`
+	Name    string
+	MzML    MzML `xml:"mzML"`
 }
 
 // MzML is the root level tag
@@ -37,9 +37,21 @@ type FileContent struct {
 
 // SourceFileList tag
 type SourceFileList struct {
-	XMLName    xml.Name     `xml:"sourceFileList"`
-	Count      int          `xml:"count,attr"`
-	SourceFile []SourceFile `xml:"sourceFile"`
+	XMLName    xml.Name         `xml:"sourceFileList"`
+	Count      int              `xml:"count,attr"`
+	SourceFile []MzMLSourceFile `xml:"sourceFile"`
+}
+
+// MzMLSourceFile is a file from which this instance was created
+type MzMLSourceFile struct {
+	XMLName                     xml.Name                    `xml:"sourceFile"`
+	ID                          string                      `xml:"id,attr"`
+	Location                    string                      `xml:"location,attr"`
+	Name                        string                      `xml:"name,attr"`
+	ExternalFormatDocumentation ExternalFormatDocumentation `xml:"ExternalFormatDocumentation"`
+	FileFormat                  FileFormat                  `xml:"FileFormat"`
+	CVParam                     []CVParam                   `xml:"cvParam"`
+	UserParam                   []UserParam                 `xml:"userParam"`
 }
 
 // RefParamGroupList tag

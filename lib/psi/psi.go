@@ -109,17 +109,13 @@ func (p *MzIdentML) Parse(f string) error {
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
 
-	var mzid MzIdentML
-
 	reader := bytes.NewReader(b)
 	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = charset.NewReader
 
-	if e = decoder.Decode(&mzid); e != nil {
+	if e = decoder.Decode(p); e != nil {
 		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
 	}
-
-	p = &mzid
 
 	return nil
 }

@@ -6,8 +6,6 @@ import (
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/psi"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -46,18 +44,6 @@ var filterCmd = &cobra.Command{
 			logrus.Warning("Razor option will be disabled because there is no protein inference data")
 			m.Filter.Razor = false
 		}
-
-		///
-		var x psi.MzIdentML
-		e := x.Parse("/home/prvst/Downloads/PeptideShaker_mzid_1_2_example.mzid")
-		if e != nil {
-			logrus.Fatal(e)
-		}
-		spew.Dump(x)
-
-		///
-
-		os.Exit(1)
 
 		m, e := fil.Run(m)
 		if e != nil {
