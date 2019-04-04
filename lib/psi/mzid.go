@@ -2,7 +2,9 @@ package psi
 
 import "encoding/xml"
 
-// MzIdentML is the root level tag
+// MzIdentML is the upper-most hierarchy level of mzIdentML with sub-containers
+// for example describing software, protocols and search results (spectrum
+// identifications or protein detection results)
 type MzIdentML struct {
 	XMLName                    xml.Name                   `xml:"MzIdentML"`
 	CreationDate               string                     `xml:"creationDate,attr"`
@@ -57,7 +59,7 @@ type Role struct {
 type SoftwareName struct {
 	XMLName   xml.Name  `xml:"SoftwareName"`
 	CVParam   CVParam   `xml:"cvParam"`
-	UserParam UserParam `xml:"UserParam"`
+	UserParam UserParam `xml:"userParam"`
 }
 
 // Customizations is Any customizations to the software, such as alternative
@@ -96,7 +98,7 @@ type Person struct {
 	MidInitials string      `xml:"midInitials,attr"`
 	Name        string      `xml:"name,attr"`
 	CVParam     CVParam     `xml:"cvParam"`
-	UserParam   UserParam   `xml:"UserParam"`
+	UserParam   UserParam   `xml:"userParam"`
 	Affiliation Affiliation `xml:"Affiliation"`
 }
 
@@ -114,7 +116,7 @@ type Organization struct {
 	ID        string      `xml:"id,attr"`
 	Name      string      `xml:"name,attr"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 	Parent    Parent      `xml:"Parent"`
 }
 
@@ -146,7 +148,7 @@ type Sample struct {
 	ContactRole []ContactRole `xml:"ContactRole"`
 	SubSample   []SubSample   `xml:"SubSample"`
 	CVParam     []CVParam     `xml:"cvParam"`
-	UserParam   []UserParam   `xml:"UserParam"`
+	UserParam   []UserParam   `xml:"userParam"`
 }
 
 // SubSample is the references to the individual component samples within a
@@ -179,7 +181,7 @@ type DBSequence struct {
 	SearchDatabaseRef string      `xml:"searchDatabase_ref,attr"`
 	Seq               Seq         `xml:"Seq"`
 	CVParam           []CVParam   `xml:"cvParam"`
-	UserParam         []UserParam `xml:"UserParam"`
+	UserParam         []UserParam `xml:"userParam"`
 }
 
 // Seq is the actual sequence of amino acids or nucleic acid
@@ -198,7 +200,7 @@ type Peptide struct {
 	Modification             []Modification             `xml:"Modification"`
 	SubstitutionModification []SubstitutionModification `xml:"SubstitutionModification"`
 	CVParam                  []CVParam                  `xml:"cvParam"`
-	UserParam                []UserParam                `xml:"UserParam"`
+	UserParam                []UserParam                `xml:"userParam"`
 }
 
 // PeptideSequence is the amino acid sequence of the (poly)peptide. If a
@@ -257,7 +259,7 @@ type PeptideEvidence struct {
 	Start               string      `xml:"start,attr"`
 	TranslationTableRef string      `xml:"translationTable_ref,attr"`
 	CVParam             []CVParam   `xml:"cvParam"`
-	UserParam           []UserParam `xml:"UserParam"`
+	UserParam           []UserParam `xml:"userParam"`
 }
 
 // AnalysisCollection is the analyses performed to get the results, which map
@@ -286,13 +288,13 @@ type SpectrumIdentification struct {
 
 // InputSpectra is one of the spectra data sets used
 type InputSpectra struct {
-	XMLName        xml.Name `xml:"InputSpectras"`
+	XMLName        xml.Name `xml:"InputSpectra"`
 	SpectraDataRef string   `xml:"spectraData_ref,attr"`
 }
 
 // SearchDatabaseRef is one of the search databases used
 type SearchDatabaseRef struct {
-	XMLName           xml.Name `xml:"InputSpectras"`
+	XMLName           xml.Name `xml:"SearchDatabaseRef"`
 	SearchDatabaseRef string   `xml:"searchDatabase_ref,attr"`
 }
 
@@ -344,7 +346,7 @@ type SpectrumIdentificationProtocol struct {
 // ProteinDetectionProtocol is the parameters and settings of a
 // ProteinDetection process
 type ProteinDetectionProtocol struct {
-	XMLName             xml.Name       `xml:"ProteinDetectionProtocolType"`
+	XMLName             xml.Name       `xml:"ProteinDetectionProtocol"`
 	AnalysisSoftwareRef string         `xml:"analysisSoftware_ref,attr"`
 	ID                  string         `xml:"id,attr"`
 	Name                string         `xml:"name,attr"`
@@ -357,14 +359,14 @@ type ProteinDetectionProtocol struct {
 type AnalysisParams struct {
 	XMLName   xml.Name    `xml:"AnalysisParams"`
 	CVParam   CVParam     `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // SearchType is the type of search performed e.g. PMF, Tag searches, MS-MS
 type SearchType struct {
 	XMLName   xml.Name    `xml:"SearchType"`
 	CVParam   CVParam     `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // AdditionalSearchParams is the search parameters other than the modifications
@@ -372,7 +374,7 @@ type SearchType struct {
 type AdditionalSearchParams struct {
 	XMLName   xml.Name    `xml:"AdditionalSearchParams"`
 	CVParam   CVParam     `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // ModificationParams is the specification of static/variable modifications
@@ -402,7 +404,7 @@ type SearchModification struct {
 type SpecificityRules struct {
 	XMLName   xml.Name    `xml:"SpecificityRules"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // Enzymes is the list of enzymes used in experiment
@@ -438,7 +440,7 @@ type SiteRegexp struct {
 type EnzymeName struct {
 	XMLName   xml.Name    `xml:"EnzymeName"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // MassTable is the masses of residues used in the search
@@ -450,7 +452,7 @@ type MassTable struct {
 	Residue          []Residue          `xml:"Residue"`
 	AmbiguousResidue []AmbiguousResidue `xml:"AmbiguousResidue"`
 	CVParam          []CVParam          `xml:"cvParam"`
-	UserParam        []UserParam        `xml:"UserParam"`
+	UserParam        []UserParam        `xml:"userParam"`
 }
 
 // Residue is the specification of a single residue within the mass table
@@ -466,7 +468,7 @@ type AmbiguousResidue struct {
 	XMLName   xml.Name    `xml:"AmbiguousResidue"`
 	Code      string      `xml:"code,attr"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // FragmentTolerance is the tolerance of the search given as a plus and minus
@@ -491,7 +493,7 @@ type ParentTolerance struct {
 type Threshold struct {
 	XMLName   xml.Name    `xml:"Threshold"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // DatabaseFilters is the specification of filters applied to the database
@@ -516,21 +518,21 @@ type Filter struct {
 type FilterType struct {
 	XMLName   xml.Name    `xml:"FilterType"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // Include is all sequences fulfilling the specifed criteria are included
 type Include struct {
 	XMLName   xml.Name    `xml:"Include"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // Exclude all sequences fulfilling the specifed criteria are excluded
 type Exclude struct {
 	XMLName   xml.Name    `xml:"Exclude"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // DatabaseTranslation is a specification of how a nucleic acid sequence
@@ -604,7 +606,7 @@ type FileFormat struct {
 type DatabaseName struct {
 	XMLName   xml.Name    `xml:"DatabaseName"`
 	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"UserParam"`
+	UserParam []UserParam `xml:"userParam"`
 }
 
 // SpectraData should be used
@@ -643,7 +645,7 @@ type SpectrumIdentificationList struct {
 	FragmentationTable           FragmentationTable             `xml:"FragmentationTable"`
 	SpectrumIdentificationResult []SpectrumIdentificationResult `xml:"SpectrumIdentificationResult"`
 	CVParam                      []CVParam                      `xml:"cvParam"`
-	UserParam                    []UserParam                    `xml:"UserParam"`
+	UserParam                    []UserParam                    `xml:"userParam"`
 }
 
 // FragmentationTable is the the types of measures that will be reported in
@@ -720,18 +722,18 @@ type Fragmentation struct {
 type IonType struct {
 	XMLName       xml.Name        `xml:"IonType"`
 	Charge        int             `xml:"charge,attr"`
-	Index         []int           `xml:"index,attr"`
+	Index         []string        `xml:"index,attr"`
 	FragmentArray []FragmentArray `xml:"FragmentArray"`
 	CVParam       []CVParam       `xml:"cvParam"`
-	UserParam     []UserParam     `xml:"UserParam"`
+	UserParam     []UserParam     `xml:"userParam"`
 }
 
 // FragmentArray is an array of values for a given type of measure and for a
 // particular ion type, in parallel to the index of ions identified
 type FragmentArray struct {
-	XMLName    xml.Name  `xml:"FragmentArray"`
-	MeasureRef string    `xml:"measure_ref,attr"`
-	Values     []float64 `xml:"values,attr"`
+	XMLName    xml.Name `xml:"FragmentArray"`
+	MeasureRef string   `xml:"measure_ref,attr"`
+	Values     []string `xml:"values,attr"`
 }
 
 // ProteinDetectionList is the protein list resulting from a protein detection
@@ -742,7 +744,7 @@ type ProteinDetectionList struct {
 	Name                  string                  `xml:"name,attr"`
 	ProteinAmbiguityGroup []ProteinAmbiguityGroup `xml:"ProteinAmbiguityGroup"`
 	CVParam               []CVParam               `xml:"cvParam"`
-	UserParam             []UserParam             `xml:"UserParam"`
+	UserParam             []UserParam             `xml:"userParam"`
 }
 
 // ProteinAmbiguityGroup is a set of logically related results from a protein
@@ -754,7 +756,7 @@ type ProteinAmbiguityGroup struct {
 	Name                       string                       `xml:"name,attr"`
 	ProteinDetectionHypothesis []ProteinDetectionHypothesis `xml:"ProteinDetectionHypothesis"`
 	CVParam                    []CVParam                    `xml:"cvParam"`
-	UserParam                  []UserParam                  `xml:"UserParam"`
+	UserParam                  []UserParam                  `xml:"userParam"`
 }
 
 // ProteinDetectionHypothesis is a single result of the ProteinDetection
@@ -767,7 +769,7 @@ type ProteinDetectionHypothesis struct {
 	PassThreshold     bool                `xml:"passThreasold,attr"`
 	PeptideHypothesis []PeptideHypothesis `xml:"PeptideHypothesis"`
 	CVParam           []CVParam           `xml:"cvParam"`
-	UserParam         []UserParam         `xml:"UserParam"`
+	UserParam         []UserParam         `xml:"userParam"`
 }
 
 // PeptideHypothesis is the evidence on which this ProteinHypothesis is based by

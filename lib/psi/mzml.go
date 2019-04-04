@@ -42,15 +42,6 @@ type SourceFileList struct {
 	SourceFile []SourceFile `xml:"sourceFile"`
 }
 
-// SourceFile tag
-type SourceFile struct {
-	XMLName  xml.Name  `xml:"sourceFile"`
-	ID       string    `xml:"id,attr"`
-	Name     string    `xml:"name,attr"`
-	Location string    `xml:"location,attr"`
-	CVParam  []CVParam `xml:"cvParam"`
-}
-
 // RefParamGroupList tag
 type RefParamGroupList struct {
 	XMLName       xml.Name        `xml:"referenceableParamGroupList"`
