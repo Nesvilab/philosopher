@@ -873,7 +873,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 					if tie == false {
 
 						var mplist []string
-						for pt, _ := range r[k].MappedProteinsTNP {
+						for pt := range r[k].MappedProteinsTNP {
 							mplist = append(mplist, pt)
 						}
 						sort.Strings(mplist)
