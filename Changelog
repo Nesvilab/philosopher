@@ -14,6 +14,8 @@
 
 ### Changed
 - The Decoys tags are automatically acquired from the database command, not necessary anymore for the Filter and PeptideProphet.
+- Reverted to 1.11.6 due to deadlock bug.
+
 ### Fixed
 
 
