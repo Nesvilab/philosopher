@@ -7,26 +7,6 @@ import (
 	"path/filepath"
 )
 
-// GetUniModTerms deploys, reads and assemble the unimod data into structs
-func GetUniModTerms(temp string) (Terms, error) {
-
-	// deploys unimod database
-	f, err := DeployUniModObo(temp)
-	if err != nil {
-		return err
-	}
-
-	// process xml file and load structs
-	err = read(f)
-	if err != nil {
-		return err
-	}
-
-	serialize()
-
-	return nil
-}
-
 // DeployUniModObo deploys the OBO file to the temp folder
 func DeployUniModObo(temp string) (string, error) {
 
@@ -41,14 +21,4 @@ func DeployUniModObo(temp string) (string, error) {
 	}
 
 	return oboFile, nil
-}
-
-func read(s string) error {
-
-	return nil
-}
-
-func serialize() {
-
-	return
 }
