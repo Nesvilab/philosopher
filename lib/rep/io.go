@@ -187,15 +187,15 @@ func SerializeEVCombined(e *Evidence) *err.Error {
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *Evidence) Restore() *err.Error {
+func (e *Evidence) Restore() *err.Error {
 
-	b, e := ioutil.ReadFile(sys.EvBin())
-	if e != nil {
+	b, er := ioutil.ReadFile(sys.EvBin())
+	if er != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
-	if e != nil {
+	er = msgpack.Unmarshal(b, &e)
+	if er != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
 	}
 
