@@ -10,7 +10,7 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 )
 
-// OBO top level struct
+// OBO is the top level struct
 type OBO struct {
 	FormatVersion string
 	Date          string
