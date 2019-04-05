@@ -1,49 +1,54 @@
 package obo
 
 import (
-	"bufio"
+	"errors"
 	"fmt"
-	"log"
-	"os"
+	"io/ioutil"
 	"path/filepath"
-
-	"github.com/prvst/philosopher/lib/err"
 )
 
-// UniMod is the top level struct
-type UniMod []Mod
+// GetUniModTerms deploys, reads and assemble the unimod data into structs
+func GetUniModTerms(temp string) (Terms, error) {
 
-// Mod is the top level struct
-type Mod struct {
-	ID               string  `toml:"ID"`
-	Name             string  `toml:"Name"`
-	Definition       string  `toml:"Definition"`
-	TermID           int     `toml:"TermID"`
-	MonoIsotopicMass float64 `toml:"MonoIsotopicMass"`
-	AverageMass      float64 `toml:"AverageMass"`
-	Composition      string  `toml:"Composition"`
-	DateTimePosted   string  `toml:"DateTimePosted"`
-	DateTimeModified string  `toml:"DateTimeModified"`
-	IsA              string  `toml:"IsA"`
-}
-
-// Parse is the function that will read an OBO file and return the filled structs
-func (o *UniMod) Parse(f string) *err.Error {
-
-	oboFile, e := os.Open(f)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
-	}
-	defer oboFile.Close()
-
-	scanner := bufio.NewScanner(oboFile)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+	// deploys unimod database
+	f, err := DeployUniModObo(temp)
+	if err != nil {
+		return err
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	// process xml file and load structs
+	err = read(f)
+	if err != nil {
+		return err
 	}
+
+	serialize()
 
 	return nil
+}
+
+// DeployUniModObo deploys the OBO file to the temp folder
+func DeployUniModObo(temp string) (string, error) {
+
+	oboFile := fmt.Sprintf("%s%sunimod.obo", temp, string(filepath.Separator))
+
+	param, err := Asset("unimod.obo")
+	err = ioutil.WriteFile(oboFile, param, 0644)
+
+	if err != nil {
+		msg := fmt.Sprintf("Could not deploy UniMOD database %s", err)
+		return oboFile, errors.New(msg)
+	}
+
+	return oboFile, nil
+}
+
+func read(s string) error {
+
+	return nil
+}
+
+func serialize() {
+
+	return
 }
