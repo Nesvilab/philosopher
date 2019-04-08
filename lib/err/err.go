@@ -114,6 +114,9 @@ const (
 
 	// CannotGetLinuxFlavor is used when the LInux falvor cannot be determined
 	CannotGetLinuxFlavor string = "cannot determine Linux distribution"
+
+	// CannotDeployAsset is used when an asset is not able to be deploied on disk
+	CannotDeployAsset string = "cannot deploy asset on disk"
 )
 
 // Error is the base struct for all errors

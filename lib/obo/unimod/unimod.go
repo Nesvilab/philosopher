@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/prvst/philosopher/lib/err"
 )
 
-// DeployUniModObo deploys the OBO file to the temp folder
-func DeployUniModObo(temp string) (string, error) {
+// Deploy deploys the OBO file to the temp folder
+func Deploy(temp string) (string, error) {
 
 	oboFile := fmt.Sprintf("%s%sunimod.obo", temp, string(filepath.Separator))
 
@@ -21,4 +23,10 @@ func DeployUniModObo(temp string) (string, error) {
 	}
 
 	return oboFile, nil
+}
+
+// Parse reads the unimod.obo file and creates the data structure
+func Parse(s string) *err.Error {
+
+	return nil
 }
