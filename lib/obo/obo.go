@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	unmd "github.com/prvst/philosopher/lib/obo/unimod"
@@ -172,9 +171,6 @@ func (m *Onto) Parse() *err.Error {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-
-	spew.Dump(m)
-	os.Exit(1)
 
 	return nil
 }

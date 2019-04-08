@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
@@ -2369,52 +2368,45 @@ func (e *Evidence) AssembleModificationReport() error {
 // MapMassDiffToUniMod maps PSMs to modifications based on their mass shifts
 func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 
-	fmt.Println("Mapping")
+	// 10 ppm
+	var tolerance = 0.01
 
-	o, er := obo.NewUniModOntology()
-	if er != nil {
-		return er
+	o, err := obo.NewUniModOntology()
+	if err != nil {
+		return err
 	}
 
-	spew.Dump(o)
+	for _, i := range o.Terms {
 
-	// // 10 ppm
-	// var tolerance = 0.01
+		for j := range e.PSM {
 
-	// u := uni.New()
-	// u.ProcessUniMOD()
+			// for fixed and variable modifications
+			for k := range e.PSM[j].AssignedMassDiffs {
+				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoIsotopicMass+tolerance) {
+					if !strings.Contains(i.Definition, "substitution") {
+						fullname := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
+						e.PSM[j].AssignedModifications[fullname] = 0
+					}
+				}
+			}
 
-	// for _, i := range u.Modifications {
+			// for delta masses
+			if e.PSM[j].Massdiff >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoIsotopicMass+tolerance) {
+				fullName := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
+				_, ok := e.PSM[j].AssignedModifications[fullName]
+				if !ok {
+					e.PSM[j].ObservedModifications[fullName] = 0
+				}
+			}
 
-	// 	for j := range e.PSM {
+		}
+	}
 
-	// 		// for fixed and variable modifications
-	// 		for k := range e.PSM[j].AssignedMassDiffs {
-	// 			if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoMass+tolerance) {
-	// 				if !strings.Contains(i.Description, "substitution") {
-	// 					fullname := fmt.Sprintf("%.4f:%s (%s)", i.MonoMass, i.Title, i.Description)
-	// 					e.PSM[j].AssignedModifications[fullname] = 0
-	// 				}
-	// 			}
-	// 		}
-
-	// 		// for delta masses
-	// 		if e.PSM[j].Massdiff >= (i.MonoMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoMass+tolerance) {
-	// 			fullName := fmt.Sprintf("%.4f:%s (%s)", i.MonoMass, i.Title, i.Description)
-	// 			_, ok := e.PSM[j].AssignedModifications[fullName]
-	// 			if !ok {
-	// 				e.PSM[j].ObservedModifications[fullName] = 0
-	// 			}
-	// 		}
-
-	// 	}
-	// }
-
-	// for j := range e.PSM {
-	// 	if e.PSM[j].Massdiff != 0 && len(e.PSM[j].ObservedModifications) == 0 {
-	// 		e.PSM[j].ObservedModifications["Unknown"] = 0
-	// 	}
-	// }
+	for j := range e.PSM {
+		if e.PSM[j].Massdiff != 0 && len(e.PSM[j].ObservedModifications) == 0 {
+			e.PSM[j].ObservedModifications["Unknown"] = 0
+		}
+	}
 
 	return nil
 }
