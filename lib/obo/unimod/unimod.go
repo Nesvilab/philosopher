@@ -1,32 +1,26 @@
 package obo
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Deploy deploys the OBO file to the temp folder
-func Deploy(temp string) (string, error) {
+func Deploy(f string) *err.Error {
 
-	oboFile := fmt.Sprintf("%s%sunimod.obo", temp, string(filepath.Separator))
-
-	param, err := Asset("unimod.obo")
-	err = ioutil.WriteFile(oboFile, param, 0644)
-
-	if err != nil {
-		msg := fmt.Sprintf("Could not deploy UniMOD database %s", err)
-		return oboFile, errors.New(msg)
+	asset, e := Asset("unimod.obo")
+	if e != nil {
+		return &err.Error{Type: err.CannotDeployAsset, Class: err.FATA, Argument: "UniMod Obo not found"}
 	}
 
-	return oboFile, nil
-}
-
-// Parse reads the unimod.obo file and creates the data structure
-func Parse(s string) *err.Error {
+	e = ioutil.WriteFile(f, asset, sys.FilePermission())
+	if e != nil {
+		fmt.Println(e.Error())
+		return &err.Error{Type: err.CannotDeployAsset, Class: err.FATA, Argument: "Could not deploy UniMod obo"}
+	}
 
 	return nil
 }

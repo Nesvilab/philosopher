@@ -133,7 +133,10 @@ func Run(f met.Data) (met.Data, error) {
 	// evaluate modifications in data set
 	if f.Filter.Mapmods == true {
 		logrus.Info("Mapping modifications")
-		e.MapMassDiffToUniMod()
+		err := e.MapMassDiffToUniMod()
+		if err != nil {
+			logrus.Fatal(err)
+		}
 
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
