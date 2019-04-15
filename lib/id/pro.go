@@ -247,9 +247,9 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 }
 
 // Serialize converts the whle structure to a gob file
-func (d *ProtXML) Serialize() *err.Error {
+func (p *ProtXML) Serialize() *err.Error {
 
-	b, e := msgpack.Marshal(&d)
+	b, e := msgpack.Marshal(&p)
 	if e != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
@@ -263,14 +263,14 @@ func (d *ProtXML) Serialize() *err.Error {
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *ProtXML) Restore() error {
+func (p *ProtXML) Restore() error {
 
 	b, e := ioutil.ReadFile(sys.ProtxmlBin())
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
@@ -279,9 +279,9 @@ func (d *ProtXML) Restore() error {
 }
 
 // Serialize converts the whle structure to a gob file
-func (d *ProtIDList) Serialize() *err.Error {
+func (p *ProtIDList) Serialize() *err.Error {
 
-	b, e := msgpack.Marshal(&d)
+	b, e := msgpack.Marshal(&p)
 	if e != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
@@ -295,14 +295,14 @@ func (d *ProtIDList) Serialize() *err.Error {
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *ProtIDList) Restore() *err.Error {
+func (p *ProtIDList) Restore() *err.Error {
 
 	b, e := ioutil.ReadFile(sys.ProBin())
 	if e != nil {
 		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}
 
-	e = msgpack.Unmarshal(b, &d)
+	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
 		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
 	}

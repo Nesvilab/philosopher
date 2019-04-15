@@ -163,7 +163,7 @@ func (p *PepXML) Read(f string) error {
 
 		// termini modifications
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
-			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.Massdiff
+			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.MassDiff
 			if string(i.Terminus) == "N" {
 				p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = "n"
 			} else if string(i.Terminus) == "C" {

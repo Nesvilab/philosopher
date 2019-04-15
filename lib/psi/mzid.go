@@ -208,7 +208,7 @@ type Peptide struct {
 // reported
 type PeptideSequence struct {
 	XMLName xml.Name `xml:"PeptideSequence"`
-	Value   []byte   `xml:",chardata"`
+	Value   string   `xml:",chardata"`
 }
 
 // Modification is a molecule modification specification. If n modifications
