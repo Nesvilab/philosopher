@@ -1,15 +1,14 @@
 package mod
 
-// Modifications is a collections of modifications
+// Modifications is a collections of modification
 type Modifications struct {
-	InternalIndex map[float64]uint8
-	Internal      []InternalModification
-	TerminalIndex map[float64]uint8
-	Terminal      []TerminalModification
+	Mods  []Modification
+	Index map[string]Modification
 }
 
-// Mod is the basic attribute for each modification
-type Mod struct {
+// Modification is the basic attribute for each modification
+type Modification struct {
+	Index            string
 	ID               string
 	Name             string
 	Definition       string
@@ -19,17 +18,17 @@ type Mod struct {
 	MonoIsotopicMass float64
 	AverageMass      float64
 	MassDiff         float64
+	Internal         InternalModification
+	Terminal         TerminalModification
 }
 
 // InternalModification is a modification that happens inside the peptide structure
 type InternalModification struct {
-	Mod
 	AminoAcid string
 }
 
 // TerminalModification is a list of assigned terminal modifications from the database search
 type TerminalModification struct {
-	Mod
-	ProteinTerminus string
-	Terminus        string
+	IsProteinTerminus string
+	Terminus          string
 }

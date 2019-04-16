@@ -9,6 +9,7 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/rogpeppe/go-charset/charset"
+
 	// anon charset
 	_ "github.com/rogpeppe/go-charset/data"
 )
@@ -43,7 +44,7 @@ type ModificationInfo struct {
 // ModAminoacidMass tag
 type ModAminoacidMass struct {
 	XMLName  xml.Name `xml:"mod_aminoacid_mass"`
-	Position uint16   `xml:"position,attr"`
+	Position int      `xml:"position,attr"`
 	Mass     float64  `xml:"mass,attr"`
 }
 

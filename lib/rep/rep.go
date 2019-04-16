@@ -18,6 +18,7 @@ import (
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/psi"
 	"github.com/prvst/philosopher/lib/sys"
@@ -33,16 +34,10 @@ type Evidence struct {
 	Ions            IonEvidenceList
 	Peptides        PeptideEvidenceList
 	Proteins        ProteinEvidenceList
-	Mods            Modifications
+	Mods            mod.Modifications
 	Modifications   ModificationEvidence
 	CombinedProtein CombinedProteinEvidenceList
 	CombinedPeptide CombinedPeptideEvidenceList
-}
-
-// Modifications ...
-type Modifications struct {
-	DefinedModMassDiff  map[float64]float64
-	DefinedModAminoAcid map[float64]string
 }
 
 // PSMEvidence struct

@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	"math"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
@@ -29,8 +29,7 @@ type PepXML struct {
 	DecoyTag              string
 	Database              string
 	Prophet               string
-	DefinedModMassDiff    map[float64]float64
-	DefinedModAminoAcid   map[float64]string
+	Modifications         mod.Modifications
 	Models                []spc.DistributionPoint
 	PeptideIdentification PepIDList
 }
@@ -145,11 +144,7 @@ func (p *PepXML) Read(f string) error {
 			models = append(models, m)
 		}
 
-		// collect variable and fixed modifications
-		if len(p.DefinedModMassDiff) == 0 {
-			p.DefinedModMassDiff = make(map[float64]float64)
-			p.DefinedModAminoAcid = make(map[float64]string)
-		}
+		p.Modifications.Index = make(map[string]mod.Modification)
 
 		// get the search engine
 		p.SearchEngine = string(mpa.MsmsRunSummary.SearchSummary.SearchEngine)
@@ -157,19 +152,52 @@ func (p *PepXML) Read(f string) error {
 			p.SearchEngine = "MSFragger"
 		}
 
-		// internal modifications (variable only)
+		// map internal modifications from file
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
-			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.MassDiff
-			p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = string(i.AminoAcid)
+
+			key := fmt.Sprintf("%s#%.4f", i.AminoAcid, i.Mass)
+
+			_, ok := p.Modifications.Index[key]
+			if !ok {
+
+				m := mod.Modification{
+					Index:            key,
+					Type:             "Assigned",
+					MonoIsotopicMass: i.Mass,
+					MassDiff:         i.MassDiff,
+					Variable:         string(i.Variable),
+					Internal: mod.InternalModification{
+						AminoAcid: string(i.AminoAcid),
+					},
+				}
+
+				p.Modifications.Mods = append(p.Modifications.Mods, m)
+				p.Modifications.Index[key] = m
+			}
 		}
 
-		// termini modifications
+		// map terminal modifications from file
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
-			p.DefinedModMassDiff[uti.Round(i.Mass, 5, 2)] = i.MassDiff
-			if string(i.Terminus) == "N" {
-				p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = "n"
-			} else if string(i.Terminus) == "C" {
-				p.DefinedModAminoAcid[uti.Round(i.Mass, 5, 2)] = "c"
+
+			key := fmt.Sprintf("%s#%.4f", i.Terminus, i.Mass)
+
+			_, ok := p.Modifications.Index[key]
+			if !ok {
+
+				m := mod.Modification{
+					Index:            key,
+					Type:             "Assigned",
+					MonoIsotopicMass: i.Mass,
+					MassDiff:         i.MassDiff,
+					Variable:         string(i.Variable),
+					Terminal: mod.TerminalModification{
+						IsProteinTerminus: string(i.ProteinTerminus),
+						Terminus:          strings.ToLower(string(i.Terminus)),
+					},
+				}
+
+				p.Modifications.Mods = append(p.Modifications.Mods, m)
+				p.Modifications.Index[key] = m
 			}
 		}
 
@@ -177,7 +205,7 @@ func (p *PepXML) Read(f string) error {
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for _, i := range sq {
-			psm := processSpectrumQuery(i, p.DefinedModMassDiff, p.DefinedModAminoAcid, p.DecoyTag)
+			psm := processSpectrumQuery(i, p.Modifications, p.DecoyTag)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -200,11 +228,10 @@ func (p *PepXML) Read(f string) error {
 	return nil
 }
 
-func processSpectrumQuery(sq spc.SpectrumQuery, definedModMassDiff map[float64]float64, definedModAminoAcid map[float64]string, decoyTag string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
-	psm.Modifications.MassDiffIndex = make(map[float64]float64)
-	psm.Modifications.AminoAcidIndex = make(map[float64]string)
+	psm.Modifications.Index = make(map[string]mod.Modification)
 
 	psm.Index = sq.Index
 	psm.Spectrum = string(sq.Spectrum)
@@ -272,38 +299,51 @@ func processSpectrumQuery(sq spc.SpectrumQuery, definedModMassDiff map[float64]f
 		}
 
 		if len(string(i.ModificationInfo.ModifiedPeptide)) > 0 {
-
-			psm.ModifiedPeptide = string(i.ModificationInfo.ModifiedPeptide)
-
-			for _, j := range i.ModificationInfo.ModAminoacidMass {
-				pos := fmt.Sprintf("%d", j.Position)
-				psm.ModPositions = append(psm.ModPositions, pos)
-				psm.AssignedModMasses = append(psm.AssignedModMasses, j.Mass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(j.Mass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(j.Mass, 5, 2)])
-			}
-
-			// n-temrinal modifications
-			if i.ModificationInfo.ModNTermMass != 0 {
-				psm.ModPositions = append(psm.ModPositions, "n")
-				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModNTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(i.ModificationInfo.ModNTermMass, 5, 2)])
-			}
-
-			// c-terminal modifications
-			if i.ModificationInfo.ModCTermMass != 0 {
-				psm.ModPositions = append(psm.ModPositions, "c")
-				psm.AssignedModMasses = append(psm.AssignedModMasses, i.ModificationInfo.ModCTermMass)
-				psm.AssignedMassDiffs = append(psm.AssignedMassDiffs, definedModMassDiff[uti.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
-				psm.AssignedAminoAcid = append(psm.AssignedAminoAcid, definedModAminoAcid[uti.Round(i.ModificationInfo.ModCTermMass, 5, 2)])
-			}
-
+			psm.mapModsFromPepXML(i.ModificationInfo, mods)
 		}
 
 	}
 
 	return psm
+}
+
+// mapModsFromPepXML receives a pepXML struct with modifications and adds them to
+// the given struct
+func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods mod.Modifications) {
+
+	p.ModifiedPeptide = string(m.ModifiedPeptide)
+
+	for _, i := range m.ModAminoacidMass {
+		aa := p.ModifiedPeptide[:i.Position]
+		key := fmt.Sprintf("%s#%.4f", aa, i.Mass)
+		v, ok := mods.Index[key]
+		if ok {
+			v.Position = strconv.Itoa(i.Position)
+			p.Modifications.Mods = append(p.Modifications.Mods, v)
+		}
+	}
+
+	// n-temrinal modifications
+	if m.ModNTermMass != 0 {
+		key := fmt.Sprintf("n#%.4f", m.ModNTermMass)
+		v, ok := mods.Index[key]
+		if ok {
+			v.Position = "n"
+			p.Modifications.Mods = append(p.Modifications.Mods, v)
+		}
+	}
+
+	// c-terminal modifications
+	if m.ModCTermMass != 0 {
+		key := fmt.Sprintf("c#%.4f", m.ModCTermMass)
+		v, ok := mods.Index[key]
+		if ok {
+			v.Position = "c"
+			p.Modifications.Mods = append(p.Modifications.Mods, v)
+		}
+	}
+
+	return
 }
 
 // adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference

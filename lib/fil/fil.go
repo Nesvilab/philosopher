@@ -14,6 +14,7 @@ import (
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
@@ -121,8 +122,7 @@ func Run(f met.Data) (met.Data, error) {
 	// restoring for the modifications
 	var pxml id.PepXML
 	pxml.Restore()
-	e.Mods.DefinedModAminoAcid = pxml.DefinedModAminoAcid
-	e.Mods.DefinedModMassDiff = pxml.DefinedModMassDiff
+	e.Mods = pxml.Modifications
 	pxml = id.PepXML{}
 
 	var psm id.PepIDList
@@ -207,8 +207,8 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 
 	var files []string
 	var pepIdent id.PepIDList
-	var definedModMassDiff = make(map[float64]float64)
-	var definedModAminoAcid = make(map[float64]string)
+	var mods []mod.Modification
+	var modsIndex = make(map[string]mod.Modification)
 	var searchEngine string
 
 	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
@@ -250,12 +250,12 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 
 		pepIdent = append(pepIdent, p.PeptideIdentification...)
 
-		for k, v := range p.DefinedModAminoAcid {
-			definedModAminoAcid[k] = v
-		}
-
-		for k, v := range p.DefinedModMassDiff {
-			definedModMassDiff[k] = v
+		for _, k := range p.Modifications.Mods {
+			_, ok := modsIndex[k.Index]
+			if !ok {
+				mods = append(mods, k)
+				modsIndex[k.Index] = k
+			}
 		}
 
 		searchEngine = p.SearchEngine
@@ -265,8 +265,8 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 	var pepXML id.PepXML
 	pepXML.DecoyTag = decoyTag
 	pepXML.PeptideIdentification = pepIdent
-	pepXML.DefinedModAminoAcid = definedModAminoAcid
-	pepXML.DefinedModMassDiff = definedModMassDiff
+	pepXML.Modifications.Mods = mods
+	pepXML.Modifications.Index = modsIndex
 
 	// promoting Spectra that matches to both decoys and targets to TRUE hits
 	pepXML.PromoteProteinIDs()

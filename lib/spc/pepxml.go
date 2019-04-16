@@ -268,7 +268,7 @@ type PTMProphetResult struct {
 // ModAminoAcidProbability tag
 type ModAminoAcidProbability struct {
 	XMLName     xml.Name `xml:"mod_aminoacid_probability"`
-	Position    uint16   `xml:"position,attr"`
+	Position    int      `xml:"position,attr"`
 	Probability float32  `xml:"probability,attr"`
 }
 
