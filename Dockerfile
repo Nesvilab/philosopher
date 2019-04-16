@@ -11,7 +11,7 @@ LABEL license="GPL-3.0"
 LABEL BIOTOOLS=""
 LABEL tags="Proteomics"
 
-MAINTAINER Felipe da Veiga Leprevost <felipevl@umich.edu>
+#MAINTAINER Felipe da Veiga Leprevost <felipevl@umich.edu>
 
 USER biodocker
 

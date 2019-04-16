@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
@@ -76,6 +77,7 @@ type PeptideIdentification struct {
 	DiscriminantValue    float64
 	Intensity            float64
 	IsRejected           uint8
+	Modifications        mod.Modifications
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -201,6 +203,8 @@ func (p *PepXML) Read(f string) error {
 func processSpectrumQuery(sq spc.SpectrumQuery, definedModMassDiff map[float64]float64, definedModAminoAcid map[float64]string, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
+	psm.Modifications.MassDiffIndex = make(map[float64]float64)
+	psm.Modifications.AminoAcidIndex = make(map[float64]string)
 
 	psm.Index = sq.Index
 	psm.Spectrum = string(sq.Spectrum)
@@ -344,7 +348,7 @@ func (p *PepXML) PromoteProteinIDs() {
 			}
 		}
 
-		if len(list) > 1 {
+		if len(list) > 0 {
 			for i := range list {
 				if strings.Contains(list[i], "sp|") {
 					ref = list[i]

@@ -127,7 +127,6 @@ func (p *ProtXML) Read(f string) error {
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 			ptid.TopPepProb = 0
-			//ptid.TopPepProb = j.Peptide[0].InitialProbability
 
 			if strings.EqualFold(string(j.Parameter.Name), "prot_length") {
 				ptid.Length = j.Parameter.Value
@@ -212,7 +211,7 @@ func (p *ProtXML) PromoteProteinIDs() {
 				}
 			}
 
-			if len(list) > 1 {
+			if len(list) > 0 {
 				for i := range list {
 					if strings.Contains(list[i], "sp|") {
 						ref = list[i]
