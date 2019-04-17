@@ -42,23 +42,23 @@ type Evidence struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Index                 uint32
-	Spectrum              string
-	Scan                  int
-	Peptide               string
-	IonForm               string
-	Protein               string
-	RazorProtein          string
-	ProteinDescription    string
-	ProteinID             string
-	EntryName             string
-	GeneName              string
-	ModifiedPeptide       string
-	MappedProteins        map[string]int
-	ModPositions          []string
-	AssignedModMasses     []float64
-	AssignedMassDiffs     []float64
-	AssignedAminoAcid     []string
+	Index              uint32
+	Spectrum           string
+	Scan               int
+	Peptide            string
+	IonForm            string
+	Protein            string
+	RazorProtein       string
+	ProteinDescription string
+	ProteinID          string
+	EntryName          string
+	GeneName           string
+	ModifiedPeptide    string
+	MappedProteins     map[string]int
+	// ModPositions          []string
+	// AssignedModMasses     []float64
+	// AssignedMassDiffs     []float64
+	// AssignedAminoAcid     []string
 	AssignedModifications map[string]uint16
 	ObservedModifications map[string]uint16
 	AssumedCharge         uint8
@@ -87,6 +87,7 @@ type PSMEvidence struct {
 	IsUnique              bool
 	IsURazor              bool
 	Labels                tmt.Labels
+	Modifications         mod.Modifications
 }
 
 // PSMEvidenceList ...
@@ -395,7 +396,7 @@ func Run(m met.Data) met.Data {
 		repo.PlotMassHist()
 	}
 
-	repo.MzIdentMLReport(m.Version)
+	//repo.MzIdentMLReport(m.Version)
 
 	return m
 }
@@ -427,10 +428,10 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
 		p.ModifiedPeptide = i.ModifiedPeptide
-		p.ModPositions = i.ModPositions
-		p.AssignedModMasses = i.AssignedModMasses
-		p.AssignedMassDiffs = i.AssignedMassDiffs
-		p.AssignedAminoAcid = i.AssignedAminoAcid
+		// p.ModPositions = i.ModPositions
+		// p.AssignedModMasses = i.AssignedModMasses
+		// p.AssignedMassDiffs = i.AssignedMassDiffs
+		// p.AssignedAminoAcid = i.AssignedAminoAcid
 		p.AssumedCharge = i.AssumedCharge
 		p.HitRank = i.HitRank
 		p.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -453,6 +454,7 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.AssignedModifications = make(map[string]uint16)
 		p.ObservedModifications = make(map[string]uint16)
 		p.MappedProteins = make(map[string]int)
+		p.Modifications = i.Modifications
 
 		for _, j := range i.AlternativeProteins {
 			p.MappedProteins[j]++
@@ -2294,13 +2296,13 @@ func (e *Evidence) AssembleModificationReport() error {
 			// for assigned mods
 			// 0 here means something that doest not map to the pepXML header
 			// like multiple mods on n-term
-			for _, l := range e.PSM[i].AssignedMassDiffs {
+			for _, l := range e.PSM[i].Modifications.Mods {
 
-				if l > bins[j].LowerMass && l <= bins[j].HigherRight && l != 0 {
-					_, ok := assignChecklist[l]
+				if l.MassDiff > bins[j].LowerMass && l.MassDiff <= bins[j].HigherRight && l.MassDiff != 0 {
+					_, ok := assignChecklist[l.MassDiff]
 					if !ok {
 						bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
-						assignChecklist[l] = 0
+						assignChecklist[l.MassDiff] = 0
 					}
 				}
 			}
@@ -2372,22 +2374,31 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 	}
 
 	for _, i := range o.Terms {
-
 		for j := range e.PSM {
 
 			// for fixed and variable modifications
-			for k := range e.PSM[j].AssignedMassDiffs {
-				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoIsotopicMass+tolerance) {
+			for k := range e.PSM[j].Modifications.Mods {
+				if e.PSM[j].Modifications.Mods[k].MassDiff >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].Modifications.Mods[k].MassDiff <= (i.MonoIsotopicMass+tolerance) {
 					if !strings.Contains(i.Definition, "substitution") {
-						fullname := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
-						e.PSM[j].AssignedModifications[fullname] = 0
+
+						_, ok := i.Sites[e.PSM[j].Modifications.Mods[k].AminoAcid]
+						if ok {
+
+							e.PSM[j].Modifications.Mods[k].Name = i.Name
+							e.PSM[j].Modifications.Mods[k].Definition = i.Definition
+							e.PSM[j].Modifications.Mods[k].ID = i.ID
+
+							fullName := fmt.Sprintf("%s:%.4f", i.Name, i.MonoIsotopicMass)
+							e.PSM[j].AssignedModifications[fullName] = 0
+						}
+
 					}
 				}
 			}
 
 			// for delta masses
 			if e.PSM[j].Massdiff >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoIsotopicMass+tolerance) {
-				fullName := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
+				fullName := fmt.Sprintf("%s:%.4f", i.Name, i.MonoIsotopicMass)
 				_, ok := e.PSM[j].AssignedModifications[fullName]
 				if !ok {
 					e.PSM[j].ObservedModifications[fullName] = 0
@@ -2397,14 +2408,54 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 		}
 	}
 
-	for j := range e.PSM {
-		if e.PSM[j].Massdiff != 0 && len(e.PSM[j].ObservedModifications) == 0 {
-			e.PSM[j].ObservedModifications["Unknown"] = 0
-		}
-	}
-
 	return nil
 }
+
+// // MapMassDiffToUniMod maps PSMs to modifications based on their mass shifts
+// func (e *Evidence) MapMassDiffToUniMod() *err.Error {
+
+// 	// 10 ppm
+// 	var tolerance = 0.01
+
+// 	o, err := obo.NewUniModOntology()
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	for _, i := range o.Terms {
+
+// 		for j := range e.PSM {
+
+// 			// for fixed and variable modifications
+// 			for k := range e.PSM[j].AssignedMassDiffs {
+// 				if e.PSM[j].AssignedMassDiffs[k] >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].AssignedMassDiffs[k] <= (i.MonoIsotopicMass+tolerance) {
+// 					if !strings.Contains(i.Definition, "substitution") {
+// 						fullname := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
+// 						e.PSM[j].AssignedModifications[fullname] = 0
+// 					}
+// 				}
+// 			}
+
+// 			// for delta masses
+// 			if e.PSM[j].Massdiff >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoIsotopicMass+tolerance) {
+// 				fullName := fmt.Sprintf("%.4f:%s (%s)", i.MonoIsotopicMass, i.ID, i.Name)
+// 				_, ok := e.PSM[j].AssignedModifications[fullName]
+// 				if !ok {
+// 					e.PSM[j].ObservedModifications[fullName] = 0
+// 				}
+// 			}
+
+// 		}
+// 	}
+
+// 	for j := range e.PSM {
+// 		if e.PSM[j].Massdiff != 0 && len(e.PSM[j].ObservedModifications) == 0 {
+// 			e.PSM[j].ObservedModifications["Unknown"] = 0
+// 		}
+// 	}
+
+// 	return nil
+// }
 
 // ModificationReport ...
 func (e *Evidence) ModificationReport() {

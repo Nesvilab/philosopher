@@ -143,8 +143,8 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				var uniqMds = make(map[string]uint8)
 
-				for _, j := range i.AssignedMassDiffs {
-					mass := strconv.FormatFloat(j, 'f', 6, 64)
+				for _, j := range i.Modifications.Mods {
+					mass := strconv.FormatFloat(j.MonoIsotopicMass, 'f', 6, 64)
 					uniqMds[mass] = 0
 				}
 
@@ -155,7 +155,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 					delete(uniqMds, "0.000000")
 				}
 
-				for j, _ := range uniqMds {
+				for j := range uniqMds {
 					keys = append(keys, j)
 				}
 
@@ -172,7 +172,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 		}
 	}
 
-	for k, _ := range uniqPeptides {
+	for k := range uniqPeptides {
 
 		var e rep.CombinedPeptideEvidence
 		e.Spc = make(map[string]int)
@@ -195,7 +195,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 				uniqCharges[ch] = 0
 			}
 
-			for ch, _ := range uniqCharges {
+			for ch := range uniqCharges {
 				e.ChargeStates = append(e.ChargeStates, ch)
 			}
 			sort.Strings(e.ChargeStates)
@@ -229,8 +229,8 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 
 			var uniqMds = make(map[string]uint8)
 
-			for _, k := range j.AssignedMassDiffs {
-				mass := strconv.FormatFloat(k, 'f', 6, 64)
+			for _, k := range j.Modifications.Mods {
+				mass := strconv.FormatFloat(k.MonoIsotopicMass, 'f', 6, 64)
 				uniqMds[mass] = 0
 			}
 
@@ -241,7 +241,7 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 				delete(uniqMds, "0.000000")
 			}
 
-			for k, _ := range uniqMds {
+			for k := range uniqMds {
 				keys = append(keys, k)
 			}
 
@@ -252,7 +252,7 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			keyMaps[key]++
 		}
 
-		for i, _ := range combined {
+		for i := range combined {
 			count, ok := keyMaps[combined[i].Key]
 			if ok {
 				combined[i].Spc[k] = count
@@ -277,8 +277,8 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 
 			var uniqMds = make(map[string]uint8)
 
-			for _, k := range j.AssignedMassDiffs {
-				mass := strconv.FormatFloat(k, 'f', 6, 64)
+			for _, k := range j.Modifications.Mods {
+				mass := strconv.FormatFloat(k.MonoIsotopicMass, 'f', 6, 64)
 				uniqMds[mass] = 0
 			}
 
@@ -289,7 +289,7 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 				delete(uniqMds, "0.000000")
 			}
 
-			for k, _ := range uniqMds {
+			for k := range uniqMds {
 				keys = append(keys, k)
 			}
 
@@ -300,7 +300,7 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 			keyMaps[key]++
 		}
 
-		for i, _ := range combined {
+		for i := range combined {
 			count, ok := keyMaps[combined[i].Key]
 			if ok {
 				combined[i].Spc[k] = count

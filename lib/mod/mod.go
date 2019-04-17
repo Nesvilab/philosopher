@@ -8,27 +8,28 @@ type Modifications struct {
 
 // Modification is the basic attribute for each modification
 type Modification struct {
-	Index            string
-	ID               string
-	Name             string
-	Definition       string
-	Variable         string
-	Position         string
-	Type             string
-	MonoIsotopicMass float64
-	AverageMass      float64
-	MassDiff         float64
-	Internal         InternalModification
-	Terminal         TerminalModification
-}
-
-// InternalModification is a modification that happens inside the peptide structure
-type InternalModification struct {
-	AminoAcid string
-}
-
-// TerminalModification is a list of assigned terminal modifications from the database search
-type TerminalModification struct {
+	Index             string
+	ID                string
+	Name              string
+	Definition        string
+	Variable          string
+	Position          string
+	Type              string
+	MonoIsotopicMass  float64
+	AverageMass       float64
+	MassDiff          float64
+	AminoAcid         string
 	IsProteinTerminus string
 	Terminus          string
 }
+
+// // InternalModification is a modification that happens inside the peptide structure
+// type InternalModification struct {
+// 	AminoAcid string
+// }
+
+// // TerminalModification is a list of assigned terminal modifications from the database search
+// type TerminalModification struct {
+// 	IsProteinTerminus string
+// 	Terminus          string
+// }

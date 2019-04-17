@@ -47,6 +47,7 @@ type Term struct {
 	MonoIsotopicMass float64
 	AverageMass      float64
 	Composition      string
+	Sites            map[string]uint8
 }
 
 // NewUniModOntology constructucst a set of UniMod ontologies
@@ -103,16 +104,17 @@ func (m *Onto) Parse() *err.Error {
 
 	var flag = -1
 	var term Term
+	term.Sites = make(map[string]uint8)
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 
 		if strings.HasPrefix(scanner.Text(), "format-version:") {
-			m.Version = splitAndCollect(scanner.Text(), false)
+			m.Version = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.HasPrefix(scanner.Text(), "date:") {
-			m.Date = splitAndCollect(scanner.Text(), false)
+			m.Date = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.Contains(scanner.Text(), "[Term]") {
@@ -120,50 +122,55 @@ func (m *Onto) Parse() *err.Error {
 		}
 
 		if strings.HasPrefix(scanner.Text(), "id:") && flag == 1 {
-			term.ID = splitAndCollect(scanner.Text(), false)
+			term.ID = splitAndCollect(scanner.Text(), "common")
 		} else if strings.HasPrefix(scanner.Text(), "name:") && flag == 1 {
-			term.Name = splitAndCollect(scanner.Text(), false)
+			term.Name = splitAndCollect(scanner.Text(), "common")
 		} else if strings.HasPrefix(scanner.Text(), "def:") && flag == 1 {
-			term.Definition = splitAndCollect(scanner.Text(), false)
+			term.Definition = splitAndCollect(scanner.Text(), "common")
 		} else if strings.HasPrefix(scanner.Text(), "comment:") && flag == 1 {
-			term.Comments = splitAndCollect(scanner.Text(), false)
+			term.Comments = splitAndCollect(scanner.Text(), "common")
 		} else if strings.HasPrefix(scanner.Text(), "synonym:") && flag == 1 {
-			term.Synonyms = splitAndCollect(scanner.Text(), false)
+			term.Synonyms = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.HasPrefix(scanner.Text(), "comment") && flag == 1 {
-			term.Comments = splitAndCollect(scanner.Text(), false)
+			term.Comments = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.HasPrefix(scanner.Text(), "synonym") && flag == 1 {
-			term.Synonyms = splitAndCollect(scanner.Text(), false)
+			term.Synonyms = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.HasPrefix(scanner.Text(), "xref: record_id") && flag == 1 {
-			i, _ := strconv.Atoi(splitAndCollect(scanner.Text(), true))
+			i, _ := strconv.Atoi(splitAndCollect(scanner.Text(), "xref"))
 			term.RecordID = i
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_mono_mass") && flag == 1 {
-			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), true), 64)
+			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
 			term.MonoIsotopicMass = i
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_avge_mass") && flag == 1 {
-			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), true), 64)
+			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
 			term.AverageMass = i
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_composition") && flag == 1 {
-			term.Composition = splitAndCollect(scanner.Text(), true)
+			term.Composition = splitAndCollect(scanner.Text(), "xref")
 		} else if strings.HasPrefix(scanner.Text(), "xref: date_time_posted") && flag == 1 {
-			term.DateTimePosted = splitAndCollect(scanner.Text(), true)
+			term.DateTimePosted = splitAndCollect(scanner.Text(), "xref")
 		} else if strings.HasPrefix(scanner.Text(), "xref: date_time_modified") && flag == 1 {
-			term.DateTimeModified = splitAndCollect(scanner.Text(), true)
+			term.DateTimeModified = splitAndCollect(scanner.Text(), "xref")
 		}
 
 		if strings.HasPrefix(scanner.Text(), "is_a") && flag == 1 {
-			term.IsA = splitAndCollect(scanner.Text(), false)
+			term.IsA = splitAndCollect(scanner.Text(), "common")
 		}
 
 		if strings.EqualFold(scanner.Text(), "//") && flag == 1 {
 			flag = 0
 			m.Terms = append(m.Terms, term)
 			term = Term{}
+			term.Sites = make(map[string]uint8)
+		}
+
+		if strings.Contains(scanner.Text(), "xref:") && strings.Contains(scanner.Text(), "_site") && flag == 1 {
+			term.Sites[splitAndCollect(scanner.Text(), "site")]++
 		}
 
 	}
@@ -207,13 +214,18 @@ func (m *Onto) Restore() *err.Error {
 	return nil
 }
 
-func splitAndCollect(s string, isXref bool) string {
+func splitAndCollect(s string, target string) string {
 
-	if isXref == false {
+	if target == "common" {
 		l := strings.Split(s, ": ")
-		return l[1]
+		return strings.Replace(l[1], "\"", "", -1)
+	} else if target == "xref" {
+		l := strings.Split(s, "\"")
+		return strings.Replace(l[1], "\"", "", -1)
+	} else if target == "site" {
+		l := strings.Split(s, "_site ")
+		return strings.Replace(l[1], "\"", "", -1)
 	}
 
-	l := strings.Split(s, "\"")
-	return l[1]
+	return ""
 }

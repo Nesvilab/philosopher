@@ -166,9 +166,7 @@ func (p *PepXML) Read(f string) error {
 					MonoIsotopicMass: i.Mass,
 					MassDiff:         i.MassDiff,
 					Variable:         string(i.Variable),
-					Internal: mod.InternalModification{
-						AminoAcid: string(i.AminoAcid),
-					},
+					AminoAcid:        string(i.AminoAcid),
 				}
 
 				p.Modifications.Mods = append(p.Modifications.Mods, m)
@@ -179,21 +177,20 @@ func (p *PepXML) Read(f string) error {
 		// map terminal modifications from file
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
 
-			key := fmt.Sprintf("%s#%.4f", i.Terminus, i.Mass)
+			key := fmt.Sprintf("%s-term#%.4f", i.Terminus, i.Mass)
 
 			_, ok := p.Modifications.Index[key]
 			if !ok {
 
 				m := mod.Modification{
-					Index:            key,
-					Type:             "Assigned",
-					MonoIsotopicMass: i.Mass,
-					MassDiff:         i.MassDiff,
-					Variable:         string(i.Variable),
-					Terminal: mod.TerminalModification{
-						IsProteinTerminus: string(i.ProteinTerminus),
-						Terminus:          strings.ToLower(string(i.Terminus)),
-					},
+					Index:             key,
+					Type:              "Assigned",
+					MonoIsotopicMass:  i.Mass,
+					MassDiff:          i.MassDiff,
+					Variable:          string(i.Variable),
+					AminoAcid:         fmt.Sprintf("%s-term", i.Terminus),
+					IsProteinTerminus: string(i.ProteinTerminus),
+					Terminus:          strings.ToLower(string(i.Terminus)),
 				}
 
 				p.Modifications.Mods = append(p.Modifications.Mods, m)
@@ -325,21 +322,37 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 
 	// n-temrinal modifications
 	if m.ModNTermMass != 0 {
-		key := fmt.Sprintf("n#%.4f", m.ModNTermMass)
+		key := fmt.Sprintf("N-term#%.4f", m.ModNTermMass)
 		v, ok := mods.Index[key]
 		if ok {
-			v.Position = "n"
+			v.Position = "N-term"
+			v.AminoAcid = "N-term"
 			p.Modifications.Mods = append(p.Modifications.Mods, v)
 		}
 	}
 
 	// c-terminal modifications
 	if m.ModCTermMass != 0 {
-		key := fmt.Sprintf("c#%.4f", m.ModCTermMass)
+		key := fmt.Sprintf("C-term#%.4f", m.ModCTermMass)
 		v, ok := mods.Index[key]
 		if ok {
-			v.Position = "c"
+			v.Position = "C-term"
+			v.AminoAcid = "C-term"
 			p.Modifications.Mods = append(p.Modifications.Mods, v)
+		}
+	}
+
+	if p.Massdiff != 0 {
+		key := fmt.Sprintf("%.4f", p.Massdiff)
+		_, ok := p.Modifications.Index[key]
+		if !ok {
+			m := mod.Modification{
+				Index:    key,
+				Type:     "Observed",
+				MassDiff: p.Massdiff,
+			}
+			p.Modifications.Mods = append(p.Modifications.Mods, m)
+			p.Modifications.Index[key] = m
 		}
 	}
 

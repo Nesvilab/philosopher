@@ -11,8 +11,8 @@ type DataSetLabelNames struct {
 	LabelName map[string]string
 }
 
-// TODO update error methos on the abacus function
 // Run abacus
+// TODO update error methos on the abacus function
 func Run(a met.Abacus, temp string, args []string) error {
 
 	if len(a.CombPep) == 0 && len(a.CombPro) == 0 {

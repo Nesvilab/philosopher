@@ -17,11 +17,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Pair ...
 type Pair struct {
 	Key   string
 	Value float64
 }
 
+// PairList ...
 type PairList []Pair
 
 func (p PairList) Len() int           { return len(p) }
