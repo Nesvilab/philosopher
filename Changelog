@@ -6,11 +6,13 @@
 ### Fixed
 
 
-# Philosopher ?
-### Build: ?
+# Philosopher 20190417
+### Build: 201904171251
 
 ### Added
 ### Changed
+- Updated Dockerfile
+
 ### Fixed
 - Updated PTMProphet for Windows, version 5.2.0.
 
