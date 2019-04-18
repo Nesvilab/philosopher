@@ -36,17 +36,13 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index               uint32
-	Spectrum            string
-	Scan                int
-	Peptide             string
-	Protein             string
-	ModifiedPeptide     string
-	AlternativeProteins []string
-	// ModPositions         []string
-	// AssignedModMasses    []float64
-	// AssignedMassDiffs    []float64
-	// AssignedAminoAcid    []string
+	Index                uint32
+	Spectrum             string
+	Scan                 int
+	Peptide              string
+	Protein              string
+	ModifiedPeptide      string
+	AlternativeProteins  []string
 	AssumedCharge        uint8
 	PrevAA               string
 	NextAA               string
@@ -351,10 +347,10 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if !ok {
 			m := mod.Modification{
 				Index:    key,
+				Name:     "Unknown",
 				Type:     "Observed",
 				MassDiff: p.Massdiff,
 			}
-			//p.Modifications.Mods = append(p.Modifications.Mods, m)
 			p.Modifications.Index[key] = m
 		}
 	}

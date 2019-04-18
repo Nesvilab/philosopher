@@ -218,7 +218,6 @@ func (e *Evidence) UpdateIonStatus() {
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
 	var ptMap = make(map[string]string)
-	//var ptIndiMap = make(map[string][]string)
 
 	for _, i := range e.Proteins {
 
@@ -256,7 +255,6 @@ func (e *Evidence) UpdateIonStatus() {
 		v, ok := ptMap[e.PSM[i].IonForm]
 		if ok {
 			e.PSM[i].Protein = v
-			//e.PSM[i].AlternativeProteins = ptIndiMap[v]
 		}
 	}
 
@@ -281,36 +279,36 @@ func (e *Evidence) UpdateIonStatus() {
 // individual PSM and assign them to ions
 func (e *Evidence) UpdateIonAssignedAndObservedMods() {
 
-	var aMap = make(map[string][]string)
-	var aPepMap = make(map[string][]string)
+	// var aMap = make(map[string][]string)
+	// var aPepMap = make(map[string][]string)
 
-	// collect the assigned modifications from the PSM data
-	for _, i := range e.PSM {
-		for j := range i.AssignedModifications {
-			aMap[i.IonForm] = append(aMap[i.IonForm], j)
-			aPepMap[i.Peptide] = append(aPepMap[i.Peptide], j)
-		}
-	}
+	// // collect the assigned modifications from the PSM data
+	// for _, i := range e.PSM {
+	// 	for j := range i.AssignedModifications {
+	// 		aMap[i.IonForm] = append(aMap[i.IonForm], j)
+	// 		aPepMap[i.Peptide] = append(aPepMap[i.Peptide], j)
+	// 	}
+	// }
 
-	// forward it to the Ion data
-	for i := range e.Ions {
-		v, ok := aMap[e.Ions[i].IonForm]
-		if ok {
-			for _, j := range v {
-				e.Ions[i].AssignedModifications[j] = 0
-			}
-		}
-	}
+	// // forward it to the Ion data
+	// for i := range e.Ions {
+	// 	v, ok := aMap[e.Ions[i].IonForm]
+	// 	if ok {
+	// 		for _, j := range v {
+	// 			e.Ions[i].AssignedModifications[j] = 0
+	// 		}
+	// 	}
+	// }
 
-	// forward it to the peptide data
-	for i := range e.Peptides {
-		v, ok := aPepMap[e.Peptides[i].Sequence]
-		if ok {
-			for _, j := range v {
-				e.Peptides[i].AssignedModifications[j] = 0
-			}
-		}
-	}
+	// // forward it to the peptide data
+	// for i := range e.Peptides {
+	// 	v, ok := aPepMap[e.Peptides[i].Sequence]
+	// 	if ok {
+	// 		for _, j := range v {
+	// 			e.Peptides[i].AssignedModifications[j] = 0
+	// 		}
+	// 	}
+	// }
 
 	return
 }
