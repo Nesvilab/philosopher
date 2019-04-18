@@ -21,6 +21,7 @@
 
 ### Fixed
 - Updated PTMProphet for Windows, version 5.2.0.
+- Fixed a bug related to the target-decoy protein classification when printing decoys.
 
 
 # Philosopher 20190405
