@@ -11,8 +11,12 @@
 
 ### Added
 - Support for Unimod ontologies
+- PrevAA and NextAA added to PSM data.
+
 ### Changed
-- Updated Dockerfile
+- Updated Dockerfile.
+- Considerable changes were implemented to the modification tracking and reporting.
+- Fixed modifications do not show on the report tables anymore.
 - Modified and Unmodified observations dropped from the ion table.
 
 ### Fixed
@@ -23,7 +27,7 @@
 ### Build: 201904051526
 
 ### Added
-- Support for UniProt UniRef databases
+- Support for UniProt UniRef databases.
 
 ### Changed
 - The Decoys tags are automatically acquired from the database command, not necessary anymore for the Filter and PeptideProphet.
@@ -43,8 +47,8 @@
 ### Added
 
 ### Changed
-- Prophets updated to 5.2.0
-- Comet updated to 2018014
+- Prophets updated to 5.2.0.
+- Comet updated to 2018014.
 
 ### Fixed
 - Freequant error when reading files was corrected.

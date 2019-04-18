@@ -45,6 +45,8 @@ type PSMEvidence struct {
 	Index                uint32
 	Spectrum             string
 	Scan                 int
+	PrevAA               string
+	NextAA               string
 	Peptide              string
 	IonForm              string
 	Protein              string
@@ -385,7 +387,7 @@ func Run(m met.Data) met.Data {
 		repo.PlotMassHist()
 	}
 
-	//repo.MzIdentMLReport(m.Version)
+	//repo.MzIdentMLReport(m.Version, m.Database.Annot)
 
 	return m
 }
@@ -413,6 +415,8 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 		p.Index = i.Index
 		p.Spectrum = i.Spectrum
 		p.Scan = i.Scan
+		p.PrevAA = i.PrevAA
+		p.NextAA = i.NextAA
 		p.Peptide = i.Peptide
 		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
@@ -2758,11 +2762,12 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 }
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded
-func (e Evidence) MzIdentMLReport(version string) error {
+func (e Evidence) MzIdentMLReport(version, database string) error {
 
 	var mzid psi.MzIdentML
 
 	t := time.Now()
+	var idCounter = 0
 
 	// Header
 	mzid.Name = "foo"
@@ -2916,9 +2921,124 @@ func (e Evidence) MzIdentMLReport(version string) error {
 
 		seqs = append(seqs, *db)
 	}
-	mzid.SequenceCollection.DBSequence = seqs
+	//mzid.SequenceCollection.DBSequence = seqs
+	seqs = nil
 
 	// SequenceCollection - Peptide
+	var peps []psi.Peptide
+	for _, i := range e.Peptides {
+
+		p := psi.Peptide{
+			ID: i.Sequence,
+			PeptideSequence: psi.PeptideSequence{
+				Value: i.Sequence,
+			},
+		}
+
+		for _, j := range i.Modifications.Index {
+			if j.Name != "Unknown" {
+				mod := psi.Modification{
+					AvgMassDelta:          j.AverageMass,
+					MonoIsotopicMassDelta: j.MonoIsotopicMass,
+					Residues:              j.AminoAcid,
+					Location:              j.Position,
+					CVParam: []psi.CVParam{
+						psi.CVParam{
+							CVRef:     "UNIMOD",
+							Accession: j.ID,
+							Name:      j.Name,
+						},
+					},
+				}
+
+				p.Modification = append(p.Modification, mod)
+			}
+		}
+
+		peps = append(peps, p)
+	}
+	//mzid.SequenceCollection.Peptide = peps
+	peps = nil
+
+	// SequenceCollection - PeptideEvidence
+	var pevs []psi.PeptideEvidence
+	idCounter = 0
+	for _, i := range e.PSM {
+
+		idCounter++
+
+		evi := psi.PeptideEvidence{
+			DBSequenceRef: i.ProteinID,
+			ID:            fmt.Sprintf("PepEv_%d", idCounter),
+			IsDecoy:       strconv.FormatBool(i.IsDecoy),
+			PeptideRef:    i.Peptide,
+			Pre:           i.PrevAA,
+			Post:          i.NextAA,
+		}
+
+		pevs = append(pevs, evi)
+	}
+	//mzid.SequenceCollection.PeptideEvidence = pevs
+	pevs = nil
+
+	var sources = make(map[string]uint8)
+	for _, i := range e.PSM {
+		s := strings.Split(i.Spectrum, ".")
+		sources[s[0]]++
+	}
+
+	// AnalysisCollection
+	idCounter = 0
+	ac := &psi.AnalysisCollection{}
+	for i := range sources {
+
+		idCounter++
+
+		si := &psi.SpectrumIdentification{
+			SpectrumIdentificationListRef:     fmt.Sprintf("SIL_%d", idCounter),
+			ID:                                fmt.Sprintf("SpecIdent_%d", idCounter),
+			SpectrumIdentificationProtocolRef: fmt.Sprintf("SearchProtocol_%d", idCounter),
+			InputSpectra: []psi.InputSpectra{
+				psi.InputSpectra{
+					SpectraDataRef: i,
+				},
+			},
+			SearchDatabaseRef: []psi.SearchDatabaseRef{
+				psi.SearchDatabaseRef{
+					SearchDatabaseRef: database,
+				},
+			},
+		}
+
+		ac.SpectrumIdentification = append(ac.SpectrumIdentification, *si)
+	}
+
+	ac.ProteinDetection = psi.ProteinDetection{
+		ProteinDetectionProtocolRef: "Philosopher_protocol",
+		ProteinDetectionListRef:     "Protein Groups",
+		ID:                          "Phi_1",
+	}
+	mzid.AnalysisCollection = *ac
+
+	// AnalysisProtocolCollection
+
+	//DataCollection
+	dta := psi.DataCollection{}
+
+	idCounter = 0
+	for i := range sources {
+		sf := &psi.SourceFile{
+			ID:       i,
+			Location: i,
+			Name:     i,
+		}
+
+		dta.Inputs.SourceFile = append(dta.Inputs.SourceFile, *sf)
+	}
+
+	// dta.Inputs.SearchDatabase = psi.SearchDatabase{
+	// 	ID: database,
+	// }
 
 	// Burn!
 	err := mzid.Write()

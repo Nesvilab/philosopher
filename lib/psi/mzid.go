@@ -224,11 +224,12 @@ type PeptideSequence struct {
 // presence/absence on particular product ions), this can additionally be
 // encoded within the FragmentationArray
 type Modification struct {
-	XMLName      xml.Name  `xml:"Modification"`
-	AvgMassDelta float64   `xml:"avgMassDelta,attr,omitempty"`
-	Location     int       `xml:"location,attr,omitempty"`
-	Residues     string    `xml:"residues,attr,omitempty"`
-	CVParam      []CVParam `xml:"cvParam"`
+	XMLName               xml.Name  `xml:"Modification"`
+	AvgMassDelta          float64   `xml:"avgMassDelta,attr,omitempty"`
+	MonoIsotopicMassDelta float64   `xml:"monoisotopicMassDelta,attr,omitempty"`
+	Location              string    `xml:"location,attr,omitempty"`
+	Residues              string    `xml:"residues,attr,omitempty"`
+	CVParam               []CVParam `xml:"cvParam"`
 }
 
 // SubstitutionModification is a modification where one residue is substituted
@@ -251,7 +252,7 @@ type PeptideEvidence struct {
 	End                 int         `xml:"end,attr,omitempty"`
 	Frame               string      `xml:"frame,attr,omitempty"`
 	ID                  string      `xml:"id,attr,omitempty"`
-	IsDecoy             bool        `xml:"isDecoy,attr,omitempty"`
+	IsDecoy             string      `xml:"isDecoy,attr,omitempty"`
 	Name                string      `xml:"name,attr,omitempty"`
 	PeptideRef          string      `xml:"peptide_ref,attr,omitempty"`
 	Post                string      `xml:"post,attr,omitempty"`
