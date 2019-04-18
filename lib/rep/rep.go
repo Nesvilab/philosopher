@@ -621,9 +621,9 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -733,9 +733,9 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -832,12 +832,11 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 
 		var assL []string
 		var obs []string
-
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -1089,9 +1088,9 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 
 			for _, j := range i.Modifications.Index {
 				if j.Type == "Assigned" && j.Variable == "Y" {
-					assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+					assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 				} else if j.Type == "Observed" {
-					obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+					obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 				}
 			}
 
@@ -1192,9 +1191,9 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 
 			for _, j := range i.Modifications.Index {
 				if j.Type == "Assigned" && j.Variable == "Y" {
-					assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+					assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 				} else if j.Type == "Observed" {
-					obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+					obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 				}
 			}
 
@@ -1397,9 +1396,9 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -1486,24 +1485,14 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 
 	for _, i := range printSet {
 
-		// var assL []string
-		// for j := range i.AssignedModifications {
-		// 	assL = append(assL, j)
-		// }
-
-		// var obs []string
-		// for j := range i.ObservedModifications {
-		// 	obs = append(obs, j)
-		// }
-
 		var assL []string
 		var obs []string
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -1788,9 +1777,9 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -1910,9 +1899,9 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasDec
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -2067,9 +2056,9 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 
 		for _, j := range i.Modifications.Index {
 			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
 			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
+				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
 			}
 		}
 
@@ -2318,8 +2307,8 @@ func (e *Evidence) AssembleModificationReport() error {
 	return nil
 }
 
-// MapMassDiffToUniMod maps PSMs to modifications based on their mass shifts
-func (e *Evidence) MapMassDiffToUniMod() *err.Error {
+// MapMods maps PSMs to modifications based on their mass shifts
+func (e *Evidence) MapMods() *err.Error {
 
 	// 10 ppm
 	var tolerance = 0.01
@@ -2346,6 +2335,13 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 							updatedMod.Definition = j.Definition
 							updatedMod.ID = j.ID
 							e.PSM[i].Modifications.Index[k] = updatedMod
+						} else {
+							if updatedMod.Type == "Observed" {
+								updatedMod.Name = j.Name
+								updatedMod.Definition = j.Definition
+								updatedMod.ID = j.ID
+								e.PSM[i].Modifications.Index[k] = updatedMod
+							}
 						}
 
 					}
@@ -2374,8 +2370,14 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 							updatedMod.Definition = j.Definition
 							updatedMod.ID = j.ID
 							e.Ions[i].Modifications.Index[k] = updatedMod
+						} else {
+							if updatedMod.Type == "Observed" {
+								updatedMod.Name = j.Name
+								updatedMod.Definition = j.Definition
+								updatedMod.ID = j.ID
+								e.Ions[i].Modifications.Index[k] = updatedMod
+							}
 						}
-
 					}
 				} else {
 					continue
@@ -2402,6 +2404,48 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 							updatedMod.Definition = j.Definition
 							updatedMod.ID = j.ID
 							e.Peptides[i].Modifications.Index[k] = updatedMod
+						} else {
+							if updatedMod.Type == "Observed" {
+								updatedMod.Name = j.Name
+								updatedMod.Definition = j.Definition
+								updatedMod.ID = j.ID
+								e.Peptides[i].Modifications.Index[k] = updatedMod
+							}
+						}
+
+					}
+				} else {
+					continue
+				}
+			}
+
+		}
+	}
+
+	for i := range e.Proteins {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.Proteins[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+					if !strings.Contains(j.Definition, "substitution") {
+
+						updatedMod := v
+
+						_, ok := j.Sites[v.AminoAcid]
+						if ok {
+
+							updatedMod.Name = j.Name
+							updatedMod.Definition = j.Definition
+							updatedMod.ID = j.ID
+							e.Proteins[i].Modifications.Index[k] = updatedMod
+						} else {
+							if updatedMod.Type == "Observed" {
+								updatedMod.Name = j.Name
+								updatedMod.Definition = j.Definition
+								updatedMod.ID = j.ID
+								e.Proteins[i].Modifications.Index[k] = updatedMod
+							}
 						}
 
 					}

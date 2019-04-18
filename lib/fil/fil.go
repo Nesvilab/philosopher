@@ -131,16 +131,16 @@ func Run(f met.Data) (met.Data, error) {
 	psm = nil
 
 	// // evaluate modifications in data set
-	// if f.Filter.Mapmods == true {
-	// 	logrus.Info("Mapping modifications")
-	// 	err := e.MapMassDiffToUniMod()
-	// 	if err != nil {
-	// 		logrus.Fatal(err)
-	// 	}
+	// //if f.Filter.Mapmods == true {
+	// logrus.Info("Mapping modifications")
+	// e.MapMods()
+	// // if err != nil {
+	// // 	logrus.Fatal(err)
+	// // }
 
-	// 	logrus.Info("Processing modifications")
-	// 	e.AssembleModificationReport()
-	// }
+	// logrus.Info("Processing modifications")
+	// e.AssembleModificationReport()
+	// //}
 
 	var ion id.PepIDList
 	ion.Restore("ion")
@@ -148,16 +148,11 @@ func Run(f met.Data) (met.Data, error) {
 	ion = nil
 
 	// evaluate modifications in data set
-	if f.Filter.Mapmods == true {
-		logrus.Info("Mapping modifications")
-		err := e.MapMassDiffToUniMod()
-		if err != nil {
-			logrus.Fatal(err)
-		}
+	logrus.Info("Mapping modifications")
+	e.MapMods()
 
-		logrus.Info("Processing modifications")
-		e.AssembleModificationReport()
-	}
+	logrus.Info("Processing modifications")
+	e.AssembleModificationReport()
 
 	var pept id.PepIDList
 	pept.Restore("pep")
@@ -185,8 +180,8 @@ func Run(f met.Data) (met.Data, error) {
 	logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
 
-	logrus.Info("Propagating modifications to layers")
-	e.UpdateIonAssignedAndObservedMods()
+	//logrus.Info("Propagating modifications to layers")
+	//e.UpdateIonAssignedAndObservedMods()
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
