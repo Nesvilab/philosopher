@@ -250,7 +250,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 
 		pepIdent = append(pepIdent, p.PeptideIdentification...)
 
-		for _, k := range p.Modifications.Mods {
+		for _, k := range p.Modifications.Index {
 			_, ok := modsIndex[k.Index]
 			if !ok {
 				mods = append(mods, k)
@@ -265,7 +265,6 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 	var pepXML id.PepXML
 	pepXML.DecoyTag = decoyTag
 	pepXML.PeptideIdentification = pepIdent
-	pepXML.Modifications.Mods = mods
 	pepXML.Modifications.Index = modsIndex
 
 	// promoting Spectra that matches to both decoys and targets to TRUE hits

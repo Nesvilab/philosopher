@@ -143,7 +143,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				var uniqMds = make(map[string]uint8)
 
-				for _, j := range i.Modifications.Mods {
+				for _, j := range i.Modifications.Index {
 					mass := strconv.FormatFloat(j.MonoIsotopicMass, 'f', 6, 64)
 					uniqMds[mass] = 0
 				}
@@ -229,7 +229,7 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 
 			var uniqMds = make(map[string]uint8)
 
-			for _, k := range j.Modifications.Mods {
+			for _, k := range j.Modifications.Index {
 				mass := strconv.FormatFloat(k.MonoIsotopicMass, 'f', 6, 64)
 				uniqMds[mass] = 0
 			}
@@ -277,7 +277,7 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 
 			var uniqMds = make(map[string]uint8)
 
-			for _, k := range j.Modifications.Mods {
+			for _, k := range j.Modifications.Index {
 				mass := strconv.FormatFloat(k.MonoIsotopicMass, 'f', 6, 64)
 				uniqMds[mass] = 0
 			}

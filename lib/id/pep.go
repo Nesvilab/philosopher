@@ -36,17 +36,17 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                uint32
-	Spectrum             string
-	Scan                 int
-	Peptide              string
-	Protein              string
-	ModifiedPeptide      string
-	AlternativeProteins  []string
-	ModPositions         []string
-	AssignedModMasses    []float64
-	AssignedMassDiffs    []float64
-	AssignedAminoAcid    []string
+	Index               uint32
+	Spectrum            string
+	Scan                int
+	Peptide             string
+	Protein             string
+	ModifiedPeptide     string
+	AlternativeProteins []string
+	// ModPositions         []string
+	// AssignedModMasses    []float64
+	// AssignedMassDiffs    []float64
+	// AssignedAminoAcid    []string
 	AssumedCharge        uint8
 	PrevAA               string
 	NextAA               string
@@ -169,7 +169,7 @@ func (p *PepXML) Read(f string) error {
 					AminoAcid:        string(i.AminoAcid),
 				}
 
-				p.Modifications.Mods = append(p.Modifications.Mods, m)
+				//p.Modifications.Mods = append(p.Modifications.Mods, m)
 				p.Modifications.Index[key] = m
 			}
 		}
@@ -193,7 +193,7 @@ func (p *PepXML) Read(f string) error {
 					Terminus:          strings.ToLower(string(i.Terminus)),
 				}
 
-				p.Modifications.Mods = append(p.Modifications.Mods, m)
+				//p.Modifications.Mods = append(p.Modifications.Mods, m)
 				p.Modifications.Index[key] = m
 			}
 		}
@@ -311,12 +311,15 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 	p.ModifiedPeptide = string(m.ModifiedPeptide)
 
 	for _, i := range m.ModAminoacidMass {
-		aa := p.ModifiedPeptide[:i.Position]
-		key := fmt.Sprintf("%s#%.4f", aa, i.Mass)
+		aa := strings.Split(p.Peptide, "")
+		key := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass)
 		v, ok := mods.Index[key]
 		if ok {
-			v.Position = strconv.Itoa(i.Position)
-			p.Modifications.Mods = append(p.Modifications.Mods, v)
+			m := v
+			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
+			m.Index = newKey
+			m.Position = strconv.Itoa(i.Position)
+			p.Modifications.Index[newKey] = m
 		}
 	}
 
@@ -325,9 +328,9 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		key := fmt.Sprintf("N-term#%.4f", m.ModNTermMass)
 		v, ok := mods.Index[key]
 		if ok {
-			v.Position = "N-term"
-			v.AminoAcid = "N-term"
-			p.Modifications.Mods = append(p.Modifications.Mods, v)
+			m := v
+			m.AminoAcid = "N-term"
+			p.Modifications.Index[key] = m
 		}
 	}
 
@@ -336,9 +339,9 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		key := fmt.Sprintf("C-term#%.4f", m.ModCTermMass)
 		v, ok := mods.Index[key]
 		if ok {
-			v.Position = "C-term"
-			v.AminoAcid = "C-term"
-			p.Modifications.Mods = append(p.Modifications.Mods, v)
+			m := v
+			m.AminoAcid = "C-term"
+			p.Modifications.Index[key] = m
 		}
 	}
 
@@ -351,7 +354,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 				Type:     "Observed",
 				MassDiff: p.Massdiff,
 			}
-			p.Modifications.Mods = append(p.Modifications.Mods, m)
+			//p.Modifications.Mods = append(p.Modifications.Mods, m)
 			p.Modifications.Index[key] = m
 		}
 	}

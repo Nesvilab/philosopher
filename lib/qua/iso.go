@@ -386,7 +386,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 		var flag = 0
 
-		if len(evi.PSM[i].Modifications.Mods) < 1 {
+		if len(evi.PSM[i].Modifications.Index) < 1 {
 			evi.PSM[i].Labels.Channel1.Intensity = 0
 			evi.PSM[i].Labels.Channel2.Intensity = 0
 			evi.PSM[i].Labels.Channel3.Intensity = 0
@@ -399,7 +399,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel10.Intensity = 0
 			evi.PSM[i].Labels.Channel11.Intensity = 0
 		} else {
-			for _, j := range evi.PSM[i].Modifications.Mods {
+			for _, j := range evi.PSM[i].Modifications.Index {
 				if j.MassDiff >= 229.1629 {
 					flag++
 				}

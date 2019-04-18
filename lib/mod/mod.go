@@ -2,7 +2,6 @@ package mod
 
 // Modifications is a collections of modification
 type Modifications struct {
-	Mods  []Modification
 	Index map[string]Modification
 }
 
@@ -22,14 +21,3 @@ type Modification struct {
 	IsProteinTerminus string
 	Terminus          string
 }
-
-// // InternalModification is a modification that happens inside the peptide structure
-// type InternalModification struct {
-// 	AminoAcid string
-// }
-
-// // TerminalModification is a list of assigned terminal modifications from the database search
-// type TerminalModification struct {
-// 	IsProteinTerminus string
-// 	Terminus          string
-// }
