@@ -93,35 +93,35 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence               string
-	IonForm                string
-	ModifiedSequence       string
-	RetentionTime          string
-	ChargeState            uint8
-	ModifiedObservations   int
-	UnModifiedObservations int
-	Spectra                map[string]int
-	MappedProteins         map[string]int
-	MZ                     float64
-	PeptideMass            float64
-	PrecursorNeutralMass   float64
-	Weight                 float64
-	GroupWeight            float64
-	Intensity              float64
-	Probability            float64
-	Expectation            float64
-	SummedLabelIntensity   float64
-	IsUnique               bool
-	IsURazor               bool
-	IsDecoy                bool
-	Protein                string
-	ProteinID              string
-	GeneName               string
-	EntryName              string
-	ProteinDescription     string
-	Labels                 tmt.Labels
-	PhosphoLabels          tmt.Labels
-	Modifications          mod.Modifications
+	Sequence         string
+	IonForm          string
+	ModifiedSequence string
+	RetentionTime    string
+	ChargeState      uint8
+	//ModifiedObservations   int
+	//UnModifiedObservations int
+	Spectra              map[string]int
+	MappedProteins       map[string]int
+	MZ                   float64
+	PeptideMass          float64
+	PrecursorNeutralMass float64
+	Weight               float64
+	GroupWeight          float64
+	Intensity            float64
+	Probability          float64
+	Expectation          float64
+	SummedLabelIntensity float64
+	IsUnique             bool
+	IsURazor             bool
+	IsDecoy              bool
+	Protein              string
+	ProteinID            string
+	GeneName             string
+	EntryName            string
+	ProteinDescription   string
+	Labels               tmt.Labels
+	PhosphoLabels        tmt.Labels
+	Modifications        mod.Modifications
 }
 
 // IonEvidenceList ...
@@ -162,45 +162,41 @@ func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].S
 
 // ProteinEvidence ...
 type ProteinEvidence struct {
-	OriginalHeader               string
-	PartHeader                   string
-	ProteinName                  string
-	ProteinGroup                 uint32
-	ProteinSubGroup              string
-	ProteinID                    string
-	EntryName                    string
-	Description                  string
-	Organism                     string
-	Length                       int
-	Coverage                     float32
-	GeneNames                    string
-	ProteinExistence             string
-	Sequence                     string
-	SupportingSpectra            map[string]int
-	IndiProtein                  map[string]uint8
-	UniqueStrippedPeptides       int
-	TotalPeptideIons             map[string]IonEvidence
-	TotalSpC                     int
-	UniqueSpC                    int
-	URazorSpC                    int // Unique + razor
-	TotalIntensity               float64
-	UniqueIntensity              float64
-	URazorIntensity              float64 // Unique + razor
-	Probability                  float64
-	TopPepProb                   float64
-	IsDecoy                      bool
-	IsContaminant                bool
-	URazorModifiedObservations   int
-	URazorUnModifiedObservations int
-	URazorAssignedModifications  map[string]uint16
-	URazorObservedModifications  map[string]uint16
-	TotalLabels                  tmt.Labels
-	UniqueLabels                 tmt.Labels
-	URazorLabels                 tmt.Labels // Unique + razor
-	PhosphoTotalLabels           tmt.Labels
-	PhosphoUniqueLabels          tmt.Labels
-	PhosphoURazorLabels          tmt.Labels // Unique + razor
-	Modifications                mod.Modifications
+	OriginalHeader         string
+	PartHeader             string
+	ProteinName            string
+	ProteinGroup           uint32
+	ProteinSubGroup        string
+	ProteinID              string
+	EntryName              string
+	Description            string
+	Organism               string
+	Length                 int
+	Coverage               float32
+	GeneNames              string
+	ProteinExistence       string
+	Sequence               string
+	SupportingSpectra      map[string]int
+	IndiProtein            map[string]uint8
+	UniqueStrippedPeptides int
+	TotalPeptideIons       map[string]IonEvidence
+	TotalSpC               int
+	UniqueSpC              int
+	URazorSpC              int // Unique + razor
+	TotalIntensity         float64
+	UniqueIntensity        float64
+	URazorIntensity        float64 // Unique + razor
+	Probability            float64
+	TopPepProb             float64
+	IsDecoy                bool
+	IsContaminant          bool
+	TotalLabels            tmt.Labels
+	UniqueLabels           tmt.Labels
+	URazorLabels           tmt.Labels // Unique + razor
+	PhosphoTotalLabels     tmt.Labels
+	PhosphoUniqueLabels    tmt.Labels
+	PhosphoURazorLabels    tmt.Labels // Unique + razor
+	Modifications          mod.Modifications
 }
 
 // ProteinEvidenceList list
@@ -462,27 +458,6 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 			p.IsDecoy = true
 		}
 
-		// for j := 0; j <= len(i.ModPositions)-1; j++ {
-		// 	if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "n" {
-		// 		loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-		// 		p.AssignedModifications[loc] = 0
-		// 	}
-		// }
-
-		// for j := 0; j <= len(i.ModPositions)-1; j++ {
-		// 	if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] != "n" && i.AssignedAminoAcid[j] != "c" {
-		// 		loc := fmt.Sprintf("%s%s(%.4f)", i.ModPositions[j], i.AssignedAminoAcid[j], i.AssignedMassDiffs[j])
-		// 		p.AssignedModifications[loc] = 0
-		// 	}
-		// }
-
-		// for j := 0; j <= len(i.ModPositions)-1; j++ {
-		// 	if i.AssignedMassDiffs[j] != 0 && i.AssignedAminoAcid[j] == "c" {
-		// 		loc := fmt.Sprintf("%s(%.4f)", i.ModPositions[j], i.AssignedMassDiffs[j])
-		// 		p.AssignedModifications[loc] = 0
-		// 	}
-		// }
-
 		list = append(list, p)
 	}
 
@@ -640,16 +615,6 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 	}
 
 	for _, i := range printSet {
-
-		// var assL []string
-		// for j := range i.AssignedModifications {
-		// 	assL = append(assL, j)
-		// }
-
-		// var obs []string
-		// for j := range i.ObservedModifications {
-		// 	obs = append(obs, j)
-		// }
 
 		var assL []string
 		var obs []string
@@ -864,16 +829,6 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 	}
 
 	for _, i := range printSet {
-
-		// var assL []string
-		// for j := range i.AssignedModifications {
-		// 	assL = append(assL, j)
-		// }
-
-		// var obs []string
-		// for j := range i.ObservedModifications {
-		// 	obs = append(obs, j)
-		// }
 
 		var assL []string
 		var obs []string
@@ -1129,16 +1084,6 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 
 		if len(i.MappedProteins) > 0 {
 
-			// var assL []string
-			// for j := range i.AssignedModifications {
-			// 	assL = append(assL, j)
-			// }
-
-			// var obs []string
-			// for j := range i.ObservedModifications {
-			// 	obs = append(obs, j)
-			// }
-
 			var assL []string
 			var obs []string
 
@@ -1161,7 +1106,7 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 			sort.Strings(assL)
 			sort.Strings(obs)
 
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\n",
 				i.Sequence,
 				i.ModifiedSequence,
 				i.MZ,
@@ -1170,8 +1115,8 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 				i.Probability,
 				i.Expectation,
 				len(i.Spectra),
-				i.UnModifiedObservations,
-				i.ModifiedObservations,
+				//i.UnModifiedObservations,
+				//i.ModifiedObservations,
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),
@@ -1242,16 +1187,6 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 
 		if len(i.MappedProteins) > 0 {
 
-			// var assL []string
-			// for j := range i.AssignedModifications {
-			// 	assL = append(assL, j)
-			// }
-
-			// var obs []string
-			// for j := range i.ObservedModifications {
-			// 	obs = append(obs, j)
-			// }
-
 			var assL []string
 			var obs []string
 
@@ -1274,7 +1209,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 			sort.Strings(assL)
 			sort.Strings(obs)
 
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
 				i.Sequence,
 				i.ModifiedSequence,
 				i.MZ,
@@ -1283,8 +1218,8 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 				i.Probability,
 				i.Expectation,
 				len(i.Spectra),
-				i.UnModifiedObservations,
-				i.ModifiedObservations,
+				//i.UnModifiedObservations,
+				//i.ModifiedObservations,
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),
@@ -1331,9 +1266,8 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var spectra = make(map[string][]string)
 	var mappedProts = make(map[string][]string)
 	var bestProb = make(map[string]float64)
+	var pepMods = make(map[string][]mod.Modification)
 	var err error
-
-	var pepMods = make(map[string]map[string]mod.Modification)
 
 	for _, i := range pep {
 		if !cla.IsDecoyPSM(i, decoyTag) {
@@ -1360,7 +1294,9 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 				mappedProts[i.Peptide] = append(mappedProts[i.Peptide], j)
 			}
 
-			pepMods[i.Peptide] = i.Modifications.Index
+			for _, j := range i.Modifications.Index {
+				pepMods[i.Peptide] = append(pepMods[i.Peptide], j)
+			}
 
 		}
 
@@ -1399,31 +1335,15 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 			pep.Protein = d
 		}
 
-		m, ok := pepMods[k]
+		mods, ok := pepMods[pep.Sequence]
 		if ok {
-			for key, v := range m {
-				_, ok := pep.Modifications.Index[key]
-				if !ok {
-					pep.Modifications.Index[key] = v
+			for _, j := range mods {
+				_, okMod := pep.Modifications.Index[j.Index]
+				if !okMod {
+					pep.Modifications.Index[j.Index] = j
 				}
 			}
 		}
-
-		// va, oka := assignedModMap[k]
-		// if oka {
-		// 	for _, j := range va {
-		// 		pep.AssignedModifications[j] = 0
-		// 	}
-		// }
-
-		// vo, oko := observedModMap[k]
-		// if oko {
-		// 	for _, j := range vo {
-		// 		pep.ObservedModifications[j] = 0
-		// 	}
-		// } else {
-		// 	pep.UnModifiedObservations++
-		// }
 
 		pep.Spc = len(spectra[k])
 		pep.Intensity = pepInt[k]
@@ -1471,16 +1391,6 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 	}
 
 	for _, i := range printSet {
-
-		// var assL []string
-		// for j := range i.AssignedModifications {
-		// 	assL = append(assL, j)
-		// }
-
-		// var obs []string
-		// for j := range i.ObservedModifications {
-		// 	obs = append(obs, j)
-		// }
 
 		var assL []string
 		var obs []string
@@ -1656,11 +1566,16 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) error {
 
 	var list ProteinEvidenceList
+	var protMods = make(map[string][]mod.Modification)
 	var err error
 
 	var evidenceIons = make(map[string]IonEvidence)
 	for _, i := range e.Ions {
 		evidenceIons[i.IonForm] = i
+
+		for _, j := range i.Modifications.Index {
+			protMods[i.IonForm] = append(protMods[i.IonForm], j)
+		}
 	}
 
 	for _, i := range pro {
@@ -1714,12 +1629,28 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 					ref.MappedProteins[l] = 0
 				}
 
+				ref.Modifications = k.Modifications
+
 				ref.IsUnique = k.IsUnique
 				if k.Razor == 1 {
 					ref.IsURazor = true
 				}
 
-				rep.TotalPeptideIons[ion] = ref
+				mods, ok := protMods[ion]
+				if ok {
+					for _, j := range mods {
+						_, okMod := ref.Modifications.Index[j.Index]
+						if !okMod && k.IsUnique {
+							ref.Modifications.Index[j.Index] = j
+							rep.Modifications.Index[j.Index] = j
+						}
+
+						if !okMod && k.Razor == 1 {
+							ref.Modifications.Index[j.Index] = j
+							rep.Modifications.Index[j.Index] = j
+						}
+					}
+				}
 
 			} else {
 
@@ -1742,40 +1673,30 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 					ref.MappedProteins[l] = 0
 				}
 
+				ref.Modifications = k.Modifications
+
 				ref.IsUnique = k.IsUnique
 				if k.Razor == 1 {
 					ref.IsURazor = true
 				}
 
-				rep.TotalPeptideIons[ion] = ref
+				mods, ok := protMods[ion]
+				if ok {
+					for _, j := range mods {
+						_, okMod := ref.Modifications.Index[j.Index]
+						if !okMod && k.IsUnique {
+							ref.Modifications.Index[j.Index] = j
+							rep.Modifications.Index[j.Index] = j
+						}
+
+						if !okMod && k.Razor == 1 {
+							ref.Modifications.Index[j.Index] = j
+							rep.Modifications.Index[j.Index] = j
+						}
+					}
+				}
 
 			}
-
-			// if k.IsUnique == true {
-			// 	rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
-			// 	rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
-
-			// 	for key, value := range evidenceIons[ion].AssignedModifications {
-			// 		rep.URazorAssignedModifications[key] += value
-			// 	}
-
-			// 	for key, value := range evidenceIons[ion].ObservedModifications {
-			// 		rep.URazorObservedModifications[key] += value
-			// 	}
-			// }
-
-			// if k.Razor == 1 {
-			// 	rep.URazorUnModifiedObservations += evidenceIons[ion].UnModifiedObservations
-			// 	rep.URazorModifiedObservations += evidenceIons[ion].ModifiedObservations
-
-			// 	for key, value := range evidenceIons[ion].AssignedModifications {
-			// 		rep.URazorAssignedModifications[key] += value
-			// 	}
-
-			// 	for key, value := range evidenceIons[ion].ObservedModifications {
-			// 		rep.URazorObservedModifications[key] += value
-			// 	}
-			// }
 
 		}
 
@@ -1863,16 +1784,13 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 		}
 
 		var assL []string
-		if len(i.URazorAssignedModifications) > 0 {
-			for j := range i.URazorAssignedModifications {
-				assL = append(assL, j)
-			}
-		}
-
 		var obs []string
-		if len(i.URazorObservedModifications) > 0 {
-			for j := range i.URazorObservedModifications {
-				obs = append(obs, j)
+
+		for _, j := range i.Modifications.Index {
+			if j.Type == "Assigned" && j.Variable == "Y" {
+				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+			} else if j.Type == "Observed" {
+				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
 			}
 		}
 
@@ -1988,16 +1906,13 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasDec
 		}
 
 		var assL []string
-		if len(i.URazorAssignedModifications) > 0 {
-			for j := range i.URazorAssignedModifications {
-				assL = append(assL, j)
-			}
-		}
-
 		var obs []string
-		if len(i.URazorObservedModifications) > 0 {
-			for j := range i.URazorObservedModifications {
-				obs = append(obs, j)
+
+		for _, j := range i.Modifications.Index {
+			if j.Type == "Assigned" && j.Variable == "Y" {
+				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+			} else if j.Type == "Observed" {
+				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
 			}
 		}
 
@@ -2148,16 +2063,13 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 		}
 
 		var assL []string
-		if len(i.URazorAssignedModifications) > 0 {
-			for j := range i.URazorAssignedModifications {
-				assL = append(assL, j)
-			}
-		}
-
 		var obs []string
-		if len(i.URazorObservedModifications) > 0 {
-			for j := range i.URazorObservedModifications {
-				obs = append(obs, j)
+
+		for _, j := range i.Modifications.Index {
+			if j.Type == "Assigned" && j.Variable == "Y" {
+				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
+			} else if j.Type == "Observed" {
+				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
 			}
 		}
 
@@ -2417,74 +2329,88 @@ func (e *Evidence) MapMassDiffToUniMod() *err.Error {
 		return err
 	}
 
-	for _, i := range o.Terms {
-		for j := range e.PSM {
+	for i := range e.PSM {
+		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.PSM[j].Modifications.Index {
-				if v.MassDiff >= (i.MonoIsotopicMass-tolerance) && v.MassDiff <= (i.MonoIsotopicMass+tolerance) {
-					if !strings.Contains(i.Definition, "substitution") {
+			for k, v := range e.PSM[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+					if !strings.Contains(j.Definition, "substitution") {
 
 						updatedMod := v
 
-						_, ok := i.Sites[v.AminoAcid]
+						_, ok := j.Sites[v.AminoAcid]
 						if ok {
 
-							updatedMod.Name = i.Name
-							updatedMod.Definition = i.Definition
-							updatedMod.ID = i.ID
-							e.PSM[j].Modifications.Index[k] = updatedMod
+							updatedMod.Name = j.Name
+							updatedMod.Definition = j.Definition
+							updatedMod.ID = j.ID
+							e.PSM[i].Modifications.Index[k] = updatedMod
 						}
 
 					}
-				}
-			}
-
-			// for delta masses
-			if e.PSM[j].Massdiff >= (i.MonoIsotopicMass-tolerance) && e.PSM[j].Massdiff <= (i.MonoIsotopicMass+tolerance) {
-				if !strings.Contains(i.Definition, "substitution") {
-
-					key := fmt.Sprintf("%.4f", e.PSM[j].Massdiff)
-
-					m := mod.Modification{
-						Index:      key,
-						Name:       "Unknown",
-						Definition: i.Definition,
-						ID:         i.ID,
-						Type:       "Observed",
-						MassDiff:   e.PSM[j].Massdiff,
-					}
-
-					e.PSM[j].Modifications.Index[key] = m
+				} else {
+					continue
 				}
 			}
 
 		}
+	}
 
-		for j := range e.Ions {
+	for i := range e.Ions {
+		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.Ions[j].Modifications.Index {
-				if v.MassDiff >= (i.MonoIsotopicMass-tolerance) && v.MassDiff <= (i.MonoIsotopicMass+tolerance) {
-					if !strings.Contains(i.Definition, "substitution") {
+			for k, v := range e.Ions[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+					if !strings.Contains(j.Definition, "substitution") {
 
 						updatedMod := v
 
-						_, ok := i.Sites[v.AminoAcid]
+						_, ok := j.Sites[v.AminoAcid]
 						if ok {
 
-							updatedMod.Name = i.Name
-							updatedMod.Definition = i.Definition
-							updatedMod.ID = i.ID
-							e.Ions[j].Modifications.Index[k] = updatedMod
+							updatedMod.Name = j.Name
+							updatedMod.Definition = j.Definition
+							updatedMod.ID = j.ID
+							e.Ions[i].Modifications.Index[k] = updatedMod
 						}
 
 					}
+				} else {
+					continue
 				}
 			}
 
 		}
+	}
 
+	for i := range e.Peptides {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.Peptides[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+					if !strings.Contains(j.Definition, "substitution") {
+
+						updatedMod := v
+
+						_, ok := j.Sites[v.AminoAcid]
+						if ok {
+
+							updatedMod.Name = j.Name
+							updatedMod.Definition = j.Definition
+							updatedMod.ID = j.ID
+							e.Peptides[i].Modifications.Index[k] = updatedMod
+						}
+
+					}
+				} else {
+					continue
+				}
+			}
+
+		}
 	}
 
 	return nil

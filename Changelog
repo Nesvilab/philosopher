@@ -10,8 +10,10 @@
 ### Build: 201904171251
 
 ### Added
+- Support for Unimod ontologies
 ### Changed
 - Updated Dockerfile
+- Modified and Unmodified observations dropped from the ion table.
 
 ### Fixed
 - Updated PTMProphet for Windows, version 5.2.0.

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/tmt"
@@ -62,6 +63,7 @@ type PeptideIonIdentification struct {
 	IsUnique                bool
 	PeptideParentProtein    []string
 	Labels                  tmt.Labels
+	Modifications           mod.Modifications
 }
 
 // GroupList represents a protein group list
@@ -151,6 +153,7 @@ func (p *ProtXML) Read(f string) error {
 				pepid.GroupWeight = k.GroupWeight
 				pepid.CalcNeutralPepMass = k.CalcNeutralPepMass
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
+				pepid.Modifications.Index = make(map[string]mod.Modification)
 				pepid.Razor = -1
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {

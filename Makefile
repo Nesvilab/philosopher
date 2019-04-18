@@ -73,6 +73,8 @@ deploy:
 
 	unzip -o lib/dat/bindata.go.zip -d  lib/dat/
 
+	unzip -o lib/obo/unimod/bindata.go.zip -d  lib/obo/unimod/
+
 .PHONY: test
 test:
 #	ginkgo -r -cover -outputdir test/profiles

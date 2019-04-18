@@ -121,19 +121,19 @@ func (e *Evidence) UpdateIonModCount() {
 		}
 	}
 
-	for i := range e.Ions {
+	// for i := range e.Ions {
 
-		v1, ok1 := UnModIons[e.Ions[i].IonForm]
-		if ok1 {
-			e.Ions[i].UnModifiedObservations = v1
-		}
+	// 	v1, ok1 := UnModIons[e.Ions[i].IonForm]
+	// 	if ok1 {
+	// 		e.Ions[i].UnModifiedObservations = v1
+	// 	}
 
-		v2, ok2 := ModIons[e.Ions[i].IonForm]
-		if ok2 {
-			e.Ions[i].ModifiedObservations = v2
-		}
+	// 	v2, ok2 := ModIons[e.Ions[i].IonForm]
+	// 	if ok2 {
+	// 		e.Ions[i].ModifiedObservations = v2
+	// 	}
 
-	}
+	// }
 
 	return
 }
