@@ -36,6 +36,8 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 
 		var p PSMEvidence
 
+		source := strings.Split(i.Spectrum, ".")
+		p.Source = source[0]
 		p.Index = i.Index
 		p.Spectrum = i.Spectrum
 		p.Scan = i.Scan

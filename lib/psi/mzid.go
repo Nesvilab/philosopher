@@ -605,9 +605,9 @@ type FileFormat struct {
 // exactly to one of the release databases listed in the CV, otherwise a
 // userParam should be used
 type DatabaseName struct {
-	XMLName   xml.Name    `xml:"DatabaseName"`
-	CVParam   []CVParam   `xml:"cvParam"`
-	UserParam []UserParam `xml:"userParam"`
+	XMLName   xml.Name  `xml:"DatabaseName"`
+	CVParam   CVParam   `xml:"cvParam"`
+	UserParam UserParam `xml:"userParam"`
 }
 
 // SpectraData should be used
@@ -688,18 +688,19 @@ type SpectrumIdentificationItem struct {
 	XMLName                  xml.Name             `xml:"SpectrumIdentificationItem"`
 	CalculatedMassToCharge   float64              `xml:"calculatedMassToCharge,attr,omitempty"`
 	CalculatedPI             float64              `xml:"calculatedPI,attr,omitempty"`
-	ChargeState              int                  `xml:"chargeState,attr,omitempty"`
+	ChargeState              uint8                `xml:"chargeState,attr,omitempty"`
 	ExperimentalMassToCharge float64              `xml:"experimentalMassToCharge,attr,omitempty"`
 	ID                       string               `xml:"id,attr,omitempty"`
 	MassTableRef             string               `xml:"massTable_ref,attr,omitempty"`
 	Name                     string               `xml:"name,attr,omitempty"`
-	PassThreshold            bool                 `xml:"passThreshold,attr,omitempty"`
+	PassThreshold            string               `xml:"passThreshold,attr,omitempty"`
 	PeptideRef               string               `xml:"peptide_ref,attr,omitempty"`
-	Rank                     int                  `xml:"rank,attr,omitempty"`
+	Rank                     uint8                `xml:"rank,attr,omitempty"`
 	SampleRef                string               `xml:"sample_ref,attr,omitempty"`
 	PeptideEvidenceRef       []PeptideEvidenceRef `xml:"PeptideEvidenceRef"`
 	Fragmentation            Fragmentation        `xml:"Fragmentation"`
 	CVParam                  []CVParam            `xml:"cvParam"`
+	UserParam                []UserParam          `xml:"userParam"`
 }
 
 // PeptideEvidenceRef reference to the PeptideEvidence element identified.
@@ -767,7 +768,7 @@ type ProteinDetectionHypothesis struct {
 	DBSquenceRef      string              `xml:"dBSequence_ref,attr,omitempty"`
 	ID                string              `xml:"id,attr,omitempty"`
 	Name              string              `xml:"name,attr,omitempty"`
-	PassThreshold     bool                `xml:"passThreasold,attr,omitempty"`
+	PassThreshold     string              `xml:"passThreasold,attr,omitempty"`
 	PeptideHypothesis []PeptideHypothesis `xml:"PeptideHypothesis"`
 	CVParam           []CVParam           `xml:"cvParam"`
 	UserParam         []UserParam         `xml:"userParam"`

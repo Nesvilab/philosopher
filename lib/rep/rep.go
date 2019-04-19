@@ -30,6 +30,7 @@ type Evidence struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
+	Source               string
 	Index                uint32
 	Spectrum             string
 	Scan                 int
@@ -83,13 +84,11 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence         string
-	IonForm          string
-	ModifiedSequence string
-	RetentionTime    string
-	ChargeState      uint8
-	//ModifiedObservations   int
-	//UnModifiedObservations int
+	Sequence             string
+	IonForm              string
+	ModifiedSequence     string
+	RetentionTime        string
+	ChargeState          uint8
 	Spectra              map[string]int
 	MappedProteins       map[string]int
 	MZ                   float64

@@ -2,6 +2,7 @@ package rep
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -18,6 +19,30 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 
 	t := time.Now()
 	var idCounter = 0
+
+	// collect source file names
+	var sourceMap = make(map[string]uint8)
+	var sources []string
+	for _, i := range e.PSM {
+		s := strings.Split(i.Spectrum, ".")
+		sourceMap[s[0]]++
+	}
+
+	for i := range sourceMap {
+		sources = append(sources, i)
+	}
+
+	sort.Strings(sources)
+
+	// load the database
+	var dtb dat.Base
+	dtb.Restore()
+	// if len(dtb.Records) < 1 {
+	// 	return f, errors.New("Database data not available, interrupting processing")
+	// }
+
+	// peptide evidence reference map
+	var pepRef = make(map[string]string)
 
 	// Header
 	mzid.Name = "foo"
@@ -138,12 +163,6 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	mzid.AuditCollection = *auditCol
 
 	// SequenceCollection - DBSequence
-	var dtb dat.Base
-	dtb.Restore()
-	// if len(dtb.Records) < 1 {
-	// 	return f, errors.New("Database data not available, interrupting processing")
-	// }
-
 	var seqs []psi.DBSequence
 	for _, i := range dtb.Records {
 
@@ -226,21 +245,18 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 			Post:          i.NextAA,
 		}
 
+		// record the reference for the SpectrumIdentificationItem
+		pepRef[i.Peptide] = fmt.Sprintf("PepEv_%d", idCounter)
+
 		pevs = append(pevs, evi)
 	}
 	//mzid.SequenceCollection.PeptideEvidence = pevs
 	pevs = nil
 
-	var sources = make(map[string]uint8)
-	for _, i := range e.PSM {
-		s := strings.Split(i.Spectrum, ".")
-		sources[s[0]]++
-	}
-
 	// AnalysisCollection
 	idCounter = 0
 	ac := &psi.AnalysisCollection{}
-	for i := range sources {
+	for _, i := range sources {
 
 		idCounter++
 
@@ -273,11 +289,11 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	// AnalysisProtocolCollection
 	//TODO
 
-	//DataCollection
+	// DataCollection
 	dta := psi.DataCollection{}
 
 	idCounter = 0
-	for i := range sources {
+	for _, i := range sources {
 		sf := &psi.SourceFile{
 			ID:       i,
 			Location: i,
@@ -287,7 +303,8 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 		dta.Inputs.SourceFile = append(dta.Inputs.SourceFile, *sf)
 	}
 
-	sdb := psi.SearchDatabase{
+	// DataCollection - Input - SearchDatabase
+	sdb := &psi.SearchDatabase{
 		ID:                   database,
 		NumDatabaseSequences: len(dtb.Records),
 		Location:             database,
@@ -298,8 +315,393 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 				Name:      "FASTA format",
 			},
 		},
+		DatabaseName: psi.DatabaseName{
+			CVParam: psi.CVParam{
+				CVRef:     "PSI-MS",
+				Accession: "MS:1001073",
+				Name:      "database type amino acid",
+			},
+			UserParam: psi.UserParam{
+				Name: database,
+			},
+		},
 	}
-	mzid.DataCollection.Inputs.SearchDatabase = append(mzid.DataCollection.Inputs.SearchDatabase, sdb)
+	mzid.DataCollection.Inputs.SearchDatabase = append(mzid.DataCollection.Inputs.SearchDatabase, *sdb)
+
+	// DataCollection - Input - SpectraData
+	for _, i := range sources {
+		sd := &psi.SpectraData{
+			Location: "./",
+			ID:       i,
+			Name:     i,
+			FileFormat: psi.FileFormat{
+				CVParam: psi.CVParam{
+					CVRef:     "PSI-MS",
+					Accession: "MS:1000584",
+					Name:      "mzML format",
+				},
+			},
+		}
+		mzid.DataCollection.Inputs.SpectraData = append(mzid.DataCollection.Inputs.SpectraData, *sd)
+	}
+
+	// DataCollection - AnalysisData
+	ad := &psi.AnalysisData{
+		SpectrumIdentificationList: []psi.SpectrumIdentificationList{
+			psi.SpectrumIdentificationList{
+				ID: "SIL_1",
+				FragmentationTable: psi.FragmentationTable{
+					Measure: []psi.Measure{
+						psi.Measure{
+							ID: "Measure_MZ",
+							CVParam: []psi.CVParam{
+								psi.CVParam{
+									CVRef:         "PSI-MS",
+									Accession:     "MS:1001225",
+									Name:          "product ion m/z",
+									UnitCvRef:     "PSI-MS",
+									UnitAccession: "MS:1000040",
+									UnitName:      "m/z",
+								},
+							},
+						},
+						psi.Measure{
+							ID: "Measure_Int",
+							CVParam: []psi.CVParam{
+								psi.CVParam{
+									CVRef:         "PSI-MS",
+									Accession:     "MS:1001226",
+									Name:          "product ion intensity",
+									UnitCvRef:     "PSI-MS",
+									UnitAccession: "MS:1000131",
+									UnitName:      "number of detector counts",
+								},
+							},
+						},
+						psi.Measure{
+							ID: "Measure_Error",
+							CVParam: []psi.CVParam{
+								psi.CVParam{
+									CVRef:         "PSI-MS",
+									Accession:     "MS:1001227",
+									Name:          "product ion m/z error",
+									UnitCvRef:     "PSI-MS",
+									UnitAccession: "MS:1000040",
+									UnitName:      "m/z",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// DataCollection - SpectrumIdentificationResult
+	idCounter = 0
+	for i := 0; i <= len(sources)-1; i++ {
+		for _, j := range e.PSM {
+			if strings.Contains(j.Spectrum, sources[i]) {
+
+				idCounter++
+
+				sir := &psi.SpectrumIdentificationResult{
+					SpectraDataRef: sources[i],
+					ID:             fmt.Sprintf("SIR_%d", idCounter),
+					SpectrumID:     fmt.Sprintf("%d", j.Index),
+					SpectrumIdentificationItem: []psi.SpectrumIdentificationItem{
+						psi.SpectrumIdentificationItem{
+							PassThreshold:            "true",
+							Rank:                     j.HitRank,
+							PeptideRef:               j.Peptide,
+							CalculatedMassToCharge:   j.CalcNeutralPepMass,
+							ChargeState:              j.AssumedCharge,
+							ExperimentalMassToCharge: j.PrecursorNeutralMass,
+							ID:                       fmt.Sprintf("SII_%d", j.HitRank),
+							PeptideEvidenceRef: []psi.PeptideEvidenceRef{
+								psi.PeptideEvidenceRef{
+									PeptideEvidenceRef: pepRef[j.Peptide],
+								},
+							},
+							//Fragmentation: psi.Fragmentation{},
+							CVParam: []psi.CVParam{
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000796",
+									Name:      "spectrum title",
+									Value:     j.Spectrum,
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1001192",
+									Name:      "Expect value",
+									Value:     fmt.Sprintf("%f", j.Expectation),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000882",
+									Name:      "protein",
+									Value:     j.ProteinID,
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000886",
+									Name:      "protein name",
+									Value:     j.ProteinDescription,
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000934",
+									Name:      "gene name",
+									Value:     j.GeneName,
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000888",
+									Name:      "modified peptide sequence",
+									Value:     j.ModifiedPeptide,
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1000894",
+									Name:      "retention time",
+									Value:     fmt.Sprintf("%f", j.RetentionTime),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1001976",
+									Name:      "delta M",
+									Value:     fmt.Sprintf("%f", j.Massdiff),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002357",
+									Name:      "PSM-level probability",
+									Value:     fmt.Sprintf("%f", j.Probability),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002252",
+									Name:      "Comet:xcorr",
+									Value:     fmt.Sprintf("%f", j.Xcorr),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002253",
+									Name:      "Comet:deltacn",
+									Value:     fmt.Sprintf("%f", j.DeltaCN),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002254",
+									Name:      "Comet:deltacnstar",
+									Value:     fmt.Sprintf("%f", j.DeltaCNStar),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002255",
+									Name:      "Comet:spscore",
+									Value:     fmt.Sprintf("%f", j.SPScore),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002256",
+									Name:      "Comet:sprank",
+									Value:     fmt.Sprintf("%f", j.SPRank),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1001331",
+									Name:      "X! Tandem:hyperscore",
+									Value:     fmt.Sprintf("%f", j.Hyperscore),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002217",
+									Name:      "decoy peptide",
+									Value:     fmt.Sprintf("%v", j.IsDecoy),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1001843",
+									Name:      "MS1 feature maximum intensity",
+									Value:     fmt.Sprintf("%f", j.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1001363",
+									Name:      "peptide unique to one protein",
+									Value:     fmt.Sprintf("%v", j.IsUnique),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1003015",
+									Name:      "razor peptide",
+									Value:     fmt.Sprintf("%v", j.IsURazor),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002616",
+									Name:      "TMT reagent 126",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel1.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002763",
+									Name:      "TMT reagent 127N",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel2.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002764",
+									Name:      "TMT reagent 127C",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel3.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002765",
+									Name:      "TMT reagent 128N",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel4.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002766",
+									Name:      "TMT reagent 128C",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel5.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002767",
+									Name:      "TMT reagent 129N",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel6.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002768",
+									Name:      "TMT reagent 129C",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel7.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002769",
+									Name:      "TMT reagent 130N",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel8.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002770",
+									Name:      "TMT reagent 130C",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel9.Intensity),
+								},
+								psi.CVParam{
+									CVRef:     "PSI-MS",
+									Accession: "MS:1002621",
+									Name:      "TMT reagent 131",
+									Value:     fmt.Sprintf("%f", j.Labels.Channel10.Intensity),
+								},
+							},
+							UserParam: []psi.UserParam{
+								psi.UserParam{
+									Name:  "entry name",
+									Value: j.EntryName,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 126 Label",
+									Value: j.Labels.Channel1.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 17N Label",
+									Value: j.Labels.Channel2.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 127C Label",
+									Value: j.Labels.Channel3.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 128N Label",
+									Value: j.Labels.Channel4.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 128C Label",
+									Value: j.Labels.Channel5.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 129N Label",
+									Value: j.Labels.Channel6.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 129C Label",
+									Value: j.Labels.Channel7.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 130N Label",
+									Value: j.Labels.Channel8.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 130C Label",
+									Value: j.Labels.Channel9.Name,
+								},
+								psi.UserParam{
+									Name:  "TMT reagent 131 Label",
+									Value: j.Labels.Channel10.Name,
+								},
+							},
+						},
+					},
+				}
+
+				ad.SpectrumIdentificationList[0].SpectrumIdentificationResult = append(ad.SpectrumIdentificationList[0].SpectrumIdentificationResult, *sir)
+			}
+		}
+	}
+
+	// DataCollection - ProteinDetectionList
+	idCounter = 0
+	if len(e.Proteins) > 0 {
+		pdl := &psi.ProteinDetectionList{
+			ID: "protein groups",
+		}
+
+		var groupsMap = make(map[int]uint8)
+
+		var groups []int
+
+		for _, i := range e.Proteins {
+			groupsMap[int(i.ProteinGroup)] = 0
+		}
+
+		for i := range groupsMap {
+			groups = append(groups, i)
+		}
+
+		sort.Ints(groups)
+
+		for _, i := range groups {
+
+			idCounter++
+
+			pag := &psi.ProteinAmbiguityGroup{
+				ID: fmt.Sprintf("%d", i),
+			}
+
+			for _, j := range e.Proteins {
+				if int(j.ProteinGroup) == i {
+
+					pdh := &psi.ProteinDetectionHypothesis{
+						PassThreshold: "true",
+					}
+
+					pag.ProteinDetectionHypothesis = append(pag.ProteinDetectionHypothesis, *pdh)
+				}
+			}
+
+			pdl.ProteinAmbiguityGroup = append(pdl.ProteinAmbiguityGroup, *pag)
+		}
+
+		ad.ProteinDetectionList = *pdl
+	}
+
+	mzid.DataCollection.AnalysisData = *ad
 
 	// Burn!
 	err := mzid.Write()
