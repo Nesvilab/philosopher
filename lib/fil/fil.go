@@ -137,7 +137,6 @@ func Run(f met.Data) (met.Data, error) {
 	// // if err != nil {
 	// // 	logrus.Fatal(err)
 	// // }
-
 	// logrus.Info("Processing modifications")
 	// e.AssembleModificationReport()
 	// //}
@@ -159,11 +158,11 @@ func Run(f met.Data) (met.Data, error) {
 	e.AssemblePeptideReport(pept, f.Filter.Tag)
 	pept = nil
 
-	// // evaluate modifications in data set
-	// if f.Filter.Mapmods == true {
-	// 	e.UpdateIonModCount()
-	// 	e.UpdatePeptideModCount()
-	// }
+	// evaluate modifications in data set
+	if f.Filter.Mapmods == true {
+		e.UpdateIonModCount()
+		e.UpdatePeptideModCount()
+	}
 
 	logrus.Info("Processing Protein Inference")
 	pro.Restore()

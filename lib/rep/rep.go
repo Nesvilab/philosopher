@@ -1645,6 +1645,8 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 					}
 				}
 
+				rep.TotalPeptideIons[ion] = ref
+
 			} else {
 
 				var ref IonEvidence
@@ -1688,6 +1690,8 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 						}
 					}
 				}
+
+				rep.TotalPeptideIons[ion] = ref
 
 			}
 
