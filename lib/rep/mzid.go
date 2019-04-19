@@ -299,7 +299,7 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 			},
 		},
 	}
-	mzid.DataCollection.Inputs.SearchDatabase[0] = sdb
+	mzid.DataCollection.Inputs.SearchDatabase = append(mzid.DataCollection.Inputs.SearchDatabase, sdb)
 
 	// Burn!
 	err := mzid.Write()

@@ -153,16 +153,7 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
@@ -247,16 +238,7 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {

@@ -237,16 +237,7 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 			ip = append(ip, k)
 		}
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
@@ -516,16 +507,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 			ip = append(ip, k)
 		}
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {

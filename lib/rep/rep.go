@@ -403,3 +403,20 @@ func getLabelNames(annot string) (map[string]string, *err.Error) {
 
 	return labels, nil
 }
+
+// prepares the list of modifications to be printed by the report functions
+func getModsList(m map[string]mod.Modification) ([]string, []string) {
+
+	var a []string
+	var o []string
+
+	for _, i := range m {
+		if i.Type == "Assigned" {
+			a = append(a, fmt.Sprintf("%s:%s%s", i.Name, i.Position, i.AminoAcid))
+		} else if i.Type == "Observed" {
+			o = append(o, fmt.Sprintf("%s:%.4f", i.Name, i.MassDiff))
+		}
+	}
+
+	return a, o
+}

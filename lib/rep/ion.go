@@ -141,16 +141,7 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 
 		if len(i.MappedProteins) > 0 {
 
-			var assL []string
-			var obs []string
-
-			for _, j := range i.Modifications.Index {
-				if j.Type == "Assigned" && j.Variable == "Y" {
-					assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-				} else if j.Type == "Observed" {
-					obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-				}
-			}
+			assL, obs := getModsList(i.Modifications.Index)
 
 			var mappedProteins []string
 			for j := range i.MappedProteins {
@@ -172,8 +163,6 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 				i.Probability,
 				i.Expectation,
 				len(i.Spectra),
-				//i.UnModifiedObservations,
-				//i.ModifiedObservations,
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),
@@ -244,16 +233,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 
 		if len(i.MappedProteins) > 0 {
 
-			var assL []string
-			var obs []string
-
-			for _, j := range i.Modifications.Index {
-				if j.Type == "Assigned" && j.Variable == "Y" {
-					assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-				} else if j.Type == "Observed" {
-					obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-				}
-			}
+			assL, obs := getModsList(i.Modifications.Index)
 
 			var mappedProteins []string
 			for j := range i.MappedProteins {
@@ -275,8 +255,6 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 				i.Probability,
 				i.Expectation,
 				len(i.Spectra),
-				//i.UnModifiedObservations,
-				//i.ModifiedObservations,
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),

@@ -126,16 +126,7 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" {
-				assL = append(assL, fmt.Sprintf("%s:%s%s", j.Name, j.Position, j.AminoAcid))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%s:%.4f", j.Name, j.MassDiff))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
@@ -234,16 +225,7 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
@@ -346,16 +328,7 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
@@ -448,15 +421,7 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 
 	for _, i := range printSet {
 
-		var assL []string
-		var obs []string
-		for _, j := range i.Modifications.Index {
-			if j.Type == "Assigned" && j.Variable == "Y" {
-				assL = append(assL, fmt.Sprintf("%s%s:%s", j.Position, j.AminoAcid, j.Name))
-			} else if j.Type == "Observed" {
-				obs = append(obs, fmt.Sprintf("%.4f:%s", j.MassDiff, j.Name))
-			}
-		}
+		assL, obs := getModsList(i.Modifications.Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
