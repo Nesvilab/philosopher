@@ -576,7 +576,7 @@ type SearchDatabase struct {
 	ID                          string                      `xml:"id,attr,omitempty"`
 	Location                    string                      `xml:"location,attr,omitempty"`
 	Name                        string                      `xml:"name,attr,omitempty"`
-	NumDatabaseSequences        string                      `xml:"numDatabaseSequences,attr,omitempty"`
+	NumDatabaseSequences        int                         `xml:"numDatabaseSequences,attr,omitempty"`
 	NumResidues                 string                      `xml:"numResidues,attr,omitempty"`
 	ReleaseDate                 string                      `xml:"releaseDate,attr,omitempty"`
 	Version                     string                      `xml:"version,attr,omitempty"`
