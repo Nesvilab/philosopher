@@ -41,8 +41,14 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	// 	return f, errors.New("Database data not available, interrupting processing")
 	// }
 
+	// spectra evidence reference map
+	var specRef = make(map[string]string)
+
 	// peptide evidence reference map
 	var pepRef = make(map[string]string)
+
+	// protein evidence reference map
+	var proRef = make(map[string]string)
 
 	// Header
 	mzid.Name = "foo"
@@ -163,11 +169,14 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	mzid.AuditCollection = *auditCol
 
 	// SequenceCollection - DBSequence
+	idCounter = 0
 	var seqs []psi.DBSequence
 	for _, i := range dtb.Records {
 
+		idCounter++
+
 		db := &psi.DBSequence{
-			ID:                i.ID,
+			ID:                fmt.Sprintf("DB_%d", idCounter),
 			Accession:         i.ID,
 			SearchDatabaseRef: "",
 			CVParam: []psi.CVParam{
@@ -188,9 +197,10 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 			},
 		}
 
+		proRef[i.ID] = fmt.Sprintf("DB_%d", idCounter)
 		seqs = append(seqs, *db)
 	}
-	//mzid.SequenceCollection.DBSequence = seqs
+	mzid.SequenceCollection.DBSequence = seqs
 	seqs = nil
 
 	// SequenceCollection - Peptide
@@ -226,7 +236,7 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 
 		peps = append(peps, p)
 	}
-	//mzid.SequenceCollection.Peptide = peps
+	mzid.SequenceCollection.Peptide = peps
 	peps = nil
 
 	// SequenceCollection - PeptideEvidence
@@ -245,12 +255,10 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 			Post:          i.NextAA,
 		}
 
-		// record the reference for the SpectrumIdentificationItem
 		pepRef[i.Peptide] = fmt.Sprintf("PepEv_%d", idCounter)
-
 		pevs = append(pevs, evi)
 	}
-	//mzid.SequenceCollection.PeptideEvidence = pevs
+	mzid.SequenceCollection.PeptideEvidence = pevs
 	pevs = nil
 
 	// AnalysisCollection
@@ -407,7 +415,7 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 
 				sir := &psi.SpectrumIdentificationResult{
 					SpectraDataRef: sources[i],
-					ID:             fmt.Sprintf("SIR_%d", idCounter),
+					ID:             fmt.Sprintf("Spectrum_%d", idCounter),
 					SpectrumID:     fmt.Sprintf("%d", j.Index),
 					SpectrumIdentificationItem: []psi.SpectrumIdentificationItem{
 						psi.SpectrumIdentificationItem{
@@ -650,6 +658,7 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 					},
 				}
 
+				specRef[j.Spectrum] = fmt.Sprintf("Spectrum_%d", idCounter)
 				ad.SpectrumIdentificationList[0].SpectrumIdentificationResult = append(ad.SpectrumIdentificationList[0].SpectrumIdentificationResult, *sir)
 			}
 		}
@@ -663,7 +672,6 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 		}
 
 		var groupsMap = make(map[int]uint8)
-
 		var groups []int
 
 		for _, i := range e.Proteins {
@@ -688,7 +696,45 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 				if int(j.ProteinGroup) == i {
 
 					pdh := &psi.ProteinDetectionHypothesis{
-						PassThreshold: "true",
+						ID:                j.ProteinSubGroup,
+						PassThreshold:     "true",
+						DBSquenceRef:      proRef[j.ProteinID],
+						PeptideHypothesis: []psi.PeptideHypothesis{},
+						CVParam: []psi.CVParam{
+							psi.CVParam{
+								CVRef:     "PSI-MS",
+								Accession: "MS:1000796",
+								Name:      "spectrum title",
+								Value:     "",
+							},
+						},
+						UserParam: []psi.UserParam{
+							psi.UserParam{
+								Name:  "original protein header",
+								Value: j.OriginalHeader,
+							},
+							psi.UserParam{
+								Name:  "partial header",
+								Value: j.PartHeader,
+							},
+						},
+					}
+
+					for _, k := range j.TotalPeptideIons {
+						peph := &psi.PeptideHypothesis{
+							PeptideEvidenceRef: pepRef[k.Sequence],
+						}
+						_ = k
+
+						for l := range k.Spectra {
+							siir := psi.SpectrumIdentificationItemRef{
+								SpectrumIdentificationItemRef: specRef[l],
+							}
+
+							peph.SpectrumIdentificationItemRef = append(peph.SpectrumIdentificationItemRef, siir)
+						}
+
+						pdh.PeptideHypothesis = append(pdh.PeptideHypothesis, *peph)
 					}
 
 					pag.ProteinDetectionHypothesis = append(pag.ProteinDetectionHypothesis, *pdh)

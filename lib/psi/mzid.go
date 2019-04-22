@@ -779,7 +779,7 @@ type ProteinDetectionHypothesis struct {
 type PeptideHypothesis struct {
 	XMLName                       xml.Name                        `xml:"PeptideHypothesis"`
 	PeptideEvidenceRef            string                          `xml:"peptideEvidence_ref,attr,omitempty"`
-	SpectrumIdentificationItemRef []SpectrumIdentificationItemRef `xml:"SpectrumIdentificationItemRef,attr,omitempty"`
+	SpectrumIdentificationItemRef []SpectrumIdentificationItemRef `xml:"SpectrumIdentificationItemRef,omitempty"`
 }
 
 // SpectrumIdentificationItemRef Reference(s) to the SpectrumIdentificationItem

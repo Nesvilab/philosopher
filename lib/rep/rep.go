@@ -374,6 +374,7 @@ func Run(m met.Data) met.Data {
 		repo.PlotMassHist()
 	}
 
+	logrus.Info("Creating mzID")
 	repo.MzIdentMLReport(m.Version, m.Database.Annot)
 
 	return m
