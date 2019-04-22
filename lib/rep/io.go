@@ -29,8 +29,14 @@ func (e *Evidence) Serialize() *err.Error {
 // SerializeGranular converts the whole structure into sevral small gob files
 func (e *Evidence) SerializeGranular() *err.Error {
 
+	// create EV Parameters
+	er := SerializeEVParameters(e)
+	if er != nil {
+		return er
+	}
+
 	// create EV PSM
-	er := SerializeEVPSM(e)
+	er = SerializeEVPSM(e)
 	if er != nil {
 		return er
 	}
@@ -69,6 +75,22 @@ func (e *Evidence) SerializeGranular() *err.Error {
 	er = SerializeEVCombined(e)
 	if er != nil {
 		return er
+	}
+
+	return nil
+}
+
+// SerializeEVParameters creates an ev serial with Parameter data
+func SerializeEVParameters(e *Evidence) *err.Error {
+
+	b, er := msgpack.Marshal(&e.Parameters)
+	if er != nil {
+		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	}
+
+	er = ioutil.WriteFile(sys.EvParameterBin(), b, sys.FilePermission())
+	if er != nil {
+		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}
 
 	return nil
@@ -205,8 +227,14 @@ func (e *Evidence) Restore() *err.Error {
 // RestoreGranular reads philosopher results files and restore the data sctructure
 func (e *Evidence) RestoreGranular() *err.Error {
 
+	// Parameters
+	err := RestoreEVParameters(e)
+	if err != nil {
+		return err
+	}
+
 	// PSM
-	err := RestoreEVPSM(e)
+	err = RestoreEVPSM(e)
 	if err != nil {
 		return err
 	}
@@ -247,6 +275,21 @@ func (e *Evidence) RestoreGranular() *err.Error {
 		return err
 	}
 
+	return nil
+}
+
+// RestoreEVParameters restores Ev PSM data
+func RestoreEVParameters(d *Evidence) *err.Error {
+
+	b, e := ioutil.ReadFile(sys.EvParameterBin())
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	e = msgpack.Unmarshal(b, &d.Parameters)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+	}
 	return nil
 }
 
@@ -364,8 +407,14 @@ func RestoreEVCombined(d *Evidence) *err.Error {
 // RestoreGranularWithPath reads philosopher results files and restore the data sctructure
 func (e *Evidence) RestoreGranularWithPath(p string) *err.Error {
 
+	// Parameters
+	err := RestoreEVParametersWithPath(e, p)
+	if err != nil {
+		return err
+	}
+
 	// PSM
-	err := RestoreEVPSMWithPath(e, p)
+	err = RestoreEVPSMWithPath(e, p)
 	if err != nil {
 		return err
 	}
@@ -404,6 +453,24 @@ func (e *Evidence) RestoreGranularWithPath(p string) *err.Error {
 	err = RestoreEVCombinedWithPath(e, p)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// RestoreEVParametersWithPath restores Ev PSM data
+func RestoreEVParametersWithPath(d *Evidence, p string) *err.Error {
+
+	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvParameterBin())
+
+	b, e := ioutil.ReadFile(path)
+	if e != nil {
+		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+	}
+
+	e = msgpack.Unmarshal(b, &d.Parameters)
+	if e != nil {
+		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
 	}
 
 	return nil

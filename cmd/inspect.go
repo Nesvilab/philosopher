@@ -45,12 +45,27 @@ var inspectCmd = &cobra.Command{
 				spew.Dump(o)
 			}
 
+		} else if object == "parameters" {
+
+			var o rep.SearchParametersEvidence
+
+			target := fmt.Sprintf(".meta%sev.param.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			err := dec.Decode(&o)
+			if err != nil {
+				logrus.Fatal("Could not restore Parameter data:", err)
+			}
+			spew.Dump(o)
+
 		} else if object == "psm" {
+
+			var o rep.PSMEvidenceList
 
 			target := fmt.Sprintf(".meta%sev.psm.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
-			var o rep.PSMEvidenceList
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
@@ -60,10 +75,11 @@ var inspectCmd = &cobra.Command{
 
 		} else if object == "db" {
 
+			var o dat.Base
+
 			target := fmt.Sprintf(".meta%sdb.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
-			var o dat.Base
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {
@@ -73,10 +89,11 @@ var inspectCmd = &cobra.Command{
 
 		} else if object == "protein" {
 
+			var o rep.ProteinEvidenceList
+
 			target := fmt.Sprintf(".meta%spro.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
-			var o rep.ProteinEvidenceList
 			dec := msgpack.NewDecoder(file)
 			err := dec.Decode(&o)
 			if err != nil {

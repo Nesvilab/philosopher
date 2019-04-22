@@ -27,6 +27,7 @@ type PepXML struct {
 	SpectraFile           string
 	SearchEngine          string
 	DecoyTag              string
+	SearchParameters      []spc.Parameter
 	Database              string
 	Prophet               string
 	Modifications         mod.Modifications
@@ -110,10 +111,9 @@ func (p *PepXML) Read(f string) error {
 		p.SpectraFile = fmt.Sprintf("%s%s", mpa.MsmsRunSummary.BaseName, mpa.MsmsRunSummary.RawData)
 
 		var models []spc.DistributionPoint
-		pps := mpa.AnalysisSummary[0].PeptideprophetSummary
 
 		// collect distribution points from meta
-		for _, i := range pps.DistributionPoint {
+		for _, i := range mpa.AnalysisSummary[0].PeptideprophetSummary.DistributionPoint {
 			var m spc.DistributionPoint
 			m.Fvalue = i.Fvalue
 			m.Obs1Distr = i.Obs1Distr
@@ -165,7 +165,6 @@ func (p *PepXML) Read(f string) error {
 					AminoAcid:        string(i.AminoAcid),
 				}
 
-				//p.Modifications.Mods = append(p.Modifications.Mods, m)
 				p.Modifications.Index[key] = m
 			}
 		}
@@ -189,9 +188,17 @@ func (p *PepXML) Read(f string) error {
 					Terminus:          strings.ToLower(string(i.Terminus)),
 				}
 
-				//p.Modifications.Mods = append(p.Modifications.Mods, m)
 				p.Modifications.Index[key] = m
 			}
+		}
+
+		for _, i := range xml.MsmsPipelineAnalysis.MsmsRunSummary.SearchSummary.Parameter {
+			par := &spc.Parameter{
+				Name:  i.Name,
+				Value: i.Value,
+			}
+			p.SearchParameters = append(p.SearchParameters, *par)
+
 		}
 
 		// start processing spectra queries

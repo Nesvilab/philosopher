@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prvst/philosopher/lib/spc"
+
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
@@ -122,7 +124,9 @@ func Run(f met.Data) (met.Data, error) {
 	// restoring for the modifications
 	var pxml id.PepXML
 	pxml.Restore()
+
 	e.Mods = pxml.Modifications
+	e.AssembleSearchParameters(pxml.SearchParameters)
 	pxml = id.PepXML{}
 
 	var psm id.PepIDList
@@ -214,6 +218,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 	var files []string
 	var pepIdent id.PepIDList
 	var mods []mod.Modification
+	var params []spc.Parameter
 	var modsIndex = make(map[string]mod.Modification)
 	var searchEngine string
 
@@ -241,6 +246,8 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 		if e != nil {
 			return nil, "", e
 		}
+
+		params = p.SearchParameters
 
 		// print models
 		if models == true {
@@ -270,6 +277,7 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 	// create a "fake" global pepXML comprising all data
 	var pepXML id.PepXML
 	pepXML.DecoyTag = decoyTag
+	pepXML.SearchParameters = params
 	pepXML.PeptideIdentification = pepIdent
 	pepXML.Modifications.Index = modsIndex
 

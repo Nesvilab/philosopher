@@ -142,6 +142,7 @@ type SearchSummary struct {
 	EnzymaticSearchConstraint []EnzymaticSearchConstraint `xml:"enzymatic_search_constraint"`
 	AminoAcidModifications    []AminoacidModification     `xml:"aminoacid_modification"`
 	TerminalModifications     []TerminalModification      `xml:"terminal_modification"`
+	Parameter                 []Parameter                 `xml:"parameter"`
 }
 
 // SearchDatabase tag

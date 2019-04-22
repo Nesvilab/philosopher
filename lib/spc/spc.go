@@ -22,8 +22,8 @@ type DataFormat interface {
 // Parameter tag
 type Parameter struct {
 	XMLName xml.Name `xml:"parameter"`
-	Name    []byte   `xml:"name,attr"`
-	Value   int      `xml:"value,attr"`
+	Name    string   `xml:"name,attr"`
+	Value   string   `xml:"value,attr"`
 }
 
 // Annotation tag

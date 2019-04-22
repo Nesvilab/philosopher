@@ -18,6 +18,7 @@ import (
 // Evidence ...
 type Evidence struct {
 	Decoys          bool
+	Parameters      SearchParametersEvidence
 	PSM             PSMEvidenceList
 	Ions            IonEvidenceList
 	Peptides        PeptideEvidenceList
@@ -26,6 +27,86 @@ type Evidence struct {
 	Modifications   ModificationEvidence
 	CombinedProtein CombinedProteinEvidenceList
 	CombinedPeptide CombinedPeptideEvidenceList
+}
+
+// SearchParametersEvidence ...
+type SearchParametersEvidence struct {
+	MSFragger                          string
+	DatabaseName                       string
+	NumThreads                         string
+	PrecursorMassLower                 string
+	PrecursorMassUpper                 string
+	PrecursorMassUnits                 string
+	PrecursorTrueTolerance             string
+	PrecursorTrueUnits                 string
+	FragmentMassTolerance              string
+	FragmentMassUnits                  string
+	CalibrateMass                      string
+	Ms1ToleranceMad                    string
+	Ms2ToleranceMad                    string
+	EvaluateMassCalibration            string
+	IsotopeError                       string
+	MassOffsets                        string
+	PrecursorMassMode                  string
+	ShiftedIons                        string
+	ShiftedIonsExcludeRanges           string
+	FragmentIonSeries                  string
+	SearchEnzymeName                   string
+	SearchEnzymeCutafter               string
+	SearchEnzymeButnotafter            string
+	NumEnzymeTermini                   string
+	AllowedMissedCleavage              string
+	ClipNTermM                         string
+	AllowMultipleVariableModsOnResidue string
+	MaxVariableModsPerMod              string
+	MaxVariableModsCombinations        string
+	OutputFileExtension                string
+	OutputFormat                       string
+	OutputReportTopN                   string
+	OutputMaxExpect                    string
+	ReportAlternativeProteins          string
+	OverrideCharge                     string
+	PrecursorCharge                    string
+	DigestMinLength                    string
+	DigestMaxLength                    string
+	DigestMassRange                    string
+	MaxFragmentCharge                  string
+	TrackZeroTopN                      string
+	ZeroBinAcceptExpect                string
+	ZeroBinMultExpect                  string
+	AddTopNComplementary               string
+	MinimumPeaks                       string
+	UseTopNPeaks                       string
+	MinFragmentsModelling              string
+	MinMatchedFragments                string
+	MinimumRatio                       string
+	ClearMzRange                       string
+	VariableMod01                      string
+	VariableMod02                      string
+	Alanine                            string
+	Cysteine                           string
+	CTermPeptide                       string
+	CTermProtein                       string
+	AsparticAcid                       string
+	GlutamicAcid                       string
+	Phenylalanine                      string
+	Glycine                            string
+	Histidine                          string
+	Isoleucine                         string
+	Lysine                             string
+	Leucine                            string
+	Methionine                         string
+	Asparagine                         string
+	NTermPeptide                       string
+	NTermProtein                       string
+	Proline                            string
+	Glutamine                          string
+	Arginine                           string
+	Serine                             string
+	Threonine                          string
+	Valine                             string
+	Tryptophan                         string
+	Tyrosine                           string
 }
 
 // PSMEvidence struct

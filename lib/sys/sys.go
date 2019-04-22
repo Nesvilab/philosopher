@@ -160,6 +160,12 @@ func EvBin() string {
 	return p
 }
 
+// EvParameterBin file
+func EvParameterBin() string {
+	p := fmt.Sprintf("%s%sev.param.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
 // EvMetaBin file
 func EvMetaBin() string {
 	p := fmt.Sprintf("%s%sev.meta.bin", MetaDir(), string(filepath.Separator))

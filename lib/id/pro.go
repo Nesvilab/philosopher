@@ -34,7 +34,7 @@ type ProteinIdentification struct {
 	GroupSiblingID           string
 	ProteinName              string
 	UniqueStrippedPeptides   []string
-	Length                   int
+	Length                   string
 	PercentCoverage          float32
 	PctSpectrumIDs           float32
 	GroupProbability         float64
@@ -130,7 +130,7 @@ func (p *ProtXML) Read(f string) error {
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 			ptid.TopPepProb = 0
 
-			if strings.EqualFold(string(j.Parameter.Name), "prot_length") {
+			if strings.EqualFold(j.Parameter.Name, "prot_length") {
 				ptid.Length = j.Parameter.Value
 			}
 

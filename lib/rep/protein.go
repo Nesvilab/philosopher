@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/dat"
@@ -44,7 +45,7 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 		rep.ProteinName = i.ProteinName
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
-		rep.Length = i.Length
+		rep.Length, _ = strconv.Atoi(i.Length)
 		rep.Coverage = i.PercentCoverage
 		rep.UniqueStrippedPeptides = len(i.UniqueStrippedPeptides)
 		rep.Probability = i.Probability

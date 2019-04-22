@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/dat"
@@ -194,7 +195,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 
 				ce.SupportingSpectra = make(map[string]string)
 				ce.ProteinName = j.ProteinName
-				ce.Length = j.Length
+				ce.Length, _ = strconv.Atoi(j.Length)
 				ce.Coverage = j.PercentCoverage
 				ce.GroupNumber = j.GroupNumber
 				ce.SiblingID = j.GroupSiblingID
