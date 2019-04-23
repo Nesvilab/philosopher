@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/mod"
+
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/sys"
@@ -41,6 +43,14 @@ func (e *Evidence) MapMods() *err.Error {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						e.PSM[i].Modifications.Index[k] = updatedMod
+					} else {
+						newMod := &mod.Modification{
+							updatedMod.Name: j.Name
+							updatedMod.Definition: j.Definition
+							updatedMod.ID: j.ID
+							updatedMod.MonoIsotopicMass: j.MonoIsotopicMass
+							e.PSM[i].Modifications.Index[k] = updatedMod
+						}
 					}
 					if updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
