@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/pierrre/archivefile/zip"
@@ -82,12 +83,19 @@ func Init(version, build string) *err.Error {
 	da.Version = version
 	da.Build = build
 
-	os.Mkdir(da.MetaDir, 0755)
+	os.Mkdir(da.MetaDir, sys.FilePermission())
 	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
 		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create meta directory; check folder permissions"}
 	}
 
-	os.Mkdir(da.Temp, 0755)
+	if runtime.GOOS == sys.Windows() {
+		e = HideFile(sys.MetaDir())
+		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
+			return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create meta directory; check folder permissions"}
+		}
+	}
+
+	os.Mkdir(da.Temp, sys.FilePermission())
 	if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
 		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't find temporary directory; check folder permissions"}
 	}

@@ -134,17 +134,6 @@ func Run(f met.Data) (met.Data, error) {
 	e.AssemblePSMReport(psm, f.Filter.Tag)
 	psm = nil
 
-	// // evaluate modifications in data set
-	// //if f.Filter.Mapmods == true {
-	// logrus.Info("Mapping modifications")
-	// e.MapMods()
-	// // if err != nil {
-	// // 	logrus.Fatal(err)
-	// // }
-	// logrus.Info("Processing modifications")
-	// e.AssembleModificationReport()
-	// //}
-
 	var ion id.PepIDList
 	ion.Restore("ion")
 	e.AssembleIonReport(ion, f.Filter.Tag)
@@ -1321,47 +1310,6 @@ func extractPSMfromPepXML(peplist id.PepIDList, pro id.ProtIDList) id.PepIDList 
 			}
 		}
 	}
-
-	// // get all protein names from protxml
-	// for _, i := range pro {
-	// 	protmap[string(i.ProteinName)] = 0
-	// }
-	//
-	// for _, i := range peplist {
-	//
-	// 	_, ptTag := protmap[string(i.Protein)]
-	// 	if ptTag {
-	// 		filterMap[string(i.Spectrum)] = i
-	// 		protmap[string(i.Protein)]++
-	// 	} else {
-	// 		for _, j := range i.AlternativeProteins {
-	// 			_, altTag := protmap[j]
-	// 			if altTag {
-	// 				filterMap[string(i.Spectrum)] = i
-	// 				protmap[string(j)]++
-	// 			}
-	// 		}
-	// 	}
-	//
-	// }
-
-	// // match protein names to <protein> tag on pepxml
-	// for j := range peplist {
-	// 	_, ok := protmap[string(peplist[j].Protein)]
-	// 	if ok {
-	// 		filterMap[string(peplist[j].Spectrum)] = peplist[j]
-	// 	}
-	// }
-	//
-	// // match protein names to <alternative_proteins> tag on pepxml
-	// for m := range peplist {
-	// 	for n := range peplist[m].AlternativeProteins {
-	// 		_, ok := protmap[peplist[m].AlternativeProteins[n]]
-	// 		if ok {
-	// 			filterMap[string(peplist[m].Spectrum)] = peplist[m]
-	// 		}
-	// 	}
-	// }
 
 	for _, v := range filterMap {
 		output = append(output, v)

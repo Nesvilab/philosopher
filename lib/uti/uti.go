@@ -1,7 +1,9 @@
 // Package uti provides general, low priority methods and functions for different purposes
 package uti
 
-import "math"
+import (
+	"math"
+)
 
 // Round serves the rol of the missing math.Round function
 func Round(val float64, roundOn float64, places int) (newVal float64) {
