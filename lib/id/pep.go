@@ -62,6 +62,7 @@ type PeptideIdentification struct {
 	LocalizedPTMSites    map[string]int
 	LocalizedPTMMassDiff map[string]string
 	Probability          float64
+	IsoMassD             int
 	Expectation          float64
 	Xcorr                float64
 	DeltaCN              float64
@@ -260,6 +261,11 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		for _, j := range i.AnalysisResult {
 			if string(j.Analysis) == "peptideprophet" {
 				psm.Probability = j.PeptideProphetResult.Probability
+				for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
+					if k.Name == "isomassd" {
+						psm.IsoMassD, _ = strconv.Atoi(k.Value)
+					}
+				}
 			}
 			if string(j.Analysis) == "interprophet" {
 				psm.Probability = j.InterProphetResult.Probability
@@ -298,10 +304,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 		}
 
-		if len(string(i.ModificationInfo.ModifiedPeptide)) > 0 {
-			psm.mapModsFromPepXML(i.ModificationInfo, mods)
-		}
-
+		psm.mapModsFromPepXML(i.ModificationInfo, mods)
 	}
 
 	return psm
@@ -348,18 +351,26 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		}
 	}
 
-	if p.Massdiff != 0 {
-		key := fmt.Sprintf("%.4f", p.Massdiff)
+	var isotopicCorr float64
+	if p.IsoMassD != 0 {
+		isotopicCorr = p.Massdiff - (1.007316 * float64(p.IsoMassD))
+	} else {
+		isotopicCorr = p.Massdiff
+	}
+
+	if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
+		key := fmt.Sprintf("%.4f", isotopicCorr)
 		_, ok := p.Modifications.Index[key]
 		if !ok {
 			m := mod.Modification{
 				Index:    key,
 				Name:     "Unknown",
 				Type:     "Observed",
-				MassDiff: p.Massdiff,
+				MassDiff: isotopicCorr,
 			}
 			p.Modifications.Index[key] = m
 		}
+
 	}
 
 	return

@@ -245,9 +245,10 @@ type AnalysisResult struct {
 
 // PeptideProphetResult tag
 type PeptideProphetResult struct {
-	XMLName     xml.Name `xml:"peptideprophet_result"`
-	Probability float64  `xml:"probability,attr"`
-	AllNttProb  []byte   `xml:"all_ntt_prob,attr"`
+	XMLName            xml.Name           `xml:"peptideprophet_result"`
+	Probability        float64            `xml:"probability,attr"`
+	AllNttProb         []byte             `xml:"all_ntt_prob,attr"`
+	SearchScoreSummary SearchScoreSummary `xml:"search_score_summary"`
 }
 
 // InterProphetResult tag
@@ -275,8 +276,8 @@ type ModAminoAcidProbability struct {
 
 // SearchScoreSummary tag
 type SearchScoreSummary struct {
-	XMLName   xml.Name  `xml:"search_score_summary"`
-	Parameter Parameter `xml:"parameter"`
+	XMLName   xml.Name    `xml:"search_score_summary"`
+	Parameter []Parameter `xml:"parameter"`
 }
 
 // SearchScore tag
