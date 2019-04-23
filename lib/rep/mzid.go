@@ -295,7 +295,355 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	mzid.AnalysisCollection = *ac
 
 	// AnalysisProtocolCollection
-	//TODO
+	apc := &psi.AnalysisProtocolCollection{
+		SpectrumIdentificationProtocol: []psi.SpectrumIdentificationProtocol{
+			psi.SpectrumIdentificationProtocol{
+				AnalysisSoftwareRef: "DatabaseSearch_ID",
+				ID:                  "Search_Protocol_1",
+				SearchType: psi.SearchType{
+					CVParam: psi.CVParam{
+						CVRef:     "PSI-MS",
+						Accession: "MS:1001083",
+						Name:      "ms-ms search",
+					},
+				},
+				AdditionalSearchParams: psi.AdditionalSearchParams{
+					CVParam: []psi.CVParam{
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1001211",
+							Name:      "parent mass type mono",
+						},
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1001256",
+							Name:      "fragment mass type mono",
+						},
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1002492",
+							Name:      "consensus scoring",
+						},
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1002490",
+							Name:      "peptide-level scoring",
+						},
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1002497",
+							Name:      "group PSMs by sequence with modifications",
+						},
+						psi.CVParam{
+							CVRef:     "PSI-MS",
+							Accession: "MS:1002491",
+							Name:      "modification localization scoring",
+						},
+					},
+					UserParam: []psi.UserParam{
+						psi.UserParam{
+							Name:  "MSFragger",
+							Value: e.Parameters.MSFragger,
+						},
+						psi.UserParam{
+							Name:  "database_name",
+							Value: e.Parameters.DatabaseName,
+						},
+						psi.UserParam{
+							Name:  "precursor_mass_lower",
+							Value: e.Parameters.PrecursorMassLower,
+						},
+						psi.UserParam{
+							Name:  "precursor_mass_upper",
+							Value: e.Parameters.PrecursorMassUpper,
+						},
+						psi.UserParam{
+							Name:  "precursor_mass_units",
+							Value: e.Parameters.PrecursorMassUnits,
+						},
+						psi.UserParam{
+							Name:  "precursor_true_tolerance",
+							Value: e.Parameters.PrecursorTrueTolerance,
+						},
+						psi.UserParam{
+							Name:  "precursor_true_units",
+							Value: e.Parameters.PrecursorTrueUnits,
+						},
+						psi.UserParam{
+							Name:  "fragment_mass_tolerance",
+							Value: e.Parameters.FragmentMassTolerance,
+						},
+						psi.UserParam{
+							Name:  "fragment_mass_units",
+							Value: e.Parameters.FragmentMassUnits,
+						},
+						psi.UserParam{
+							Name:  "calibrate_mass",
+							Value: e.Parameters.CalibrateMass,
+						},
+						psi.UserParam{
+							Name:  "ms1_tolerance_mad",
+							Value: e.Parameters.Ms1ToleranceMad,
+						},
+						psi.UserParam{
+							Name:  "ms2_tolerance_mad",
+							Value: e.Parameters.Ms2ToleranceMad,
+						},
+						psi.UserParam{
+							Name:  "evaluate_mass_calibration",
+							Value: e.Parameters.EvaluateMassCalibration,
+						},
+						psi.UserParam{
+							Name:  "isotope_error",
+							Value: e.Parameters.IsotopeError,
+						},
+						psi.UserParam{
+							Name:  "mass_offsets",
+							Value: e.Parameters.MassOffsets,
+						},
+						psi.UserParam{
+							Name:  "precursor_mass_mode",
+							Value: e.Parameters.PrecursorMassMode,
+						},
+						psi.UserParam{
+							Name:  "shifted_ions",
+							Value: e.Parameters.ShiftedIons,
+						},
+						psi.UserParam{
+							Name:  "shifted_ions_exclude_ranges",
+							Value: e.Parameters.ShiftedIonsExcludeRanges,
+						},
+						psi.UserParam{
+							Name:  "fragment_ion_series",
+							Value: e.Parameters.FragmentIonSeries,
+						},
+						psi.UserParam{
+							Name:  "search_enzyme_name",
+							Value: e.Parameters.SearchEnzymeName,
+						},
+						psi.UserParam{
+							Name:  "search_enzyme_cutafter",
+							Value: e.Parameters.SearchEnzymeCutafter,
+						},
+						psi.UserParam{
+							Name:  "search_enzyme_butnotafter",
+							Value: e.Parameters.SearchEnzymeButnotafter,
+						},
+						psi.UserParam{
+							Name:  "num_enzyme_termini",
+							Value: e.Parameters.NumEnzymeTermini,
+						},
+						psi.UserParam{
+							Name:  "allowed_missed_cleavage",
+							Value: e.Parameters.AllowedMissedCleavage,
+						},
+						psi.UserParam{
+							Name:  "clip_nTerm_M",
+							Value: e.Parameters.ClipNTermM,
+						},
+						psi.UserParam{
+							Name:  "allow_multiple_variable_mods_on_residue",
+							Value: e.Parameters.AllowMultipleVariableModsOnResidue,
+						},
+						psi.UserParam{
+							Name:  "max_variable_mods_per_mod",
+							Value: e.Parameters.MaxVariableModsPerMod,
+						},
+						psi.UserParam{
+							Name:  "max_variable_mods_combinations",
+							Value: e.Parameters.MaxVariableModsCombinations,
+						},
+						psi.UserParam{
+							Name:  "output_file_extension",
+							Value: e.Parameters.OutputFileExtension,
+						},
+						psi.UserParam{
+							Name:  "output_format",
+							Value: e.Parameters.OutputFormat,
+						},
+						psi.UserParam{
+							Name:  "output_report_topN",
+							Value: e.Parameters.OutputReportTopN,
+						},
+						psi.UserParam{
+							Name:  "output_max_expect",
+							Value: e.Parameters.OutputMaxExpect,
+						},
+						psi.UserParam{
+							Name:  "report_alternative_proteins",
+							Value: e.Parameters.ReportAlternativeProteins,
+						},
+						psi.UserParam{
+							Name:  "override_charge",
+							Value: e.Parameters.OverrideCharge,
+						},
+						psi.UserParam{
+							Name:  "precursor_charge",
+							Value: e.Parameters.PrecursorCharge,
+						},
+						psi.UserParam{
+							Name:  "digest_min_length",
+							Value: e.Parameters.DigestMinLength,
+						},
+						psi.UserParam{
+							Name:  "digest_max_length",
+							Value: e.Parameters.DigestMaxLength,
+						},
+						psi.UserParam{
+							Name:  "digest_mass_range",
+							Value: e.Parameters.DigestMassRange,
+						},
+						psi.UserParam{
+							Name:  "max_fragment_charge",
+							Value: e.Parameters.MaxFragmentCharge,
+						},
+						psi.UserParam{
+							Name:  "track_zero_topN",
+							Value: e.Parameters.TrackZeroTopN,
+						},
+						psi.UserParam{
+							Name:  "zero_bin_accept_expect",
+							Value: e.Parameters.ZeroBinAcceptExpect,
+						},
+						psi.UserParam{
+							Name:  "zero_bin_mult_expect",
+							Value: e.Parameters.ZeroBinMultExpect,
+						},
+						psi.UserParam{
+							Name:  "add_topN_complementary",
+							Value: e.Parameters.AddTopNComplementary,
+						},
+						psi.UserParam{
+							Name:  "minimum_peaks",
+							Value: e.Parameters.MinimumPeaks,
+						},
+						psi.UserParam{
+							Name:  "use_topN_peaks",
+							Value: e.Parameters.UseTopNPeaks,
+						},
+						psi.UserParam{
+							Name:  "min_fragments_modelling",
+							Value: e.Parameters.MinFragmentsModelling,
+						},
+						psi.UserParam{
+							Name:  "min_matched_fragments",
+							Value: e.Parameters.MinMatchedFragments,
+						},
+						psi.UserParam{
+							Name:  "minimum_ratio",
+							Value: e.Parameters.MinimumRatio,
+						},
+						psi.UserParam{
+							Name:  "clear_mz_range",
+							Value: e.Parameters.ClearMzRange,
+						},
+						psi.UserParam{
+							Name:  "variable_mod_01",
+							Value: e.Parameters.VariableMod01,
+						},
+						psi.UserParam{
+							Name:  "variable_mod_02",
+							Value: e.Parameters.VariableMod02,
+						},
+						psi.UserParam{
+							Name:  "add_C_cysteine",
+							Value: e.Parameters.Cysteine,
+						},
+						psi.UserParam{
+							Name:  "add_Cterm_peptide",
+							Value: e.Parameters.CTermPeptide,
+						},
+						psi.UserParam{
+							Name:  "add_Cterm_protein",
+							Value: e.Parameters.CTermProtein,
+						},
+						psi.UserParam{
+							Name:  "add_D_aspartic_acid",
+							Value: e.Parameters.AsparticAcid,
+						},
+						psi.UserParam{
+							Name:  "add_E_glutamic_acid",
+							Value: e.Parameters.GlutamicAcid,
+						},
+						psi.UserParam{
+							Name:  "add_F_phenylalanine",
+							Value: e.Parameters.Phenylalanine,
+						},
+						psi.UserParam{
+							Name:  "add_G_glycine",
+							Value: e.Parameters.Glycine,
+						},
+						psi.UserParam{
+							Name:  "add_H_histidine",
+							Value: e.Parameters.Histidine,
+						},
+						psi.UserParam{
+							Name:  "add_I_isoleucine",
+							Value: e.Parameters.Isoleucine,
+						},
+						psi.UserParam{
+							Name:  "add_K_lysine",
+							Value: e.Parameters.Lysine,
+						},
+						psi.UserParam{
+							Name:  "add_L_leucine",
+							Value: e.Parameters.Leucine,
+						},
+						psi.UserParam{
+							Name:  "add_M_methionine",
+							Value: e.Parameters.Methionine,
+						},
+						psi.UserParam{
+							Name:  "add_N_asparagine",
+							Value: e.Parameters.Asparagine,
+						},
+						psi.UserParam{
+							Name:  "add_Nterm_peptide",
+							Value: e.Parameters.NTermPeptide,
+						},
+						psi.UserParam{
+							Name:  "add_Nterm_protein",
+							Value: e.Parameters.NTermProtein,
+						},
+						psi.UserParam{
+							Name:  "add_P_proline",
+							Value: e.Parameters.Proline,
+						},
+						psi.UserParam{
+							Name:  "add_Q_glutamine",
+							Value: e.Parameters.GlutamicAcid,
+						},
+						psi.UserParam{
+							Name:  "add_R_arginine",
+							Value: e.Parameters.Arginine,
+						},
+						psi.UserParam{
+							Name:  "add_S_serine",
+							Value: e.Parameters.Serine,
+						},
+						psi.UserParam{
+							Name:  "add_T_threonine",
+							Value: e.Parameters.Threonine,
+						},
+						psi.UserParam{
+							Name:  "add_V_valine",
+							Value: e.Parameters.Valine,
+						},
+						psi.UserParam{
+							Name:  "add_W_tryptophan",
+							Value: e.Parameters.Tryptophan,
+						},
+						psi.UserParam{
+							Name:  "add_Y_tyrosine",
+							Value: e.Parameters.Tyrosine,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	mzid.AnalysisProtocolCollection = *apc
 
 	// DataCollection
 	dta := psi.DataCollection{}

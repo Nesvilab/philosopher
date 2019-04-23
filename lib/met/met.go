@@ -289,6 +289,7 @@ type Cluster struct {
 type Report struct {
 	Decoys  bool `yaml:"withDecoys"`
 	MSstats bool `yaml:"msstats"`
+	MZID    bool `yaml:"mzID"`
 }
 
 // Index options and parameters

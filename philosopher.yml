@@ -167,6 +167,7 @@ labelquant:
 report:
   msstats: false             # create an output compatible to MSstats
   withDecoys: false          # add decoy observations to reports
+  mzID: false                # create a mzID output
 
 cluster:
   organismUniProtID: ''      # UniProt proteome ID

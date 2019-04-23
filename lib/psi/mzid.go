@@ -320,9 +320,9 @@ type InputSpectrumIdentifications struct {
 // AnalysisProtocolCollection is the collection of protocols which include the
 // parameters and settings of the performed analyses
 type AnalysisProtocolCollection struct {
-	XMLName                        xml.Name                       `xml:"AnalysisProtocolCollection"`
-	SpectrumIdentificationProtocol SpectrumIdentificationProtocol `xml:"SpectrumIdentificationProtocol"`
-	ProteinDetectionProtocol       ProteinDetectionProtocol       `xml:"ProteinDetectionProtocol"`
+	XMLName                        xml.Name                         `xml:"AnalysisProtocolCollection"`
+	SpectrumIdentificationProtocol []SpectrumIdentificationProtocol `xml:"SpectrumIdentificationProtocol"`
+	ProteinDetectionProtocol       ProteinDetectionProtocol         `xml:"ProteinDetectionProtocol"`
 }
 
 // SpectrumIdentificationProtocol is the parameters and settings of a
@@ -374,7 +374,7 @@ type SearchType struct {
 // searched
 type AdditionalSearchParams struct {
 	XMLName   xml.Name    `xml:"AdditionalSearchParams"`
-	CVParam   CVParam     `xml:"cvParam"`
+	CVParam   []CVParam   `xml:"cvParam"`
 	UserParam []UserParam `xml:"userParam"`
 }
 

@@ -6,6 +6,19 @@
 ### Fixed
 
 
+# Philosopher ?
+### Build: ?
+
+### Added
+- Database search parameters are now collected from pep.xml files.
+- mzID output is now available.
+
+### Changed
+- The mapmods flag is deprecated. The flag will still be available and the mapping will ocurr for all analysis.
+
+### Fixed
+
+
 # Philosopher 20190418
 ### Build: 201904181623
 
