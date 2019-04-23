@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/obo"
@@ -14,6 +13,144 @@ import (
 	"github.com/prvst/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
 )
+
+// MapMods maps PSMs to modifications based on their mass shifts
+func (e *Evidence) MapMods() *err.Error {
+
+	// 10 ppm
+	var tolerance = 0.01
+
+	o, err := obo.NewUniModOntology()
+	if err != nil {
+		return err
+	}
+
+	for i := range e.PSM {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.PSM[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+					updatedMod := v
+
+					_, ok := j.Sites[v.AminoAcid]
+					if ok {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.PSM[i].Modifications.Index[k] = updatedMod
+					}
+					if updatedMod.Type == "Observed" {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.PSM[i].Modifications.Index[k] = updatedMod
+					}
+				}
+			}
+
+		}
+	}
+
+	for i := range e.Ions {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.Ions[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+					updatedMod := v
+
+					_, ok := j.Sites[v.AminoAcid]
+					if ok {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Ions[i].Modifications.Index[k] = updatedMod
+					}
+					if updatedMod.Type == "Observed" {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Ions[i].Modifications.Index[k] = updatedMod
+					}
+				}
+			}
+
+		}
+	}
+
+	for i := range e.Peptides {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.Peptides[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+					updatedMod := v
+
+					_, ok := j.Sites[v.AminoAcid]
+					if ok {
+
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Peptides[i].Modifications.Index[k] = updatedMod
+					}
+					if updatedMod.Type == "Observed" {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Peptides[i].Modifications.Index[k] = updatedMod
+					}
+
+				}
+			}
+
+		}
+	}
+
+	for i := range e.Proteins {
+		for _, j := range o.Terms {
+
+			// for fixed and variable modifications
+			for k, v := range e.Proteins[i].Modifications.Index {
+				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+					updatedMod := v
+
+					_, ok := j.Sites[v.AminoAcid]
+					if ok {
+
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						//updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Proteins[i].Modifications.Index[k] = updatedMod
+					}
+					if updatedMod.Type == "Observed" {
+						updatedMod.Name = j.Name
+						updatedMod.Definition = j.Definition
+						updatedMod.ID = j.ID
+						//updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+						e.Proteins[i].Modifications.Index[k] = updatedMod
+					}
+
+				}
+			}
+
+		}
+	}
+
+	return nil
+}
 
 // AssembleModificationReport cretaes the modifications lists
 func (e *Evidence) AssembleModificationReport() error {
@@ -117,153 +254,6 @@ func (e *Evidence) AssembleModificationReport() error {
 
 	modEvi.MassBins = bins
 	e.Modifications = modEvi
-
-	return nil
-}
-
-// MapMods maps PSMs to modifications based on their mass shifts
-func (e *Evidence) MapMods() *err.Error {
-
-	// 10 ppm
-	var tolerance = 0.01
-
-	o, err := obo.NewUniModOntology()
-	if err != nil {
-		return err
-	}
-
-	for i := range e.PSM {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range e.PSM[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-					updatedMod := v
-
-					_, ok := j.Sites[v.AminoAcid]
-					if ok {
-						if !strings.Contains(j.Definition, "substitution") {
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.PSM[i].Modifications.Index[k] = updatedMod
-						}
-					}
-					if updatedMod.Type == "Observed" {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						e.PSM[i].Modifications.Index[k] = updatedMod
-					}
-				} else {
-					continue
-				}
-			}
-
-		}
-	}
-
-	for i := range e.Ions {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range e.Ions[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-					if !strings.Contains(j.Definition, "substitution") {
-
-						updatedMod := v
-
-						_, ok := j.Sites[v.AminoAcid]
-						if ok {
-
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Ions[i].Modifications.Index[k] = updatedMod
-						}
-						if updatedMod.Type == "Observed" {
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Ions[i].Modifications.Index[k] = updatedMod
-						}
-					}
-				} else {
-					continue
-				}
-			}
-
-		}
-	}
-
-	for i := range e.Peptides {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range e.Peptides[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-					if !strings.Contains(j.Definition, "substitution") {
-
-						updatedMod := v
-
-						_, ok := j.Sites[v.AminoAcid]
-						if ok {
-
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Peptides[i].Modifications.Index[k] = updatedMod
-						}
-						if updatedMod.Type == "Observed" {
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Peptides[i].Modifications.Index[k] = updatedMod
-						}
-
-					}
-				} else {
-					continue
-				}
-			}
-
-		}
-	}
-
-	for i := range e.Proteins {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range e.Proteins[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-					if !strings.Contains(j.Definition, "substitution") {
-
-						updatedMod := v
-
-						_, ok := j.Sites[v.AminoAcid]
-						if ok {
-
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Proteins[i].Modifications.Index[k] = updatedMod
-						}
-						if updatedMod.Type == "Observed" {
-							updatedMod.Name = j.Name
-							updatedMod.Definition = j.Definition
-							updatedMod.ID = j.ID
-							e.Proteins[i].Modifications.Index[k] = updatedMod
-						}
-
-					}
-				} else {
-					continue
-				}
-			}
-
-		}
-	}
 
 	return nil
 }

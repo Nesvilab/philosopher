@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/bio"
+
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
@@ -353,7 +355,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 
 	var isotopicCorr float64
 	if p.IsoMassD != 0 {
-		isotopicCorr = p.Massdiff - (1.007316 * float64(p.IsoMassD))
+		isotopicCorr = p.Massdiff - (bio.Proton * float64(p.IsoMassD))
 	} else {
 		isotopicCorr = p.Massdiff
 	}
