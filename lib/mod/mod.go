@@ -20,4 +20,5 @@ type Modification struct {
 	AminoAcid         string
 	IsProteinTerminus string
 	Terminus          string
+	IsobaricMods      map[string]uint8
 }

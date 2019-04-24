@@ -166,6 +166,7 @@ func (p *PepXML) Read(f string) error {
 					MassDiff:         i.MassDiff,
 					Variable:         string(i.Variable),
 					AminoAcid:        string(i.AminoAcid),
+					IsobaricMods:     make(map[string]uint8),
 				}
 
 				p.Modifications.Index[key] = m
@@ -189,6 +190,7 @@ func (p *PepXML) Read(f string) error {
 					AminoAcid:         fmt.Sprintf("%s-term", i.Terminus),
 					IsProteinTerminus: string(i.ProteinTerminus),
 					Terminus:          strings.ToLower(string(i.Terminus)),
+					IsobaricMods:      make(map[string]uint8),
 				}
 
 				p.Modifications.Index[key] = m
@@ -327,6 +329,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 			m.Index = newKey
 			m.Position = strconv.Itoa(i.Position)
+			m.IsobaricMods = make(map[string]uint8)
 			p.Modifications.Index[newKey] = m
 		}
 	}
@@ -338,6 +341,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "N-term"
+			m.IsobaricMods = make(map[string]uint8)
 			p.Modifications.Index[key] = m
 		}
 	}
@@ -349,6 +353,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "C-term"
+			m.IsobaricMods = make(map[string]uint8)
 			p.Modifications.Index[key] = m
 		}
 	}
@@ -365,10 +370,11 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		_, ok := p.Modifications.Index[key]
 		if !ok {
 			m := mod.Modification{
-				Index:    key,
-				Name:     "Unknown",
-				Type:     "Observed",
-				MassDiff: isotopicCorr,
+				Index:        key,
+				Name:         "Unknown",
+				Type:         "Observed",
+				MassDiff:     isotopicCorr,
+				IsobaricMods: make(map[string]uint8),
 			}
 			p.Modifications.Index[key] = m
 		}
