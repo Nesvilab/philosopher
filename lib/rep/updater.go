@@ -55,6 +55,7 @@ func (e *Evidence) UpdateMappedProteins() {
 				break
 			}
 		}
+
 	}
 
 	for i := range e.Peptides {

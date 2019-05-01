@@ -428,7 +428,7 @@ func (p *PepXML) PromoteProteinIDs() {
 
 		if len(list) > 0 {
 			for i := range list {
-				if strings.Contains(list[i], "sp|") {
+				if strings.HasPrefix(list[i], "sp|") {
 					ref = list[i]
 					break
 				} else {
@@ -437,7 +437,6 @@ func (p *PepXML) PromoteProteinIDs() {
 			}
 			p.PeptideIdentification[i].Protein = ref
 		}
-
 	}
 
 	return

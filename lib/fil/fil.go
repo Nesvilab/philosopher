@@ -802,9 +802,6 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 		}
 	}
 
-	// spew.Dump(r)
-	// os.Exit(1)
-
 	// this will make the assignment more deterministic
 	for k := range r {
 		rList = append(rList, k)
@@ -923,9 +920,6 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 			r[k] = razor
 		}
 	}
-
-	// spew.Dump(r)
-	// os.Exit(1)
 
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {

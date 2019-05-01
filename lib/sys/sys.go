@@ -278,5 +278,6 @@ func Arch386() string {
 
 // FilePermission sets the default permission for every file written to disk
 func FilePermission() os.FileMode {
-	return 0644
+	//return 0644
+	return 0755
 }
