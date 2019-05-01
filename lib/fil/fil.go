@@ -181,7 +181,7 @@ func Run(f met.Data) (met.Data, error) {
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
 	if f.Filter.Razor == true {
-		e.UpdateProteinStatus()
+		//e.UpdateProteinStatus()
 		e.UpdateGeneNames()
 		e.UpdateSupportingSpectra()
 	}
