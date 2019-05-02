@@ -160,7 +160,7 @@ var _ = Describe("Sys", func() {
 		})
 
 		It("FilePermission", func() {
-			Expect(FilePermission()).To(Equal(os.FileMode(0644)))
+			Expect(FilePermission()).To(Equal(os.FileMode(0755)))
 		})
 
 	})

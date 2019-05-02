@@ -140,8 +140,10 @@ func Run(f met.Data) (met.Data, error) {
 	ion = nil
 
 	// evaluate modifications in data set
-	logrus.Info("Mapping modifications")
-	e.MapMods()
+	if f.Filter.Mapmods == true {
+		logrus.Info("Mapping modifications")
+		e.MapMods()
+	}
 
 	logrus.Info("Processing modifications")
 	e.AssembleModificationReport()
