@@ -54,7 +54,6 @@ func init() {
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Ifrags, "ifrags", "", false, "use internal fragments for localization")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Autodirect, "autodirect", "", false, "use direct evidence when the lability is high, use in combination with LABILITY")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.NoMinoFactor, "nominofactor", "", false, "disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)")
-		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.MzTol, "mztol", "", 0.1, "use specified +/- MS2 mz tolerance on site specific ions")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.PPMTol, "ppmtol", "", 1, "use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.MinProb, "minprob", "", 0.9, "use specified minimum probability to evaluate peptides")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.MassDiffMode, "massdiffmode", "", false, "use the Mass Difference and localize")

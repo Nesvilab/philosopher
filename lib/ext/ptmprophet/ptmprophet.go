@@ -186,11 +186,6 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if params.MzTol != 0.1 {
-		v := fmt.Sprintf("MZTOL=%.4f", params.MzTol)
-		cmd.Args = append(cmd.Args, v)
-	}
-
 	if params.PPMTol != 1 {
 		v := fmt.Sprintf("PPMTOL=%.4f", params.PPMTol)
 		cmd.Args = append(cmd.Args, v)

@@ -148,6 +148,7 @@ var pipelineCmd = &cobra.Command{
 				m.Serialize()
 			}
 
+			// PTMProphet
 			if p.Commands.PTMProphet == "yes" {
 				logrus.Info("Executing PTMProphet on ", i)
 				m.PTMProphet = p.PTMProphet

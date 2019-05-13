@@ -207,7 +207,6 @@ type PTMProphet struct {
 	MaxFragZ     int     `yaml:"maxfragz"`
 	Mino         int     `yaml:"mino"`
 	MassOffset   int     `yaml:"massoffset"`
-	MzTol        float64 `yaml:"mztol"`
 	PPMTol       float64 `yaml:"ppmtol"`
 	MinProb      float64 `yaml:"minprob"`
 	NoUpdate     bool    `yaml:"noupdate"`
