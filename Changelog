@@ -15,6 +15,7 @@
 
 ### Changed
 - The mapmods flag is deprecated. The flag will still be available and the mapping will ocurr for all analysis.
+- idconvert and mscovnert are temporarily disabled for all platforms.
 
 ### Fixed
 

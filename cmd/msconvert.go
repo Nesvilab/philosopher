@@ -1,5 +1,5 @@
 // +build ignore
-//!windows
+// !windows
 
 package cmd
 
