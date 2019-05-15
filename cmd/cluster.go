@@ -16,12 +16,15 @@ var clusterCmd = &cobra.Command{
 	Short: "Protein report based on protein clusters",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		m.FunctionInitCheckUp()
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		logrus.Info("Executing Cluster ", Version)
 		// run clustering
-		e := clu.GenerateReport(m)
-		if e != nil {
+		ee := clu.GenerateReport(m)
+		if ee != nil {
 			logrus.Fatal(e.Error())
 		}
 

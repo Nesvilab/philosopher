@@ -14,11 +14,14 @@ var databaseCmd = &cobra.Command{
 	Short: "Target-Decoy database formatting",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		m.FunctionInitCheckUp()
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		logrus.Info("Executing Database ", Version)
 
-		m, e := dat.Run(m)
+		m, e = dat.Run(m)
 		if e != nil {
 			logrus.Fatal(e)
 		}

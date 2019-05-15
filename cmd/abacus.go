@@ -16,7 +16,10 @@ var abacusCmd = &cobra.Command{
 	Short: "Combined analysis of LC-MS/MS results",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		m.FunctionInitCheckUp()
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		if len(args) < 2 {
 			logrus.Fatal("The combined analysis needs at least 2 result files to work")

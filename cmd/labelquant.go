@@ -17,12 +17,10 @@ var labelquantCmd = &cobra.Command{
 	Short: "Isobaric Labeling-Based Relative Quantification ",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
-		m.FunctionInitCheckUp()
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		m.Quantify.Format = "mzML"
 
@@ -47,9 +45,9 @@ var labelquantCmd = &cobra.Command{
 			logrus.Fatal("Unknown file format")
 		}
 
-		var e error
-		m.Quantify, e = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
-		if e != nil {
+		var ee error
+		m.Quantify, ee = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
+		if ee != nil {
 			logrus.Fatal(e)
 		}
 

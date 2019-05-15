@@ -17,12 +17,10 @@ var iprophCmd = &cobra.Command{
 	//Long:  "Multi-level integrative analysis of shotgun proteomic data\niProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		// if len(m.UUID) < 1 && len(m.Home) < 1 {
-		// 	e := &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
-		// 	logrus.Fatal(e.Error())
-		// }
-
-		m.FunctionInitCheckUp()
+		e := m.FunctionInitCheckUp()
+		if e != nil {
+			logrus.Fatal(e)
+		}
 
 		logrus.Info("Executing InterProphet ", Version)
 		var ipt = interprophet.New(m.Temp)
@@ -32,7 +30,7 @@ var iprophCmd = &cobra.Command{
 		}
 
 		// prepare binaries
-		e := ipt.Deploy(m.OS, m.Distro)
+		e = ipt.Deploy(m.OS, m.Distro)
 		if e != nil {
 			logrus.Fatal(e.Message)
 		}
