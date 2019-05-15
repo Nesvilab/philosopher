@@ -260,6 +260,7 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 
 		sort.Strings(assL)
 		sort.Strings(obs)
+		sort.Strings(ip)
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
@@ -382,6 +383,7 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasDec
 
 		sort.Strings(assL)
 		sort.Strings(obs)
+		sort.Strings(ip)
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
 		var reportIntensities [11]float64
@@ -530,6 +532,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 
 		sort.Strings(assL)
 		sort.Strings(obs)
+		sort.Strings(ip)
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
 		var reportIntensities [11]float64

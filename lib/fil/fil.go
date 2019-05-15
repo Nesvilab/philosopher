@@ -143,10 +143,10 @@ func Run(f met.Data) (met.Data, error) {
 	if f.Filter.Mapmods == true {
 		logrus.Info("Mapping modifications")
 		e.MapMods()
-	}
 
-	logrus.Info("Processing modifications")
-	e.AssembleModificationReport()
+		logrus.Info("Processing modifications")
+		e.AssembleModificationReport()
+	}
 
 	var pept id.PepIDList
 	pept.Restore("pep")

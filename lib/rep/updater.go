@@ -15,7 +15,7 @@ type PeptideMap struct {
 // UpdateMappedProteins updates the list of mapped proteins on the data structures
 func (e *Evidence) UpdateMappedProteins() {
 
-	var list []PeptideMap
+	var list = make(map[string]PeptideMap)
 	var checkup = make(map[string]int)
 
 	for _, i := range e.Proteins {
@@ -28,68 +28,143 @@ func (e *Evidence) UpdateMappedProteins() {
 				pm.Sequence = v.Sequence
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
-
-				//if v.IsURazor == true {
 				pm.RazorProtein = i.PartHeader
-				//}
 
-				list = append(list, pm)
+				list[pm.Sequence] = pm
 				checkup[v.Sequence] = 0
 			}
-
 		}
 	}
 
 	for i := range e.PSM {
-		for _, j := range list {
-			if e.PSM[i].Peptide == j.Sequence {
+		v, ok := list[e.PSM[i].Peptide]
+		if ok {
 
-				for k := range j.Proteins {
-					e.PSM[i].MappedProteins[k]++
-				}
+			for k := range v.Proteins {
+				e.PSM[i].MappedProteins[k]++
+			}
 
-				if len(e.PSM[i].RazorProtein) < 1 {
-					e.PSM[i].RazorProtein = j.RazorProtein
-					e.PSM[i].IsURazor = true
-				}
-				break
+			if len(e.PSM[i].RazorProtein) < 1 {
+				e.PSM[i].RazorProtein = v.RazorProtein
+				e.PSM[i].IsURazor = true
 			}
 		}
-
 	}
 
 	for i := range e.Peptides {
-		for _, j := range list {
-			if e.Peptides[i].Sequence == j.Sequence {
+		v, ok := list[e.Peptides[i].Sequence]
+		if ok {
 
-				for k := range j.Proteins {
-					e.Peptides[i].MappedProteins[k]++
-				}
-
-				e.Peptides[i].Protein = j.RazorProtein
-
-				break
+			for k := range v.Proteins {
+				e.Peptides[i].MappedProteins[k]++
 			}
+
+			e.Peptides[i].Protein = v.RazorProtein
 		}
 	}
 
 	for i := range e.Ions {
-		for _, j := range list {
-			if e.Ions[i].Sequence == j.Sequence {
+		v, ok := list[e.Ions[i].Sequence]
+		if ok {
 
-				for k := range j.Proteins {
-					e.Ions[i].MappedProteins[k]++
-				}
-
-				e.Ions[i].Protein = j.RazorProtein
-
-				break
+			for k := range v.Proteins {
+				e.Ions[i].MappedProteins[k]++
 			}
+
+			e.Ions[i].Protein = v.RazorProtein
 		}
 	}
 
 	return
 }
+
+// func (e *Evidence) UpdateMappedProteins() {
+
+// 	var list []PeptideMap
+// 	var checkup = make(map[string]int)
+
+// 	log.Println("check-1")
+
+// 	for _, i := range e.Proteins {
+// 		for _, v := range i.TotalPeptideIons {
+
+// 			_, ok := checkup[v.Sequence]
+// 			if !ok {
+// 				var pm PeptideMap
+
+// 				pm.Sequence = v.Sequence
+// 				pm.Proteins = v.MappedProteins
+// 				pm.Proteins[i.PartHeader] = 0
+
+// 				//if v.IsURazor == true {
+// 				pm.RazorProtein = i.PartHeader
+// 				//}
+
+// 				list = append(list, pm)
+// 				checkup[v.Sequence] = 0
+// 			}
+
+// 		}
+// 	}
+
+// 	log.Println("check-2")
+
+// 	for i := range e.PSM {
+// 		for _, j := range list {
+// 			if e.PSM[i].Peptide == j.Sequence {
+
+// 				for k := range j.Proteins {
+// 					e.PSM[i].MappedProteins[k]++
+// 				}
+
+// 				if len(e.PSM[i].RazorProtein) < 1 {
+// 					e.PSM[i].RazorProtein = j.RazorProtein
+// 					e.PSM[i].IsURazor = true
+// 				}
+// 				break
+// 			}
+// 		}
+
+// 	}
+
+// 	log.Println("check-3")
+
+// 	for i := range e.Peptides {
+// 		for _, j := range list {
+// 			if e.Peptides[i].Sequence == j.Sequence {
+
+// 				for k := range j.Proteins {
+// 					e.Peptides[i].MappedProteins[k]++
+// 				}
+
+// 				e.Peptides[i].Protein = j.RazorProtein
+
+// 				break
+// 			}
+// 		}
+// 	}
+
+// 	log.Println("check-4")
+
+// 	for i := range e.Ions {
+// 		for _, j := range list {
+// 			if e.Ions[i].Sequence == j.Sequence {
+
+// 				for k := range j.Proteins {
+// 					e.Ions[i].MappedProteins[k]++
+// 				}
+
+// 				e.Ions[i].Protein = j.RazorProtein
+
+// 				break
+// 			}
+// 		}
+// 	}
+
+// 	log.Println("check-5")
+
+// 	return
+// }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
 func (e *Evidence) UpdateIonModCount() {
