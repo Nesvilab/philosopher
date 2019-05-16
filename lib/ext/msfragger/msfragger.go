@@ -83,3 +83,131 @@ func (c *MSFragger) Execute(cmdArgs []string, m met.MSFragger) *err.Error {
 
 	return nil
 }
+
+func (c *MSFragger) appendParams(params met.MSFragger, cmd *exec.Cmd) *exec.Cmd {
+
+	if params.ExcludeZ == true {
+		cmd.Args = append(cmd.Args, "EXCLUDE_ZEROS")
+	}
+
+	if params.Noplot == true {
+		cmd.Args = append(cmd.Args, "NOPLOT")
+	}
+
+	if params.Nooccam == true {
+		cmd.Args = append(cmd.Args, "NOOCCAM")
+	}
+
+	if params.Softoccam == true {
+		cmd.Args = append(cmd.Args, "SOFTOCCAM")
+	}
+
+	if params.Icat == true {
+		cmd.Args = append(cmd.Args, "ICAT")
+	}
+
+	if params.Glyc == true {
+		cmd.Args = append(cmd.Args, "GLYC")
+	}
+
+	if params.Nogroupwts == true {
+		cmd.Args = append(cmd.Args, "NOGROUPWTS")
+	}
+
+	if params.NonSP == true {
+		cmd.Args = append(cmd.Args, "NONSP")
+	}
+
+	if params.Accuracy == true {
+		cmd.Args = append(cmd.Args, "ACCURACY")
+	}
+
+	if params.Asap == true {
+		cmd.Args = append(cmd.Args, "ASAP")
+	}
+
+	if params.Refresh == true {
+		cmd.Args = append(cmd.Args, "REFRESH")
+	}
+
+	if params.Normprotlen == true {
+		cmd.Args = append(cmd.Args, "NORMPROTLEN")
+	}
+
+	if params.Logprobs == true {
+		cmd.Args = append(cmd.Args, "LOGPROBS")
+	}
+
+	if params.Confem == true {
+		cmd.Args = append(cmd.Args, "CONFEM")
+	}
+
+	if params.Allpeps == true {
+		cmd.Args = append(cmd.Args, "ALLPEPS")
+	}
+
+	if params.Unmapped == true {
+		cmd.Args = append(cmd.Args, "UNMAPPED")
+	}
+
+	if params.Noprotlen == true {
+		cmd.Args = append(cmd.Args, "NOPROTLEN")
+	}
+
+	if params.Instances == true {
+		cmd.Args = append(cmd.Args, "INSTANCES")
+	}
+
+	if params.Fpkm == true {
+		cmd.Args = append(cmd.Args, "FPKM")
+	}
+
+	if params.Protmw == true {
+		cmd.Args = append(cmd.Args, "PROTMW")
+	}
+
+	if params.Iprophet == true {
+		cmd.Args = append(cmd.Args, "IPROPHET")
+	}
+
+	if params.Asapprophet == true {
+		cmd.Args = append(cmd.Args, "ASAP_PROPHET")
+	}
+
+	if params.Delude == true {
+		cmd.Args = append(cmd.Args, "DELUDE")
+	}
+
+	// // there is an error in the way how the modified version was implemented.
+	// // The mod version is *always* active, and the tag makes it normal again.
+	// // it should be the oposite, so thats why this block looks like that.
+	// if c.Excludemods == true {
+	// 	// the program is always trying to process os'es
+	// 	//cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
+	// } else {
+	// 	// the tag makes the program running in "normal" mode
+	// 	cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
+	// }
+
+	if params.Maxppmdiff != 20 {
+		v := fmt.Sprintf("MAXPPMDIFF%d", params.Maxppmdiff)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.Minprob != 0.05 {
+		v := fmt.Sprintf("MINPROB%.4f", params.Minprob)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.Minindep != 0 {
+		v := fmt.Sprintf("MININDEP%d", params.Minindep)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.Mufactor != 1 {
+		v := fmt.Sprintf("MUFACTOR%d", params.Mufactor)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	return cmd
+}
