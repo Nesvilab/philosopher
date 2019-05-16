@@ -3,6 +3,8 @@ package peptideprophet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // UnixInteractParser ...

@@ -205,8 +205,10 @@ func (e *Evidence) AssembleModificationReport() error {
 				if l.MassDiff > bins[j].LowerMass && l.MassDiff <= bins[j].HigherRight && l.MassDiff != 0 {
 					_, ok := assignChecklist[l.MassDiff]
 					if !ok {
-						bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
-						assignChecklist[l.MassDiff] = 0
+						if l.Type == "Assigned" {
+							bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
+							assignChecklist[l.MassDiff] = 0
+						}
 					}
 				}
 			}

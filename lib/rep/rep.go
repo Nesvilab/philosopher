@@ -498,7 +498,9 @@ func getModsList(m map[string]mod.Modification) ([]string, []string) {
 			a = append(a, fmt.Sprintf("%s%s(%.4f)", i.Position, i.AminoAcid, i.MassDiff))
 		}
 		if i.Type == "Observed" && i.Name != "Unknown" {
-			o = append(o, fmt.Sprintf("%s(%.4f)", i.Name, i.MonoIsotopicMass))
+			for j := range i.IsobaricMods {
+				o = append(o, fmt.Sprintf("%s(%.4f)", j, i.MonoIsotopicMass))
+			}
 		}
 	}
 
