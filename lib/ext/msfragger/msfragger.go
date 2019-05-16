@@ -1,4 +1,4 @@
-package fragger
+package msfragger
 
 import (
 	"fmt"
@@ -34,25 +34,26 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 
 	var frg = New(m.Temp)
 
-	if len(m.MSFragger.Param) < 1 {
-		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "No parameter file found. Run 'comet --help' for more information"}
-		//logrus.Fatal("No parameter file found. Run 'comet --help' for more information")
-	}
+	// if len(m.MSFragger.Param) < 1 {
+	// 	return m, &err.Error{Type: err.CannotRunMSFragger, Class: err.WARN, Argument: "No parameter file found, using values defined via command line"}
+	// }
 
 	// collect and store the mz files
 	m.MSFragger.RawFiles = args
 
-	// convert the param file to binary and store it in meta
-	var binFile []byte
-	paramAbs, _ := filepath.Abs(m.MSFragger.Param)
-	binFile, e := ioutil.ReadFile(paramAbs)
-	if e != nil {
-		logrus.Fatal(e)
+	if len(m.MSFragger.Param) > 1 {
+		// convert the param file to binary and store it in meta
+		var binFile []byte
+		paramAbs, _ := filepath.Abs(m.MSFragger.Param)
+		binFile, e := ioutil.ReadFile(paramAbs)
+		if e != nil {
+			logrus.Fatal(e)
+		}
+		m.MSFragger.ParamFile = binFile
 	}
-	m.MSFragger.ParamFile = binFile
 
 	// run comet
-	e = frg.Execute(args, m.MSFragger)
+	e := frg.Execute(args, m.MSFragger)
 	if e != nil {
 		//logrus.Fatal(e)
 	}

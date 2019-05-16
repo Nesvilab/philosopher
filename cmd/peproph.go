@@ -20,11 +20,6 @@ var peprophCmd = &cobra.Command{
 
 		e := m.FunctionInitCheckUp()
 		if e != nil {
-			logrus.Fatal(e)
-		}
-
-		e = m.FunctionInitCheckUp()
-		if e != nil {
 			fmt.Println(e.Error())
 		}
 

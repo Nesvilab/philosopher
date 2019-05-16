@@ -11,7 +11,7 @@ import (
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/comet"
-	"github.com/prvst/philosopher/lib/ext/fragger"
+	"github.com/prvst/philosopher/lib/ext/msfragger"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/ext/proteinprophet"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
@@ -129,7 +129,7 @@ var pipelineCmd = &cobra.Command{
 				if e != nil {
 					logrus.Fatal(e)
 				}
-				fragger.Run(m, files)
+				msfragger.Run(m, files)
 				m.Serialize()
 			}
 

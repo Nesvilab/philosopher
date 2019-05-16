@@ -103,6 +103,9 @@ const (
 	// CannotRunComet is used when the comet search engine returns an error
 	CannotRunComet string = "cannot run Comet search"
 
+	// CannotRunMSFragger is used when the msfragger search engine returns an error
+	CannotRunMSFragger string = "cannot run MSFragger search"
+
 	// CannotRunProgram is used when a given binary fails to run
 	CannotRunProgram string = "cannot execute program"
 

@@ -90,12 +90,86 @@ type Comet struct {
 
 // MSFragger options and parameters
 type MSFragger struct {
-	JarPath      string `yaml:"path"`
-	Memmory      string `yaml:"memmory"`
-	Param        string `yaml:"param"`
-	RawExtension string `yaml:"raw"`
-	ParamFile    []byte
-	RawFiles     []string
+	JarPath                            string  `yaml:"path"`
+	Memmory                            int     `yaml:"memmory"`
+	Threads                            int     `yaml:"num_threads"`
+	RawExtension                       string  `yaml:"raw"`
+	DatabaseName                       string  `yaml:"database_name"`
+	PrecursorMassLower                 int     `yaml:"precursor_mass_lower"`
+	PrecursorMassUpper                 int     `yaml:"precursor_mass_upper"`
+	PrecursorMassUnits                 int     `yaml:"precursor_mass_units"`
+	PrecursorTrueTolerance             int     `yaml:"precursor_true_tolerance"`
+	PrecursorTrueUnits                 int     `yaml:"precursor_true_units"`
+	FragmentMassTolerance              int     `yaml:"fragment_mass_tolerance"`
+	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
+	CalibrateMass                      int     `yaml:"calibrate_mass"`
+	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
+	IsotopeError                       int     `yaml:"isotope_error"`
+	MassOffsets                        int     `yaml:"mass_offsets"`
+	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
+	ShiftedIons                        int     `yaml:"shifted_ions"`
+	ShiftedIonsExcludeRanges           string  `yaml:"shifted_ions_exclude_ranges"`
+	FragmentIonSeries                  string  `yaml:"fragment_ion_series"`
+	SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
+	SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`
+	SearchEnzymeButNotAfter            string  `yaml:"search_enzyme_butnotafter"`
+	NumEnzymeTermini                   int     `yaml:"num_enzyme_termini"`
+	AllowedMissedCleavage              int     `yaml:"allowed_missed_cleavage"`
+	ClipNTermM                         int     `yaml:"clip_nTerm_M"`
+	AllowMultipleVariableModsOnResidue int     `yaml:"allow_multiple_variable_mods_on_residue"`
+	MaxVariableModsPerMod              int     `yaml:"max_variable_mods_per_mod"`
+	MaxVariableModsCombinations        int     `yaml:"max_variable_mods_combinations"`
+	OutputFileExtension                string  `yaml:"output_file_extension"`
+	OutputFormat                       string  `yaml:"output_format"`
+	OutputReportTopN                   int     `yaml:"output_report_topN"`
+	OutputMaxExpect                    int     `yaml:"output_max_expect"`
+	ReportAlternativeProteins          int     `yaml:"report_alternative_proteins"`
+	OverrideCharge                     int     `yaml:"override_charge"`
+	PrecursorCharge                    string  `yaml:"precursor_charge"`
+	DigestMinLength                    int     `yaml:"digest_min_length"`
+	DigestMaxLength                    int     `yaml:"digest_max_length"`
+	DigestMassRange                    string  `yaml:"digest_mass_range"`
+	MaxFragmentCharge                  int     `yaml:"max_fragment_charge"`
+	TrackZeroTopN                      int     `yaml:"track_zero_topN"`
+	ZeroBinAcceptExpect                int     `yaml:"zero_bin_accept_expect"`
+	ZeroBinMultExpect                  int     `yaml:"zero_bin_mult_expect"`
+	AddTopNComplementary               int     `yaml:"add_topN_complementary"`
+	MinimumPeaks                       int     `yaml:"minimum_peaks"`
+	UseTopNPeaks                       int     `yaml:"use_topN_peaks"`
+	MinFragmentsModelling              int     `yaml:"min_fragments_modelling"`
+	MinMatchedFragments                int     `yaml:"min_matched_fragments"`
+	MinimumRatio                       float64 `yaml:"minimum_ratio"`
+	ClearMzRange                       string  `yaml:"clear_mz_range"`
+	VariableMod01                      string  `yaml:"variable_mod_01"`
+	VariableMod02                      string  `yaml:"variable_mod_02"`
+	VariableMod03                      string  `yaml:"variable_mod_03"`
+	VariableMod04                      string  `yaml:"variable_mod_04"`
+	AddCysteine                        float64 `yaml:"add_C_cysteine"`
+	AddCtermPeptide                    float64 `yaml:"add_Cterm_peptide"`
+	AddCtermProtein                    float64 `yaml:"add_Cterm_protein"`
+	AddAsparticAcid                    float64 `yaml:"add_D_aspartic_acid"`
+	AddGlutamicAcid                    float64 `yaml:"add_E_glutamic_acid"`
+	AddPhenylAlnine                    float64 `yaml:"add_F_phenylalanine"`
+	AddGlycine                         float64 `yaml:"add_G_glycine"`
+	AddHistidine                       float64 `yaml:"add_H_histidine"`
+	AddIsoleucine                      float64 `yaml:"add_I_isoleucine"`
+	AddLysine                          float64 `yaml:"add_K_lysine"`
+	AddLeucine                         float64 `yaml:"add_L_leucine"`
+	AddMethionine                      float64 `yaml:"add_M_methionine"`
+	AddAsparagine                      float64 `yaml:"add_N_asparagine"`
+	AddNTermPeptide                    float64 `yaml:"add_Nterm_peptide"`
+	AddNtermPoteine                    float64 `yaml:"add_Nterm_protein"`
+	AddProline                         float64 `yaml:"add_P_proline"`
+	AddGlutamine                       float64 `yaml:"add_Q_glutamine"`
+	AddArginine                        float64 `yaml:"add_R_arginine"`
+	AddSerine                          float64 `yaml:"add_S_serine"`
+	AddThreonine                       float64 `yaml:"add_T_threonine"`
+	AddValine                          float64 `yaml:"add_V_valine"`
+	AddTryptophan                      float64 `yaml:"add_W_tryptophan"`
+	AddTyrosine                        float64 `yaml:"add_Y_tyrosine"`
+	Param                              string  `yaml:"param"`
+	RawFiles                           []string
+	ParamFile                          []byte
 }
 
 // PeptideProphet options and parameters
