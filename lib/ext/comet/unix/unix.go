@@ -3,6 +3,8 @@ package comet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // UnixParameterFile ...
@@ -13,7 +15,7 @@ func UnixParameterFile(unixParam string) error {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
 
-	err = ioutil.WriteFile(unixParam, param, 0644)
+	err = ioutil.WriteFile(unixParam, param, sys.FilePermission())
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
@@ -29,7 +31,7 @@ func Unix64(unix64 string) error {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
 
-	err = ioutil.WriteFile(unix64, bin, 0755)
+	err = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")
 	}

@@ -48,7 +48,7 @@ var pipelineCmd = &cobra.Command{
 		// 	logrus.Fatal(e.Error())
 		// }
 
-		os.Mkdir(meta.Temp, 0755)
+		os.Mkdir(meta.Temp, sys.FilePermission())
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
 			logrus.Info("Can't find temporary directory; check folder permissions")
 		}

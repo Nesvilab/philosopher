@@ -300,7 +300,7 @@ func (d *Base) Deploy(temp string) *err.Error {
 	d.CrapDB = fmt.Sprintf("%s%scrap.fas", temp, string(filepath.Separator))
 
 	param, e := Asset("crap.fas")
-	e = ioutil.WriteFile(d.CrapDB, param, 0644)
+	e = ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
 
 	if e != nil {
 		return &err.Error{Type: err.CannotDeployCrapDB, Class: err.FATA, Argument: e.Error()}

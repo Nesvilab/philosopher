@@ -18,7 +18,7 @@ func (e *Evidence) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	er = ioutil.WriteFile(sys.EvBin(), b, 0644)
+	er = ioutil.WriteFile(sys.EvBin(), b, sys.FilePermission())
 	if er != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}

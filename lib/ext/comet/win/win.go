@@ -3,6 +3,8 @@ package comet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // WinParameterFile ...
@@ -13,7 +15,7 @@ func WinParameterFile(winParam string) error {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
 
-	err = ioutil.WriteFile(winParam, param, 0644)
+	err = ioutil.WriteFile(winParam, param, sys.FilePermission())
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
@@ -29,7 +31,7 @@ func Win32(win32 string) error {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
 
-	err = ioutil.WriteFile(win32, bin, 0755)
+	err = ioutil.WriteFile(win32, bin, sys.FilePermission())
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")
 	}
@@ -41,7 +43,7 @@ func Win32(win32 string) error {
 func Win64(win64 string) error {
 
 	bin, err := Asset("comet.2018014.win64.exe")
-	err = ioutil.WriteFile(win64, bin, 0755)
+	err = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy Comet parameter file")

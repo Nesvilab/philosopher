@@ -9,7 +9,7 @@ import (
 func UnixInteractParser(s string) error {
 
 	bin, err := Asset("InteractParser")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy InteractParser")
@@ -22,7 +22,7 @@ func UnixInteractParser(s string) error {
 func UnixRefreshParser(s string) error {
 
 	bin, err := Asset("RefreshParser")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy RefreshParser")
@@ -35,7 +35,7 @@ func UnixRefreshParser(s string) error {
 func UnixPeptideProphetParser(s string) error {
 
 	bin, err := Asset("PeptideProphetParser")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy PeptideProphetParser")

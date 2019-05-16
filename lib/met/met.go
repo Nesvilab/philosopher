@@ -368,7 +368,7 @@ func (d *Data) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
 
-	e = ioutil.WriteFile(sys.Meta(), b, 0644)
+	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
 	}
@@ -395,7 +395,6 @@ func (d *Data) Restore(f string) *err.Error {
 
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
 		os.Mkdir(d.Temp, sys.FilePermission())
-		//0755
 	}
 
 	return nil

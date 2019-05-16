@@ -9,7 +9,7 @@ import (
 func WinInteractParser(s string) error {
 
 	bin, err := Asset("InteractParser.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy InteractParser")
@@ -22,7 +22,7 @@ func WinInteractParser(s string) error {
 func WinRefreshParser(s string) error {
 
 	bin, err := Asset("RefreshParser.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy RefreshParser")
@@ -35,7 +35,7 @@ func WinRefreshParser(s string) error {
 func WinPeptideProphetParser(s string) error {
 
 	bin, err := Asset("PeptideProphetParser.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy PeptideProphetParser")
@@ -48,7 +48,7 @@ func WinPeptideProphetParser(s string) error {
 func Mv(s string) error {
 
 	bin, err := Asset("mv.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy mv.exe")
@@ -61,7 +61,7 @@ func Mv(s string) error {
 func LibgccDLL(s string) error {
 
 	bin, err := Asset("libgcc_s_dw2-1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy libgcc_s_dw2")
@@ -74,7 +74,7 @@ func LibgccDLL(s string) error {
 func Zlib1DLL(s string) error {
 
 	bin, err := Asset("zlib1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy Zlib1DLL")

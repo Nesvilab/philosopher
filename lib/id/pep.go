@@ -597,7 +597,7 @@ func (p *PepXML) Serialize() *err.Error {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
 	}
 
-	e = ioutil.WriteFile(sys.PepxmlBin(), b, 0644)
+	e = ioutil.WriteFile(sys.PepxmlBin(), b, sys.FilePermission())
 	if e != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
 	}
@@ -641,7 +641,7 @@ func (p *PepIDList) Serialize(level string) *err.Error {
 		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
 	}
 
-	er = ioutil.WriteFile(dest, b, 0644)
+	er = ioutil.WriteFile(dest, b, sys.FilePermission())
 	if er != nil {
 		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
 	}

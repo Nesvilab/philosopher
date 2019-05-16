@@ -3,13 +3,15 @@ package interprophet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // WinInterProphetParser accessor
 func WinInterProphetParser(s string) error {
 
 	bin, err := Asset("InterProphetParser.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy InterProphetParser")
@@ -22,7 +24,7 @@ func WinInterProphetParser(s string) error {
 func LibgccDLL(s string) error {
 
 	bin, err := Asset("libgcc_s_dw2-1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy libgcc_s_dw2")
@@ -35,7 +37,7 @@ func LibgccDLL(s string) error {
 func Zlib1DLL(s string) error {
 
 	bin, err := Asset("zlib1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy Zlib1DLL")

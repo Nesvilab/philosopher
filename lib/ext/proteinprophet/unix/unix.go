@@ -3,13 +3,15 @@ package proteinprophet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/sys"
 )
 
 // UnixBatchCoverage ...
 func UnixBatchCoverage(s string) error {
 
 	bin, err := Asset("batchcoverage")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy batchcoverage")
@@ -22,7 +24,7 @@ func UnixBatchCoverage(s string) error {
 func UnixDatabaseParser(s string) error {
 
 	bin, err := Asset("DatabaseParser")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy DatabaseParser")
@@ -35,7 +37,7 @@ func UnixDatabaseParser(s string) error {
 func UnixProteinProphet(s string) error {
 
 	bin, err := Asset("ProteinProphet")
-	err = ioutil.WriteFile(s, bin, 0755)
+	err = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if err != nil {
 		return errors.New("Cannot deploy ProteinProphet")
