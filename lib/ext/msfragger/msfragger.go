@@ -53,7 +53,7 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 	}
 
 	// run comet
-	e := frg.Execute(args, m.MSFragger)
+	e := frg.Execute(m.MSFragger, args)
 	if e != nil {
 		//logrus.Fatal(e)
 	}
@@ -62,10 +62,18 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 }
 
 // Execute is the main fucntion to execute MSFragger
-func (c *MSFragger) Execute(cmdArgs []string, m met.MSFragger) *err.Error {
+func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) *err.Error {
 
-	mem := fmt.Sprintf("-Xmx%sG", m.Memmory)
-	cmd := exec.Command("java", "-jar", mem, m.JarPath, m.Param)
+	// var cmd *exec.Cmd
+	// mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
+
+	// if len(params.Param) > 0 {
+	// 	cmd = exec.Command("java", "-jar", mem, params.JarPath, params.Param)
+	// } else {
+	// 	cmd = exec.Command("java", "-jar", mem, params.JarPath, "--database_name ../2019-04-01-td-UP000005640.fas")
+	// }
+
+	cmd := appendParams(params)
 
 	for _, i := range cmdArgs {
 		file, _ := filepath.Abs(i)
@@ -84,130 +92,174 @@ func (c *MSFragger) Execute(cmdArgs []string, m met.MSFragger) *err.Error {
 	return nil
 }
 
-func (c *MSFragger) appendParams(params met.MSFragger, cmd *exec.Cmd) *exec.Cmd {
+func appendParams(params met.MSFragger) *exec.Cmd {
 
-	if params.ExcludeZ == true {
-		cmd.Args = append(cmd.Args, "EXCLUDE_ZEROS")
+	mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
+	dbpath, _ := filepath.Abs(params.DatabaseName)
+
+	if len(params.VariableMod01) < 1 {
+		params.VariableMod01 = ""
 	}
 
-	if params.Noplot == true {
-		cmd.Args = append(cmd.Args, "NOPLOT")
+	if len(params.VariableMod02) < 1 {
+		params.VariableMod02 = ""
 	}
 
-	if params.Nooccam == true {
-		cmd.Args = append(cmd.Args, "NOOCCAM")
+	if len(params.VariableMod03) < 1 {
+		params.VariableMod03 = ""
 	}
 
-	if params.Softoccam == true {
-		cmd.Args = append(cmd.Args, "SOFTOCCAM")
+	if len(params.VariableMod04) < 1 {
+		params.VariableMod04 = ""
 	}
 
-	if params.Icat == true {
-		cmd.Args = append(cmd.Args, "ICAT")
-	}
+	args := exec.Command("java",
+		"-jar",
+		mem,
+		params.JarPath,
+		"--database_name",
+		dbpath,
+		"--num_threads",
+		fmt.Sprintf("%d", params.Threads),
+		"--precursor_mass_lower",
+		fmt.Sprintf("%d", params.PrecursorMassLower),
+		"--precursor_mass_upper",
+		fmt.Sprintf("%d", params.PrecursorMassUpper),
+		"--precursor_mass_units",
+		fmt.Sprintf("%d", params.PrecursorMassUnits),
+		"--fragment_mass_tolerance",
+		fmt.Sprintf("%d", params.FragmentMassTolerance),
+		"--fragment_mass_units",
+		fmt.Sprintf("%d", params.FragmentMassUnits),
+		"--calibrate_mass",
+		fmt.Sprintf("%d", params.CalibrateMass),
+		"--isotope_error",
+		fmt.Sprintf("%d", params.IsotopeError),
+		"--mass_offsets",
+		fmt.Sprintf("%d", params.MassOffsets),
+		"--shifted_ions",
+		fmt.Sprintf("%d", params.ShiftedIons),
+		"--precursor_mass_mode",
+		fmt.Sprintf("%s", params.PrecursorMassMode),
+		"--shifted_ions_exclude_ranges",
+		fmt.Sprintf("%s", params.ShiftedIonsExcludeRanges),
+		"--fragment_ion_series",
+		fmt.Sprintf("%s", params.FragmentIonSeries),
+		"--search_enzyme_name",
+		fmt.Sprintf("%s", params.SearchEnzymeName),
+		"--search_enzyme_cutafter",
+		fmt.Sprintf("%s", params.SearchEnzymeCutafter),
+		"--search_enzyme_butnotafter",
+		fmt.Sprintf("%s", params.SearchEnzymeButNotAfter),
+		"--num_enzyme_termini",
+		fmt.Sprintf("%d", params.NumEnzymeTermini),
+		"--allowed_missed_cleavage",
+		fmt.Sprintf("%d", params.AllowedMissedCleavage),
+		"--clip_nTerm_M",
+		fmt.Sprintf("%d", params.ClipNTermM),
+		"--variable_mod_01",
+		fmt.Sprintf("%s", params.VariableMod01),
+		"--variable_mod_02",
+		fmt.Sprintf("%s", params.VariableMod02),
+		//"--variable_mod_03",
+		//fmt.Sprintf("%s", params.VariableMod03),
+		//"--variable_mod_04",
+		//fmt.Sprintf("%s", params.VariableMod04),
+		"--allow_multiple_variable_mods_on_residue",
+		fmt.Sprintf("%d", params.AllowMultipleVariableModsOnResidue),
+		"--max_variable_mods_per_mod",
+		fmt.Sprintf("%d", params.MaxVariableModsPerMod),
+		"--max_variable_mods_combinations",
+		fmt.Sprintf("%d", params.MaxVariableModsCombinations),
+		"--output_file_extension",
+		fmt.Sprintf("%s", params.OutputFileExtension),
+		"--output_format",
+		fmt.Sprintf("%s", params.OutputFormat),
+		"--output_report_topN",
+		fmt.Sprintf("%d", params.OutputReportTopN),
+		"--output_max_expect",
+		fmt.Sprintf("%d", params.OutputMaxExpect),
+		"--report_alternative_proteins",
+		fmt.Sprintf("%d", params.ReportAlternativeProteins),
+		"--precursor_charge",
+		fmt.Sprintf("%s", params.PrecursorCharge),
+		"--override_charge",
+		fmt.Sprintf("%d", params.OverrideCharge),
+		"--digest_min_length",
+		fmt.Sprintf("%d", params.DigestMinLength),
+		"--digest_max_length",
+		fmt.Sprintf("%d", params.DigestMaxLength),
+		"--digest_mass_range",
+		fmt.Sprintf("%s", params.DigestMassRange),
+		"--max_fragment_charge",
+		fmt.Sprintf("%d", params.MaxFragmentCharge),
+		"--track_zero_topN",
+		fmt.Sprintf("%d", params.TrackZeroTopN),
+		"--zero_bin_accept_expect",
+		fmt.Sprintf("%d", params.ZeroBinAcceptExpect),
+		"--zero_bin_mult_expect",
+		fmt.Sprintf("%d", params.ZeroBinMultExpect),
+		"--add_topN_complementary",
+		fmt.Sprintf("%d", params.AddTopNComplementary),
+		"--minimum_peaks",
+		fmt.Sprintf("%d", params.MinimumPeaks),
+		"--use_topN_peaks",
+		fmt.Sprintf("%d", params.UseTopNPeaks),
+		"--min_fragments_modelling",
+		fmt.Sprintf("%d", params.MinFragmentsModelling),
+		"--min_matched_fragments",
+		fmt.Sprintf("%d", params.MinMatchedFragments),
+		"--minimum_ratio",
+		fmt.Sprintf("%f", params.MinimumRatio),
+		"--clear_mz_range",
+		fmt.Sprintf("%s", params.ClearMzRange),
+		"--add_C_cysteine",
+		fmt.Sprintf("%f", params.AddCysteine),
+		"--add_Cterm_peptide",
+		fmt.Sprintf("%f", params.AddCtermPeptide),
+		"--add_Cterm_protein",
+		fmt.Sprintf("%f", params.AddCtermProtein),
+		"--add_D_aspartic_acid",
+		fmt.Sprintf("%f", params.AddAsparticAcid),
+		"--add_E_glutamic_acid",
+		fmt.Sprintf("%f", params.AddGlutamicAcid),
+		"--add_F_phenylalanine",
+		fmt.Sprintf("%f", params.AddPhenylAlnine),
+		"--add_G_glycine",
+		fmt.Sprintf("%f", params.AddGlycine),
+		"--add_H_histidine",
+		fmt.Sprintf("%f", params.AddHistidine),
+		"--add_I_isoleucine",
+		fmt.Sprintf("%f", params.AddIsoleucine),
+		"--add_K_lysine",
+		fmt.Sprintf("%f", params.AddLysine),
+		"--add_L_leucine",
+		fmt.Sprintf("%f", params.AddLeucine),
+		"--add_M_methionine",
+		fmt.Sprintf("%f", params.AddMethionine),
+		"--add_N_asparagine",
+		fmt.Sprintf("%f", params.AddAsparagine),
+		"--add_Nterm_peptide",
+		fmt.Sprintf("%f", params.AddNTermPeptide),
+		"--add_Nterm_protein",
+		fmt.Sprintf("%f", params.AddNtermProteine),
+		"--add_P_proline",
+		fmt.Sprintf("%f", params.AddProline),
+		"--add_Q_glutamine",
+		fmt.Sprintf("%f", params.AddGlutamine),
+		"--add_R_arginine",
+		fmt.Sprintf("%f", params.AddArginine),
+		"--add_S_serine",
+		fmt.Sprintf("%f", params.AddSerine),
+		"--add_T_threonine",
+		fmt.Sprintf("%f", params.AddThreonine),
+		"--add_V_valine",
+		fmt.Sprintf("%f", params.AddValine),
+		"--add_W_tryptophan",
+		fmt.Sprintf("%f", params.AddTryptophan),
+		"--add_Y_tyrosine",
+		fmt.Sprintf("%f", params.AddTyrosine),
+	)
 
-	if params.Glyc == true {
-		cmd.Args = append(cmd.Args, "GLYC")
-	}
-
-	if params.Nogroupwts == true {
-		cmd.Args = append(cmd.Args, "NOGROUPWTS")
-	}
-
-	if params.NonSP == true {
-		cmd.Args = append(cmd.Args, "NONSP")
-	}
-
-	if params.Accuracy == true {
-		cmd.Args = append(cmd.Args, "ACCURACY")
-	}
-
-	if params.Asap == true {
-		cmd.Args = append(cmd.Args, "ASAP")
-	}
-
-	if params.Refresh == true {
-		cmd.Args = append(cmd.Args, "REFRESH")
-	}
-
-	if params.Normprotlen == true {
-		cmd.Args = append(cmd.Args, "NORMPROTLEN")
-	}
-
-	if params.Logprobs == true {
-		cmd.Args = append(cmd.Args, "LOGPROBS")
-	}
-
-	if params.Confem == true {
-		cmd.Args = append(cmd.Args, "CONFEM")
-	}
-
-	if params.Allpeps == true {
-		cmd.Args = append(cmd.Args, "ALLPEPS")
-	}
-
-	if params.Unmapped == true {
-		cmd.Args = append(cmd.Args, "UNMAPPED")
-	}
-
-	if params.Noprotlen == true {
-		cmd.Args = append(cmd.Args, "NOPROTLEN")
-	}
-
-	if params.Instances == true {
-		cmd.Args = append(cmd.Args, "INSTANCES")
-	}
-
-	if params.Fpkm == true {
-		cmd.Args = append(cmd.Args, "FPKM")
-	}
-
-	if params.Protmw == true {
-		cmd.Args = append(cmd.Args, "PROTMW")
-	}
-
-	if params.Iprophet == true {
-		cmd.Args = append(cmd.Args, "IPROPHET")
-	}
-
-	if params.Asapprophet == true {
-		cmd.Args = append(cmd.Args, "ASAP_PROPHET")
-	}
-
-	if params.Delude == true {
-		cmd.Args = append(cmd.Args, "DELUDE")
-	}
-
-	// // there is an error in the way how the modified version was implemented.
-	// // The mod version is *always* active, and the tag makes it normal again.
-	// // it should be the oposite, so thats why this block looks like that.
-	// if c.Excludemods == true {
-	// 	// the program is always trying to process os'es
-	// 	//cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
-	// } else {
-	// 	// the tag makes the program running in "normal" mode
-	// 	cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")
-	// }
-
-	if params.Maxppmdiff != 20 {
-		v := fmt.Sprintf("MAXPPMDIFF%d", params.Maxppmdiff)
-		cmd.Args = append(cmd.Args, v)
-	}
-
-	if params.Minprob != 0.05 {
-		v := fmt.Sprintf("MINPROB%.4f", params.Minprob)
-		cmd.Args = append(cmd.Args, v)
-	}
-
-	if params.Minindep != 0 {
-		v := fmt.Sprintf("MININDEP%d", params.Minindep)
-		cmd.Args = append(cmd.Args, v)
-	}
-
-	if params.Mufactor != 1 {
-		v := fmt.Sprintf("MUFACTOR%d", params.Mufactor)
-		cmd.Args = append(cmd.Args, v)
-	}
-
-	return cmd
+	return args
 }

@@ -158,7 +158,7 @@ type MSFragger struct {
 	AddMethionine                      float64 `yaml:"add_M_methionine"`
 	AddAsparagine                      float64 `yaml:"add_N_asparagine"`
 	AddNTermPeptide                    float64 `yaml:"add_Nterm_peptide"`
-	AddNtermPoteine                    float64 `yaml:"add_Nterm_protein"`
+	AddNtermProteine                   float64 `yaml:"add_Nterm_protein"`
 	AddProline                         float64 `yaml:"add_P_proline"`
 	AddGlutamine                       float64 `yaml:"add_Q_glutamine"`
 	AddArginine                        float64 `yaml:"add_R_arginine"`
