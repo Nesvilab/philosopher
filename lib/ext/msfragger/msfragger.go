@@ -95,7 +95,8 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) *err.Error {
 func appendParams(params met.MSFragger) *exec.Cmd {
 
 	mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
-	dbpath, _ := filepath.Abs(params.DatabaseName)
+	dbPath, _ := filepath.Abs(params.DatabaseName)
+	jarPath, _ := filepath.Abs(params.JarPath)
 
 	if len(params.VariableMod01) < 1 {
 		params.VariableMod01 = ""
@@ -116,9 +117,9 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 	args := exec.Command("java",
 		"-jar",
 		mem,
-		params.JarPath,
+		jarPath,
 		"--database_name",
-		dbpath,
+		dbPath,
 		"--num_threads",
 		fmt.Sprintf("%d", params.Threads),
 		"--precursor_mass_lower",
@@ -161,10 +162,10 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		fmt.Sprintf("%s", params.VariableMod01),
 		"--variable_mod_02",
 		fmt.Sprintf("%s", params.VariableMod02),
-		//"--variable_mod_03",
-		//fmt.Sprintf("%s", params.VariableMod03),
-		//"--variable_mod_04",
-		//fmt.Sprintf("%s", params.VariableMod04),
+		"--variable_mod_03",
+		fmt.Sprintf("%s", params.VariableMod03),
+		"--variable_mod_04",
+		fmt.Sprintf("%s", params.VariableMod04),
 		"--allow_multiple_variable_mods_on_residue",
 		fmt.Sprintf("%d", params.AllowMultipleVariableModsOnResidue),
 		"--max_variable_mods_per_mod",
