@@ -81,7 +81,7 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
-	customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag)
+	customDB, e := db.Save(m.Home, m.Temp, m.Database.Tag, m.Database.Rev, m.Database.Iso)
 	if e != nil {
 		logrus.Fatal(e)
 	}
@@ -95,7 +95,7 @@ func Run(m met.Data) (met.Data, *err.Error) {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
-	db.Save(m.Home, m.Temp, m.Database.Tag)
+	db.Save(m.Home, m.Temp, m.Database.Tag, m.Database.Rev, m.Database.Iso)
 
 	err = db.Serialize()
 	if err != nil {
@@ -310,15 +310,25 @@ func (d *Base) Deploy(temp string) *err.Error {
 }
 
 // Save fasta file to disk
-func (d *Base) Save(home, temp, tag string) (string, *err.Error) {
+func (d *Base) Save(home, temp, tag string, isRev, hasIso bool) (string, *err.Error) {
 
 	base := filepath.Base(d.UniProtDB)
 
 	t := time.Now()
 	stamp := fmt.Sprintf(t.Format("2006-01-02"))
 
-	workfile := fmt.Sprintf("%s%s%s-td-%s", temp, string(filepath.Separator), stamp, base)
-	outfile := fmt.Sprintf("%s%s%s-td-%s", home, string(filepath.Separator), stamp, base)
+	baseName := fmt.Sprintf("%s%s-td", string(filepath.Separator), stamp)
+
+	if isRev == true {
+		baseName = baseName + "-rev"
+	}
+
+	if hasIso == true {
+		baseName = baseName + "-iso"
+	}
+
+	workfile := fmt.Sprintf("%s%s-%s", temp, baseName, base)
+	outfile := fmt.Sprintf("%s%s-%s", home, baseName, base)
 
 	// create decoy db file
 	file, e := os.Create(workfile)
