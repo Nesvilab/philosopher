@@ -34,10 +34,6 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 
 	var frg = New(m.Temp)
 
-	// if len(m.MSFragger.Param) < 1 {
-	// 	return m, &err.Error{Type: err.CannotRunMSFragger, Class: err.WARN, Argument: "No parameter file found, using values defined via command line"}
-	// }
-
 	// collect and store the mz files
 	m.MSFragger.RawFiles = args
 

@@ -23,10 +23,7 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 	var names []string
 	var xmlFiles []string
 	var datasets = make(map[string]rep.Evidence)
-
 	var labelList []DataSetLabelNames
-
-	// TODO: create a combined pepXML file by running Interprophet on all data sets
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
@@ -42,7 +39,8 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 		// restoring the database
 		var e rep.Evidence
-		e.RestoreGranularWithPath(i)
+		//e.RestoreGranularWithPath(i)
+		_ = rep.RestoreEVPSMWithPath(&e, i)
 
 		var labels DataSetLabelNames
 		labels.LabelName = make(map[string]string)
@@ -86,6 +84,9 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	logrus.Info("Processing spectral counts")
 	evidences = getPeptideSpectralCounts(evidences, datasets)
+
+	logrus.Info("Processing intensities")
+	evidences = getIntensities(evidences, datasets)
 
 	savePeptideAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
 
@@ -268,7 +269,7 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 
 	for k, v := range datasets {
 
-		var keyMaps = make(map[string]int)
+		var keyMaps = make(map[string]float64)
 
 		for _, j := range v.PSM {
 
@@ -278,7 +279,7 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 			var uniqMds = make(map[string]uint8)
 
 			for _, k := range j.Modifications.Index {
-				mass := strconv.FormatFloat(k.MonoIsotopicMass, 'f', 6, 64)
+				mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
 				uniqMds[mass] = 0
 			}
 
@@ -297,13 +298,21 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 
 			key := strings.Join(keys, "#")
 
-			keyMaps[key]++
+			v, ok := keyMaps[key]
+			if !ok {
+				keyMaps[key] = j.Intensity
+			} else {
+				if j.Intensity > v {
+					keyMaps[key] = j.Intensity
+				}
+			}
+
 		}
 
 		for i := range combined {
-			count, ok := keyMaps[combined[i].Key]
+			int, ok := keyMaps[combined[i].Key]
 			if ok {
-				combined[i].Spc[k] = count
+				combined[i].Intensity[k] = int
 			}
 		}
 
@@ -329,6 +338,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
+		line += fmt.Sprintf("%s Intensity\t", i)
 	}
 
 	line += "\n"
@@ -359,7 +369,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		line += fmt.Sprintf("%s\t", i.ProteinDescription)
 
 		for _, j := range namesList {
-			line += fmt.Sprintf("%d\t", i.Spc[j])
+			line += fmt.Sprintf("%d\t%.4f\t", i.Spc[j], i.Intensity[j])
 		}
 
 		line += "\n"
