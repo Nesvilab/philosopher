@@ -24,7 +24,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "File.Name\tPeptide.Sequence\tCharge.State\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein\n")
+	_, err = io.WriteString(file, "Spectrum.File\tSequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
