@@ -124,7 +124,7 @@ dockers:
     binaries:
     - philosopher
 
-    image_templates:
+    image:
     - "leprevost/philosopher:latest"
     - "leprevost/philosopher:{{ .Version }}"
     
@@ -134,7 +134,7 @@ dockers:
     # If set to auto, the release will not be pushed to the docker repository
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Defaults to false.
-    skip_push: true
+    # skip_push: true
 
 
 # snapcraft:
