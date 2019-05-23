@@ -136,10 +136,8 @@ dockers:
     # Defaults to false.
     skip_push: false
 
-    draft: false
 
-
-# snapcraft:
+# snapcraft
 #   # You can change the name of the package.
 #   # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
 #   name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
