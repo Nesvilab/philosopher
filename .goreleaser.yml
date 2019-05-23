@@ -114,7 +114,6 @@ release:
 
 dockers:
   -
-
     goos: linux
 
     goarch: amd64
@@ -124,9 +123,7 @@ dockers:
     binaries:
     - philosopher
 
-    image:
-    - "leprevost/philosopher:latest"
-    - "leprevost/philosopher:{{ .Version }}"
+    image: "leprevost/philosopher:{{ .Version }}"
     
     dockerfile: Dockerfile
 
