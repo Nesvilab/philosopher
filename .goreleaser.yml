@@ -125,6 +125,7 @@ dockers:
     - philosopher
 
     image_templates:
+    - "docker.io/hexabio/philosopher:latest"
     - "docker.io/hexabio/philosopher:{{ .Version }}"
     
     dockerfile: Dockerfile
@@ -133,7 +134,7 @@ dockers:
     # If set to auto, the release will not be pushed to the docker repository
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Defaults to false.
-    skip_push: false
+    #skip_push: false
 
 
 # snapcraft:
