@@ -25,19 +25,16 @@ builds:
 
   goarm:
     - 6
-    - 7    
+    - 7
 
 archives:
-
-- format: zip
-
 - replacements:
     darwin: darwin
     linux: linux
     windows: windows
     amd64: x86_64
 
-
+  format: zip
 
   files:
     - License
