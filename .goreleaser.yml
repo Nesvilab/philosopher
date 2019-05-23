@@ -28,11 +28,16 @@ builds:
     - 7    
 
 archives:
+
+- format: zip
+
 - replacements:
     darwin: darwin
     linux: linux
     windows: windows
     amd64: x86_64
+
+
 
   files:
     - License
@@ -44,8 +49,6 @@ checksum:
 
 snapshot:
   name_template: "{{ .Tag }}-next"
-
-format: zip
 
 #sign:
 #  artifacts: checksum
