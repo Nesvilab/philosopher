@@ -95,7 +95,9 @@ windows:
 
 .PHONY: release
 release:
-	gox ${LDFLAGS}
+	git tag -a ${BUILD} -m "Philosopher ${VERSION}"
+	git push origin master -f --tags
+	goreleaser --snapshot --rm-dist
 
 .PHONY: all
 all:

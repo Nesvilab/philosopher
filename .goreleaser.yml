@@ -86,12 +86,12 @@ nfpms:
 release:
 
   github:
-    owner: prvst
-    name: git@github.com:Nesvilab/philosopher
+    #owner: prvst
+    #name: git@github.com:Nesvilab/philosopher
 
   # If set to true, will not auto-publish the release.
   # Default is false.
-  draft: true
+  draft: false
 
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
