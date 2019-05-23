@@ -97,7 +97,7 @@ windows:
 release:
 	git tag -a ${BUILD} -m "Philosopher ${VERSION}"
 	git push origin master -f --tags
-	goreleaser --snapshot --rm-dist
+	goreleaser
 
 .PHONY: all
 all:
