@@ -86,9 +86,9 @@ nfpms:
 release:
 
   github:
-    
-  owner: prvst
-  name: git@github.com:Nesvilab/philosopher
+
+    owner: prvst
+    name: git@github.com:Nesvilab/philosopher
 
   # You can disable this pipe in order to not upload any artifacts to
   # GitHub.
