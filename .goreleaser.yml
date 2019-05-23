@@ -114,6 +114,7 @@ release:
 
 dockers:
   -
+
     goos: linux
 
     goarch: amd64
@@ -123,7 +124,9 @@ dockers:
     binaries:
     - philosopher
 
-    image: "leprevost/philosopher"
+    image_templates:
+    - "leprevost/philosopher:latest"
+    - "leprevost/philosopher:{{ .Version }}"
     
     dockerfile: Dockerfile
 
@@ -131,7 +134,9 @@ dockers:
     # If set to auto, the release will not be pushed to the docker repository
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Defaults to false.
-    # skip_push: true
+    skip_push: false
+
+    draft: false
 
 
 # snapcraft:
