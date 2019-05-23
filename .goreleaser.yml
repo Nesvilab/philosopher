@@ -38,8 +38,6 @@ archives:
 
   files:
     - License
-    - README.md
-    - Changelog
 
 checksum:
   name_template: 'checksums.txt'
