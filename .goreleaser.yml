@@ -123,8 +123,7 @@ dockers:
     - philosopher
 
     image_templates:
-    - "leprevost/philosopher:latest"
-    - "leprevost/philosopher:{{ .Version }}"
+    - "biocontainers/philosopher:{{ .Version }}"
     
     dockerfile: Dockerfile
 
