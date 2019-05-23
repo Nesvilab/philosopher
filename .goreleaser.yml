@@ -125,8 +125,8 @@ dockers:
     - philosopher
 
     image_templates:
-    - "docker.io/hexabio/philosopher:latest"
-    - "docker.io/hexabio/philosopher:{{ .Version }}"
+    - "docker.io/leprevost/philosopher:latest"
+    - "docker.io/leprevost/philosopher:{{ .Version }}"
     
     dockerfile: Dockerfile
 
