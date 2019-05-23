@@ -86,8 +86,14 @@ nfpms:
 release:
 
   github:
-    #owner: prvst
-    #name: git@github.com:Nesvilab/philosopher
+    
+  owner: prvst
+  name: git@github.com:Nesvilab/philosopher
+
+  # You can disable this pipe in order to not upload any artifacts to
+  # GitHub.
+  # Defaults to false.
+  disable: false
 
   # If set to true, will not auto-publish the release.
   # Default is false.
@@ -101,12 +107,7 @@ release:
 
   # You can change the name of the GitHub release.
   # Default is `{{.Tag}}`
-  name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
-
-  # You can disable this pipe in order to not upload any artifacts to
-  # GitHub.
-  # Defaults to false.
-  disable: false
+  name_template: "{{.ProjectName}}-v{{.Version}}"
 
 # snapcraft:
 #   # You can change the name of the package.
