@@ -111,6 +111,31 @@ release:
   # Default is `{{.Tag}}`
   name_template: "{{.ProjectName}}-v{{.Version}}"
 
+
+dockers:
+  -
+
+    goos: linux
+
+    goarch: amd64
+
+    goarm: ''
+
+    binaries:
+    - philosopher
+
+    image_templates:
+    - "hexabio/philosopher:{{ .Version }}"
+
+    # Skips the docker push. Could be useful if you also do draft releases.
+    # If set to auto, the release will not be pushed to the docker repository
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Defaults to false.
+    skip_push: false
+
+    # Path to the Dockerfile (from the project root).
+    dockerfile: Dockerfile
+
 # snapcraft:
 #   # You can change the name of the package.
 #   # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
