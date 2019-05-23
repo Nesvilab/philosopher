@@ -135,6 +135,12 @@ dockers:
     # Defaults to false.
     skip_push: false
 
+    build_flag_templates:
+    - "--label=org.label-schema.schema-version=1.0"
+    - "--label=org.label-schema.version={{.Version}}"
+    - "--label=org.label-schema.name={{.ProjectName}}"
+    - "--build-arg=FOO={{.ENV.Bar}}"
+
 # snapcraft:
 #   # You can change the name of the package.
 #   # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
