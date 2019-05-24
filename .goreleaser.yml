@@ -82,8 +82,8 @@ release:
 
   github:
 
-    owner: prvst
-    name: philosopher-source
+    owner: Nesvilab
+    name: philosopher
 
   # You can disable this pipe in order to not upload any artifacts to
   # GitHub.

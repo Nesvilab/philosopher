@@ -86,6 +86,6 @@ install:
 
 .PHONY: release
 release:
-	git tag -a v1.0.0 -m "Philosopher v1.0.0"
+	git tag -a v1.0.1 -m "Philosopher v1.0.1"
 	git push origin master -f --tags
 	goreleaser --release-notes=Changelog --rm-dist
