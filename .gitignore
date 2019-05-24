@@ -31,3 +31,6 @@ bindata.go
 *.pep.xml
 *.prot.xml
 *.tar.gz
+
+#release
+dist/

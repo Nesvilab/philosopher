@@ -29,10 +29,10 @@ builds:
 
 archives:
 - replacements:
-    darwin: darwin
-    linux: linux
-    windows: windows
-    amd64: x86_64
+    #darwin: darwin
+    #linux: linux
+    #windows: windows
+    #amd64: x86_64
 
   format: zip
 
@@ -43,7 +43,7 @@ checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  name_template: "{{ .Tag }}"
 
 #sign:
 #  artifacts: checksum
@@ -64,8 +64,8 @@ nfpms:
   builds:
 
   replacements:
-    amd64: 64-bit
-    darwin: macOS
+    #amd64: 64-bit
+    #darwin: macOS
 
   vendor: University of Michigan, Department of Pathology, Proteome Bioinformatics Laboratory
 
