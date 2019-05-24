@@ -9,12 +9,17 @@ var (
 	Version string
 	// Build code
 	Build string
+
+	version = "dev"
+	build   = "build"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func main() {
 
-	cmd.Version = Version
-	cmd.Build = Build
+	cmd.Version = version
+	cmd.Build = build
 
 	cmd.Execute()
 }

@@ -3,7 +3,6 @@ FROM biocontainers/biocontainers:latest
 LABEL base.image="biocontainers:latest"
 LABEL version="1"
 LABEL software="Philosopher"
-LABEL software.version="20190418"
 LABEL description="A complete toolkit for shotgun proteomics data analysis"
 LABEL website="https://philosopher.nesvilab.org"
 LABEL documentation="https://github.com/Nesvilab/philosopher/wiki"
@@ -11,15 +10,12 @@ LABEL license="GPL-3.0"
 LABEL BIOTOOLS=""
 LABEL tags="Proteomics"
 
-MAINTAINER Felipe da Veiga Leprevost <felipevl@umich.edu>
+# MAINTAINER Felipe da Veiga Leprevost <felipevl@umich.edu>
 
 USER biodocker
 
-RUN wget https://github.com/prvst/philosopher/releases/download/20190418/philosopher_linux_amd64 -P /home/biodocker/bin/Philosopher/ && \
-  chmod -R 755 /home/biodocker/bin/Philosopher/*
+ADD philosopher /home/biodocker/bin/
 
-ENV PATH /home/biodocker/bin/Philosopher/:$PATH
+ENV PATH /home/biodocker/bin/:$PATH
 
 WORKDIR /data/
-
-CMD ["philosopher"]

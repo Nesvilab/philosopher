@@ -37,7 +37,7 @@ deps:
 	go get -u github.com/onsi/ginkgo
 	go get -u github.com/onsi/gomega
 	go get -u github.com/onsi/ginkgo/ginkgo
-	#go get -u github.com/konsorten/go-windows-terminal-sequences
+	go get -u github.com/konsorten/go-windows-terminal-sequences
 
 .PHONY: deploy
 deploy:
@@ -80,54 +80,12 @@ test:
 
 .PHONY: install
 install:
-	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
-
-.PHONY: linux
-linux:
-	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-
-.PHONY: windows
-windows:
-	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	#cp philosopher.${VERSION}.exe /home/prvst/Public/philosopher.exe
+	#gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
+	#cp philosopher.${VERSION} ${GOBIN}/philosopher;
+	#mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
 
 .PHONY: release
 release:
-	git tag -a ${BUILD} -m "Philosopher ${VERSION}"
+	git tag -a v0.1.0 -m "Philosopher v0.1.0"
 	git push origin master -f --tags
-	goreleaser --release-notes=release --rm-dist
-
-.PHONY: all
-all:
-	#gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	#cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	#cp philosopher.${VERSION} /home/felipevl/Servers/castor/home/felipevl/bin/philosopher
-	#cp philosopher.${VERSION} /home/felipevl/Servers/pathbio/bin/philosopher
-	#mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
-	gox ${LDFLAGS} .
-
-.PHONY: clean
-clean:
-	if [ -f ${BINARY} ]; then rm ${BINARY}; fi
-	if [ -f ${BINARY}_linux_386 ]; then rm ${BINARY}_linux_386; fi
-	if [ -f ${BINARY}_linux_amd64 ]; then rm ${BINARY}_linux_amd64; fi
-	if [ -f ${BINARY}_linux_arm ]; then rm ${BINARY}_linux_arm; fi
-	if [ -f ${BINARY}_windows_386.exe ]; then rm ${BINARY}_windows_386.exe; fi
-	if [ -f ${BINARY}_windows_amd64.exe ]; then rm ${BINARY}_windows_amd64.exe; fi
-	if [ -f ${BINARY}_darwin_amd64 ]; then rm ${BINARY}_darwin_amd64; fi
-	if [ -f ${BINARY}_darwin_386 ]; then rm ${BINARY}_darwin_386; fi
-	if [ -f ${BINARY}_freebsd_amd64 ]; then rm ${BINARY}_freebsd_amd64; fi
-	if [ -f ${BINARY}_freebsd_386 ]; then rm ${BINARY}_freebsd_386; fi
-	if [ -f ${BINARY}_freebsd_arm ]; then rm ${BINARY}_freebsd_arm; fi
-	if [ -f ${BINARY}_netbsd_amd64 ]; then rm ${BINARY}_netbsd_amd64; fi
-	if [ -f ${BINARY}_netbsd_386 ]; then rm ${BINARY}_netbsd_386; fi
-	if [ -f ${BINARY}_netbsd_arm ]; then rm ${BINARY}_netbsd_arm; fi
-	if [ -f ${BINARY}_openbsd_amd64 ]; then rm ${BINARY}_openbsd_amd64; fi
-	if [ -f ${BINARY}_openbsd_386 ]; then rm ${BINARY}_openbsd_386; fi
-	if [ -f ${BINARY}_linux_mips ]; then rm ${BINARY}_linux_mips; fi
-	if [ -f ${BINARY}_linux_mips64 ]; then rm ${BINARY}_linux_mips64; fi
-	if [ -f ${BINARY}_linux_mips64le ]; then rm ${BINARY}_linux_mips64le; fi
-	if [ -f ${BINARY}_linux_mipsle ]; then rm ${BINARY}_linux_mipsle; fi
-	if [ -f ${BINARY}_linux_s390x ]; then rm ${BINARY}_linux_s390x; fi
+	goreleaser --release-notes=Changelog --rm-dist

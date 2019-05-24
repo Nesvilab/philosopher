@@ -11,7 +11,7 @@ builds:
   - CGO_ENABLED=0
 
   ldflags:
-    - -w -s -X main.Version=${VERSION} -X main.Build=${BUILD}
+    - -w -s -X main.version={{ .Version }} -X main.build={{ .Tag }}
 
   goos:
     - freebsd
@@ -20,11 +20,6 @@ builds:
 
   goarch:
     - amd64
-    - arm64
-
-  goarm:
-    - 6
-    - 7
 
 archives:
 - replacements:
@@ -37,12 +32,14 @@ archives:
 
   files:
     - License
+    - Changelog
+    - philosopher.yml
 
 checksum:
   name_template: 'checksums.txt'
 
 snapshot:
-  name_template: "{{ .Tag }}"
+  name_template: "{{ .Version }}"
 
 changelog:
   sort: asc
@@ -55,7 +52,7 @@ nfpms:
 -
   #id: "default"
 
-  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
   builds:
 
@@ -104,7 +101,7 @@ release:
   # You can change the name of the GitHub release.
   # Default is `{{.Tag}}`
   #name_template: "{{.ProjectName}} {{.Version}}"
-  name_template: "Philosopher {{.Version}}"
+  name_template: "Philosopher {{ .Version }}"
 
 
 dockers:
@@ -120,9 +117,8 @@ dockers:
     - philosopher
 
     image_templates:
-    - "biocontainers/philosopher:{{ .Version }}"
-    - "leprevost/philosopher:{{ .Version }}"
-    - "leprevost/philosopher:latest"
+    - "prvst/philosopher:{{ .Version }}"
+    - "prvst/philosopher:latest"
     
     dockerfile: Dockerfile
 
@@ -136,7 +132,7 @@ dockers:
 snapcraft:
   # You can change the name of the package.
   # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
-  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
   # Wether to publish the snap to the snapcraft store.
   # Remember you need to `snapcraft login` first.
