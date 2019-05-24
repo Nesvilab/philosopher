@@ -82,8 +82,8 @@ release:
 
   github:
 
-    owner: prvst
-    name: philosopher-source
+    owner: Nesvilab
+    name: philosopher
 
   # You can disable this pipe in order to not upload any artifacts to
   # GitHub.
@@ -193,7 +193,3 @@ snapcraft:
       # things they allow:
       # https://snapcraft.io/docs/reference/interfaces.
       plugs: ["home", "network"]
-
-      # If you want your app to be autostarted and to always run in the
-      # background, you can make it a simple daemon.
-      daemon: simple
