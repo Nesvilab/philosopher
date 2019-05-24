@@ -120,6 +120,8 @@ dockers:
 
     image_templates:
     - "biocontainers/philosopher:{{ .Version }}"
+    - "leprevost/philosopher:{{ .Version }}"
+    - "leprevost/philosopher:latest"
     
     dockerfile: Dockerfile
 
