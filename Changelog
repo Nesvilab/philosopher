@@ -1,14 +1,2 @@
-### Added
-- Database search parameters are now collected from pep.xml files.
-- mzID output is now available.
-- Peptide combined reports now have intensities.
-
 ### Changed
-- The mapmods flag is deprecated. The flag will still be available and the mapping will ocurr for all analysis.
-- idconvert and mscovnert are temporarily disabled for all platforms.
-- Updated Golang to 1.12.5
-- The filter command now operates aproximately 4 times faster.
-- Database files names now indicate if they have isoforms and reviewed sequences.
-
-### Fixed
-- Small bug fixes and methods for tool performance.
+- Updating from time-based versioning to sematic-based
