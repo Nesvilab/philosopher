@@ -6,7 +6,7 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
-LDFLAGS = -ldflags "-w -s -X main.Version=${VERSION} -X main.Build=${BUILD}"
+LDFLAGS = -ldflags "-w -s -X main.version=${VERSION} -X main.build=${BUILD}"
 
 .DEFAULT_GOAL: $(BINARY)
 
