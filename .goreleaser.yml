@@ -93,7 +93,7 @@ release:
 
   # If set to true, will not auto-publish the release.
   # Default is false.
-  draft: true
+  draft: false
 
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
@@ -128,12 +128,6 @@ dockers:
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Defaults to false.
     skip_push: false
-
-    build_flag_templates:
-    - "--label=org.label-schema.schema-version=1.0"
-    - "--label=org.label-schema.version={{.Version}}"
-    - "--label=org.label-schema.name={{.ProjectName}}"
-    - "--build-arg=FOO={{.ENV.Bar}}"
 
 
 snapcraft:
