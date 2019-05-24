@@ -149,7 +149,7 @@ snapcraft:
   # most important story about your snap. Keep it under 100 words though,
   # we live in tweetspace and your description wants to look good in the snap
   # store.
-  description: |
+  description:
     Philosopher is a software designed for proteome bioinformatics analysis.
 
   # A guardrail to prevent you from releasing a snap to all your users before

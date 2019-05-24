@@ -6,6 +6,10 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
+
+TAG = v1.0.1
+
+
 LDFLAGS = -ldflags "-w -s -X main.version=${VERSION} -X main.build=${BUILD}"
 
 .DEFAULT_GOAL: $(BINARY)
@@ -73,19 +77,26 @@ deploy:
 
 	unzip -o lib/obo/unimod/bindata.go.zip -d  lib/obo/unimod/
 
+.PHONY: coverage
+coverage:
+	ginkgo -r -cover -outputdir test/profiles
+
 .PHONY: test
 test:
-#	ginkgo -r -cover -outputdir test/profiles
 	ginkgo -r
 
-.PHONY: install
-install:
-	#gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher.${VERSION}
-	#cp philosopher.${VERSION} ${GOBIN}/philosopher;
-	#mv philosopher.${VERSION} ${GOBIN}/philosopher.${VERSION};
+.PHONY: linux
+linux:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
+
+.PHONY: draft
+draft:
+	ginkgo -r
+	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
 
 .PHONY: release
 release:
-	git tag -a v1.0.1 -m "Philosopher v1.0.1"
+	ginkgo -r
+	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
 	goreleaser --release-notes=Changelog --rm-dist
