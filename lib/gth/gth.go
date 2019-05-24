@@ -43,7 +43,7 @@ func UpdateChecker(v, b string) {
 		if err != nil {
 			logrus.Warning("GitHub unreachable for the moment, can't check for versions right now.")
 		} else {
-			if rel[0].TagName > b {
+			if rel[0].TagName > v {
 				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
 			}
 		}
