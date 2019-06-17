@@ -48,13 +48,13 @@ func Run(f met.Data) (met.Data, error) {
 
 	f.SearchEngine = searchEngine
 
+	if len(pepid) == 0 {
+		return f, errors.New("No PSMs were found in data set")
+	}
+
 	psmT, pepT, ionT, err := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 	if err != nil {
 		return f, err
-	}
-
-	if len(pepid) == 0 {
-		return f, errors.New("No PSMs were found in data set")
 	}
 
 	if len(f.Filter.Pox) > 0 {

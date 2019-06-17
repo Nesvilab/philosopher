@@ -185,7 +185,7 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 			i.EntryName,
 			i.GeneName,
 			i.ProteinDescription,
-			strings.Join(mappedProteins, ","),
+			strings.Join(mappedProteins, ", "),
 		)
 		_, err = io.WriteString(file, line)
 		if err != nil {
