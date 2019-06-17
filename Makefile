@@ -6,11 +6,9 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
+TAG = v1.0.2
 
-TAG = v1.0.1
-
-
-LDFLAGS = -ldflags "-w -s -X main.version=${VERSION} -X main.build=${BUILD}"
+LDFLAGS = -ldflags "-w -s -X main.version=${TAG} -X main.build=${BUILD}"
 
 .DEFAULT_GOAL: $(BINARY)
 
@@ -42,6 +40,7 @@ deps:
 	go get -u github.com/onsi/gomega
 	go get -u github.com/onsi/ginkgo/ginkgo
 	go get -u github.com/konsorten/go-windows-terminal-sequences
+	go get github.com/blang/semver
 
 .PHONY: deploy
 deploy:

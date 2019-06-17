@@ -8,8 +8,6 @@
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
 
-version: 20190322
-
 analytics: true                                # reports when a workspace is created for usage estimation (default true)
 slackToken: ''                                 # specify the Slack API token
 slackChannel: ''                               # specify the channel name

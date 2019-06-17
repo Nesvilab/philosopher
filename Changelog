@@ -1,3 +1,4 @@
 ### Added
+- Semantic versioning checking. Warnings will be pushed to major and minor changes only.
 ### Changed
 ### Fixed

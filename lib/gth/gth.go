@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -41,13 +42,26 @@ func UpdateChecker(v, b string) {
 		var rel Releases
 		err = json.Unmarshal(body, &rel)
 		if err != nil {
+
 			logrus.Warning("GitHub unreachable for the moment, can't check for versions right now.")
+
 		} else {
-			if rel[0].TagName > v {
+
+			local := strings.Split(v, ".")
+			local[0] = strings.Replace(local[0], "v", "", 1)
+
+			remote := strings.Split(rel[0].TagName, ".")
+			remote[0] = strings.Replace(remote[0], "v", "", 1)
+
+			if remote[0] > local[0] {
 				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
 			}
-		}
 
+			if (remote[0] == local[0]) && (remote[1] > local[1]) {
+				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/prvst/philosopher/releases")
+			}
+
+		}
 	}
 
 }
