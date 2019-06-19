@@ -115,7 +115,7 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	_, err = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	if err != nil {
 		logrus.Fatal("Cannot create peptide ion report header")
 	}
@@ -154,7 +154,7 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 			sort.Strings(assL)
 			sort.Strings(obs)
 
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 				i.Sequence,
 				i.ModifiedSequence,
 				i.MZ,
@@ -166,7 +166,6 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),
-				i.Intensity,
 				i.Protein,
 				i.ProteinID,
 				i.EntryName,

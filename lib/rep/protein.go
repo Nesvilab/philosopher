@@ -620,7 +620,7 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
 func (e *Evidence) ProteinFastaReport(hasDecoys bool) error {
 
-	output := fmt.Sprintf("%s%sproteins.fas", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sprotein.fas", sys.MetaDir(), string(filepath.Separator))
 
 	file, err := os.Create(output)
 	if err != nil {

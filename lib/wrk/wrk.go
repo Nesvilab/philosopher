@@ -142,9 +142,19 @@ func Backup() *err.Error {
 // Clean deletes all meta data and the workspace directory
 func Clean() *err.Error {
 
+	var d met.Data
+	d.Restore(sys.Meta())
+
 	e := os.RemoveAll(sys.MetaDir())
 	if e != nil {
 		return &err.Error{Type: err.CannotDeleteMetaDirectory, Class: err.FATA, Argument: e.Error()}
+	}
+
+	if len(d.Temp) > 0 {
+		e := os.RemoveAll(d.Temp)
+		if e != nil {
+			return &err.Error{Type: err.CannotDeleteMetaDirectory, Class: err.FATA, Argument: e.Error()}
+		}
 	}
 
 	return nil
