@@ -88,6 +88,10 @@ test:
 linux:
 	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
 
+.PHONY: windows
+windows:
+	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.exe
+
 .PHONY: draft
 draft:
 	ginkgo -r
