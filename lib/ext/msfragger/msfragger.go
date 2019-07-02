@@ -60,15 +60,6 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 // Execute is the main fucntion to execute MSFragger
 func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) *err.Error {
 
-	// var cmd *exec.Cmd
-	// mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
-
-	// if len(params.Param) > 0 {
-	// 	cmd = exec.Command("java", "-jar", mem, params.JarPath, params.Param)
-	// } else {
-	// 	cmd = exec.Command("java", "-jar", mem, params.JarPath, "--database_name ../2019-04-01-td-UP000005640.fas")
-	// }
-
 	cmd := appendParams(params)
 
 	for _, i := range cmdArgs {
@@ -124,22 +115,24 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		fmt.Sprintf("%d", params.PrecursorMassUpper),
 		"--precursor_mass_units",
 		fmt.Sprintf("%d", params.PrecursorMassUnits),
+		"--precursor_true_tolerance",
+		fmt.Sprintf("%d", params.PrecursorTrueTolerance),
 		"--fragment_mass_tolerance",
-		fmt.Sprintf("%d", params.FragmentMassTolerance),
+		fmt.Sprintf("%f", params.FragmentMassTolerance),
 		"--fragment_mass_units",
 		fmt.Sprintf("%d", params.FragmentMassUnits),
 		"--calibrate_mass",
 		fmt.Sprintf("%d", params.CalibrateMass),
 		"--isotope_error",
-		fmt.Sprintf("%d", params.IsotopeError),
+		fmt.Sprintf("%s", params.IsotopeError),
 		"--mass_offsets",
 		fmt.Sprintf("%d", params.MassOffsets),
-		"--shifted_ions",
-		fmt.Sprintf("%d", params.ShiftedIons),
+		"--localize_delta_mass",
+		fmt.Sprintf("%d", params.LocalizeDeltaMass),
 		"--precursor_mass_mode",
 		fmt.Sprintf("%s", params.PrecursorMassMode),
-		"--shifted_ions_exclude_ranges",
-		fmt.Sprintf("%s", params.ShiftedIonsExcludeRanges),
+		//"--shifted_ions_exclude_ranges",
+		//fmt.Sprintf("%s", params.ShiftedIonsExcludeRanges),
 		"--fragment_ion_series",
 		fmt.Sprintf("%s", params.FragmentIonSeries),
 		"--search_enzyme_name",

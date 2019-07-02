@@ -100,15 +100,15 @@ type MSFragger struct {
 	PrecursorMassUnits                 int     `yaml:"precursor_mass_units"`
 	PrecursorTrueTolerance             int     `yaml:"precursor_true_tolerance"`
 	PrecursorTrueUnits                 int     `yaml:"precursor_true_units"`
-	FragmentMassTolerance              int     `yaml:"fragment_mass_tolerance"`
+	FragmentMassTolerance              float64 `yaml:"fragment_mass_tolerance"`
 	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
 	CalibrateMass                      int     `yaml:"calibrate_mass"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
-	IsotopeError                       int     `yaml:"isotope_error"`
+	IsotopeError                       string  `yaml:"isotope_error"`
 	MassOffsets                        int     `yaml:"mass_offsets"`
 	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
-	ShiftedIons                        int     `yaml:"shifted_ions"`
-	ShiftedIonsExcludeRanges           string  `yaml:"shifted_ions_exclude_ranges"`
+	LocalizeDeltaMass                  int     `yaml:"localize_delta_mass"`
+	DeltaMassExcludeRanges             string  `yaml:"delta_mass_exclude_ranges"`
 	FragmentIonSeries                  string  `yaml:"fragment_ion_series"`
 	SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
 	SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`

@@ -108,31 +108,88 @@ var pipelineCmd = &cobra.Command{
 			if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
 				logrus.Fatal("You can only specify one search engine at a time")
 			}
+		}
 
-			// Comet
-			if p.Commands.Comet == "yes" {
+		if p.Commands.Comet == "yes" || p.Commands.MSFragger == "yes" {
+			var mzFiles []string
+
+			for _, i := range args {
+
+				// getting inside de the dataset folder
+				dsAbs, _ := filepath.Abs(i)
+				os.Chdir(dsAbs)
+
 				m.Comet = p.Comet
-				gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
-				files, e := filepath.Glob(gobExt)
+				gobExtC := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+				filesC, e := filepath.Glob(gobExtC)
 				if e != nil {
 					logrus.Fatal(e)
 				}
-				comet.Run(m, files)
+
+				if len(filesC) > 0 {
+					for _, j := range filesC {
+						f, _ := filepath.Abs(j)
+						mzFiles = append(mzFiles, f)
+					}
+				}
+
+				m.MSFragger = p.MSFragger
+				gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
+				filesM, e := filepath.Glob(gobExtM)
+				if e != nil {
+					logrus.Fatal(e)
+				}
+
+				if len(filesM) > 0 {
+					for _, j := range filesM {
+						f, _ := filepath.Abs(j)
+						mzFiles = append(mzFiles, f)
+					}
+				}
+
+				// return to the top level directory
+				os.Chdir(dir)
+			}
+
+			// Comet
+			if p.Commands.Comet == "yes" {
+				comet.Run(m, mzFiles)
 				m.Serialize()
 			}
 
 			// MSFragger
 			if p.Commands.MSFragger == "yes" {
-				m.MSFragger = p.MSFragger
-				gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
-				files, e := filepath.Glob(gobExt)
-				if e != nil {
-					logrus.Fatal(e)
-				}
-				msfragger.Run(m, files)
+				msfragger.Run(m, mzFiles)
 				m.Serialize()
 			}
+		}
 
+		// // Comet
+		// if p.Commands.Comet == "yes" {
+		// 	m.Comet = p.Comet
+		// 	gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+		// 	files, e := filepath.Glob(gobExt)
+		// 	if e != nil {
+		// 		logrus.Fatal(e)
+		// 	}
+		// 	comet.Run(m, files)
+		// 	m.Serialize()
+		// }
+
+		// // MSFragger
+		// if p.Commands.MSFragger == "yes" {
+		// 	m.MSFragger = p.MSFragger
+		// 	gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
+		// 	files, e := filepath.Glob(gobExt)
+		// 	if e != nil {
+		// 		logrus.Fatal(e)
+		// 	}
+		// 	msfragger.Run(m, files)
+		// 	m.Serialize()
+		// }
+
+		// For each dataset ...
+		for _, i := range args {
 			// PeptideProphet
 			if p.Commands.PeptideProphet == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)

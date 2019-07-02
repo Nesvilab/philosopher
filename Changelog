@@ -1,2 +1,5 @@
-### Changed
-- Updated the TPP tools to the latest snapshot version.
+### Added
+- Added documentation for MSFragger parameters.
+### Fixed
+- Missing isolated parameter added to yaml file.
+- Missing MSFragger parameters.
