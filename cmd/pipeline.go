@@ -164,32 +164,16 @@ var pipelineCmd = &cobra.Command{
 			}
 		}
 
-		// // Comet
-		// if p.Commands.Comet == "yes" {
-		// 	m.Comet = p.Comet
-		// 	gobExt := fmt.Sprintf("*.%s", p.Comet.RawExtension)
-		// 	files, e := filepath.Glob(gobExt)
-		// 	if e != nil {
-		// 		logrus.Fatal(e)
-		// 	}
-		// 	comet.Run(m, files)
-		// 	m.Serialize()
-		// }
-
-		// // MSFragger
-		// if p.Commands.MSFragger == "yes" {
-		// 	m.MSFragger = p.MSFragger
-		// 	gobExt := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
-		// 	files, e := filepath.Glob(gobExt)
-		// 	if e != nil {
-		// 		logrus.Fatal(e)
-		// 	}
-		// 	msfragger.Run(m, files)
-		// 	m.Serialize()
-		// }
-
 		// For each dataset ...
 		for _, i := range args {
+
+			// getting inside de the dataset folder
+			dsAbs, _ := filepath.Abs(i)
+			os.Chdir(dsAbs)
+
+			// reload the meta data
+			m.Restore(sys.Meta())
+
 			// PeptideProphet
 			if p.Commands.PeptideProphet == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
