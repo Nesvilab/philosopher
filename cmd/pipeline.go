@@ -83,10 +83,10 @@ var pipelineCmd = &cobra.Command{
 			logrus.Fatal("You need to provide at least two datasets for the abacus integrative analysis.")
 		}
 
-		// For each dataset ...
+		// For each dataset initialize workspace
 		for _, i := range args {
 
-			logrus.Info("Executing the pipeline on ", i)
+			logrus.Info("Initiating the pipeline on ", i)
 
 			// getting inside de the dataset folder
 			dsAbs, _ := filepath.Abs(i)
@@ -108,8 +108,12 @@ var pipelineCmd = &cobra.Command{
 			if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
 				logrus.Fatal("You can only specify one search engine at a time")
 			}
+
+			// return to the top level directory
+			os.Chdir(dir)
 		}
 
+		// run database search on all files from top folder
 		if p.Commands.Comet == "yes" || p.Commands.MSFragger == "yes" {
 			var mzFiles []string
 
@@ -164,7 +168,7 @@ var pipelineCmd = &cobra.Command{
 			}
 		}
 
-		// For each dataset ...
+		// For each dataset run the Prophets inside them
 		for _, i := range args {
 
 			// getting inside de the dataset folder
@@ -224,8 +228,9 @@ var pipelineCmd = &cobra.Command{
 		if p.Commands.Abacus == "yes" && len(p.Filter.Pox) == 0 {
 			logrus.Info("Creating combined protein inference")
 			os.Chdir(dir)
-			m.ProteinProphet = p.ProteinProphet
-			m.ProteinProphet.Output = "combined"
+			meta.Restore(sys.Meta())
+			meta.ProteinProphet = p.ProteinProphet
+			meta.ProteinProphet.Output = "combined"
 			var files []string
 			for _, j := range args {
 				fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
@@ -235,8 +240,13 @@ var pipelineCmd = &cobra.Command{
 				fqn, _ = filepath.Abs(fqn)
 				files = append(files, fqn)
 			}
-			proteinprophet.Run(m, files)
-			combinedProtXML = fmt.Sprintf("%s%scombined.prot.xml", m.Temp, string(filepath.Separator))
+
+			os.Chdir(dir)
+
+			proteinprophet.Run(meta, files)
+			combinedProtXML = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
+
+			m.Filter.Pox = combinedProtXML
 
 			// copy to work directory
 			sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
@@ -244,6 +254,7 @@ var pipelineCmd = &cobra.Command{
 			m.Serialize()
 		}
 
+		// for each data set, run the filter and quantify
 		for _, i := range args {
 
 			// getting inside  each dataset folder again
