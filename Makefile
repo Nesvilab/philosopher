@@ -97,9 +97,12 @@ draft:
 	ginkgo -r
 	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
 
-.PHONY: release
-release:
+.PHONY: push
+push:
 	ginkgo -r
 	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
+
+.PHONY: release
+release:
 	goreleaser --release-notes=Changelog --rm-dist
