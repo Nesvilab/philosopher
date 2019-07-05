@@ -146,12 +146,12 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 
 	var list rep.CombinedProteinEvidenceList
 
-	if _, err := os.Stat(a.CombPro); os.IsNotExist(err) {
+	if _, err := os.Stat("combined.prot.xml"); os.IsNotExist(err) {
 		logrus.Fatal("Cannot find combined.prot.xml file")
 	} else {
 
 		var protxml id.ProtXML
-		protxml.Read(a.CombPro)
+		protxml.Read("combined.prot.xml")
 		protxml.DecoyTag = a.Tag
 
 		// promote decoy proteins with indistinguishable target proteins

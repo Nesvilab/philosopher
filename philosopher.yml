@@ -5,12 +5,15 @@
 # 'yes'. For each selected command, go to its section and adjust the parameters
 # accordingly to your analysis.
 #
+# If you want to include MSFragger and TMT-Integrator into your analysis, you will
+# haver o download them separately and then add their location tot their configuration
+#
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
 
 analytics: true                                # reports when a workspace is created for usage estimation (default true)
-slackToken: ''                                 # specify the Slack API token
-slackChannel: ''                               # specify the channel name
+slackToken:                                    # specify the Slack API token
+slackChannel:                                  # specify the channel name
 
 commands:
   workspace: yes                               # manage the experiment workspace for the analysis
@@ -28,28 +31,28 @@ commands:
   abacus: no                                   # combined analysis of LC-MS/MS results
 
 database:
-  add: ''                                      # add custom sequences (UniProt FASTA format only)
-  annotate: ''                                 # process a ready-to-use database
+  add:                                         # add custom sequences (UniProt FASTA format only)
+  annotate:                                    # process a ready-to-use database
   contam: true                                 # add common contaminants
-  custom: ''                                   # use a pre formatted custom database
+  custom:                                      # use a pre formatted custom database
   enzyme: trypsin                              # enzyme for digestion (trypsin, lys_c, lys_n, glu_c, chymotrypsin) (default "trypsin")
-  id: ''                                       # UniProt proteome ID
+  id:                                          # UniProt proteome ID
   isoform: false                               # add isoform sequences
   prefix: rev_                                 # decoy prefix to be added (default "rev_")
   reviewed: true                               # use only reviewed sequences from Swiss-Prot
 
 comet:
   noindex: true                                # skip raw file indexing
-  param: ''                                    # comet parameter file (default "comet.params.txt")
+  param:                                       # comet parameter file (default "comet.params.txt")
   raw: mzML                                    # format of the spectra file
 
 msfragger:
-  path: ''                                     # path to MSFragger jar
+  path:                                        # path to MSFragger jar
   memmory: 8                                   # how much memory in GB to use
-  param: ''                                    # MSFragger parameter file
+  param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
   num_ threads: 0                              # 0=poll CPU to set num threads; else specify num threads directly (max 64)
-  database_name: ''                            # path to the protein database file in FASTA format
+  database_name:                               # path to the protein database file in FASTA format
   precursor_mass_lower: -20                    # lower bound of the precursor mass window
   precursor_mass_upper: 20                     # upper bound of the precursor mass window
   precursor_mass_units: 1                      # 0=Daltons, 1=ppm
@@ -58,7 +61,7 @@ msfragger:
   fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
   fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
   calibrate_mass: 0                            # 0=Off, 1=On, 2=On and find optimal parameters
-  isotope_error: ''                            # 0=off, -1/0/1/2/3 (standard C13 error)
+  isotope_error:                               # 0=off, -1/0/1/2/3 (standard C13 error)
   mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
   precursor_mass_mode: selected                # selected or isolated
   localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
@@ -70,10 +73,10 @@ msfragger:
   num_enzyme_termini: 2                        # 2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion
   allowed_missed_cleavage: 1                   # maximum value is 5
   clip_nTerm_M: 1                              # specifies the trimming of a protein N-terminal methionine as a variable modification (0 or 1)
-  variable_mod_01: 15.99490_M                  # variable modifications
-  variable_mod_02: 42.01060_[^                 # variable modifications
-  variable_mod_03: ''                          # variable modifications
-  variable_mod_04: ''                          # variable modifications
+  variable_mod_01: 15.99490 M                  # variable modification
+  variable_mod_02: 42.01060 [^                 # variable modification
+  variable_mod_03:                             # variable modification
+  variable_mod_04:                             # variable modification
   allow_multiple_variable_mods_on_residue: 1   # static mods are not considered
   max_variable_mods_per_mod: 3                 # maximum of 5
   max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
@@ -125,10 +128,10 @@ msfragger:
 peptideprophet:
   extension: pepXML                            # pepXML file extension
   accmass: false                               # use Accurate Mass model binning
-  database: ''                                 # path to the database
+  database:                                    # path to the database
   decoy: rev_                                  # semi-supervised mode, protein name prefix to identify Decoy entries
   decoyprobs: false                            # compute possible non-zero probabilities for Decoy entries on the last iteration
-  enzyme: ''                                   # enzyme used in sample (optional)
+  enzyme:                                      # enzyme used in sample (optional)
   exclude: false                               # exclude deltaCn*, Mascot*, and Comet* results from results (default Penalize * results)
   expectscore: false                           # use expectation value as the only contributor to the f-value for modeling
   forcedistr: false                            # bypass quality control checks, report model despite bad modeling
@@ -158,7 +161,7 @@ peptideprophet:
 
 ptmprophet:
   autodirect: false                            # use direct evidence when the lability is high, use in combination with LABILITY
-  cions: ''                                    # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
+  cions:                                       # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                # use only direct evidence for evaluating PTM site probabilities
   em: 1                                        # set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)
   fragppmtol: 15                               # when computing PSM-specific mass_offset and mass_tolerance, use specified default +/- MS2 mz tolerance on fragment ions
@@ -171,9 +174,9 @@ ptmprophet:
   maxthreads: 1                                # use specified number of threads for processing
   mino: 0                                      # use specified number of pseudo-counts when computing Oscore (0 = use default)
   minprob: 0                                   # use specified minimum probability to evaluate peptides
-  mods: ''                                     # specify modifications
+  mods:                                        # specify modifications
   mztol: 0.1                                   # use specified +/- MS2 mz tolerance on site specific ions
-  nions: ''                                    # use specified N-term ions, separate multiple ions by commas (default: a,b for CID, c for ETD)
+  nions:                                       # use specified N-term ions, separate multiple ions by commas (default: a,b for CID, c for ETD)
   nominofactor: false                          # disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)
   ppmtol: 1                                    # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
   verbose: false                               # produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
@@ -224,7 +227,7 @@ freequant:
   isolated: false                              # use the isolated ion instead of the selected ion for quantification
 
 labelquant:
-  annotation: ''                               # annotation file with custom names for the TMT channels
+  annotation:                                  # annotation file with custom names for the TMT channels
   bestPSM: false                               # select the best PSMs for protein quantification
   level: 2                                     # ms level for the quantification
   minProb: 0.7                                 # only use PSMs with a minimum probability score
@@ -240,13 +243,13 @@ report:
   mzID: false                                  # create a mzID output
 
 cluster:
-  organismUniProtID: ''                        # UniProt proteome ID
+  organismUniProtID:                           # UniProt proteome ID
   level: 0.9                                   # cluster identity level (default 0.9)
                   
 abacus:
   labels: false                                # indicates whether the data sets include TMT labels or not
-  protein: combined.prot.xml                   # combined protein file
-  peptide: combined.pep.xml                    # combined peptide file
+  protein: true                                # global level protein report
+  peptide: false                               # global level peptide report
   proteinprobability: 0.9                      # minimum protein probability (default 0.9)
   peptideProbability: 0.5                      # minimum peptide probability (default 0.5)
   picked: false                                # apply the picked FDR algorithm before the protein scoring
@@ -255,10 +258,10 @@ abacus:
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
 
 tmt-integrator:
-  path: ''                                     # path to TMT-Integrator jar
+  path:                                        # path to TMT-Integrator jar
   memmory: 8                                   # how much memory in GB to use
-  protein_database: ''                         # protein fasta file
-  output: ''                                   # the location of output files
+  protein_database:                            # protein fasta file
+  output:                                      # the location of output files
   combined_protein: combined.prot.xml          # the combined_protein.tsv generated by philosopher
   channel_num: 10                              # the number of TMT channels
   ref_tag: pool                                # the tag for identifying reference channel

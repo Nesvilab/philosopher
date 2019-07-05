@@ -193,63 +193,65 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 // Prophets execute the TPP Prophets
 func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	for _, i := range data {
+	if p.Commands.PeptideProphet == "yes" || p.Commands.ProteinProphet == "yes" || p.Commands.PTMProphet == "yes" {
+		for _, i := range data {
 
-		logrus.Info("Running the validation and inference on ", i)
+			logrus.Info("Running the validation and inference on ", i)
 
-		// getting inside de the dataset folder
-		dsAbs, _ := filepath.Abs(i)
-		os.Chdir(dsAbs)
+			// getting inside de the dataset folder
+			dsAbs, _ := filepath.Abs(i)
+			os.Chdir(dsAbs)
 
-		// reload the meta data
-		meta.Restore(sys.Meta())
+			// reload the meta data
+			meta.Restore(sys.Meta())
 
-		// PeptideProphet
-		if p.Commands.PeptideProphet == "yes" {
-			logrus.Info("Executing PeptideProphet on ", i)
-			meta.PeptideProphet = p.PeptideProphet
-			meta.PeptideProphet.Output = "interact"
-			meta.PeptideProphet.Combine = true
-			gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-			files, e := filepath.Glob(gobExt)
-			if e != nil {
-				logrus.Fatal(e.Error())
+			// PeptideProphet
+			if p.Commands.PeptideProphet == "yes" {
+				logrus.Info("Executing PeptideProphet on ", i)
+				meta.PeptideProphet = p.PeptideProphet
+				meta.PeptideProphet.Output = "interact"
+				meta.PeptideProphet.Combine = true
+				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+				files, e := filepath.Glob(gobExt)
+				if e != nil {
+					logrus.Fatal(e.Error())
+				}
+				peptideprophet.Run(meta, files)
+				meta.Serialize()
 			}
-			peptideprophet.Run(meta, files)
-			meta.Serialize()
-		}
 
-		// PTMProphet
-		if p.Commands.PTMProphet == "yes" {
-			logrus.Info("Executing PTMProphet on ", i)
-			meta.PTMProphet = p.PTMProphet
-			var files []string
-			files = append(files, "interact.pep.xml")
-			meta.PTMProphet.InputFiles = files
-			ptmprophet.Run(meta, files)
-			meta.Serialize()
-		}
-
-		// ProteinProphet
-		if p.Commands.ProteinProphet == "yes" {
-			logrus.Info("Executing ProteinProphet on ", i)
-			meta.ProteinProphet = p.ProteinProphet
-			meta.ProteinProphet.Output = "interact"
-			var files []string
+			// PTMProphet
 			if p.Commands.PTMProphet == "yes" {
-				files = append(files, "interact.mod.pep.xml")
-			} else {
+				logrus.Info("Executing PTMProphet on ", i)
+				meta.PTMProphet = p.PTMProphet
+				var files []string
 				files = append(files, "interact.pep.xml")
+				meta.PTMProphet.InputFiles = files
+				ptmprophet.Run(meta, files)
+				meta.Serialize()
 			}
-			proteinprophet.Run(meta, files)
-			meta.Serialize()
+
+			// ProteinProphet
+			if p.Commands.ProteinProphet == "yes" {
+				logrus.Info("Executing ProteinProphet on ", i)
+				meta.ProteinProphet = p.ProteinProphet
+				meta.ProteinProphet.Output = "interact"
+				var files []string
+				if p.Commands.PTMProphet == "yes" {
+					files = append(files, "interact.mod.pep.xml")
+				} else {
+					files = append(files, "interact.pep.xml")
+				}
+				proteinprophet.Run(meta, files)
+				meta.Serialize()
+			}
+
+			// return to the top level directory
+			os.Chdir(dir)
+
+			// reload the meta data
+			meta.Restore(sys.Meta())
 		}
-
-		// return to the top level directory
-		os.Chdir(dir)
-
-		// reload the meta data
-		meta.Restore(sys.Meta())
 	}
 
 	return meta
@@ -323,20 +325,22 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Filter = p.Filter
 
 			if len(meta.Filter.Pex) == 0 {
+
 				meta.Filter.Pex = "interact.pep.xml"
+
 				if p.Commands.PTMProphet == "yes" {
 					meta.Filter.Pex = "interact.mod.pep.xml"
 				}
+
 				if p.Commands.ProteinProphet == "yes" {
 					meta.Filter.Pox = "interact.prot.xml"
 				}
+
 			}
 
-			// if len(meta.Filter.Pox) == 0 {
-			// 	if p.Commands.Abacus == "yes" {
-			// 		meta.Filter.Pox = meta.Filter.Pox
-			// 	}
-			// }
+			if len(meta.Filter.Pox) == 0 && p.Commands.Abacus == "yes" {
+				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
+			}
 
 			m, e := fil.Run(meta)
 			if e != nil {

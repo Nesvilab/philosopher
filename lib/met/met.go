@@ -340,12 +340,12 @@ type Quantify struct {
 
 // Abacus options ad parameters
 type Abacus struct {
-	CombPro  string  `yaml:"protein"`
-	CombPep  string  `yaml:"peptide"`
 	Tag      string  `yaml:"tag"`
 	Annot    string  `yaml:"annotation"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
+	CombPro  bool    `yaml:"protein"`
+	CombPep  bool    `yaml:"peptide"`
 	Razor    bool    `yaml:"razor"`
 	Picked   bool    `yaml:"picked"`
 	Labels   bool    `yaml:"labels"`

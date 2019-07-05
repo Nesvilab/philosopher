@@ -99,12 +99,12 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 	var seqMap = make(map[string]int8)
 	var chargeMap = make(map[string][]string)
 
-	if _, err := os.Stat(a.CombPep); os.IsNotExist(err) {
+	if _, err := os.Stat("combined.pep.xml"); os.IsNotExist(err) {
 		logrus.Fatal("Cannot find combined.pep.xml file")
 	} else {
 
 		var pep id.PepXML
-		pep.Read(a.CombPep)
+		pep.Read("combined.pep.xml")
 		pep.DecoyTag = a.Tag
 
 		// get all peptide sequences from combined file and collapse them
