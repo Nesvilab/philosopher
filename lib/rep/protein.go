@@ -506,7 +506,18 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 		}
 	}
 
+	var printSetMod ProteinEvidenceList
 	for _, i := range printSet {
+
+		assL, _ := getModsList(i.Modifications.Index)
+		modString := strings.Join(assL, ", ")
+
+		if strings.Contains(modString, "79.9663") {
+			printSetMod = append(printSetMod, i)
+		}
+	}
+
+	for _, i := range printSetMod {
 
 		var ip []string
 		for k := range i.IndiProtein {
@@ -517,7 +528,6 @@ func (e *Evidence) PhosphoProteinTMTReport(labels map[string]string, uniqueOnly,
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
-			//if j.IsNondegenerateEvidence == true {
 			if j.IsUnique == true {
 				uniqIons++
 			}

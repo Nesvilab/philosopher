@@ -198,7 +198,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 	}
 	defer file.Close()
 
-	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tUnmodified Observations\tModified Observations\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {

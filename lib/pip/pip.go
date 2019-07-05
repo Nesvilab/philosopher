@@ -325,29 +325,23 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Filter = p.Filter
 
 			if len(meta.Filter.Pex) == 0 {
-
 				meta.Filter.Pex = "interact.pep.xml"
+			}
 
-				if p.Commands.PTMProphet == "yes" {
-					meta.Filter.Pex = "interact.mod.pep.xml"
-				}
-
-				if p.Commands.ProteinProphet == "yes" {
-					meta.Filter.Pox = "interact.prot.xml"
-				}
-
+			if len(meta.Filter.Pox) == 0 {
+				meta.Filter.Pox = "interact.prot.xml"
 			}
 
 			if len(meta.Filter.Pox) == 0 && p.Commands.Abacus == "yes" {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
 			}
 
-			m, e := fil.Run(meta)
+			meta, e := fil.Run(meta)
 			if e != nil {
 				logrus.Fatal(e.Error())
 			}
 
-			m.Serialize()
+			meta.Serialize()
 		}
 
 		// FreeQuant
