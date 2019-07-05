@@ -279,6 +279,6 @@ tmt-integrator:
   mod_mass: 79.9663                            # used peptides with the modification mass
   target_mod_tag: K[170]                       # used peptides with the target modification tag (currently only allowing one target modification)
   min_site_prob: 0.9                           # minimum modification site probability
-  ptmprophet: true                             # using PTMProphet result (only for phosphorylated data)
+  PTMProphet: true                             # using PTMProphet result (only for phosphorylated data)
   ms1_int: true                                # using MS1 intensity. If not, reference intensities are used for abundance calculation.
   top3_pep: true                               # using top 3 intensive peptides

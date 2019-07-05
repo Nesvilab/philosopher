@@ -45,6 +45,7 @@ type Data struct {
 	Cluster        Cluster
 	Abacus         Abacus
 	Report         Report
+	TMTIntegrator  TMTIntegrator
 	Index          Index
 	Pipeline       Pipeline
 }
@@ -363,6 +364,15 @@ type Report struct {
 	Decoys  bool `yaml:"withDecoys"`
 	MSstats bool `yaml:"msstats"`
 	MZID    bool `yaml:"mzID"`
+}
+
+// TMTIntegrator options and parameters
+type TMTIntegrator struct {
+	JarPath   string `yaml:"path"`
+	Memmory   int    `yaml:"memmory"`
+	Param     string `yaml:"param"`
+	Files     []string
+	ParamFile []byte
 }
 
 // Index options and parameters

@@ -1,5 +1,4 @@
 ### Added
-- Added documentation for MSFragger parameters.
+### Changed
 ### Fixed
-- Missing isolated parameter added to yaml file.
-- Missing MSFragger parameters.
+- Minor bug fixes.
