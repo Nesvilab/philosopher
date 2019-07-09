@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/ext/interprophet"
+
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
 
 	"github.com/prvst/philosopher/lib/aba"
@@ -257,12 +259,60 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 	return meta
 }
 
+// CombinedPeptideList executes iProphet command creating the combined PepXML
+func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	var ip = interprophet.New(meta.Temp)
+	var combinedPepXML string
+
+	if p.Commands.Abacus == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
+
+		logrus.Info("Integrating peptide validation")
+
+		// return to the top level directory
+		os.Chdir(dir)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		meta.InterProphet.Output = "combined"
+		meta.InterProphet.Nonsp = true
+
+		var files []string
+
+		for _, j := range data {
+			fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
+			if p.Commands.PTMProphet == "yes" {
+				fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
+			}
+			fqn, _ = filepath.Abs(fqn)
+			files = append(files, fqn)
+		}
+
+		// return to the top level directory
+		os.Chdir(dir)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		ip.Run(meta.InterProphet, meta.Home, meta.Temp, files)
+		combinedPepXML = fmt.Sprintf("%s%scombined.pep.xml", meta.Temp, string(filepath.Separator))
+
+		// copy to work directory
+		sys.CopyFile(combinedPepXML, filepath.Base(combinedPepXML))
+
+		meta.Serialize()
+	}
+
+	return meta
+}
+
 // CombinedProteinList executes ProteinProphet command creating the combined ProtXML
 func CombinedProteinList(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	var combinedProtXML string
 
-	if p.Commands.Abacus == "yes" && len(p.Filter.Pox) == 0 {
+	if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
 
 		logrus.Info("Creating combined protein inference")
 

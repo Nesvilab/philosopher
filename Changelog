@@ -1,4 +1,8 @@
 ### Added
+- TMT-Integrator was added to the pipeline command.
+- InterProphet is now used to create combined peptide lists.
+
 ### Changed
+
 ### Fixed
 - Minor bug fixes.

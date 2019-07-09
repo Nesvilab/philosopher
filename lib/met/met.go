@@ -344,8 +344,8 @@ type Abacus struct {
 	Annot    string  `yaml:"annotation"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
-	CombPro  bool    `yaml:"protein"`
-	CombPep  bool    `yaml:"peptide"`
+	Peptide  bool    `yaml:"peptide"`
+	Protein  bool    `yaml:"protein"`
 	Razor    bool    `yaml:"razor"`
 	Picked   bool    `yaml:"picked"`
 	Labels   bool    `yaml:"labels"`

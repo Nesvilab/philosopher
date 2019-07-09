@@ -79,6 +79,9 @@ var pipelineCmd = &cobra.Command{
 		// PeptideProphet - PTMProphet - ProteinProphet
 		meta = pip.Prophets(meta, p, dir, args)
 
+		// Abacus - combined pepxml
+		meta = pip.CombinedPeptideList(meta, p, dir, args)
+
 		// Abacus - combined protxml
 		meta = pip.CombinedProteinList(meta, p, dir, args)
 

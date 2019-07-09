@@ -29,6 +29,7 @@ commands:
   report: no                                   # multi-level reporting for both narrow-searches and open-searches
   cluster: no                                  # protein report based on protein clusters
   abacus: no                                   # combined analysis of LC-MS/MS results
+  tmtintegrator: no                            # integrates channel abundances from multiple TMT samples
 
 database:
   add:                                         # add custom sequences (UniProt FASTA format only)
