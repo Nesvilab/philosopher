@@ -289,8 +289,10 @@ func getLabelNames(annot string) (map[string]string, *err.Error) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
+		if len(scanner.Text()) > 0 {
+			names := strings.Split(scanner.Text(), " ")
+			labels[names[0]] = names[1]
+		}
 	}
 
 	if e = scanner.Err(); e != nil {

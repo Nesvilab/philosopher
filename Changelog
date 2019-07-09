@@ -3,6 +3,7 @@
 - InterProphet is now used to create combined peptide lists.
 
 ### Changed
+- Updated pipeline configuration file.
 
 ### Fixed
 - Minor bug fixes.
