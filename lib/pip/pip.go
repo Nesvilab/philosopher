@@ -111,13 +111,6 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 			meta.Serialize()
 		}
 
-		meta.MSFragger.DatabaseName = meta.Database.Annot
-		meta.PeptideProphet.Database = meta.Database.Annot
-		meta.Filter.Tag = meta.Database.Tag
-		meta.Abacus.Tag = meta.Database.Tag
-
-		meta.PeptideProphet.Decoy = meta.Database.Tag
-
 		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
 			logrus.Fatal("You can only specify one search engine at a time")
 		}
@@ -162,6 +155,8 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			}
 
 			meta.MSFragger = p.MSFragger
+			meta.MSFragger.DatabaseName = p.Database.Annot
+
 			gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
@@ -217,6 +212,8 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			if p.Commands.PeptideProphet == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
 				meta.PeptideProphet = p.PeptideProphet
+				meta.PeptideProphet.Database = p.Database.Annot
+				meta.PeptideProphet.Decoy = p.Database.Tag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -377,6 +374,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			logrus.Info("Executing filter on ", i)
 			meta.Filter = p.Filter
+			meta.Filter.Tag = p.Database.Tag
 
 			if len(meta.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
@@ -479,6 +477,8 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 		meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
+		meta.Abacus.Tag = p.Database.Tag
+
 		err := aba.Run(meta.Abacus, meta.Temp, data)
 		if err != nil {
 			logrus.Fatal(err)
