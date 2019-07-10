@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
@@ -262,7 +263,6 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 // CombinedPeptideList executes iProphet command creating the combined PepXML
 func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	var ip = interprophet.New(meta.Temp)
 	var combinedPepXML string
 
 	if p.Commands.Abacus == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
@@ -275,9 +275,6 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
-		meta.InterProphet.Output = "combined"
-		meta.InterProphet.Nonsp = true
-
 		var files []string
 
 		for _, j := range data {
@@ -289,14 +286,16 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 			files = append(files, fqn)
 		}
 
-		// return to the top level directory
-		os.Chdir(dir)
+		meta.InterProphet.Output = "combined"
+		meta.InterProphet.Nonsp = true
+		meta.InterProphet.InputFiles = files
+		meta.InterProphet.Decoy = "rev_"
 
-		// reload the meta data
-		meta.Restore(sys.Meta())
+		// run
+		spew.Dump(meta.InterProphet)
+		meta = interprophet.Run(meta, files)
 
-		ip.Run(meta.InterProphet, meta.Home, meta.Temp, files)
-		combinedPepXML = fmt.Sprintf("%s%scombined.pep.xml", meta.Temp, string(filepath.Separator))
+		//combinedPepXML = fmt.Sprintf("%s%scombined.pep.xml", meta.Temp, string(filepath.Separator))
 
 		// copy to work directory
 		sys.CopyFile(combinedPepXML, filepath.Base(combinedPepXML))

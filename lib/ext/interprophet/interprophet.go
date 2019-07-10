@@ -12,6 +12,7 @@ import (
 	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 )
 
 // InterProphet represents the tool configuration
@@ -34,6 +35,32 @@ func New(temp string) InterProphet {
 	self.Zlib1DLL = temp + string(filepath.Separator) + "zlib1.dll"
 
 	return self
+}
+
+// Run is the main entry point for InterProphet
+func Run(m met.Data, args []string) met.Data {
+
+	var itp = New(m.Temp)
+	m.InterProphet.InputFiles = args
+
+	if len(args) < 1 {
+		logrus.Fatal("No input file provided")
+	}
+
+	// deploy the binaries
+	e := itp.Deploy(m.OS, m.Distro)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+
+	// run InterProphet
+	xml, e := itp.Execute(m.InterProphet, m.Home, m.Temp, args)
+	if e != nil {
+		logrus.Fatal(e.Message)
+	}
+	_ = xml
+
+	return m
 }
 
 // Deploy generates comet binary on workdir bin directory
@@ -59,8 +86,8 @@ func (i *InterProphet) Deploy(os, distro string) *err.Error {
 	return nil
 }
 
-// Run IProphet ...
-func (i InterProphet) Run(params met.InterProphet, home, temp string, args []string) ([]string, *err.Error) {
+// Execute IProphet
+func (i InterProphet) Execute(params met.InterProphet, home, temp string, args []string) ([]string, *err.Error) {
 
 	// run
 	bin := i.DefaultInterProphetParser
@@ -115,7 +142,7 @@ func (i InterProphet) Run(params met.InterProphet, home, temp string, args []str
 	return processedOutput, nil
 }
 
-func (p InterProphet) appendParams(params met.InterProphet, cmd *exec.Cmd) *exec.Cmd {
+func (i InterProphet) appendParams(params met.InterProphet, cmd *exec.Cmd) *exec.Cmd {
 
 	if params.Length == true {
 		cmd.Args = append(cmd.Args, "LENGTH")

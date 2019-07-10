@@ -32,15 +32,7 @@ commands:
   tmtintegrator: no                            # integrates channel abundances from multiple TMT samples
 
 database:
-  add:                                         # add custom sequences (UniProt FASTA format only)
-  annotate:                                    # process a ready-to-use database
-  contam: true                                 # add common contaminants
-  custom:                                      # use a pre formatted custom database
-  enzyme: trypsin                              # enzyme for digestion (trypsin, lys_c, lys_n, glu_c, chymotrypsin) (default "trypsin")
-  id:                                          # UniProt proteome ID
-  isoform: false                               # add isoform sequences
-  prefix: rev_                                 # decoy prefix to be added (default "rev_")
-  reviewed: true                               # use only reviewed sequences from Swiss-Prot
+  path:                                        # path to the target-decoy protein database.
 
 comet:
   noindex: true                                # skip raw file indexing

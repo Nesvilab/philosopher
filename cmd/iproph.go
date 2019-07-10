@@ -36,15 +36,7 @@ var iprophCmd = &cobra.Command{
 		}
 
 		// run
-		xml, e := ipt.Run(m.InterProphet, m.Home, m.Temp, args)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
-
-		m.InterProphet.InputFiles = args
-
-		_ = xml
-		//evi.IndexIdentification(xml, m.InterProphet.Decoy)
+		m = interprophet.Run(m, args)
 
 		m.Serialize()
 
