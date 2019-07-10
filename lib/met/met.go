@@ -68,9 +68,9 @@ type Idconvert struct {
 // Database options and parameters
 type Database struct {
 	ID     string `yaml:"id"`
-	Annot  string `yaml:"annotate"`
+	Annot  string `yaml:"protein_database"`
 	Enz    string `yaml:"enzyme"`
-	Tag    string `yaml:"prefix"`
+	Tag    string `yaml:"decoy_tag"`
 	Add    string `yaml:"add"`
 	Custom string `yaml:"custom"`
 	Crap   bool   `yaml:"contam"`

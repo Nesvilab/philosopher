@@ -113,6 +113,13 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 			meta.Serialize()
 		}
 
+		meta.MSFragger.DatabaseName = meta.Database.Annot
+		meta.PeptideProphet.Database = meta.Database.Annot
+		meta.Filter.Tag = meta.Database.Tag
+		meta.Abacus.Tag = meta.Database.Tag
+
+		meta.PeptideProphet.Decoy = meta.Database.Tag
+
 		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
 			logrus.Fatal("You can only specify one search engine at a time")
 		}
