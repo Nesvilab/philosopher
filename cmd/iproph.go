@@ -23,17 +23,6 @@ var iprophCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing InterProphet ", Version)
-		var ipt = interprophet.New(m.Temp)
-
-		if len(args) < 1 {
-			logrus.Fatal("No input file provided")
-		}
-
-		// prepare binaries
-		e = ipt.Deploy(m.OS, m.Distro)
-		if e != nil {
-			logrus.Fatal(e.Message)
-		}
 
 		// run
 		m = interprophet.Run(m, args)
@@ -55,7 +44,7 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		iprophCmd.Flags().IntVarP(&m.InterProphet.Threads, "threads", "", 1, "specify threads to use")
+		iprophCmd.Flags().IntVarP(&m.InterProphet.Threads, "threads", "", 4, "specify threads to use")
 		iprophCmd.Flags().StringVarP(&m.InterProphet.Decoy, "decoy", "", "", "specify the decoy tag")
 		iprophCmd.Flags().Float64VarP(&m.InterProphet.MinProb, "minProb", "", 0, "specify minimum probability of results to report")
 		iprophCmd.Flags().StringVarP(&m.InterProphet.Output, "output", "", "interact.iproph", "specify output name prefix")

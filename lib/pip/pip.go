@@ -7,9 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
-
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
 
 	"github.com/prvst/philosopher/lib/aba"
@@ -297,12 +295,12 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 		meta.InterProphet.Nonsp = true
 		meta.InterProphet.InputFiles = files
 		meta.InterProphet.Decoy = "rev_"
+		meta.InterProphet.Threads = 6
 
 		// run
-		spew.Dump(meta.InterProphet)
 		meta = interprophet.Run(meta, files)
 
-		//combinedPepXML = fmt.Sprintf("%s%scombined.pep.xml", meta.Temp, string(filepath.Separator))
+		combinedPepXML = fmt.Sprintf("%s%scombined.pep.xml", meta.Temp, string(filepath.Separator))
 
 		// copy to work directory
 		sys.CopyFile(combinedPepXML, filepath.Base(combinedPepXML))
@@ -388,7 +386,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 				meta.Filter.Pox = "interact.prot.xml"
 			}
 
-			if len(meta.Filter.Pox) == 0 && p.Commands.Abacus == "yes" {
+			if p.Commands.Abacus == "yes" && meta.Abacus.Protein == true {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
 			}
 

@@ -60,6 +60,8 @@ func Run(m met.Data, args []string) met.Data {
 	}
 	_ = xml
 
+	m.InterProphet.InputFiles = args
+
 	return m
 }
 
