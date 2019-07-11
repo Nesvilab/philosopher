@@ -384,7 +384,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 				meta.Filter.Pox = "interact.prot.xml"
 			}
 
-			if p.Commands.Abacus == "yes" && meta.Abacus.Protein == true {
+			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
 			}
 
