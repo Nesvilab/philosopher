@@ -1,12 +1,3 @@
 ### Added
-- TMT-Integrator was added to the pipeline command.
-- InterProphet is now used to create combined peptide lists.
-- New TMT-Integrator parameter.
-
 ### Changed
-- Updated pipeline configuration file.
-- Repeated tags were removed from the pipeline cparamgter file.
-
 ### Fixed
-- Minor bug fixes.
-- Misassignment between abacus command and filter during the pipeline processing. 
