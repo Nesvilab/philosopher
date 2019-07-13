@@ -376,15 +376,19 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Filter = p.Filter
 			meta.Filter.Tag = p.Database.Tag
 
-			if len(meta.Filter.Pex) == 0 {
+			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
+			} else {
+				meta.Filter.Pex = p.Filter.Pex
 			}
 
-			if len(meta.Filter.Pox) == 0 {
+			if len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = "interact.prot.xml"
+			} else {
+				meta.Filter.Pox = p.Filter.Pox
 			}
 
-			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true {
+			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
 			}
 
