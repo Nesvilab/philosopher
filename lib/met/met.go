@@ -341,7 +341,6 @@ type Quantify struct {
 // Abacus options ad parameters
 type Abacus struct {
 	Tag      string  `yaml:"tag"`
-	Annot    string  `yaml:"annotation"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
 	Peptide  bool    `yaml:"peptide"`

@@ -13,21 +13,21 @@ type DataSetLabelNames struct {
 
 // Run abacus
 // TODO update error methos on the abacus function
-func Run(a met.Abacus, temp string, args []string) error {
+func Run(m met.Data, args []string) error {
 
-	if a.Peptide == false && a.Protein == false {
+	if m.Abacus.Peptide == false && m.Abacus.Protein == false {
 		logrus.Fatal("You need to specify a peptide or protein combined file for the Abacus analysis")
 	}
 
-	if a.Peptide == true {
-		e := peptideLevelAbacus(a, temp, args)
+	if m.Abacus.Peptide == true {
+		e := peptideLevelAbacus(m, args)
 		if e != nil {
 			return e
 		}
 	}
 
-	if a.Protein == true {
-		e := proteinLevelAbacus(a, temp, args)
+	if m.Abacus.Protein == true {
+		e := proteinLevelAbacus(m, args)
 		if e != nil {
 			return e
 		}

@@ -26,7 +26,7 @@ var abacusCmd = &cobra.Command{
 		}
 
 		logrus.Info("Executing Abacus ", Version)
-		err := aba.Run(m.Abacus, m.Temp, args)
+		err := aba.Run(m, args)
 		if err != nil {
 			logrus.Fatal(err)
 		}

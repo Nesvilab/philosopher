@@ -18,7 +18,7 @@ import (
 )
 
 // Create peptide combined report
-func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
+func peptideLevelAbacus(m met.Data, args []string) error {
 
 	var names []string
 	var xmlFiles []string
@@ -27,7 +27,7 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	seqMap, chargeMap, err := processPeptideCombinedFile(a)
+	seqMap, chargeMap, err := processPeptideCombinedFile(m.Abacus)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func peptideLevelAbacus(a met.Abacus, temp string, args []string) error {
 	logrus.Info("Processing intensities")
 	evidences = getIntensities(evidences, datasets)
 
-	savePeptideAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
 	return nil
 }

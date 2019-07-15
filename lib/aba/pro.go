@@ -23,7 +23,7 @@ import (
 )
 
 // Create protein combined report
-func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
+func proteinLevelAbacus(m met.Data, args []string) error {
 
 	var names []string
 	var xmlFiles []string
@@ -38,7 +38,7 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	evidences, err := processProteinCombinedFile(a, database)
+	evidences, err := processProteinCombinedFile(m.Abacus, database)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 	// If only one '_', then we put in the second row just GENE (i.e. remove the first _ and what follows after)
 
 	var reprintLabels []string
-	if a.Reprint == true {
+	if m.Abacus.Reprint == true {
 		for _, i := range names {
 			if strings.Contains(strings.ToUpper(i), "CONTROL") {
 				reprintLabels = append(reprintLabels, "CONTROL")
@@ -123,19 +123,19 @@ func proteinLevelAbacus(a met.Abacus, temp string, args []string) error {
 	evidences = sumProteinIntensities(evidences, datasets)
 
 	// collect TMT labels
-	if a.Labels == true {
+	if m.Abacus.Labels == true {
 		evidences = getProteinLabelIntensities(evidences, datasets)
 	}
 
-	if a.Labels == true {
-		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, true, labelList)
+	if m.Abacus.Labels == true {
+		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, true, labelList)
 	} else {
-		saveProteinAbacusResult(temp, evidences, datasets, names, a.Unique, false, labelList)
+		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 	}
 
-	if a.Reprint == true {
+	if m.Abacus.Reprint == true {
 		logrus.Info("Creating Reprint report")
-		saveReprintResults(temp, evidences, datasets, names, reprintLabels, a.Unique, false, labelList)
+		saveReprintResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
 	}
 
 	return nil

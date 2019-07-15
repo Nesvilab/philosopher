@@ -482,15 +482,14 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 		meta.Abacus = p.Abacus
 		meta.Abacus.Tag = p.Database.Tag
+		meta.Abacus.Picked = p.Filter.Picked
+		meta.Abacus.Razor = p.Filter.Razor
 
 		if len(p.LabelQuant.Annot) > 0 {
 			meta.Abacus.Labels = true
 		}
 
-		meta.Abacus.Picked = p.Filter.Picked
-		meta.Abacus.Razor = p.Filter.Razor
-
-		err := aba.Run(meta.Abacus, meta.Temp, data)
+		err := aba.Run(meta, data)
 		if err != nil {
 			logrus.Fatal(err)
 		}
