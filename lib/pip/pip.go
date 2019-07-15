@@ -66,7 +66,7 @@ type Commands struct {
 	Report         string `yaml:"report"`
 	Cluster        string `yaml:"cluster"`
 	Abacus         string `yaml:"abacus"`
-	TMTIntegrator  string `yaml:"tmt-integrator"`
+	TMTIntegrator  string `yaml:"tmtintegrator"`
 }
 
 // DeployParameterFile ...
@@ -540,23 +540,13 @@ func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.D
 		var psms []string
 
 		for _, i := range data {
-
-			// getting inside de the dataset folder
-			dsAbs, _ := filepath.Abs(i)
-			os.Chdir(dsAbs)
-
-			// reload the meta data
-			meta.Restore(sys.Meta())
-
 			meta.TMTIntegrator = p.TMTIntegrator
+			psms = append(psms, fmt.Sprintf("%s%spsm.tsv", i, string(filepath.Separator)))
+		}
 
-			psms = append(psms, fmt.Sprintf("%s%spsm.tsv", dsAbs, string(filepath.Separator)))
-
-			_, err := tmtintegrator.Run(meta, psms)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
+		_, err := tmtintegrator.Run(meta, psms)
+		if err != nil {
+			logrus.Fatal(err)
 		}
 
 	}

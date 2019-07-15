@@ -85,10 +85,10 @@ func appendParams(params met.TMTIntegrator) *exec.Cmd {
 	jarPath, _ := filepath.Abs(params.JarPath)
 
 	args := exec.Command("java",
-		"-jar",
 		mem,
+		"-jar",
 		jarPath,
-		params.Param,
+		"philosopher.yml",
 	)
 
 	return args

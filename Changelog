@@ -1,3 +1,13 @@
 ### Added
-### Changed
+
+- Mising clevel parameter on the pipeline configuration file.
+
+[//]: ### Changed
+
 ### Fixed
+
+- A small typo was prventing the execution of TMT-Integrator with the pipeline.
+
+## Snapcrat
+
+- `snap install philosopher`

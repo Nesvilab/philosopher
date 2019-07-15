@@ -244,7 +244,7 @@ abacus:
   peptideProbability: 0.5                      # minimum peptide probability (default 0.5)
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
 
-tmt-integrator:
+tmtintegrator:
   path:                                        # path to TMT-Integrator jar
   memmory: 8                                   # how much memory in GB to use
   output:                                      # the location of output files
