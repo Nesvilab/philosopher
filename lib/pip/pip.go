@@ -337,12 +337,6 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 			files = append(files, fqn)
 		}
 
-		// return to the top level directory
-		os.Chdir(dir)
-
-		// reload the meta data
-		meta.Restore(sys.Meta())
-
 		proteinprophet.Run(meta, files)
 		combinedProtXML = fmt.Sprintf("%s%scombined.prot.xml", meta.Temp, string(filepath.Separator))
 

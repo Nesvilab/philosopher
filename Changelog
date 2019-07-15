@@ -1,12 +1,6 @@
 ### Added
-
-- Mising clevel parameter on the pipeline configuration file.
-
-[//]: ### Changed
-
+### Changed
 ### Fixed
-
-- A small typo was prventing the execution of TMT-Integrator with the pipeline.
 
 ## Snapcrat
 
