@@ -49,7 +49,7 @@ type Directives struct {
 	Report         met.Report         `yaml:"report"`
 	Cluster        met.Cluster        `yaml:"cluster"`
 	Abacus         met.Abacus         `yaml:"abacus"`
-	TMTIntegrator  met.TMTIntegrator  `yaml:"tmt-integrator"`
+	TMTIntegrator  met.TMTIntegrator  `yaml:"tmtintegrator"`
 }
 
 // Commands struct {
