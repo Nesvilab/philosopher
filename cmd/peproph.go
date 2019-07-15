@@ -76,7 +76,6 @@ func init() {
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Combine, "combine", "", false, "combine the results from PeptideProphet into a single result file")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Database, "database", "", "", "path to the database")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Enzyme, "enzyme", "", "", "enzyme used in sample")
-		//peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Rt, "rt", "", false, "enable peptide RT model")
 	}
 
 	RootCmd.AddCommand(peprophCmd)

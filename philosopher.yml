@@ -120,6 +120,7 @@ msfragger:
 
 peptideprophet:
   extension: pepXML                            # pepXML file extension
+  clevel: 0                                    # set Conservative Level in neg_stdev from the neg_mean, low numbers are less conservative, high numbers are more conservative
   accmass: false                               # use Accurate Mass model binning
   decoyprobs: false                            # compute possible non-zero probabilities for Decoy entries on the last iteration
   enzyme: trypsin                              # enzyme used in sample (optional)
