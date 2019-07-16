@@ -101,6 +101,18 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		params.VariableMod04 = ""
 	}
 
+	if len(params.VariableMod05) < 1 {
+		params.VariableMod05 = ""
+	}
+
+	if len(params.VariableMod06) < 1 {
+		params.VariableMod06 = ""
+	}
+
+	if len(params.VariableMod07) < 1 {
+		params.VariableMod07 = ""
+	}
+
 	args := exec.Command("java",
 		"-jar",
 		mem,

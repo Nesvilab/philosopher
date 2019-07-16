@@ -145,6 +145,9 @@ type MSFragger struct {
 	VariableMod02                      string  `yaml:"variable_mod_02"`
 	VariableMod03                      string  `yaml:"variable_mod_03"`
 	VariableMod04                      string  `yaml:"variable_mod_04"`
+	VariableMod05                      string  `yaml:"variable_mod_05"`
+	VariableMod06                      string  `yaml:"variable_mod_06"`
+	VariableMod07                      string  `yaml:"variable_mod_07"`
 	AddCysteine                        float64 `yaml:"add_C_cysteine"`
 	AddCtermPeptide                    float64 `yaml:"add_Cterm_peptide"`
 	AddCtermProtein                    float64 `yaml:"add_Cterm_protein"`
