@@ -354,6 +354,9 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 // FilterQuantifyReport executes the Filter, Quantify and Report commands in tandem
 func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string) met.Data {
 
+	// this is the virtual home directory where the pipeline is being executed.
+	vHome := meta.Home
+
 	for _, i := range data {
 
 		// getting inside  each dataset folder again
@@ -383,7 +386,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			}
 
 			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
-				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", meta.Home, string(filepath.Separator))
+				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
 			}
 
 			meta, e := fil.Run(meta)
