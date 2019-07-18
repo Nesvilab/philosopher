@@ -180,12 +180,14 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 		// Comet
 		if p.Commands.Comet == "yes" {
 			comet.Run(meta, mzFiles)
+			meta.SearchEngine = "MSFragger"
 			meta.Serialize()
 		}
 
 		// MSFragger
 		if p.Commands.MSFragger == "yes" {
 			msfragger.Run(meta, mzFiles)
+			meta.SearchEngine = "Comet"
 			meta.Serialize()
 		}
 	}

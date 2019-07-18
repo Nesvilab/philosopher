@@ -45,7 +45,7 @@ msfragger:
   memmory: 8                                   # how much memory in GB to use
   param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
-  num_ threads: 0                              # 0=poll CPU to set num threads; else specify num threads directly (max 64)
+  num_threads: 0                              # 0=poll CPU to set num threads; else specify num threads directly (max 64)
   precursor_mass_lower: -20                    # lower bound of the precursor mass window
   precursor_mass_upper: 20                     # upper bound of the precursor mass window
   precursor_mass_units: 1                      # 0=Daltons, 1=ppm

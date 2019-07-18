@@ -1,6 +1,9 @@
-### Added
-### Changed
+<!-- ### Added -->
+<!-- ### Changed -->
 ### Fixed
+- Fixed MSFragger setting when pritting correct tables.
+- Fixed a small typo on the pipeline parameter file.
+- Fixed path to the combined protein file when running the pipeline.
 
 ## Snapcrat
 
