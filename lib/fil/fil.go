@@ -920,6 +920,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 			razor := r[k]
 			razor.MappedProtein = pt
 			r[k] = razor
+			//spew.Dump(r[k])
 		}
 	}
 
@@ -937,7 +938,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 		}
 	}
 
-	// 	// mark as razor all peptides in the reference map
+	// mark as razor all peptides in the reference map
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 			var r float64
@@ -947,6 +948,9 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
 				}
+				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "AAAAAAAAAAR" {
+				// 	fmt.Println(p.Groups[i].Proteins[j].ProteinName)
+				// }
 			}
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}

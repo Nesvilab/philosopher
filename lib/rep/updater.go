@@ -32,6 +32,11 @@ func (e *Evidence) UpdateMappedProteins() {
 
 				list[pm.Sequence] = pm
 				checkup[v.Sequence] = 0
+
+				// if v.Sequence == "AAAAAAAAAAR" {
+				// 	spew.Dump(pm)
+				// }
+
 			}
 		}
 	}
@@ -44,10 +49,11 @@ func (e *Evidence) UpdateMappedProteins() {
 				e.PSM[i].MappedProteins[k]++
 			}
 
-			if len(e.PSM[i].RazorProtein) < 1 {
-				e.PSM[i].RazorProtein = v.RazorProtein
-				e.PSM[i].IsURazor = true
-			}
+			//if len(e.PSM[i].RazorProtein) < 1 {
+			e.PSM[i].Protein = v.RazorProtein
+			e.PSM[i].RazorProtein = v.RazorProtein
+			e.PSM[i].IsURazor = true
+			//}
 		}
 	}
 

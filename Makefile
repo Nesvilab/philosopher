@@ -90,7 +90,7 @@ linux:
 
 .PHONY: windows
 windows:
-	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher.exe
+	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
 
 .PHONY: draft
 draft:
