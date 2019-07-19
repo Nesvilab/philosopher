@@ -168,14 +168,7 @@ func Run(f met.Data) (met.Data, error) {
 	pro = nil
 
 	logrus.Info("Correcting PSM to Protein mappings")
-	e.UpdateMappedProteins()
-
-	// ADD ERROR CASES
-	logrus.Info("Mapping Ion status to PSMs")
-	e.UpdateIonStatus()
-
-	//logrus.Info("Propagating modifications to layers")
-	//e.UpdateIonAssignedAndObservedMods()
+	e.UpdateMappedProteins(f.Filter.Tag)
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
@@ -183,7 +176,6 @@ func Run(f met.Data) (met.Data, error) {
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
 	if f.Filter.Razor == true {
-		//e.UpdateProteinStatus()
 		e.UpdateGeneNames()
 		e.UpdateSupportingSpectra()
 	}

@@ -245,7 +245,6 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
-			//if j.IsNondegenerateEvidence == true {
 			if j.IsUnique == true {
 				uniqIons++
 			}

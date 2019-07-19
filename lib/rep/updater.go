@@ -1,22 +1,32 @@
 package rep
 
 import (
+	"strings"
+
 	"github.com/prvst/philosopher/lib/dat"
 )
 
 // PeptideMap struct
 type PeptideMap struct {
-	Sequence     string
-	Protein      string
-	RazorProtein string
-	Proteins     map[string]int
+	Sequence string
+	Protein  string
+	Proteins map[string]int
 }
 
 // UpdateMappedProteins updates the list of mapped proteins on the data structures
-func (e *Evidence) UpdateMappedProteins() {
+func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 
 	var list = make(map[string]PeptideMap)
 	var checkup = make(map[string]int)
+	var proteinMap = make(map[string]int8)
+
+	// The PSM exclusion list was implemented on July 19 because e noticed that the psm.tsv
+	// and protein tsv had a different number of unique protein IDs. The PSM tables had spectra
+	// mapping to decoys and/or other proteins that do not exist in the final protein table. This
+	// is most likely an effect of the backtracking with the promotion fo sequences based on the
+	// alternative lists. Since these PSMs are mapping to proteins that do not enter the final
+	// protein list, we decided to remove them and make both lists compatible in quantity and quality.
+	var psmExclusion = make(map[string]uint8)
 
 	for _, i := range e.Proteins {
 		for _, v := range i.TotalPeptideIons {
@@ -28,15 +38,11 @@ func (e *Evidence) UpdateMappedProteins() {
 				pm.Sequence = v.Sequence
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
-				pm.RazorProtein = i.PartHeader
+				pm.Protein = i.PartHeader
 
 				list[pm.Sequence] = pm
 				checkup[v.Sequence] = 0
-
-				// if v.Sequence == "AAAAAAAAAAR" {
-				// 	spew.Dump(pm)
-				// }
-
+				proteinMap[i.PartHeader] = 0
 			}
 		}
 	}
@@ -49,13 +55,28 @@ func (e *Evidence) UpdateMappedProteins() {
 				e.PSM[i].MappedProteins[k]++
 			}
 
-			//if len(e.PSM[i].RazorProtein) < 1 {
-			e.PSM[i].Protein = v.RazorProtein
-			e.PSM[i].RazorProtein = v.RazorProtein
-			e.PSM[i].IsURazor = true
-			//}
+			if (!strings.Contains(v.Protein, decoyTag) && strings.Contains(e.PSM[i].Protein, decoyTag)) || (!strings.Contains(v.Protein, decoyTag) && !strings.Contains(e.PSM[i].Protein, decoyTag)) {
+				e.PSM[i].Protein = v.Protein
+				e.PSM[i].IsURazor = true
+			}
+
+		}
+
+		_, ok = proteinMap[e.PSM[i].Protein]
+		if !ok {
+			psmExclusion[e.PSM[i].Spectrum] = 0
 		}
 	}
+
+	var psm PSMEvidenceList
+	for _, i := range e.PSM {
+		_, ok := psmExclusion[i.Spectrum]
+		if !ok {
+			psm = append(psm, i)
+		}
+	}
+
+	e.PSM = psm
 
 	for i := range e.Peptides {
 		v, ok := list[e.Peptides[i].Sequence]
@@ -65,7 +86,7 @@ func (e *Evidence) UpdateMappedProteins() {
 				e.Peptides[i].MappedProteins[k]++
 			}
 
-			e.Peptides[i].Protein = v.RazorProtein
+			e.Peptides[i].Protein = v.Protein
 		}
 	}
 
@@ -77,100 +98,13 @@ func (e *Evidence) UpdateMappedProteins() {
 				e.Ions[i].MappedProteins[k]++
 			}
 
-			e.Ions[i].Protein = v.RazorProtein
+			e.Ions[i].Protein = v.Protein
 		}
+
 	}
 
 	return
 }
-
-// func (e *Evidence) UpdateMappedProteins() {
-
-// 	var list []PeptideMap
-// 	var checkup = make(map[string]int)
-
-// 	log.Println("check-1")
-
-// 	for _, i := range e.Proteins {
-// 		for _, v := range i.TotalPeptideIons {
-
-// 			_, ok := checkup[v.Sequence]
-// 			if !ok {
-// 				var pm PeptideMap
-
-// 				pm.Sequence = v.Sequence
-// 				pm.Proteins = v.MappedProteins
-// 				pm.Proteins[i.PartHeader] = 0
-
-// 				//if v.IsURazor == true {
-// 				pm.RazorProtein = i.PartHeader
-// 				//}
-
-// 				list = append(list, pm)
-// 				checkup[v.Sequence] = 0
-// 			}
-
-// 		}
-// 	}
-
-// 	log.Println("check-2")
-
-// 	for i := range e.PSM {
-// 		for _, j := range list {
-// 			if e.PSM[i].Peptide == j.Sequence {
-
-// 				for k := range j.Proteins {
-// 					e.PSM[i].MappedProteins[k]++
-// 				}
-
-// 				if len(e.PSM[i].RazorProtein) < 1 {
-// 					e.PSM[i].RazorProtein = j.RazorProtein
-// 					e.PSM[i].IsURazor = true
-// 				}
-// 				break
-// 			}
-// 		}
-
-// 	}
-
-// 	log.Println("check-3")
-
-// 	for i := range e.Peptides {
-// 		for _, j := range list {
-// 			if e.Peptides[i].Sequence == j.Sequence {
-
-// 				for k := range j.Proteins {
-// 					e.Peptides[i].MappedProteins[k]++
-// 				}
-
-// 				e.Peptides[i].Protein = j.RazorProtein
-
-// 				break
-// 			}
-// 		}
-// 	}
-
-// 	log.Println("check-4")
-
-// 	for i := range e.Ions {
-// 		for _, j := range list {
-// 			if e.Ions[i].Sequence == j.Sequence {
-
-// 				for k := range j.Proteins {
-// 					e.Ions[i].MappedProteins[k]++
-// 				}
-
-// 				e.Ions[i].Protein = j.RazorProtein
-
-// 				break
-// 			}
-// 		}
-// 	}
-
-// 	log.Println("check-5")
-
-// 	return
-// }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
 func (e *Evidence) UpdateIonModCount() {
@@ -216,30 +150,6 @@ func (e *Evidence) UpdateIonModCount() {
 	// 	}
 
 	// }
-
-	return
-}
-
-// UpdateProteinStatus assignes the razor protein to THE protein column and removes it form the alt Protein
-// it basically swiches places with the current protein assignment from pepXML
-func (e *Evidence) UpdateProteinStatus() {
-
-	for i := range e.PSM {
-
-		if e.PSM[i].IsURazor == true && e.PSM[i].Protein != e.PSM[i].RazorProtein {
-
-			var altProteins []string
-
-			// push the selected protein to the top fo the list
-			altProteins = append(altProteins, e.PSM[i].Protein)
-
-			// replace the selected protein by the razor one
-			e.PSM[i].Protein = e.PSM[i].RazorProtein
-
-		} else if e.PSM[i].IsURazor == false && e.PSM[i].Protein != e.PSM[i].RazorProtein {
-			e.PSM[i].RazorProtein = e.PSM[i].Protein
-		}
-	}
 
 	return
 }
@@ -331,7 +241,7 @@ func (e *Evidence) UpdateIonStatus() {
 		rp, rOK := urazorMap[e.PSM[i].IonForm]
 		if rOK {
 			e.PSM[i].IsURazor = true
-			e.PSM[i].RazorProtein = rp
+			e.PSM[i].Protein = rp
 		}
 
 		v, ok := ptMap[e.PSM[i].IonForm]
@@ -356,44 +266,6 @@ func (e *Evidence) UpdateIonStatus() {
 
 	return
 }
-
-// UpdateIonAssignedAndObservedMods collects all Assigned and Observed modifications from
-// individual PSM and assign them to ions
-//func (e *Evidence) UpdateIonAssignedAndObservedMods() {
-
-// var aMap = make(map[string][]string)
-// var aPepMap = make(map[string][]string)
-
-// // collect the assigned modifications from the PSM data
-// for _, i := range e.PSM {
-// 	for j := range i.AssignedModifications {
-// 		aMap[i.IonForm] = append(aMap[i.IonForm], j)
-// 		aPepMap[i.Peptide] = append(aPepMap[i.Peptide], j)
-// 	}
-// }
-
-// // forward it to the Ion data
-// for i := range e.Ions {
-// 	v, ok := aMap[e.Ions[i].IonForm]
-// 	if ok {
-// 		for _, j := range v {
-// 			e.Ions[i].AssignedModifications[j] = 0
-// 		}
-// 	}
-// }
-
-// // forward it to the peptide data
-// for i := range e.Peptides {
-// 	v, ok := aPepMap[e.Peptides[i].Sequence]
-// 	if ok {
-// 		for _, j := range v {
-// 			e.Peptides[i].AssignedModifications[j] = 0
-// 		}
-// 	}
-// }
-
-//return
-//}
 
 // UpdateSupportingSpectra pushes back from SM to Protein the new supporting spectra from razor results
 func (e *Evidence) UpdateSupportingSpectra() {

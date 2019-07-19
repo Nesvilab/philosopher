@@ -543,3 +543,8 @@ func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bo
 
 	return
 }
+
+// RemovePSM takes an element out of a list by the index
+func RemovePSM(slice PSMEvidenceList, s int) PSMEvidenceList {
+	return append(slice[:s], slice[s+1:]...)
+}
