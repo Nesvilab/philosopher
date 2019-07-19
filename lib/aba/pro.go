@@ -170,14 +170,14 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 			}
 		}
 
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor)
+		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor, a.Tag)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, j := range proid {
 
-			if !strings.Contains(j.ProteinName, a.Tag) {
+			if !strings.HasPrefix(j.ProteinName, a.Tag) {
 
 				var ce rep.CombinedProteinEvidence
 

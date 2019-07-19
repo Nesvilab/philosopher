@@ -37,7 +37,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 
 			if i.IsURazor == true {
 				if e.Decoys == false {
-					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 						printSet = append(printSet, i)
 					}
 				} else {
@@ -48,7 +48,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 		} else {
 
 			if e.Decoys == false {
-				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {
@@ -119,7 +119,7 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 
 			if i.IsURazor == true {
 				if e.Decoys == false {
-					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 						printSet = append(printSet, i)
 					}
 				} else {
@@ -130,7 +130,7 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 		} else {
 
 			if e.Decoys == false {
-				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.Contains(i.Protein, decoyTag) {
+				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
 			} else {

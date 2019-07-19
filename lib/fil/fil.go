@@ -64,7 +64,7 @@ func Run(f met.Data) (met.Data, error) {
 			return f, proerr
 		}
 
-		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo)
+		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 		if err != nil {
 			return f, err
 		}
@@ -354,7 +354,7 @@ func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int, err
 
 	for _, i := range p {
 		if i.AssumedCharge == charge {
-			if strings.Contains(i.Protein, decoyTag) {
+			if strings.HasPrefix(i.Protein, decoyTag) {
 				d++
 			} else {
 				t++
@@ -572,7 +572,7 @@ func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXM
 
 // processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool) error {
+func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool, decoyTag string) error {
 
 	var err error
 	var pid id.ProtIDList
@@ -598,7 +598,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	}
 
 	// run the FDR filter for proteins
-	pid, err = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor)
+	pid, err = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
 	if err != nil {
 		return err
 	}
@@ -613,7 +613,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 		defer file.Close()
 
 		for _, i := range pid {
-			if !strings.Contains(i.ProteinName, "rev_") {
+			if !strings.HasPrefix(i.ProteinName, decoyTag) {
 
 				var line []string
 
@@ -952,7 +952,7 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 }
 
 // ProtXMLFilter filters the protein list under a specific fdr
-func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool) (id.ProtIDList, error) {
+func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool, decoyTag string) (id.ProtIDList, error) {
 
 	//var proteinIDs ProtIDList
 	var list id.ProtIDList

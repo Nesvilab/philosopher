@@ -51,7 +51,7 @@ func (e *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) err
 		rep.Probability = i.Probability
 		rep.TopPepProb = i.TopPepProb
 
-		if strings.Contains(i.ProteinName, decoyTag) {
+		if strings.HasPrefix(i.ProteinName, decoyTag) {
 			rep.IsDecoy = true
 		} else {
 			rep.IsDecoy = false

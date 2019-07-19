@@ -39,7 +39,7 @@ func IsDecoyProtein(p id.ProteinIdentification, tag string) bool {
 	// default for TRUE ( DECOY)
 	var class = true
 
-	if strings.Contains(string(p.ProteinName), tag) {
+	if strings.HasPrefix(string(p.ProteinName), tag) {
 		class = true
 	} else {
 		class = false
@@ -54,7 +54,7 @@ func IsDecoy(name string, tag string) bool {
 	// default for TRUE ( DECOY)
 	var class = true
 
-	if strings.Contains(name, tag) {
+	if strings.HasPrefix(name, tag) {
 		class = true
 	} else {
 		class = false
@@ -70,7 +70,7 @@ func IsDecoyIon(names map[string]int, tag string) bool {
 	var class = true
 
 	for i := range names {
-		if strings.Contains(i, tag) {
+		if strings.HasPrefix(i, tag) {
 			class = true
 		} else {
 			class = false

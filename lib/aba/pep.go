@@ -109,7 +109,7 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 
 		// get all peptide sequences from combined file and collapse them
 		for _, i := range pep.PeptideIdentification {
-			if !strings.Contains(i.Protein, a.Tag) {
+			if !strings.HasPrefix(i.Protein, a.Tag) {
 				seqMap[i.Peptide] = 0
 				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
 			}

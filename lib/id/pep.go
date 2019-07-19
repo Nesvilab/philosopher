@@ -420,7 +420,7 @@ func (p *PepXML) PromoteProteinIDs() {
 
 		if strings.Contains(p.PeptideIdentification[i].Protein, p.DecoyTag) {
 			for j := range p.PeptideIdentification[i].AlternativeProteins {
-				if !strings.Contains(p.PeptideIdentification[i].AlternativeProteins[j], p.DecoyTag) {
+				if !strings.HasPrefix(p.PeptideIdentification[i].AlternativeProteins[j], p.DecoyTag) {
 					list = append(list, p.PeptideIdentification[i].AlternativeProteins[j])
 				}
 			}
@@ -573,14 +573,14 @@ func tdclassifier(p PeptideIdentification, tag string) bool {
 	// default for TRUE ( DECOY)
 	var class = true
 
-	if strings.Contains(string(p.Protein), tag) {
+	if strings.HasPrefix(string(p.Protein), tag) {
 		class = true
 	} else {
 		class = false
 	}
 
 	for i := range p.AlternativeProteins {
-		if !strings.Contains(p.AlternativeProteins[i], tag) {
+		if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
 			class = false
 		}
 		break

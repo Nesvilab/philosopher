@@ -55,7 +55,8 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				e.PSM[i].MappedProteins[k]++
 			}
 
-			if (!strings.Contains(v.Protein, decoyTag) && strings.Contains(e.PSM[i].Protein, decoyTag)) || (!strings.Contains(v.Protein, decoyTag) && !strings.Contains(e.PSM[i].Protein, decoyTag)) {
+			//if (!strings.Contains(v.Protein, decoyTag) && strings.Contains(e.PSM[i].Protein, decoyTag)) || (!strings.Contains(v.Protein, decoyTag) && !strings.Contains(e.PSM[i].Protein, decoyTag)) {
+			if !strings.HasPrefix(v.Protein, decoyTag) {
 				e.PSM[i].Protein = v.Protein
 				e.PSM[i].IsURazor = true
 			}
@@ -136,20 +137,6 @@ func (e *Evidence) UpdateIonModCount() {
 
 		}
 	}
-
-	// for i := range e.Ions {
-
-	// 	v1, ok1 := UnModIons[e.Ions[i].IonForm]
-	// 	if ok1 {
-	// 		e.Ions[i].UnModifiedObservations = v1
-	// 	}
-
-	// 	v2, ok2 := ModIons[e.Ions[i].IonForm]
-	// 	if ok2 {
-	// 		e.Ions[i].ModifiedObservations = v2
-	// 	}
-
-	// }
 
 	return
 }
