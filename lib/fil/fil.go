@@ -170,6 +170,10 @@ func Run(f met.Data) (met.Data, error) {
 	logrus.Info("Correcting PSM to Protein mappings")
 	e.UpdateMappedProteins(f.Filter.Tag)
 
+	// ADD ERROR CASES
+	//logrus.Info("Mapping Ion status to PSMs")
+	e.UpdateIonStatus()
+
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
 

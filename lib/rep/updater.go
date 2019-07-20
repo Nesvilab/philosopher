@@ -55,7 +55,6 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				e.PSM[i].MappedProteins[k]++
 			}
 
-			//if (!strings.Contains(v.Protein, decoyTag) && strings.Contains(e.PSM[i].Protein, decoyTag)) || (!strings.Contains(v.Protein, decoyTag) && !strings.Contains(e.PSM[i].Protein, decoyTag)) {
 			if !strings.HasPrefix(v.Protein, decoyTag) {
 				e.PSM[i].Protein = v.Protein
 				e.PSM[i].IsURazor = true
@@ -293,9 +292,13 @@ func (e *Evidence) UpdateSupportingSpectra() {
 	for i := range e.Proteins {
 		for j := range e.Proteins[i].TotalPeptideIons {
 
-			for k := range e.Proteins[i].TotalPeptideIons[j].Spectra {
-				delete(e.Proteins[i].TotalPeptideIons[k].Spectra, k)
+			if len(e.Proteins[i].TotalPeptideIons[j].Spectra) == 0 {
+				delete(e.Proteins[i].TotalPeptideIons, j)
 			}
+
+			// for k := range e.Proteins[i].TotalPeptideIons[j].Spectra {
+			// 	delete(e.Proteins[i].TotalPeptideIons[k].Spectra, k)
+			// }
 
 		}
 	}
