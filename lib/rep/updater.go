@@ -8,9 +8,11 @@ import (
 
 // PeptideMap struct
 type PeptideMap struct {
-	Sequence string
-	Protein  string
-	Proteins map[string]int
+	Sequence  string
+	Protein   string
+	ProteinID string
+	Gene      string
+	Proteins  map[string]int
 }
 
 // UpdateMappedProteins updates the list of mapped proteins on the data structures
@@ -39,6 +41,8 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
 				pm.Protein = i.PartHeader
+				pm.ProteinID = i.ProteinID
+				pm.Gene = i.GeneNames
 
 				list[pm.Sequence] = pm
 				checkup[v.Sequence] = 0
@@ -57,9 +61,10 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 
 			if !strings.HasPrefix(v.Protein, decoyTag) {
 				e.PSM[i].Protein = v.Protein
-				e.PSM[i].IsURazor = true
+				e.PSM[i].ProteinID = v.ProteinID
+				e.PSM[i].GeneName = v.Gene
+				//e.PSM[i].IsURazor = true
 			}
-
 		}
 
 		_, ok = proteinMap[e.PSM[i].Protein]
@@ -99,6 +104,69 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 			}
 
 			e.Ions[i].Protein = v.Protein
+		}
+
+	}
+
+	return
+}
+
+// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
+func (e *Evidence) UpdateIonStatus() {
+
+	var uniqueMap = make(map[string]bool)
+	var urazorMap = make(map[string]string)
+	var ptMap = make(map[string]string)
+
+	for _, i := range e.Proteins {
+
+		for _, j := range i.TotalPeptideIons {
+			if j.IsUnique == true {
+				uniqueMap[j.IonForm] = true
+			}
+		}
+
+		for _, j := range i.TotalPeptideIons {
+			if j.IsURazor == true {
+				urazorMap[j.IonForm] = i.PartHeader
+			}
+		}
+
+	}
+
+	for i := range e.PSM {
+
+		if len(e.PSM[i].MappedProteins) == 0 {
+			e.PSM[i].IsUnique = true
+		}
+
+		_, uOK := uniqueMap[e.PSM[i].IonForm]
+		if uOK {
+			e.PSM[i].IsUnique = true
+		}
+
+		rp, rOK := urazorMap[e.PSM[i].IonForm]
+		if rOK {
+			e.PSM[i].IsURazor = true
+			e.PSM[i].Protein = rp
+		}
+
+		v, ok := ptMap[e.PSM[i].IonForm]
+		if ok {
+			e.PSM[i].Protein = v
+		}
+	}
+
+	for i := range e.Ions {
+
+		_, uOK := uniqueMap[e.Ions[i].IonForm]
+		if uOK {
+			e.Ions[i].IsUnique = true
+		}
+
+		_, rOK := urazorMap[e.Ions[i].IonForm]
+		if rOK {
+			e.Ions[i].IsURazor = true
 		}
 
 	}
@@ -185,69 +253,6 @@ func (e *Evidence) UpdateGeneNames() {
 		e.Peptides[i].ProteinDescription = descMap[e.Peptides[i].Protein]
 		e.Peptides[i].ProteinID = idMap[e.Peptides[i].Protein]
 		e.Peptides[i].EntryName = entryMap[e.Peptides[i].Protein]
-	}
-
-	return
-}
-
-// UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-func (e *Evidence) UpdateIonStatus() {
-
-	var uniqueMap = make(map[string]bool)
-	var urazorMap = make(map[string]string)
-	var ptMap = make(map[string]string)
-
-	for _, i := range e.Proteins {
-
-		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
-				uniqueMap[j.IonForm] = true
-			}
-		}
-
-		for _, j := range i.TotalPeptideIons {
-			if j.IsURazor == true {
-				urazorMap[j.IonForm] = i.PartHeader
-			}
-		}
-
-	}
-
-	for i := range e.PSM {
-
-		if len(e.PSM[i].MappedProteins) == 0 {
-			e.PSM[i].IsUnique = true
-		}
-
-		_, uOK := uniqueMap[e.PSM[i].IonForm]
-		if uOK {
-			e.PSM[i].IsUnique = true
-		}
-
-		rp, rOK := urazorMap[e.PSM[i].IonForm]
-		if rOK {
-			e.PSM[i].IsURazor = true
-			e.PSM[i].Protein = rp
-		}
-
-		v, ok := ptMap[e.PSM[i].IonForm]
-		if ok {
-			e.PSM[i].Protein = v
-		}
-	}
-
-	for i := range e.Ions {
-
-		_, uOK := uniqueMap[e.Ions[i].IonForm]
-		if uOK {
-			e.Ions[i].IsUnique = true
-		}
-
-		_, rOK := urazorMap[e.Ions[i].IonForm]
-		if rOK {
-			e.Ions[i].IsURazor = true
-		}
-
 	}
 
 	return

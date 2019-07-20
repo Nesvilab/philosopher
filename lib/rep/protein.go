@@ -236,6 +236,10 @@ func (e *Evidence) ProteinReport(hasDecoys bool) {
 
 	for _, i := range printSet {
 
+		// if i.ProteinID == "Q5CZC0" {
+		// 	spew.Dump(i)
+		// }
+
 		var ip []string
 		for k := range i.IndiProtein {
 			ip = append(ip, k)
