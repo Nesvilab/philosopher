@@ -882,7 +882,6 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 							if r[k].MappedProteinsTNP[pt] >= topCount {
 								topCount = r[k].MappedProteinsTNP[pt]
 								topPT = pt
-								//break
 							}
 						}
 
@@ -944,9 +943,11 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
 				}
-				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "AAAAAAAAAAR" {
+
+				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "LLESLIR" {
 				// 	fmt.Println(p.Groups[i].Proteins[j].ProteinName)
 				// }
+
 			}
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
