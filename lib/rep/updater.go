@@ -9,6 +9,7 @@ import (
 // PeptideMap struct
 type PeptideMap struct {
 	Sequence  string
+	IonForm   string
 	Protein   string
 	ProteinID string
 	Gene      string
@@ -19,6 +20,7 @@ type PeptideMap struct {
 func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 
 	var list = make(map[string]PeptideMap)
+	var ionList = make(map[string]PeptideMap)
 	var checkup = make(map[string]int)
 	var proteinMap = make(map[string]int8)
 
@@ -29,6 +31,7 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 	// alternative lists. Since these PSMs are mapping to proteins that do not enter the final
 	// protein list, we decided to remove them and make both lists compatible in quantity and quality.
 	var psmExclusion = make(map[string]uint8)
+	var pepExclusion = make(map[string]uint8)
 
 	for _, i := range e.Proteins {
 		for _, v := range i.TotalPeptideIons {
@@ -38,6 +41,7 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				var pm PeptideMap
 
 				pm.Sequence = v.Sequence
+				pm.IonForm = v.IonForm
 				pm.Proteins = v.MappedProteins
 				pm.Proteins[i.PartHeader] = 0
 				pm.Protein = i.PartHeader
@@ -45,20 +49,20 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				pm.Gene = i.GeneNames
 
 				list[pm.Sequence] = pm
+				ionList[pm.IonForm] = pm
 				checkup[v.Sequence] = 0
 				proteinMap[i.PartHeader] = 0
 			}
 		}
 	}
 
+	// PSMs
 	for i := range e.PSM {
 		v, ok := list[e.PSM[i].Peptide]
 		if ok {
-
 			for k := range v.Proteins {
 				e.PSM[i].MappedProteins[k]++
 			}
-
 			if !strings.HasPrefix(v.Protein, decoyTag) {
 				e.PSM[i].Protein = v.Protein
 				e.PSM[i].ProteinID = v.ProteinID
@@ -66,7 +70,6 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 				//e.PSM[i].IsURazor = true
 			}
 		}
-
 		_, ok = proteinMap[e.PSM[i].Protein]
 		if !ok {
 			psmExclusion[e.PSM[i].Spectrum] = 0
@@ -83,33 +86,194 @@ func (e *Evidence) UpdateMappedProteins(decoyTag string) {
 
 	e.PSM = psm
 
+	// Peptides
 	for i := range e.Peptides {
 		v, ok := list[e.Peptides[i].Sequence]
 		if ok {
-
 			for k := range v.Proteins {
 				e.Peptides[i].MappedProteins[k]++
 			}
-
-			e.Peptides[i].Protein = v.Protein
+			if !strings.HasPrefix(v.Protein, decoyTag) {
+				e.Peptides[i].Protein = v.Protein
+				e.Peptides[i].ProteinID = v.ProteinID
+				e.Peptides[i].GeneName = v.Gene
+			}
+		}
+		_, ok = proteinMap[e.Peptides[i].Sequence]
+		if !ok {
+			psmExclusion[e.Peptides[i].Sequence] = 0
 		}
 	}
 
+	var pep PeptideEvidenceList
+	for _, i := range e.Peptides {
+		_, ok := pepExclusion[i.Sequence]
+		if !ok {
+			pep = append(pep, i)
+		}
+	}
+
+	e.Peptides = pep
+
+	// Ions
 	for i := range e.Ions {
 		v, ok := list[e.Ions[i].Sequence]
 		if ok {
-
 			for k := range v.Proteins {
 				e.Ions[i].MappedProteins[k]++
 			}
-
-			e.Ions[i].Protein = v.Protein
+			if !strings.HasPrefix(v.Protein, decoyTag) {
+				e.Ions[i].Protein = v.Protein
+				e.Ions[i].ProteinID = v.ProteinID
+				e.Ions[i].GeneName = v.Gene
+			}
 		}
-
+		// _, ok = proteinMap[e.Ions[i].Sequence]
+		// if !ok {
+		// 	ionExclusion[e.Ions[i].IonForm] = 0
+		// }
 	}
+
+	// var ion IonEvidenceList
+	// for _, i := range e.Ions {
+	// 	_, ok := ionExclusion[i.IonForm]
+	// 	if !ok {
+	// 		ion = append(ion, i)
+	// 	}
+	// }
+
+	// e.Ions = ion
 
 	return
 }
+
+// func (e *Evidence) UpdateMappedProteins(decoyTag string) {
+
+// 	var list = make(map[string]PeptideMap)
+// 	var checkup = make(map[string]int)
+// 	var proteinMap = make(map[string]int8)
+
+// 	// The PSM exclusion list was implemented on July 19 because e noticed that the psm.tsv
+// 	// and protein tsv had a different number of unique protein IDs. The PSM tables had spectra
+// 	// mapping to decoys and/or other proteins that do not exist in the final protein table. This
+// 	// is most likely an effect of the backtracking with the promotion fo sequences based on the
+// 	// alternative lists. Since these PSMs are mapping to proteins that do not enter the final
+// 	// protein list, we decided to remove them and make both lists compatible in quantity and quality.
+// 	var psmExclusion = make(map[string]uint8)
+// 	var pepExclusion = make(map[string]uint8)
+// 	var ionExclusion = make(map[string]uint8)
+
+// 	for _, i := range e.Proteins {
+// 		for _, v := range i.TotalPeptideIons {
+
+// 			_, ok := checkup[v.Sequence]
+// 			if !ok {
+// 				var pm PeptideMap
+
+// 				pm.Sequence = v.Sequence
+// 				pm.Proteins = v.MappedProteins
+// 				pm.Proteins[i.PartHeader] = 0
+// 				pm.Protein = i.PartHeader
+// 				pm.ProteinID = i.ProteinID
+// 				pm.Gene = i.GeneNames
+
+// 				list[pm.Sequence] = pm
+// 				checkup[v.Sequence] = 0
+// 				proteinMap[i.PartHeader] = 0
+// 			}
+// 		}
+// 	}
+
+// 	// PSMs
+// 	for i := range e.PSM {
+// 		v, ok := list[e.PSM[i].Peptide]
+// 		if ok {
+// 			for k := range v.Proteins {
+// 				e.PSM[i].MappedProteins[k]++
+// 			}
+// 			if !strings.HasPrefix(v.Protein, decoyTag) {
+// 				e.PSM[i].Protein = v.Protein
+// 				e.PSM[i].ProteinID = v.ProteinID
+// 				e.PSM[i].GeneName = v.Gene
+// 				//e.PSM[i].IsURazor = true
+// 			}
+// 		}
+// 		_, ok = proteinMap[e.PSM[i].Protein]
+// 		if !ok {
+// 			psmExclusion[e.PSM[i].Spectrum] = 0
+// 		}
+// 	}
+
+// 	var psm PSMEvidenceList
+// 	for _, i := range e.PSM {
+// 		_, ok := psmExclusion[i.Spectrum]
+// 		if !ok {
+// 			psm = append(psm, i)
+// 		}
+// 	}
+
+// 	e.PSM = psm
+
+// 	// Peptides
+// 	for i := range e.Peptides {
+// 		v, ok := list[e.Peptides[i].Sequence]
+// 		if ok {
+// 			for k := range v.Proteins {
+// 				e.Peptides[i].MappedProteins[k]++
+// 			}
+// 			if !strings.HasPrefix(v.Protein, decoyTag) {
+// 				e.Peptides[i].Protein = v.Protein
+// 				e.Peptides[i].ProteinID = v.ProteinID
+// 				e.Peptides[i].GeneName = v.Gene
+// 			}
+// 		}
+// 		_, ok = proteinMap[e.Peptides[i].Sequence]
+// 		if !ok {
+// 			psmExclusion[e.Peptides[i].Sequence] = 0
+// 		}
+// 	}
+
+// 	var pep PeptideEvidenceList
+// 	for _, i := range e.Peptides {
+// 		_, ok := pepExclusion[i.Sequence]
+// 		if !ok {
+// 			pep = append(pep, i)
+// 		}
+// 	}
+
+// 	e.Peptides = pep
+
+// 	// Ions
+// 	for i := range e.Ions {
+// 		v, ok := list[e.Ions[i].Sequence]
+// 		if ok {
+// 			for k := range v.Proteins {
+// 				e.Ions[i].MappedProteins[k]++
+// 			}
+// 			if !strings.HasPrefix(v.Protein, decoyTag) {
+// 				e.Ions[i].Protein = v.Protein
+// 				e.Ions[i].ProteinID = v.ProteinID
+// 				e.Ions[i].GeneName = v.Gene
+// 			}
+// 		}
+// 		_, ok = proteinMap[e.Ions[i].Sequence]
+// 		if !ok {
+// 			ionExclusion[e.Ions[i].IonForm] = 0
+// 		}
+// 	}
+
+// 	var ion IonEvidenceList
+// 	for _, i := range e.Ions {
+// 		_, ok := ionExclusion[i.IonForm]
+// 		if !ok {
+// 			ion = append(ion, i)
+// 		}
+// 	}
+
+// 	e.Ions = ion
+
+// 	return
+// }
 
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
 func (e *Evidence) UpdateIonStatus() {
