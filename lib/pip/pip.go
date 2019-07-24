@@ -283,9 +283,9 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 		for _, j := range data {
 			fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
-			if p.Commands.PTMProphet == "yes" {
-				fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
-			}
+			// if p.Commands.PTMProphet == "yes" {
+			// 	fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
+			// }
 			fqn, _ = filepath.Abs(fqn)
 			files = append(files, fqn)
 		}
@@ -377,6 +377,9 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
+				if p.Commands.PTMProphet == "yes" {
+					meta.Filter.Pex = "interact.mod.pep.xml"
+				}
 			} else {
 				meta.Filter.Pex = p.Filter.Pex
 			}

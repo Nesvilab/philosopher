@@ -99,7 +99,7 @@ draft:
 
 .PHONY: push
 push:
-	ginkgo -r
+	#ginkgo -r
 	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
 
