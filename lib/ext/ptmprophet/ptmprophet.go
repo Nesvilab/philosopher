@@ -34,6 +34,7 @@ func New(temp string) PTMProphet {
 	return self
 }
 
+// Run PTMProphet
 func Run(m met.Data, args []string) met.Data {
 
 	var ptm = New(m.Temp)
