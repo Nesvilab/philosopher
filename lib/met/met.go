@@ -287,6 +287,7 @@ type PTMProphet struct {
 	MassOffset   int     `yaml:"massoffset"`
 	PPMTol       float64 `yaml:"ppmtol"`
 	MinProb      float64 `yaml:"minprob"`
+	Static       bool    `yaml:"static"`
 	NoUpdate     bool    `yaml:"noupdate"`
 	KeepOld      bool    `yaml:"keepold"`
 	Verbose      bool    `yaml:"verbose"`

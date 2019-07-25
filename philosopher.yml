@@ -45,7 +45,7 @@ msfragger:
   memmory: 8                                   # how much memory in GB to use
   param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
-  num_threads: 0                              # 0=poll CPU to set num threads; else specify num threads directly (max 64)
+  num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
   precursor_mass_lower: -20                    # lower bound of the precursor mass window
   precursor_mass_upper: 20                     # upper bound of the precursor mass window
   precursor_mass_units: 1                      # 0=Daltons, 1=ppm
@@ -159,6 +159,7 @@ ptmprophet:
   cions:                                       # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                # use only direct evidence for evaluating PTM site probabilities
   em: 1                                        # set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)
+  static: false                                # use static fragppmtol for all PSMs instead of dynamically estimates offsets and tolerances
   fragppmtol: 15                               # when computing PSM-specific mass_offset and mass_tolerance, use specified default +/- MS2 mz tolerance on fragment ions
   ifrags: false                                # use internal fragments for localization
   keepold: false                               # retain old PTMProphet results in the pepXML file

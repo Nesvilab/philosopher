@@ -1,7 +1,11 @@
-<!-- ### Added -->
-<!-- ### Changed -->
+### Added
+- Added STATIC option to PTMProphet
+
+### Changed
+
 ### Fixed
 - Fixed a problem wih the PSM-to-Protein razor assingment.
+- Small bugs and performance improvement.
 
 ## Snapcrat
 

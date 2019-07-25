@@ -157,6 +157,10 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, "NOMINOFACTOR")
 	}
 
+	if params.Static == true {
+		cmd.Args = append(cmd.Args, "STATIC")
+	}
+
 	if params.EM != 1 {
 		v := fmt.Sprintf("EM=%d", params.EM)
 		cmd.Args = append(cmd.Args, v)
