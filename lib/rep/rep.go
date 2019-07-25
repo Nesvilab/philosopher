@@ -446,10 +446,10 @@ func Run(m met.Data) met.Data {
 			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
 		}
 
-		if len(m.Quantify.Plex) > 0 {
-			logrus.Info("Creating TMT phospho protein report")
-			repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
-		}
+		// if len(m.Quantify.Plex) > 0 {
+		// 	logrus.Info("Creating TMT phospho protein report")
+		// 	repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
+		// }
 
 		logrus.Info("Plotting mass distribution")
 		repo.PlotMassHist()
