@@ -196,16 +196,18 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, v)
 	}
 
-	if len(params.Mods) > 0 {
-		cmd.Args = append(cmd.Args, params.Mods)
-	}
-
 	if len(params.NIons) > 0 {
-		cmd.Args = append(cmd.Args, params.NIons)
+		v := fmt.Sprintf("NIONS=%s", params.NIons)
+		cmd.Args = append(cmd.Args, v)
 	}
 
 	if len(params.CIons) > 0 {
-		cmd.Args = append(cmd.Args, params.CIons)
+		v := fmt.Sprintf("CIONS=%s", params.CIons)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if len(params.Mods) > 0 {
+		cmd.Args = append(cmd.Args, params.Mods)
 	}
 
 	return cmd
