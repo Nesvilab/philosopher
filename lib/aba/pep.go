@@ -33,7 +33,7 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 	}
 
 	// recover all files
-	logrus.Info("Restoring results")
+	logrus.Info("Restoring peptide results")
 
 	for _, i := range args {
 

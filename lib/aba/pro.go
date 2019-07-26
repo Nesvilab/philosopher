@@ -44,7 +44,7 @@ func proteinLevelAbacus(m met.Data, args []string) error {
 	}
 
 	// recover all files
-	logrus.Info("Restoring results")
+	logrus.Info("Restoring protein results")
 
 	for _, i := range args {
 

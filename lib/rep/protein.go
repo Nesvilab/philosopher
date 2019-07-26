@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
@@ -405,7 +404,6 @@ func (e *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasDec
 			reportIntensities[10] = i.URazorLabels.Channel11.Intensity
 		}
 
-		spew.Dump(assL)
 		if len(i.TotalPeptideIons) > 0 {
 			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\n",
 				i.ProteinGroup,           // Group
