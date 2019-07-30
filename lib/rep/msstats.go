@@ -24,7 +24,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum.File\tSequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
+	_, err = io.WriteString(file, "Spectrum.Name\tSpectrum.File\tPeptide.Sequence\tModified.Peptide.Sequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
 	if err != nil {
 		logrus.Fatal("Cannot print PSM to file")
 	}
@@ -64,9 +64,11 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 		parts := strings.Split(i.Spectrum, ".")
 		fileName = fmt.Sprintf("%s.raw", parts[0])
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\n",
+			i.Spectrum,
 			fileName,
 			i.Peptide,
+			i.ModifiedPeptide,
 			i.AssumedCharge,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			i.Probability,
@@ -99,7 +101,7 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 	}
 	defer file.Close()
 
-	header := "File.Name\tPeptide.Sequence\tCharge.State\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein\tPurity\t126.Abundance\t127N.Abundance\t127C.Abundance\t128N.Abundance\t128C.Abundance\t129N.Abundance\t129C.Abundance\t130N.Abundance\t130C.Abundance\t131N.Abundance\t131C.Abundance\n"
+	header := "Spectrum.Name\tSpectrum.File\tPeptide.Sequence\tModified.Peptide.Sequence\tCharge.State\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein\tPurity\t126.Abundance\t127N.Abundance\t127C.Abundance\t128N.Abundance\t128C.Abundance\t129N.Abundance\t129C.Abundance\t130N.Abundance\t130C.Abundance\t131N.Abundance\t131C.Abundance\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
@@ -146,9 +148,11 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 		parts := strings.Split(i.Spectrum, ".")
 		fileName = fmt.Sprintf("%s.raw", parts[0])
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%.2f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+			i.Spectrum,
 			fileName,
 			i.Peptide,
+			i.ModifiedPeptide,
 			i.AssumedCharge,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			i.Probability,
