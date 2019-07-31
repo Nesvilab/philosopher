@@ -41,7 +41,7 @@ func Run(f met.Data) (met.Data, error) {
 
 	logrus.Info("Processing peptide identification files")
 
-	pepid, searchEngine, err := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Filter.Model)
+	pepid, searchEngine, err := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
 	if err != nil {
 		return f, err
 	}
@@ -200,7 +200,7 @@ func Run(f met.Data) (met.Data, error) {
 }
 
 // readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, string, error) {
+func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string, error) {
 
 	var files []string
 	var pepIdent id.PepIDList
@@ -242,7 +242,6 @@ func readPepXMLInput(xmlFile, decoyTag string, models bool) (id.PepIDList, strin
 				logrus.Error("Cannot print models for interprophet files")
 			} else {
 				logrus.Info("Printing models")
-				temp, _ := sys.GetTemp()
 				go p.ReportModels(temp, filepath.Base(i))
 				time.Sleep(time.Second * 3)
 			}
