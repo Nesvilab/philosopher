@@ -134,8 +134,9 @@ func proteinLevelAbacus(m met.Data, args []string) error {
 	}
 
 	if m.Abacus.Reprint == true {
-		logrus.Info("Creating Reprint report")
-		saveReprintResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
+		logrus.Info("Creating Reprint reports")
+		saveReprintSpCResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
+		saveReprintIntResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
 	}
 
 	return nil
@@ -459,11 +460,11 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	return
 }
 
-// saveReprintResults creates a single report using 1 or more philosopher result files using the Reprint format
-func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+// saveReprintSpCResults creates a single Spectral Count report using 1 or more philosopher result files using the Reprint format
+func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
-	output := fmt.Sprintf("%s%sreprint.tsv", session, string(filepath.Separator))
+	output := fmt.Sprintf("%s%sreprint.spc.tsv", session, string(filepath.Separator))
 
 	// create result file
 	file, err := os.Create(output)
@@ -495,19 +496,6 @@ func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceLis
 	// organize by group number
 	sort.Sort(evidences)
 
-	var summTotalSpC = make(map[string]int)
-	var summUniqueSpC = make(map[string]int)
-	var summURazorSpC = make(map[string]int)
-
-	// collect and sum all evidences from all data sets for each protein
-	for _, i := range evidences {
-		for _, j := range namesList {
-			summTotalSpC[i.ProteinID] += i.TotalSpc[j]
-			summUniqueSpC[i.ProteinID] += i.UniqueSpc[j]
-			summURazorSpC[i.ProteinID] += i.UrazorSpc[j]
-		}
-	}
-
 	for _, i := range evidences {
 
 		var line string
@@ -516,6 +504,138 @@ func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceLis
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
+		}
+
+		line += "\n"
+		n, err := io.WriteString(file, line)
+		if err != nil {
+			logrus.Fatal(n, err)
+		}
+
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
+
+	return
+}
+
+// func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+
+// 	// create result file
+// 	output := fmt.Sprintf("%s%sreprint.spc.tsv", session, string(filepath.Separator))
+
+// 	// create result file
+// 	file, err := os.Create(output)
+// 	if err != nil {
+// 		logrus.Fatal("Cannot create report file:", err)
+// 	}
+// 	defer file.Close()
+
+// 	line := "PROTID\t"
+
+// 	for _, i := range namesList {
+// 		line += fmt.Sprintf("%s_SPC\t", i)
+// 	}
+
+// 	line += "\n"
+// 	line += "na\t"
+
+// 	for _, i := range labelList {
+// 		line += fmt.Sprintf("%s\t", i)
+// 	}
+
+// 	line += "\n"
+
+// 	n, err := io.WriteString(file, line)
+// 	if err != nil {
+// 		logrus.Fatal(n, err)
+// 	}
+
+// 	// organize by group number
+// 	sort.Sort(evidences)
+
+// 	// var summTotalSpC = make(map[string]int)
+// 	// var summUniqueSpC = make(map[string]int)
+// 	// var summURazorSpC = make(map[string]int)
+
+// 	// // collect and sum all evidences from all data sets for each protein
+// 	// for _, i := range evidences {
+// 	// 	for _, j := range namesList {
+// 	// 		summTotalSpC[i.ProteinID] += i.TotalSpc[j]
+// 	// 		summUniqueSpC[i.ProteinID] += i.UniqueSpc[j]
+// 	// 		summURazorSpC[i.ProteinID] += i.UrazorSpc[j]
+// 	// 	}
+// 	// }
+
+// 	for _, i := range evidences {
+
+// 		var line string
+
+// 		line += fmt.Sprintf("%s\t", i.ProteinID)
+
+// 		for _, j := range namesList {
+// 			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
+// 		}
+
+// 		line += "\n"
+// 		n, err := io.WriteString(file, line)
+// 		if err != nil {
+// 			logrus.Fatal(n, err)
+// 		}
+
+// 	}
+
+// 	// copy to work directory
+// 	sys.CopyFile(output, filepath.Base(output))
+
+// 	return
+// }
+
+// saveReprintIntResults creates a single Intensity-based report using 1 or more philosopher result files using the Reprint format
+func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+
+	// create result file
+	output := fmt.Sprintf("%s%sreprint.int.tsv", session, string(filepath.Separator))
+
+	// create result file
+	file, err := os.Create(output)
+	if err != nil {
+		logrus.Fatal("Cannot create report file:", err)
+	}
+	defer file.Close()
+
+	line := "PROTID\t"
+
+	for _, i := range namesList {
+		line += fmt.Sprintf("%s_INT\t", i)
+	}
+
+	line += "\n"
+	line += "na\t"
+
+	for _, i := range labelList {
+		line += fmt.Sprintf("%s\t", i)
+	}
+
+	line += "\n"
+
+	n, err := io.WriteString(file, line)
+	if err != nil {
+		logrus.Fatal(n, err)
+	}
+
+	// organize by group number
+	sort.Sort(evidences)
+
+	for _, i := range evidences {
+
+		var line string
+
+		line += fmt.Sprintf("%s\t", i.ProteinID)
+
+		for _, j := range namesList {
+			line += fmt.Sprintf("%f\t", i.UrazorIntensity[j])
 		}
 
 		line += "\n"

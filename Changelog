@@ -1,6 +1,7 @@
 ### Added
 - Added STATIC option to PTMProphet.
-- reprint optiona dded to the yaml file.
+- Reprint option added to the yaml file.
+- New Intensity-based Reprint report added to Abacus.
 
 ### Changed
 
