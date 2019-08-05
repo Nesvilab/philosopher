@@ -246,6 +246,7 @@ abacus:
   proteinprobability: 0.9                      # minimum protein probability (default 0.9)
   peptideProbability: 0.5                      # minimum peptide probability (default 0.5)
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
+  reprint: false                               # create abacus reports using the Reprint format
 
 tmtintegrator:
   path:                                        # path to TMT-Integrator jar
