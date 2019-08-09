@@ -158,7 +158,7 @@ ptmprophet:
   autodirect: false                            # use direct evidence when the lability is high, use in combination with LABILITY
   cions:                                       # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                # use only direct evidence for evaluating PTM site probabilities
-  em: 1                                        # set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)
+  em: 2                                        # set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)
   static: false                                # use static fragppmtol for all PSMs instead of dynamically estimates offsets and tolerances
   fragppmtol: 15                               # when computing PSM-specific mass_offset and mass_tolerance, use specified default +/- MS2 mz tolerance on fragment ions
   ifrags: false                                # use internal fragments for localization
