@@ -8,14 +8,13 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/bio"
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/sirupsen/logrus"
 )
 
 // // peakIntensity collects PSM intensities from the apex peak
-func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) (rep.Evidence, *err.Error) {
+func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
 
@@ -56,10 +55,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
-		e := mz.Read(fileName, false, true, true)
-		if e != nil {
-			return evi, e
-		}
+		mz.Read(fileName, false, true, true)
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
@@ -72,16 +68,6 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				}
 			}
 		}
-
-		// for _, i := range mz.Spectra {
-		// 	if i.Level == "2" {
-		// 		spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, i.Scan, i.Scan, i.Precursor.ChargeState)
-		// 		_, ok := mzMap[spectrum]
-		// 		if ok {
-		// 			mzMap[spectrum] = i.Precursor.TargetIon
-		// 		}
-		// 	}
-		// }
 
 		v, ok := spectra[s]
 		if ok {
@@ -119,7 +105,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		}
 	}
 
-	return evi, nil
+	return evi
 }
 
 // xic extract ion chomatograms
@@ -158,12 +144,12 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64, isIso bool
 	return list, false
 }
 
-func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
+func calculateIntensities(e rep.Evidence) rep.Evidence {
 
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		return e, &err.Error{Type: err.CannotFindPSMData, Class: err.FATA, Argument: "no PSMs or Ions found, cannot attribute intensity calculations"}
+		logrus.Fatal("no PSMs or Ions found, cannot attribute intensity calculations")
 	}
 
 	var peptideIntMap = make(map[string]float64)
@@ -259,5 +245,5 @@ func calculateIntensities(e rep.Evidence) (rep.Evidence, *err.Error) {
 
 	}
 
-	return e, nil
+	return e
 }

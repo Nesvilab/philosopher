@@ -16,17 +16,12 @@ var msfraggerCmd = &cobra.Command{
 	Short: "Ultra fast and comprehensive peptide identification in mass spectrometry–based proteomics",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing MSFragger ", Version)
 
-		m, ee := msfragger.Run(m, args)
-		if ee != nil {
-			logrus.Warn(ee)
-		}
+		m := msfragger.Run(m, args)
+
 		m.Serialize()
 
 		// clean tmp

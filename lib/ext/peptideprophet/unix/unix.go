@@ -8,40 +8,40 @@ import (
 )
 
 // UnixInteractParser ...
-func UnixInteractParser(s string) error {
+func UnixInteractParser(s string) {
 
-	bin, err := Asset("InteractParser")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("InteractParser")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy InteractParser")
+	if e != nil {
+		err.DeployAsset(errors.New("InteractParser")
 	}
 
-	return nil
+	return
 }
 
 // UnixRefreshParser ...
-func UnixRefreshParser(s string) error {
+func UnixRefreshParser(s string) {
 
-	bin, err := Asset("RefreshParser")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("RefreshParser")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy RefreshParser")
+	if e != nil {
+		err.DeployAsset(errors.New("RefreshParser")
 	}
 
-	return nil
+	return 
 }
 
 // UnixPeptideProphetParser ...
-func UnixPeptideProphetParser(s string) error {
+func UnixPeptideProphetParser(s string) {
 
-	bin, err := Asset("PeptideProphetParser")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("PeptideProphetParser")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy PeptideProphetParser")
+	if e != nil {
+		err.DeployAsset(errors.New("PeptideProphetParser")
 	}
 
-	return nil
+	return
 }

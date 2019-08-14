@@ -1,6 +1,7 @@
 package proteinprophet
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // ProteinProphet is tool configuration
@@ -54,21 +54,14 @@ func Run(m met.Data, args []string) met.Data {
 	var pop = New(m.Temp)
 
 	if len(args) < 1 {
-		logrus.Fatal("No input file provided")
+		err.NoParametersFound(errors.New("missing pep.xml"))
 	}
 
 	// deploy the binaries
-	e := pop.Deploy(m.OS, m.Distro)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
+	pop.Deploy(m.OS, m.Distro)
 
 	// run ProteinProphet
-	xml, e := pop.Execute(m.ProteinProphet, m.Home, m.Temp, args)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
-	_ = xml
+	pop.Execute(m.ProteinProphet, m.Home, m.Temp, args)
 
 	m.ProteinProphet.InputFiles = args
 
@@ -76,7 +69,7 @@ func Run(m met.Data, args []string) met.Data {
 }
 
 // Deploy generates comet binary on workdir bin directory
-func (p *ProteinProphet) Deploy(os, distro string) *err.Error {
+func (p *ProteinProphet) Deploy(os, distro string) {
 
 	if os == sys.Windows() {
 		wPoP.WinBatchCoverage(p.WinBatchCoverage)
@@ -103,15 +96,15 @@ func (p *ProteinProphet) Deploy(os, distro string) *err.Error {
 			unix.UnixProteinProphet(p.UnixProteinProphet)
 			p.DefaultProteinProphet = p.UnixProteinProphet
 		} else {
-			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy ProteinProphet"}
+			err.UnsupportedDistribution()
 		}
 	}
 
-	return nil
+	return
 }
 
 // Execute ProteinProphet executes peptideprophet
-func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, args []string) ([]string, *err.Error) {
+func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, args []string) []string {
 
 	// run
 	bin := p.DefaultProteinProphet
@@ -146,7 +139,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "ProteinProphet"}
+		err.ExecutingBinary(e)
 	}
 	_ = cmd.Wait()
 
@@ -154,7 +147,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))
 	e = sys.CopyFile(output, dest)
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "ProtXML"}
+		err.CopyingFile(e)
 	}
 
 	// collect all resulting files
@@ -165,7 +158,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 		}
 	}
 
-	return processedOutput, nil
+	return processedOutput
 }
 
 func (p ProteinProphet) appendParams(params met.ProteinProphet, cmd *exec.Cmd) *exec.Cmd {

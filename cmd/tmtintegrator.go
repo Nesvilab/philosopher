@@ -16,17 +16,12 @@ var tmtintegratorCmd = &cobra.Command{
 	Short: "integrates channel abundances from multiple TMT samples",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing TMT-Integrator ", Version)
 
-		m, ee := tmtintegrator.Run(m, args)
-		if ee != nil {
-			logrus.Warn(ee)
-		}
+		m := tmtintegrator.Run(m, args)
+
 		m.Serialize()
 
 		// clean tmp

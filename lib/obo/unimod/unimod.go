@@ -9,18 +9,18 @@ import (
 )
 
 // Deploy deploys the OBO file to the temp folder
-func Deploy(f string) *err.Error {
+func Deploy(f string) {
 
 	asset, e := Asset("unimod.obo")
 	if e != nil {
-		return &err.Error{Type: err.CannotDeployAsset, Class: err.FATA, Argument: "UniMod Obo not found"}
+		err.DeployAsset(e)
 	}
 
 	e = ioutil.WriteFile(f, asset, sys.FilePermission())
 	if e != nil {
 		fmt.Println(e.Error())
-		return &err.Error{Type: err.CannotDeployAsset, Class: err.FATA, Argument: "Could not deploy UniMod obo"}
+		err.DeployAsset(e)
 	}
 
-	return nil
+	return
 }

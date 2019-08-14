@@ -4,37 +4,39 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // UnixParameterFile ...
-func UnixParameterFile(unixParam string) error {
+func UnixParameterFile(unixParam string) {
 
-	param, err := Asset("comet.params")
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	param, e := Asset("comet.params")
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	err = ioutil.WriteFile(unixParam, param, sys.FilePermission())
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	e = ioutil.WriteFile(unixParam, param, sys.FilePermission())
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	return nil
+	return
 }
 
 // Unix64 ...
-func Unix64(unix64 string) error {
+func Unix64(unix64 string) {
 
-	bin, err := Asset("comet.2018014.linux.exe")
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	bin, e := Asset("comet.2018014.linux.exe")
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	err = ioutil.WriteFile(unix64, bin, sys.FilePermission())
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	return nil
+	return
 }

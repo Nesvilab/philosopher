@@ -19,8 +19,7 @@ var _ = Describe("Fas", func() {
 		})
 
 		It("Parsing FASTA", func() {
-			f, e := ParseFile("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-			Expect(e).NotTo(HaveOccurred())
+			f := ParseFile("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
 			Expect(len(f)).To(Equal(40896))
 		})
 
@@ -35,17 +34,14 @@ var _ = Describe("Fas", func() {
 		})
 
 		It("Parsing FASTA Description", func() {
-			f, e := ParseFastaDescription("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-			Expect(e).NotTo(HaveOccurred())
+			f := ParseFastaDescription("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
 			Expect(len(f)).To(Equal(20448))
 		})
 
 		It("Parsing FASTA File", func() {
-			f, e := ParseFile("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-			Expect(e).NotTo(HaveOccurred())
+			f := ParseFile("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
 
 			f = CleanDatabase(f, "rev_", "cont_")
-			Expect(e).NotTo(HaveOccurred())
 			Expect(len(f)).To(Equal(20448))
 		})
 

@@ -9,7 +9,6 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/sirupsen/logrus"
 )
 
 // TMTIntegrator represents the tool configuration
@@ -30,7 +29,7 @@ func New(temp string) TMTIntegrator {
 }
 
 // Run is the TMTIntegrator main entry point
-func Run(m met.Data, args []string) (met.Data, *err.Error) {
+func Run(m met.Data, args []string) met.Data {
 
 	var tmti = New(m.Temp)
 
@@ -43,22 +42,19 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 		paramAbs, _ := filepath.Abs(m.TMTIntegrator.Param)
 		binFile, e := ioutil.ReadFile(paramAbs)
 		if e != nil {
-			logrus.Fatal(e)
+			err.ReadFile(e)
 		}
 		m.TMTIntegrator.ParamFile = binFile
 	}
 
 	// run TMTIntegrator
-	e := tmti.Execute(m.TMTIntegrator, args)
-	if e != nil {
-		//logrus.Fatal(e)
-	}
+	tmti.Execute(m.TMTIntegrator, args)
 
-	return m, nil
+	return m
 }
 
 // Execute is the main fucntion to execute TMTIntegrator
-func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) *err.Error {
+func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) {
 
 	cmd := appendParams(params)
 
@@ -71,12 +67,12 @@ func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) *err
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return nil
+		err.ExecutingBinary(e)
 	}
 
 	_ = cmd.Wait()
 
-	return nil
+	return
 }
 
 func appendParams(params met.TMTIntegrator) *exec.Cmd {

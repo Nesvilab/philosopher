@@ -8,14 +8,14 @@ import (
 )
 
 // UnixPTMProphetParser locates and extracts the PTMProphet binary
-func UnixPTMProphetParser(s string) *err.Error {
+func UnixPTMProphetParser(s string) {
 
 	bin, e := Asset("PTMProphetParser")
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		return &err.Error{Type: err.CannotExtractAsset, Class: err.FATA, Argument: "PTMProphetParser"}
+		err.ExecutingBinary(e)
 	}
 
-	return nil
+	return
 }

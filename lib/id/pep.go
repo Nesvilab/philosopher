@@ -9,13 +9,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/bio"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -98,13 +98,10 @@ func (p PepIDList) Swap(i, j int) {
 }
 
 // Read is the main function for parsing pepxml data
-func (p *PepXML) Read(f string) error {
+func (p *PepXML) Read(f string) {
 
 	var xml spc.PepXML
-	e := xml.Parse(f)
-	if e != nil {
-		return e
-	}
+	xml.Parse(f)
 
 	var mpa = xml.MsmsPipelineAnalysis
 
@@ -215,7 +212,7 @@ func (p *PepXML) Read(f string) error {
 		}
 
 		if len(psmlist) == 0 {
-			return &err.Error{Type: err.NoPSMFound, Class: err.FATA}
+			err.NoPSMFound()
 		}
 
 		p.PeptideIdentification = psmlist
@@ -225,12 +222,12 @@ func (p *PepXML) Read(f string) error {
 		p.adjustMassDeviation()
 
 		if len(psmlist) == 0 {
-			logrus.Error("No PSM detected, check your files and try agains")
+			err.NoPSMFound()
 		}
 
 	}
 
-	return nil
+	return
 }
 
 func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag string) PeptideIdentification {
@@ -443,7 +440,7 @@ func (p *PepXML) PromoteProteinIDs() {
 }
 
 // ReportModels creates PNG images using the PeptideProphet TD score distribution
-func (p *PepXML) ReportModels(session, name string) (err error) {
+func (p *PepXML) ReportModels(session, name string) {
 
 	var xAxis []float64
 
@@ -524,46 +521,50 @@ func (p *PepXML) ReportModels(session, name string) (err error) {
 		}
 	}
 
-	return err
+	return
 }
 
-func printModel(v, path string, xAxis, obs, pos, neg []float64) error {
+func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 	p, e := plot.New()
+
 	if e != nil {
-		return &err.Error{Type: err.CannotInstantiateStruct, Class: err.FATA, Argument: "plotter"}
+
+		err.Plotter(e)
+
+	} else {
+
+		p.Title.Text = "FVAL" + v
+		p.X.Label.Text = "FVAL"
+		p.Y.Label.Text = "Density"
+
+		obsPts := make(plotter.XYs, len(xAxis))
+		posPts := make(plotter.XYs, len(xAxis))
+		negPts := make(plotter.XYs, len(xAxis))
+		for i := range obs {
+			obsPts[i].X = xAxis[i]
+			obsPts[i].Y = obs[i]
+			posPts[i].X = xAxis[i]
+			posPts[i].Y = pos[i]
+			negPts[i].X = xAxis[i]
+			negPts[i].Y = neg[i]
+		}
+
+		e = plotutil.AddLinePoints(p, "Observed", obsPts, "Positive", posPts, "Negative", negPts)
+		if e != nil {
+			panic(e)
+		}
+
+		// Save the plot to a PNG file.
+		if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
+			panic(err)
+		}
+
+		// copy to work directory
+		sys.CopyFile(path, filepath.Base(path))
 	}
 
-	p.Title.Text = "FVAL" + v
-	p.X.Label.Text = "FVAL"
-	p.Y.Label.Text = "Density"
-
-	obsPts := make(plotter.XYs, len(xAxis))
-	posPts := make(plotter.XYs, len(xAxis))
-	negPts := make(plotter.XYs, len(xAxis))
-	for i := range obs {
-		obsPts[i].X = xAxis[i]
-		obsPts[i].Y = obs[i]
-		posPts[i].X = xAxis[i]
-		posPts[i].Y = pos[i]
-		negPts[i].X = xAxis[i]
-		negPts[i].Y = neg[i]
-	}
-
-	e = plotutil.AddLinePoints(p, "Observed", obsPts, "Positive", posPts, "Negative", negPts)
-	if e != nil {
-		panic(e)
-	}
-
-	// Save the plot to a PNG file.
-	if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
-		panic(err)
-	}
-
-	// copy to work directory
-	sys.CopyFile(path, filepath.Base(path))
-
-	return nil
+	return
 }
 
 // tdclassifier identifies a PSM as target or Decoy based on the
@@ -590,39 +591,39 @@ func tdclassifier(p PeptideIdentification, tag string) bool {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *PepXML) Serialize() *err.Error {
+func (p *PepXML) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
+		err.MarshalFile(e)
 	}
 
 	e = ioutil.WriteFile(sys.PepxmlBin(), b, sys.FilePermission())
 	if e != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
+		err.WriteFile(e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *PepXML) Restore() error {
+func (p *PepXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.PepxmlBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.DecodeMsgPck(e)
 	}
 
-	return nil
+	return
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *PepIDList) Serialize(level string) *err.Error {
+func (p *PepIDList) Serialize(level string) {
 
 	var dest string
 
@@ -633,20 +634,20 @@ func (p *PepIDList) Serialize(level string) *err.Error {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
+		err.WarnCustom(errors.New("Cannot determine binary data class"))
 	}
 
-	b, er := msgpack.Marshal(&p)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&p)
+	if e != nil {
+		err.MarshalFile(e)
 	}
 
-	er = ioutil.WriteFile(dest, b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(dest, b, sys.FilePermission())
+	if e != nil {
+		err.WriteFile(e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -661,17 +662,17 @@ func (p *PepIDList) Restore(level string) error {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		return errors.New("Cannot seralize Peptide identifications")
+		err.WarnCustom(errors.New("Cannot determine binary data class"))
 	}
 
 	b, e := ioutil.ReadFile(dest)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Cannot seralize Peptide identifications"}
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Cannot seralize Peptide identifications"}
+		err.DecodeMsgPck(e)
 	}
 
 	return nil

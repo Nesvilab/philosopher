@@ -7,80 +7,80 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 )
 
-// WinInteractParser ...
-func WinInteractParser(s string) error {
+// WinInteractParser deploys InteractParser.exe
+func WinInteractParser(s string) {
 
-	bin, err := Asset("InteractParser.exe")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("InteractParser.exe")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy InteractParser")
+	if e != nil {
+		return err.DeployAsset(errors.New("InteractParser")
 	}
 
-	return nil
+	return
 }
 
-// WinRefreshParser ...
-func WinRefreshParser(s string) error {
+// WinRefreshParser deploys Refreshparser.exe
+func WinRefreshParser(s string) {
 
-	bin, err := Asset("RefreshParser.exe")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("RefreshParser.exe")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy RefreshParser")
+	if e != nil {
+		err.DeployAsset(errors.New("RefreshParser")
 	}
 
-	return nil
+	return
 }
 
-// WinPeptideProphetParser ...
-func WinPeptideProphetParser(s string) error {
+// WinPeptideProphetParser deploys Windows PeptideProphetParser
+func WinPeptideProphetParser(s string) {
 
-	bin, err := Asset("PeptideProphetParser.exe")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("PeptideProphetParser.exe")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy PeptideProphetParser")
+	if e != nil {
+		err.DeployAsset(errors.New("PeptideProphetParser")
 	}
 
-	return nil
+	return
 }
 
-// Mv ...
-func Mv(s string) error {
+// Mv deploys mv.exe
+func Mv(s string) {
 
-	bin, err := Asset("mv.exe")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("mv.exe")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy mv.exe")
+	if e != nil {
+		err.DeployAsset(errors.New("mv.exe")
 	}
 
-	return nil
+	return
 }
 
-// LibgccDLL ...
-func LibgccDLL(s string) error {
+// LibgccDLL deploys libgcc_s_dw2.dll
+func LibgccDLL(s string) {
 
-	bin, err := Asset("libgcc_s_dw2-1.dll")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("libgcc_s_dw2-1.dll")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy libgcc_s_dw2")
+	if e != nil {
+		err.DeployAsset(errors.New("libgcc_s_dw2")
 	}
 
-	return nil
+	return
 }
 
-// Zlib1DLL ...
-func Zlib1DLL(s string) error {
+// Zlib1DLL deploys zlib1.dll
+func Zlib1DLL(s string) {
 
-	bin, err := Asset("zlib1.dll")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("zlib1.dll")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy Zlib1DLL")
+	if e != nil {
+		err.DeployAsset(errors.New("Zlib1DLL")
 	}
 
-	return nil
+	return
 }

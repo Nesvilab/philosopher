@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/met"
 	unmd "github.com/prvst/philosopher/lib/obo/unimod"
 	"github.com/prvst/philosopher/lib/sys"
@@ -19,9 +20,9 @@ import (
 
 // DataFormat defines different data type from PSI
 type DataFormat interface {
-	Deploy() *err.Error
-	Serialize() *err.Error
-	Restore() *err.Error
+	Deploy()
+	Serialize()
+	Restore()
 }
 
 // Onto contains Ontology terms
@@ -51,11 +52,10 @@ type Term struct {
 }
 
 // NewUniModOntology constructucst a set of UniMod ontologies
-func NewUniModOntology() (Onto, *err.Error) {
+func NewUniModOntology() Onto {
 
 	var m met.Data
 	var o Onto
-	var e *err.Error
 
 	m.Restore(sys.Meta())
 
@@ -69,10 +69,7 @@ func NewUniModOntology() (Onto, *err.Error) {
 	o.TimeStamp = m.TimeStamp
 
 	// Deploy
-	e = o.Deploy()
-	if e != nil {
-		return o, e
-	}
+	o.Deploy()
 
 	// Read
 	o.Parse()
@@ -80,25 +77,25 @@ func NewUniModOntology() (Onto, *err.Error) {
 	// Serielize
 	o.Serialize()
 
-	return o, nil
+	return o
 }
 
 // Deploy deploys the OBO file to the temp folder
-func (m *Onto) Deploy() *err.Error {
+func (m *Onto) Deploy() {
 
 	m.OboFile = fmt.Sprintf("%s%sunimod.obo", m.Temp, string(filepath.Separator))
 
 	unmd.Deploy(m.OboFile)
 
-	return nil
+	return
 }
 
 // Parse reads the unimod.obo file and creates the data structure
-func (m *Onto) Parse() *err.Error {
+func (m *Onto) Parse() {
 
-	file, err := os.Open(m.OboFile)
-	if err != nil {
-		log.Fatal(err)
+	file, e := os.Open(m.OboFile)
+	if e != nil {
+		err.ReadFile(e)
 	}
 	defer file.Close()
 
@@ -175,43 +172,43 @@ func (m *Onto) Parse() *err.Error {
 
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+	if e := scanner.Err(); e != nil {
+		log.Fatal(e)
 	}
 
-	return nil
+	return
 }
 
 // Serialize UniMod data structure
-func (m Onto) Serialize() *err.Error {
+func (m Onto) Serialize() {
 
-	b, er := msgpack.Marshal(&m)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&m)
+	if e != nil {
+		err.MarshalFile(e)
 	}
 
-	er = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
+	if e != nil {
+		err.WriteFile(e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (m *Onto) Restore() *err.Error {
+func (m *Onto) Restore() {
 
 	b, e := ioutil.ReadFile(sys.MODBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &m)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
+		err.DecodeMsgPck(e)
 	}
 
-	return nil
+	return
 }
 
 func splitAndCollect(s string, target string) string {

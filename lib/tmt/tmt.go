@@ -1,8 +1,6 @@
 package tmt
 
-import (
-	"github.com/prvst/philosopher/lib/err"
-)
+import "github.com/sirupsen/logrus"
 
 // Labels main struct
 type Labels struct {
@@ -117,7 +115,7 @@ type Channel11 struct {
 }
 
 // New builds a new Labelled spectra object
-func New(plex string) (Labels, *err.Error) {
+func New(plex string) Labels {
 
 	var o Labels
 
@@ -164,8 +162,8 @@ func New(plex string) (Labels, *err.Error) {
 		o.Channel10.Mz = 131.138180
 		o.Channel11.Mz = 131.144499
 	} else {
-		return o, &err.Error{Type: err.UnknownMultiplex, Class: err.FATA}
+		logrus.Fatal("Unknown multiplex setting, please define the plex number used in your experiment")
 	}
 
-	return o, nil
+	return o
 }

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/mod"
@@ -365,10 +364,7 @@ func Run(m met.Data) met.Data {
 
 	var repo = New()
 
-	err := repo.RestoreGranular()
-	if err != nil {
-		logrus.Fatal(err.Error())
-	}
+	repo.RestoreGranular()
 
 	if len(m.Filter.Pox) > 0 {
 
@@ -395,7 +391,7 @@ func Run(m met.Data) met.Data {
 		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
 		annotfile, _ = filepath.Abs(annotfile)
 
-		labelNames, _ := getLabelNames(annotfile)
+		labelNames := getLabelNames(annotfile)
 		logrus.Info("Creating TMT PSM report")
 
 		if strings.Contains(m.SearchEngine, "MSFragger") && len(m.Quantify.Plex) > 0 {
@@ -464,13 +460,13 @@ func Run(m met.Data) met.Data {
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) (map[string]string, *err.Error) {
+func getLabelNames(annot string) map[string]string {
 
 	var labels = make(map[string]string)
 
 	file, e := os.Open(annot)
 	if e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read annotation file:", e)
 	}
 	defer file.Close()
 
@@ -481,10 +477,10 @@ func getLabelNames(annot string) (map[string]string, *err.Error) {
 	}
 
 	if e = scanner.Err(); e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Annotation file seems to be empty:", e)
 	}
 
-	return labels, nil
+	return labels
 }
 
 // prepares the list of modifications to be printed by the report functions

@@ -1,6 +1,10 @@
 package bio
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/prvst/philosopher/lib/err"
+)
 
 // AminoAcid representation
 type AminoAcid struct {
@@ -15,7 +19,7 @@ type AminoAcid struct {
 type OligoPeptide []AminoAcid
 
 // New return the correct information for the give aminoacid
-func New(name string) (AminoAcid, error) {
+func New(name string) AminoAcid {
 
 	var aa AminoAcid
 
@@ -62,9 +66,9 @@ func New(name string) (AminoAcid, error) {
 	case "Valine":
 		aa = AminoAcid{Code: "V", ShortName: "Val", Name: "Valine", MonoIsotopeMass: 99.068413945, AverageMass: 99.13106}
 	default:
-		err := errors.New("Amino acid not found")
-		return aa, err
+		err.WarnCustom(errors.New("Amino acid not found"))
+		return aa
 	}
 
-	return aa, nil
+	return aa
 }

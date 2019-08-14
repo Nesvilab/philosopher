@@ -44,17 +44,12 @@ func New(temp string) Comet {
 }
 
 // Run is the Comet main entry point
-func Run(m met.Data, args []string) (met.Data, *err.Error) {
+func Run(m met.Data, args []string) met.Data {
 
 	var cmt = New(m.Temp)
 
-	if len(m.Comet.Param) < 1 {
-		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "No parameter file found. Run 'comet --help' for more information"}
-		//logrus.Fatal("No parameter file found. Run 'comet --help' for more information")
-	}
-
-	if m.Comet.Print == false && len(args) < 1 {
-		return m, &err.Error{Type: err.CannotRunComet, Class: err.FATA, Argument: "Missing parameter file or data file for analysis"}
+	if len(m.Comet.Param) < 1 || m.Comet.Print == false && len(args) < 1 {
+		err.Comet()
 	}
 
 	// deploy the binaries
@@ -63,7 +58,7 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 	if m.Comet.Print == true {
 		logrus.Info("Printing parameter file")
 		sys.CopyFile(cmt.DefaultParam, filepath.Base(cmt.DefaultParam))
-		return m, nil
+		return m
 	}
 
 	// collect and store the mz files
@@ -98,12 +93,9 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 	}
 
 	// run comet
-	e = cmt.Execute(args, m.Comet.Param)
-	if e != nil {
-		//logrus.Fatal(e)
-	}
+	cmt.Execute(args, m.Comet.Param)
 
-	return m, nil
+	return m
 }
 
 // Deploy generates comet binary on workdir bin directory
@@ -140,7 +132,7 @@ func (c *Comet) Deploy(os, arch string) {
 }
 
 // Execute is the main fucntion to execute Comet
-func (c *Comet) Execute(cmdArgs []string, param string) *err.Error {
+func (c *Comet) Execute(cmdArgs []string, param string) {
 
 	par := fmt.Sprintf("-P%s", param)
 	args := []string{par}
@@ -153,12 +145,8 @@ func (c *Comet) Execute(cmdArgs []string, param string) *err.Error {
 	run := exec.Command(c.DefaultBin, args...)
 	run.Stdout = os.Stdout
 	run.Stderr = os.Stderr
-	e := run.Start()
-	if e != nil {
-		//return &err.Error{Type: err.CannotRunComet, Class: err.FATA}
-		return nil
-	}
+	run.Start()
 	_ = run.Wait()
 
-	return nil
+	return
 }

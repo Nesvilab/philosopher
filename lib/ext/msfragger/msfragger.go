@@ -9,7 +9,6 @@ import (
 
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/sirupsen/logrus"
 )
 
 // MSFragger represents the tool configuration
@@ -30,7 +29,7 @@ func New(temp string) MSFragger {
 }
 
 // Run is the Fragger main entry point
-func Run(m met.Data, args []string) (met.Data, *err.Error) {
+func Run(m met.Data, args []string) met.Data {
 
 	var frg = New(m.Temp)
 
@@ -43,22 +42,19 @@ func Run(m met.Data, args []string) (met.Data, *err.Error) {
 		paramAbs, _ := filepath.Abs(m.MSFragger.Param)
 		binFile, e := ioutil.ReadFile(paramAbs)
 		if e != nil {
-			logrus.Fatal(e)
+			err.ReadFile(e)
 		}
 		m.MSFragger.ParamFile = binFile
 	}
 
 	// run comet
-	e := frg.Execute(m.MSFragger, args)
-	if e != nil {
-		//logrus.Fatal(e)
-	}
+	frg.Execute(m.MSFragger, args)
 
-	return m, nil
+	return m
 }
 
 // Execute is the main fucntion to execute MSFragger
-func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) *err.Error {
+func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 
 	cmd := appendParams(params)
 
@@ -71,12 +67,12 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) *err.Error {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return nil
+		err.ExecutingBinary(e)
 	}
 
 	_ = cmd.Wait()
 
-	return nil
+	return
 }
 
 func appendParams(params met.MSFragger) *exec.Cmd {

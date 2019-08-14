@@ -16,10 +16,7 @@ var filterCmd = &cobra.Command{
 	Short: "Statistical filtering, validation and False Discovery Rates assessment",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Filter ", Version)
 
@@ -48,10 +45,7 @@ var filterCmd = &cobra.Command{
 			m.Filter.Razor = false
 		}
 
-		m, ee := fil.Run(m)
-		if ee != nil {
-			logrus.Fatal(e.Error())
-		}
+		m := fil.Run(m)
 
 		m.Serialize()
 

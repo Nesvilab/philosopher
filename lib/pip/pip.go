@@ -394,10 +394,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
 			}
 
-			meta, e := fil.Run(meta)
-			if e != nil {
-				logrus.Fatal(e.Error())
-			}
+			meta := fil.Run(meta)
 
 			meta.Serialize()
 		}
@@ -411,10 +408,8 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Quantify.Dir = dsAbs
 			meta.Quantify.Format = "mzML"
 
-			e := qua.RunLabelFreeQuantification(meta.Quantify)
-			if e != nil {
-				logrus.Fatal(e.Error())
-			}
+			qua.RunLabelFreeQuantification(meta.Quantify)
+
 			meta.Serialize()
 		}
 
@@ -428,11 +423,8 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Quantify.Format = "mzML"
 			meta.Quantify.Brand = "tmt"
 
-			var e error
-			meta.Quantify, e = qua.RunTMTQuantification(meta.Quantify, meta.Filter.Mapmods)
-			if e != nil {
-				logrus.Fatal(e)
-			}
+			meta.Quantify = qua.RunTMTQuantification(meta.Quantify, meta.Filter.Mapmods)
+
 			meta.Serialize()
 		}
 
@@ -546,11 +538,7 @@ func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.D
 			psms = append(psms, fmt.Sprintf("%s%spsm.tsv", i, string(filepath.Separator)))
 		}
 
-		_, err := tmtintegrator.Run(meta, psms)
-		if err != nil {
-			logrus.Fatal(err)
-		}
-
+		tmtintegrator.Run(meta, psms)
 	}
 
 	return meta

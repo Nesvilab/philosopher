@@ -7,7 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/sirupsen/logrus"
+
 	"github.com/rogpeppe/go-charset/charset"
 
 	// anon charset
@@ -49,11 +50,11 @@ type ModAminoacidMass struct {
 }
 
 // Parse is the main function for parsing pepxml data
-func (p *PepXML) Parse(f string) error {
+func (p *PepXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
+		logrus.Fatal("Cannot open file ", f)
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -65,21 +66,21 @@ func (p *PepXML) Parse(f string) error {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mpa); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot parse XML file ", f)
 	}
 
 	p.MsmsPipelineAnalysis = mpa
 	p.Name = filepath.Base(f)
 
-	return nil
+	return
 }
 
 // Parse is the main function for parsing pepxml data
-func (p *ProtXML) Parse(f string) error {
+func (p *ProtXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
+		logrus.Fatal("Cannot open file ", f)
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -91,11 +92,11 @@ func (p *ProtXML) Parse(f string) error {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&ps); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: filepath.Base(f)}
+		logrus.Fatal("Cannot parse XML file ", f)
 	}
 
 	p.ProteinSummary = ps
 	p.Name = filepath.Base(f)
 
-	return nil
+	return
 }

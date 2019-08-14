@@ -9,7 +9,6 @@ import (
 
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/psi"
-	"github.com/sirupsen/logrus"
 )
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded
@@ -1098,10 +1097,7 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	mzid.DataCollection.AnalysisData = *ad
 
 	// Burn!
-	err := mzid.Write()
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	mzid.Write()
 
 	return nil
 }

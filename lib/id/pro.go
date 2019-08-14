@@ -1,11 +1,11 @@
 package id
 
 import (
-	"errors"
 	"io/ioutil"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
 	"github.com/prvst/philosopher/lib/sys"
@@ -88,13 +88,10 @@ func (p ProtIDList) Swap(i, j int) {
 }
 
 // Read ...
-func (p *ProtXML) Read(f string) error {
+func (p *ProtXML) Read(f string) {
 
 	var xml spc.ProtXML
-	err := xml.Parse(f)
-	if err != nil {
-		return err
-	}
+	xml.Parse(f)
 
 	var ptg = xml.ProteinSummary.ProteinGroup
 	var groups GroupList
@@ -190,10 +187,10 @@ func (p *ProtXML) Read(f string) error {
 	p.Groups = groups
 
 	if len(groups) == 0 {
-		return errors.New("No Protein groups detected, check your file and try again")
+		err.NoProteinFound()
 	}
 
-	return nil
+	return
 }
 
 // PromoteProteinIDs promotes protein identifications where the reference protein
@@ -249,65 +246,65 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *ProtXML) Serialize() *err.Error {
+func (p *ProtXML) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
+		err.MarshalFile(e)
 	}
 
 	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
 	if e != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
+		err.WriteFile(e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *ProtXML) Restore() error {
+func (p *ProtXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProtxmlBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.DecodeMsgPck(e)
 	}
 
-	return nil
+	return
 }
 
 // Serialize converts the whle structure to a gob file
-func (p *ProtIDList) Serialize() *err.Error {
+func (p *ProtIDList) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: e.Error()}
+		err.MarshalFile(e)
 	}
 
 	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
 	if e != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: e.Error()}
+		err.WriteFile(e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *ProtIDList) Restore() *err.Error {
+func (p *ProtIDList) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": Could not restore Philosopher result"}
+		err.DecodeMsgPck(e)
 	}
 
-	return nil
+	return
 }

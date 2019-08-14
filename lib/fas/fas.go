@@ -6,11 +6,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/sirupsen/logrus"
 )
 
 // ParseFile a fasta file and returns a map with the header as key and sequence as value
-func ParseFile(filename string) (map[string]string, *err.Error) {
+func ParseFile(filename string) map[string]string {
 
 	var fastaHeader string
 	var fastaSeq string
@@ -18,7 +18,7 @@ func ParseFile(filename string) (map[string]string, *err.Error) {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		return fastaMap, &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot open database file ", filename)
 	}
 	defer f.Close()
 
@@ -37,7 +37,7 @@ func ParseFile(filename string) (map[string]string, *err.Error) {
 		}
 	}
 
-	return fastaMap, nil
+	return fastaMap
 }
 
 // ParseUniProtDescriptionMap parses a UniProt FASTA file and returns a map with ID and DESC
@@ -46,7 +46,7 @@ func ParseUniProtDescriptionMap(database string) (fastaMap map[string]string) {
 	fastaMap = make(map[string]string)
 
 	// parse fasta file
-	file, _ := ParseFile(database)
+	file := ParseFile(database)
 	faseq, _ := regexp.Compile(`\w+\|(.*?)\|(.*?)\s(.*)`)
 
 	// get protein name and description and add them to fastaMap
@@ -65,7 +65,7 @@ func ParseUniProtSequencenMap(database string) (fastaMap map[string]string) {
 	fastaMap = make(map[string]string)
 
 	// parse fasta file
-	file, _ := ParseFile(database)
+	file := ParseFile(database)
 	faseq, _ := regexp.Compile(`\w+\|(.*?)\|(.*?)\s(.*)`)
 
 	// get protein name and description and add them to fastaMap
@@ -78,11 +78,11 @@ func ParseUniProtSequencenMap(database string) (fastaMap map[string]string) {
 }
 
 // ParseFastaDescription a fasta file and returns a map with the header as key and sequence as value
-func ParseFastaDescription(filename string) (map[string][]string, *err.Error) {
+func ParseFastaDescription(filename string) map[string][]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		return nil, &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read FASTA file ", filename)
 	}
 	defer f.Close()
 
@@ -101,7 +101,7 @@ func ParseFastaDescription(filename string) (map[string][]string, *err.Error) {
 		}
 	}
 
-	return fastaMap, nil
+	return fastaMap
 }
 
 // CleanDatabase removes decoys and contaminants

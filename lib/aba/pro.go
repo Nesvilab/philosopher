@@ -2,6 +2,7 @@ package aba
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,8 +12,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/err"
+
+	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
@@ -23,7 +25,7 @@ import (
 )
 
 // Create protein combined report
-func proteinLevelAbacus(m met.Data, args []string) error {
+func proteinLevelAbacus(m met.Data, args []string) {
 
 	var names []string
 	var xmlFiles []string
@@ -38,10 +40,7 @@ func proteinLevelAbacus(m met.Data, args []string) error {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	evidences, err := processProteinCombinedFile(m.Abacus, database)
-	if err != nil {
-		return err
-	}
+	evidences := processProteinCombinedFile(m.Abacus, database)
 
 	// recover all files
 	logrus.Info("Restoring protein results")
@@ -72,7 +71,7 @@ func proteinLevelAbacus(m met.Data, args []string) error {
 		} else {
 			labels.Name = i
 		}
-		labels.LabelName, _ = getLabelNames(annot)
+		labels.LabelName = getLabelNames(annot)
 
 		// collect project names
 		prjName := i
@@ -139,16 +138,18 @@ func proteinLevelAbacus(m met.Data, args []string) error {
 		saveReprintIntResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
 	}
 
-	return nil
+	return
 }
 
 // processCombinedFile reads the combined protXML and creates a unique protein list as a reference fo all counts
-func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedProteinEvidenceList, error) {
+func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedProteinEvidenceList {
 
 	var list rep.CombinedProteinEvidenceList
 
 	if _, err := os.Stat("combined.prot.xml"); os.IsNotExist(err) {
+
 		logrus.Fatal("Cannot find combined.prot.xml file")
+
 	} else {
 
 		var protxml id.ProtXML
@@ -165,16 +166,10 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 
 		// applies razor algorithm
 		if a.Razor == true {
-			protxml, err = fil.RazorFilter(protxml)
-			if err != nil {
-				return list, err
-			}
+			protxml = fil.RazorFilter(protxml)
 		}
 
-		proid, err := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor, a.Tag)
-		if err != nil {
-			return nil, err
-		}
+		proid := fil.ProtXMLFilter(protxml, 0.01, a.PepProb, a.ProtProb, a.Picked, a.Razor, a.Tag)
 
 		for _, j := range proid {
 
@@ -226,7 +221,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) (rep.CombinedPr
 		}
 	}
 
-	return list, nil
+	return list
 }
 
 func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
@@ -304,7 +299,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	// create result file
 	file, err := os.Create(output)
 	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+		logrus.Fatal("Cannot create abacus report file:", err)
 	}
 	defer file.Close()
 
@@ -469,7 +464,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	// create result file
 	file, err := os.Create(output)
 	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+		logrus.Fatal("Cannot create reprint SpC report:", err)
 	}
 	defer file.Close()
 
@@ -520,78 +515,6 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	return
 }
 
-// func saveReprintResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
-
-// 	// create result file
-// 	output := fmt.Sprintf("%s%sreprint.spc.tsv", session, string(filepath.Separator))
-
-// 	// create result file
-// 	file, err := os.Create(output)
-// 	if err != nil {
-// 		logrus.Fatal("Cannot create report file:", err)
-// 	}
-// 	defer file.Close()
-
-// 	line := "PROTID\t"
-
-// 	for _, i := range namesList {
-// 		line += fmt.Sprintf("%s_SPC\t", i)
-// 	}
-
-// 	line += "\n"
-// 	line += "na\t"
-
-// 	for _, i := range labelList {
-// 		line += fmt.Sprintf("%s\t", i)
-// 	}
-
-// 	line += "\n"
-
-// 	n, err := io.WriteString(file, line)
-// 	if err != nil {
-// 		logrus.Fatal(n, err)
-// 	}
-
-// 	// organize by group number
-// 	sort.Sort(evidences)
-
-// 	// var summTotalSpC = make(map[string]int)
-// 	// var summUniqueSpC = make(map[string]int)
-// 	// var summURazorSpC = make(map[string]int)
-
-// 	// // collect and sum all evidences from all data sets for each protein
-// 	// for _, i := range evidences {
-// 	// 	for _, j := range namesList {
-// 	// 		summTotalSpC[i.ProteinID] += i.TotalSpc[j]
-// 	// 		summUniqueSpC[i.ProteinID] += i.UniqueSpc[j]
-// 	// 		summURazorSpC[i.ProteinID] += i.UrazorSpc[j]
-// 	// 	}
-// 	// }
-
-// 	for _, i := range evidences {
-
-// 		var line string
-
-// 		line += fmt.Sprintf("%s\t", i.ProteinID)
-
-// 		for _, j := range namesList {
-// 			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
-// 		}
-
-// 		line += "\n"
-// 		n, err := io.WriteString(file, line)
-// 		if err != nil {
-// 			logrus.Fatal(n, err)
-// 		}
-
-// 	}
-
-// 	// copy to work directory
-// 	sys.CopyFile(output, filepath.Base(output))
-
-// 	return
-// }
-
 // saveReprintIntResults creates a single Intensity-based report using 1 or more philosopher result files using the Reprint format
 func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
@@ -601,7 +524,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	// create result file
 	file, err := os.Create(output)
 	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+		logrus.Fatal("Cannot create reprint Int. report:", err)
 	}
 	defer file.Close()
 
@@ -653,13 +576,13 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) (map[string]string, *err.Error) {
+func getLabelNames(annot string) map[string]string {
 
 	var labels = make(map[string]string)
 
 	file, e := os.Open(annot)
 	if e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot open annotation file: ", annot)
 	}
 	defer file.Close()
 
@@ -670,8 +593,8 @@ func getLabelNames(annot string) (map[string]string, *err.Error) {
 	}
 
 	if e = scanner.Err(); e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		err.FatalCustom(errors.New("The annotation file looks to be empty"))
 	}
 
-	return labels, nil
+	return labels
 }

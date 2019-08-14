@@ -4,18 +4,20 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Win64 ...
-func Win64(win64 string) error {
+func Win64(win64 string) {
 
-	bin, err := Asset("cd-hit.exe")
-	err = ioutil.WriteFile(win64, bin, sys.FilePermission())
+	bin, e := Asset("cd-hit.exe")
+	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy CD-hit")
+	if e != nil {
+		err.ExecutingBinary(errors.New("CD-hit"))
 	}
 
-	return nil
+	return
 }

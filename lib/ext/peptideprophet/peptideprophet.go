@@ -1,6 +1,7 @@
 package peptideprophet
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // PeptideProphet is the main tool data configuration structure
@@ -55,7 +55,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pep = New(m.Temp)
 
 	if len(m.PeptideProphet.Database) < 1 {
-		logrus.Fatal("You need to provide a protein database")
+		err.FatalCustom(errors.New("You need to provide a protein database"))
 	}
 
 	// get the database tag from database command
@@ -64,17 +64,10 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	e := pep.Deploy(m.OS, m.Distro)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
+	pep.Deploy(m.OS, m.Distro)
 
 	// run
-	xml, e := pep.Execute(m.PeptideProphet, m.Home, m.Temp, args)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
-	_ = xml
+	pep.Execute(m.PeptideProphet, m.Home, m.Temp, args)
 
 	m.PeptideProphet.InputFiles = args
 
@@ -82,7 +75,7 @@ func Run(m met.Data, args []string) met.Data {
 }
 
 // Deploy PeptideProphet binaries on binary directory
-func (p *PeptideProphet) Deploy(os, distro string) *err.Error {
+func (p *PeptideProphet) Deploy(os, distro string) {
 
 	if os == sys.Windows() {
 		wPeP.WinInteractParser(p.WinInteractParser)
@@ -110,17 +103,16 @@ func (p *PeptideProphet) Deploy(os, distro string) *err.Error {
 			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
 			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
 		} else {
-			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy PeptideProphet"}
+			err.UnsupportedDistribution()
 		}
 	}
 
-	return nil
+	return
 }
 
 // Execute PeptideProphet
-func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
+func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, args []string) []string {
 
-	// holds the finished pepXML file, we push this up to be indexed
 	var output []string
 
 	var listedArgs []string
@@ -130,34 +122,24 @@ func (p PeptideProphet) Execute(params met.PeptideProphet, home, temp string, ar
 	}
 
 	// run InteractParser
-	files, e := interactParser(p, params, home, temp, listedArgs)
-	if e != nil {
-		return nil, e
-	}
+	files := interactParser(p, params, home, temp, listedArgs)
 
 	for _, i := range files {
 		if strings.Contains(i, params.Output) {
 
 			// run RefreshParser
-			e = refreshParser(p, i, params.Database, params.Output, temp)
-			if e != nil {
-				return nil, e
-			}
+			refreshParser(p, i, params.Database, params.Output, temp)
 
 			// run PeptideProphetParser
-			output, e = peptideProphet(p, params, temp, i)
-			if e != nil {
-				return nil, e
-			}
-
+			output = peptideProphet(p, params, temp, i)
 		}
 	}
 
-	return output, nil
+	return output
 }
 
 // interactParser executes InteractParser binary
-func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp string, args []string) ([]string, *err.Error) {
+func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp string, args []string) []string {
 
 	var files []string
 
@@ -222,7 +204,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			cmd.Stderr = os.Stderr
 			e := cmd.Start()
 			if e != nil {
-				return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "interactParser"}
+				err.ExecutingBinary(e)
 			}
 			_ = cmd.Wait()
 
@@ -278,17 +260,17 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 		cmd.Stderr = os.Stderr
 		e := cmd.Start()
 		if e != nil {
-			return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "interactParser"}
+			err.ExecutingBinary(e)
 		}
 		_ = cmd.Wait()
 
 	}
 
-	return files, nil
+	return files
 }
 
 // refreshParser executes RefreshParser binary
-func refreshParser(p PeptideProphet, file, database, output, temp string) *err.Error {
+func refreshParser(p PeptideProphet, file, database, output, temp string) {
 
 	bin := p.DefaultRefreshParser
 	cmd := exec.Command(bin)
@@ -320,15 +302,15 @@ func refreshParser(p PeptideProphet, file, database, output, temp string) *err.E
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "refreshParser"}
+		err.ExecutingBinary(e)
 	}
 	_ = cmd.Wait()
 
-	return nil
+	return
 }
 
 // peptideProphet executes peptideprophet
-func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file string) ([]string, *err.Error) {
+func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file string) []string {
 	bin := p.DefaultPeptideProphetParser
 	cmd := exec.Command(bin)
 
@@ -488,7 +470,7 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "PeptideProphet"}
+		err.ExecutingBinary(e)
 	}
 	_ = cmd.Wait()
 
@@ -500,5 +482,5 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 		}
 	}
 
-	return output, nil
+	return output
 }

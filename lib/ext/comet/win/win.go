@@ -4,50 +4,51 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
-// WinParameterFile ...
-func WinParameterFile(winParam string) error {
+// WinParameterFile writes the parameter file to the disk
+func WinParameterFile(winParam string) {
 
-	param, err := Asset("comet.params.txt")
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	param, e := Asset("comet.params.txt")
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	err = ioutil.WriteFile(winParam, param, sys.FilePermission())
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	e = ioutil.WriteFile(winParam, param, sys.FilePermission())
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	return nil
+	return
 }
 
-// Win32 ...
-func Win32(win32 string) error {
+// Win32 deploys win32 bits comt parameter file
+func Win32(win32 string) {
 
-	bin, err := Asset("comet.2018014.win32.exe")
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	bin, e := Asset("comet.2018014.win32.exe")
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	err = ioutil.WriteFile(win32, bin, sys.FilePermission())
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	e = ioutil.WriteFile(win32, bin, sys.FilePermission())
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	return nil
+	return
 }
 
-// Win64 ...
-func Win64(win64 string) error {
+// Win64 deploys win64 bits comt parameter file
+func Win64(win64 string) {
 
-	bin, err := Asset("comet.2018014.win64.exe")
-	err = ioutil.WriteFile(win64, bin, sys.FilePermission())
+	bin, e := Asset("comet.2018014.win64.exe")
+	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy Comet parameter file")
+	if e != nil {
+		err.DeployAsset(errors.New("Comet parameter file"))
 	}
 
-	return nil
+	return
 }

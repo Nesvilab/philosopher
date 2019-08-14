@@ -7,41 +7,41 @@ import (
 	"github.com/prvst/philosopher/lib/sys"
 )
 
-// UnixBatchCoverage ...
-func UnixBatchCoverage(s string) error {
+// UnixBatchCoverage deploys batchcoverage
+func UnixBatchCoverage(s string) {
 
-	bin, err := Asset("batchcoverage")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("batchcoverage")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy batchcoverage")
+	if e != nil {
+		err.DeployAsset(errors.New("batchcoverage")
 	}
 
-	return nil
+	return
 }
 
-// UnixDatabaseParser ...
-func UnixDatabaseParser(s string) error {
+// UnixDatabaseParser deploys DatabaseParser
+func UnixDatabaseParser(s string) {
 
-	bin, err := Asset("DatabaseParser")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("DatabaseParser")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy DatabaseParser")
+	if e != nil {
+		err.DeployAsset(errors.New("DatabaseParser")
 	}
 
-	return nil
+	return
 }
 
-// UnixProteinProphet ...
-func UnixProteinProphet(s string) error {
+// UnixProteinProphet deploys Proteinprophet
+func UnixProteinProphet(s string) {
 
-	bin, err := Asset("ProteinProphet")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("ProteinProphet")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy ProteinProphet")
+	if e != nil {
+		err.DeployAsset(errors.New("ProteinProphet")
 	}
 
-	return nil
+	return
 }

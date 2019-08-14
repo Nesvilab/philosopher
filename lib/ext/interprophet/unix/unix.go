@@ -4,18 +4,20 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // UnixInterProphetParser accessor
-func UnixInterProphetParser(s string) error {
+func UnixInterProphetParser(s string) {
 
-	bin, err := Asset("InterProphetParser")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("InterProphetParser")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy InterProphetParser")
+	if e != nil {
+		err.DeployAsset(errors.New("InterProphetParser"))
 	}
 
-	return nil
+	return
 }

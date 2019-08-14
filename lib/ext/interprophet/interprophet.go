@@ -1,6 +1,7 @@
 package interprophet
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,7 +13,6 @@ import (
 	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // InterProphet represents the tool configuration
@@ -44,21 +44,14 @@ func Run(m met.Data, args []string) met.Data {
 	m.InterProphet.InputFiles = args
 
 	if len(args) < 1 {
-		logrus.Fatal("No input file provided")
+		err.NoParametersFound(errors.New("IProphet input files"))
 	}
 
 	// deploy the binaries
-	e := itp.Deploy(m.OS, m.Distro)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
+	itp.Deploy(m.OS, m.Distro)
 
 	// run InterProphet
-	xml, e := itp.Execute(m.InterProphet, m.Home, m.Temp, args)
-	if e != nil {
-		logrus.Fatal(e.Message)
-	}
-	_ = xml
+	itp.Execute(m.InterProphet, m.Home, m.Temp, args)
 
 	m.InterProphet.InputFiles = args
 
@@ -66,7 +59,7 @@ func Run(m met.Data, args []string) met.Data {
 }
 
 // Deploy generates comet binary on workdir bin directory
-func (i *InterProphet) Deploy(os, distro string) *err.Error {
+func (i *InterProphet) Deploy(os, distro string) {
 
 	if os == sys.Windows() {
 		wiPr.WinInterProphetParser(i.WinInterProphetParser)
@@ -81,15 +74,15 @@ func (i *InterProphet) Deploy(os, distro string) *err.Error {
 			unix.UnixInterProphetParser(i.UnixInterProphetParser)
 			i.DefaultInterProphetParser = i.UnixInterProphetParser
 		} else {
-			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "dont know how to deploy InterProphet"}
+			err.UnsupportedDistribution()
 		}
 	}
 
-	return nil
+	return
 }
 
 // Execute IProphet
-func (i InterProphet) Execute(params met.InterProphet, home, temp string, args []string) ([]string, *err.Error) {
+func (i InterProphet) Execute(params met.InterProphet, home, temp string, args []string) []string {
 
 	// run
 	bin := i.DefaultInterProphetParser
@@ -122,7 +115,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "InterProphet"}
+		err.ExecutingBinary(e)
 	}
 	_ = cmd.Wait()
 
@@ -130,7 +123,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))
 	e = sys.CopyFile(output, dest)
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotCopyFile, Class: err.FATA, Argument: "IprophXML"}
+		err.CopyingFile(e)
 	}
 
 	// collect all resulting files
@@ -141,7 +134,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 		}
 	}
 
-	return processedOutput, nil
+	return processedOutput
 }
 
 func (i InterProphet) appendParams(params met.InterProphet, cmd *exec.Cmd) *exec.Cmd {

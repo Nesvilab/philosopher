@@ -26,7 +26,7 @@ type Record struct {
 }
 
 // ProcessENSEMBL parses ENSEMBL like FASTA records
-func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
+func ProcessENSEMBL(k, v, decoyTag string) Record {
 
 	var e Record
 
@@ -83,11 +83,11 @@ func ProcessENSEMBL(k, v, decoyTag string) (Record, *err.Error) {
 		e.IsDecoy = false
 	}
 
-	return e, nil
+	return e
 }
 
 // ProcessNCBI parses UniProt like FASTA records
-func ProcessNCBI(k, v, decoyTag string) (Record, *err.Error) {
+func ProcessNCBI(k, v, decoyTag string) Record {
 
 	var e Record
 
@@ -177,11 +177,11 @@ func ProcessNCBI(k, v, decoyTag string) (Record, *err.Error) {
 		e.IsDecoy = false
 	}
 
-	return e, nil
+	return e
 }
 
 // ProcessUniProtKB parses UniProt like FASTA records
-func ProcessUniProtKB(k, v, decoyTag string) (Record, *err.Error) {
+func ProcessUniProtKB(k, v, decoyTag string) Record {
 
 	var e Record
 
@@ -244,7 +244,7 @@ func ProcessUniProtKB(k, v, decoyTag string) (Record, *err.Error) {
 	if strings.Contains(k, "GN=") && (strings.Contains(k, "PE=") || strings.Contains(k, "SV=")) {
 
 		if len(orn) < 2 {
-			return e, &err.Error{Type: err.CannotParseFastaFile, Class: err.FATA, Argument: "Check for formatting errors or malformed headers"}
+			err.ParsingFASTA()
 		}
 
 		gnReg := regexp.MustCompile(`GN=(.+?)(\s.+)`)
@@ -309,11 +309,11 @@ func ProcessUniProtKB(k, v, decoyTag string) (Record, *err.Error) {
 
 	e.OriginalHeader = k
 
-	return e, nil
+	return e
 }
 
 // ProcessUniRef parses UniProt like FASTA records
-func ProcessUniRef(k, v, decoyTag string) (Record, *err.Error) {
+func ProcessUniRef(k, v, decoyTag string) Record {
 
 	var e Record
 
@@ -360,11 +360,11 @@ func ProcessUniRef(k, v, decoyTag string) (Record, *err.Error) {
 
 	e.OriginalHeader = k
 
-	return e, nil
+	return e
 }
 
 // ProcessGeneric parses generci and uknown database headers
-func ProcessGeneric(k, v, decoyTag string) (Record, *err.Error) {
+func ProcessGeneric(k, v, decoyTag string) Record {
 
 	var e Record
 
@@ -388,25 +388,25 @@ func ProcessGeneric(k, v, decoyTag string) (Record, *err.Error) {
 	part := strings.Split(k, " ")
 	e.PartHeader = part[0]
 
-	return e, nil
+	return e
 }
 
 // Classify determines what kind of database originated the given sequence
-func Classify(s, decoyTag string) (string, *err.Error) {
+func Classify(s, decoyTag string) string {
 
 	// remove the decoy and contamintant tags so we can see better the seq header
 	seq := strings.Replace(s, decoyTag, "", -1)
 	seq = strings.Replace(seq, "con_", "", -1)
 
 	if strings.HasPrefix(seq, "sp|") || strings.HasPrefix(seq, "tr|") || strings.HasPrefix(seq, "db|") {
-		return "uniprot", nil
+		return "uniprot"
 	} else if strings.HasPrefix(seq, "AP_") || strings.HasPrefix(seq, "NP_") || strings.HasPrefix(seq, "YP_") || strings.HasPrefix(seq, "XP_") || strings.HasPrefix(seq, "ZP") || strings.HasPrefix(seq, "WP_") {
-		return "ncbi", nil
+		return "ncbi"
 	} else if strings.HasPrefix(seq, "ENSP") {
-		return "ensembl", nil
+		return "ensembl"
 	} else if strings.HasPrefix(seq, "UniRef") {
-		return "uniref", nil
+		return "uniref"
 	}
 
-	return "generic", nil
+	return "generic"
 }

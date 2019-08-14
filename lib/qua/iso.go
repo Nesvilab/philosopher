@@ -16,7 +16,7 @@ const (
 )
 
 // calculateIonPurity verifies how much interference there is on the precursor scans for each fragment
-func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep.PSMEvidence {
 
 	// index MS1 and MS2 spectra in a dictionary
 	var indexedMS1 = make(map[string]mzn.Spectrum)
@@ -123,11 +123,11 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) ([]re
 
 	}
 
-	return evi, nil
+	return evi
 }
 
 // prepareLabelStructureWithMS2 instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
-func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.MsData) (map[string]tmt.Labels, error) {
+func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.MsData) map[string]tmt.Labels {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
@@ -136,10 +136,7 @@ func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.
 	for _, i := range mz.Spectra {
 		if i.Level == "2" {
 
-			tmt, err := tmt.New(plex)
-			if err != nil {
-				return labels, err
-			}
+			tmt := tmt.New(plex)
 
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", i.Scan)
@@ -227,11 +224,11 @@ func prepareLabelStructureWithMS2(dir, format, plex string, tol float64, mz mzn.
 		}
 	}
 
-	return labels, nil
+	return labels
 }
 
 // prepareLabelStructureWithMS3 instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
-func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzn.MsData) (map[string]tmt.Labels, error) {
+func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzn.MsData) map[string]tmt.Labels {
 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]tmt.Labels)
@@ -240,10 +237,7 @@ func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzn.
 	for _, i := range mz.Spectra {
 		if i.Level == "3" {
 
-			tmt, err := tmt.New(plex)
-			if err != nil {
-				return labels, err
-			}
+			tmt := tmt.New(plex)
 
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", i.Scan)
@@ -332,11 +326,11 @@ func prepareLabelStructureWithMS3(dir, format, plex string, tol float64, mz mzn.
 		}
 	}
 
-	return labels, nil
+	return labels
 }
 
 // mapLabeledSpectra maps all labeled spectra to PSMs
-func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) ([]rep.PSMEvidence, error) {
+func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.PSMEvidence) []rep.PSMEvidence {
 
 	for i := range evi {
 
@@ -364,7 +358,7 @@ func mapLabeledSpectra(labels map[string]tmt.Labels, purity float64, evi []rep.P
 		}
 	}
 
-	return evi, nil
+	return evi
 }
 
 // the assignment of usage is only done for general PSM, not for phosphoPSMs

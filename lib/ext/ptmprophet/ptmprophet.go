@@ -40,17 +40,10 @@ func Run(m met.Data, args []string) met.Data {
 	var ptm = New(m.Temp)
 
 	// deploy the binaries
-	e := ptm.Deploy(m.OS, m.Distro)
-	if e != nil {
-		fmt.Println(e.Message)
-	}
+	ptm.Deploy(m.OS, m.Distro)
 
 	// run
-	xml, e := ptm.Execute(m.PTMProphet, args)
-	if e != nil {
-		fmt.Println(e.Message)
-	}
-	_ = xml
+	ptm.Execute(m.PTMProphet, args)
 
 	m.PTMProphet.InputFiles = args
 
@@ -58,7 +51,7 @@ func Run(m met.Data, args []string) met.Data {
 }
 
 // Deploy PTMProphet binaries on binary directory
-func (p *PTMProphet) Deploy(os, distro string) *err.Error {
+func (p *PTMProphet) Deploy(os, distro string) {
 
 	if os == sys.Windows() {
 		wPeP.WinPTMProphetParser(p.WinPTMProphetParser)
@@ -71,15 +64,15 @@ func (p *PTMProphet) Deploy(os, distro string) *err.Error {
 			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
 			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
 		} else {
-			return &err.Error{Type: err.UnsupportedDistribution, Class: err.FATA, Argument: "PTMProphetParser"}
+			err.UnsupportedDistribution()
 		}
 	}
 
-	return nil
+	return
 }
 
 // Execute PTMProphet
-func (p *PTMProphet) Execute(params met.PTMProphet, args []string) ([]string, *err.Error) {
+func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	// get the execution commands
 	bin := p.DefaultPTMProphetParser
@@ -108,7 +101,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) ([]string, *e
 
 	e := cmd.Start()
 	if e != nil {
-		return nil, &err.Error{Type: err.CannotExecuteBinary, Class: err.FATA, Argument: "PTMprophet"}
+		err.ExecutingBinary(e)
 	}
 	_ = cmd.Wait()
 
@@ -120,7 +113,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) ([]string, *e
 		}
 	}
 
-	return processedOutput, nil
+	return processedOutput
 }
 
 func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd {

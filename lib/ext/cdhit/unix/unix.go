@@ -4,18 +4,20 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // Unix64 ...
-func Unix64(unix64 string) error {
+func Unix64(unix64 string) {
 
-	bin, err := Asset("cd-hit")
-	err = ioutil.WriteFile(unix64, bin, sys.FilePermission())
+	bin, e := Asset("cd-hit")
+	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy CD-hit")
+	if e != nil {
+		err.DeployAsset(errors.New("CD-HIT"))
 	}
 
-	return nil
+	return
 }

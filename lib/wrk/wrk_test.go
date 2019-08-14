@@ -2,12 +2,10 @@ package wrk_test
 
 import (
 	"os"
-	"reflect"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	. "github.com/prvst/philosopher/lib/wrk"
 )
@@ -38,13 +36,7 @@ var _ = Describe("Wrk", func() {
 		})
 
 		It("Clean", func() {
-			e := Clean()
-			Expect(e).NotTo(HaveOccurred())
-			if e != nil {
-				Expect(reflect.TypeOf(e)).To(Equal("Error"))
-				Expect(e.Type).To(Equal(err.CannotDeleteMetaDirectory))
-				Expect(e.Class).To(Equal(err.FATA))
-			}
+			Clean()
 		})
 
 	})

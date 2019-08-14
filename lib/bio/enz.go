@@ -3,6 +3,8 @@ package bio
 import (
 	"errors"
 	"strings"
+
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // Enzyme struct
@@ -13,7 +15,7 @@ type Enzyme struct {
 }
 
 // Synth is an enzyme builder
-func (e *Enzyme) Synth(t string) error {
+func (e *Enzyme) Synth(t string) {
 
 	if strings.EqualFold(strings.ToLower(t), "trypsin") {
 		e.Name = "trypsin"
@@ -36,8 +38,8 @@ func (e *Enzyme) Synth(t string) error {
 		e.Pattern = "DE[^P]"
 		e.Join = "K"
 	} else {
-		return errors.New("Enzyme not supported")
+		err.ErrorCustom(errors.New("Enzyme not supported"))
 	}
 
-	return nil
+	return
 }

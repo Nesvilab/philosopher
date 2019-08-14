@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
@@ -18,10 +17,7 @@ var peprophCmd = &cobra.Command{
 	//Long:  "Statistical validation of peptide assignments for MS/MS Proteomics data\nPeptidProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			fmt.Println(e.Error())
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing PeptideProphet ", Version)
 

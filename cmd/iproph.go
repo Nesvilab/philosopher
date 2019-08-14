@@ -17,10 +17,7 @@ var iprophCmd = &cobra.Command{
 	//Long:  "Multi-level integrative analysis of shotgun proteomic data\niProphet v5.0",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing InterProphet ", Version)
 

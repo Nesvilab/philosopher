@@ -1,6 +1,7 @@
 package aba
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -10,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
@@ -18,7 +20,7 @@ import (
 )
 
 // Create peptide combined report
-func peptideLevelAbacus(m met.Data, args []string) error {
+func peptideLevelAbacus(m met.Data, args []string) {
 
 	var names []string
 	var xmlFiles []string
@@ -27,10 +29,7 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	seqMap, chargeMap, err := processPeptideCombinedFile(m.Abacus)
-	if err != nil {
-		return err
-	}
+	seqMap, chargeMap := processPeptideCombinedFile(m.Abacus)
 
 	// recover all files
 	logrus.Info("Restoring peptide results")
@@ -40,7 +39,7 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 		// restoring the database
 		var e rep.Evidence
 		//e.RestoreGranularWithPath(i)
-		_ = rep.RestoreEVPSMWithPath(&e, i)
+		rep.RestoreEVPSMWithPath(&e, i)
 
 		var labels DataSetLabelNames
 		labels.LabelName = make(map[string]string)
@@ -62,7 +61,7 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 		} else {
 			labels.Name = i
 		}
-		labels.LabelName, _ = getLabelNames(annot)
+		labels.LabelName = getLabelNames(annot)
 
 		// collect project names
 		prjName := i
@@ -80,7 +79,7 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 	sort.Strings(names)
 
 	logrus.Info("Collecting data from individual experiments")
-	evidences, err := collectPeptideDatafromExperiments(datasets, seqMap, chargeMap)
+	evidences := collectPeptideDatafromExperiments(datasets, seqMap, chargeMap)
 
 	logrus.Info("Processing spectral counts")
 	evidences = getPeptideSpectralCounts(evidences, datasets)
@@ -90,17 +89,19 @@ func peptideLevelAbacus(m met.Data, args []string) error {
 
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
-	return nil
+	return
 }
 
-func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string, error) {
+func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string) {
 
 	//var list rep.CombinedPeptideEvidenceList
 	var seqMap = make(map[string]int8)
 	var chargeMap = make(map[string][]string)
 
-	if _, err := os.Stat("combined.pep.xml"); os.IsNotExist(err) {
-		logrus.Fatal("Cannot find combined.pep.xml file")
+	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
+
+		err.NoParametersFound(errors.New("missing combined.pep.xml"))
+
 	} else {
 
 		var pep id.PepXML
@@ -117,10 +118,10 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 
 	}
 
-	return seqMap, chargeMap, nil
+	return seqMap, chargeMap
 }
 
-func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap map[string]int8, chargeMap map[string][]string) (rep.CombinedPeptideEvidenceList, error) {
+func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap map[string]int8, chargeMap map[string][]string) rep.CombinedPeptideEvidenceList {
 
 	var evidences rep.CombinedPeptideEvidenceList
 	var uniqPeptides = make(map[string]uint8)
@@ -214,7 +215,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 	}
 
-	return evidences, nil
+	return evidences
 }
 
 func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {

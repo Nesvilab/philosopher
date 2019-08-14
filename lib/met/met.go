@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -448,57 +447,57 @@ func CleanTemp(dir string) error {
 }
 
 // Serialize converts the whole structure to a gob file
-func (d *Data) Serialize() *err.Error {
+func (d *Data) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
+		logrus.Trace("Cannot serialize data")
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA}
+		logrus.Trace("Cannot write serial data")
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (d *Data) Restore(f string) *err.Error {
+func (d *Data) Restore(f string) {
 
 	b, e := ioutil.ReadFile(f)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
+		logrus.Trace("Cannot restore serial data")
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
+		logrus.Trace("Cannot unmarshal serial data")
 	}
 
 	if len(d.UUID) < 1 {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA}
+		logrus.Fatal("Serial data has no UUID")
 	}
 
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
 		os.Mkdir(d.Temp, sys.FilePermission())
 	}
 
-	return nil
+	return
 }
 
 // FunctionInitCheckUp does initilization checkup and verification if meta and temp folders are up.
 // In case not, meta troews an error and folder is created.
-func (d Data) FunctionInitCheckUp() *err.Error {
+func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		return &err.Error{Type: err.WorkspaceNotFound, Class: err.FATA}
+		logrus.Fatal("Workspace not found")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
 		os.Mkdir(d.Temp, sys.FilePermission())
-		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create temporary directory; check folder permissions"}
+		logrus.Fatal("Cannot create temporary directory, check folder permissions")
 	}
 
-	return nil
+	return
 }

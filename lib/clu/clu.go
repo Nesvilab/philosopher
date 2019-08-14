@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/prvst/philosopher/lib/err"
 
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/cdhit"
@@ -44,13 +45,10 @@ type Cluster struct {
 type List []Cluster
 
 // GenerateReport creates the protein report output
-func GenerateReport(c met.Data) error {
+func GenerateReport(c met.Data) {
 
 	// create clean reference db for clustering
-	clusterFasta, err := createCleanDataBaseReference(c.UUID, c.Temp)
-	if err != nil {
-		return err
-	}
+	clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")
@@ -58,11 +56,7 @@ func GenerateReport(c met.Data) error {
 
 	// parse the cluster file
 	logrus.Info("Parsing clusters")
-	clusters, err := parseClusterFile(clusterFile, clusterFasta)
-
-	if err != nil {
-		return err
-	}
+	clusters := parseClusterFile(clusterFile, clusterFasta)
 
 	// maps all proteins from the db against the clusters
 	logrus.Info("Mapping proteins to clusters")
@@ -74,27 +68,20 @@ func GenerateReport(c met.Data) error {
 	// mapping to functional annotation and save to disk
 	savetoDisk(mappedClust, c.Temp, c.Cluster.UID)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return
 }
 
 // CreateCleanDataBaseReference removes decoys and contaminants from struct
-func createCleanDataBaseReference(uid, temp string) (string, error) {
-
-	var err error
+func createCleanDataBaseReference(uid, temp string) string {
 
 	var u dat.Base
 	u.Restore()
 
 	clstrFasta := temp + string(filepath.Separator) + uid + ".fasta"
 
-	file, err := os.Create(clstrFasta)
-	if err != nil {
-		msg := "Could not create output for binning"
-		return "", errors.New(msg)
+	file, e := os.Create(clstrFasta)
+	if e != nil {
+		err.FatalCustom(errors.New("Could not create output for binning"))
 	}
 	defer file.Close()
 
@@ -103,17 +90,16 @@ func createCleanDataBaseReference(uid, temp string) (string, error) {
 		if i.IsDecoy == false && i.IsContaminant == false {
 
 			line := fmt.Sprintf(">%s\n%s\n", i.OriginalHeader, i.Sequence)
-			_, err = io.WriteString(file, line)
+			_, e = io.WriteString(file, line)
 
-			if err != nil {
-				msg := "Could not create output for binning"
-				return "", errors.New(msg)
+			if e != nil {
+				err.FatalCustom(errors.New("Could not create output for binning"))
 			}
 
 		}
 	}
 
-	return clstrFasta, nil
+	return clstrFasta
 }
 
 // Execute is top function for Comet
@@ -134,24 +120,22 @@ func execute(level float64) (string, string) {
 }
 
 // ParseClusterFile ...
-func parseClusterFile(cls, database string) (List, error) {
+func parseClusterFile(cls, database string) List {
 
 	var list List
 	var clustermap = make(map[int][]string)
 	var centroidmap = make(map[int]string)
 	var clusterNumber int
 	var seqsName []string
-	var err error
 
-	f, err := os.Open(cls)
-	if err != nil {
-		msg := "[ERROR] Cannot open cluster file" + cls
-		return nil, errors.New(msg)
+	f, e := os.Open(cls)
+	if e != nil {
+		err.FatalCustom(errors.New("Cannot open cluster file"))
 	}
 	defer f.Close()
 
-	reheader, err := regexp.Compile(`^>Cluster\s+(.*)`)
-	reseq, err := regexp.Compile(`\|(.*)\|.*`)
+	reheader, e := regexp.Compile(`^>Cluster\s+(.*)`)
+	reseq, e := regexp.Compile(`\|(.*)\|.*`)
 
 	scanner := bufio.NewScanner(f)
 
@@ -161,9 +145,9 @@ func parseClusterFile(cls, database string) (List, error) {
 
 			cluster := reheader.FindStringSubmatch(scanner.Text())
 			num := cluster[1]
-			i, ferr := strconv.Atoi(num)
-			if ferr != nil {
-				return nil, errors.New("FASTA header not found")
+			i, e := strconv.Atoi(num)
+			if e != nil {
+				err.FatalCustom(errors.New("FAST header not found"))
 			}
 			clusterNumber = i
 
@@ -176,7 +160,7 @@ func parseClusterFile(cls, database string) (List, error) {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
 				if len(centroid) < 2 {
-					return nil, errors.New("FASTA file contains non-formatted sequence headers")
+					err.FatalCustom(errors.New("FASTA file contains non-formatted sequence headers"))
 				}
 				centroidmap[clusterNumber] = centroid[1]
 			}
@@ -206,11 +190,7 @@ func parseClusterFile(cls, database string) (List, error) {
 		list = append(list, c)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	return list, nil
+	return list
 }
 
 // MapProtXML2Clusters ...
@@ -262,18 +242,6 @@ func mapProtXML2Clusters(clusters List) List {
 			}
 		}
 	}
-
-	// for i := range clusters {
-	//   for j := range clusters[i].Peptides {
-	//
-	//     _, ok := pepMap[clusters[i].Peptides[j]]
-	//     if ok {
-	//       pepMap[clusters[i].Peptides[j]]++
-	//     } else {
-	//       pepMap[clusters[i].Peptides[j]] = 1
-	//     }
-	//   }
-	// }
 
 	// now runs for each cluster and checks if the peptides appear in other clusters
 	for i := range clusters {
@@ -332,34 +300,30 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	outfile := fmt.Sprintf("%s/%s.tab", resultDir, organism)
 
 	// tries to create an output file
-	output, err := os.Create(outfile)
-	if err != nil {
-		log.Println("[ERROR] Could not create output file", query, "-", err)
-		os.Exit(2)
+	output, e := os.Create(outfile)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
-	response, err := http.Get(query)
-	if err != nil {
-		log.Println("[ERROR] Could not find annotation file", err)
-		os.Exit(2)
+	response, e := http.Get(query)
+	if e != nil {
+		err.FatalCustom(errors.New("Could not find the annotation file"))
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
-	n, err := io.Copy(output, response.Body)
-	if err != nil {
-		log.Println("[ERROR] Could not download annotation file", n, "-", err)
-		return
+	_, e = io.Copy(output, response.Body)
+	if e != nil {
+		err.FatalCustom(errors.New("Cannot download the annotation file"))
 	}
 
 	faMap = make(map[string][]string)
 
-	f, err := os.Open(outfile)
-	if outfile == "" || err != nil {
-		log.Println("[ERROR] Empty or inexistent file")
-		os.Exit(2)
+	f, e := os.Open(outfile)
+	if outfile == "" || e != nil {
+		err.FatalCustom(errors.New("Emty or inexisting file"))
 	}
 	defer f.Close()
 
@@ -391,10 +355,9 @@ func savetoDisk(list List, temp, uid string) {
 	output := fmt.Sprintf("%s%sclusters.tsv", temp, string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		log.Println("[ERROR]:", err)
-		os.Exit(2)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer file.Close()
 
@@ -406,10 +369,9 @@ func savetoDisk(list List, temp, uid string) {
 		line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n")
 	}
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		log.Println("[ERROR]", n, err)
-		os.Exit(2)
+	_, e = io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e)
 	}
 
 	var faMap = make(map[string][]string)
@@ -428,12 +390,6 @@ func savetoDisk(list List, temp, uid string) {
 				members = append(members, k)
 			}
 			membersString := strings.Join(members, ", ")
-
-			// var status string
-			// parts, ok := faMap[list[i].Centroid]
-			// if ok {
-			// 	status = parts[0]
-			// }
 
 			line := fmt.Sprintf("%d\t%s\t%d\t%s\t%.2f\t%d\t%d\t%d\t%s\t",
 				list[i].Number,
@@ -462,10 +418,9 @@ func savetoDisk(list List, temp, uid string) {
 
 			line += "\n"
 
-			n, err := io.WriteString(file, line)
-			if err != nil {
-				logrus.Println("[ERROR]", n, err)
-				os.Exit(2)
+			_, e := io.WriteString(file, line)
+			if e != nil {
+				err.WriteToFile(e)
 			}
 		}
 

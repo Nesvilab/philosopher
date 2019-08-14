@@ -17,10 +17,7 @@ var freequant = &cobra.Command{
 	Short: "Label-free Quantification ",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {
@@ -42,10 +39,7 @@ var freequant = &cobra.Command{
 		m.Quantify.RTWin = m.Quantify.PTWin
 
 		// run label-free quantification
-		e = qua.RunLabelFreeQuantification(m.Quantify)
-		if e != nil {
-			logrus.Fatal(e.Error())
-		}
+		qua.RunLabelFreeQuantification(m.Quantify)
 
 		// store paramters on meta data
 		m.Serialize()

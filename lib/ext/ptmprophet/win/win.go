@@ -8,14 +8,14 @@ import (
 )
 
 // WinPTMProphetParser locates and extracts the PTMProphet binary
-func WinPTMProphetParser(s string) *err.Error {
+func WinPTMProphetParser(s string) {
 
 	bin, e := Asset("PTMProphetParser.exe")
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		return &err.Error{Type: err.CannotExtractAsset, Class: err.FATA, Argument: "PTMProphetParser"}
+		err.ExecutingBinary(e)
 	}
 
-	return nil
+	return
 }

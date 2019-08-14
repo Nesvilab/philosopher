@@ -5,599 +5,527 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
 // Serialize converts the whole structure to a gob file
-func (e *Evidence) Serialize() *err.Error {
+func (evi *Evidence) Serialize() {
 
-	b, er := msgpack.Marshal(&e)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi)
+	if e != nil {
+		logrus.Fatal("cannot marshal file:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeGranular converts the whole structure into sevral small gob files
-func (e *Evidence) SerializeGranular() *err.Error {
+func (evi *Evidence) SerializeGranular() {
 
 	// create EV Parameters
-	er := SerializeEVParameters(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVParameters(evi)
 
 	// create EV PSM
-	er = SerializeEVPSM(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVPSM(evi)
 
 	// create EV Ion
-	er = SerializeEVIon(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVIon(evi)
 
 	// create EV Peptides
-	er = SerializeEVPeptides(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVPeptides(evi)
 
 	// create EV Ion
-	er = SerializeEVProteins(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVProteins(evi)
 
 	// create EV Mods
-	er = SerializeEVMods(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVMods(evi)
 
 	// create EV Modifications
-	er = SerializeEVModifications(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVModifications(evi)
 
 	// create EV Combined
-	er = SerializeEVCombined(e)
-	if er != nil {
-		return er
-	}
+	SerializeEVCombined(evi)
 
-	return nil
+	return
 }
 
 // SerializeEVParameters creates an ev serial with Parameter data
-func SerializeEVParameters(e *Evidence) *err.Error {
+func SerializeEVParameters(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Parameters)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Parameters)
+	if e != nil {
+		logrus.Trace("Cannot marshal Parameters data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvParameterBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvParameterBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize Parameters data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVPSM creates an ev serial with Evidence data
-func SerializeEVPSM(e *Evidence) *err.Error {
+func SerializeEVPSM(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.PSM)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.PSM)
+	if e != nil {
+		logrus.Trace("Cannot marshal PSM data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvPSMBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvPSMBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize PSM data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVIon creates an ev serial with Evidence data
-func SerializeEVIon(e *Evidence) *err.Error {
+func SerializeEVIon(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Ions)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Ions)
+	if e != nil {
+		logrus.Trace("Cannot marshal Ions data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvIonBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvIonBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize Ions data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVPeptides creates an ev serial with Evidence data
-func SerializeEVPeptides(e *Evidence) *err.Error {
+func SerializeEVPeptides(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Peptides)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Peptides)
+	if e != nil {
+		logrus.Trace("Cannot marshal Peptides data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvPeptideBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvPeptideBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize Peptides data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVProteins creates an ev serial with Evidence data
-func SerializeEVProteins(e *Evidence) *err.Error {
+func SerializeEVProteins(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Proteins)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Proteins)
+	if e != nil {
+		logrus.Trace("Cannot marshal Proteins data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvProteinBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvProteinBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize Proteins data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVMods creates an ev serial with Evidence data
-func SerializeEVMods(e *Evidence) *err.Error {
+func SerializeEVMods(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Mods)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Mods)
+	if e != nil {
+		logrus.Trace("Cannot marshal Modifications data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize Modifications data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVModifications creates an ev serial with Evidence data
-func SerializeEVModifications(e *Evidence) *err.Error {
+func SerializeEVModifications(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.Modifications)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.Modifications)
+	if e != nil {
+		logrus.Trace("Cannot marshal data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvModificationsEvBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvModificationsEvBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return nil
+	return
 }
 
 // SerializeEVCombined creates an ev serial with Evidence data
-func SerializeEVCombined(e *Evidence) *err.Error {
+func SerializeEVCombined(evi *Evidence) {
 
-	b, er := msgpack.Marshal(&e.CombinedProtein)
-	if er != nil {
-		return &err.Error{Type: err.CannotCreateOutputFile, Class: err.FATA, Argument: er.Error()}
+	b, e := msgpack.Marshal(&evi.CombinedProtein)
+	if e != nil {
+		logrus.Trace("Cannot marshal data:", e)
 	}
 
-	er = ioutil.WriteFile(sys.EvCombinedBin(), b, sys.FilePermission())
-	if er != nil {
-		return &err.Error{Type: err.CannotSerializeData, Class: err.FATA, Argument: er.Error()}
+	e = ioutil.WriteFile(sys.EvCombinedBin(), b, sys.FilePermission())
+	if e != nil {
+		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return nil
+	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (e *Evidence) Restore() *err.Error {
+func (evi *Evidence) Restore() {
 
-	b, er := ioutil.ReadFile(sys.EvBin())
-	if er != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: ": database data may be corrupted"}
+	b, e := ioutil.ReadFile(sys.EvBin())
+	if e != nil {
+		logrus.Trace("Cannot marshal data:", e)
 	}
 
-	er = msgpack.Unmarshal(b, &e)
-	if er != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: ": database data may be corrupted"}
+	e = msgpack.Unmarshal(b, &e)
+	if e != nil {
+		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreGranular reads philosopher results files and restore the data sctructure
-func (e *Evidence) RestoreGranular() *err.Error {
+func (evi *Evidence) RestoreGranular() {
 
 	// Parameters
-	err := RestoreEVParameters(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVParameters(evi)
 
 	// PSM
-	err = RestoreEVPSM(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVPSM(evi)
 
 	// Ion
-	err = RestoreEVIon(e)
-	if err != nil {
-		return err
-	}
-
+	RestoreEVIon(evi)
 	// Peptide
-	err = RestoreEVPeptide(e)
-	if err != nil {
-		return err
-	}
+
+	RestoreEVPeptide(evi)
 
 	// Protein
-	err = RestoreEVProtein(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVProtein(evi)
 
 	// Mods
-	err = RestoreEVMods(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVMods(evi)
 
 	// Modifications
-	err = RestoreEVModifications(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVModifications(evi)
 
 	// Combined
-	err = RestoreEVCombined(e)
-	if err != nil {
-		return err
-	}
+	RestoreEVCombined(evi)
 
-	return nil
+	return
 }
 
 // RestoreEVParameters restores Ev PSM data
-func RestoreEVParameters(d *Evidence) *err.Error {
+func RestoreEVParameters(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvParameterBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Parameters)
+	e = msgpack.Unmarshal(b, &evi.Parameters)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
-	return nil
+	return
 }
 
 // RestoreEVPSM restores Ev PSM data
-func RestoreEVPSM(d *Evidence) *err.Error {
+func RestoreEVPSM(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvPSMBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.PSM)
+	e = msgpack.Unmarshal(b, &evi.PSM)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
-	return nil
+	return
 }
 
 // RestoreEVIon restores Ev Ion data
-func RestoreEVIon(d *Evidence) *err.Error {
+func RestoreEVIon(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvIonBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Ions)
+	e = msgpack.Unmarshal(b, &evi.Ions)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVPeptide restores Ev Ion data
-func RestoreEVPeptide(d *Evidence) *err.Error {
+func RestoreEVPeptide(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvPeptideBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Peptides)
+	e = msgpack.Unmarshal(b, &evi.Peptides)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVProtein restores Ev Protein data
-func RestoreEVProtein(d *Evidence) *err.Error {
+func RestoreEVProtein(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvProteinBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Proteins)
+	e = msgpack.Unmarshal(b, &evi.Proteins)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVMods restores Ev Mods data
-func RestoreEVMods(d *Evidence) *err.Error {
+func RestoreEVMods(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvModificationsBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Mods)
+	e = msgpack.Unmarshal(b, &evi.Mods)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVModifications restores Ev Mods data
-func RestoreEVModifications(d *Evidence) *err.Error {
+func RestoreEVModifications(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvModificationsEvBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Modifications)
+	e = msgpack.Unmarshal(b, &evi.Modifications)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVCombined restores Ev Mods data
-func RestoreEVCombined(d *Evidence) *err.Error {
+func RestoreEVCombined(evi *Evidence) {
 
 	b, e := ioutil.ReadFile(sys.EvCombinedBin())
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.CombinedProtein)
+	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreGranularWithPath reads philosopher results files and restore the data sctructure
-func (e *Evidence) RestoreGranularWithPath(p string) *err.Error {
+func (evi *Evidence) RestoreGranularWithPath(p string) {
 
 	// Parameters
-	err := RestoreEVParametersWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVParametersWithPath(evi, p)
 
 	// PSM
-	err = RestoreEVPSMWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVPSMWithPath(evi, p)
 
 	// Ion
-	err = RestoreEVIonWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVIonWithPath(evi, p)
 
 	// Peptide
-	err = RestoreEVPeptideWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVPeptideWithPath(evi, p)
 
 	// Protein
-	err = RestoreEVProteinWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVProteinWithPath(evi, p)
 
 	// Mods
-	err = RestoreEVModsWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVModsWithPath(evi, p)
 
 	// Modifications
-	err = RestoreEVModificationsWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVModificationsWithPath(evi, p)
 
 	// Combined
-	err = RestoreEVCombinedWithPath(e, p)
-	if err != nil {
-		return err
-	}
+	RestoreEVCombinedWithPath(evi, p)
 
-	return nil
+	return
 }
 
 // RestoreEVParametersWithPath restores Ev PSM data
-func RestoreEVParametersWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVParametersWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvParameterBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Parameters)
+	e = msgpack.Unmarshal(b, &evi.Parameters)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVPSMWithPath restores Ev PSM data
-func RestoreEVPSMWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVPSMWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPSMBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.PSM)
+	e = msgpack.Unmarshal(b, &evi.PSM)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVIonWithPath restores Ev Ion data
-func RestoreEVIonWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVIonWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvIonBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Ions)
+	e = msgpack.Unmarshal(b, &evi.Ions)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVPeptideWithPath restores Ev Ion data
-func RestoreEVPeptideWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVPeptideWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvPeptideBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Peptides)
+	e = msgpack.Unmarshal(b, &evi.Peptides)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVProteinWithPath restores Ev Protein data
-func RestoreEVProteinWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVProteinWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvProteinBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Proteins)
+	e = msgpack.Unmarshal(b, &evi.Proteins)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVModsWithPath restores Ev Mods data
-func RestoreEVModsWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVModsWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Mods)
+	e = msgpack.Unmarshal(b, &evi.Mods)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVModificationsWithPath restores Ev Mods data
-func RestoreEVModificationsWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVModificationsWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.Modifications)
+	e = msgpack.Unmarshal(b, &evi.Modifications)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }
 
 // RestoreEVCombinedWithPath restores Ev Mods data
-func RestoreEVCombinedWithPath(d *Evidence, p string) *err.Error {
+func RestoreEVCombinedWithPath(evi *Evidence, p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
 
 	b, e := ioutil.ReadFile(path)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot read file:", e)
 	}
 
-	e = msgpack.Unmarshal(b, &d.CombinedProtein)
+	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
 	if e != nil {
-		return &err.Error{Type: err.CannotRestoreGob, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return nil
+	return
 }

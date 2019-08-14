@@ -16,20 +16,14 @@ var abacusCmd = &cobra.Command{
 	Short: "Combined analysis of LC-MS/MS results",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {
 			logrus.Fatal("The combined analysis needs at least 2 result files to work")
 		}
 
 		logrus.Info("Executing Abacus ", Version)
-		err := aba.Run(m, args)
-		if err != nil {
-			logrus.Fatal(err)
-		}
+		aba.Run(m, args)
 
 		// store parameters on meta data
 		m.Serialize()

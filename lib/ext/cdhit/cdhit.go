@@ -1,11 +1,12 @@
 package cdhit
 
 import (
-	"errors"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
+
+	"github.com/prvst/philosopher/lib/err"
 
 	ucdhit "github.com/prvst/philosopher/lib/ext/cdhit/unix"
 	wcdhit "github.com/prvst/philosopher/lib/ext/cdhit/win"
@@ -76,21 +77,20 @@ func (c *CDhit) Deploy() {
 }
 
 // Run runs the cdhit binary with user's information
-func (c *CDhit) Run(level float64) error {
+func (c *CDhit) Run(level float64) {
 
 	l := strconv.FormatFloat(level, 'E', -1, 64)
-	var err error
 
 	cmd := c.DefaultBin
 	args := []string{"-i", c.FastaDB, "-o", c.ClusterFasta, "-c", l}
 
 	run := exec.Command(cmd, args...)
-	err = run.Start()
+	e := run.Start()
 	_ = run.Wait()
 
-	if err != nil {
-		return errors.New("Could not run CD-Hit")
+	if e != nil {
+		err.ExecutingBinary(e)
 	}
 
-	return nil
+	return
 }

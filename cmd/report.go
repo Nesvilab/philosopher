@@ -16,10 +16,7 @@ var reportCmd = &cobra.Command{
 	Short: "Multi-level reporting for both narrow-searches and open-searches",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Report ", Version)
 

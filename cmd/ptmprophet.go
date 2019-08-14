@@ -16,10 +16,7 @@ var ptmprophetCmd = &cobra.Command{
 	Short: "PTM site localization",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing PTMProphet ", Version)
 

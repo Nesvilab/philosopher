@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/spc"
 
 	"github.com/prvst/philosopher/lib/cla"
@@ -25,14 +27,12 @@ import (
 )
 
 // Run executes the Filter processing
-//func (f *Filter) Run(psmFDR, pepFDR, ionFDR, ptFDR, pepProb, protProb float64, isPicked, isRazor, mapmod bool) error {
-func Run(f met.Data) (met.Data, error) {
+func Run(f met.Data) met.Data {
 
 	e := rep.New()
 	var pepxml id.PepXML
 	var pep id.PepIDList
 	var pro id.ProtIDList
-	var err error
 
 	// get the database tag from database command
 	if len(f.Filter.Tag) == 0 {
@@ -41,34 +41,21 @@ func Run(f met.Data) (met.Data, error) {
 
 	logrus.Info("Processing peptide identification files")
 
-	pepid, searchEngine, err := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
-	if err != nil {
-		return f, err
-	}
+	pepid, searchEngine := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
 
 	f.SearchEngine = searchEngine
 
 	if len(pepid) == 0 {
-		return f, errors.New("No PSMs were found in data set")
+		err.NoPSMFound()
 	}
 
-	psmT, pepT, ionT, err := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
-	if err != nil {
-		return f, err
-	}
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 
 	if len(f.Filter.Pox) > 0 {
 
-		protXML, proerr := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
-		if proerr != nil {
-			return f, proerr
-		}
+		protXML := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 
-		err = processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
-		if err != nil {
-			return f, err
-		}
-		//protXML = id.ProtXML{}
+		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 
 		if f.Filter.Seq == true {
 
@@ -76,10 +63,7 @@ func Run(f met.Data) (met.Data, error) {
 			// filtered psm list and filtered prot list
 			pep.Restore("psm")
 			pro.Restore()
-			err = sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-			if err != nil {
-				return f, err
-			}
+			sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
 			pep = nil
 			pro = nil
 
@@ -89,10 +73,7 @@ func Run(f met.Data) (met.Data, error) {
 			// filtered psm list and filtered prot list
 			pep.Restore("psm")
 			pro.Restore()
-			err = cappedSequentialControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, psmT, pepT, ionT, f.Filter.Tag)
-			if err != nil {
-				return f, err
-			}
+			cappedSequentialControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, psmT, pepT, ionT, f.Filter.Tag)
 			pep = nil
 			pro = nil
 
@@ -102,10 +83,7 @@ func Run(f met.Data) (met.Data, error) {
 			// complete pep list and filtered mirror-image prot list
 			pepxml.Restore()
 			pro.Restore()
-			err = twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-			if err != nil {
-				return f, err
-			}
+			twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
 			pepxml = id.PepXML{}
 			pro = nil
 
@@ -116,7 +94,7 @@ func Run(f met.Data) (met.Data, error) {
 	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
-		return f, errors.New("Database data not available, interrupting processing")
+		err.FatalCustom(errors.New("Database data not available, interrupting processing"))
 	}
 
 	logrus.Info("Post processing identifications")
@@ -161,10 +139,7 @@ func Run(f met.Data) (met.Data, error) {
 
 	logrus.Info("Processing Protein Inference")
 	pro.Restore()
-	err = e.AssembleProteinReport(pro, f.Filter.Tag)
-	if err != nil {
-		return f, err
-	}
+	e.AssembleProteinReport(pro, f.Filter.Tag)
 	pro = nil
 
 	logrus.Info("Correcting PSM to Protein mappings")
@@ -185,22 +160,16 @@ func Run(f met.Data) (met.Data, error) {
 	}
 
 	logrus.Info("Calculating Spectral Counts")
-	e, cerr := qua.CalculateSpectralCounts(e)
-	if cerr != nil {
-		return f, cerr
-	}
+	e = qua.CalculateSpectralCounts(e)
 
 	logrus.Info("Saving")
-	cerr = e.SerializeGranular()
-	if cerr != nil {
-		return f, cerr
-	}
+	e.SerializeGranular()
 
-	return f, nil
+	return f
 }
 
 // readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string, error) {
+func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string) {
 
 	var files []string
 	var pepIdent id.PepIDList
@@ -216,7 +185,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList,
 		list, _ := filepath.Glob(glob)
 
 		if len(list) == 0 {
-			return pepIdent, "", errors.New("No pepXML files found, check your files and try again")
+			err.NoParametersFound(errors.New("missing pepXML files"))
 		}
 
 		for _, i := range list {
@@ -229,10 +198,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList,
 	for _, i := range files {
 		var p id.PepXML
 		p.DecoyTag = decoyTag
-		e := p.Read(i)
-		if e != nil {
-			return nil, "", e
-		}
+		p.Read(i)
 
 		params = p.SearchParameters
 
@@ -274,48 +240,46 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList,
 	sort.Sort(pepXML.PeptideIdentification)
 	pepXML.Serialize()
 
-	return pepIdent, searchEngine, nil
+	return pepIdent, searchEngine
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) (float64, float64, float64, error) {
-
-	var err error
+func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
 
-	t, d, _ = chargeProfile(p, 1, decoyTag)
+	t, d = chargeProfile(p, 1, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
 	}).Info("1+ Charge profile")
 
-	t, d, _ = chargeProfile(p, 2, decoyTag)
+	t, d = chargeProfile(p, 2, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
 	}).Info("2+ Charge profile")
 
-	t, d, _ = chargeProfile(p, 3, decoyTag)
+	t, d = chargeProfile(p, 3, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
 	}).Info("3+ Charge profile")
 
-	t, d, _ = chargeProfile(p, 4, decoyTag)
+	t, d = chargeProfile(p, 4, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
 	}).Info("4+ Charge profile")
 
-	t, d, _ = chargeProfile(p, 5, decoyTag)
+	t, d = chargeProfile(p, 5, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
 	}).Info("5+ Charge profile")
 
-	t, d, _ = chargeProfile(p, 6, decoyTag)
+	t, d = chargeProfile(p, 6, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
@@ -331,29 +295,20 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, psmThreshold, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPSM, psmThreshold := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, peptideThreshold, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPeptides, peptideThreshold := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, ionThreshold, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredIons, ionThreshold := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return psmThreshold, peptideThreshold, ionThreshold, nil
+	return psmThreshold, peptideThreshold, ionThreshold
 }
 
 // chargeProfile ...
-func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int, err error) {
+func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
 
 	for _, i := range p {
 		if i.AssumedCharge == charge {
@@ -365,11 +320,7 @@ func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int, err
 		}
 	}
 
-	if t < 1 || d < 1 {
-		err = errors.New("Invalid charge state count")
-	}
-
-	return t, d, err
+	return t, d
 }
 
 //getUniquePSMs selects only unique pepetide ions for the given data stucture
@@ -427,7 +378,7 @@ func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64, error) {
+func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64) {
 
 	//var msg string
 	var targets float64
@@ -436,7 +387,6 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 	var list id.PepIDList
 	var peplist id.PepIDList
 	var minProb float64 = 10
-	var err error
 
 	if strings.EqualFold(level, "PSM") {
 
@@ -484,8 +434,6 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 			list = append(list, peplist[i])
 		}
 
-	} else {
-		err = errors.New("Error applying FDR score; unknown level")
 	}
 
 	sort.Sort(list)
@@ -549,18 +497,15 @@ func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 		"threshold": minProb,
 	}).Info(msg)
 
-	return cleanlist, minProb, err
+	return cleanlist, minProb
 }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
-func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXML, error) {
+func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 	var protXML id.ProtXML
 
-	err := protXML.Read(xmlFile)
-	if err != nil {
-		return protXML, err
-	}
+	protXML.Read(xmlFile)
 
 	protXML.DecoyTag = decoyTag
 
@@ -570,14 +515,13 @@ func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) (id.ProtXM
 
 	protXML.Serialize()
 
-	return protXML, nil
+	return protXML
 }
 
 // processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool, decoyTag string) error {
+func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool, decoyTag string) {
 
-	var err error
 	var pid id.ProtIDList
 
 	// tagget / decoy / threshold
@@ -594,24 +538,18 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 	// applies razor algorithm
 	if isRazor == true {
-		p, err = RazorFilter(p)
-		if err != nil {
-			return err
-		}
+		p = RazorFilter(p)
 	}
 
 	// run the FDR filter for proteins
-	pid, err = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
-	if err != nil {
-		return err
-	}
+	pid = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
 
 	if fo == true {
 		output := fmt.Sprintf("%s%spep_pro_mappings.tsv", sys.MetaDir(), string(filepath.Separator))
 
-		file, err := os.Create(output)
-		if err != nil {
-			logrus.Fatal("Could not create output file")
+		file, e := os.Create(output)
+		if e != nil {
+			err.WriteFile(e)
 		}
 		defer file.Close()
 
@@ -629,9 +567,9 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 				}
 
 				mapping := strings.Join(line, "\t")
-				_, err = io.WriteString(file, mapping)
-				if err != nil {
-					return errors.New("Cannot print PSM to file")
+				_, e = io.WriteString(file, mapping)
+				if e != nil {
+					err.WriteToFile(e)
 				}
 
 			}
@@ -641,7 +579,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	// save results on meta folder
 	pid.Serialize()
 
-	return nil
+	return
 }
 
 // proteinProfile ...
@@ -742,7 +680,7 @@ type RazorCandidate struct {
 type RazorCandidateMap map[string]RazorCandidate
 
 // RazorFilter classifies peptides as razor
-func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
+func RazorFilter(p id.ProtXML) id.ProtXML {
 
 	var r = make(map[string]RazorCandidate)
 	var rList []string
@@ -952,11 +890,11 @@ func RazorFilter(p id.ProtXML) (id.ProtXML, error) {
 		}
 	}
 
-	return p, nil
+	return p
 }
 
 // ProtXMLFilter filters the protein list under a specific fdr
-func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool, decoyTag string) (id.ProtIDList, error) {
+func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked, isRazor bool, decoyTag string) id.ProtIDList {
 
 	//var proteinIDs ProtIDList
 	var list id.ProtIDList
@@ -964,7 +902,6 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	var decoys float64
 	var calcFDR float64
 	var minProb float64 = 10
-	var err error
 
 	// collect all proteins from every group
 	for i := range p.Groups {
@@ -1063,8 +1000,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	}
 
 	if curProb == 10 {
-		msgProb := fmt.Sprintf("The protein FDR filter didn't reached the desired threshold of %.4f, try a higher threshold using the --prot parameter", targetFDR)
-		err = errors.New(msgProb)
+		err.ErrorCustom(errors.New("The protein FDR filter didn't reached the desired threshold of %.4f, try a higher threshold using the --prot parameter"))
 	}
 
 	fmtScore := uti.ToFixed(curScore, 4)
@@ -1116,12 +1052,12 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		"threshold": minProb,
 	}).Info(msg)
 
-	return cleanlist, err
+	return cleanlist
 }
 
 // sequentialFDRControl estimates FDR levels by applying a second filter where all
 // proteins from the protein filtered list are matched against filtered PSMs
-func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
+func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) {
 
 	extPep := extractPSMfromPepXML(pep, pro)
 
@@ -1138,30 +1074,21 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 		"ions":     len(uniqIons),
 	}).Info("Applying sequential FDR estimation")
 
-	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPSM, _ := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPeptides, _ := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredIons, _ := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return nil
+	return
 }
 
 // twoDFDRFilter estimates FDR levels by applying a second filter by regenerating
 // a protein list with decoys from protXML and pepXML.
-func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) error {
+func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) {
 
 	// filter protein list at given FDR level and regenerate protein list by adding pairing decoys
 	//logrus.Info("Creating mirror image from filtered protein list")
@@ -1191,31 +1118,22 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 		"ions":     len(uniqIons),
 	}).Info("Second filtering results")
 
-	filteredPSM, _, err := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPSM, _ := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _, err := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPeptides, _ := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _, err := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredIons, _ := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return nil
+	return
 }
 
 // cappedSequentialControl estimates FDR levels by applying a second filter where all
 // proteins from the protein filtered list are matched against filtered PSMs
 // It will use the threshold of the first pass as a cap for the second pass
-func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion, psmT, pepT, ionT float64, decoyTag string) error {
+func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion, psmT, pepT, ionT float64, decoyTag string) {
 
 	extPep := extractPSMfromPepXML(pep, pro)
 
@@ -1259,25 +1177,16 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 		}
 	}
 
-	filteredPSM, _, err := pepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPSM, _ := pepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _, err := pepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredPeptides, _ := pepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _, err := pepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
-	if err != nil {
-		logrus.Fatal(err)
-	}
+	filteredIons, _ := pepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return nil
+	return
 }
 
 // extractPSMfromPepXML retrieves all psm from protxml that maps into pepxml files

@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
@@ -15,15 +14,12 @@ import (
 )
 
 // MapMods maps PSMs to modifications based on their mass shifts
-func (e *Evidence) MapMods() *err.Error {
+func (e *Evidence) MapMods() {
 
 	// 10 ppm
 	var tolerance = 0.01
 
-	o, err := obo.NewUniModOntology()
-	if err != nil {
-		return err
-	}
+	o := obo.NewUniModOntology()
 
 	for i := range e.PSM {
 		for _, j := range o.Terms {
@@ -157,7 +153,7 @@ func (e *Evidence) MapMods() *err.Error {
 		}
 	}
 
-	return nil
+	return
 }
 
 // AssembleModificationReport cretaes the modifications lists

@@ -8,10 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/rogpeppe/go-charset/charset"
 	"github.com/sirupsen/logrus"
+
 	// anon charset
 	_ "github.com/rogpeppe/go-charset/data"
 )
@@ -77,11 +77,11 @@ type UserParam struct {
 }
 
 // Parse is the main function for parsing IndexedMzML data
-func (p *IndexedMzML) Parse(f string) error {
+func (p *IndexedMzML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
+		logrus.Fatal("Cannot read file:", e)
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -93,22 +93,23 @@ func (p *IndexedMzML) Parse(f string) error {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mzml); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
+		logrus.Fatal("Cannot parse XML file:", e)
 	}
 
 	p.MzML = mzml.MzML
 	p.Name = filepath.Base(f)
 
-	return nil
+	return
 }
 
 // Parse is the main function for parsing MzIdentML data
-func (p *MzIdentML) Parse(f string) error {
+func (p *MzIdentML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: filepath.Base(f)}
+		logrus.Fatal("Cannot read file:", e)
 	}
+
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
 
@@ -117,20 +118,20 @@ func (p *MzIdentML) Parse(f string) error {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(p); e != nil {
-		return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
+		logrus.Trace("Cannot decode XML file:", e)
 	}
 
-	return nil
+	return
 }
 
 // Parse is the main function for parsing pepxml data
-func (p *MzIdentML) Write() error {
+func (p *MzIdentML) Write() {
 
 	output := fmt.Sprintf("%s%sreport.mzid", sys.MetaDir(), string(filepath.Separator))
 
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create MzId report:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		logrus.Fatal("Cannot create MzId file:", e)
 	}
 	defer file.Close()
 
@@ -139,12 +140,12 @@ func (p *MzIdentML) Write() error {
 	enc := xml.NewEncoder(file)
 	enc.Indent("  ", "    ")
 
-	if err := enc.Encode(p); err != nil {
-		fmt.Printf("error: %v\n", err)
+	if e := enc.Encode(p); e != nil {
+		logrus.Trace("Cannot decode file:", e)
 	}
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return nil
+	return
 }

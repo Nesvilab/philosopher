@@ -31,34 +31,22 @@ func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 // RunLabelFreeQuantification is the top function for label free quantification
-func RunLabelFreeQuantification(p met.Quantify) *err.Error {
+func RunLabelFreeQuantification(p met.Quantify) {
 
 	var evi rep.Evidence
-	e := evi.RestoreGranular()
-	if e != nil {
-		return e
-	}
+	evi.RestoreGranular()
 
-	evi, e = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
-	if e != nil {
-		return e
-	}
+	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 
-	evi, e = calculateIntensities(evi)
-	if e != nil {
-		return e
-	}
+	evi = calculateIntensities(evi)
 
-	e = evi.SerializeGranular()
-	if e != nil {
-		return e
-	}
+	evi.SerializeGranular()
 
-	return nil
+	return
 }
 
 // RunTMTQuantification is the top function for label quantification
-func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
+func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
@@ -67,16 +55,10 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	logrus.Info("Restoring data")
 
 	var evi rep.Evidence
-	e := evi.RestoreGranular()
-	if e != nil {
-		return p, e
-	}
+	evi.RestoreGranular()
 
 	// removed all calculated defined values from before
-	evi, e = cleanPreviousData(evi, p.Plex)
-	if e != nil {
-		return p, e
-	}
+	evi = cleanPreviousData(evi, p.Plex)
 
 	// collect all used source file names
 	for _, i := range evi.PSM {
@@ -96,10 +78,7 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	// read the annotation file
 	p.LabelNames = make(map[string]string)
 	if len(p.Annot) > 0 {
-		p.LabelNames, e = getLabelNames(p.Annot)
-		if e != nil {
-			return p, e
-		}
+		p.LabelNames = getLabelNames(p.Annot)
 	}
 
 	logrus.Info("Calculating intensities and ion interference")
@@ -111,10 +90,7 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		e = mz.Read(fileName, false, false, false)
-		if e != nil {
-			return p, e
-		}
+		mz.Read(fileName, false, false, false)
 
 		// mz, e := getSpectra(p.Dir, p.Format, p.Level, sourceList[i])
 		// if e != nil {
@@ -125,26 +101,16 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 			mz.Spectra[i].Decode()
 		}
 
-		mappedPurity, _ := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
-		if e != nil {
-			return p, e
-		}
+		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 
 		//ms1 = raw.MS1{}
 
 		var labels = make(map[string]tmt.Labels)
 		if p.Level == 3 {
-			var labE error
-			labels, labE = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, mz)
-			if labE != nil {
-				return p, labE
-			}
+			labels = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, mz)
+
 		} else {
-			var labE error
-			labels, labE = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, mz)
-			if labE != nil {
-				return p, labE
-			}
+			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, mz)
 		}
 
 		//ms2 = raw.MS2{}
@@ -152,10 +118,7 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 
 		labels = assignLabelNames(labels, p.LabelNames)
 
-		mappedPSM, err := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
-		if err != nil {
-			return p, err
-		}
+		mappedPSM := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 
 		for _, j := range mappedPurity {
 			v, ok := psmMap[j.Spectrum]
@@ -211,79 +174,51 @@ func RunTMTQuantification(p met.Quantify, mods bool) (met.Quantify, error) {
 	logrus.Info("Saving")
 
 	// create EV PSM
-	e = rep.SerializeEVPSM(&evi)
-	if e != nil {
-		return p, e
-	}
+	rep.SerializeEVPSM(&evi)
 
 	// create EV Ion
-	e = rep.SerializeEVIon(&evi)
-	if e != nil {
-		return p, e
-	}
+	rep.SerializeEVIon(&evi)
 
 	// create EV Peptides
-	e = rep.SerializeEVPeptides(&evi)
-	if e != nil {
-		return p, e
-	}
-	// create EV Ion
-	e = rep.SerializeEVProteins(&evi)
-	if e != nil {
-		return p, e
-	}
+	rep.SerializeEVPeptides(&evi)
 
-	return p, nil
+	// create EV Ion
+	rep.SerializeEVProteins(&evi)
+
+	return p
 }
 
 // cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(evi rep.Evidence, plex string) (rep.Evidence, *err.Error) {
-
-	var e *err.Error
+func cleanPreviousData(evi rep.Evidence, plex string) rep.Evidence {
 
 	for i := range evi.PSM {
-		evi.PSM[i].Labels, e = tmt.New(plex)
-		if e != nil {
-			return evi, e
-		}
+		evi.PSM[i].Labels = tmt.New(plex)
 	}
 
 	for i := range evi.Ions {
-		evi.Ions[i].Labels, e = tmt.New(plex)
-		if e != nil {
-			return evi, e
-		}
+		evi.Ions[i].Labels = tmt.New(plex)
 	}
 
 	for i := range evi.Proteins {
-		evi.Proteins[i].TotalLabels, e = tmt.New(plex)
-		if e != nil {
-			return evi, e
-		}
+		evi.Proteins[i].TotalLabels = tmt.New(plex)
 
-		evi.Proteins[i].UniqueLabels, e = tmt.New(plex)
-		if e != nil {
-			return evi, e
-		}
+		evi.Proteins[i].UniqueLabels = tmt.New(plex)
 
-		evi.Proteins[i].URazorLabels, e = tmt.New(plex)
-		if e != nil {
-			return evi, e
-		}
+		evi.Proteins[i].URazorLabels = tmt.New(plex)
 
 	}
 
-	return evi, nil
+	return evi
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) (map[string]string, *err.Error) {
+func getLabelNames(annot string) map[string]string {
 
 	var labels = make(map[string]string)
 
 	file, e := os.Open(annot)
 	if e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		err.ReadFile(e)
 	}
 	defer file.Close()
 
@@ -296,10 +231,10 @@ func getLabelNames(annot string) (map[string]string, *err.Error) {
 	}
 
 	if e = scanner.Err(); e != nil {
-		return labels, &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
+		err.ReadFile(e)
 	}
 
-	return labels, nil
+	return labels
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName

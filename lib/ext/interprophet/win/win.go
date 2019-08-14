@@ -4,44 +4,46 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 )
 
 // WinInterProphetParser accessor
-func WinInterProphetParser(s string) error {
+func WinInterProphetParser(s string) {
 
-	bin, err := Asset("InterProphetParser.exe")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("InterProphetParser.exe")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy InterProphetParser")
+	if e != nil {
+		err.DeployAsset(errors.New("InterProphetParser"))
 	}
 
-	return nil
+	return
 }
 
 // LibgccDLL accessor
-func LibgccDLL(s string) error {
+func LibgccDLL(s string) {
 
-	bin, err := Asset("libgcc_s_dw2-1.dll")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("libgcc_s_dw2-1.dll")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy libgcc_s_dw2")
+	if e != nil {
+		err.DeployAsset(errors.New("libgcc_s_dw2"))
 	}
 
-	return nil
+	return
 }
 
 // Zlib1DLL accessor
-func Zlib1DLL(s string) error {
+func Zlib1DLL(s string) {
 
-	bin, err := Asset("zlib1.dll")
-	err = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e := Asset("zlib1.dll")
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
-	if err != nil {
-		return errors.New("Cannot deploy Zlib1DLL")
+	if e != nil {
+		err.DeployAsset(errors.New("Zlib1DLL")
 	}
 
-	return nil
+	return
 }

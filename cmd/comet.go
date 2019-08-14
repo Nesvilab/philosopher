@@ -16,17 +16,11 @@ var cometCmd = &cobra.Command{
 	Short: "Peptide spectrum matching with Comet",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		e := m.FunctionInitCheckUp()
-		if e != nil {
-			logrus.Fatal(e)
-		}
+		m.FunctionInitCheckUp()
 
 		logrus.Info("Executing Comet ", Version)
 
-		m, e = comet.Run(m, args)
-		if e != nil {
-			logrus.Fatal(e.Error())
-		}
+		m = comet.Run(m, args)
 
 		m.Serialize()
 

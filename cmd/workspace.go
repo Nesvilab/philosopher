@@ -20,10 +20,7 @@ var workspaceCmd = &cobra.Command{
 
 		logrus.Info("Executing Workspace ", Version)
 
-		e := wrk.Run(Version, Build, b, c, i, n)
-		if e != nil {
-			logrus.Fatal(e.Error())
-		}
+		wrk.Run(Version, Build, b, c, i, n)
 
 		logrus.Info("Done")
 		return

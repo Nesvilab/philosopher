@@ -5,14 +5,15 @@ import (
 	"compress/zlib"
 	"encoding/base64"
 	"encoding/binary"
-	"errors"
 	"io"
 	"math"
 	"strconv"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/psi"
+	"github.com/sirupsen/logrus"
 )
 
 // MsData top struct
@@ -79,13 +80,10 @@ func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
 // Read is the main function for parsing mzML data
-func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) *err.Error {
+func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 
 	var xml psi.IndexedMzML
-	e := xml.Parse(f)
-	if e != nil {
-		return &err.Error{Type: err.CannotOpenFile, Class: err.FATA, Argument: e.Error()}
-	}
+	xml.Parse(f)
 
 	p.FileName = f
 
@@ -109,24 +107,21 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) *err.Error {
 			continue
 		}
 
-		spectrum, e := processSpectrum(i)
-		if e != nil {
-			return &err.Error{Type: err.CannotParseXML, Class: err.FATA, Argument: e.Error()}
-		}
+		spectrum := processSpectrum(i)
 
 		spectra = append(spectra, spectrum)
 	}
 
 	if len(spectra) == 0 {
-		return &err.Error{Type: err.NoPSMFound, Class: err.FATA}
+		err.NoSpectraFound()
 	}
 
 	p.Spectra = spectra
 
-	return nil
+	return
 }
 
-func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
+func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 
 	var spec Spectrum
 
@@ -147,7 +142,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 		if string(j.Accession) == "MS:1000016" {
 			val, e := strconv.ParseFloat(j.Value, 64)
 			if e != nil {
-				return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+				err.CastFloatToString(e)
 			}
 			spec.ScanStartTime = val
 		}
@@ -187,7 +182,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000827" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.TargetIon = val
 			}
@@ -195,7 +190,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000828" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.IsolationWindowLowerOffset = val
 			}
@@ -203,7 +198,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000829" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.IsolationWindowUpperOffset = val
 			}
@@ -214,7 +209,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000744" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.SelectedIon = val
 			}
@@ -222,7 +217,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000041" {
 				val, e := strconv.Atoi(j.Value)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.ChargeState = val
 			}
@@ -230,7 +225,7 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 			if string(j.Accession) == "MS:1000042" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					return spec, &err.Error{Type: err.CannotConvertFloatToString, Class: err.FATA}
+					err.CastFloatToString(e)
 				}
 				spec.Precursor.PeakIntensity = val
 			}
@@ -250,9 +245,6 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 		} else if string(j.Accession) == "MS:1000576" {
 			spec.Mz.Compression = "0"
 		}
-
-		//spec.Mz.DecodedStream, _ = Decode("mz", mzSpec.BinaryDataArrayList.BinaryDataArray[0])
-		//spec.Mz.Stream = nil
 	}
 
 	spec.Intensity.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[1].Binary.Value
@@ -270,9 +262,6 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 		}
 	}
 
-	//spec.Intensity.DecodedStream, _ = Decode("int", mzSpec.BinaryDataArrayList.BinaryDataArray[1])
-	//spec.Intensity.Stream = nil
-
 	if mzSpec.BinaryDataArrayList.Count == 3 {
 		spec.IonMobility.Stream = mzSpec.BinaryDataArrayList.BinaryDataArray[2].Binary.Value
 		for _, j := range mzSpec.BinaryDataArrayList.BinaryDataArray[2].CVParam {
@@ -288,77 +277,30 @@ func processSpectrum(mzSpec psi.Spectrum) (Spectrum, *err.Error) {
 				spec.IonMobility.Compression = "0"
 			}
 		}
-
-		//spec.IonMobility.DecodedStream, _ = Decode("im", mzSpec.BinaryDataArrayList.BinaryDataArray[2])
-		//spec.IonMobility.Stream = nil
 	}
 
-	//spec.Decode()
-
-	return spec, nil
+	return spec
 }
 
 // Decode processes the binary data
-func (s *Spectrum) Decode() error {
+func (s *Spectrum) Decode() {
 
-	var err error
-
-	s.Mz.DecodedStream, err = readEncoded(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
+	s.Mz.DecodedStream = readEncoded(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
 	s.Mz.Stream = nil
-	if err != nil {
-		return err
-	}
 
-	s.Intensity.DecodedStream, err = readEncoded(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
+	s.Intensity.DecodedStream = readEncoded(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
 	s.Intensity.Stream = nil
-	if err != nil {
-		return err
-	}
 
 	if len(s.IonMobility.Stream) > 0 {
-		s.IonMobility.DecodedStream, err = readEncoded(s.IonMobility.Stream, s.IonMobility.Precision, s.IonMobility.Compression)
+		s.IonMobility.DecodedStream = readEncoded(s.IonMobility.Stream, s.IonMobility.Precision, s.IonMobility.Compression)
 		s.IonMobility.Stream = nil
-		if err != nil {
-			return err
-		}
 	}
 
-	return nil
+	return
 }
 
-// // Decode processes the binary data
-// func Decode(class string, bin mz.BinaryDataArray) ([]float64, error) {
-//
-// 	var compression bool
-// 	var precision string
-// 	var err error
-//
-// 	for i := range bin.CVParam {
-//
-// 		if string(bin.CVParam[i].Accession) == "MS:1000523" {
-// 			precision = "64"
-// 		} else if string(bin.CVParam[i].Accession) == "MS:1000521" {
-// 			precision = "32"
-// 		}
-//
-// 		if string(bin.CVParam[i].Accession) == "MS:1000574" {
-// 			compression = true
-// 		} else if string(bin.CVParam[i].Accession) == "MS:1000576" {
-// 			compression = false
-// 		}
-//
-// 	}
-//
-// 	f, err := readEncoded(class, bin, precision, compression)
-// 	if err != nil {
-// 		return f, err
-// 	}
-//
-// 	return f, nil
-// }
-
 // readEncoded transforms the binary data into float64 values
-func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) {
+func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 
 	var stream []uint8
 	var floatArray []float64
@@ -368,9 +310,9 @@ func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) 
 
 	var bytestream bytes.Buffer
 	if isCompressed == "1" {
-		r, err := zlib.NewReader(b64)
-		if err != nil {
-			return floatArray, err
+		r, e := zlib.NewReader(b64)
+		if e != nil {
+			err.ReadingMzMLZlib(e)
 		}
 		io.Copy(&bytestream, r)
 	} else {
@@ -406,62 +348,8 @@ func readEncoded(bin []byte, precision, isCompressed string) ([]float64, error) 
 			}
 		}
 	} else {
-		return floatArray, errors.New("Undefined binary precision")
+		logrus.Trace("Error trying to define mzML binary precision")
 	}
 
-	return floatArray, nil
+	return floatArray
 }
-
-// func readEncoded(class string, bin mz.BinaryDataArray, precision string, isCompressed bool) ([]float64, error) {
-//
-// 	var stream []uint8
-// 	var floatArray []float64
-//
-// 	b := bytes.NewReader(bin.Binary.Value)
-// 	b64 := base64.NewDecoder(base64.StdEncoding, b)
-//
-// 	var bytestream bytes.Buffer
-// 	if isCompressed == true {
-// 		r, err := zlib.NewReader(b64)
-// 		if err != nil {
-// 			return floatArray, err
-// 		}
-// 		io.Copy(&bytestream, r)
-// 	} else {
-// 		io.Copy(&bytestream, b64)
-// 	}
-//
-// 	dataArray := bytestream.Bytes()
-//
-// 	var counter int
-//
-// 	if precision == "32" {
-// 		for i := range dataArray {
-// 			counter++
-// 			stream = append(stream, dataArray[i])
-// 			if counter == 4 {
-// 				bits := binary.LittleEndian.Uint32(stream)
-// 				converted := math.Float32frombits(bits)
-// 				floatArray = append(floatArray, float64(converted))
-// 				stream = nil
-// 				counter = 0
-// 			}
-// 		}
-// 	} else if precision == "64" {
-// 		for i := range dataArray {
-// 			counter++
-// 			stream = append(stream, dataArray[i])
-// 			if counter == 8 {
-// 				bits := binary.LittleEndian.Uint64(stream)
-// 				converted := math.Float64frombits(bits)
-// 				floatArray = append(floatArray, float64(converted))
-// 				stream = nil
-// 				counter = 0
-// 			}
-// 		}
-// 	} else {
-// 		return floatArray, errors.New("Undefined binary precision")
-// 	}
-//
-// 	return floatArray, nil
-// }

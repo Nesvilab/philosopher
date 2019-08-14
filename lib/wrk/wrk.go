@@ -16,7 +16,7 @@ import (
 )
 
 // Run is the workspace main entry point
-func Run(Version, Build string, b, c, i, n bool) *err.Error {
+func Run(Version, Build string, b, c, i, n bool) {
 
 	if n == false {
 		gth.UpdateChecker(Version, Build)
@@ -29,75 +29,57 @@ func Run(Version, Build string, b, c, i, n bool) *err.Error {
 	if i == true {
 
 		logrus.Info("Creating workspace")
-		e := Init(Version, Build)
-		if e != nil {
-			if e.Class == "warning" {
-				logrus.Warn(e.Error())
-			}
-		}
-		return e
+		Init(Version, Build)
 
 	} else if b == true {
 
 		logrus.Info("Creating backup")
-		e := Backup()
-		if e != nil {
-			logrus.Warn(e.Error())
-		}
-		return e
+		Backup()
 
 	} else if c == true {
 
 		logrus.Info("Removing workspace")
-		e := Clean()
-		if e != nil {
-			logrus.Warn(e.Error())
-		}
-		return e
-
+		Clean()
 	}
 
-	return nil
+	return
 }
 
 // Init creates a new workspace
-func Init(version, build string) *err.Error {
+func Init(version, build string) {
 
 	var m met.Data
 	m.Restore(sys.Meta())
 
 	if len(m.UUID) > 1 && len(m.Home) > 1 {
-		return &err.Error{Type: err.CannotOverwriteMeta, Class: err.WARN}
+		err.OverwrittingMeta()
 	}
 
 	dir, e := os.Getwd()
 	if e != nil {
-		return &err.Error{Type: err.CannotStatLocalDirectory, Class: err.FATA, Argument: "check folder permissions"}
+		err.GettingLocalDir(e)
 	}
 
 	da := met.New(dir)
-	// if e != nil {
-	// 	logrus.Fatal(e.Error())
-	// }
 
 	da.Version = version
 	da.Build = build
 
 	os.Mkdir(da.MetaDir, sys.FilePermission())
 	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create meta directory; check folder permissions"}
+		err.CreatingMetaDirectory(e)
 	}
 
 	if runtime.GOOS == sys.Windows() {
 		e = HideFile(sys.MetaDir())
 		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-			return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't create meta directory; check folder permissions"}
+			err.CreatingMetaDirectory(e)
 		}
 	}
 
 	os.Mkdir(da.Temp, sys.FilePermission())
 	if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
-		return &err.Error{Type: err.CannotCreateDirectory, Class: err.FATA, Argument: "Can't find temporary directory; check folder permissions"}
+		err.LocatingTemDirecotry(e)
 	}
 
 	da.Home = fmt.Sprintf("%s", da.Home)
@@ -105,17 +87,17 @@ func Init(version, build string) *err.Error {
 
 	da.Serialize()
 
-	return nil
+	return
 }
 
 // Backup collects all binary files from the workspace and zips them
-func Backup() *err.Error {
+func Backup() {
 
 	var m met.Data
 	m.Restore(sys.Meta())
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {
-		return &err.Error{Type: err.CannotFindMetaDirectory, Class: err.FATA}
+		err.LocatingMetaDirecotry()
 	}
 
 	var name string
@@ -133,29 +115,29 @@ func Backup() *err.Error {
 
 	e := zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
 	if e != nil {
-		return &err.Error{Type: err.CannotZipMetaDirectory, Class: err.FATA}
+		err.ArchivingMetaDirecotry(e)
 	}
 
-	return nil
+	return
 }
 
 // Clean deletes all meta data and the workspace directory
-func Clean() *err.Error {
+func Clean() {
 
 	var d met.Data
 	d.Restore(sys.Meta())
 
 	e := os.RemoveAll(sys.MetaDir())
 	if e != nil {
-		return &err.Error{Type: err.CannotDeleteMetaDirectory, Class: err.FATA, Argument: e.Error()}
+		err.DeletingMetaDirecotry(e)
 	}
 
 	if len(d.Temp) > 0 {
 		e := os.RemoveAll(d.Temp)
 		if e != nil {
-			return &err.Error{Type: err.CannotDeleteMetaDirectory, Class: err.FATA, Argument: e.Error()}
+			err.DeletingMetaDirecotry(e)
 		}
 	}
 
-	return nil
+	return
 }
