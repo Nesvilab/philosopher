@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -14,7 +15,7 @@ func UnixBatchCoverage(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("batchcoverage")
+		err.DeployAsset(errors.New("batchcoverage"))
 	}
 
 	return
@@ -27,7 +28,7 @@ func UnixDatabaseParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("DatabaseParser")
+		err.DeployAsset(errors.New("DatabaseParser"))
 	}
 
 	return
@@ -40,7 +41,7 @@ func UnixProteinProphet(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("ProteinProphet")
+		err.DeployAsset(errors.New("ProteinProphet"))
 	}
 
 	return
