@@ -1,6 +1,7 @@
 package met
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -388,8 +388,6 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Print      bool
-	//Parallel   bool
-	//Dataset    string
 }
 
 // New initializes the structure with the system information needed
@@ -449,12 +447,12 @@ func (d *Data) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		logrus.Trace("Cannot serialize data")
+		err.MarshalFile(e)
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
-		logrus.Trace("Cannot write serial data")
+		err.WriteFile(e)
 	}
 
 	return
@@ -465,16 +463,16 @@ func (d *Data) Restore(f string) {
 
 	b, e := ioutil.ReadFile(f)
 	if e != nil {
-		logrus.Trace("Cannot restore serial data")
+		err.ReadFile(e)
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		logrus.Trace("Cannot unmarshal serial data")
+		err.DecodeMsgPck(e)
 	}
 
 	if len(d.UUID) < 1 {
-		logrus.Fatal("Serial data has no UUID")
+		err.WarnCustom(errors.New("The current directory has no Workspace"))
 	}
 
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
@@ -489,12 +487,12 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		logrus.Fatal("Workspace not found")
+		err.WorkspaceNotFound(errors.New(""))
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
 		os.Mkdir(d.Temp, sys.FilePermission())
-		logrus.Fatal("Cannot create temporary directory, check folder permissions")
+		err.LocatingTemDirecotry(e)
 	}
 
 	return

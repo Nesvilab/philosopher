@@ -1,6 +1,7 @@
 package wrk
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,7 +24,7 @@ func Run(Version, Build string, b, c, i, n bool) {
 	}
 
 	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
-		logrus.Fatal("this command accepts only one parameter")
+		err.FatalCustom(errors.New("this command accepts only one parameter"))
 	}
 
 	if i == true {

@@ -117,6 +117,11 @@ func ExecutingBinary(e error) {
 	logrus.Fatal("Cannot execute program: ", e)
 }
 
+// WorkspaceNotFound : FATAL call when trying to locate a workspace
+func WorkspaceNotFound(e error) {
+	logrus.Fatal("Workspace not found: ", e)
+}
+
 // GettingLocalDir : FATAL call when trying to pinpoint current directory
 func GettingLocalDir(e error) {
 	logrus.Fatal("Cannot verify local directory path: ", e)
