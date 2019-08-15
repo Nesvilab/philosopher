@@ -3,6 +3,7 @@ package wrk
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -14,6 +15,7 @@ import (
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Run is the workspace main entry point
@@ -50,40 +52,44 @@ func Run(Version, Build string, b, c, i, n bool) {
 func Init(version, build string) {
 
 	var m met.Data
-	m.Restore(sys.Meta())
+
+	b, _ := ioutil.ReadFile(sys.Meta())
+
+	msgpack.Unmarshal(b, &m)
 
 	if len(m.UUID) > 1 && len(m.Home) > 1 {
 		err.OverwrittingMeta()
+	} else {
+
+		dir, e := os.Getwd()
+		if e != nil {
+			err.GettingLocalDir(e)
+		}
+
+		da := met.New(dir)
+
+		da.Version = version
+		da.Build = build
+
+		os.Mkdir(da.MetaDir, sys.FilePermission())
+		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
+			err.CreatingMetaDirectory(e)
+		}
+
+		if runtime.GOOS == sys.Windows() {
+			HideFile(sys.MetaDir())
+		}
+
+		os.Mkdir(da.Temp, sys.FilePermission())
+		if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
+			err.LocatingTemDirecotry(e)
+		}
+
+		da.Home = fmt.Sprintf("%s", da.Home)
+		da.MetaDir = fmt.Sprintf("%s", da.MetaDir)
+
+		da.Serialize()
 	}
-
-	dir, e := os.Getwd()
-	if e != nil {
-		err.GettingLocalDir(e)
-	}
-
-	da := met.New(dir)
-
-	da.Version = version
-	da.Build = build
-
-	os.Mkdir(da.MetaDir, sys.FilePermission())
-	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-		err.CreatingMetaDirectory(e)
-	}
-
-	if runtime.GOOS == sys.Windows() {
-		HideFile(sys.MetaDir())
-	}
-
-	os.Mkdir(da.Temp, sys.FilePermission())
-	if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
-		err.LocatingTemDirecotry(e)
-	}
-
-	da.Home = fmt.Sprintf("%s", da.Home)
-	da.MetaDir = fmt.Sprintf("%s", da.MetaDir)
-
-	da.Serialize()
 
 	return
 }

@@ -475,6 +475,7 @@ func (d *Data) Restore(f string) {
 		err.WarnCustom(errors.New("The current directory has no Workspace"))
 	}
 
+	// checks if the temp is still there, if not recreate it
 	if _, err := os.Stat(d.Temp); os.IsNotExist(err) {
 		os.Mkdir(d.Temp, sys.FilePermission())
 	}
@@ -483,7 +484,7 @@ func (d *Data) Restore(f string) {
 }
 
 // FunctionInitCheckUp does initilization checkup and verification if meta and temp folders are up.
-// In case not, meta troews an error and folder is created.
+// In case not, meta trows an error and folder is created.
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {

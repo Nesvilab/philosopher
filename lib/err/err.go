@@ -7,19 +7,9 @@ func WarnCustom(e error) {
 	logrus.Warn(e)
 }
 
-// OverwrittingMeta : Warn call when trying to execute external binaries
+// OverwrittingMeta : WARN call when trying to execute external binaries
 func OverwrittingMeta() {
 	logrus.Warn("A meta data folder was found and will not be overwritten")
-}
-
-// Plotter : WARN call for faled plotter instantiation
-func Plotter(e error) {
-	logrus.Fatal("Could not instantiate plotter: ", e)
-}
-
-// ErrorCustom : ERROR call for custom cases
-func ErrorCustom(e error) {
-	logrus.Error(e)
 }
 
 // MarshalFile : TRACE call for a failed Marshaling event
@@ -40,6 +30,16 @@ func CopyingFile(e error) {
 // CastFloatToString : TRACE call when trying to cast a float number to string
 func CastFloatToString(e error) {
 	logrus.Trace("Cannot cast float information to string")
+}
+
+// ErrorCustom : ERROR call for custom cases
+func ErrorCustom(e error) {
+	logrus.Error(e)
+}
+
+// Plotter : WARN call for faled plotter instantiation
+func Plotter(e error) {
+	logrus.Fatal("Could not instantiate plotter: ", e)
 }
 
 // ReadFile : FATAL call for file not found
