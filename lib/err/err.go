@@ -82,6 +82,11 @@ func NoParametersFound(e error) {
 	logrus.Fatal("Missing input parameters: ", e)
 }
 
+// DatabaseNotFound : FATAL call for a missing database file
+func DatabaseNotFound(e error) {
+	logrus.Fatal("Database not found: ", e)
+}
+
 // NoSpectraFound : FATAL call empty Spectra structs
 func NoSpectraFound() {
 	logrus.Fatal("No Spectra was found in data set")

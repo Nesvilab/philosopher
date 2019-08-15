@@ -651,7 +651,7 @@ func (p *PepIDList) Serialize(level string) {
 }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (p *PepIDList) Restore(level string) error {
+func (p *PepIDList) Restore(level string) {
 
 	var dest string
 
@@ -675,5 +675,5 @@ func (p *PepIDList) Restore(level string) error {
 		err.DecodeMsgPck(e)
 	}
 
-	return nil
+	return
 }

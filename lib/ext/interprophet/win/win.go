@@ -42,7 +42,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("Zlib1DLL")
+		err.DeployAsset(errors.New("Zlib1DLL"))
 	}
 
 	return

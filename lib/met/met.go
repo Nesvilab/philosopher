@@ -8,6 +8,8 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -403,10 +405,8 @@ func New(h string) Data {
 	d.OS = runtime.GOOS
 	d.Arch = runtime.GOARCH
 
-	distro, e := sys.GetLinuxFlavor()
-	if e != nil {
-		logrus.Fatal(e)
-	}
+	distro := sys.GetLinuxFlavor()
+
 	d.Distro = distro
 
 	d.Home = h
@@ -417,7 +417,7 @@ func New(h string) Data {
 
 	d.DB = d.Home + string(filepath.Separator) + sys.DBBin()
 
-	temp, e := sys.GetTemp()
+	temp := sys.GetTemp()
 	temp += string(filepath.Separator) + uuid
 	d.Temp = temp
 
@@ -428,22 +428,20 @@ func New(h string) Data {
 }
 
 // CleanTemp removes all files from the given temp directory
-func CleanTemp(dir string) error {
+func CleanTemp(dir string) {
 
-	//os.RemoveAll(tmp)
-
-	files, err := filepath.Glob(filepath.Join(dir, "*"))
-	if err != nil {
-		return err
+	files, e := filepath.Glob(filepath.Join(dir, "*"))
+	if e != nil {
+		err.ErrorCustom(e)
 	}
 	for _, file := range files {
-		err = os.RemoveAll(file)
-		if err != nil {
-			return err
+		e = os.RemoveAll(file)
+		if e != nil {
+			err.ErrorCustom(e)
 		}
 	}
 
-	return nil
+	return
 }
 
 // Serialize converts the whole structure to a gob file

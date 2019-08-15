@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
 
@@ -69,22 +71,22 @@ type Commands struct {
 	TMTIntegrator  string `yaml:"tmtintegrator"`
 }
 
-// DeployParameterFile ...
-func DeployParameterFile(temp string) (string, error) {
+// DeployParameterFile deploys the pipeline yaml config file
+func DeployParameterFile(temp string) string {
 
 	file := temp + string(filepath.Separator) + "philosopher.yml"
 
-	param, err := Asset("philosopher.yml")
-	if err != nil {
-		return file, errors.New("Cannot deploy pipeline configuration file")
+	param, e := Asset("philosopher.yml")
+	if e != nil {
+		err.DeployAsset(errors.New("pipeline configuration file"))
 	}
 
-	err = ioutil.WriteFile(file, param, sys.FilePermission())
-	if err != nil {
-		return file, errors.New("Cannot write pipeline parameter file")
+	e = ioutil.WriteFile(file, param, sys.FilePermission())
+	if e != nil {
+		err.DeployAsset(errors.New("pipeline configuration file"))
 	}
 
-	return file, nil
+	return file
 }
 
 // InitializeWorkspaces moves inside each data folder and initializes the Workspace with a database
@@ -483,10 +485,7 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 			meta.Abacus.Labels = true
 		}
 
-		err := aba.Run(meta, data)
-		if err != nil {
-			logrus.Fatal(err)
-		}
+		aba.Run(meta, data)
 	}
 
 	return meta

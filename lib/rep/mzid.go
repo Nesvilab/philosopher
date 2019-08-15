@@ -12,7 +12,7 @@ import (
 )
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded
-func (e Evidence) MzIdentMLReport(version, database string) error {
+func (e Evidence) MzIdentMLReport(version, database string) {
 
 	var mzid psi.MzIdentML
 
@@ -36,9 +36,6 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	// load the database
 	var dtb dat.Base
 	dtb.Restore()
-	// if len(dtb.Records) < 1 {
-	// 	return f, errors.New("Database data not available, interrupting processing")
-	// }
 
 	// spectra evidence reference map
 	var specRef = make(map[string]string)
@@ -1099,5 +1096,5 @@ func (e Evidence) MzIdentMLReport(version, database string) error {
 	// Burn!
 	mzid.Write()
 
-	return nil
+	return
 }

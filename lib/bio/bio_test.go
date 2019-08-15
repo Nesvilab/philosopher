@@ -1,8 +1,6 @@
 package bio_test
 
 import (
-	"errors"
-
 	. "github.com/prvst/philosopher/lib/bio"
 
 	. "github.com/onsi/ginkgo"
@@ -14,7 +12,7 @@ var _ = Describe("Bio", func() {
 	Context("Amino acid instantiation", func() {
 
 		It("Alanine", func() {
-			a, _ := New("Alanine")
+			a := New("Alanine")
 			Expect(a.Code).To(Equal("A"))
 			Expect(a.ShortName).To(Equal("Ala"))
 			Expect(a.Name).To(Equal("Alanine"))
@@ -23,7 +21,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Arginine", func() {
-			a, _ := New("Arginine")
+			a := New("Arginine")
 			Expect(a.Code).To(Equal("R"))
 			Expect(a.ShortName).To(Equal("Arg"))
 			Expect(a.Name).To(Equal("Arginine"))
@@ -32,7 +30,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Asparagine", func() {
-			a, _ := New("Asparagine")
+			a := New("Asparagine")
 			Expect(a.Code).To(Equal("N"))
 			Expect(a.ShortName).To(Equal("Asn"))
 			Expect(a.Name).To(Equal("Asparagine"))
@@ -41,7 +39,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Aspartic Acid", func() {
-			a, _ := New("Aspartic Acid")
+			a := New("Aspartic Acid")
 			Expect(a.Code).To(Equal("D"))
 			Expect(a.ShortName).To(Equal("Asp"))
 			Expect(a.Name).To(Equal("Aspartic Acid"))
@@ -50,7 +48,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Cysteine", func() {
-			a, _ := New("Cysteine")
+			a := New("Cysteine")
 			Expect(a.Code).To(Equal("C"))
 			Expect(a.ShortName).To(Equal("Cys"))
 			Expect(a.Name).To(Equal("Cysteine"))
@@ -59,7 +57,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Glutamine", func() {
-			a, _ := New("Glutamine")
+			a := New("Glutamine")
 			Expect(a.Code).To(Equal("E"))
 			Expect(a.ShortName).To(Equal("Glu"))
 			Expect(a.Name).To(Equal("Glutamine"))
@@ -68,7 +66,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Glutamic Acid", func() {
-			a, _ := New("Glutamic Acid")
+			a := New("Glutamic Acid")
 			Expect(a.Code).To(Equal("Q"))
 			Expect(a.ShortName).To(Equal("Gln"))
 			Expect(a.Name).To(Equal("Glutamic Acid"))
@@ -77,7 +75,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Glycine", func() {
-			a, _ := New("Glycine")
+			a := New("Glycine")
 			Expect(a.Code).To(Equal("G"))
 			Expect(a.ShortName).To(Equal("Gly"))
 			Expect(a.Name).To(Equal("Glycine"))
@@ -86,7 +84,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Histidine", func() {
-			a, _ := New("Histidine")
+			a := New("Histidine")
 			Expect(a.Code).To(Equal("H"))
 			Expect(a.ShortName).To(Equal("His"))
 			Expect(a.Name).To(Equal("Histidine"))
@@ -95,7 +93,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Isoleucine", func() {
-			a, _ := New("Isoleucine")
+			a := New("Isoleucine")
 			Expect(a.Code).To(Equal("I"))
 			Expect(a.ShortName).To(Equal("Ile"))
 			Expect(a.Name).To(Equal("Isoleucine"))
@@ -104,7 +102,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Leucine", func() {
-			a, _ := New("Leucine")
+			a := New("Leucine")
 			Expect(a.Code).To(Equal("L"))
 			Expect(a.ShortName).To(Equal("Leu"))
 			Expect(a.Name).To(Equal("Leucine"))
@@ -113,7 +111,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Lysine", func() {
-			a, _ := New("Lysine")
+			a := New("Lysine")
 			Expect(a.Code).To(Equal("K"))
 			Expect(a.ShortName).To(Equal("Lys"))
 			Expect(a.Name).To(Equal("Lysine"))
@@ -122,7 +120,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Methionine", func() {
-			a, _ := New("Methionine")
+			a := New("Methionine")
 			Expect(a.Code).To(Equal("M"))
 			Expect(a.ShortName).To(Equal("Met"))
 			Expect(a.Name).To(Equal("Methionine"))
@@ -131,7 +129,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Phenylalanine", func() {
-			a, _ := New("Phenylalanine")
+			a := New("Phenylalanine")
 			Expect(a.Code).To(Equal("F"))
 			Expect(a.ShortName).To(Equal("Phe"))
 			Expect(a.Name).To(Equal("Phenylalanine"))
@@ -140,7 +138,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Proline", func() {
-			a, _ := New("Proline")
+			a := New("Proline")
 			Expect(a.Code).To(Equal("P"))
 			Expect(a.ShortName).To(Equal("Pro"))
 			Expect(a.Name).To(Equal("Proline"))
@@ -149,7 +147,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Serine", func() {
-			a, _ := New("Serine")
+			a := New("Serine")
 			Expect(a.Code).To(Equal("S"))
 			Expect(a.ShortName).To(Equal("Ser"))
 			Expect(a.Name).To(Equal("Serine"))
@@ -158,7 +156,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Threonine", func() {
-			a, _ := New("Threonine")
+			a := New("Threonine")
 			Expect(a.Code).To(Equal("T"))
 			Expect(a.ShortName).To(Equal("Thr"))
 			Expect(a.Name).To(Equal("Threonine"))
@@ -167,7 +165,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Tryptophan", func() {
-			a, _ := New("Tryptophan")
+			a := New("Tryptophan")
 			Expect(a.Code).To(Equal("W"))
 			Expect(a.ShortName).To(Equal("Trp"))
 			Expect(a.Name).To(Equal("Tryptophan"))
@@ -176,7 +174,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Tyrosine", func() {
-			a, _ := New("Tyrosine")
+			a := New("Tyrosine")
 			Expect(a.Code).To(Equal("Y"))
 			Expect(a.ShortName).To(Equal("Tyr"))
 			Expect(a.Name).To(Equal("Tyrosine"))
@@ -185,7 +183,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Valine", func() {
-			a, _ := New("Valine")
+			a := New("Valine")
 			Expect(a.Code).To(Equal("V"))
 			Expect(a.ShortName).To(Equal("Val"))
 			Expect(a.Name).To(Equal("Valine"))
@@ -194,8 +192,7 @@ var _ = Describe("Bio", func() {
 		})
 
 		It("Invalid", func() {
-			_, err := New("Foobar")
-			Expect(err).To(Equal(errors.New("Amino acid not found")))
+			New("Foobar")
 		})
 	})
 

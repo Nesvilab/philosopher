@@ -24,7 +24,6 @@ var _ = Describe("Met", func() {
 			dir, e = os.Getwd()
 			Expect(e).NotTo(HaveOccurred())
 			d = New(dir)
-			Expect(e).NotTo(HaveOccurred())
 		})
 
 		It("UUID", func() {
@@ -65,7 +64,7 @@ var _ = Describe("Met", func() {
 		})
 
 		It("Temp Directory", func() {
-			temp, e := sys.GetTemp()
+			temp := sys.GetTemp()
 			Expect(e).NotTo(HaveOccurred())
 			temp += string(filepath.Separator) + d.UUID
 			Expect(d.Temp).To(Equal(temp))

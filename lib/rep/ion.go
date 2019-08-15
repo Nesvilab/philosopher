@@ -18,13 +18,12 @@ import (
 )
 
 // AssembleIonReport reports consist on ion reporting
-func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
+func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
 	var psmIonMap = make(map[string][]string)
 	var bestProb = make(map[string]float64)
-	var err error
 
 	var ionMods = make(map[string][]mod.Modification)
 
@@ -101,7 +100,7 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) error {
 	sort.Sort(list)
 	e.Ions = list
 
-	return err
+	return
 }
 
 // PeptideIonReport reports consist on ion reporting

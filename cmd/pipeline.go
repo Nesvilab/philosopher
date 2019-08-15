@@ -40,10 +40,7 @@ var pipelineCmd = &cobra.Command{
 			logrus.Info("Can't find temporary directory; check folder permissions")
 		}
 
-		param, e := pip.DeployParameterFile(meta.Temp)
-		if e != nil {
-			logrus.Fatal(e.Error())
-		}
+		param := pip.DeployParameterFile(meta.Temp)
 
 		if m.Pipeline.Print == true {
 			logrus.Info("Printing parameter file")

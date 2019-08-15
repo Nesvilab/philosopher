@@ -5,7 +5,7 @@ import (
 )
 
 // AssembleSearchParameters organizes the aprameters defined by the search engine
-func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) error {
+func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) {
 
 	for _, i := range params {
 		if i.Name == "MSFragger" {
@@ -163,5 +163,5 @@ func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) error {
 		}
 	}
 
-	return nil
+	return
 }

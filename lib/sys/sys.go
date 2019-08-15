@@ -4,16 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // GetHome returns the user home directory name
-func GetHome() (string, error) {
+func GetHome() string {
 
 	var home string
 
@@ -25,15 +26,14 @@ func GetHome() (string, error) {
 	} else if runtime.GOOS == Linux() {
 		home = os.Getenv("HOME")
 	} else {
-		return "", errors.New("Cannot define your operating system")
+		err.FatalCustom(errors.New("Cannot define your operating system"))
 	}
 
-	return home, nil
+	return home
 }
 
 // GetTemp retirves the temporary directory name
-func GetTemp() (string, error) {
-
+func GetTemp() string {
 	var tmp string
 
 	if runtime.GOOS == Windows() {
@@ -41,14 +41,14 @@ func GetTemp() (string, error) {
 	} else if runtime.GOOS == Linux() {
 		tmp = "/tmp"
 	} else {
-		return "", errors.New("Cannot define your operating system")
+		err.FatalCustom(errors.New("Cannot define your operating system"))
 	}
 
-	return tmp, nil
+	return tmp
 }
 
 // GetLinuxFlavor returns the Linux flavor by looking into the lsb_release
-func GetLinuxFlavor() (string, error) {
+func GetLinuxFlavor() string {
 
 	var flavor string
 
@@ -70,40 +70,40 @@ func GetLinuxFlavor() (string, error) {
 		flavor = Windows()
 	}
 
-	return flavor, nil
+	return flavor
 }
 
 // CopyFile emulates a system copy function. The function needs
 // the full qualified names for both origin and destination
-func CopyFile(from, to string) error {
+func CopyFile(from, to string) {
 
 	// Open original file
-	originalFile, err := os.Open(from)
-	if err != nil {
-		log.Fatal(err)
+	originalFile, e := os.Open(from)
+	if e != nil {
+		err.ReadFile(e)
 	}
 	defer originalFile.Close()
 
 	// Create new file
-	newFile, err := os.Create(to)
-	if err != nil {
-		log.Fatal(err)
+	newFile, e := os.Create(to)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer newFile.Close()
 
 	// Copy the bytes to destination from source
-	_, err = io.Copy(newFile, originalFile)
-	if err != nil {
-		return errors.New("Error copying file")
+	_, e = io.Copy(newFile, originalFile)
+	if e != nil {
+		err.CopyingFile(e)
 	}
 
 	// Commit the file contents
-	err = newFile.Sync()
-	if err != nil {
-		return err
+	e = newFile.Sync()
+	if e != nil {
+		err.FatalCustom(e)
 	}
 
-	return nil
+	return
 }
 
 // Meta file

@@ -2,17 +2,21 @@
 
 package wrk
 
-import "syscall"
+import (
+	"syscall"
+
+	"github.com/prvst/philosopher/lib/err"
+)
 
 // HideFile makes the .meta folder hidden on Windows
-func HideFile(filename string) error {
-	filenameW, err := syscall.UTF16PtrFromString(filename)
-	if err != nil {
-		return err
+func HideFile(filename string) {
+	filenameW, e := syscall.UTF16PtrFromString(filename)
+	if e != nil {
+		err.FatalCustom(e)
 	}
-	err = syscall.SetFileAttributes(filenameW, syscall.FILE_ATTRIBUTE_HIDDEN)
-	if err != nil {
-		return err
+	e = syscall.SetFileAttributes(filenameW, syscall.FILE_ATTRIBUTE_HIDDEN)
+	if e != nil {
+		err.ErrorCustom(e)
 	}
-	return nil
+	return
 }

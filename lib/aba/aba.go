@@ -1,9 +1,10 @@
 package aba
 
 import (
+	"errors"
+
 	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
-	"github.com/sirupsen/logrus"
 )
 
 // DataSetLabelNames maps all custom names to each TMT tags
@@ -17,7 +18,7 @@ type DataSetLabelNames struct {
 func Run(m met.Data, args []string) {
 
 	if m.Abacus.Peptide == false && m.Abacus.Protein == false {
-		err.FatalCustom(errors.New("You need to specify a peptide or protein combined file for the Abacus analysis")
+		err.FatalCustom(errors.New("You need to specify a peptide or protein combined file for the Abacus analysis"))
 	}
 
 	if m.Abacus.Peptide == true {

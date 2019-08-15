@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
@@ -14,18 +16,18 @@ import (
 )
 
 // MapMods maps PSMs to modifications based on their mass shifts
-func (e *Evidence) MapMods() {
+func (evi *Evidence) MapMods() {
 
 	// 10 ppm
 	var tolerance = 0.01
 
 	o := obo.NewUniModOntology()
 
-	for i := range e.PSM {
+	for i := range evi.PSM {
 		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.PSM[i].Modifications.Index {
+			for k, v := range evi.PSM[i].Modifications.Index {
 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
 
 					updatedMod := v
@@ -37,7 +39,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.PSM[i].Modifications.Index[k] = updatedMod
+						evi.PSM[i].Modifications.Index[k] = updatedMod
 					}
 					if updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
@@ -45,7 +47,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.PSM[i].Modifications.Index[k] = updatedMod
+						evi.PSM[i].Modifications.Index[k] = updatedMod
 					}
 				}
 			}
@@ -53,11 +55,11 @@ func (e *Evidence) MapMods() {
 		}
 	}
 
-	for i := range e.Ions {
+	for i := range evi.Ions {
 		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.Ions[i].Modifications.Index {
+			for k, v := range evi.Ions[i].Modifications.Index {
 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
 
 					updatedMod := v
@@ -69,7 +71,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Ions[i].Modifications.Index[k] = updatedMod
+						evi.Ions[i].Modifications.Index[k] = updatedMod
 					}
 					if updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
@@ -77,7 +79,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Ions[i].Modifications.Index[k] = updatedMod
+						evi.Ions[i].Modifications.Index[k] = updatedMod
 					}
 				}
 			}
@@ -85,11 +87,11 @@ func (e *Evidence) MapMods() {
 		}
 	}
 
-	for i := range e.Peptides {
+	for i := range evi.Peptides {
 		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.Peptides[i].Modifications.Index {
+			for k, v := range evi.Peptides[i].Modifications.Index {
 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
 
 					updatedMod := v
@@ -102,7 +104,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Peptides[i].Modifications.Index[k] = updatedMod
+						evi.Peptides[i].Modifications.Index[k] = updatedMod
 					}
 					if updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
@@ -110,7 +112,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Peptides[i].Modifications.Index[k] = updatedMod
+						evi.Peptides[i].Modifications.Index[k] = updatedMod
 					}
 
 				}
@@ -119,11 +121,11 @@ func (e *Evidence) MapMods() {
 		}
 	}
 
-	for i := range e.Proteins {
+	for i := range evi.Proteins {
 		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
-			for k, v := range e.Proteins[i].Modifications.Index {
+			for k, v := range evi.Proteins[i].Modifications.Index {
 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
 
 					updatedMod := v
@@ -136,7 +138,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Proteins[i].Modifications.Index[k] = updatedMod
+						evi.Proteins[i].Modifications.Index[k] = updatedMod
 					}
 					if updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
@@ -144,7 +146,7 @@ func (e *Evidence) MapMods() {
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
 						updatedMod.IsobaricMods[j.Name]++
-						e.Proteins[i].Modifications.Index[k] = updatedMod
+						evi.Proteins[i].Modifications.Index[k] = updatedMod
 					}
 
 				}
@@ -157,7 +159,7 @@ func (e *Evidence) MapMods() {
 }
 
 // AssembleModificationReport cretaes the modifications lists
-func (e *Evidence) AssembleModificationReport() error {
+func (evi *Evidence) AssembleModificationReport() {
 
 	var modEvi ModificationEvidence
 
@@ -184,7 +186,7 @@ func (e *Evidence) AssembleModificationReport() error {
 	}
 
 	// calculate the total number of PSMs per cluster
-	for i := range e.PSM {
+	for i := range evi.PSM {
 
 		// the checklist will not allow the same PSM to be added multiple times to the
 		// same bin in case multiple identical mods are present in te sequence
@@ -196,13 +198,13 @@ func (e *Evidence) AssembleModificationReport() error {
 			// for assigned mods
 			// 0 here means something that doest not map to the pepXML header
 			// like multiple mods on n-term
-			for _, l := range e.PSM[i].Modifications.Index {
+			for _, l := range evi.PSM[i].Modifications.Index {
 
 				if l.MassDiff > bins[j].LowerMass && l.MassDiff <= bins[j].HigherRight && l.MassDiff != 0 {
 					_, ok := assignChecklist[l.MassDiff]
 					if !ok {
 						if l.Type == "Assigned" {
-							bins[j].AssignedMods = append(bins[j].AssignedMods, e.PSM[i])
+							bins[j].AssignedMods = append(bins[j].AssignedMods, evi.PSM[i])
 							assignChecklist[l.MassDiff] = 0
 						}
 					}
@@ -210,11 +212,11 @@ func (e *Evidence) AssembleModificationReport() error {
 			}
 
 			// for delta masses
-			if e.PSM[i].Massdiff > bins[j].LowerMass && e.PSM[i].Massdiff <= bins[j].HigherRight {
-				_, ok := obsChecklist[e.PSM[i].Massdiff]
+			if evi.PSM[i].Massdiff > bins[j].LowerMass && evi.PSM[i].Massdiff <= bins[j].HigherRight {
+				_, ok := obsChecklist[evi.PSM[i].Massdiff]
 				if !ok {
-					bins[j].ObservedMods = append(bins[j].ObservedMods, e.PSM[i])
-					obsChecklist[e.PSM[i].Massdiff] = 0
+					bins[j].ObservedMods = append(bins[j].ObservedMods, evi.PSM[i])
+					obsChecklist[evi.PSM[i].Massdiff] = 0
 				}
 			}
 
@@ -255,25 +257,22 @@ func (e *Evidence) AssembleModificationReport() error {
 		bins[i].CorrectedMass = uti.Round(bins[i].CorrectedMass, 5, 4)
 	}
 
-	//e.Modifications = modEvi
-	//e.Modifications.MassBins = bins
-
 	modEvi.MassBins = bins
-	e.Modifications = modEvi
+	evi.Modifications = modEvi
 
-	return nil
+	return
 }
 
 // ModificationReport ...
-func (e *Evidence) ModificationReport() {
+func (evi *Evidence) ModificationReport() {
 
 	// create result file
 	output := fmt.Sprintf("%s%smodifications.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Could not create report files"))
 	}
 	defer file.Close()
 
@@ -284,7 +283,7 @@ func (e *Evidence) ModificationReport() {
 		logrus.Fatal(n, err)
 	}
 
-	for _, i := range e.Modifications.MassBins {
+	for _, i := range evi.Modifications.MassBins {
 
 		line = fmt.Sprintf("%.4f\t%d\t%d",
 			i.CorrectedMass,
@@ -307,13 +306,13 @@ func (e *Evidence) ModificationReport() {
 }
 
 // PlotMassHist plots the delta mass histogram
-func (e *Evidence) PlotMassHist() error {
+func (evi *Evidence) PlotMassHist() {
 
 	outfile := fmt.Sprintf("%s%sdelta-mass.html", sys.MetaDir(), string(filepath.Separator))
 
-	file, err := os.Create(outfile)
-	if err != nil {
-		return errors.New("Could not create output for delta mass binning")
+	file, e := os.Create(outfile)
+	if e != nil {
+		err.WriteFile(errors.New("Could not create output for delta mass binning"))
 	}
 	defer file.Close()
 
@@ -321,7 +320,7 @@ func (e *Evidence) PlotMassHist() error {
 	var y1var []string
 	var y2var []string
 
-	for _, i := range e.Modifications.MassBins {
+	for _, i := range evi.Modifications.MassBins {
 		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
 		xvar = append(xvar, xel)
 		y1el := fmt.Sprintf("'%d',", len(i.AssignedMods))
@@ -358,12 +357,12 @@ func (e *Evidence) PlotMassHist() error {
 	io.WriteString(file, "</script>\n")
 	io.WriteString(file, "</body>")
 
-	if err != nil {
-		logrus.Warning("There was an error trying to plot the mass distribution")
+	if e != nil {
+		err.WarnCustom(errors.New("There was an error trying to plot the mass distribution"))
 	}
 
 	// copy to work directory
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
-	return nil
+	return
 }

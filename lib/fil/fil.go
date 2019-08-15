@@ -525,7 +525,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	var pid id.ProtIDList
 
 	// tagget / decoy / threshold
-	t, d, _ := proteinProfile(p)
+	t, d := proteinProfile(p)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
@@ -583,7 +583,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 }
 
 // proteinProfile ...
-func proteinProfile(p id.ProtXML) (t, d int, err error) {
+func proteinProfile(p id.ProtXML) (t, d int) {
 
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
@@ -595,7 +595,7 @@ func proteinProfile(p id.ProtXML) (t, d int, err error) {
 		}
 	}
 
-	return t, d, err
+	return t, d
 }
 
 // PickedFDR employs the picked FDR strategy
@@ -1096,7 +1096,7 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 
 	// get new protein list profile
 	//logrus.Info(protxml.ProteinProfileWithList(mirrorProteinList, pa.Tag, pa.Con))
-	t, d, _ := proteinProfileWithList(mirrorProteinList, decoyTag)
+	t, d := proteinProfileWithList(mirrorProteinList, decoyTag)
 	logrus.WithFields(logrus.Fields{
 		"target": t,
 		"decoy":  d,
@@ -1271,8 +1271,8 @@ func mirrorProteinList(p id.ProtIDList, decoyTag string) id.ProtIDList {
 	return list
 }
 
-// proteinProfileWithList ...
-func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t, d int, err error) {
+// proteinProfileWithList
+func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t, d int) {
 
 	for i := range list {
 		if cla.IsDecoyProtein(list[i], decoyTag) {
@@ -1281,6 +1281,5 @@ func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t
 			t++
 		}
 	}
-
-	return t, d, err
+	return t, d
 }

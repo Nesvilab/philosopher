@@ -17,7 +17,7 @@ import (
 
 // DataFormat defines different types of data formats from the SPC
 type DataFormat interface {
-	Parse() error
+	Parse()
 }
 
 // Parameter tag

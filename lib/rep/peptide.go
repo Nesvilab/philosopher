@@ -17,7 +17,7 @@ import (
 )
 
 // AssemblePeptideReport reports consist on ion reporting
-func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) error {
+func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 	var list PeptideEvidenceList
 	var pepSeqMap = make(map[string]bool) //is this a decoy
@@ -28,7 +28,6 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	var mappedProts = make(map[string][]string)
 	var bestProb = make(map[string]float64)
 	var pepMods = make(map[string][]mod.Modification)
-	var err error
 
 	for _, i := range pep {
 		if !cla.IsDecoyPSM(i, decoyTag) {
@@ -118,7 +117,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) erro
 	sort.Sort(list)
 	e.Peptides = list
 
-	return err
+	return
 }
 
 // PeptideReport reports consist on ion reporting

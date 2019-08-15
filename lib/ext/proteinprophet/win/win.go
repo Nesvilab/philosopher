@@ -3,69 +3,71 @@ package proteinprophet
 import (
 	"errors"
 	"io/ioutil"
+
+	"github.com/prvst/philosopher/lib/err"
 )
 
-// WinBatchCoverage ...
-func WinBatchCoverage(s string) error {
+// WinBatchCoverage deploys batchcoverage
+func WinBatchCoverage(s string) {
 
-	bin, err := Asset("batchcoverage.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	bin, e := Asset("batchcoverage.exe")
+	e = ioutil.WriteFile(s, bin, 0755)
 
-	if err != nil {
-		return errors.New("Cannot deploy batchcoverage")
+	if e != nil {
+		err.DeployAsset(errors.New("batchcoverage"))
 	}
 
-	return nil
+	return
 }
 
-// WinDatabaseParser ...
-func WinDatabaseParser(s string) error {
+// WinDatabaseParser deploys DatabaseParser
+func WinDatabaseParser(s string) {
 
-	bin, err := Asset("DatabaseParser.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	bin, e := Asset("DatabaseParser.exe")
+	e = ioutil.WriteFile(s, bin, 0755)
 
-	if err != nil {
-		return errors.New("Cannot deploy DatabaseParser")
+	if e != nil {
+		err.DeployAsset(errors.New("DatabaseParser"))
 	}
 
-	return nil
+	return
 }
 
-// WinProteinProphet ...
-func WinProteinProphet(s string) error {
+// WinProteinProphet deploys ProteinProphet.exe
+func WinProteinProphet(s string) {
 
-	bin, err := Asset("ProteinProphet.exe")
-	err = ioutil.WriteFile(s, bin, 0755)
+	bin, e := Asset("ProteinProphet.exe")
+	e = ioutil.WriteFile(s, bin, 0755)
 
-	if err != nil {
-		return errors.New("Cannot deploy ProteinProphet")
+	if e != nil {
+		err.DeployAsset(errors.New("ProteinProphet"))
 	}
 
-	return nil
+	return
 }
 
-// LibgccDLL ...
-func LibgccDLL(s string) error {
+// LibgccDLL deploys libgcc_s_dw2.dll
+func LibgccDLL(s string) {
 
-	bin, err := Asset("libgcc_s_dw2-1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	bin, e := Asset("libgcc_s_dw2-1.dll")
+	e = ioutil.WriteFile(s, bin, 0755)
 
-	if err != nil {
-		return errors.New("Cannot deploy libgcc_s_dw2")
+	if e != nil {
+		err.DeployAsset(errors.New("libgcc_s_dw2"))
 	}
 
-	return nil
+	return
 }
 
-// Zlib1DLL ...
-func Zlib1DLL(s string) error {
+// Zlib1DLL deploys zlib1.dll
+func Zlib1DLL(s string) {
 
-	bin, err := Asset("zlib1.dll")
-	err = ioutil.WriteFile(s, bin, 0755)
+	bin, e := Asset("zlib1.dll")
+	e = ioutil.WriteFile(s, bin, 0755)
 
-	if err != nil {
-		return errors.New("Cannot deploy Zlib1DLL")
+	if e != nil {
+		err.DeployAsset(errors.New("zlib1"))
 	}
 
-	return nil
+	return
 }

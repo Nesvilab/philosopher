@@ -71,10 +71,7 @@ func Init(version, build string) {
 	}
 
 	if runtime.GOOS == sys.Windows() {
-		e = HideFile(sys.MetaDir())
-		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-			err.CreatingMetaDirectory(e)
-		}
+		HideFile(sys.MetaDir())
 	}
 
 	os.Mkdir(da.Temp, sys.FilePermission())

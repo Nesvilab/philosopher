@@ -18,7 +18,7 @@ import (
 
 // DataFormat defines different data type from PSI
 type DataFormat interface {
-	Parse() error
+	Parse()
 }
 
 // SourceFile is a file from which this instance was created

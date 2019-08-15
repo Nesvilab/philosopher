@@ -22,4 +22,5 @@ func main() {
 	cmd.Build = build
 
 	cmd.Execute()
+
 }

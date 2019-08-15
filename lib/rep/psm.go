@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -8,16 +9,17 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/cla"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
-// AssemblePSMReport ...
-func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
+// AssemblePSMReport creates the PSM structure for reporting
+func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
 	var list PSMEvidenceList
 
@@ -92,31 +94,31 @@ func (e *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) error {
 	}
 
 	sort.Sort(list)
-	e.PSM = list
+	evi.PSM = list
 
-	return nil
+	return
 }
 
 // PSMReport report all psms from study that passed the FDR filter
-func (e *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Cannot create report file"))
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	if e != nil {
+		err.WriteToFile(errors.New("Cannot print PSM to file"))
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -141,7 +143,6 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		//TODO FIX MODS
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%e\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%d\t%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			i.Spectrum,
 			i.Peptide,
@@ -176,9 +177,9 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 			i.ProteinDescription,
 			strings.Join(mappedProteins, ", "),
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e)
 		}
 	}
 
@@ -189,14 +190,14 @@ func (e *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 }
 
 // PSMTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRazor, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer file.Close()
 
@@ -208,14 +209,14 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 		}
 	}
 
-	_, err = io.WriteString(file, header)
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, header)
+	if e != nil {
+		err.WriteToFile(e)
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -287,9 +288,9 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 			i.Labels.Channel10.Intensity,
 			i.Labels.Channel11.Intensity,
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e)
 		}
 	}
 
@@ -300,25 +301,25 @@ func (e *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, hasRa
 }
 
 // PSMFraggerReport report all psms from study that passed the FDR filter
-func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	if e != nil {
+		err.WriteToFile(e)
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -372,9 +373,9 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
 			i.ProteinDescription,
 			strings.Join(mappedProteins, ", "),
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e)
 		}
 	}
 
@@ -385,14 +386,14 @@ func (e *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool) {
 }
 
 // PSMTMTFraggerReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string, hasRazor, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer file.Close()
 
@@ -404,14 +405,14 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 		}
 	}
 
-	_, err = io.WriteString(file, header)
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, header)
+	if e != nil {
+		err.WriteToFile(e)
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -478,9 +479,9 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 			i.Labels.Channel10.Intensity,
 			i.Labels.Channel11.Intensity,
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e)
 		}
 	}
 
@@ -491,25 +492,25 @@ func (e *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag string
 }
 
 // PSMLocalizationReport report ptm localization based on PTMProphet outputs
-func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%slocalization.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e)
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tModification\tNumber of Sites\tObserved Mass Localization\n")
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tModification\tNumber of Sites\tObserved Mass Localization\n")
+	if e != nil {
+		err.WriteToFile(e)
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -531,9 +532,9 @@ func (e *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bo
 				i.LocalizedPTMSites[j],
 				i.LocalizedPTMMassDiff[j],
 			)
-			_, err = io.WriteString(file, line)
-			if err != nil {
-				logrus.Fatal("Cannot print PSM to file")
+			_, e = io.WriteString(file, line)
+			if e != nil {
+				err.WriteToFile(e)
 			}
 		}
 	}

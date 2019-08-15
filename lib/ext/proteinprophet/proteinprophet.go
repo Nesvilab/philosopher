@@ -145,10 +145,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 
 	// copy to work directory
 	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))
-	e = sys.CopyFile(output, dest)
-	if e != nil {
-		err.CopyingFile(e)
-	}
+	sys.CopyFile(output, dest)
 
 	// collect all resulting files
 	var processedOutput []string

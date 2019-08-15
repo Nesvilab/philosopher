@@ -3,18 +3,21 @@
 package wrk
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // HideFile makes the .meta folder hidden on Windows
-func HideFile(filename string) error {
+func HideFile(filename string) {
 	if !strings.HasPrefix(filepath.Base(filename), ".") {
-		err := os.Rename(filename, "."+filename)
-		if err != nil {
-			return err
+		e := os.Rename(filename, "."+filename)
+		if e != nil {
+			err.FatalCustom(errors.New("Cannot hide file"))
 		}
 	}
-	return nil
+	return
 }
