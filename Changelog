@@ -6,6 +6,7 @@
 ### Changed
 - Default PTMProphet EM value changed from 1 to 2.
 - idconvert and msconvert are now unavailable.
+- Abacus pepxml and protxml parameters dont require a value anymore.
 
 ### Fixed
 - Fixed a problem wih the PSM-to-Protein razor assingment.
