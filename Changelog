@@ -5,10 +5,12 @@
 
 ### Changed
 - Default PTMProphet EM value changed from 1 to 2.
+- idconvert and msconvert are now unavailable.
 
 ### Fixed
 - Fixed a problem wih the PSM-to-Protein razor assingment.
 - Small bugs and performance improvement.
+- The error library API was fixed after a core update.
 
 ## Snapcrat
 

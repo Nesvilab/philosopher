@@ -94,7 +94,6 @@ windows:
 
 .PHONY: draft
 draft:
-	ginkgo -r
 	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
 
 .PHONY: push
