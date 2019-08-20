@@ -1,6 +1,7 @@
-### Added
-### Changed
+<!-- ### Added -->
+<!-- ### Changed -->
 ### Fixed
+- Added other error classes to avoid fatal redirections
 
 ## Snapcrat
 

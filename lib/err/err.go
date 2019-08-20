@@ -2,6 +2,8 @@ package err
 
 import (
 	"fmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Custom call for custom cases
@@ -297,7 +299,22 @@ func ParsingFASTA(e error, t string) {
 // callLogrus returns the appropriate response for each erro type
 func callLogrus(m, t string) {
 
-	callLogrus(m, t)
+	switch t {
+	case "trace":
+		logrus.Trace(m)
+	case "debug":
+		logrus.Debug(m)
+	case "info":
+		logrus.Info(m)
+	case "warning":
+		logrus.Warning(m)
+	case "error":
+		logrus.Error(m)
+	case "fatal":
+		logrus.Fatal(m)
+	default:
+		logrus.Fatal(m)
+	}
 
 	return
 }

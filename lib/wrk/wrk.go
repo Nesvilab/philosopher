@@ -97,11 +97,15 @@ func Init(version, build string) {
 // Backup collects all binary files from the workspace and zips them
 func Backup() {
 
+	// this is a soft verification just to see if there is any existing file
 	var m met.Data
-	m.Restore(sys.Meta())
+	_, e := ioutil.ReadFile(sys.Meta())
+	if e != nil {
+		err.ReadFile(e, "warning")
+	}
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {
-		err.LocatingMetaDirecotry(errors.New(""), "warning")
+		err.LocatingMetaDirecotry(errors.New(""), "error")
 	}
 
 	var name string
@@ -117,9 +121,9 @@ func Backup() {
 	progress := func(archivePath string) {
 	}
 
-	e := zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
+	e = zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
 	if e != nil {
-		err.ArchivingMetaDirecotry(e, "warning")
+		err.ArchivingMetaDirecotry(e, "error")
 	}
 
 	return
