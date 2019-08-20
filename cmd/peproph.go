@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/peptideprophet"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ var peprophCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		logrus.Info("Executing PeptideProphet ", Version)
+		err.Executing("PeptideProphet ", Version)
 
 		peptideprophet.Run(m, args)
 		m.Serialize()
@@ -27,7 +27,7 @@ var peprophCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

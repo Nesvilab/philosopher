@@ -3,10 +3,11 @@ package cmd
 import (
 	"os"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,8 @@ var clusterCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		logrus.Info("Executing Cluster ", Version)
+		err.Executing("Cluster ", Version)
+
 		// run clustering
 		clu.GenerateReport(m)
 
@@ -28,7 +30,7 @@ var clusterCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 
 	"github.com/prvst/philosopher/lib/aba"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +20,10 @@ var abacusCmd = &cobra.Command{
 		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {
-			logrus.Fatal("The combined analysis needs at least 2 result files to work")
+			err.InputNotFound(errors.New("The combined analysis needs at least 2 result files to work"), "fatal")
 		}
 
-		logrus.Info("Executing Abacus ", Version)
+		err.Executing("Abacus", Version)
 		aba.Run(m, args)
 
 		// store parameters on meta data
@@ -31,7 +32,7 @@ var abacusCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

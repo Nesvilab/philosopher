@@ -329,9 +329,9 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	output := fmt.Sprintf("%s%scombined_peptide.tsv", session, string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e, "error")
 	}
 	defer file.Close()
 
@@ -343,9 +343,9 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 
 	line += "\n"
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e = io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -374,9 +374,9 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		}
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}

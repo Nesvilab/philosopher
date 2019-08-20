@@ -70,7 +70,7 @@ func Run(m met.Data, args []string) met.Data {
 	paramAbs, _ := filepath.Abs(m.Comet.Param)
 	binFile, e := ioutil.ReadFile(paramAbs)
 	if e != nil {
-		logrus.Fatal(e)
+		err.Custom(e, "fatal")
 	}
 	m.Comet.ParamFile = binFile
 

@@ -1,6 +1,10 @@
 package tmt
 
-import "github.com/sirupsen/logrus"
+import (
+	"errors"
+
+	"github.com/prvst/philosopher/lib/err"
+)
 
 // Labels main struct
 type Labels struct {
@@ -162,7 +166,7 @@ func New(plex string) Labels {
 		o.Channel10.Mz = 131.138180
 		o.Channel11.Mz = 131.144499
 	} else {
-		logrus.Fatal("Unknown multiplex setting, please define the plex number used in your experiment")
+		err.Custom(errors.New("Unknown multiplex setting, please define the plex number used in your experiment"), "error")
 	}
 
 	return o

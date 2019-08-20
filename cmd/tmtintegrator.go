@@ -3,10 +3,10 @@ package cmd
 import (
 	"os"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var tmtintegratorCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		logrus.Info("Executing TMT-Integrator ", Version)
+		err.Executing("TMT-Integrator ", Version)
 
 		m := tmtintegrator.Run(m, args)
 
@@ -27,7 +27,7 @@ var tmtintegratorCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 
 	},

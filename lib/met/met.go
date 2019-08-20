@@ -461,18 +461,12 @@ func (d *Data) Serialize() {
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Data) Restore(f string) {
 
-	b, e := ioutil.ReadFile(f)
-	if e != nil {
-		err.ReadFile(e, "fatal")
-	}
+	b, e1 := ioutil.ReadFile(f)
 
-	e = msgpack.Unmarshal(b, &d)
-	if e != nil {
-		err.DecodeMsgPck(e, "fatal")
-	}
+	e2 := msgpack.Unmarshal(b, &d)
 
-	if len(d.UUID) < 1 {
-		err.Custom(errors.New("The current directory has no Workspace"), "fatal")
+	if e1 != nil && e2 != nil && len(d.UUID) < 1 {
+		err.Custom(errors.New("The current directory has no Workspace"), "warning")
 	}
 
 	// checks if the temp is still there, if not recreate it

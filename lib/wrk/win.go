@@ -3,6 +3,7 @@
 package wrk
 
 import (
+	"errors"
 	"syscall"
 
 	"github.com/prvst/philosopher/lib/err"
@@ -12,11 +13,11 @@ import (
 func HideFile(filename string) {
 	filenameW, e := syscall.UTF16PtrFromString(filename)
 	if e != nil {
-		err.FatalCustom(e)
+		err.Custom(e, "fatal")
 	}
 	e = syscall.SetFileAttributes(filenameW, syscall.FILE_ATTRIBUTE_HIDDEN)
 	if e != nil {
-		err.ErrorCustom(e)
+		err.Custom(errors.New("Cannot hide file"), "error")
 	}
 	return
 }

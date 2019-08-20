@@ -57,11 +57,11 @@ func Run(m met.Data) met.Data {
 	}
 
 	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
-		logrus.Fatal("You need to provide a taxon ID or a custom FASTA file")
+		err.InputNotFound(errors.New("You need to provide a taxon ID or a custom FASTA file"), "fatal")
 	}
 
 	if m.Database.Crap == false {
-		logrus.Warning("Contaminants are not going to be added to database")
+		err.InputNotFound(errors.New("Contaminants are not going to be added to database"), "warning")
 	}
 
 	if len(m.Database.Custom) < 1 {
@@ -155,21 +155,21 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	// tries to create an output file
 	output, e := os.Create(d.UniProtDB)
 	if e != nil {
-		logrus.Fatal("Cannot create a local database file")
+		err.WriteFile(errors.New("Cannot create a local database file"), "fatal")
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		logrus.Fatal("UniProt query failed, please check your connection")
+		err.Custom(errors.New(("UniProt query failed, please check your connection"), "error")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		logrus.Fatal("UniProt download failed, please check your connection")
+		err.Custom(error.New("UniProt download failed, please check your connection"), "fatal")
 	}
 
 	return
@@ -309,12 +309,12 @@ func (d *Base) Restore() {
 
 	b, e := ioutil.ReadFile(sys.DBBin())
 	if e != nil {
-		err.MarshalFile(e, "fatal")
+		err.MarshalFile(e, "warning")
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		err.SerializeFile(e, "fatal")
+		err.SerializeFile(e, "warning")
 	}
 
 	return

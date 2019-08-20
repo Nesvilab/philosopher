@@ -15,7 +15,6 @@ import (
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // AssembleProteinReport ...
@@ -211,17 +210,17 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create protein report:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Cannot create protein report"), "error")
 	}
 	defer file.Close()
 
 	line := fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e = io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -296,9 +295,9 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 		)
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -316,9 +315,9 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Cannot create report file"), "error")
 	}
 	defer file.Close()
 
@@ -330,9 +329,9 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 		}
 	}
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e = io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -443,10 +442,9 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 				strings.Join(ip, ", "),
 			) // Indistinguishable Proteins
 
-			//			line += "\n"
-			n, err := io.WriteString(file, line)
-			if err != nil {
-				logrus.Fatal(n, err)
+			_, e = io.WriteString(file, line)
+			if e != nil {
+				err.WriteToFile(e, "fatal")
 			}
 		}
 	}
@@ -485,7 +483,7 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 		line := ">" + header + "\n" + i.Sequence + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+			err.WriteToFile(e, "fatal")
 		}
 	}
 

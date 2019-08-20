@@ -611,12 +611,12 @@ func (p *PepXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.PepxmlBin())
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		err.ReadFile(e, "warning")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		err.DecodeMsgPck(e, "warning")
 	}
 
 	return

@@ -29,7 +29,7 @@ func OverwrittingMeta(e error, t string) {
 // MarshalFile call for a failed Marshaling event
 func MarshalFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot read file: %s", e)
+	m := fmt.Sprintf("Cannot marshal file: %s", e)
 
 	callLogrus(m, t)
 
@@ -49,7 +49,7 @@ func SerializeFile(e error, t string) {
 // CopyingFile call when trying to copy files to another location
 func CopyingFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot copy or mvoe file: %s", e)
+	m := fmt.Sprintf("Cannot copy or move file: %s", e)
 
 	callLogrus(m, t)
 
@@ -130,6 +130,16 @@ func DeployAsset(e error, t string) {
 func DecodeMsgPck(e error, t string) {
 
 	m := fmt.Sprintf("Cannot decode packed binary: %s", e)
+
+	callLogrus(m, t)
+
+	return
+}
+
+// InputNotFound call empty parameters list
+func InputNotFound(e error, t string) {
+
+	m := fmt.Sprintf("Missing input file: %s", e)
 
 	callLogrus(m, t)
 
@@ -296,6 +306,26 @@ func ParsingFASTA(e error, t string) {
 	return
 }
 
+// Done call when a process is ready
+func Done() {
+
+	m := fmt.Sprintf("Done")
+
+	callLogrus(m, "info")
+
+	return
+}
+
+// Executing declares the command or program and the version
+func Executing(s, v string) {
+
+	m := fmt.Sprintf("Executing %s %s", s, v)
+
+	callLogrus(m, "info")
+
+	return
+}
+
 // callLogrus returns the appropriate response for each erro type
 func callLogrus(m, t string) {
 
@@ -313,7 +343,7 @@ func callLogrus(m, t string) {
 	case "fatal":
 		logrus.Fatal(m)
 	default:
-		logrus.Fatal(m)
+		logrus.Error(m)
 	}
 
 	return

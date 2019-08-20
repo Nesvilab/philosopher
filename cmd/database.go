@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/dat"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +16,14 @@ var databaseCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		logrus.Info("Executing Database ", Version)
+		err.Executing("Database ", Version)
 
 		m = dat.Run(m)
 
 		// store paramters on meta data
 		m.Serialize()
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

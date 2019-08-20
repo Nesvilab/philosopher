@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 	"strings"
+
+	"github.com/prvst/philosopher/lib/err"
 
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -22,24 +24,24 @@ var labelquantCmd = &cobra.Command{
 		m.Quantify.Format = "mzML"
 
 		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
-			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
+			err.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
 		if len(m.Quantify.Plex) < 1 {
-			logrus.Fatal("You need to especify the experiment Plex")
+			err.InputNotFound(errors.New("You need to especify the experiment Plex"), "fatal")
 		}
 
 		// hardcoded tmt for now
-		logrus.Info("Executing label-based quantification ", Version)
+		err.Executing("Isobaric-label quantification ", Version)
 		m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			logrus.Fatal("Only the mzML format is supported")
+			err.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			logrus.Fatal("Unknown file format")
+			err.InputNotFound(errors.New("Unknown file format"), "fatal")
 		}
 
 		m.Quantify = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
@@ -50,7 +52,7 @@ var labelquantCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

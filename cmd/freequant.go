@@ -1,13 +1,14 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -21,18 +22,18 @@ var freequant = &cobra.Command{
 
 		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {
-			logrus.Fatal("You need to provide the path to the mz files and the correct extension.")
+			err.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
-		logrus.Info("Executing label-free quantification ", Version)
+		err.Executing("Label-free quantification ", Version)
 
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			logrus.Fatal("Only the mzML format is supported")
+			err.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			logrus.Fatal("Unknown file format")
+			err.InputNotFound(errors.New("Unknown file format"), "fatal")
 		}
 
 		//forcing the larger time window to be the same as the smaller one
@@ -47,7 +48,7 @@ var freequant = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		logrus.Info("Done")
+		err.Done()
 		return
 	},
 }

@@ -146,7 +146,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			gobExtC := fmt.Sprintf("*.%s", p.Comet.RawExtension)
 			filesC, e := filepath.Glob(gobExtC)
 			if e != nil {
-				logrus.Fatal(e)
+				err.Custom(e, "fatal")
 			}
 
 			if len(filesC) > 0 {
@@ -162,7 +162,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
-				logrus.Fatal(e)
+				err.Custom(e, "fatal")
 			}
 
 			if len(filesM) > 0 {
@@ -223,7 +223,7 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
-					logrus.Fatal(e.Error())
+					err.Custom(e, "fatal")
 				}
 				peptideprophet.Run(meta, files)
 				meta.Serialize()

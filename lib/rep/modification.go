@@ -12,7 +12,6 @@ import (
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/prvst/philosopher/lib/uti"
-	"github.com/sirupsen/logrus"
 )
 
 // MapMods maps PSMs to modifications based on their mass shifts
@@ -272,15 +271,15 @@ func (evi *Evidence) ModificationReport() {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create report files"), "fatal")
+		err.WriteFile(errors.New("Could not create report files"), "error")
 	}
 	defer file.Close()
 
 	line := fmt.Sprintf("Mass Bin\tPSMs with Assigned Modifications\tPSMs with Observed Modifications\n")
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e = io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	for _, i := range evi.Modifications.MassBins {
@@ -292,9 +291,9 @@ func (evi *Evidence) ModificationReport() {
 		)
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}

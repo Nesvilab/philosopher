@@ -2,10 +2,12 @@ package gth
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/sirupsen/logrus"
 )
 
@@ -29,19 +31,19 @@ type Releases []Release
 func UpdateChecker(v, b string) {
 
 	// GET request
-	res, err := http.Get("https://api.github.com/repos/prvst/philosopher/releases")
-	if err != nil {
-		logrus.Warning("Can't check for updates, server unreachable: ", err)
+	res, e := http.Get("https://api.github.com/repos/prvst/philosopher/releases")
+	if e != nil {
+		err.Custom(errors.New("Can't check for updates, server unreachable"), "warning")
 	} else {
 
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			logrus.Fatal(err)
+		body, e := ioutil.ReadAll(res.Body)
+		if e != nil {
+			err.Custom(e, "fatal")
 		}
 
 		var rel Releases
-		err = json.Unmarshal(body, &rel)
-		if err != nil {
+		e = json.Unmarshal(body, &rel)
+		if e != nil {
 
 			logrus.Warning("GitHub unreachable for the moment, can't check for versions right now.")
 

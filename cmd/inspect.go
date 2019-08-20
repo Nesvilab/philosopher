@@ -5,11 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
 )
@@ -24,8 +25,6 @@ var inspectCmd = &cobra.Command{
 	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		//file, _ := os.Open(os.Args[2])
-
 		if object == "meta" {
 
 			var o met.Data
@@ -34,9 +33,9 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
-			err := dec.Decode(&o)
-			if err != nil {
-				logrus.Fatal("Could not restore meta data:", err)
+			e := dec.Decode(&o)
+			if e != nil {
+				err.DecodeMsgPck(e, "fatal")
 			}
 
 			if key == "session" {
@@ -53,9 +52,9 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
-			err := dec.Decode(&o)
-			if err != nil {
-				logrus.Fatal("Could not restore Parameter data:", err)
+			e := dec.Decode(&o)
+			if e != nil {
+				err.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
 
@@ -67,9 +66,9 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
-			err := dec.Decode(&o)
-			if err != nil {
-				logrus.Fatal("Could not restore PSM data:", err)
+			e := dec.Decode(&o)
+			if e != nil {
+				err.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
 
@@ -81,9 +80,9 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
-			err := dec.Decode(&o)
-			if err != nil {
-				logrus.Fatal("Could not restore database data:", err)
+			e := dec.Decode(&o)
+			if e != nil {
+				err.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Records)
 
@@ -95,9 +94,9 @@ var inspectCmd = &cobra.Command{
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
-			err := dec.Decode(&o)
-			if err != nil {
-				logrus.Fatal("Could not restore protein data:", err)
+			e := dec.Decode(&o)
+			if e != nil {
+				err.DecodeMsgPck(e, "fatal")
 			}
 
 			if len(key) > 0 {
