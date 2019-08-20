@@ -16,7 +16,7 @@ func Unix64(unix64 string) {
 	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("CD-HIT"))
+		err.DeployAsset(errors.New("CD-HIT"), "trace")
 	}
 
 	return

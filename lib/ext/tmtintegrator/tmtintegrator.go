@@ -42,7 +42,7 @@ func Run(m met.Data, args []string) met.Data {
 		paramAbs, _ := filepath.Abs(m.TMTIntegrator.Param)
 		binFile, e := ioutil.ReadFile(paramAbs)
 		if e != nil {
-			err.ReadFile(e)
+			err.ReadFile(e, "fatal")
 		}
 		m.TMTIntegrator.ParamFile = binFile
 	}
@@ -67,7 +67,7 @@ func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "fatal")
 	}
 
 	_ = cmd.Wait()

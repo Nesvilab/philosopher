@@ -95,7 +95,7 @@ func (m *Onto) Parse() {
 
 	file, e := os.Open(m.OboFile)
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -184,12 +184,12 @@ func (m Onto) Serialize() {
 
 	b, e := msgpack.Marshal(&m)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -200,12 +200,12 @@ func (m *Onto) Restore() {
 
 	b, e := ioutil.ReadFile(sys.MODBin())
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &m)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return

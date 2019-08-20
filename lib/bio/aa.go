@@ -66,7 +66,7 @@ func New(name string) AminoAcid {
 	case "Valine":
 		aa = AminoAcid{Code: "V", ShortName: "Val", Name: "Valine", MonoIsotopeMass: 99.068413945, AverageMass: 99.13106}
 	default:
-		err.WarnCustom(errors.New("Amino acid not found"))
+		err.Custom(errors.New("Amino acid not found"), "warning")
 		return aa
 	}
 

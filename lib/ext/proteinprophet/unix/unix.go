@@ -15,7 +15,7 @@ func UnixBatchCoverage(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("batchcoverage"))
+		err.DeployAsset(errors.New("batchcoverage"), "trace")
 	}
 
 	return
@@ -28,7 +28,7 @@ func UnixDatabaseParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("DatabaseParser"))
+		err.DeployAsset(errors.New("DatabaseParser"), "trace")
 	}
 
 	return
@@ -41,7 +41,7 @@ func UnixProteinProphet(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("ProteinProphet"))
+		err.DeployAsset(errors.New("ProteinProphet"), "trace")
 	}
 
 	return

@@ -13,13 +13,13 @@ func Deploy(f string) {
 
 	asset, e := Asset("unimod.obo")
 	if e != nil {
-		err.DeployAsset(e)
+		err.DeployAsset(e, "trace")
 	}
 
 	e = ioutil.WriteFile(f, asset, sys.FilePermission())
 	if e != nil {
 		fmt.Println(e.Error())
-		err.DeployAsset(e)
+		err.DeployAsset(e, "trace")
 	}
 
 	return

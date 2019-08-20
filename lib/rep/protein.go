@@ -167,7 +167,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 	dtb.Restore()
 
 	if len(dtb.Records) < 1 {
-		err.DatabaseNotFound(errors.New(""))
+		err.DatabaseNotFound(errors.New(""), "fatal")
 	}
 
 	// fix the name sand headers and pull database information into proteinreport
@@ -464,7 +464,7 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -485,7 +485,7 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 		line := ">" + header + "\n" + i.Sequence + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot print PSM to file"))
+			err.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
 		}
 	}
 

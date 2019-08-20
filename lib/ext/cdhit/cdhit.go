@@ -89,7 +89,7 @@ func (c *CDhit) Run(level float64) {
 	_ = run.Wait()
 
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "fatal")
 	}
 
 	return

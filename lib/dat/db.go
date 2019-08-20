@@ -1,6 +1,7 @@
 package dat
 
 import (
+	"errors"
 	"regexp"
 	"strings"
 
@@ -244,7 +245,7 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	if strings.Contains(k, "GN=") && (strings.Contains(k, "PE=") || strings.Contains(k, "SV=")) {
 
 		if len(orn) < 2 {
-			err.ParsingFASTA()
+			err.ParsingFASTA(errors.New(""), "fatal")
 		}
 
 		gnReg := regexp.MustCompile(`GN=(.+?)(\s.+)`)

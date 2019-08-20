@@ -212,7 +212,7 @@ func (p *PepXML) Read(f string) {
 		}
 
 		if len(psmlist) == 0 {
-			err.NoPSMFound()
+			err.NoPSMFound(errors.New(""), "fatal")
 		}
 
 		p.PeptideIdentification = psmlist
@@ -222,7 +222,7 @@ func (p *PepXML) Read(f string) {
 		p.adjustMassDeviation()
 
 		if len(psmlist) == 0 {
-			err.NoPSMFound()
+			err.NoPSMFound(errors.New(""), "fatal")
 		}
 
 	}
@@ -530,7 +530,7 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 	if e != nil {
 
-		err.Plotter(e)
+		err.Plotter(e, "fatal")
 
 	} else {
 
@@ -595,12 +595,12 @@ func (p *PepXML) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.PepxmlBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -611,12 +611,12 @@ func (p *PepXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.PepxmlBin())
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return
@@ -634,17 +634,17 @@ func (p *PepIDList) Serialize(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		err.WarnCustom(errors.New("Cannot determine binary data class"))
+		err.Custom(errors.New("Cannot determine binary data class"), "fatal")
 	}
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(dest, b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -662,17 +662,17 @@ func (p *PepIDList) Restore(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		err.WarnCustom(errors.New("Cannot determine binary data class"))
+		err.Custom(errors.New("Cannot determine binary data class"), "fatal")
 	}
 
 	b, e := ioutil.ReadFile(dest)
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return

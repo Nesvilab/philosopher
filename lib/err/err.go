@@ -1,158 +1,303 @@
 package err
 
-import "github.com/sirupsen/logrus"
+import (
+	"fmt"
+)
 
-// WarnCustom : WARN call for custom cases
-func WarnCustom(e error) {
-	logrus.Warn(e)
+// Custom call for custom cases
+func Custom(e error, t string) {
+
+	m := fmt.Sprintf("%s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// OverwrittingMeta : WARN call when trying to execute external binaries
-func OverwrittingMeta() {
-	logrus.Warn("A meta data folder was found and will not be overwritten")
+// OverwrittingMeta call when trying to execute external binaries
+func OverwrittingMeta(e error, t string) {
+
+	m := fmt.Sprintf("A meta data folder was found and will not be overwritten: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// MarshalFile : TRACE call for a failed Marshaling event
-func MarshalFile(e error) {
-	logrus.Trace("Cannot read file: ", e)
+// MarshalFile call for a failed Marshaling event
+func MarshalFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot read file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// SerializeFile : TRACE call for a failed serialization attempt
-func SerializeFile(e error) {
-	logrus.Trace("Cannot serialize file: ", e)
+// SerializeFile call for a failed serialization attempt
+func SerializeFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot serialize file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// CopyingFile : TRACE call when trying to copy files to another location
-func CopyingFile(e error) {
-	logrus.Trace("Cannot copy or mvoe file: ", e)
+// CopyingFile call when trying to copy files to another location
+func CopyingFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot copy or mvoe file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// CastFloatToString : TRACE call when trying to cast a float number to string
-func CastFloatToString(e error) {
-	logrus.Trace("Cannot cast float information to string")
+// CastFloatToString call when trying to cast a float number to string
+func CastFloatToString(e error, t string) {
+
+	m := fmt.Sprintf("Cannot cast float information to string: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// ErrorCustom : ERROR call for custom cases
-func ErrorCustom(e error) {
-	logrus.Error(e)
+// Plotter call for faled plotter instantiation
+func Plotter(e error, t string) {
+
+	m := fmt.Sprintf("Could not instantiate plotter: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// Plotter : WARN call for faled plotter instantiation
-func Plotter(e error) {
-	logrus.Fatal("Could not instantiate plotter: ", e)
+// ReadFile call for file not found
+func ReadFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot read file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// ReadFile : FATAL call for file not found
-func ReadFile(e error) {
-	logrus.Fatal("Cannot read file: ", e)
+// ReadingMzMLZlib call when trying to erad mzML zlibed spectra
+func ReadingMzMLZlib(e error, t string) {
+
+	m := fmt.Sprintf("Error trying to read mzML zlib data: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// ReadingMzMLZlib : FATAL call when trying to erad mzML zlibed spectra
-func ReadingMzMLZlib(e error) {
-	logrus.Fatal("Error trying to read mzML zlib data:", e)
+// WriteFile call for failed file writing event
+func WriteFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot write file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// FatalCustom : FATAL call for custom cases
-func FatalCustom(e error) {
-	logrus.Fatal(e)
+// WriteToFile call for failed file writing event
+func WriteToFile(e error, t string) {
+
+	m := fmt.Sprintf("Cannot write to file: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// WriteFile : FATAL call for failed file writing event
-func WriteFile(e error) {
-	logrus.Fatal("Cannot write file: ", e)
+// DeployAsset call for failed asset deployment
+func DeployAsset(e error, t string) {
+
+	m := fmt.Sprintf("Cannot deploy asset: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// WriteToFile : FATAL call for failed file writing into a file event
-func WriteToFile(e error) {
-	logrus.Fatal("Cannot write file: ", e)
+// DecodeMsgPck call for failed msgpack decoding
+func DecodeMsgPck(e error, t string) {
+
+	m := fmt.Sprintf("Cannot decode packed binary: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// DeployAsset : FATAL call for failed asset deployment
-func DeployAsset(e error) {
-	logrus.Fatal("Cannot deploy asset: ", e)
+// NoParametersFound call empty parameters list
+func NoParametersFound(e error, t string) {
+
+	m := fmt.Sprintf("Missing input parameters: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// DecodeMsgPck : FATAL call for failed msgpack decoding
-func DecodeMsgPck(e error) {
-	logrus.Fatal("Cannot decode packed binary: ", e)
+// DatabaseNotFound call for a missing database file
+func DatabaseNotFound(e error, t string) {
+
+	m := fmt.Sprintf("Database not found: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// NoParametersFound : FATAL call empty parameters list
-func NoParametersFound(e error) {
-	logrus.Fatal("Missing input parameters: ", e)
+// NoSpectraFound call empty Spectra structs
+func NoSpectraFound(e error, t string) {
+
+	m := fmt.Sprintf("No Spectra was found in data set: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// DatabaseNotFound : FATAL call for a missing database file
-func DatabaseNotFound(e error) {
-	logrus.Fatal("Database not found: ", e)
+// NoPSMFound call empty PSM structs
+func NoPSMFound(e error, t string) {
+
+	m := fmt.Sprintf("No PSM was found in data set: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// NoSpectraFound : FATAL call empty Spectra structs
-func NoSpectraFound() {
-	logrus.Fatal("No Spectra was found in data set")
+// NoProteinFound call empty Protein structs
+func NoProteinFound(e error, t string) {
+
+	m := fmt.Sprintf("No Protein was found in data set: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// NoPSMFound : FATAL call empty PSM structs
-func NoPSMFound() {
-	logrus.Fatal("No PSM was found in data set")
+// Comet call when running the Comet search engine
+func Comet(e error, t string) {
+
+	m := fmt.Sprintf("Missing parameter file or data file for analysis: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// NoProteinFound : FATAL call empty Protein structs
-func NoProteinFound() {
-	logrus.Fatal("No Protein was found in data set")
+// UnsupportedDistribution call for error trying to determine OS distribution
+func UnsupportedDistribution(e error, t string) {
+
+	m := fmt.Sprintf("Cannot determine OS distribtion for binary version deployment: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// Comet : FATAL call when running the Comet search engine
-func Comet() {
-	logrus.Fatal("Missing parameter file or data file for analysis")
+// ExecutingBinary call when trying to execute external binaries
+func ExecutingBinary(e error, t string) {
+
+	m := fmt.Sprintf("Cannot execute program: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// UnsupportedDistribution : FATAL call for error trying to determine OS distribution
-func UnsupportedDistribution() {
-	logrus.Fatal("Cannot determine OS distribtion for binary version deployment")
+// WorkspaceNotFound call when trying to locate a workspace
+func WorkspaceNotFound(e error, t string) {
+
+	m := fmt.Sprintf("Workspace not found: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// ExecutingBinary : FATAL call when trying to execute external binaries
-func ExecutingBinary(e error) {
-	logrus.Fatal("Cannot execute program: ", e)
+// GettingLocalDir call when trying to pinpoint current directory
+func GettingLocalDir(e error, t string) {
+
+	m := fmt.Sprintf("Cannot verify local directory path: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// WorkspaceNotFound : FATAL call when trying to locate a workspace
-func WorkspaceNotFound(e error) {
-	logrus.Fatal("Workspace not found: ", e)
+// CreatingMetaDirectory call when trying to create a meta directory
+func CreatingMetaDirectory(e error, t string) {
+
+	m := fmt.Sprintf("Cannot create meta directory; check folder permissions: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// GettingLocalDir : FATAL call when trying to pinpoint current directory
-func GettingLocalDir(e error) {
-	logrus.Fatal("Cannot verify local directory path: ", e)
+// LocatingTemDirecotry call when trying to locate the Temp directory
+func LocatingTemDirecotry(e error, t string) {
+
+	m := fmt.Sprintf("Cannot locate temporary directory: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// CreatingMetaDirectory : FATAL call when trying to create a meta directory
-func CreatingMetaDirectory(e error) {
-	logrus.Fatal("Cannot create meta directory; check folder permissions: ", e)
+// LocatingMetaDirecotry call when trying to locate the Meta directory
+func LocatingMetaDirecotry(e error, t string) {
+
+	m := fmt.Sprintf("Cannot locate meta directory: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// LocatingTemDirecotry : FATAL call when trying to locate the Temp directory
-func LocatingTemDirecotry(e error) {
-	logrus.Fatal("Cannot locate temporary directory: ", e)
+// ArchivingMetaDirecotry call when trying to archive the Meta directory
+func ArchivingMetaDirecotry(e error, t string) {
+
+	m := fmt.Sprintf("Cannot archive meta directory, chekc your zip libraries: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// LocatingMetaDirecotry : FATAL call when trying to locate the Meta directory
-func LocatingMetaDirecotry() {
-	logrus.Fatal("Cannot locate meta directory")
+// DeletingMetaDirecotry call when trying to delete the Meta directory
+func DeletingMetaDirecotry(e error, t string) {
+
+	m := fmt.Sprintf("Cannot delete meta directory, check your permissions: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// ArchivingMetaDirecotry : FATAL call when trying to archive the Meta directory
-func ArchivingMetaDirecotry(e error) {
-	logrus.Fatal("Cannot archive meta directory, chekc your zip libraries: ", e)
+// ParsingFASTA call when trying parse a protein FASTA database
+func ParsingFASTA(e error, t string) {
+
+	m := fmt.Sprintf("Cannot parse the FASTA file, check for formatting errors or malformed headers: %s", e)
+
+	callLogrus(m, t)
+
+	return
 }
 
-// DeletingMetaDirecotry : FATAL call when trying to delete the Meta directory
-func DeletingMetaDirecotry(e error) {
-	logrus.Fatal("Cannot delete meta directory, check your permissions: ", e)
-}
+// callLogrus returns the appropriate response for each erro type
+func callLogrus(m, t string) {
 
-// ParsingFASTA : FATAL call when trying parse a protein FASTA database
-func ParsingFASTA() {
-	logrus.Fatal("Cannot parse the FASTA file, check for formatting errors or malformed headers")
+	callLogrus(m, t)
+
+	return
 }

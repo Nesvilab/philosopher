@@ -15,7 +15,7 @@ func UnixInteractParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InteractParser"))
+		err.DeployAsset(errors.New("InteractParser"), "trace")
 	}
 
 	return
@@ -28,7 +28,7 @@ func UnixRefreshParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("RefreshParser"))
+		err.DeployAsset(errors.New("RefreshParser"), "trace")
 	}
 
 	return
@@ -41,7 +41,7 @@ func UnixPeptideProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("PeptideProphetParser"))
+		err.DeployAsset(errors.New("PeptideProphetParser"), "trace")
 	}
 
 	return

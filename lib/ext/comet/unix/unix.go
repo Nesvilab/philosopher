@@ -14,12 +14,12 @@ func UnixParameterFile(unixParam string) {
 
 	param, e := Asset("comet.params")
 	if e != nil {
-		err.DeployAsset(errors.New("Comet parameter file"))
+		err.DeployAsset(errors.New("Comet parameter file"), "fatal")
 	}
 
 	e = ioutil.WriteFile(unixParam, param, sys.FilePermission())
 	if e != nil {
-		err.DeployAsset(errors.New("Comet parameter file"))
+		err.DeployAsset(errors.New("Comet parameter file"), "fatal")
 	}
 
 	return
@@ -30,12 +30,12 @@ func Unix64(unix64 string) {
 
 	bin, e := Asset("comet.2018014.linux.exe")
 	if e != nil {
-		err.DeployAsset(errors.New("Comet parameter file"))
+		err.DeployAsset(errors.New("Comet parameter file"), "fatal")
 	}
 
 	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 	if e != nil {
-		err.DeployAsset(errors.New("Comet parameter file"))
+		err.DeployAsset(errors.New("Comet parameter file"), "fatal")
 	}
 
 	return

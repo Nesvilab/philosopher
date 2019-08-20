@@ -107,13 +107,13 @@ func (evi *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create report file"))
+		err.WriteFile(errors.New("Cannot create report file"), "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	if e != nil {
-		err.WriteToFile(errors.New("Cannot print PSM to file"))
+		err.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -179,7 +179,7 @@ func (evi *Evidence) PSMReport(decoyTag string, hasRazor, hasDecoys bool) {
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e)
+			err.WriteToFile(e, "fatal")
 		}
 	}
 
@@ -197,7 +197,7 @@ func (evi *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, has
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -211,7 +211,7 @@ func (evi *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, has
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(e)
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -290,7 +290,7 @@ func (evi *Evidence) PSMTMTReport(labels map[string]string, decoyTag string, has
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e)
+			err.WriteToFile(e, "fatal")
 		}
 	}
 
@@ -308,13 +308,13 @@ func (evi *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool)
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tOriginal Delta Mass\tAdjusted Delta Mass\tExperimental Mass\tPeptide Mass\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications\tNumber of Phospho Sites\tPhospho Site Localization\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	if e != nil {
-		err.WriteToFile(e)
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -375,7 +375,7 @@ func (evi *Evidence) PSMFraggerReport(decoyTag string, hasRazor, hasDecoys bool)
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e)
+			err.WriteToFile(e, "fatal")
 		}
 	}
 
@@ -393,7 +393,7 @@ func (evi *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag stri
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -407,7 +407,7 @@ func (evi *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag stri
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(e)
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -481,7 +481,7 @@ func (evi *Evidence) PSMTMTFraggerReport(labels map[string]string, decoyTag stri
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e)
+			err.WriteToFile(e, "fatal")
 		}
 	}
 
@@ -499,13 +499,13 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tModification\tNumber of Sites\tObserved Mass Localization\n")
 	if e != nil {
-		err.WriteToFile(e)
+		err.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -534,7 +534,7 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 			)
 			_, e = io.WriteString(file, line)
 			if e != nil {
-				err.WriteToFile(e)
+				err.WriteToFile(e, "fatal")
 			}
 		}
 	}

@@ -44,7 +44,7 @@ func Run(m met.Data, args []string) met.Data {
 	m.InterProphet.InputFiles = args
 
 	if len(args) < 1 {
-		err.NoParametersFound(errors.New("IProphet input files"))
+		err.NoParametersFound(errors.New("IProphet input files"), "fatal")
 	}
 
 	// deploy the binaries
@@ -74,7 +74,7 @@ func (i *InterProphet) Deploy(os, distro string) {
 			unix.UnixInterProphetParser(i.UnixInterProphetParser)
 			i.DefaultInterProphetParser = i.UnixInterProphetParser
 		} else {
-			err.UnsupportedDistribution()
+			err.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -115,7 +115,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

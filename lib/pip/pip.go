@@ -78,12 +78,12 @@ func DeployParameterFile(temp string) string {
 
 	param, e := Asset("philosopher.yml")
 	if e != nil {
-		err.DeployAsset(errors.New("pipeline configuration file"))
+		err.DeployAsset(errors.New("pipeline configuration file"), "fatal")
 	}
 
 	e = ioutil.WriteFile(file, param, sys.FilePermission())
 	if e != nil {
-		err.DeployAsset(errors.New("pipeline configuration file"))
+		err.DeployAsset(errors.New("pipeline configuration file"), "fatal")
 	}
 
 	return file

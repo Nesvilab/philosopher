@@ -1,6 +1,7 @@
 package ptmprophet
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -64,7 +65,7 @@ func (p *PTMProphet) Deploy(os, distro string) {
 			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
 			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
 		} else {
-			err.UnsupportedDistribution()
+			err.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -101,7 +102,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

@@ -1,17 +1,6 @@
 ### Added
-- Added STATIC option to PTMProphet.
-- Reprint option added to the yaml file.
-- New Intensity-based Reprint report added to Abacus.
-
 ### Changed
-- Default PTMProphet EM value changed from 1 to 2.
-- idconvert and msconvert are now unavailable.
-- Abacus pepxml and protxml parameters dont require a value anymore.
-
 ### Fixed
-- Fixed a problem wih the PSM-to-Protein razor assingment.
-- The error library API was fixed after a core update.
-- Small bugs and performance improvement.
 
 ## Snapcrat
 

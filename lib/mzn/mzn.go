@@ -5,6 +5,7 @@ import (
 	"compress/zlib"
 	"encoding/base64"
 	"encoding/binary"
+	"errors"
 	"io"
 	"math"
 	"strconv"
@@ -113,7 +114,7 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 	}
 
 	if len(spectra) == 0 {
-		err.NoSpectraFound()
+		err.NoSpectraFound(errors.New(""), "fatal")
 	}
 
 	p.Spectra = spectra
@@ -142,7 +143,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 		if string(j.Accession) == "MS:1000016" {
 			val, e := strconv.ParseFloat(j.Value, 64)
 			if e != nil {
-				err.CastFloatToString(e)
+				err.CastFloatToString(e, "error")
 			}
 			spec.ScanStartTime = val
 		}
@@ -182,7 +183,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000827" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.TargetIon = val
 			}
@@ -190,7 +191,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000828" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.IsolationWindowLowerOffset = val
 			}
@@ -198,7 +199,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000829" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.IsolationWindowUpperOffset = val
 			}
@@ -209,7 +210,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000744" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.SelectedIon = val
 			}
@@ -217,7 +218,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000041" {
 				val, e := strconv.Atoi(j.Value)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.ChargeState = val
 			}
@@ -225,7 +226,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000042" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					err.CastFloatToString(e)
+					err.CastFloatToString(e, "fatal")
 				}
 				spec.Precursor.PeakIntensity = val
 			}
@@ -312,7 +313,7 @@ func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 	if isCompressed == "1" {
 		r, e := zlib.NewReader(b64)
 		if e != nil {
-			err.ReadingMzMLZlib(e)
+			err.ReadingMzMLZlib(e, "fatal")
 		}
 		io.Copy(&bytestream, r)
 	} else {

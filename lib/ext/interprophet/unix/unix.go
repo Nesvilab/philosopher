@@ -16,7 +16,7 @@ func UnixInterProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InterProphetParser"))
+		err.DeployAsset(errors.New("InterProphetParser"), "trace")
 	}
 
 	return

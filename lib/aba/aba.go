@@ -18,7 +18,7 @@ type DataSetLabelNames struct {
 func Run(m met.Data, args []string) {
 
 	if m.Abacus.Peptide == false && m.Abacus.Protein == false {
-		err.FatalCustom(errors.New("You need to specify a peptide or protein combined file for the Abacus analysis"))
+		err.Custom(errors.New("You need to specify a peptide or protein combined file for the Abacus analysis"), "fatal")
 	}
 
 	if m.Abacus.Peptide == true {

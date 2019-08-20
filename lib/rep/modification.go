@@ -272,7 +272,7 @@ func (evi *Evidence) ModificationReport() {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create report files"))
+		err.WriteFile(errors.New("Could not create report files"), "fatal")
 	}
 	defer file.Close()
 
@@ -312,7 +312,7 @@ func (evi *Evidence) PlotMassHist() {
 
 	file, e := os.Create(outfile)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create output for delta mass binning"))
+		err.WriteFile(errors.New("Could not create output for delta mass binning"), "fatal")
 	}
 	defer file.Close()
 
@@ -358,7 +358,7 @@ func (evi *Evidence) PlotMassHist() {
 	io.WriteString(file, "</body>")
 
 	if e != nil {
-		err.WarnCustom(errors.New("There was an error trying to plot the mass distribution"))
+		err.Custom(errors.New("There was an error trying to plot the mass distribution"), "fatal")
 	}
 
 	// copy to work directory

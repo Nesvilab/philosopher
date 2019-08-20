@@ -1,6 +1,7 @@
 package dat
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -126,7 +127,7 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 			d.Records = append(d.Records, db)
 
 		} else {
-			err.ParsingFASTA()
+			err.ParsingFASTA(errors.New(""), "fatal")
 		}
 	}
 
@@ -233,7 +234,7 @@ func (d *Base) Deploy(temp string) {
 	param, e := Asset("crap.fas")
 	e = ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -278,7 +279,7 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso bool) string {
 		line := i + "\n" + d.TaDeDB[i] + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteFile(e)
+			err.WriteFile(e, "fatal")
 		}
 	}
 
@@ -292,12 +293,12 @@ func (d *Base) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
 	if e != nil {
-		err.SerializeFile(e)
+		err.SerializeFile(e, "fatal")
 	}
 
 	return
@@ -308,12 +309,12 @@ func (d *Base) Restore() {
 
 	b, e := ioutil.ReadFile(sys.DBBin())
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		err.SerializeFile(e)
+		err.SerializeFile(e, "fatal")
 	}
 
 	return
@@ -330,7 +331,7 @@ func (d *Base) RestoreWithPath(p string) {
 	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return

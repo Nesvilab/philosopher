@@ -16,7 +16,7 @@ func HideFile(filename string) {
 	if !strings.HasPrefix(filepath.Base(filename), ".") {
 		e := os.Rename(filename, "."+filename)
 		if e != nil {
-			err.FatalCustom(errors.New("Cannot hide file"))
+			err.Custom(errors.New("Cannot hide file"), "fatal")
 		}
 	}
 	return

@@ -15,7 +15,7 @@ func WinInteractParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InteractParser"))
+		err.DeployAsset(errors.New("InteractParser"), "trace")
 	}
 
 	return
@@ -28,7 +28,7 @@ func WinRefreshParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("RefreshParser"))
+		err.DeployAsset(errors.New("RefreshParser"), "trace")
 	}
 
 	return
@@ -41,7 +41,7 @@ func WinPeptideProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("PeptideProphetParser"))
+		err.DeployAsset(errors.New("PeptideProphetParser"), "trace")
 	}
 
 	return
@@ -54,7 +54,7 @@ func Mv(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("mv.exe"))
+		err.DeployAsset(errors.New("mv.exe"), "trace")
 	}
 
 	return
@@ -67,7 +67,7 @@ func LibgccDLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("libgcc_s_dw2"))
+		err.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
 	}
 
 	return
@@ -80,7 +80,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("Zlib1DLL"))
+		err.DeployAsset(errors.New("Zlib1DLL"), "trace")
 	}
 
 	return

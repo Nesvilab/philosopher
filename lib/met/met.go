@@ -430,12 +430,12 @@ func CleanTemp(dir string) {
 
 	files, e := filepath.Glob(filepath.Join(dir, "*"))
 	if e != nil {
-		err.ErrorCustom(e)
+		err.Custom(e, "fatal")
 	}
 	for _, file := range files {
 		e = os.RemoveAll(file)
 		if e != nil {
-			err.ErrorCustom(e)
+			err.Custom(e, "fatal")
 		}
 	}
 
@@ -447,12 +447,12 @@ func (d *Data) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -463,16 +463,16 @@ func (d *Data) Restore(f string) {
 
 	b, e := ioutil.ReadFile(f)
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	if len(d.UUID) < 1 {
-		err.WarnCustom(errors.New("The current directory has no Workspace"))
+		err.Custom(errors.New("The current directory has no Workspace"), "fatal")
 	}
 
 	// checks if the temp is still there, if not recreate it
@@ -488,12 +488,12 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		err.WorkspaceNotFound(errors.New(""))
+		err.WorkspaceNotFound(errors.New(""), "warning")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
 		os.Mkdir(d.Temp, sys.FilePermission())
-		err.LocatingTemDirecotry(e)
+		err.LocatingTemDirecotry(e, "warning")
 	}
 
 	return

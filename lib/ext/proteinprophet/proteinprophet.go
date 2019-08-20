@@ -54,7 +54,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pop = New(m.Temp)
 
 	if len(args) < 1 {
-		err.NoParametersFound(errors.New("missing pep.xml"))
+		err.NoParametersFound(errors.New("missing pep.xml"), "fatal")
 	}
 
 	// deploy the binaries
@@ -96,7 +96,7 @@ func (p *ProteinProphet) Deploy(os, distro string) {
 			unix.UnixProteinProphet(p.UnixProteinProphet)
 			p.DefaultProteinProphet = p.UnixProteinProphet
 		} else {
-			err.UnsupportedDistribution()
+			err.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -139,7 +139,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

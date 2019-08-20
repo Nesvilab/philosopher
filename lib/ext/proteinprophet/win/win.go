@@ -14,7 +14,7 @@ func WinBatchCoverage(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("batchcoverage"))
+		err.DeployAsset(errors.New("batchcoverage"), "trace")
 	}
 
 	return
@@ -27,7 +27,7 @@ func WinDatabaseParser(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("DatabaseParser"))
+		err.DeployAsset(errors.New("DatabaseParser"), "trace")
 	}
 
 	return
@@ -40,7 +40,7 @@ func WinProteinProphet(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("ProteinProphet"))
+		err.DeployAsset(errors.New("ProteinProphet"), "trace")
 	}
 
 	return
@@ -53,7 +53,7 @@ func LibgccDLL(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("libgcc_s_dw2"))
+		err.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
 	}
 
 	return
@@ -66,7 +66,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("zlib1"))
+		err.DeployAsset(errors.New("zlib1"), "trace")
 	}
 
 	return

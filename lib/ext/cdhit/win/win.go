@@ -16,7 +16,7 @@ func Win64(win64 string) {
 	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
 	if e != nil {
-		err.ExecutingBinary(errors.New("CD-hit"))
+		err.ExecutingBinary(errors.New("CD-hit"), "trace")
 	}
 
 	return

@@ -1,6 +1,7 @@
 package comet
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -49,7 +50,7 @@ func Run(m met.Data, args []string) met.Data {
 	var cmt = New(m.Temp)
 
 	if len(m.Comet.Param) < 1 || m.Comet.Print == false && len(args) < 1 {
-		err.Comet()
+		err.Comet(errors.New(""), "fatal")
 	}
 
 	// deploy the binaries

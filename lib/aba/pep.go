@@ -100,7 +100,7 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		err.NoParametersFound(errors.New("missing combined.pep.xml"))
+		err.NoParametersFound(errors.New("missing combined.pep.xml"), "fatal")
 
 	} else {
 

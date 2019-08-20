@@ -1,6 +1,7 @@
 package id
 
 import (
+	"errors"
 	"io/ioutil"
 	"strings"
 
@@ -187,7 +188,7 @@ func (p *ProtXML) Read(f string) {
 	p.Groups = groups
 
 	if len(groups) == 0 {
-		err.NoProteinFound()
+		err.NoProteinFound(errors.New(""), "fatal")
 	}
 
 	return
@@ -250,12 +251,12 @@ func (p *ProtXML) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -266,12 +267,12 @@ func (p *ProtXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProtxmlBin())
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return
@@ -282,12 +283,12 @@ func (p *ProtIDList) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e)
+		err.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e)
+		err.WriteFile(e, "fatal")
 	}
 
 	return
@@ -298,12 +299,12 @@ func (p *ProtIDList) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProBin())
 	if e != nil {
-		err.ReadFile(e)
+		err.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	return

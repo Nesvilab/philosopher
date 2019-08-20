@@ -38,7 +38,7 @@ func (e *Enzyme) Synth(t string) {
 		e.Pattern = "DE[^P]"
 		e.Join = "K"
 	} else {
-		err.ErrorCustom(errors.New("Enzyme not supported"))
+		err.Custom(errors.New("Enzyme not supported"), "warning")
 	}
 
 	return

@@ -14,7 +14,7 @@ func WinPTMProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.ExecutingBinary(e)
+		err.ExecutingBinary(e, "trace")
 	}
 
 	return

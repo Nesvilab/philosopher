@@ -593,7 +593,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		err.FatalCustom(errors.New("The annotation file looks to be empty"))
+		err.Custom(errors.New("The annotation file looks to be empty"), "fatal")
 	}
 
 	return labels

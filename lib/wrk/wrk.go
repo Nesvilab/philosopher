@@ -26,7 +26,7 @@ func Run(Version, Build string, b, c, i, n bool) {
 	}
 
 	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
-		err.FatalCustom(errors.New("this command accepts only one parameter"))
+		err.Custom(errors.New("this command accepts only one parameter"), "fatal")
 	}
 
 	if i == true {
@@ -58,12 +58,12 @@ func Init(version, build string) {
 	msgpack.Unmarshal(b, &m)
 
 	if len(m.UUID) > 1 && len(m.Home) > 1 {
-		err.OverwrittingMeta()
+		err.OverwrittingMeta(errors.New(""), "warning")
 	} else {
 
 		dir, e := os.Getwd()
 		if e != nil {
-			err.GettingLocalDir(e)
+			err.GettingLocalDir(e, "warning")
 		}
 
 		da := met.New(dir)
@@ -73,7 +73,7 @@ func Init(version, build string) {
 
 		os.Mkdir(da.MetaDir, sys.FilePermission())
 		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-			err.CreatingMetaDirectory(e)
+			err.CreatingMetaDirectory(e, "fatal")
 		}
 
 		if runtime.GOOS == sys.Windows() {
@@ -82,7 +82,7 @@ func Init(version, build string) {
 
 		os.Mkdir(da.Temp, sys.FilePermission())
 		if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
-			err.LocatingTemDirecotry(e)
+			err.LocatingTemDirecotry(e, "fatal")
 		}
 
 		da.Home = fmt.Sprintf("%s", da.Home)
@@ -101,7 +101,7 @@ func Backup() {
 	m.Restore(sys.Meta())
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {
-		err.LocatingMetaDirecotry()
+		err.LocatingMetaDirecotry(errors.New(""), "warning")
 	}
 
 	var name string
@@ -119,7 +119,7 @@ func Backup() {
 
 	e := zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
 	if e != nil {
-		err.ArchivingMetaDirecotry(e)
+		err.ArchivingMetaDirecotry(e, "warning")
 	}
 
 	return
@@ -128,18 +128,22 @@ func Backup() {
 // Clean deletes all meta data and the workspace directory
 func Clean() {
 
+	// this is a soft verification just to see if there is any existing file
 	var d met.Data
-	d.Restore(sys.Meta())
-
-	e := os.RemoveAll(sys.MetaDir())
+	_, e := ioutil.ReadFile(sys.Meta())
 	if e != nil {
-		err.DeletingMetaDirecotry(e)
+		err.ReadFile(e, "warning")
+	}
+
+	e = os.RemoveAll(sys.MetaDir())
+	if e != nil {
+		err.DeletingMetaDirecotry(e, "warning")
 	}
 
 	if len(d.Temp) > 0 {
 		e := os.RemoveAll(d.Temp)
 		if e != nil {
-			err.DeletingMetaDirecotry(e)
+			err.DeletingMetaDirecotry(e, "warning")
 		}
 	}
 
