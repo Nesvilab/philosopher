@@ -179,7 +179,7 @@ func NoSpectraFound(e error, t string) {
 // NoPSMFound call empty PSM structs
 func NoPSMFound(e error, t string) {
 
-	m := fmt.Sprintf("No PSM was found in data set: %s", e)
+	m := fmt.Sprintf("No PSM was found in data set %s", e)
 
 	callLogrus(m, t)
 
