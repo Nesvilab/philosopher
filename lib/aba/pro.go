@@ -1,3 +1,4 @@
+// Package aba (Abacus), protein level
 package aba
 
 import (

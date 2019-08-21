@@ -1,3 +1,4 @@
+// Package dat (Database)
 package dat
 
 import (

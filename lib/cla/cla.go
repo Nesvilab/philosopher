@@ -1,3 +1,5 @@
+// Package cla (Classification) provides methods to verify if different types
+// of evidences are target or decoys
 package cla
 
 import (

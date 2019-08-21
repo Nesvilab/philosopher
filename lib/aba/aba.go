@@ -1,3 +1,4 @@
+// Package aba (Abacus)
 package aba
 
 import (

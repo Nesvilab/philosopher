@@ -24,17 +24,6 @@ Add 116 common contaminants found in LC-MS/MS experiments. More information can 
 
 Skips the downloading of a fresh database and use an existing one instead. The custom file will also be used to create decoys and contaminants if desired.
 
-`--enzyme`
-
-The name of the enzyme for the digestion. The options are:
-
-* trypsin
-* lys_c
-* lys_n
-* chymotrypsin
-
-The default option is _trypsin_.
-
 `--id`
 
 The Proteome ID used to find and download an organism proteome. See below where to find the ID.
