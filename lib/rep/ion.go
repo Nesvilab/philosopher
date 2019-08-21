@@ -20,7 +20,7 @@ import (
 )
 
 // AssembleIonReport reports consist on ion reporting
-func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
+func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 
 	var list IonEvidenceList
 	var psmPtMap = make(map[string][]string)
@@ -30,7 +30,7 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	var ionMods = make(map[string][]mod.Modification)
 
 	// collapse all psm to protein based on Peptide-level identifications
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 
 		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Spectrum)
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
@@ -100,13 +100,13 @@ func (e *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	}
 
 	sort.Sort(list)
-	e.Ions = list
+	evi.Ions = list
 
 	return
 }
 
 // PeptideIonReport reports consist on ion reporting
-func (e *Evidence) PeptideIonReport(hasDecoys bool) {
+func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
@@ -123,7 +123,7 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 
 	// building the printing set tat may or not contain decoys
 	var printSet IonEvidenceList
-	for _, i := range e.Ions {
+	for _, i := range evi.Ions {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -188,12 +188,12 @@ func (e *Evidence) PeptideIonReport(hasDecoys bool) {
 }
 
 // PeptideIonTMTReport reports the ion table with TMT quantification
-func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool) {
+func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
-	file, err := os.Create(output)
-	if err != nil {
+	file, e := os.Create(output)
+	if e != nil {
 		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
@@ -213,7 +213,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 
 	// building the printing set tat may or not contain decoys
 	var printSet IonEvidenceList
-	for _, i := range e.Ions {
+	for _, i := range evi.Ions {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -276,6 +276,7 @@ func (e *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool)
 				i.Labels.Channel10.Intensity,
 				i.Labels.Channel11.Intensity,
 			)
+			_, e = io.WriteString(file, line)
 			if e != nil {
 				err.WriteToFile(errors.New("Cannot print to file peptide ion TMT report"), "fatal")
 			}

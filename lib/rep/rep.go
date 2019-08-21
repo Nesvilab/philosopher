@@ -479,7 +479,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		err.Custom(errors.New("Annotation file seems to be empty", e), "error")
+		err.Custom(errors.New("Annotation file seems to be empty"), "error")
 	}
 
 	return labels

@@ -14,7 +14,7 @@ import (
 )
 
 // MSstatsReport report all psms from study that passed the FDR filter
-func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
+func (evi *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 
 	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
 
@@ -33,11 +33,11 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasRazor == true {
 
 			if i.IsURazor == true {
-				if e.Decoys == false {
+				if evi.Decoys == false {
 					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 						printSet = append(printSet, i)
 					}
@@ -48,7 +48,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 
 		} else {
 
-			if e.Decoys == false {
+			if evi.Decoys == false {
 				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}
@@ -91,7 +91,7 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 }
 
 // MSstatsTMTReport report all psms with TMT labels from study that passed the FDR filter
-func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, hasRazor bool) {
+func (evi *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, hasRazor bool) {
 
 	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
 
@@ -117,11 +117,11 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 		if hasRazor == true {
 
 			if i.IsURazor == true {
-				if e.Decoys == false {
+				if evi.Decoys == false {
 					if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 						printSet = append(printSet, i)
 					}
@@ -132,7 +132,7 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 
 		} else {
 
-			if e.Decoys == false {
+			if evi.Decoys == false {
 				if i.IsDecoy == false && len(i.Protein) > 0 && !strings.HasPrefix(i.Protein, decoyTag) {
 					printSet = append(printSet, i)
 				}

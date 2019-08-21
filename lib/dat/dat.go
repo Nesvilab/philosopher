@@ -162,14 +162,14 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		err.Custom(errors.New(("UniProt query failed, please check your connection"), "error")
+		err.Custom(errors.New("UniProt query failed, please check your connection"), "error")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		err.Custom(error.New("UniProt download failed, please check your connection"), "fatal")
+		err.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
 	}
 
 	return

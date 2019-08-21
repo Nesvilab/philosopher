@@ -146,7 +146,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	var list rep.CombinedProteinEvidenceList
 
-	if _, err := os.Stat("combined.prot.xml"); os.IsNotExist(err) {
+	if _, e := os.Stat("combined.prot.xml"); os.IsNotExist(e) {
 
 		err.Custom(errors.New("Cannot find combined.prot.xml file"), "fatal")
 
@@ -343,7 +343,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	line += "Indistinguishable Proteins\t"
 
 	line += "\n"
-	_, e := io.WriteString(file, line)
+	_, e = io.WriteString(file, line)
 	if e != nil {
 		err.WriteToFile(e, "fatal")
 	}
@@ -462,8 +462,8 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	output := fmt.Sprintf("%s%sreprint.spc.tsv", session, string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
+	file, e := os.Create(output)
+	if e != nil {
 		err.WriteFile(errors.New("Cannot create reprint SpC report"), "error")
 	}
 	defer file.Close()
@@ -483,7 +483,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 
 	line += "\n"
 
-	_, e := io.WriteString(file, line)
+	_, e = io.WriteString(file, line)
 	if e != nil {
 		err.WriteToFile(e, "fatal")
 	}
@@ -543,7 +543,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 
 	line += "\n"
 
-	_, e := io.WriteString(file, line)
+	_, e = io.WriteString(file, line)
 	if e != nil {
 		err.WriteToFile(e, "fatal")
 	}

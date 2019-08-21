@@ -15,11 +15,10 @@ import (
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // AssemblePeptideReport reports consist on ion reporting
-func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
+func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 	var list PeptideEvidenceList
 	var pepSeqMap = make(map[string]bool) //is this a decoy
@@ -39,7 +38,7 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 		}
 	}
 
-	for _, i := range e.PSM {
+	for _, i := range evi.PSM {
 
 		_, ok := pepSeqMap[i.Peptide]
 		if ok {
@@ -117,24 +116,23 @@ func (e *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 	}
 
 	sort.Sort(list)
-	e.Peptides = list
+	evi.Peptides = list
 
 	return
 }
 
 // PeptideReport reports consist on ion reporting
-func (e *Evidence) PeptideReport(hasDecoys bool) {
+func (evi *Evidence) PeptideReport(hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create peptide output file"), "fatal)"
+		err.WriteFile(errors.New("Could not create peptide output file"), "fatal")
 	}
 	defer file.Close()
 
-	//_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
-	_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
+	_, e = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 
 	if e != nil {
 		err.WriteToFile(errors.New("Cannot write to Peptide report"), "fatal")
@@ -142,7 +140,7 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 
 	// building the printing set tat may or not contain decoys
 	var printSet PeptideEvidenceList
-	for _, i := range e.Peptides {
+	for _, i := range evi.Peptides {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)
@@ -201,13 +199,13 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 }
 
 // PeptideTMTReport reports consist on ion reporting
-func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
+func (evi *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create peptide TMT output file"), "fatal)"
+		err.WriteFile(errors.New("Could not create peptide TMT output file"), "fatal")
 	}
 	defer file.Close()
 
@@ -222,12 +220,12 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(errors.New("Could not write peptide output header"), "fatal)"
+		err.WriteToFile(errors.New("Could not write peptide output header"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
 	var printSet PeptideEvidenceList
-	for _, i := range e.Peptides {
+	for _, i := range evi.Peptides {
 		if hasDecoys == false {
 			if i.IsDecoy == false {
 				printSet = append(printSet, i)

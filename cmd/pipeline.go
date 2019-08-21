@@ -97,7 +97,7 @@ var pipelineCmd = &cobra.Command{
 			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
 		}
 
-		err.Done(errors.New(""), "info")
+		err.Done()
 		return
 	},
 }
