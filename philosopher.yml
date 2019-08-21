@@ -40,7 +40,7 @@ comet:
   param:                                       # comet parameter file (default "comet.params.txt")
   raw: mzML                                    # format of the spectra file
 
-msfragger:
+msfragger:                                     # v
   path:                                        # path to MSFragger jar
   memmory: 8                                   # how much memory in GB to use
   param:                                       # MSFragger parameter file
@@ -121,7 +121,7 @@ msfragger:
   add_W_tryptophan: 0.000000                   # tryptophan fixed modifications
   add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
 
-peptideprophet:
+peptideprophet:                                # v5.2
   extension: pepXML                            # pepXML file extension
   clevel: 0                                    # set Conservative Level in neg_stdev from the neg_mean, low numbers are less conservative, high numbers are more conservative
   accmass: false                               # use Accurate Mass model binning
@@ -154,7 +154,7 @@ peptideprophet:
   ppm: false                                   # use PPM mass error instead of Dalton for mass modeling
   zero: false                                  # report results with minimum probability 0
 
-ptmprophet:
+ptmprophet:                                    # v5.2
   autodirect: false                            # use direct evidence when the lability is high, use in combination with LABILITY
   cions:                                       # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                # use only direct evidence for evaluating PTM site probabilities
@@ -176,7 +176,7 @@ ptmprophet:
   ppmtol: 1                                    # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
   verbose: false                               # produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
 
-proteinprophet:
+proteinprophet:                                # v5.2
   accuracy: false                              # equivalent to --minprob 0
   allpeps: false                               # consider all possible peptides in the database in the confidence model
   confem: false                                # use the EM to compute probability given the confidence
@@ -248,30 +248,27 @@ abacus:
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
   reprint: false                               # create abacus reports using the Reprint format
 
-tmtintegrator:
+tmtintegrator:                                 # v1.7
   path:                                        # path to TMT-Integrator jar
   memmory: 8                                   # how much memory in GB to use
   output:                                      # the location of output files
   channel_num: 10                              # the number of TMT channels
-  ref_tag: pool                                # the tag for identifying reference channel
-  groupby: -1                                  # 0: gene; 1:Protein ID; 2: Peptide; 3: Phospho Site Location; -1: All
-  psm_norm: false                              # normalization on psm level
-  outlier_removal: true                        # applying outlier removal
-  prot_norm: 2                                 # normalization on protein level, options: 0=None, 1=MD, 2=GN
-  min_pep_prob: 0                              # minimum peptide probability
-  min_purity: 0.5                              # minimum purity
-  min_percent: 0.05                            # the percentage of PSMs being used for downstream process
-  unique_pep: false                            # using unique peptides or not
-  unique_gene: 0                               # using unique genes (0=PSMs having shared genes; 1=PSMs don't have shared genes; 2=PSMs only have unique single genes)
-  best_psm: true                               # only keeping the PSM having the highest summed TMT intensity
-  overlabel: true                              # allow over labeling or not
-  prot_exclude: sp|;tr|;                       # excluding proteins with these terms
-  pep_tag: n[43];S[316];n[230]                 # used peptides with the modification tag (separator: :wink:
-  mod_pep: false                               # using modified peptides or not
-  mod_mass:                                    # used peptides with the modification mass
-  target_mod_tag:                              # used peptides with the target modification tag (currently only allowing one target modification)
-  min_site_prob: 0.9                           # minimum modification site probability
-  PTMProphet: true                             # using PTMProphet result (only for phosphorylated data)
-  ms1_int: true                                # using MS1 intensity. If not, reference intensities are used for abundance calculation.
-  top3_pep: true                               # using top 3 intensive peptides
-  print_RefInt: true                           # printing reference intensity
+  ref_tag:                                     # the unique tag for identifying reference channel
+  groupby: -1                                  # group psms by different levels (-1=gene/protein/peptide/site; 0=gene; 1=protein; 2=peptide; 3=site)
+  psm_norm: false                              # perform normalization on psm level
+  outlier_removal: true                        # perform outlier removal
+  prot_norm: -1                                # perform normalization on the reports (-1=None/MD/GN; 0=None; 1=MD; 2=GN)
+  min_pep_prob: 0.9                            # the threshold of peptide probability
+  min_purity: 0.5                              # the threshold of purity score
+  min_percent: 0.05                            # the percentage of PSMs being used for generating the reports
+  unique_pep: false                            # use unique peptides or not
+  unique_gene: 0                               # use unique genes or not (0=PSMs having shared genes; 1=PSMs don't have shared genes; 2=PSMs only have unique single genes)
+  best_psm: true                               # only keep the PSM having the highest summed TMT intensity
+  prot_exclude: none                           # exclude proteins with specified tags in the accession number
+  allow_overlabel: true                        # allow over labeling on S (e.g., S(229.1629)) or not
+  allow_unlabeled: false                       # allow psms without the labels of n[43], n[230], S[316]
+  mod_tag: none                                # keep psms with the modified tags (none for global; S(79.9663); T(79.9663); Y(79.9663)for phospho; K(42.0106) for Aceytlation)
+  min_site_prob: -1                            # the threshold of modified site probability (-1=global; 0=data with ptm (but not phosphorylation); above 0(e.g., 0.9)=phosphorylation)
+  ms1_int: true                                # use MS1 intensity or not. If not, reference intensities are used for abundance calculation
+  top3_pep: true                               # use top 3 intensive peptides or not
+  print_RefInt: false                          # print reference intensity or not
