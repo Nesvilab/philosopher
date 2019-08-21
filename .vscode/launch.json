@@ -8,10 +8,14 @@
             "name": "Launch",
             "type": "go",
             "request": "launch",
-            "mode": "auto",
-            "program": "${fileDirname}",
+            "mode": "debug",
+            "program": "/home/prvst/go/src/github.com/prvst/philosopher/main.go",
             "env": {},
-            "args": [workspace --init]
+            "showLog": true,
+            "args": [
+                "workspace",
+                "--init"
+            ],
         }
     ]
 }
