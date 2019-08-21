@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 )
@@ -16,7 +16,7 @@ func WinInterProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InterProphetParser"), "trace")
+		msg.DeployAsset(errors.New("InterProphetParser"), "trace")
 	}
 
 	return
@@ -29,7 +29,7 @@ func LibgccDLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
 	}
 
 	return
@@ -42,7 +42,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("Zlib1DLL"), "trace")
+		msg.DeployAsset(errors.New("Zlib1DLL"), "trace")
 	}
 
 	return

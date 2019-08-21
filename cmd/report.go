@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
@@ -18,7 +18,7 @@ var reportCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("Report ", Version)
+		msg.Executing("Report ", Version)
 
 		rep.Run(m)
 
@@ -28,7 +28,7 @@ var reportCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

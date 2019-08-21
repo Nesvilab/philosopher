@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	unix "github.com/prvst/philosopher/lib/ext/ptmprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/ptmprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -65,7 +65,7 @@ func (p *PTMProphet) Deploy(os, distro string) {
 			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
 			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
 		} else {
-			err.UnsupportedDistribution(errors.New(""), "fatal")
+			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -102,7 +102,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

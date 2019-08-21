@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -13,13 +13,13 @@ func Deploy(f string) {
 
 	asset, e := Asset("unimod.obo")
 	if e != nil {
-		err.DeployAsset(e, "trace")
+		msg.DeployAsset(e, "trace")
 	}
 
 	e = ioutil.WriteFile(f, asset, sys.FilePermission())
 	if e != nil {
 		fmt.Println(e.Error())
-		err.DeployAsset(e, "trace")
+		msg.DeployAsset(e, "trace")
 	}
 
 	return

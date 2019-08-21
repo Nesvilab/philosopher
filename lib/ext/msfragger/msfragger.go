@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
 )
 
@@ -42,7 +42,7 @@ func Run(m met.Data, args []string) met.Data {
 		paramAbs, _ := filepath.Abs(m.MSFragger.Param)
 		binFile, e := ioutil.ReadFile(paramAbs)
 		if e != nil {
-			err.ReadFile(e, "fatal")
+			msg.ReadFile(e, "fatal")
 		}
 		m.MSFragger.ParamFile = binFile
 	}
@@ -67,7 +67,7 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 
 	_ = cmd.Wait()

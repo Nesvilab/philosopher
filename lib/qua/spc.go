@@ -3,7 +3,7 @@ package qua
 import (
 	"errors"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/rep"
 )
 
@@ -11,7 +11,7 @@ import (
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 	if len(e.PSM) < 1 && len(e.Ions) < 1 {
-		err.NoPSMFound(errors.New(""), "fatal")
+		msg.NoPSMFound(errors.New(""), "fatal")
 	}
 
 	var uniqueIonPSM = make(map[string]string)

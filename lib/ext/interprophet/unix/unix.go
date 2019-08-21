@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 )
@@ -16,7 +16,7 @@ func UnixInterProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InterProphetParser"), "trace")
+		msg.DeployAsset(errors.New("InterProphetParser"), "trace")
 	}
 
 	return

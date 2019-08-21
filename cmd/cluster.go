@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/clu"
 	"github.com/prvst/philosopher/lib/met"
@@ -19,7 +19,7 @@ var clusterCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("Cluster ", Version)
+		msg.Executing("Cluster ", Version)
 
 		// run clustering
 		clu.GenerateReport(m)
@@ -30,7 +30,7 @@ var clusterCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

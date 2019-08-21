@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // WinBatchCoverage deploys batchcoverage
@@ -14,7 +14,7 @@ func WinBatchCoverage(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("batchcoverage"), "trace")
+		msg.DeployAsset(errors.New("batchcoverage"), "trace")
 	}
 
 	return
@@ -27,7 +27,7 @@ func WinDatabaseParser(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("DatabaseParser"), "trace")
+		msg.DeployAsset(errors.New("DatabaseParser"), "trace")
 	}
 
 	return
@@ -40,7 +40,7 @@ func WinProteinProphet(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("ProteinProphet"), "trace")
+		msg.DeployAsset(errors.New("ProteinProphet"), "trace")
 	}
 
 	return
@@ -53,7 +53,7 @@ func LibgccDLL(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
 	}
 
 	return
@@ -66,7 +66,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, 0755)
 
 	if e != nil {
-		err.DeployAsset(errors.New("zlib1"), "trace")
+		msg.DeployAsset(errors.New("zlib1"), "trace")
 	}
 
 	return

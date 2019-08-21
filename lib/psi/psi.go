@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/rogpeppe/go-charset/charset"
@@ -83,7 +83,7 @@ func (p *IndexedMzML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -95,7 +95,7 @@ func (p *IndexedMzML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mzml); e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	p.MzML = mzml.MzML
@@ -109,7 +109,7 @@ func (p *MzIdentML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 
 	defer xmlFile.Close()
@@ -133,7 +133,7 @@ func (p *MzIdentML) Write() {
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -143,7 +143,7 @@ func (p *MzIdentML) Write() {
 	enc.Indent("  ", "    ")
 
 	if e := enc.Encode(p); e != nil {
-		err.DecodeMsgPck(e, "trace")
+		msg.DecodeMsgPck(e, "trace")
 	}
 
 	// copy to work directory

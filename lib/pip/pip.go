@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/ext/tmtintegrator"
@@ -78,12 +78,12 @@ func DeployParameterFile(temp string) string {
 
 	param, e := Asset("philosopher.yml")
 	if e != nil {
-		err.DeployAsset(errors.New("pipeline configuration file"), "fatal")
+		msg.DeployAsset(errors.New("pipeline configuration file"), "fatal")
 	}
 
 	e = ioutil.WriteFile(file, param, sys.FilePermission())
 	if e != nil {
-		err.DeployAsset(errors.New("pipeline configuration file"), "fatal")
+		msg.DeployAsset(errors.New("pipeline configuration file"), "fatal")
 	}
 
 	return file
@@ -114,7 +114,7 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		}
 
 		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-			err.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
+			msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
 		}
 
 		// return to the top level directory
@@ -146,7 +146,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			gobExtC := fmt.Sprintf("*.%s", p.Comet.RawExtension)
 			filesC, e := filepath.Glob(gobExtC)
 			if e != nil {
-				err.Custom(e, "fatal")
+				msg.Custom(e, "fatal")
 			}
 
 			if len(filesC) > 0 {
@@ -162,7 +162,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
-				err.Custom(e, "fatal")
+				msg.Custom(e, "fatal")
 			}
 
 			if len(filesM) > 0 {
@@ -223,7 +223,7 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
-					err.Custom(e, "fatal")
+					msg.Custom(e, "fatal")
 				}
 				peptideprophet.Run(meta, files)
 				meta.Serialize()

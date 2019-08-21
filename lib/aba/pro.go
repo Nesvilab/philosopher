@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/fil"
@@ -148,7 +148,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	if _, e := os.Stat("combined.prot.xml"); os.IsNotExist(e) {
 
-		err.Custom(errors.New("Cannot find combined.prot.xml file"), "fatal")
+		msg.Custom(errors.New("Cannot find combined.prot.xml file"), "fatal")
 
 	} else {
 
@@ -299,7 +299,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "error")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 
@@ -345,7 +345,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	line += "\n"
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -444,7 +444,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -464,7 +464,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create reprint SpC report"), "error")
+		msg.WriteFile(errors.New("Cannot create reprint SpC report"), "error")
 	}
 	defer file.Close()
 
@@ -485,7 +485,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -504,7 +504,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -524,7 +524,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create reprint Int. report"), "error")
+		msg.WriteFile(errors.New("Cannot create reprint Int. report"), "error")
 	}
 	defer file.Close()
 
@@ -545,7 +545,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -564,7 +564,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -582,7 +582,7 @@ func getLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		err.ReadFile(errors.New("Cannot open annotation file"), "error")
+		msg.ReadFile(errors.New("Cannot open annotation file"), "error")
 	}
 	defer file.Close()
 
@@ -593,7 +593,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		err.Custom(errors.New("The annotation file looks to be empty"), "fatal")
+		msg.Custom(errors.New("The annotation file looks to be empty"), "fatal")
 	}
 
 	return labels

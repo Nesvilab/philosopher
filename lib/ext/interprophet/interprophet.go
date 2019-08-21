@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	unix "github.com/prvst/philosopher/lib/ext/interprophet/unix"
 	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -44,7 +44,7 @@ func Run(m met.Data, args []string) met.Data {
 	m.InterProphet.InputFiles = args
 
 	if len(args) < 1 {
-		err.NoParametersFound(errors.New("IProphet input files"), "fatal")
+		msg.NoParametersFound(errors.New("IProphet input files"), "fatal")
 	}
 
 	// deploy the binaries
@@ -74,7 +74,7 @@ func (i *InterProphet) Deploy(os, distro string) {
 			unix.UnixInterProphetParser(i.UnixInterProphetParser)
 			i.DefaultInterProphetParser = i.UnixInterProphetParser
 		} else {
-			err.UnsupportedDistribution(errors.New(""), "fatal")
+			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -115,7 +115,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

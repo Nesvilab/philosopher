@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/ext/ptmprophet"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -18,7 +18,7 @@ var ptmprophetCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("PTMProphet ", Version)
+		msg.Executing("PTMProphet ", Version)
 
 		m.PTMProphet.InputFiles = args
 		ptmprophet.Run(m, args)
@@ -27,7 +27,7 @@ var ptmprophetCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 	},
 }
 

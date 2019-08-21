@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -15,7 +15,7 @@ func UnixInteractParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InteractParser"), "trace")
+		msg.DeployAsset(errors.New("InteractParser"), "trace")
 	}
 
 	return
@@ -28,7 +28,7 @@ func UnixRefreshParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("RefreshParser"), "trace")
+		msg.DeployAsset(errors.New("RefreshParser"), "trace")
 	}
 
 	return
@@ -41,7 +41,7 @@ func UnixPeptideProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("PeptideProphetParser"), "trace")
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "trace")
 	}
 
 	return

@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
@@ -166,7 +166,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 	dtb.Restore()
 
 	if len(dtb.Records) < 1 {
-		err.DatabaseNotFound(errors.New(""), "fatal")
+		msg.DatabaseNotFound(errors.New(""), "fatal")
 	}
 
 	// fix the name sand headers and pull database information into proteinreport
@@ -212,7 +212,7 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create protein report"), "error")
+		msg.WriteFile(errors.New("Cannot create protein report"), "error")
 	}
 	defer file.Close()
 
@@ -220,7 +220,7 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -297,7 +297,7 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 		line += "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -317,7 +317,7 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create report file"), "error")
+		msg.WriteFile(errors.New("Cannot create report file"), "error")
 	}
 	defer file.Close()
 
@@ -331,7 +331,7 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -444,7 +444,7 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 
 			_, e = io.WriteString(file, line)
 			if e != nil {
-				err.WriteToFile(e, "fatal")
+				msg.WriteToFile(e, "fatal")
 			}
 		}
 	}
@@ -462,7 +462,7 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -483,7 +483,7 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 		line := ">" + header + "\n" + i.Sequence + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 	}
 

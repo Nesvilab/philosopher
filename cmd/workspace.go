@@ -5,7 +5,7 @@ import (
 	"os"
 
 	ga "github.com/jpillora/go-ogle-analytics"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
@@ -18,11 +18,11 @@ var workspaceCmd = &cobra.Command{
 	Short: "Manage the experiment workspace for the analysis",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err.Executing("Workspace ", Version)
+		msg.Executing("Workspace ", Version)
 
 		wrk.Run(Version, Build, b, c, i, n)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

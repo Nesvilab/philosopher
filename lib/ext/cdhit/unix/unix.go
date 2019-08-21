@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 )
@@ -16,7 +16,7 @@ func Unix64(unix64 string) {
 	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("CD-HIT"), "trace")
+		msg.DeployAsset(errors.New("CD-HIT"), "trace")
 	}
 
 	return

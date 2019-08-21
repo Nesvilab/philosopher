@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/fas"
 	"github.com/prvst/philosopher/lib/met"
@@ -57,11 +57,11 @@ func Run(m met.Data) met.Data {
 	}
 
 	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
-		err.InputNotFound(errors.New("You need to provide a taxon ID or a custom FASTA file"), "fatal")
+		msg.InputNotFound(errors.New("You need to provide a taxon ID or a custom FASTA file"), "fatal")
 	}
 
 	if m.Database.Crap == false {
-		err.InputNotFound(errors.New("Contaminants are not going to be added to database"), "warning")
+		msg.InputNotFound(errors.New("Contaminants are not going to be added to database"), "warning")
 	}
 
 	if len(m.Database.Custom) < 1 {
@@ -127,7 +127,7 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 			d.Records = append(d.Records, db)
 
 		} else {
-			err.ParsingFASTA(errors.New(""), "fatal")
+			msg.ParsingFASTA(errors.New(""), "fatal")
 		}
 	}
 
@@ -155,21 +155,21 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	// tries to create an output file
 	output, e := os.Create(d.UniProtDB)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create a local database file"), "fatal")
+		msg.WriteFile(errors.New("Cannot create a local database file"), "fatal")
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		err.Custom(errors.New("UniProt query failed, please check your connection"), "error")
+		msg.Custom(errors.New("UniProt query failed, please check your connection"), "error")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		err.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
+		msg.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
 	}
 
 	return
@@ -234,7 +234,7 @@ func (d *Base) Deploy(temp string) {
 	param, e := Asset("crap.fas")
 	e = ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 
 	return
@@ -264,7 +264,7 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso bool) string {
 	// create decoy db file
 	file, e := os.Create(workfile)
 	if e != nil {
-		err.ReadFile(errors.New("Cannot open the database file"), "fatal")
+		msg.ReadFile(errors.New("Cannot open the database file"), "fatal")
 	}
 	defer file.Close()
 
@@ -279,7 +279,7 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso bool) string {
 		line := i + "\n" + d.TaDeDB[i] + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteFile(e, "fatal")
+			msg.WriteFile(e, "fatal")
 		}
 	}
 
@@ -293,12 +293,12 @@ func (d *Base) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		err.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
 	if e != nil {
-		err.SerializeFile(e, "fatal")
+		msg.SerializeFile(e, "fatal")
 	}
 
 	return
@@ -309,12 +309,12 @@ func (d *Base) Restore() {
 
 	b, e := ioutil.ReadFile(sys.DBBin())
 	if e != nil {
-		err.MarshalFile(e, "warning")
+		msg.MarshalFile(e, "warning")
 	}
 
 	e = msgpack.Unmarshal(b, &d)
 	if e != nil {
-		err.SerializeFile(e, "warning")
+		msg.SerializeFile(e, "warning")
 	}
 
 	return
@@ -331,7 +331,7 @@ func (d *Base) RestoreWithPath(p string) {
 	dec := msgpack.NewDecoder(file)
 	e := dec.Decode(&d)
 	if e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	return

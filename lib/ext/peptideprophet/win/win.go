@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -15,7 +15,7 @@ func WinInteractParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("InteractParser"), "trace")
+		msg.DeployAsset(errors.New("InteractParser"), "trace")
 	}
 
 	return
@@ -28,7 +28,7 @@ func WinRefreshParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("RefreshParser"), "trace")
+		msg.DeployAsset(errors.New("RefreshParser"), "trace")
 	}
 
 	return
@@ -41,7 +41,7 @@ func WinPeptideProphetParser(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("PeptideProphetParser"), "trace")
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "trace")
 	}
 
 	return
@@ -54,7 +54,7 @@ func Mv(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("mv.exe"), "trace")
+		msg.DeployAsset(errors.New("mv.exe"), "trace")
 	}
 
 	return
@@ -67,7 +67,7 @@ func LibgccDLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
 	}
 
 	return
@@ -80,7 +80,7 @@ func Zlib1DLL(s string) {
 	e = ioutil.WriteFile(s, bin, sys.FilePermission())
 
 	if e != nil {
-		err.DeployAsset(errors.New("Zlib1DLL"), "trace")
+		msg.DeployAsset(errors.New("Zlib1DLL"), "trace")
 	}
 
 	return

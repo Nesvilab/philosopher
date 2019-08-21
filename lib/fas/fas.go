@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // ParseFile a fasta file and returns a map with the header as key and sequence as value
@@ -19,7 +19,7 @@ func ParseFile(filename string) map[string]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		err.ReadFile(errors.New("Cannot open the database file"), "error")
+		msg.ReadFile(errors.New("Cannot open the database file"), "error")
 	}
 	defer f.Close()
 
@@ -83,7 +83,7 @@ func ParseFastaDescription(filename string) map[string][]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		err.ReadFile(errors.New("Cannot open FASTA file"), "fatal")
+		msg.ReadFile(errors.New("Cannot open FASTA file"), "fatal")
 	}
 	defer f.Close()
 

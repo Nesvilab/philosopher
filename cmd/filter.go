@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -19,7 +19,7 @@ var filterCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("Filter ", Version)
+		msg.Executing("Filter ", Version)
 
 		// clean, clean clean
 		os.RemoveAll(sys.EvBin())
@@ -38,11 +38,11 @@ var filterCmd = &cobra.Command{
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {
-			err.InputNotFound(errors.New("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
+			msg.InputNotFound(errors.New("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
 		}
 
 		if len(m.Filter.Pox) == 0 && m.Filter.Razor == true {
-			err.Custom(errors.New("Razor option will be disabled because there is no protein inference data"), "warning")
+			msg.Custom(errors.New("Razor option will be disabled because there is no protein inference data"), "warning")
 			m.Filter.Razor = false
 		}
 
@@ -53,7 +53,7 @@ var filterCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

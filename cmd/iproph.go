@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/ext/interprophet"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -19,7 +19,7 @@ var iprophCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("InterProphet ", Version)
+		msg.Executing("InterProphet ", Version)
 
 		// run
 		m = interprophet.Run(m, args)
@@ -29,7 +29,7 @@ var iprophCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 
 		return
 	},

@@ -3,7 +3,7 @@ package tmt
 import (
 	"errors"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // Labels main struct
@@ -166,7 +166,7 @@ func New(plex string) Labels {
 		o.Channel10.Mz = 131.138180
 		o.Channel11.Mz = 131.144499
 	} else {
-		err.Custom(errors.New("Unknown multiplex setting, please define the plex number used in your experiment"), "error")
+		msg.Custom(errors.New("Unknown multiplex setting, please define the plex number used in your experiment"), "error")
 	}
 
 	return o

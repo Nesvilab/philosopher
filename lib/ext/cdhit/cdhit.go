@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	ucdhit "github.com/prvst/philosopher/lib/ext/cdhit/unix"
 	wcdhit "github.com/prvst/philosopher/lib/ext/cdhit/win"
@@ -89,7 +89,7 @@ func (c *CDhit) Run(level float64) {
 	_ = run.Wait()
 
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 
 	return

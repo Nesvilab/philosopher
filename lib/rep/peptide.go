@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/cla"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
@@ -128,14 +128,14 @@ func (evi *Evidence) PeptideReport(hasDecoys bool) {
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create peptide output file"), "fatal")
+		msg.WriteFile(errors.New("Could not create peptide output file"), "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 
 	if e != nil {
-		err.WriteToFile(errors.New("Cannot write to Peptide report"), "fatal")
+		msg.WriteToFile(errors.New("Cannot write to Peptide report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -188,7 +188,7 @@ func (evi *Evidence) PeptideReport(hasDecoys bool) {
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot print to Peptide report"), "fatal")
+			msg.WriteToFile(errors.New("Cannot print to Peptide report"), "fatal")
 		}
 	}
 
@@ -205,7 +205,7 @@ func (evi *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) 
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create peptide TMT output file"), "fatal")
+		msg.WriteFile(errors.New("Could not create peptide TMT output file"), "fatal")
 	}
 	defer file.Close()
 
@@ -220,7 +220,7 @@ func (evi *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) 
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(errors.New("Could not write peptide output header"), "fatal")
+		msg.WriteToFile(errors.New("Could not write peptide output header"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -284,7 +284,7 @@ func (evi *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) 
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot print to peptide TMT"), "fatal")
+			msg.WriteToFile(errors.New("Cannot print to peptide TMT"), "fatal")
 		}
 	}
 

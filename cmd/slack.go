@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"
@@ -28,7 +28,7 @@ var slackCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if len(token) < 1 {
-			err.InputNotFound(errors.New("You need to specify yout toke in order to push a notification"), "error")
+			msg.InputNotFound(errors.New("You need to specify yout toke in order to push a notification"), "error")
 		}
 
 		sla.Run(name, token, message, channel)

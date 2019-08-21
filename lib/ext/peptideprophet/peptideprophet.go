@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	unix "github.com/prvst/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/prvst/philosopher/lib/ext/peptideprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -55,7 +55,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pep = New(m.Temp)
 
 	if len(m.PeptideProphet.Database) < 1 {
-		err.Custom(errors.New("You need to provide a protein database"), "fatal")
+		msg.Custom(errors.New("You need to provide a protein database"), "fatal")
 	}
 
 	// get the database tag from database command
@@ -103,7 +103,7 @@ func (p *PeptideProphet) Deploy(os, distro string) {
 			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
 			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
 		} else {
-			err.UnsupportedDistribution(errors.New(""), "fatal")
+			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -204,7 +204,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			cmd.Stderr = os.Stderr
 			e := cmd.Start()
 			if e != nil {
-				err.ExecutingBinary(e, "fatal")
+				msg.ExecutingBinary(e, "fatal")
 			}
 			_ = cmd.Wait()
 
@@ -260,7 +260,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 		cmd.Stderr = os.Stderr
 		e := cmd.Start()
 		if e != nil {
-			err.ExecutingBinary(e, "fatal")
+			msg.ExecutingBinary(e, "fatal")
 		}
 		_ = cmd.Wait()
 
@@ -302,7 +302,7 @@ func refreshParser(p PeptideProphet, file, database, output, temp string) {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 
@@ -470,7 +470,7 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

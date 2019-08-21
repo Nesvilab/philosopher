@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf16"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // interface shared by all data objects in the raw file
@@ -512,7 +512,7 @@ func (rd *RawData) ProcessRaw(f string) {
 
 	file, e := os.Open(f)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 
 	// Read headers for file version and RunHeader addresses.
@@ -769,7 +769,7 @@ func (data *RunHeader) Retrieve(rs io.ReadSeeker, info RawFileInfo, ver Version)
 	}
 
 	if data.ScantrailerAddr == 0 {
-		err.Custom(errors.New(""), "fatal")
+		msg.Custom(errors.New(""), "fatal")
 	}
 
 	return
@@ -1243,14 +1243,14 @@ func readAt(rs io.ReadSeeker, pos uint64, v Version, data reader) uint64 {
 
 	spos, e := rs.Seek(int64(pos), 0)
 	if e != nil {
-		err.Custom(errors.New("error seeking file"), "fatal")
+		msg.Custom(errors.New("error seeking file"), "fatal")
 	}
 
 	data.Read(rs, v)
 
 	spos, e = rs.Seek(0, 1)
 	if e != nil {
-		err.Custom(errors.New("error determining position in file"), "fatal")
+		msg.Custom(errors.New("error determining position in file"), "fatal")
 	}
 
 	return uint64(spos)
@@ -1262,7 +1262,7 @@ func readBetween(rs io.ReadSeeker, begin uint64, end uint64, v Version, data rea
 
 	_, e := rs.Seek(int64(begin), 0)
 	if e != nil {
-		err.Custom(errors.New("error seeking file"), "fatal")
+		msg.Custom(errors.New("error seeking file"), "fatal")
 	}
 
 	// may fail because of memory requirements

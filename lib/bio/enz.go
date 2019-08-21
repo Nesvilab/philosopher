@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // Enzyme struct
@@ -38,7 +38,7 @@ func (e *Enzyme) Synth(t string) {
 		e.Pattern = "DE[^P]"
 		e.Join = "K"
 	} else {
-		err.Custom(errors.New("Enzyme not supported"), "warning")
+		msg.Custom(errors.New("Enzyme not supported"), "warning")
 	}
 
 	return

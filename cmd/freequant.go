@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
@@ -22,18 +22,18 @@ var freequant = &cobra.Command{
 
 		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {
-			err.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
+			msg.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
-		err.Executing("Label-free quantification ", Version)
+		msg.Executing("Label-free quantification ", Version)
 
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			err.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
+			msg.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			err.InputNotFound(errors.New("Unknown file format"), "fatal")
+			msg.InputNotFound(errors.New("Unknown file format"), "fatal")
 		}
 
 		//forcing the larger time window to be the same as the smaller one
@@ -48,7 +48,7 @@ var freequant = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

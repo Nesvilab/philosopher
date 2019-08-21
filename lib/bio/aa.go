@@ -3,7 +3,7 @@ package bio
 import (
 	"errors"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // AminoAcid representation
@@ -66,7 +66,7 @@ func New(name string) AminoAcid {
 	case "Valine":
 		aa = AminoAcid{Code: "V", ShortName: "Val", Name: "Valine", MonoIsotopeMass: 99.068413945, AverageMass: 99.13106}
 	default:
-		err.Custom(errors.New("Amino acid not found"), "warning")
+		msg.Custom(errors.New("Amino acid not found"), "warning")
 		return aa
 	}
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 )
@@ -16,7 +16,7 @@ func Win64(win64 string) {
 	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
 	if e != nil {
-		err.ExecutingBinary(errors.New("CD-hit"), "trace")
+		msg.ExecutingBinary(errors.New("CD-hit"), "trace")
 	}
 
 	return

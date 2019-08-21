@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	ucomet "github.com/prvst/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/prvst/philosopher/lib/ext/comet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -50,7 +50,7 @@ func Run(m met.Data, args []string) met.Data {
 	var cmt = New(m.Temp)
 
 	if len(m.Comet.Param) < 1 || m.Comet.Print == false && len(args) < 1 {
-		err.Comet(errors.New(""), "fatal")
+		msg.Comet(errors.New(""), "fatal")
 	}
 
 	// deploy the binaries
@@ -70,7 +70,7 @@ func Run(m met.Data, args []string) met.Data {
 	paramAbs, _ := filepath.Abs(m.Comet.Param)
 	binFile, e := ioutil.ReadFile(paramAbs)
 	if e != nil {
-		err.Custom(e, "fatal")
+		msg.Custom(e, "fatal")
 	}
 	m.Comet.ParamFile = binFile
 

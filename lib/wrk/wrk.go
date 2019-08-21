@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/pierrre/archivefile/zip"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/gth"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
@@ -26,7 +26,7 @@ func Run(Version, Build string, b, c, i, n bool) {
 	}
 
 	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
-		err.Custom(errors.New("this command accepts only one parameter"), "fatal")
+		msg.Custom(errors.New("this command accepts only one parameter"), "fatal")
 	}
 
 	if i == true {
@@ -58,12 +58,12 @@ func Init(version, build string) {
 	msgpack.Unmarshal(b, &m)
 
 	if len(m.UUID) > 1 && len(m.Home) > 1 {
-		err.OverwrittingMeta(errors.New(""), "warning")
+		msg.OverwrittingMeta(errors.New(""), "warning")
 	} else {
 
 		dir, e := os.Getwd()
 		if e != nil {
-			err.GettingLocalDir(e, "warning")
+			msg.GettingLocalDir(e, "warning")
 		}
 
 		da := met.New(dir)
@@ -73,7 +73,7 @@ func Init(version, build string) {
 
 		os.Mkdir(da.MetaDir, sys.FilePermission())
 		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-			err.CreatingMetaDirectory(e, "fatal")
+			msg.CreatingMetaDirectory(e, "fatal")
 		}
 
 		if runtime.GOOS == sys.Windows() {
@@ -82,7 +82,7 @@ func Init(version, build string) {
 
 		os.Mkdir(da.Temp, sys.FilePermission())
 		if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
-			err.LocatingTemDirecotry(e, "fatal")
+			msg.LocatingTemDirecotry(e, "fatal")
 		}
 
 		da.Home = fmt.Sprintf("%s", da.Home)
@@ -101,11 +101,11 @@ func Backup() {
 	var m met.Data
 	_, e := ioutil.ReadFile(sys.Meta())
 	if e != nil {
-		err.ReadFile(e, "warning")
+		msg.ReadFile(e, "warning")
 	}
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {
-		err.LocatingMetaDirecotry(errors.New(""), "error")
+		msg.LocatingMetaDirecotry(errors.New(""), "error")
 	}
 
 	var name string
@@ -123,7 +123,7 @@ func Backup() {
 
 	e = zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
 	if e != nil {
-		err.ArchivingMetaDirecotry(e, "error")
+		msg.ArchivingMetaDirecotry(e, "error")
 	}
 
 	return
@@ -136,18 +136,18 @@ func Clean() {
 	var d met.Data
 	_, e := ioutil.ReadFile(sys.Meta())
 	if e != nil {
-		err.ReadFile(e, "warning")
+		msg.ReadFile(e, "warning")
 	}
 
 	e = os.RemoveAll(sys.MetaDir())
 	if e != nil {
-		err.DeletingMetaDirecotry(e, "warning")
+		msg.DeletingMetaDirecotry(e, "warning")
 	}
 
 	if len(d.Temp) > 0 {
 		e := os.RemoveAll(d.Temp)
 		if e != nil {
-			err.DeletingMetaDirecotry(e, "warning")
+			msg.DeletingMetaDirecotry(e, "warning")
 		}
 	}
 

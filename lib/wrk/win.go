@@ -6,18 +6,18 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // HideFile makes the .meta folder hidden on Windows
 func HideFile(filename string) {
 	filenameW, e := syscall.UTF16PtrFromString(filename)
 	if e != nil {
-		err.Custom(e, "fatal")
+		msg.Custom(e, "fatal")
 	}
 	e = syscall.SetFileAttributes(filenameW, syscall.FILE_ATTRIBUTE_HIDDEN)
 	if e != nil {
-		err.Custom(errors.New("Cannot hide file"), "error")
+		msg.Custom(errors.New("Cannot hide file"), "error")
 	}
 	return
 }

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/spc"
 
@@ -46,7 +46,7 @@ func Run(f met.Data) met.Data {
 	f.SearchEngine = searchEngine
 
 	if len(pepid) == 0 {
-		err.NoPSMFound(errors.New(""), "fatal")
+		msg.NoPSMFound(errors.New(""), "fatal")
 	}
 
 	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
@@ -94,7 +94,7 @@ func Run(f met.Data) met.Data {
 	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
-		err.Custom(errors.New("Database data not available, interrupting processing"), "fatal")
+		msg.Custom(errors.New("Database data not available, interrupting processing"), "fatal")
 	}
 
 	logrus.Info("Post processing identifications")
@@ -185,7 +185,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList,
 		list, _ := filepath.Glob(glob)
 
 		if len(list) == 0 {
-			err.NoParametersFound(errors.New("missing pepXML files"), "fatal")
+			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
 		}
 
 		for _, i := range list {
@@ -549,7 +549,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 		file, e := os.Create(output)
 		if e != nil {
-			err.WriteFile(e, "fatal")
+			msg.WriteFile(e, "fatal")
 		}
 		defer file.Close()
 
@@ -569,7 +569,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 				mapping := strings.Join(line, "\t")
 				_, e = io.WriteString(file, mapping)
 				if e != nil {
-					err.WriteToFile(e, "fatal")
+					msg.WriteToFile(e, "fatal")
 				}
 
 			}
@@ -1000,7 +1000,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	}
 
 	if curProb == 10 {
-		err.Custom(errors.New("The protein FDR filter didn't reached the desired threshold, try a higher threshold using the --prot parameter"), "error")
+		msg.Custom(errors.New("The protein FDR filter didn't reached the desired threshold, try a higher threshold using the --prot parameter"), "error")
 	}
 
 	fmtScore := uti.ToFixed(curScore, 4)

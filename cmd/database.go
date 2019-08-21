@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
@@ -16,14 +16,14 @@ var databaseCmd = &cobra.Command{
 
 		m.FunctionInitCheckUp()
 
-		err.Executing("Database ", Version)
+		msg.Executing("Database ", Version)
 
 		m = dat.Run(m)
 
 		// store paramters on meta data
 		m.Serialize()
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

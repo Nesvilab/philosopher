@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/pip"
@@ -23,7 +23,7 @@ var pipelineCmd = &cobra.Command{
 	Short: "Automatic execution of consecutive analysis steps",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err.Executing("Pipeline ", Version)
+		msg.Executing("Pipeline ", Version)
 
 		// get current directory
 		dir, e := os.Getwd()
@@ -36,13 +36,13 @@ var pipelineCmd = &cobra.Command{
 
 		os.Mkdir(meta.Temp, sys.FilePermission())
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
-			err.Custom(errors.New("Can't find temporary directory; check folder permissions"), "info")
+			msg.Custom(errors.New("Can't find temporary directory; check folder permissions"), "info")
 		}
 
 		param := pip.DeployParameterFile(meta.Temp)
 
 		if m.Pipeline.Print == true {
-			err.Custom(errors.New("Printing parameter file"), "info")
+			msg.Custom(errors.New("Printing parameter file"), "info")
 			sys.CopyFile(param, filepath.Base(param))
 			return
 		}
@@ -51,19 +51,19 @@ var pipelineCmd = &cobra.Command{
 
 		y, e := ioutil.ReadFile(file)
 		if e != nil {
-			err.ReadFile(e, "fatal")
+			msg.ReadFile(e, "fatal")
 		}
 
 		var p pip.Directives
 		e = yaml.Unmarshal(y, &p)
 		if e != nil {
-			err.ReadFile(e, "fatal")
+			msg.ReadFile(e, "fatal")
 		}
 
 		if len(args) < 1 {
-			err.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
+			msg.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
 		} else if p.Commands.Abacus == "true" && len(args) < 2 {
-			err.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
+			msg.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
 		}
 
 		// Workspace - Database
@@ -97,7 +97,7 @@ var pipelineCmd = &cobra.Command{
 			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
 		}
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

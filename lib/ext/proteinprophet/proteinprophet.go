@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	unix "github.com/prvst/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/prvst/philosopher/lib/ext/proteinprophet/win"
 	"github.com/prvst/philosopher/lib/met"
@@ -54,7 +54,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pop = New(m.Temp)
 
 	if len(args) < 1 {
-		err.NoParametersFound(errors.New("missing pep.xml"), "fatal")
+		msg.NoParametersFound(errors.New("missing pep.xml"), "fatal")
 	}
 
 	// deploy the binaries
@@ -96,7 +96,7 @@ func (p *ProteinProphet) Deploy(os, distro string) {
 			unix.UnixProteinProphet(p.UnixProteinProphet)
 			p.DefaultProteinProphet = p.UnixProteinProphet
 		} else {
-			err.UnsupportedDistribution(errors.New(""), "fatal")
+			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
 
@@ -139,7 +139,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		err.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
 

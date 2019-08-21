@@ -3,6 +3,8 @@
 *.a
 *.so
 
+philosopher
+
 # Folders
 _obj
 _test

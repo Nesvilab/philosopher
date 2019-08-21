@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/ext/cdhit"
@@ -81,7 +81,7 @@ func createCleanDataBaseReference(uid, temp string) string {
 
 	file, e := os.Create(clstrFasta)
 	if e != nil {
-		err.Custom(errors.New("Could not create output for binning"), "fatal")
+		msg.Custom(errors.New("Could not create output for binning"), "fatal")
 	}
 	defer file.Close()
 
@@ -93,7 +93,7 @@ func createCleanDataBaseReference(uid, temp string) string {
 			_, e = io.WriteString(file, line)
 
 			if e != nil {
-				err.Custom(errors.New("Could not create output for binning"), "fatal")
+				msg.Custom(errors.New("Could not create output for binning"), "fatal")
 			}
 
 		}
@@ -130,7 +130,7 @@ func parseClusterFile(cls, database string) List {
 
 	f, e := os.Open(cls)
 	if e != nil {
-		err.Custom(errors.New("Cannot open cluster file"), "fatal")
+		msg.Custom(errors.New("Cannot open cluster file"), "fatal")
 	}
 	defer f.Close()
 
@@ -147,7 +147,7 @@ func parseClusterFile(cls, database string) List {
 			num := cluster[1]
 			i, e := strconv.Atoi(num)
 			if e != nil {
-				err.Custom(errors.New("FAST header not found"), "fatal")
+				msg.Custom(errors.New("FAST header not found"), "fatal")
 			}
 			clusterNumber = i
 
@@ -160,7 +160,7 @@ func parseClusterFile(cls, database string) List {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
 				if len(centroid) < 2 {
-					err.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "fatal")
+					msg.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "fatal")
 				}
 				centroidmap[clusterNumber] = centroid[1]
 			}
@@ -302,28 +302,28 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	// tries to create an output file
 	output, e := os.Create(outfile)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		err.Custom(errors.New("Could not find the annotation file"), "fatal")
+		msg.Custom(errors.New("Could not find the annotation file"), "fatal")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		err.Custom(errors.New("Cannot download the annotation file"), "fatal")
+		msg.Custom(errors.New("Cannot download the annotation file"), "fatal")
 	}
 
 	faMap = make(map[string][]string)
 
 	f, e := os.Open(outfile)
 	if outfile == "" || e != nil {
-		err.Custom(errors.New("Emty or inexisting file"), "fatal")
+		msg.Custom(errors.New("Emty or inexisting file"), "fatal")
 	}
 	defer f.Close()
 
@@ -357,7 +357,7 @@ func savetoDisk(list List, temp, uid string) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -371,7 +371,7 @@ func savetoDisk(list List, temp, uid string) {
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	var faMap = make(map[string][]string)
@@ -420,7 +420,7 @@ func savetoDisk(list List, temp, uid string) {
 
 			_, e := io.WriteString(file, line)
 			if e != nil {
-				err.WriteToFile(e, "fatal")
+				msg.WriteToFile(e, "fatal")
 			}
 		}
 

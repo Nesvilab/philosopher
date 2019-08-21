@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/rogpeppe/go-charset/charset"
 
@@ -54,7 +54,7 @@ func (p *PepXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -66,7 +66,7 @@ func (p *PepXML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mpa); e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	p.MsmsPipelineAnalysis = mpa
@@ -80,7 +80,7 @@ func (p *ProtXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -92,7 +92,7 @@ func (p *ProtXML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&ps); e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	p.ProteinSummary = ps

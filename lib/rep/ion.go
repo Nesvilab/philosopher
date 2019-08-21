@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/cla"
@@ -112,13 +112,13 @@ func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("peptide ion output file"), "fatal")
+		msg.WriteFile(errors.New("peptide ion output file"), "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	if e != nil {
-		err.WriteToFile(errors.New("peptide ion output header"), "fatal")
+		msg.WriteToFile(errors.New("peptide ion output header"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -176,7 +176,7 @@ func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
 			)
 			_, e = io.WriteString(file, line)
 			if e != nil {
-				err.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+				msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
 			}
 		}
 	}
@@ -194,7 +194,7 @@ func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys boo
 
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -208,7 +208,7 @@ func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys boo
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(errors.New("Cannot write to peptide ion report"), "fatal")
+		msg.WriteToFile(errors.New("Cannot write to peptide ion report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -278,7 +278,7 @@ func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys boo
 			)
 			_, e = io.WriteString(file, line)
 			if e != nil {
-				err.WriteToFile(errors.New("Cannot print to file peptide ion TMT report"), "fatal")
+				msg.WriteToFile(errors.New("Cannot print to file peptide ion TMT report"), "fatal")
 			}
 		}
 	}

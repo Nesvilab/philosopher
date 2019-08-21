@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/aba"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
@@ -20,10 +20,10 @@ var abacusCmd = &cobra.Command{
 		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {
-			err.InputNotFound(errors.New("The combined analysis needs at least 2 result files to work"), "fatal")
+			msg.InputNotFound(errors.New("The combined analysis needs at least 2 result files to work"), "fatal")
 		}
 
-		err.Executing("Abacus", Version)
+		msg.Executing("Abacus", Version)
 		aba.Run(m, args)
 
 		// store parameters on meta data
@@ -32,7 +32,7 @@ var abacusCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }

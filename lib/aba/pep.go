@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
@@ -100,7 +100,7 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		err.NoParametersFound(errors.New("missing combined.pep.xml"), "fatal")
+		msg.NoParametersFound(errors.New("missing combined.pep.xml"), "fatal")
 
 	} else {
 
@@ -331,7 +331,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "error")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 
@@ -345,7 +345,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	line += "\n"
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -376,7 +376,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		line += "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}

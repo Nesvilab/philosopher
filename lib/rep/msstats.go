@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/bio"
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -21,13 +21,13 @@ func (evi *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Spectrum.Name\tSpectrum.File\tPeptide.Sequence\tModified.Peptide.Sequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
 	if e != nil {
-		err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+		msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -80,7 +80,7 @@ func (evi *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+			msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 		}
 	}
 
@@ -98,7 +98,7 @@ func (evi *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string,
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Cannot create report MSstats TMT file"), "fatal")
+		msg.WriteFile(errors.New("Cannot create report MSstats TMT file"), "fatal")
 	}
 	defer file.Close()
 
@@ -112,7 +112,7 @@ func (evi *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string,
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+		msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -176,7 +176,7 @@ func (evi *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string,
 		)
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+			msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 		}
 	}
 

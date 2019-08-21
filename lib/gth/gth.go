@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/sirupsen/logrus"
 )
 
@@ -33,12 +33,12 @@ func UpdateChecker(v, b string) {
 	// GET request
 	res, e := http.Get("https://api.github.com/repos/prvst/philosopher/releases")
 	if e != nil {
-		err.Custom(errors.New("Can't check for updates, server unreachable"), "warning")
+		msg.Custom(errors.New("Can't check for updates, server unreachable"), "warning")
 	} else {
 
 		body, e := ioutil.ReadAll(res.Body)
 		if e != nil {
-			err.Custom(e, "fatal")
+			msg.Custom(e, "fatal")
 		}
 
 		var rel Releases

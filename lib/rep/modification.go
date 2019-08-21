@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/obo"
 	"github.com/prvst/philosopher/lib/sys"
@@ -271,7 +271,7 @@ func (evi *Evidence) ModificationReport() {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create report files"), "error")
+		msg.WriteFile(errors.New("Could not create report files"), "error")
 	}
 	defer file.Close()
 
@@ -279,7 +279,7 @@ func (evi *Evidence) ModificationReport() {
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		err.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "fatal")
 	}
 
 	for _, i := range evi.Modifications.MassBins {
@@ -293,7 +293,7 @@ func (evi *Evidence) ModificationReport() {
 		line += "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			err.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -311,7 +311,7 @@ func (evi *Evidence) PlotMassHist() {
 
 	file, e := os.Create(outfile)
 	if e != nil {
-		err.WriteFile(errors.New("Could not create output for delta mass binning"), "fatal")
+		msg.WriteFile(errors.New("Could not create output for delta mass binning"), "fatal")
 	}
 	defer file.Close()
 
@@ -357,7 +357,7 @@ func (evi *Evidence) PlotMassHist() {
 	io.WriteString(file, "</body>")
 
 	if e != nil {
-		err.Custom(errors.New("There was an error trying to plot the mass distribution"), "fatal")
+		msg.Custom(errors.New("There was an error trying to plot the mass distribution"), "fatal")
 	}
 
 	// copy to work directory

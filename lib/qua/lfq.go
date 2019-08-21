@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/bio"
 	"github.com/prvst/philosopher/lib/mzn"
@@ -152,7 +152,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		err.NoPSMFound(errors.New("cannot attribute intensity calculations"), "fatal")
+		msg.NoPSMFound(errors.New("cannot attribute intensity calculations"), "fatal")
 	}
 
 	var peptideIntMap = make(map[string]float64)

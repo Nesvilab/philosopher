@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
@@ -218,7 +218,7 @@ func getLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -231,7 +231,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 
 	return labels

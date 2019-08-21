@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 )
 
 // GetHome returns the user home directory name
@@ -26,7 +26,7 @@ func GetHome() string {
 	} else if runtime.GOOS == Linux() {
 		home = os.Getenv("HOME")
 	} else {
-		err.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
 	}
 
 	return home
@@ -41,7 +41,7 @@ func GetTemp() string {
 	} else if runtime.GOOS == Linux() {
 		tmp = "/tmp"
 	} else {
-		err.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
 	}
 
 	return tmp
@@ -80,27 +80,27 @@ func CopyFile(from, to string) {
 	// Open original file
 	originalFile, e := os.Open(from)
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 	defer originalFile.Close()
 
 	// Create new file
 	newFile, e := os.Create(to)
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 	defer newFile.Close()
 
 	// Copy the bytes to destination from source
 	_, e = io.Copy(newFile, originalFile)
 	if e != nil {
-		err.CopyingFile(e, "fatal")
+		msg.CopyingFile(e, "fatal")
 	}
 
 	// Commit the file contents
 	e = newFile.Sync()
 	if e != nil {
-		err.Custom(e, "fatal")
+		msg.Custom(e, "fatal")
 	}
 
 	return

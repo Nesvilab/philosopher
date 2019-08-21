@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
@@ -188,7 +188,7 @@ func (p *ProtXML) Read(f string) {
 	p.Groups = groups
 
 	if len(groups) == 0 {
-		err.NoProteinFound(errors.New(""), "fatal")
+		msg.NoProteinFound(errors.New(""), "fatal")
 	}
 
 	return
@@ -251,12 +251,12 @@ func (p *ProtXML) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 
 	return
@@ -267,12 +267,12 @@ func (p *ProtXML) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProtxmlBin())
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	return
@@ -283,12 +283,12 @@ func (p *ProtIDList) Serialize() {
 
 	b, e := msgpack.Marshal(&p)
 	if e != nil {
-		err.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 
 	return
@@ -299,12 +299,12 @@ func (p *ProtIDList) Restore() {
 
 	b, e := ioutil.ReadFile(sys.ProBin())
 	if e != nil {
-		err.ReadFile(e, "fatal")
+		msg.ReadFile(e, "fatal")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
 	if e != nil {
-		err.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "fatal")
 	}
 
 	return

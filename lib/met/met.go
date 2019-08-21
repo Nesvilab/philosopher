@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
@@ -430,12 +430,12 @@ func CleanTemp(dir string) {
 
 	files, e := filepath.Glob(filepath.Join(dir, "*"))
 	if e != nil {
-		err.Custom(e, "fatal")
+		msg.Custom(e, "fatal")
 	}
 	for _, file := range files {
 		e = os.RemoveAll(file)
 		if e != nil {
-			err.Custom(e, "fatal")
+			msg.Custom(e, "fatal")
 		}
 	}
 
@@ -447,12 +447,12 @@ func (d *Data) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		err.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "fatal")
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
-		err.WriteFile(e, "fatal")
+		msg.WriteFile(e, "fatal")
 	}
 
 	return
@@ -466,7 +466,7 @@ func (d *Data) Restore(f string) {
 	e2 := msgpack.Unmarshal(b, &d)
 
 	if e1 != nil && e2 != nil && len(d.UUID) < 1 {
-		err.Custom(errors.New("The current directory has no Workspace"), "warning")
+		msg.Custom(errors.New("The current directory has no Workspace"), "warning")
 	}
 
 	// checks if the temp is still there, if not recreate it
@@ -482,12 +482,12 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		err.WorkspaceNotFound(errors.New(""), "warning")
+		msg.WorkspaceNotFound(errors.New(""), "warning")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
 		os.Mkdir(d.Temp, sys.FilePermission())
-		err.LocatingTemDirecotry(e, "warning")
+		msg.LocatingTemDirecotry(e, "warning")
 	}
 
 	return

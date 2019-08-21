@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/dat"
@@ -35,7 +35,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			e := dec.Decode(&o)
 			if e != nil {
-				err.DecodeMsgPck(e, "fatal")
+				msg.DecodeMsgPck(e, "fatal")
 			}
 
 			if key == "session" {
@@ -54,7 +54,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			e := dec.Decode(&o)
 			if e != nil {
-				err.DecodeMsgPck(e, "fatal")
+				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
 
@@ -68,7 +68,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			e := dec.Decode(&o)
 			if e != nil {
-				err.DecodeMsgPck(e, "fatal")
+				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
 
@@ -82,7 +82,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			e := dec.Decode(&o)
 			if e != nil {
-				err.DecodeMsgPck(e, "fatal")
+				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Records)
 
@@ -96,7 +96,7 @@ var inspectCmd = &cobra.Command{
 			dec := msgpack.NewDecoder(file)
 			e := dec.Decode(&o)
 			if e != nil {
-				err.DecodeMsgPck(e, "fatal")
+				msg.DecodeMsgPck(e, "fatal")
 			}
 
 			if len(key) > 0 {

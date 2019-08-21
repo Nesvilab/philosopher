@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/err"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/qua"
@@ -24,24 +24,24 @@ var labelquantCmd = &cobra.Command{
 		m.Quantify.Format = "mzML"
 
 		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
-			err.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
+			msg.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
 		if len(m.Quantify.Plex) < 1 {
-			err.InputNotFound(errors.New("You need to especify the experiment Plex"), "fatal")
+			msg.InputNotFound(errors.New("You need to especify the experiment Plex"), "fatal")
 		}
 
 		// hardcoded tmt for now
-		err.Executing("Isobaric-label quantification ", Version)
+		msg.Executing("Isobaric-label quantification ", Version)
 		m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			err.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
+			msg.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			err.InputNotFound(errors.New("Unknown file format"), "fatal")
+			msg.InputNotFound(errors.New("Unknown file format"), "fatal")
 		}
 
 		m.Quantify = qua.RunTMTQuantification(m.Quantify, m.Filter.Mapmods)
@@ -52,7 +52,7 @@ var labelquantCmd = &cobra.Command{
 		// clean tmp
 		met.CleanTemp(m.Temp)
 
-		err.Done()
+		msg.Done()
 		return
 	},
 }
