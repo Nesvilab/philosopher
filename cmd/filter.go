@@ -1,12 +1,13 @@
+// Package cmd Filter top level command
 package cmd
 
 import (
 	"errors"
 	"os"
 
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )

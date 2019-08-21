@@ -1,3 +1,4 @@
+// Package cmd Slack top level command
 package cmd
 
 import (
@@ -5,7 +6,6 @@ import (
 	"os"
 
 	"github.com/prvst/philosopher/lib/msg"
-
 	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"

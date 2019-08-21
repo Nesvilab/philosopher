@@ -1,3 +1,4 @@
+// Package cmd Labelquant top level command
 package cmd
 
 import (
@@ -5,9 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
-
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/qua"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"

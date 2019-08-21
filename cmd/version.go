@@ -1,3 +1,4 @@
+// Package cmd Version top level command
 package cmd
 
 import (

@@ -1,3 +1,4 @@
+// Package cmd Database top level command
 package cmd
 
 import (

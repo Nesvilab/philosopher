@@ -1,3 +1,4 @@
+// Package cmd Pipeline top level command
 package cmd
 
 import (
@@ -6,9 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/msg"
-
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/pip"
 	"github.com/prvst/philosopher/lib/sla"
 	"github.com/prvst/philosopher/lib/sys"

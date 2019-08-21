@@ -1,11 +1,12 @@
+// Package cmd provides the top level methods that correspond to the available commands
 package cmd
 
 import (
 	"runtime"
 
 	colorable "github.com/mattn/go-colorable"
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

@@ -1,10 +1,11 @@
+// Package cmd Report top level command
 package cmd
 
 import (
 	"os"
 
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/spf13/cobra"

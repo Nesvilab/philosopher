@@ -1,3 +1,4 @@
+// Package cmd Inspect top level command
 package cmd
 
 import (
@@ -5,11 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/msg"
-
 	"github.com/davecgh/go-spew/spew"
 	"github.com/prvst/philosopher/lib/dat"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
