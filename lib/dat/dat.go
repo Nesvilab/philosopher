@@ -264,7 +264,7 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso bool) string {
 	// create decoy db file
 	file, e := os.Create(workfile)
 	if e != nil {
-		logrus.Fatal("Cannot read the database file ", workfile)
+		err.ReadFile(errors.New("Cannot open the database file"), "fatal")
 	}
 	defer file.Close()
 

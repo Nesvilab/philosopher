@@ -2,11 +2,12 @@ package fas
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"regexp"
 	"strings"
 
-	"github.com/sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // ParseFile a fasta file and returns a map with the header as key and sequence as value
@@ -18,7 +19,7 @@ func ParseFile(filename string) map[string]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		logrus.Fatal("Cannot open database file ", filename)
+		err.ReadFile(errors.New("Cannot open the database file"), "error")
 	}
 	defer f.Close()
 
@@ -82,7 +83,7 @@ func ParseFastaDescription(filename string) map[string][]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		logrus.Fatal("Cannot read FASTA file ", filename)
+		err.ReadFile(errors.New("Cannot open FASTA file"), "fatal")
 	}
 	defer f.Close()
 

@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/prvst/philosopher/lib/err"
+
 	"github.com/prvst/philosopher/lib/sys"
 	"github.com/rogpeppe/go-charset/charset"
 	"github.com/sirupsen/logrus"
@@ -81,7 +83,7 @@ func (p *IndexedMzML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
+		err.ReadFile(e, "fatal")
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -93,7 +95,7 @@ func (p *IndexedMzML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mzml); e != nil {
-		logrus.Fatal("Cannot parse XML file:", e)
+		err.DecodeMsgPck(e, "fatal")
 	}
 
 	p.MzML = mzml.MzML
@@ -107,7 +109,7 @@ func (p *MzIdentML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
+		err.ReadFile(e, "fatal")
 	}
 
 	defer xmlFile.Close()
@@ -131,7 +133,7 @@ func (p *MzIdentML) Write() {
 
 	file, e := os.Create(output)
 	if e != nil {
-		logrus.Fatal("Cannot create MzId file:", e)
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -141,7 +143,7 @@ func (p *MzIdentML) Write() {
 	enc.Indent("  ", "    ")
 
 	if e := enc.Encode(p); e != nil {
-		logrus.Trace("Cannot decode file:", e)
+		err.DecodeMsgPck(e, "trace")
 	}
 
 	// copy to work directory

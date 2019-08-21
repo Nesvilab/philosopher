@@ -3,6 +3,7 @@ package fin
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf16"
 
-	"github.com/sirupsen/logrus"
+	"github.com/prvst/philosopher/lib/err"
 )
 
 // interface shared by all data objects in the raw file
@@ -509,9 +510,9 @@ type RawData struct {
 // ProcessRaw calls other low level functions and fill out RawData struct
 func (rd *RawData) ProcessRaw(f string) {
 
-	file, err := os.Open(f)
-	if err != nil {
-		logrus.Fatal(err)
+	file, e := os.Open(f)
+	if e != nil {
+		err.ReadFile(e, "fatal")
 	}
 
 	// Read headers for file version and RunHeader addresses.
@@ -768,7 +769,7 @@ func (data *RunHeader) Retrieve(rs io.ReadSeeker, info RawFileInfo, ver Version)
 	}
 
 	if data.ScantrailerAddr == 0 {
-		logrus.Fatal("couldn't find MS run header in file")
+		err.Custom(errors.New(""), "fatal")
 	}
 
 	return
@@ -1240,16 +1241,16 @@ func binaryread(r io.Reader, data interface{}) {
 // data, and returns the position in the file afterwards
 func readAt(rs io.ReadSeeker, pos uint64, v Version, data reader) uint64 {
 
-	spos, err := rs.Seek(int64(pos), 0)
-	if err != nil {
-		logrus.Fatal("error seeking file", err)
+	spos, e := rs.Seek(int64(pos), 0)
+	if e != nil {
+		err.Custom(errors.New("error seeking file"), "fatal")
 	}
 
 	data.Read(rs, v)
 
-	spos, err = rs.Seek(0, 1)
-	if err != nil {
-		logrus.Fatal("error determining position in file", err)
+	spos, e = rs.Seek(0, 1)
+	if e != nil {
+		err.Custom(errors.New("error determining position in file"), "fatal")
 	}
 
 	return uint64(spos)
@@ -1259,9 +1260,9 @@ func readAt(rs io.ReadSeeker, pos uint64, v Version, data reader) uint64 {
 // This tested faster than bufio or just reading away
 func readBetween(rs io.ReadSeeker, begin uint64, end uint64, v Version, data reader) {
 
-	_, err := rs.Seek(int64(begin), 0)
-	if err != nil {
-		logrus.Fatal("error seeking file", err)
+	_, e := rs.Seek(int64(begin), 0)
+	if e != nil {
+		err.Custom(errors.New("error seeking file"), "fatal")
 	}
 
 	// may fail because of memory requirements

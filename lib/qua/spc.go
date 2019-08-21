@@ -1,15 +1,17 @@
 package qua
 
 import (
+	"errors"
+
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/rep"
-	"github.com/sirupsen/logrus"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 	if len(e.PSM) < 1 && len(e.Ions) < 1 {
-		logrus.Fatal("No PSMs found in your data set")
+		err.NoPSMFound(errors.New(""), "fatal")
 	}
 
 	var uniqueIonPSM = make(map[string]string)

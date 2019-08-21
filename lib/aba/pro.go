@@ -148,7 +148,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	if _, err := os.Stat("combined.prot.xml"); os.IsNotExist(err) {
 
-		logrus.Fatal("Cannot find combined.prot.xml file")
+		err.Custom(errors.New("Cannot find combined.prot.xml file"), "fatal")
 
 	} else {
 
@@ -297,9 +297,9 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	output := fmt.Sprintf("%s%scombined_protein.tsv", session, string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create abacus report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e, "error")
 	}
 	defer file.Close()
 
@@ -343,9 +343,9 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	line += "Indistinguishable Proteins\t"
 
 	line += "\n"
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e := io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -442,9 +442,9 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		line += fmt.Sprintf("%s\t", ip)
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e := io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -464,7 +464,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	// create result file
 	file, err := os.Create(output)
 	if err != nil {
-		logrus.Fatal("Cannot create reprint SpC report:", err)
+		err.WriteFile(errors.New("Cannot create reprint SpC report"), "error")
 	}
 	defer file.Close()
 
@@ -483,9 +483,9 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 
 	line += "\n"
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e := io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -502,9 +502,9 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 		}
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e := io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -522,9 +522,9 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	output := fmt.Sprintf("%s%sreprint.int.tsv", session, string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create reprint Int. report:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Cannot create reprint Int. report"), "error")
 	}
 	defer file.Close()
 
@@ -543,9 +543,9 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 
 	line += "\n"
 
-	n, err := io.WriteString(file, line)
-	if err != nil {
-		logrus.Fatal(n, err)
+	_, e := io.WriteString(file, line)
+	if e != nil {
+		err.WriteToFile(e, "fatal")
 	}
 
 	// organize by group number
@@ -562,9 +562,9 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 		}
 
 		line += "\n"
-		n, err := io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal(n, err)
+		_, e := io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(e, "fatal")
 		}
 
 	}
@@ -582,7 +582,7 @@ func getLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		logrus.Fatal("Cannot open annotation file: ", annot)
+		err.ReadFile(errors.New("Cannot open annotation file"), "error")
 	}
 	defer file.Close()
 

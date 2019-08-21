@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -8,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/bio"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // MSstatsReport report all psms from study that passed the FDR filter
@@ -18,15 +19,15 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
-	_, err = io.WriteString(file, "Spectrum.Name\tSpectrum.File\tPeptide.Sequence\tModified.Peptide.Sequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, "Spectrum.Name\tSpectrum.File\tPeptide.Sequence\tModified.Peptide.Sequence\tCharge\tCalculated.MZ\tPeptideProphet.Probability\tIntensity\tIs.Unique\tGene\tProtein.Accessions\tModifications\n")
+	if e != nil {
+		err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -77,9 +78,9 @@ func (e *Evidence) MSstatsReport(decoyTag string, hasRazor bool) {
 			i.GeneName,
 			i.Protein,
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 		}
 	}
 
@@ -95,9 +96,9 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Cannot create report file:", err)
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Cannot create report MSstats TMT file"), "fatal")
 	}
 	defer file.Close()
 
@@ -109,9 +110,9 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 		}
 	}
 
-	_, err = io.WriteString(file, header)
-	if err != nil {
-		logrus.Fatal("Cannot print PSM to file")
+	_, e = io.WriteString(file, header)
+	if e != nil {
+		err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -173,9 +174,9 @@ func (e *Evidence) MSstatsTMTReport(labels map[string]string, decoyTag string, h
 			i.Labels.Channel10.Intensity,
 			i.Labels.Channel11.Intensity,
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
 		}
 	}
 

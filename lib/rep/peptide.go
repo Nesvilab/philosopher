@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/cla"
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/sys"
@@ -125,17 +127,17 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Could not create peptide output file")
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Could not create peptide output file"), "fatal)"
 	}
 	defer file.Close()
 
 	//_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tUnmodified Observations\tModified Observations\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 	_, err = io.WriteString(file, "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
 
-	if err != nil {
-		logrus.Fatal("Cannot create peptide report header")
+	if e != nil {
+		err.WriteToFile(errors.New("Cannot write to Peptide report"), "fatal")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -186,9 +188,9 @@ func (e *Evidence) PeptideReport(hasDecoys bool) {
 			i.ProteinDescription,
 			strings.Join(mappedProteins, ", "),
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(errors.New("Cannot print to Peptide report"), "fatal")
 		}
 	}
 
@@ -203,9 +205,9 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
 
-	file, err := os.Create(output)
-	if err != nil {
-		logrus.Fatal("Could not create peptide output file")
+	file, e := os.Create(output)
+	if e != nil {
+		err.WriteFile(errors.New("Could not create peptide TMT output file"), "fatal)"
 	}
 	defer file.Close()
 
@@ -218,9 +220,9 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 		}
 	}
 
-	_, err = io.WriteString(file, header)
-	if err != nil {
-		logrus.Fatal("Cannot create peptide report header")
+	_, e = io.WriteString(file, header)
+	if e != nil {
+		err.WriteToFile(errors.New("Could not write peptide output header"), "fatal)"
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -282,9 +284,9 @@ func (e *Evidence) PeptideTMTReport(labels map[string]string, hasDecoys bool) {
 			i.Labels.Channel10.Intensity,
 			i.Labels.Channel11.Intensity,
 		)
-		_, err = io.WriteString(file, line)
-		if err != nil {
-			logrus.Fatal("Cannot print PSM to file")
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			err.WriteToFile(errors.New("Cannot print to peptide TMT"), "fatal")
 		}
 	}
 

@@ -2,11 +2,13 @@ package rep
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/err"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/mod"
@@ -466,7 +468,7 @@ func getLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		logrus.Fatal("Cannot read annotation file:", e)
+		err.ReadFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -477,7 +479,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		logrus.Fatal("Annotation file seems to be empty:", e)
+		err.Custom(errors.New("Annotation file seems to be empty", e), "error")
 	}
 
 	return labels

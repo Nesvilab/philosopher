@@ -114,7 +114,7 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		}
 
 		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-			logrus.Fatal("You can only specify one search engine at a time")
+			err.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
 		}
 
 		// return to the top level directory
