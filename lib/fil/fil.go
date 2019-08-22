@@ -145,6 +145,14 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Correcting PSM to Protein mappings")
 	e.UpdateMappedProteins(f.Filter.Tag)
 
+	// for _, x := range e.Proteins {
+	// 	if strings.Contains(x.PartHeader, "rev_") {
+	// 		fmt.Println(x)
+	// 	}
+	// }
+
+	// os.Exit(1)
+
 	// ADD ERROR CASES
 	//logrus.Info("Mapping Ion status to PSMs")
 	e.UpdateIonStatus()
