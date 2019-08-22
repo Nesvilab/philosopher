@@ -19,7 +19,7 @@ func Custom(e error, t string) {
 // OverwrittingMeta call when trying to execute external binaries
 func OverwrittingMeta(e error, t string) {
 
-	m := fmt.Sprintf("A meta data folder was found and will not be overwritten: %s", e)
+	m := fmt.Sprintf("A meta data folder was found and will not be overwritten. %s", e)
 
 	callLogrus(m, t)
 
@@ -29,7 +29,7 @@ func OverwrittingMeta(e error, t string) {
 // MarshalFile call for a failed Marshaling event
 func MarshalFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot marshal file: %s", e)
+	m := fmt.Sprintf("Cannot marshal file. %s", e)
 
 	callLogrus(m, t)
 
@@ -39,7 +39,7 @@ func MarshalFile(e error, t string) {
 // SerializeFile call for a failed serialization attempt
 func SerializeFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot serialize file: %s", e)
+	m := fmt.Sprintf("Cannot serialize file. %s", e)
 
 	callLogrus(m, t)
 
@@ -49,7 +49,7 @@ func SerializeFile(e error, t string) {
 // CopyingFile call when trying to copy files to another location
 func CopyingFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot copy or move file: %s", e)
+	m := fmt.Sprintf("Cannot copy or move file. %s", e)
 
 	callLogrus(m, t)
 
@@ -59,7 +59,7 @@ func CopyingFile(e error, t string) {
 // CastFloatToString call when trying to cast a float number to string
 func CastFloatToString(e error, t string) {
 
-	m := fmt.Sprintf("Cannot cast float information to string: %s", e)
+	m := fmt.Sprintf("Cannot cast float information to string. %s", e)
 
 	callLogrus(m, t)
 
@@ -69,7 +69,7 @@ func CastFloatToString(e error, t string) {
 // Plotter call for faled plotter instantiation
 func Plotter(e error, t string) {
 
-	m := fmt.Sprintf("Could not instantiate plotter: %s", e)
+	m := fmt.Sprintf("Could not instantiate plotter. %s", e)
 
 	callLogrus(m, t)
 
@@ -79,7 +79,7 @@ func Plotter(e error, t string) {
 // ReadFile call for file not found
 func ReadFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot read file: %s", e)
+	m := fmt.Sprintf("Cannot read file. %s", e)
 
 	callLogrus(m, t)
 
@@ -89,7 +89,7 @@ func ReadFile(e error, t string) {
 // ReadingMzMLZlib call when trying to erad mzML zlibed spectra
 func ReadingMzMLZlib(e error, t string) {
 
-	m := fmt.Sprintf("Error trying to read mzML zlib data: %s", e)
+	m := fmt.Sprintf("Error trying to read mzML zlib data. %s", e)
 
 	callLogrus(m, t)
 
@@ -99,7 +99,7 @@ func ReadingMzMLZlib(e error, t string) {
 // WriteFile call for failed file writing event
 func WriteFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot write file: %s", e)
+	m := fmt.Sprintf("Cannot write file. %s", e)
 
 	callLogrus(m, t)
 
@@ -109,7 +109,7 @@ func WriteFile(e error, t string) {
 // WriteToFile call for failed file writing event
 func WriteToFile(e error, t string) {
 
-	m := fmt.Sprintf("Cannot write to file: %s", e)
+	m := fmt.Sprintf("Cannot write to file. %s", e)
 
 	callLogrus(m, t)
 
@@ -119,7 +119,7 @@ func WriteToFile(e error, t string) {
 // DeployAsset call for failed asset deployment
 func DeployAsset(e error, t string) {
 
-	m := fmt.Sprintf("Cannot deploy asset: %s", e)
+	m := fmt.Sprintf("Cannot deploy asset. %s", e)
 
 	callLogrus(m, t)
 
@@ -129,7 +129,7 @@ func DeployAsset(e error, t string) {
 // DecodeMsgPck call for failed msgpack decoding
 func DecodeMsgPck(e error, t string) {
 
-	m := fmt.Sprintf("Cannot decode packed binary: %s", e)
+	m := fmt.Sprintf("Cannot decode packed binary. %s", e)
 
 	callLogrus(m, t)
 
@@ -139,7 +139,7 @@ func DecodeMsgPck(e error, t string) {
 // InputNotFound call empty parameters list
 func InputNotFound(e error, t string) {
 
-	m := fmt.Sprintf("Missing input file: %s", e)
+	m := fmt.Sprintf("Missing input file. %s", e)
 
 	callLogrus(m, t)
 
@@ -149,7 +149,7 @@ func InputNotFound(e error, t string) {
 // NoParametersFound call empty parameters list
 func NoParametersFound(e error, t string) {
 
-	m := fmt.Sprintf("Missing input parameters: %s", e)
+	m := fmt.Sprintf("Missing input parameters. %s", e)
 
 	callLogrus(m, t)
 
@@ -159,7 +159,7 @@ func NoParametersFound(e error, t string) {
 // DatabaseNotFound call for a missing database file
 func DatabaseNotFound(e error, t string) {
 
-	m := fmt.Sprintf("Database not found: %s", e)
+	m := fmt.Sprintf("Database not found. %s", e)
 
 	callLogrus(m, t)
 
@@ -169,7 +169,7 @@ func DatabaseNotFound(e error, t string) {
 // NoSpectraFound call empty Spectra structs
 func NoSpectraFound(e error, t string) {
 
-	m := fmt.Sprintf("No Spectra was found in data set: %s", e)
+	m := fmt.Sprintf("No Spectra was found in data set. %s", e)
 
 	callLogrus(m, t)
 
@@ -179,7 +179,7 @@ func NoSpectraFound(e error, t string) {
 // NoPSMFound call empty PSM structs
 func NoPSMFound(e error, t string) {
 
-	m := fmt.Sprintf("No PSM was found in data set: %s", e)
+	m := fmt.Sprintf("No PSM was found in data set. %s", e)
 
 	callLogrus(m, t)
 
@@ -189,7 +189,7 @@ func NoPSMFound(e error, t string) {
 // NoProteinFound call empty Protein structs
 func NoProteinFound(e error, t string) {
 
-	m := fmt.Sprintf("No Protein was found in data set: %s", e)
+	m := fmt.Sprintf("No Protein was found in data set. %s", e)
 
 	callLogrus(m, t)
 
@@ -199,7 +199,7 @@ func NoProteinFound(e error, t string) {
 // Comet call when running the Comet search engine
 func Comet(e error, t string) {
 
-	m := fmt.Sprintf("Missing parameter file or data file for analysis: %s", e)
+	m := fmt.Sprintf("Missing parameter file or data file for analysis. %s", e)
 
 	callLogrus(m, t)
 
@@ -209,7 +209,7 @@ func Comet(e error, t string) {
 // UnsupportedDistribution call for error trying to determine OS distribution
 func UnsupportedDistribution(e error, t string) {
 
-	m := fmt.Sprintf("Cannot determine OS distribtion for binary version deployment: %s", e)
+	m := fmt.Sprintf("Cannot determine OS distribtion for binary version deployment. %s", e)
 
 	callLogrus(m, t)
 
@@ -219,7 +219,7 @@ func UnsupportedDistribution(e error, t string) {
 // ExecutingBinary call when trying to execute external binaries
 func ExecutingBinary(e error, t string) {
 
-	m := fmt.Sprintf("Cannot execute program: %s", e)
+	m := fmt.Sprintf("Cannot execute program. %s", e)
 
 	callLogrus(m, t)
 
@@ -229,7 +229,7 @@ func ExecutingBinary(e error, t string) {
 // WorkspaceNotFound call when trying to locate a workspace
 func WorkspaceNotFound(e error, t string) {
 
-	m := fmt.Sprintf("Workspace not found: %s", e)
+	m := fmt.Sprintf("Workspace not found. %s", e)
 
 	callLogrus(m, t)
 
@@ -239,7 +239,7 @@ func WorkspaceNotFound(e error, t string) {
 // GettingLocalDir call when trying to pinpoint current directory
 func GettingLocalDir(e error, t string) {
 
-	m := fmt.Sprintf("Cannot verify local directory path: %s", e)
+	m := fmt.Sprintf("Cannot verify local directory path. %s", e)
 
 	callLogrus(m, t)
 
@@ -249,7 +249,7 @@ func GettingLocalDir(e error, t string) {
 // CreatingMetaDirectory call when trying to create a meta directory
 func CreatingMetaDirectory(e error, t string) {
 
-	m := fmt.Sprintf("Cannot create meta directory; check folder permissions: %s", e)
+	m := fmt.Sprintf("Cannot create meta directory; check folder permissions. %s", e)
 
 	callLogrus(m, t)
 
@@ -259,7 +259,7 @@ func CreatingMetaDirectory(e error, t string) {
 // LocatingTemDirecotry call when trying to locate the Temp directory
 func LocatingTemDirecotry(e error, t string) {
 
-	m := fmt.Sprintf("Cannot locate temporary directory: %s", e)
+	m := fmt.Sprintf("Cannot locate temporary directory. %s", e)
 
 	callLogrus(m, t)
 
@@ -269,7 +269,7 @@ func LocatingTemDirecotry(e error, t string) {
 // LocatingMetaDirecotry call when trying to locate the Meta directory
 func LocatingMetaDirecotry(e error, t string) {
 
-	m := fmt.Sprintf("Cannot locate meta directory: %s", e)
+	m := fmt.Sprintf("Cannot locate meta directory. %s", e)
 
 	callLogrus(m, t)
 
@@ -279,7 +279,7 @@ func LocatingMetaDirecotry(e error, t string) {
 // ArchivingMetaDirecotry call when trying to archive the Meta directory
 func ArchivingMetaDirecotry(e error, t string) {
 
-	m := fmt.Sprintf("Cannot archive meta directory, chekc your zip libraries: %s", e)
+	m := fmt.Sprintf("Cannot archive meta directory, chekc your zip libraries. %s", e)
 
 	callLogrus(m, t)
 
@@ -289,7 +289,7 @@ func ArchivingMetaDirecotry(e error, t string) {
 // DeletingMetaDirecotry call when trying to delete the Meta directory
 func DeletingMetaDirecotry(e error, t string) {
 
-	m := fmt.Sprintf("Cannot delete meta directory, check your permissions: %s", e)
+	m := fmt.Sprintf("Cannot delete meta directory, check your permissions. %s", e)
 
 	callLogrus(m, t)
 
@@ -299,7 +299,7 @@ func DeletingMetaDirecotry(e error, t string) {
 // ParsingFASTA call when trying parse a protein FASTA database
 func ParsingFASTA(e error, t string) {
 
-	m := fmt.Sprintf("Cannot parse the FASTA file, check for formatting errors or malformed headers: %s", e)
+	m := fmt.Sprintf("Cannot parse the FASTA file, check for formatting errors or malformed headers. %s", e)
 
 	callLogrus(m, t)
 
