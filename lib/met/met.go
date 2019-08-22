@@ -428,15 +428,9 @@ func New(h string) Data {
 // CleanTemp removes all files from the given temp directory
 func CleanTemp(dir string) {
 
-	files, e := filepath.Glob(filepath.Join(dir, "*"))
+	e := os.RemoveAll(dir)
 	if e != nil {
-		msg.Custom(e, "fatal")
-	}
-	for _, file := range files {
-		e = os.RemoveAll(file)
-		if e != nil {
-			msg.Custom(e, "fatal")
-		}
+		msg.Custom(e, "error")
 	}
 
 	return
@@ -466,7 +460,7 @@ func (d *Data) Restore(f string) {
 	e2 := msgpack.Unmarshal(b, &d)
 
 	if e1 != nil && e2 != nil && len(d.UUID) < 1 {
-		msg.Custom(errors.New("The current directory has no Workspace"), "warning")
+		msg.Custom(errors.New("The current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
 	}
 
 	// checks if the temp is still there, if not recreate it
@@ -482,7 +476,7 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		msg.WorkspaceNotFound(errors.New(""), "warning")
+		msg.WorkspaceNotFound(errors.New("Failed to checkup the initialization"), "fatal")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {

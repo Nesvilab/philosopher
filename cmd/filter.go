@@ -43,7 +43,7 @@ var filterCmd = &cobra.Command{
 		}
 
 		if len(m.Filter.Pox) == 0 && m.Filter.Razor == true {
-			msg.Custom(errors.New("Razor option will be disabled because there is no protein inference data"), "warning")
+			msg.Custom(errors.New("Razor option will be ignored because there is no protein inference data"), "warning")
 			m.Filter.Razor = false
 		}
 
