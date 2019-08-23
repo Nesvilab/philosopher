@@ -151,11 +151,9 @@ func Run(f met.Data) met.Data {
 	// 	}
 	// }
 
-	// os.Exit(1)
-
 	// ADD ERROR CASES
 	//logrus.Info("Mapping Ion status to PSMs")
-	e.UpdateIonStatus()
+	e.UpdateIonStatus(f.Filter.Tag)
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()

@@ -147,7 +147,7 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 }
 
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
-func (evi *Evidence) UpdateIonStatus() {
+func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
@@ -180,10 +180,16 @@ func (evi *Evidence) UpdateIonStatus() {
 			evi.PSM[i].IsUnique = true
 		}
 
+		// the decoy tag checking is a failsafe mechanism to avoid proteins
+		// with real complex razor case decisions to pass dowsntream
+		// wrong classifications. If by any chance the protein gets assigned to
+		// a razor decoy, this mchanism avoids the replacement
 		rp, rOK := urazorMap[evi.PSM[i].IonForm]
 		if rOK {
 			evi.PSM[i].IsURazor = true
-			evi.PSM[i].Protein = rp
+			if !strings.Contains(rp, decoyTag) {
+				evi.PSM[i].Protein = rp
+			}
 		}
 
 		v, ok := ptMap[evi.PSM[i].IonForm]
