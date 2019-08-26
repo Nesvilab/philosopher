@@ -176,7 +176,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			os.Chdir(dir)
 
 			// reload the meta data
-			meta.Restore(sys.Meta())
+			//meta.Restore(sys.Meta())
 		}
 
 		// Comet
@@ -259,7 +259,7 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			os.Chdir(dir)
 
 			// reload the meta data
-			meta.Restore(sys.Meta())
+			//meta.Restore(sys.Meta())
 		}
 	}
 
@@ -457,7 +457,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 		os.Chdir(dir)
 
 		// reload the meta data
-		meta.Restore(sys.Meta())
+		//meta.Restore(sys.Meta())
 	}
 
 	return meta
