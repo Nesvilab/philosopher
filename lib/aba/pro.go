@@ -2,7 +2,6 @@
 package aba
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -72,7 +71,10 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		} else {
 			labels.Name = i
 		}
-		labels.LabelName = getLabelNames(annot)
+
+		if len(m.Quantify.Annot) > 0 {
+			labels.LabelName = getLabelNames(annot)
+		}
 
 		// collect project names
 		prjName := i
@@ -574,28 +576,4 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
-}
-
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
-
-	var labels = make(map[string]string)
-
-	file, e := os.Open(annot)
-	if e != nil {
-		msg.ReadFile(errors.New("Cannot open annotation file"), "error")
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
-	}
-
-	if e = scanner.Err(); e != nil {
-		msg.Custom(errors.New("The annotation file looks to be empty"), "fatal")
-	}
-
-	return labels
 }

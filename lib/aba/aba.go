@@ -2,7 +2,10 @@
 package aba
 
 import (
+	"bufio"
 	"errors"
+	"os"
+	"strings"
 
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/msg"
@@ -31,4 +34,28 @@ func Run(m met.Data, args []string) {
 	}
 
 	return
+}
+
+// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+func getLabelNames(annot string) map[string]string {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		msg.ReadFile(errors.New("Cannot open annotation file"), "error")
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		names := strings.Split(scanner.Text(), " ")
+		labels[names[0]] = names[1]
+	}
+
+	if e = scanner.Err(); e != nil {
+		msg.Custom(errors.New("The annotation file looks to be empty"), "fatal")
+	}
+
+	return labels
 }
