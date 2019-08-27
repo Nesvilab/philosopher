@@ -1,7 +1,8 @@
 <!-- ### Added -->
 <!-- ### Changed -->
 ### Fixed
-- Added other error classes to avoid fatal redirections
+- An inconsistent error when trying to clean the wrokspaces wiht no data inside.
+- The labelquant command was demanding the presence of an annotation file.
 
 ## Snapcrat
 
