@@ -137,23 +137,18 @@ func Run(f met.Data) met.Data {
 		e.UpdatePeptideModCount()
 	}
 
-	logrus.Info("Processing Protein Inference")
-	pro.Restore()
-	e.AssembleProteinReport(pro, f.Filter.Tag)
-	pro = nil
+	if len(f.Filter.Pox) > 0 {
 
-	logrus.Info("Correcting PSM to Protein mappings")
-	e.UpdateMappedProteins(f.Filter.Tag)
+		logrus.Info("Processing Protein Inference")
+		pro.Restore()
+		e.AssembleProteinReport(pro, f.Filter.Tag)
+		pro = nil
 
-	// for _, x := range e.Proteins {
-	// 	if strings.Contains(x.PartHeader, "rev_") {
-	// 		fmt.Println(x)
-	// 	}
-	// }
+		logrus.Info("Correcting PSM to Protein mappings")
+		e.UpdateMappedProteins(f.Filter.Tag)
 
-	// ADD ERROR CASES
-	//logrus.Info("Mapping Ion status to PSMs")
-	e.UpdateIonStatus(f.Filter.Tag)
+		e.UpdateIonStatus(f.Filter.Tag)
+	}
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
@@ -161,7 +156,7 @@ func Run(f met.Data) met.Data {
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
 	if f.Filter.Razor == true {
-		e.UpdateGeneNames()
+		//e.UpdateGeneNames()
 		e.UpdateSupportingSpectra()
 	}
 

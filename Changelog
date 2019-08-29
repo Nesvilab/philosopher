@@ -1,8 +1,8 @@
-<!-- ### Added -->
-<!-- ### Changed -->
+### Added
+### Changed
+
 ### Fixed
-- An inconsistent error when trying to clean the wrokspaces wiht no data inside.
-- The labelquant command was demanding the presence of an annotation file.
+- The filter command was throwing an error when no protein data was present.
 
 ## Snapcrat
 
