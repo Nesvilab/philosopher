@@ -12,16 +12,13 @@
             "program": "/home/prvst/go/src/github.com/prvst/philosopher/main.go",
             "env": {},
             "showLog": true,
-            "cwd": "/workspace/data/01CPTAC_Ovarian_PTRC_Cell_Line_Rep1",
+            "cwd": "/data/cptac/Frozen/global",
             "args": [
-                "filter",
-                "--pepxml",
-                "interact.pep.xml",
-                "--protxml",
-                "combined.prot.xml",
-                "--razor",
-                "--picked",
-                "--sequential"
+                "pipeline",
+                "--config",
+                "philosopher.yml",
+                "01CPTAC_Ovarian_PTRC_Frozen",
+                "02CPTAC_Ovarian_PTRC_Frozen",
             ],
         }
     ]
