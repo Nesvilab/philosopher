@@ -349,7 +349,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 		// copy to work directory
 		sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
 
-		meta.Serialize()
+		//meta.Serialize()
 	}
 
 	return meta
