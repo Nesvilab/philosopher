@@ -306,7 +306,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 		// copy to work directory
 		sys.CopyFile(combinedPepXML, filepath.Base(combinedPepXML))
 
-		meta.Serialize()
+		//meta.Serialize()
 	}
 
 	return meta
