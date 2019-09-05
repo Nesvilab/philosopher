@@ -313,7 +313,10 @@ func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 	if isCompressed == "1" {
 		r, e := zlib.NewReader(b64)
 		if e != nil {
-			msg.ReadingMzMLZlib(e, "fatal")
+			msg.ReadingMzMLZlib(e, "error")
+			var emptyArray []float64
+			emptyArray = append(emptyArray, 0.0)
+			return emptyArray
 		}
 		io.Copy(&bytestream, r)
 	} else {
