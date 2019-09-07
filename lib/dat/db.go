@@ -222,9 +222,13 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	if pnm == nil {
 		e.ProteinName = ""
 		e.ProteinName = ""
+		//Description
+		e.Description = ""
 	} else {
 		e.ProteinName = pnm[1]
 		e.ProteinName = pnm[1]
+		//Description
+		e.Description = pnm[1]
 	}
 
 	// Organism
