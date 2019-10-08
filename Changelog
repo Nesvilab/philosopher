@@ -1,8 +1,10 @@
 ### Added
 ### Changed
+- Updated to Go v1.13.1
 
 ### Fixed
 - The filter command was throwing an error when no protein data was present.
+- Report with TMT was breaking when no annotation file was present.
 
 ## Snapcrat
 

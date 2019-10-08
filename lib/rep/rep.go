@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/mod"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/tmt"
 	"github.com/sirupsen/logrus"
 )
@@ -390,10 +390,15 @@ func Run(m met.Data) met.Data {
 	// verifying if there is any quantification on labels
 	if len(m.Quantify.Plex) > 0 {
 
-		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
-		annotfile, _ = filepath.Abs(annotfile)
+		var labelNames = make(map[string]string)
 
-		labelNames := getLabelNames(annotfile)
+		if len(m.Quantify.Annot) > 0 {
+			annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
+			annotfile, _ = filepath.Abs(annotfile)
+
+			labelNames = getLabelNames(annotfile)
+		}
+
 		logrus.Info("Creating TMT PSM report")
 
 		if strings.Contains(m.SearchEngine, "MSFragger") && len(m.Quantify.Plex) > 0 {
