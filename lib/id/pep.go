@@ -59,7 +59,7 @@ type PeptideIdentification struct {
 	PrecursorExpMass     float64
 	RetentionTime        float64
 	CalcNeutralPepMass   float64
-	RawMassDiff          float64
+	//RawMassDiff          float64
 	Massdiff             float64
 	LocalizedPTMSites    map[string]int
 	LocalizedPTMMassDiff map[string]string
@@ -203,11 +203,13 @@ func (p *PepXML) Read(f string) {
 
 		}
 
+		massDeviation := p.getMassDeviation()
+
 		// start processing spectra queries
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for _, i := range sq {
-			psm := processSpectrumQuery(i, p.Modifications, p.DecoyTag)
+			psm := processSpectrumQuery(i, massDeviation, p.Modifications, p.DecoyTag)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -219,7 +221,7 @@ func (p *PepXML) Read(f string) {
 		p.Prophet = string(mpa.AnalysisSummary[0].Analysis)
 		p.Models = models
 
-		p.adjustMassDeviation()
+		//p.adjustMassDeviation()
 
 		if len(psmlist) == 0 {
 			msg.NoPSMFound(errors.New(""), "fatal")
@@ -230,7 +232,7 @@ func (p *PepXML) Read(f string) {
 	return
 }
 
-func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.Modifications, decoyTag string) PeptideIdentification {
 
 	var psm PeptideIdentification
 	psm.Modifications.Index = make(map[string]mod.Modification)
@@ -257,7 +259,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
-		psm.Massdiff = i.Massdiff
+		psm.Massdiff = (i.Massdiff - massDeviation)
 
 		for _, j := range i.AnalysisResult {
 			if string(j.Analysis) == "peptideprophet" {
@@ -381,8 +383,8 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 	return
 }
 
-// adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
-func (p *PepXML) adjustMassDeviation() {
+// getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
+func (p PepXML) getMassDeviation() float64 {
 
 	var countZero int
 	var massZero float64
@@ -397,14 +399,37 @@ func (p *PepXML) adjustMassDeviation() {
 
 	adjustedMass = massZero / float64(countZero)
 
-	// keep the original massdiff on the raw variable just in case
-	for i := range p.PeptideIdentification {
-		p.PeptideIdentification[i].RawMassDiff = p.PeptideIdentification[i].Massdiff
-		p.PeptideIdentification[i].Massdiff = (p.PeptideIdentification[i].Massdiff - adjustedMass)
-	}
+	// // keep the original massdiff on the raw variable just in case
+	// for i := range p.PeptideIdentification {
+	// 	p.PeptideIdentification[i].Massdiff = (p.PeptideIdentification[i].Massdiff - adjustedMass)
+	// }
 
-	return
+	return adjustedMass
 }
+
+// // adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
+// func (p *PepXML) adjustMassDeviation() {
+
+// 	var countZero int
+// 	var massZero float64
+// 	var adjustedMass float64
+
+// 	for _, i := range p.PeptideIdentification {
+// 		if math.Abs(i.Massdiff) >= -0.1 && math.Abs(i.Massdiff) <= 0.1 {
+// 			countZero++
+// 			massZero += i.Massdiff
+// 		}
+// 	}
+
+// 	adjustedMass = massZero / float64(countZero)
+
+// 	// keep the original massdiff on the raw variable just in case
+// 	for i := range p.PeptideIdentification {
+// 		p.PeptideIdentification[i].Massdiff = (p.PeptideIdentification[i].Massdiff - adjustedMass)
+// 	}
+
+// 	return
+// }
 
 // PromoteProteinIDs promotes protein identifications where the reference protein
 // is indistinguishable to other target proteins.

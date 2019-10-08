@@ -41,7 +41,7 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Processing peptide identification files")
 
-	pepid, searchEngine := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
+	pepid, searchEngine := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model, f.MSFragger.CalibrateMass)
 
 	f.SearchEngine = searchEngine
 
@@ -170,7 +170,7 @@ func Run(f met.Data) met.Data {
 }
 
 // readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string) {
+func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass int) (id.PepIDList, string) {
 
 	var files []string
 	var pepIdent id.PepIDList

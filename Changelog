@@ -1,6 +1,10 @@
 ### Added
+
 ### Changed
-- Updated to Go v1.13.1
+- Updated to Go v1.13.1.
+- Removed RawMassDiff from the reports.
+- The Delta Mass adjustment will only happen if there was no previous mass calibration during the search.
+- The Corrected DeltaMass value is now used to map Unimod.
 
 ### Fixed
 - The filter command was throwing an error when no protein data was present.
