@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/prvst/philosopher/lib/id"
@@ -365,8 +366,31 @@ func New() Evidence {
 func Run(m met.Data) met.Data {
 
 	var repo = New()
-
 	repo.RestoreGranular()
+
+	var isComet bool
+	var hasLoc bool
+	var isoBrand string
+	var isoChannels int
+
+	if len(m.Comet.Param) > 0 {
+		isComet = true
+	}
+
+	if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
+		hasLoc = true
+	}
+
+	if m.Quantify.Brand == "tmt" {
+		isoBrand = "tmt"
+	}
+
+	if len(m.Quantify.Plex) > 0 {
+		isoChannels, _ = strconv.Atoi(m.Quantify.Plex)
+	}
+
+	repo.MetaPSMReport(m.Report.Decoys, isComet, hasLoc, isoBrand, isoChannels)
+	os.Exit(1)
 
 	if len(m.Filter.Pox) > 0 {
 

@@ -203,7 +203,7 @@ func (p *PepXML) Read(f string) {
 
 		}
 
-		massDeviation := p.getMassDeviation()
+		massDeviation := getMassDeviation(mpa.MsmsRunSummary.SpectrumQuery)
 
 		// start processing spectra queries
 		var psmlist PepIDList
@@ -384,16 +384,18 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 }
 
 // getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
-func (p PepXML) getMassDeviation() float64 {
+func getMassDeviation(sq []spc.SpectrumQuery) float64 {
 
 	var countZero int
 	var massZero float64
 	var adjustedMass float64
 
-	for _, i := range p.PeptideIdentification {
-		if math.Abs(i.Massdiff) >= -0.1 && math.Abs(i.Massdiff) <= 0.1 {
-			countZero++
-			massZero += i.Massdiff
+	for _, i := range sq {
+		for _, j := range i.SearchResult.SearchHit {
+			if math.Abs(j.Massdiff) >= -0.1 && math.Abs(j.Massdiff) <= 0.1 {
+				countZero++
+				massZero += j.Massdiff
+			}
 		}
 	}
 
