@@ -286,11 +286,13 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 // Decode processes the binary data
 func (s *Spectrum) Decode() {
 
-	s.Mz.DecodedStream = readEncoded(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
-	s.Mz.Stream = nil
+	if len(s.Mz.Stream) > 0 && len(s.Intensity.Stream) > 0 {
+		s.Mz.DecodedStream = readEncoded(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
+		s.Mz.Stream = nil
 
-	s.Intensity.DecodedStream = readEncoded(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
-	s.Intensity.Stream = nil
+		s.Intensity.DecodedStream = readEncoded(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
+		s.Intensity.Stream = nil
+	}
 
 	if len(s.IonMobility.Stream) > 0 {
 		s.IonMobility.DecodedStream = readEncoded(s.IonMobility.Stream, s.IonMobility.Precision, s.IonMobility.Compression)
