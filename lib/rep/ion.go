@@ -105,9 +105,10 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	return
 }
 
-// PeptideIonReport reports consist on ion reporting
-func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
+// MetaIonReport reports consist on ion reporting
+func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channels int, hasDecoys bool) {
 
+	var header string
 	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	file, e := os.Create(output)
@@ -116,11 +117,6 @@ func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
 	}
 	defer file.Close()
 
-	_, e = io.WriteString(file, "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\n")
-	if e != nil {
-		msg.WriteToFile(errors.New("peptide ion output header"), "fatal")
-	}
-
 	// building the printing set tat may or not contain decoys
 	var printSet IonEvidenceList
 	for _, i := range evi.Ions {
@@ -133,101 +129,35 @@ func (evi *Evidence) PeptideIonReport(hasDecoys bool) {
 		}
 	}
 
-	// peptides with no mapped poteins are related to contaminants
-	// and reverse sequences. They are dificult to clean because
-	// in some cases they are shared between a match decoy and a target,
-	// so they stay on the lists but cannot be mapped back to the
-	// original proteins. These cases should be rare to find.
-	for _, i := range printSet {
+	header = "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
 
-		if len(i.MappedProteins) > 0 {
-
-			assL, obs := getModsList(i.Modifications.Index)
-
-			var mappedProteins []string
-			for j := range i.MappedProteins {
-				if j != i.Protein {
-					mappedProteins = append(mappedProteins, j)
-				}
-			}
-
-			sort.Strings(mappedProteins)
-			sort.Strings(assL)
-			sort.Strings(obs)
-
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-				i.Sequence,
-				i.ModifiedSequence,
-				i.MZ,
-				i.ChargeState,
-				i.PeptideMass,
-				i.Probability,
-				i.Expectation,
-				len(i.Spectra),
-				i.Intensity,
-				strings.Join(assL, ", "),
-				strings.Join(obs, ", "),
-				i.Protein,
-				i.ProteinID,
-				i.EntryName,
-				i.GeneName,
-				i.ProteinDescription,
-				strings.Join(mappedProteins, ","),
-			)
-			_, e = io.WriteString(file, line)
-			if e != nil {
-				msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
-			}
+	if brand == "tmt" {
+		switch channels {
+		case 10:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+		case 11:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+		case 16:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+		default:
+			header += ""
 		}
 	}
 
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
-}
-
-// PeptideIonTMTReport reports the ion table with TMT quantification
-func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys bool) {
-
-	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
-
-	file, e := os.Create(output)
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-	defer file.Close()
-
-	header := "Peptide Sequence\tModified Sequence\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIntensity\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\n"
+	header += "\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
+			k = fmt.Sprintf("Channel %s", k)
 			header = strings.Replace(header, k, v, -1)
 		}
 	}
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot write to peptide ion report"), "fatal")
+		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
 	}
 
-	// building the printing set tat may or not contain decoys
-	var printSet IonEvidenceList
-	for _, i := range evi.Ions {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
-				printSet = append(printSet, i)
-			}
-		} else {
-			printSet = append(printSet, i)
-		}
-	}
-
-	// peptides with no mapped poteins are related to contaminants
-	// and reverse sequences. They are dificult to clean because
-	// in some cases they are shared between a match decoy and a target,
-	// so they stay on the lists but cannot be mapped back to the
-	// original proteins. These cases should be rare to find.
 	for _, i := range printSet {
 
 		if len(i.MappedProteins) > 0 {
@@ -245,7 +175,7 @@ func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys boo
 			sort.Strings(assL)
 			sort.Strings(obs)
 
-			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\n",
+			line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				i.Sequence,
 				i.ModifiedSequence,
 				i.MZ,
@@ -257,28 +187,75 @@ func (evi *Evidence) PeptideIonTMTReport(labels map[string]string, hasDecoys boo
 				i.Intensity,
 				strings.Join(assL, ", "),
 				strings.Join(obs, ", "),
-				i.Intensity,
 				i.Protein,
 				i.ProteinID,
 				i.EntryName,
 				i.GeneName,
 				i.ProteinDescription,
 				strings.Join(mappedProteins, ","),
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-				i.Labels.Channel11.Intensity,
 			)
+
+			if brand == "tmt" {
+				switch channels {
+				case 10:
+					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+						line,
+						i.Labels.Channel1.Intensity,
+						i.Labels.Channel2.Intensity,
+						i.Labels.Channel3.Intensity,
+						i.Labels.Channel4.Intensity,
+						i.Labels.Channel5.Intensity,
+						i.Labels.Channel6.Intensity,
+						i.Labels.Channel7.Intensity,
+						i.Labels.Channel8.Intensity,
+						i.Labels.Channel9.Intensity,
+						i.Labels.Channel10.Intensity,
+					)
+				case 11:
+					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+						line,
+						i.Labels.Channel1.Intensity,
+						i.Labels.Channel2.Intensity,
+						i.Labels.Channel3.Intensity,
+						i.Labels.Channel4.Intensity,
+						i.Labels.Channel5.Intensity,
+						i.Labels.Channel6.Intensity,
+						i.Labels.Channel7.Intensity,
+						i.Labels.Channel8.Intensity,
+						i.Labels.Channel9.Intensity,
+						i.Labels.Channel10.Intensity,
+						i.Labels.Channel11.Intensity,
+					)
+				case 16:
+					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+						line,
+						i.Labels.Channel1.Intensity,
+						i.Labels.Channel2.Intensity,
+						i.Labels.Channel3.Intensity,
+						i.Labels.Channel4.Intensity,
+						i.Labels.Channel5.Intensity,
+						i.Labels.Channel6.Intensity,
+						i.Labels.Channel7.Intensity,
+						i.Labels.Channel8.Intensity,
+						i.Labels.Channel9.Intensity,
+						i.Labels.Channel10.Intensity,
+						i.Labels.Channel11.Intensity,
+						//i.Labels.Channel12.Intensity,
+						//i.Labels.Channel13.Intensity,
+						//i.Labels.Channel14.Intensity,
+						//i.Labels.Channel15.Intensity,
+						//i.Labels.Channel16.Intensity,
+					)
+				default:
+					header += ""
+				}
+			}
+
+			line += "\n"
+
 			_, e = io.WriteString(file, line)
 			if e != nil {
-				msg.WriteToFile(errors.New("Cannot print to file peptide ion TMT report"), "fatal")
+				msg.WriteToFile(errors.New("Cannot print Ions to file"), "fatal")
 			}
 		}
 	}

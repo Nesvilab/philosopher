@@ -363,7 +363,7 @@ func New() Evidence {
 }
 
 // Run is the main entry poit for Report
-func Run(m met.Data) met.Data {
+func Run(m met.Data) {
 
 	var repo = New()
 	repo.RestoreGranular()
@@ -372,6 +372,7 @@ func Run(m met.Data) met.Data {
 	var hasLoc bool
 	var isoBrand string
 	var isoChannels int
+	var labels = make(map[string]string)
 
 	if len(m.Comet.Param) > 0 {
 		isComet = true
@@ -383,111 +384,61 @@ func Run(m met.Data) met.Data {
 
 	if m.Quantify.Brand == "tmt" {
 		isoBrand = "tmt"
+	} else if m.Quantify.Brand == "itraq" {
+		isoBrand = "itraq"
 	}
 
 	if len(m.Quantify.Plex) > 0 {
 		isoChannels, _ = strconv.Atoi(m.Quantify.Plex)
 	}
 
-	repo.MetaPSMReport(m.Report.Decoys, isComet, hasLoc, isoBrand, isoChannels)
-	os.Exit(1)
-
-	if len(m.Filter.Pox) > 0 {
-
-		logrus.Info("Creating Protein FASTA report")
-		repo.ProteinFastaReport(m.Report.Decoys)
-
-		if len(m.Quantify.Plex) > 0 {
-
-			logrus.Info("Creating Protein TMT report")
-			repo.ProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
-
-		} else {
-
-			logrus.Info("Creating Protein report")
-			repo.ProteinReport(m.Report.Decoys)
-
-		}
-
-	}
-
-	// verifying if there is any quantification on labels
-	if len(m.Quantify.Plex) > 0 {
-
-		var labelNames = make(map[string]string)
-
+	// get the labels from the annotation file
+	if len(m.Quantify.Annot) > 0 {
 		if len(m.Quantify.Annot) > 0 {
 			annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
 			annotfile, _ = filepath.Abs(annotfile)
-
-			labelNames = getLabelNames(annotfile)
+			labels = getLabelNames(annotfile)
 		}
-
-		logrus.Info("Creating TMT PSM report")
-
-		if strings.Contains(m.SearchEngine, "MSFragger") && len(m.Quantify.Plex) > 0 {
-			repo.PSMTMTFraggerReport(labelNames, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
-		} else {
-			repo.PSMTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
-		}
-
-		logrus.Info("Creating TMT peptide report")
-		repo.PeptideTMTReport(labelNames, m.Report.Decoys)
-
-		logrus.Info("Creating TMT peptide Ion report")
-		repo.PeptideIonTMTReport(labelNames, m.Report.Decoys)
-
-		if m.Report.MSstats == true {
-			logrus.Info("Creating TMT MSstats report")
-			repo.MSstatsTMTReport(labelNames, m.Filter.Tag, m.Filter.Razor)
-		}
-
-	} else {
-
-		logrus.Info("Creating PSM report")
-		if strings.Contains(m.SearchEngine, "MSFragger") {
-			repo.PSMFraggerReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
-		} else {
-			repo.PSMReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
-		}
-
-		logrus.Info("Creating peptide report")
-		repo.PeptideReport(m.Report.Decoys)
-
-		logrus.Info("Creating peptide Ion report")
-		repo.PeptideIonReport(m.Report.Decoys)
-
-		if m.Report.MSstats == true {
-			logrus.Info("Creating MSstats report")
-			repo.MSstatsReport(m.Filter.Tag, m.Filter.Razor)
-		}
-
 	}
 
+	logrus.Info("Creating reports")
+
+	// PSM
+	repo.MetaPSMReport(labels, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
+
+	// Ion
+	repo.MetaIonReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+
+	// Peptide
+	repo.MetaPeptideReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+
+	// Protein
+	if len(m.Filter.Pox) > 0 {
+		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Quantify.Unique)
+	}
+
+	// Modifications
 	if len(repo.Modifications.MassBins) > 0 {
-		logrus.Info("Creating modification reports")
 		repo.ModificationReport()
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
-			logrus.Info("Creating PTM localization report")
 			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
 		}
 
-		// if len(m.Quantify.Plex) > 0 {
-		// 	logrus.Info("Creating TMT phospho protein report")
-		// 	repo.PhosphoProteinTMTReport(m.Quantify.LabelNames, m.Quantify.Unique, m.Report.Decoys)
-		// }
-
-		logrus.Info("Plotting mass distribution")
 		repo.PlotMassHist()
 	}
 
+	// MSstats
+	if m.Report.MSstats == true {
+		repo.MetaMSstatsReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+	}
+
+	// MzID
 	if m.Report.MZID == true {
-		logrus.Info("Creating mzID")
 		repo.MzIdentMLReport(m.Version, m.Database.Annot)
 	}
 
-	return m
+	return
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels

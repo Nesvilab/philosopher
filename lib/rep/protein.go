@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/mod"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/sys"
 )
 
@@ -203,10 +203,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 	return
 }
 
-// ProteinReport ...
-func (evi *Evidence) ProteinReport(hasDecoys bool) {
+// MetaProteinReport creates the TSV Protein report
+func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, channels int, hasDecoys, uniqueOnly bool) {
 
-	// create result file
+	var header string
 	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
@@ -216,13 +216,6 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
-
-	_, e = io.WriteString(file, line)
-	if e != nil {
-		msg.WriteToFile(e, "fatal")
-	}
-
 	// building the printing set tat may or not contain decoys
 	var printSet ProteinEvidenceList
 	for _, i := range evi.Proteins {
@@ -235,115 +228,33 @@ func (evi *Evidence) ProteinReport(hasDecoys bool) {
 		}
 	}
 
-	for _, i := range printSet {
+	header = fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins")
 
-		var ip []string
-		for k := range i.IndiProtein {
-			ip = append(ip, k)
+	if brand == "tmt" {
+		switch channels {
+		case 10:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+		case 11:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+		case 16:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+		default:
+			header += ""
 		}
-
-		assL, obs := getModsList(i.Modifications.Index)
-
-		var uniqIons int
-		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
-				uniqIons++
-			}
-		}
-
-		var urazorIons int
-		for _, j := range i.TotalPeptideIons {
-			if j.IsURazor == true {
-				urazorIons++
-			}
-		}
-
-		sort.Strings(assL)
-		sort.Strings(obs)
-		sort.Strings(ip)
-
-		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
-		// in most cases proteins with one small peptide shared with a decoy
-
-		line = fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s\t",
-			i.ProteinGroup,           // Group
-			i.ProteinSubGroup,        // SubGroup
-			i.PartHeader,             // Protein
-			i.ProteinID,              // Protein ID
-			i.EntryName,              // Entry Name
-			i.GeneNames,              // Genes
-			i.Length,                 // Length
-			i.Coverage,               // Percent Coverage
-			i.Organism,               // Organism
-			i.Description,            // Description
-			i.ProteinExistence,       // Protein Existence
-			i.Probability,            // Protein Probability
-			i.TopPepProb,             // Top Peptide Probability
-			i.UniqueStrippedPeptides, // Stripped Peptides
-			len(i.TotalPeptideIons),  // Total Peptide Ions
-			uniqIons,                 // Unique Peptide Ions
-			urazorIons,               // Razor Peptide Ions
-			i.TotalSpC,               // Total Spectral Count
-			i.UniqueSpC,              // Unique Spectral Count
-			i.URazorSpC,              // Razor Spectral Count
-			i.TotalIntensity,         // Total Intensity
-			i.UniqueIntensity,        // Unique Intensity
-			i.URazorIntensity,        // Razor Intensity
-			strings.Join(assL, ", "), // Razor Assigned Modifications
-			strings.Join(obs, ", "),  // Razor Observed Modifications
-			strings.Join(ip, ", "),   // Indistinguishable Proteins
-		)
-
-		line += "\n"
-		_, e = io.WriteString(file, line)
-		if e != nil {
-			msg.WriteToFile(e, "fatal")
-		}
-
 	}
 
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
-}
-
-// ProteinTMTReport ...
-func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasDecoys bool) {
-
-	// create result file
-	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
-
-	// create result file
-	file, e := os.Create(output)
-	if e != nil {
-		msg.WriteFile(errors.New("Cannot create report file"), "error")
-	}
-	defer file.Close()
-
-	line := fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tDescription\tProtein Existence\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptides Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\t126 Abundance\t127N Abundance\t127C Abundance\t128N Abundance\t128C Abundance\t129N Abundance\t129C Abundance\t130N Abundance\t130C Abundance\t131N Abundance\t131C Abundance\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins\n")
+	header += "\n"
 
 	if len(labels) > 0 {
 		for k, v := range labels {
-			line = strings.Replace(line, k, v, -1)
+			k = fmt.Sprintf("Channel %s", k)
+			header = strings.Replace(header, k, v, -1)
 		}
 	}
 
-	_, e = io.WriteString(file, line)
+	_, e = io.WriteString(file, header)
 	if e != nil {
 		msg.WriteToFile(e, "fatal")
-	}
-
-	// building the printing set tat may or not contain decoys
-	var printSet ProteinEvidenceList
-	for _, i := range evi.Proteins {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
-				printSet = append(printSet, i)
-			}
-		} else {
-			printSet = append(printSet, i)
-		}
 	}
 
 	for _, i := range printSet {
@@ -374,7 +285,7 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 		sort.Strings(ip)
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
-		var reportIntensities [11]float64
+		var reportIntensities [16]float64
 		if uniqueOnly == true {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
@@ -387,6 +298,12 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 			reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
 			reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
 			reportIntensities[10] = i.UniqueLabels.Channel11.Intensity
+			// reportIntensities[11] = i.UniqueLabels.Channel12.Intensity
+			// reportIntensities[12] = i.UniqueLabels.Channel13.Intensity
+			// reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
+			// reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
+			// reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
+			// reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
 		} else {
 			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
 			reportIntensities[1] = i.URazorLabels.Channel2.Intensity
@@ -399,54 +316,108 @@ func (evi *Evidence) ProteinTMTReport(labels map[string]string, uniqueOnly, hasD
 			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
 			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
 			reportIntensities[10] = i.URazorLabels.Channel11.Intensity
+			// reportIntensities[11] = i.URazorLabels.Channel12.Intensity
+			// reportIntensities[12] = i.URazorLabels.Channel13.Intensity
+			// reportIntensities[13] = i.URazorLabels.Channel14.Intensity
+			// reportIntensities[14] = i.URazorLabels.Channel15.Intensity
+			// reportIntensities[15] = i.URazorLabels.Channel16.Intensity
+			// reportIntensities[16] = i.URazorLabels.Channel17.Intensity
 		}
 
-		if len(i.TotalPeptideIons) > 0 {
-			line = fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s\t%s\n",
-				i.ProteinGroup,           // Group
-				i.ProteinSubGroup,        // SubGroup
-				i.PartHeader,             // Protein
-				i.ProteinID,              // Protein ID
-				i.EntryName,              // Entry Name
-				i.GeneNames,              // Genes
-				i.Length,                 // Length
-				i.Coverage,               // Percent Coverage
-				i.Organism,               // Organism
-				i.Description,            // Description
-				i.ProteinExistence,       // Protein Existence
-				i.Probability,            // Protein Probability
-				i.TopPepProb,             // Top peptide Probability
-				i.UniqueStrippedPeptides, // Unique Stripped Peptides
-				len(i.TotalPeptideIons),  // Total peptide Ions
-				uniqIons,                 // Unique Peptide Ions
-				urazorIons,               // Unique+Razor peptide Ions
-				i.TotalSpC,               // Total Spectral Count
-				i.UniqueSpC,              // Unique Spectral Count
-				i.URazorSpC,              // Unique+Razor Spectral Count
-				i.TotalIntensity,         // Total Intensity
-				i.UniqueIntensity,        // Unique Intensity
-				i.URazorIntensity,        // Razor Intensity
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-				reportIntensities[10],
-				strings.Join(assL, ", "), // Razor Assigned Modifications
-				strings.Join(obs, ", "),  // Razor Observed Modifications
-				strings.Join(ip, ", "),
-			) // Indistinguishable Proteins
+		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
+		// in most cases proteins with one small peptide shared with a decoy
+		line := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+			i.ProteinGroup,           // Group
+			i.ProteinSubGroup,        // SubGroup
+			i.PartHeader,             // Protein
+			i.ProteinID,              // Protein ID
+			i.EntryName,              // Entry Name
+			i.GeneNames,              // Genes
+			i.Length,                 // Length
+			i.Coverage,               // Percent Coverage
+			i.Organism,               // Organism
+			i.Description,            // Description
+			i.ProteinExistence,       // Protein Existence
+			i.Probability,            // Protein Probability
+			i.TopPepProb,             // Top Peptide Probability
+			i.UniqueStrippedPeptides, // Stripped Peptides
+			len(i.TotalPeptideIons),  // Total Peptide Ions
+			uniqIons,                 // Unique Peptide Ions
+			urazorIons,               // Razor Peptide Ions
+			i.TotalSpC,               // Total Spectral Count
+			i.UniqueSpC,              // Unique Spectral Count
+			i.URazorSpC,              // Razor Spectral Count
+			i.TotalIntensity,         // Total Intensity
+			i.UniqueIntensity,        // Unique Intensity
+			i.URazorIntensity,        // Razor Intensity
+			strings.Join(assL, ", "), // Razor Assigned Modifications
+			strings.Join(obs, ", "),  // Razor Observed Modifications
+			strings.Join(ip, ", "),   // Indistinguishable Proteins
+		)
 
-			_, e = io.WriteString(file, line)
-			if e != nil {
-				msg.WriteToFile(e, "fatal")
+		if brand == "tmt" {
+			switch channels {
+			case 10:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+					//reportIntensities[11],
+					//reportIntensities[12],
+					//reportIntensities[13],
+					//reportIntensities[14],
+					//reportIntensities[15],
+				)
+			default:
+				header += ""
 			}
 		}
+
+		line += "\n"
+
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			msg.WriteToFile(e, "fatal")
+		}
+
 	}
 
 	// copy to work directory
