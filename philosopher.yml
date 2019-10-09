@@ -248,7 +248,7 @@ abacus:
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
   reprint: false                               # create abacus reports using the Reprint format
 
-tmtintegrator:                                 # v1.7
+tmtintegrator:                                 # v1.8
   path:                                        # path to TMT-Integrator jar
   memmory: 8                                   # memory allocation, in Gb
   output:                                      # the location of output files
