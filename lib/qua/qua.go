@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/met"
+	"github.com/prvst/philosopher/lib/msg"
 	"github.com/prvst/philosopher/lib/mzn"
 	"github.com/prvst/philosopher/lib/rep"
 	"github.com/prvst/philosopher/lib/tmt"
@@ -92,11 +92,6 @@ func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 
 		mz.Read(fileName, false, false, false)
 
-		// mz, e := getSpectra(p.Dir, p.Format, p.Level, sourceList[i])
-		// if e != nil {
-		// 	return p, e
-		// }
-
 		for i := range mz.Spectra {
 			mz.Spectra[i].Decode()
 		}
@@ -112,9 +107,6 @@ func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 		} else {
 			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, mz)
 		}
-
-		//ms2 = raw.MS2{}
-		//ms3 = raw.MS3{}
 
 		labels = assignLabelNames(labels, p.LabelNames)
 
@@ -310,6 +302,36 @@ func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string
 				i.Channel11.CustomName = "131C"
 			}
 
+		case "132N":
+			i.Channel11.CustomName = labelNames["132N"]
+			if len(i.Channel12.CustomName) < 1 {
+				i.Channel12.CustomName = "132N"
+			}
+
+		case "132C":
+			i.Channel13.CustomName = labelNames["132C"]
+			if len(i.Channel13.CustomName) < 1 {
+				i.Channel13.CustomName = "132C"
+			}
+
+		case "133N":
+			i.Channel14.CustomName = labelNames["133N"]
+			if len(i.Channel14.CustomName) < 1 {
+				i.Channel14.CustomName = "133N"
+			}
+
+		case "133C":
+			i.Channel15.CustomName = labelNames["133C"]
+			if len(i.Channel15.CustomName) < 1 {
+				i.Channel15.CustomName = "133C"
+			}
+
+		case "134N":
+			i.Channel16.CustomName = labelNames["134N"]
+			if len(i.Channel16.CustomName) < 1 {
+				i.Channel16.CustomName = "134N"
+			}
+
 		default:
 
 		}
@@ -354,7 +376,12 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel8.Intensity +
 				i.Labels.Channel9.Intensity +
 				i.Labels.Channel10.Intensity +
-				i.Labels.Channel11.Intensity
+				i.Labels.Channel11.Intensity +
+				i.Labels.Channel12.Intensity +
+				i.Labels.Channel13.Intensity +
+				i.Labels.Channel14.Intensity +
+				i.Labels.Channel15.Intensity +
+				i.Labels.Channel16.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
 		}
 	}
@@ -388,7 +415,12 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel8.Intensity +
 						i.Labels.Channel9.Intensity +
 						i.Labels.Channel10.Intensity +
-						i.Labels.Channel11.Intensity
+						i.Labels.Channel11.Intensity +
+						i.Labels.Channel12.Intensity +
+						i.Labels.Channel13.Intensity +
+						i.Labels.Channel14.Intensity +
+						i.Labels.Channel15.Intensity +
+						i.Labels.Channel16.Intensity
 
 					if tmtSum > bestPSMInt {
 						bestPSM = i.Spectrum
