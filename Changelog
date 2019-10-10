@@ -12,6 +12,7 @@
 - The filter command was throwing an error when no protein data was present.
 - Report with TMT was breaking when no annotation file was present.
 - Minor bugs and issues.
+- The Database command will throw an error if no iput at all is provided.
 
 ## Snapcrat
 
