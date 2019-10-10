@@ -46,6 +46,10 @@ func Run(m met.Data) met.Data {
 
 	var db = New()
 
+	if len(m.Database.ID) == 0 && (len(m.Database.Annot) == 0 || m.Database.Annot == "--contam" || m.Database.Annot == "--prefix") && (len(m.Database.Custom) == 0 || m.Database.Custom == "--contam" || m.Database.Custom == "--prefix") {
+		msg.InputNotFound(errors.New("Provide a protein FASTA file or Proteome ID"), "fatal")
+	}
+
 	if len(m.Database.Annot) > 0 {
 
 		logrus.Info("Processing database")
@@ -62,7 +66,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	if m.Database.Crap == false {
-		msg.InputNotFound(errors.New("Contaminants are not going to be added to database"), "warning")
+		msg.Custom(errors.New("Contaminants are not going to be added to database"), "warning")
 	}
 
 	if len(m.Database.Custom) < 1 {
