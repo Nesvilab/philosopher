@@ -286,8 +286,8 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 		"decoy":  d,
 	}).Info("6+ Charge profile")
 
-	uniqPsms := getUniquePSMs(p)
-	uniqPeps := getUniquePeptides(p)
+	uniqPsms := GetUniquePSMs(p)
+	uniqPeps := GetUniquePeptides(p)
 	uniqIons := getUniquePeptideIons(p)
 
 	logrus.WithFields(logrus.Fields{
@@ -296,13 +296,13 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, psmThreshold := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, peptideThreshold := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, ionThreshold := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
 	return psmThreshold, peptideThreshold, ionThreshold
@@ -324,8 +324,8 @@ func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
 	return t, d
 }
 
-//getUniquePSMs selects only unique pepetide ions for the given data stucture
-func getUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
+//GetUniquePSMs selects only unique pepetide ions for the given data stucture
+func GetUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := make(map[string]id.PepIDList)
 
@@ -362,8 +362,8 @@ func ExtractIonsFromPSMs(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-// getUniquePeptides selects only unique pepetide for the given data stucture
-func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
+// GetUniquePeptides selects only unique pepetide for the given data stucture
+func GetUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := make(map[string]id.PepIDList)
 
@@ -379,7 +379,8 @@ func getUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-func pepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64) {
+// PepXMLFDRFilter processes and calculates the FDR at the PSM, Ion or Peptide level
+func PepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64) {
 
 	//var msg string
 	var targets float64
@@ -1065,8 +1066,8 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 	// organize enties by score (probability or expectation)
 	sort.Sort(extPep)
 
-	uniqPsms := getUniquePSMs(extPep)
-	uniqPeps := getUniquePeptides(extPep)
+	uniqPsms := GetUniquePSMs(extPep)
+	uniqPeps := GetUniquePeptides(extPep)
 	uniqIons := getUniquePeptideIons(extPep)
 
 	logrus.WithFields(logrus.Fields{
@@ -1075,13 +1076,13 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 		"ions":     len(uniqIons),
 	}).Info("Applying sequential FDR estimation")
 
-	filteredPSM, _ := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _ := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _ := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
 	return
@@ -1109,8 +1110,8 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	// organize enties by score (probability or expectation)
 	sort.Sort(extPep)
 
-	uniqPsms := getUniquePSMs(extPep)
-	uniqPeps := getUniquePeptides(extPep)
+	uniqPsms := GetUniquePSMs(extPep)
+	uniqPeps := GetUniquePeptides(extPep)
 	uniqIons := getUniquePeptideIons(extPep)
 
 	logrus.WithFields(logrus.Fields{
@@ -1119,13 +1120,13 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 		"ions":     len(uniqIons),
 	}).Info("Second filtering results")
 
-	filteredPSM, _ := pepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _ := pepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _ := pepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
 	return
@@ -1141,8 +1142,8 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 	// organize enties by score (probability or expectation)
 	sort.Sort(extPep)
 
-	uniqPsms := getUniquePSMs(extPep)
-	uniqPeps := getUniquePeptides(extPep)
+	uniqPsms := GetUniquePSMs(extPep)
+	uniqPeps := GetUniquePeptides(extPep)
 	uniqIons := getUniquePeptideIons(extPep)
 
 	logrus.WithFields(logrus.Fields{
@@ -1178,13 +1179,13 @@ func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, 
 		}
 	}
 
-	filteredPSM, _ := pepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
+	filteredPSM, _ := PepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
 	filteredPSM.Serialize("psm")
 
-	filteredPeptides, _ := pepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
+	filteredPeptides, _ := PepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
 	filteredPeptides.Serialize("pep")
 
-	filteredIons, _ := pepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
+	filteredIons, _ := PepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
 	return

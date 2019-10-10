@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/prvst/philosopher/lib/fil"
 	"github.com/prvst/philosopher/lib/id"
 	"github.com/prvst/philosopher/lib/met"
 	"github.com/prvst/philosopher/lib/msg"
@@ -109,11 +110,21 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 	} else {
 
 		var pep id.PepXML
+		var pepID id.PepIDList
 		pep.Read("combined.pep.xml")
 		pep.DecoyTag = a.Tag
 
-		// get all peptide sequences from combined file and collapse them
 		for _, i := range pep.PeptideIdentification {
+			pepID = append(pepID, i)
+		}
+
+		//uniqPsms := getUniquePSMs(p)
+		uniqPeps := fil.GetUniquePeptides(pepID)
+
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+
+		// get all peptide sequences from combined file and collapse them
+		for _, i := range filteredPeptides {
 			if !strings.HasPrefix(i.Protein, a.Tag) {
 				seqMap[i.Peptide] = 0
 				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
