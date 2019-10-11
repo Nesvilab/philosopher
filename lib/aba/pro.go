@@ -227,6 +227,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 	return list
 }
 
+// getProteinSpectralCounts collects protein spectral counts from the individual data sets for the combined protein report
 func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
@@ -247,6 +248,7 @@ func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets
 	return combined
 }
 
+// getProteinLabelIntensities collects protein isobaric quantification from the individual data sets for the combined protein report
 func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {

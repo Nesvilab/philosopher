@@ -135,22 +135,6 @@ type AnalysisSampleCollection struct {
 	Sample  []Sample `xml:"Sample"`
 }
 
-// Sample is a description of the sample analysed by mass spectrometry using
-// CVParams or UserParams. If a composite sample has been analysed, a parent
-// sample should be defined, which references subsamples. This represents any
-// kind of substance used in an experimental workflow, such as whole organisms,
-// cells, DNA, solutions, compounds and experimental substances
-// (gels, arrays etc.)
-type Sample struct {
-	XMLName     xml.Name      `xml:"Sample"`
-	ID          string        `xml:"id,attr,omitempty"`
-	Name        string        `xml:"name,attr,omitempty"`
-	ContactRole []ContactRole `xml:"ContactRole"`
-	SubSample   []SubSample   `xml:"SubSample"`
-	CVParam     []CVParam     `xml:"cvParam"`
-	UserParam   []UserParam   `xml:"userParam"`
-}
-
 // SubSample is the references to the individual component samples within a
 // mixed parent sample
 type SubSample struct {

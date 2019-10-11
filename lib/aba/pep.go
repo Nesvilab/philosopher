@@ -97,6 +97,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	return
 }
 
+// processPeptideCombinedFile reads and filter the combined peptide report
 func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string) {
 
 	//var list rep.CombinedPeptideEvidenceList
@@ -136,6 +137,7 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 	return seqMap, chargeMap
 }
 
+// collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
 func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap map[string]int8, chargeMap map[string][]string) rep.CombinedPeptideEvidenceList {
 
 	var evidences rep.CombinedPeptideEvidenceList
@@ -233,6 +235,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 	return evidences
 }
 
+// getPeptideSpectralCounts collects spectral counts from the individual data sets for the combined peptide report
 func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
 
 	for k, v := range datasets {
@@ -281,6 +284,7 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 	return combined
 }
 
+// getIntensities collects intensities from the individual data sets for the combined peptide report
 func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
 
 	for k, v := range datasets {

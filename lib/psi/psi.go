@@ -35,7 +35,7 @@ type SourceFile struct {
 	UserParam                   []UserParam                 `xml:"userParam"`
 }
 
-// CvList is the list of controlled vocabularies used in the file
+// CvList is the container for one or more controlled vocabulary definitions
 type CvList struct {
 	XMLName xml.Name `xml:"cvList"`
 	Count   int      `xml:"count,attr,omitempty"`
@@ -76,6 +76,22 @@ type UserParam struct {
 	UnitCvRef     string   `xml:"unitCvRef,attr,omitempty"`
 	UnitName      string   `xml:"UnitName,attr,omitempty"`
 	Value         string   `xml:"value,attr,omitempty"`
+}
+
+// Sample is a description of the sample analysed by mass spectrometry using
+// CVParams or UserParams. If a composite sample has been analysed, a parent
+// sample should be defined, which references subsamples. This represents any
+// kind of substance used in an experimental workflow, such as whole organisms,
+// cells, DNA, solutions, compounds and experimental substances
+// (gels, arrays etc.)
+type Sample struct {
+	XMLName     xml.Name      `xml:"sample"`
+	ID          string        `xml:"id,attr,omitempty"`
+	Name        string        `xml:"name,attr,omitempty"`
+	ContactRole []ContactRole `xml:"ContactRole"`
+	SubSample   []SubSample   `xml:"SubSample"`
+	CVParam     []CVParam     `xml:"cvParam"`
+	UserParam   []UserParam   `xml:"userParam"`
 }
 
 // Parse is the main function for parsing IndexedMzML data
