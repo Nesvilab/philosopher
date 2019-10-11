@@ -1,5 +1,6 @@
 ### Added
 - Support for TMT-16 plex.
+- Peptide FDR filtering to combined peptide reports in Abcaus.
 
 ### Changed
 - Updated to Go v1.13.1.
@@ -14,6 +15,5 @@
 - Minor bugs and issues.
 - The Database command will throw an error if no iput at all is provided.
 
-## Snapcrat
-
+## Snapcraft
 - `snap install philosopher`
