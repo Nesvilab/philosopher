@@ -45,10 +45,6 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	if len(pepid) == 0 {
-		msg.NoPSMFound(errors.New(""), "fatal")
-	}
-
 	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 
 	if len(f.Filter.Pox) > 0 {

@@ -213,10 +213,6 @@ func (p *PepXML) Read(f string) {
 			psmlist = append(psmlist, psm)
 		}
 
-		if len(psmlist) == 0 {
-			msg.NoPSMFound(errors.New(""), "fatal")
-		}
-
 		p.PeptideIdentification = psmlist
 		p.Prophet = string(mpa.AnalysisSummary[0].Analysis)
 		p.Models = models
@@ -224,7 +220,7 @@ func (p *PepXML) Read(f string) {
 		//p.adjustMassDeviation()
 
 		if len(psmlist) == 0 {
-			msg.NoPSMFound(errors.New(""), "fatal")
+			msg.NoPSMFound(errors.New(f), "warning")
 		}
 
 	}

@@ -186,6 +186,16 @@ func NoPSMFound(e error, t string) {
 	return
 }
 
+// QuantifyingData call when trying to do quantification on a data set with problems
+func QuantifyingData(e error, t string) {
+
+	m := fmt.Sprintf("Cannot quantify data set. %s", e)
+
+	callLogrus(m, t)
+
+	return
+}
+
 // NoProteinFound call empty Protein structs
 func NoProteinFound(e error, t string) {
 
