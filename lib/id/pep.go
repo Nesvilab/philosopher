@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/prvst/philosopher/lib/uti"
 
-	"github.com/prvst/philosopher/lib/bio"
+	"github.com/prvst/philosopher/lib/msg"
 
 	"github.com/prvst/philosopher/lib/mod"
 	"github.com/prvst/philosopher/lib/spc"
@@ -163,7 +163,7 @@ func (p *PepXML) Read(f string) {
 					MassDiff:         i.MassDiff,
 					Variable:         string(i.Variable),
 					AminoAcid:        string(i.AminoAcid),
-					IsobaricMods:     make(map[string]uint8),
+					IsobaricMods:     make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -187,7 +187,7 @@ func (p *PepXML) Read(f string) {
 					AminoAcid:         fmt.Sprintf("%s-term", i.Terminus),
 					IsProteinTerminus: string(i.ProteinTerminus),
 					Terminus:          strings.ToLower(string(i.Terminus)),
-					IsobaricMods:      make(map[string]uint8),
+					IsobaricMods:      make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -259,7 +259,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
-		psm.Massdiff = (i.Massdiff - massDeviation)
+		psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
 
 		for _, j := range i.AnalysisResult {
 			if string(j.Analysis) == "peptideprophet" {
@@ -319,12 +319,14 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 
 	p.ModifiedPeptide = string(m.ModifiedPeptide)
 
-	var isotopicCorr float64
-	if p.IsoMassD != 0 {
-		isotopicCorr = p.Massdiff - (bio.Proton * float64(p.IsoMassD))
-	} else {
-		isotopicCorr = p.Massdiff
-	}
+	// var isotopicCorr float64
+	// if p.IsoMassD != 0 {
+	// 	isotopicCorr = p.Massdiff - (bio.Proton * float64(p.IsoMassD))
+	// } else {
+	// 	isotopicCorr = p.Massdiff
+	// }
+
+	//fmt.Println(isotopicCorr)
 
 	for _, i := range m.ModAminoacidMass {
 		aa := strings.Split(p.Peptide, "")
@@ -335,7 +337,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 			m.Index = newKey
 			m.Position = strconv.Itoa(i.Position)
-			m.IsobaricMods = make(map[string]uint8)
+			m.IsobaricMods = make(map[string]float64)
 			p.Modifications.Index[newKey] = m
 		}
 	}
@@ -347,7 +349,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "N-term"
-			m.IsobaricMods = make(map[string]uint8)
+			m.IsobaricMods = make(map[string]float64)
 			p.Modifications.Index[key] = m
 		}
 	}
@@ -359,26 +361,26 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "C-term"
-			m.IsobaricMods = make(map[string]uint8)
+			m.IsobaricMods = make(map[string]float64)
 			p.Modifications.Index[key] = m
 		}
 	}
 
-	if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
-		key := fmt.Sprintf("%.4f", isotopicCorr)
-		_, ok := p.Modifications.Index[key]
-		if !ok {
-			m := mod.Modification{
-				Index:        key,
-				Name:         "Unknown",
-				Type:         "Observed",
-				MassDiff:     isotopicCorr,
-				IsobaricMods: make(map[string]uint8),
-			}
-			p.Modifications.Index[key] = m
+	//if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
+	key := fmt.Sprintf("%.4f", p.Massdiff)
+	_, ok := p.Modifications.Index[key]
+	if !ok {
+		m := mod.Modification{
+			Index:        key,
+			Name:         "Unknown",
+			Type:         "Observed",
+			MassDiff:     p.Massdiff,
+			IsobaricMods: make(map[string]float64),
 		}
-
+		p.Modifications.Index[key] = m
 	}
+
+	//}
 
 	return
 }

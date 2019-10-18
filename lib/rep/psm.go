@@ -267,7 +267,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 					i.Labels.Channel11.Intensity,
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
 					i.Purity,
 					i.Labels.Channel1.Intensity,
@@ -281,11 +281,11 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 					i.Labels.Channel9.Intensity,
 					i.Labels.Channel10.Intensity,
 					i.Labels.Channel11.Intensity,
-					//i.Labels.Channel12.Intensity,
-					//i.Labels.Channel13.Intensity,
-					//i.Labels.Channel14.Intensity,
-					//i.Labels.Channel15.Intensity,
-					//i.Labels.Channel16.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
 				)
 			default:
 				header += ""

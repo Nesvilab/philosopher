@@ -23,11 +23,12 @@ func (evi *Evidence) MapMods() {
 	o := obo.NewUniModOntology()
 
 	for i := range evi.PSM {
+
 		for _, j := range o.Terms {
 
 			// for fixed and variable modifications
 			for k, v := range evi.PSM[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+				if j.MonoIsotopicMass >= (v.MassDiff-tolerance) && j.MonoIsotopicMass <= (v.MassDiff+tolerance) {
 
 					updatedMod := v
 
@@ -45,12 +46,11 @@ func (evi *Evidence) MapMods() {
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
+						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.PSM[i].Modifications.Index[k] = updatedMod
 					}
 				}
 			}
-
 		}
 	}
 
@@ -77,7 +77,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
+						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.Ions[i].Modifications.Index[k] = updatedMod
 					}
 				}
@@ -110,7 +110,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
+						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.Peptides[i].Modifications.Index[k] = updatedMod
 					}
 
