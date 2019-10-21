@@ -203,7 +203,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
