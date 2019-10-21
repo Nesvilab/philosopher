@@ -366,11 +366,13 @@ func (evi *Evidence) UpdateGeneNames() {
 	var descriptionMap = make(map[string]string)
 
 	for _, j := range dtb.Records {
-		partHeaderMap[j.ID] = j.PartHeader
-		proteinIDMap[j.ID] = j.ID
-		entryNameMap[j.ID] = j.EntryName
-		geneMap[j.ID] = j.GeneNames
-		descriptionMap[j.ID] = j.Description
+		if j.IsDecoy == false {
+			partHeaderMap[j.ID] = j.PartHeader
+			proteinIDMap[j.ID] = j.ID
+			entryNameMap[j.ID] = j.EntryName
+			geneMap[j.ID] = j.GeneNames
+			descriptionMap[j.ID] = j.Description
+		}
 	}
 
 	for i := range evi.PSM {
