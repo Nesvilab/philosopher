@@ -2,8 +2,6 @@ Welcome to the philosopher wiki!
 
 Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tuned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
 
-- Mass spec data file conversion with msconvert.
-
 - Database downloading and formatting.
 
 - Peptide Spectrum Matching with Comet.
