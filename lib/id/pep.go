@@ -55,6 +55,8 @@ type PeptideIdentification struct {
 	NumberTotalProteins  uint16
 	TotalNumberIons      uint16
 	NumberMatchedIons    uint16
+	NTT                  int
+	NMC                  int
 	PrecursorNeutralMass float64
 	PrecursorExpMass     float64
 	RetentionTime        float64
@@ -261,8 +263,14 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 			if string(j.Analysis) == "peptideprophet" {
 				psm.Probability = j.PeptideProphetResult.Probability
 				for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
-					if k.Name == "isomassd" {
+					if k.Name == "massd" {
 						psm.IsoMassD, _ = strconv.Atoi(k.Value)
+					}
+					if k.Name == "ntt" {
+						psm.NTT, _ = strconv.Atoi(k.Value)
+					}
+					if k.Name == "nmc" {
+						psm.NMC, _ = strconv.Atoi(k.Value)
 					}
 				}
 			}

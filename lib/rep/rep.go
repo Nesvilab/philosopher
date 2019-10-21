@@ -113,16 +113,17 @@ type SearchParametersEvidence struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Source   string
-	Index    uint32
-	Spectrum string
-	Scan     int
-	PrevAA   string
-	NextAA   string
-	Peptide  string
-	IonForm  string
-	Protein  string
-	//RazorProtein         string
+	Source               string
+	Index                uint32
+	Spectrum             string
+	Scan                 int
+	NTT                  int
+	NMC                  int
+	PrevAA               string
+	NextAA               string
+	Peptide              string
+	IonForm              string
+	Protein              string
 	ProteinDescription   string
 	ProteinID            string
 	EntryName            string
