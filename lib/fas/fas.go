@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 )
 
 // ParseFile a fasta file and returns a map with the header as key and sequence as value

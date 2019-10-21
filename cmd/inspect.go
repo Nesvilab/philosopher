@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/dat"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/rep"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
 )

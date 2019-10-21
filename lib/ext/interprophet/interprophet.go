@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
-	unix "github.com/prvst/philosopher/lib/ext/interprophet/unix"
-	wiPr "github.com/prvst/philosopher/lib/ext/interprophet/win"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/msg"
+	unix "github.com/nesvilab/philosopher/lib/ext/interprophet/unix"
+	wiPr "github.com/nesvilab/philosopher/lib/ext/interprophet/win"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/sys"
 )
 
 // InterProphet represents the tool configuration

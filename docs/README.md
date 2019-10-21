@@ -43,7 +43,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 
 ## How to Download
-Download the latest version [here](https://github.com/prvst/philosopher/releases/latest)
+Download the latest version [here](https://github.com/nesvilab/philosopher/releases/latest)
 
 
 ## How to Use
@@ -55,7 +55,7 @@ Check the [documentation](documentation.md) for more details about the available
 
 
 ## Questions, requests and bug reports
-If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/prvst/philosopher/issues).
+If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
 
 ## Analytics
 Check the [analytics](analytics.md) session for more information on the program usage report.

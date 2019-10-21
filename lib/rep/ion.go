@@ -9,14 +9,14 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 
-	"github.com/prvst/philosopher/lib/bio"
-	"github.com/prvst/philosopher/lib/cla"
-	"github.com/prvst/philosopher/lib/id"
-	"github.com/prvst/philosopher/lib/mod"
-	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/uti"
+	"github.com/nesvilab/philosopher/lib/bio"
+	"github.com/nesvilab/philosopher/lib/cla"
+	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/mod"
+	"github.com/nesvilab/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/uti"
 )
 
 // AssembleIonReport reports consist on ion reporting

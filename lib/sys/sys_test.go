@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/prvst/philosopher/lib/sys"
+	. "github.com/nesvilab/philosopher/lib/sys"
 )
 
 var _ = Describe("Sys", func() {

@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/id"
-	"github.com/prvst/philosopher/lib/mod"
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/dat"
+	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/mod"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/sys"
 )
 
 // AssembleProteinReport ...

@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/prvst/philosopher/lib/sys"
-	. "github.com/prvst/philosopher/lib/wrk"
+	"github.com/nesvilab/philosopher/lib/sys"
+	. "github.com/nesvilab/philosopher/lib/wrk"
 )
 
 var _ = Describe("Wrk", func() {

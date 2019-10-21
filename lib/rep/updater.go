@@ -3,7 +3,7 @@ package rep
 import (
 	"strings"
 
-	"github.com/prvst/philosopher/lib/dat"
+	"github.com/nesvilab/philosopher/lib/dat"
 )
 
 // PeptideMap struct

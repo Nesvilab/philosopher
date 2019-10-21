@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/prvst/philosopher/lib/mzn"
+	. "github.com/nesvilab/philosopher/lib/mzn"
 )
 
 var _ = Describe("Mzn", func() {

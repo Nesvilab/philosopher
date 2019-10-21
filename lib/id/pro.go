@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 
-	"github.com/prvst/philosopher/lib/mod"
-	"github.com/prvst/philosopher/lib/spc"
-	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/nesvilab/philosopher/lib/mod"
+	"github.com/nesvilab/philosopher/lib/spc"
+	"github.com/nesvilab/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/tmt"
 	"github.com/vmihailenco/msgpack"
 )
 

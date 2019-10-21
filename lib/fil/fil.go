@@ -11,19 +11,19 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 
-	"github.com/prvst/philosopher/lib/spc"
+	"github.com/nesvilab/philosopher/lib/spc"
 
-	"github.com/prvst/philosopher/lib/cla"
-	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/id"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/mod"
-	"github.com/prvst/philosopher/lib/qua"
-	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/sys"
-	"github.com/prvst/philosopher/lib/uti"
+	"github.com/nesvilab/philosopher/lib/cla"
+	"github.com/nesvilab/philosopher/lib/dat"
+	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/mod"
+	"github.com/nesvilab/philosopher/lib/qua"
+	"github.com/nesvilab/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
 )
 

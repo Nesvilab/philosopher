@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/id"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/mod"
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/tmt"
+	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/mod"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/tmt"
 	"github.com/sirupsen/logrus"
 )
 

@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/sys"
+	. "github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/sys"
 )
 
 var _ = Describe("Met", func() {

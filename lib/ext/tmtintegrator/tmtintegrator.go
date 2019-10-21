@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/met"
 )
 
 // TMTIntegrator represents the tool configuration

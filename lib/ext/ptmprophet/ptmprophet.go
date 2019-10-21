@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/msg"
-	unix "github.com/prvst/philosopher/lib/ext/ptmprophet/unix"
-	wPeP "github.com/prvst/philosopher/lib/ext/ptmprophet/win"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/msg"
+	unix "github.com/nesvilab/philosopher/lib/ext/ptmprophet/unix"
+	wPeP "github.com/nesvilab/philosopher/lib/ext/ptmprophet/win"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/sys"
 )
 
 // PTMProphet is the main tool data configuration structure

@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/vmihailenco/msgpack"
 )

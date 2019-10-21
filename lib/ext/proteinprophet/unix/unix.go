@@ -4,8 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/sys"
 )
 
 // UnixBatchCoverage deploys batchcoverage

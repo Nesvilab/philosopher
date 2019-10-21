@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/prvst/philosopher/cmd"
+	"github.com/nesvilab/philosopher/cmd"
 )
 
 var (

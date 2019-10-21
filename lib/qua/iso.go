@@ -5,10 +5,10 @@ import (
 	"math"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/mzn"
-	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/tmt"
-	"github.com/prvst/philosopher/lib/uti"
+	"github.com/nesvilab/philosopher/lib/mzn"
+	"github.com/nesvilab/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/tmt"
+	"github.com/nesvilab/philosopher/lib/uti"
 )
 
 const (

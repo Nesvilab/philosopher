@@ -8,12 +8,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/mzn"
-	"github.com/prvst/philosopher/lib/rep"
-	"github.com/prvst/philosopher/lib/tmt"
-	"github.com/prvst/philosopher/lib/uti"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/mzn"
+	"github.com/nesvilab/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/tmt"
+	"github.com/nesvilab/philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
 )
 

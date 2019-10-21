@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf16"
 
-	"github.com/prvst/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/msg"
 )
 
 // interface shared by all data objects in the raw file

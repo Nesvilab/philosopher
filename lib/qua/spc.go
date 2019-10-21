@@ -3,8 +3,8 @@ package qua
 import (
 	"errors"
 
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/rep"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins

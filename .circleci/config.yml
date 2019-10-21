@@ -8,7 +8,7 @@ jobs:
       # specify the version
       - image: circleci/golang:1.12.7
 
-    working_directory: /go/src/github.com/prvst/philosopher
+    working_directory: /go/src/github.com/nesvilab/philosopher
     steps:
       - checkout
 
@@ -17,9 +17,9 @@ jobs:
 
       - run: make deploy
 
-      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/prvst/philosopher-test/releases/download/0.0.1/01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
-      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/prvst/philosopher-test/releases/download/0.0.1/02_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
-      - run: wget -P /go/src/github.com/prvst/philosopher/test/wrksp https://github.com/prvst/philosopher-test/releases/download/0.0.1/03_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+      - run: wget -P /go/src/github.com/nesvilab/philosopher/test/wrksp https://github.com/nesvilab/philosopher-test/releases/download/0.0.1/01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+      - run: wget -P /go/src/github.com/nesvilab/philosopher/test/wrksp https://github.com/nesvilab/philosopher-test/releases/download/0.0.1/02_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
+      - run: wget -P /go/src/github.com/nesvilab/philosopher/test/wrksp https://github.com/nesvilab/philosopher-test/releases/download/0.0.1/03_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML
 
       - run: make test
 

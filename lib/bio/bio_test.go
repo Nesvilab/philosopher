@@ -1,7 +1,7 @@
 package bio_test
 
 import (
-	. "github.com/prvst/philosopher/lib/bio"
+	. "github.com/nesvilab/philosopher/lib/bio"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"os"
 
-	"github.com/prvst/philosopher/lib/fil"
-	"github.com/prvst/philosopher/lib/met"
-	"github.com/prvst/philosopher/lib/msg"
-	"github.com/prvst/philosopher/lib/sys"
+	"github.com/nesvilab/philosopher/lib/fil"
+	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
+	"github.com/nesvilab/philosopher/lib/sys"
 	"github.com/spf13/cobra"
 )
 

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prvst/philosopher/lib/dat"
-	"github.com/prvst/philosopher/lib/psi"
+	"github.com/nesvilab/philosopher/lib/dat"
+	"github.com/nesvilab/philosopher/lib/psi"
 )
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded
