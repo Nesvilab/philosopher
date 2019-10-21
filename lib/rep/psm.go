@@ -45,6 +45,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Scan = i.Scan
 		p.PrevAA = i.PrevAA
 		p.NextAA = i.NextAA
+		p.NTT = i.NTT
+		p.NMC = i.NMC
 		p.Peptide = i.Peptide
 		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
@@ -129,7 +131,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tIntensity\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tAssigned Modifications\tObserved Modifications"
 
 	if hasLoc == true {
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
@@ -203,12 +205,14 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%f\t%.4f\t%.4f\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
 			i.Nextscore,
 			i.Probability,
+			i.NTT,
+			i.NMC,
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
