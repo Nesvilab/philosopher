@@ -26,11 +26,11 @@ Skips the downloading of a fresh database and use an existing one instead. The c
 
 `--id`
 
-The Proteome ID used to find and download an organism proteome. See below where to find the ID.
+The Proteome ID used to find and download an organism proteome. Find the right identifier [here](http://www.uniprot.org/proteomes/).
 
 `--isoform`
 
-Allows isoform sequences to be added to the download.
+Allows non-canonical isoforms to be added to the download.
 
 `--prefix`
 

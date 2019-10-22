@@ -1,6 +1,6 @@
 ## Workspace management
 
-Philosopher works with the concept of workspaces, all processed and parsed data is stored locally in a custom binary format providing a more efficient way of handling data.
+Philosopher uses a workspace, where all processed and parsed data is stored locally in a custom binary format for more efficient data handling.
 
 ### Usage
 

@@ -1,12 +1,11 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.12.5-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg)
 
 ## Features
-Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tuned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
+Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop complete proteomics analyses, from peptide spectrum matching to annotated protein reports. Philosopher is also tuned for Open Search analysis, providing a modified version of the Prophets for peptide validation and protein inference. To date, Philosopher is the only proteomics toolkit that allows you to process and analyze both closed and open search results.
 
-- Mass spec data file conversion with msconvert.
 
 - Database downloading and formatting.
 
@@ -14,13 +13,13 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 - Peptide assignment validation with PeptideProphet.
 
-- Multi-level integrative analysis with iProphet.
+- Multi-level integrative evidence analysis with iProphet.
 
 - PTM site localization with PTMProphet.
 
 - Protein inference with ProteinProphet.
 
-- Open Search data validation.
+- Open search result validation.
 
 - FDR filtering with custom algorithms.
 
@@ -30,15 +29,14 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
   - Razor peptide assignment for better quantification and interpretation.
 
 
-- Label-free quantification via Spectral counting and MS1 Quantification.
+- Label-free quantification via spectral counting and MS1 intensities.
 
 - Labeling-based quantification using TMT isobaric tags.
 
 - Clustering analysis for proteomics results.
 
-- Multi-level detailed reports including peptides, ions and proteins.
+- Multi-level detailed reports including PSMs, ions, peptides, and proteins.
 
-- Mass spec identification file conversion with idconvert.
 
 
 
@@ -47,7 +45,7 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 
 
 ## How to Use
-A simple [tutorial](tutorial.md) is also provided with an extensive example on how to use Philosopher.
+A simple [tutorial](tutorial.md) is provided with a complete example on Philosopher usage.
 
 
 ## Documentation
@@ -55,7 +53,7 @@ Check the [documentation](documentation.md) for more details about the available
 
 
 ## Questions, requests and bug reports
-If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
+If you have any questions, remarks, or requests, or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
 
 ## Analytics
 Check the [analytics](analytics.md) session for more information on the program usage report.
@@ -66,7 +64,7 @@ Still in progress!
 
 ## About the developers
 [Felipe da Veiga leprevost](http://www.leprevost.com.br)
-
+Sarah Haynes
 Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
 
 
