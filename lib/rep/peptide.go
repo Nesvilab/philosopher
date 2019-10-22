@@ -145,7 +145,7 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 		}
 	}
 
-	header = "Peptide\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
+	header = "Peptide\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -195,8 +195,9 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 		sort.Strings(obs)
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
+			len(i.Sequence),
 			strings.Join(cs, ", "),
 			i.Probability,
 			i.Spc,

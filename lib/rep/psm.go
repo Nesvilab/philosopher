@@ -125,7 +125,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		}
 	}
 
-	header = "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tDelta Mass\tExperimental Mass\tPeptide Mass"
+	header = "Spectrum\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tDelta Mass\tExperimental Mass\tPeptide Mass"
 
 	if isComet == true {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
@@ -181,10 +181,11 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
+			len(i.Peptide),
 			i.AssumedCharge,
 			i.RetentionTime,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
