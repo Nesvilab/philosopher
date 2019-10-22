@@ -22,4 +22,4 @@ Philosopher is partially compatible with 16 different operating systems and arch
 
 ## Why partially ?
 
-Third-party software like the _prophets_ will only work on Linux (Debian and Red Hat based) and Windows systems. The remaining functions will work on the above list. Also, the ProteoWizard tools _msconvert_ and _idconvert_ are only offer to GNU/Linux ad Unix operating systems.
+Third-party software like the _prophets_ will only work on Linux (Debian and Red Hat based) and Windows systems. The remaining functions will work on the above list. Also, the ProteoWizard tools _msconvert_ and _idconvert_ are only offered to GNU/Linux ad Unix operating systems.

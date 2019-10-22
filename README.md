@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.13.3-blue.svg)
+![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?style=flat)
 [![CircleCI](https://circleci.com/gh/prvst/philosopher-source.svg?style=svg&circle-token=8fc2895a5f10b2507a73d672ad89d50798b417ad)](https://circleci.com/gh/prvst/philosopher-source)
 

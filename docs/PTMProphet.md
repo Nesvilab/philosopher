@@ -35,11 +35,11 @@ Output prefix file name
 
 `--ppmtol`
 
-use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters (default 1)
+Use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters (default 1)
 
 `--verbose`
 
-produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
+Produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
 
 ## Example
 

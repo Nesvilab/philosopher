@@ -1,9 +1,5 @@
 Philosopher provides easy access to the following third-party software:
 
-* [ProteoWizard msconvert](https://www.nature.com/articles/nbt.2377)
-
-* [ProteoWizard idconvert](https://www.nature.com/articles/nbt.2377)
-
 * [Comet](http://onlinelibrary.wiley.com/doi/10.1002/pmic.201200439/abstract)
 
 * [PeptideProphet](http://peptideprophet.sourceforge.net/pep-proph.pdf)
