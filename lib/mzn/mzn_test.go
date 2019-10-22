@@ -23,7 +23,7 @@ var _ = Describe("Mzn", func() {
 		})
 
 		It("Reading mzML 01A MS1", func() {
-			msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML", false, false, false)
+			msd.Read("b1906_293T_proteinID_01A_QE3_122212.mzML", false, false, false)
 			Expect(e).NotTo(HaveOccurred())
 		})
 
@@ -35,7 +35,7 @@ var _ = Describe("Mzn", func() {
 					break
 				}
 			}
-			Expect(len(msd.Spectra)).To(Equal(54357))
+			Expect(len(msd.Spectra)).To(Equal(67599))
 		})
 
 		It("mzML 01A MS1 spectra Index", func() {
@@ -51,79 +51,70 @@ var _ = Describe("Mzn", func() {
 		// })
 
 		It("mzML 01A MS1 intensities", func() {
-			Expect(spec.Intensity.DecodedStream[0]).To(Equal(9104.91796875))
+			Expect(spec.Intensity.DecodedStream[0]).To(Equal(930.33349609375))
 		})
 
 		It("mzML 01A MS1 MZ", func() {
-			Expect(spec.Mz.DecodedStream[0]).To(Equal(350.1635437011719))
+			Expect(spec.Mz.DecodedStream[0]).To(Equal(301.1378479003906))
 		})
-
-		// It("mzML 01A MS1 spectra Scan Start Time", func() {
-		// 	ms1 = raw.GetMS1(spec)
-		// 	Expect(ms1.Ms1Scan[0].ScanStartTime).To(Equal(152.34552))
-		// })
 
 		It("Read mzML 01A MS2 spectra", func() {
 			for _, i := range msd.Spectra {
-				if i.Index == "2" && i.Scan == "3" {
+				if i.Index == "2135" && i.Scan == "2136" {
 					spec = i
 					spec.Decode()
 					break
 				}
 			}
-			Expect(len(spec.Mz.DecodedStream)).To(Equal(231))
+			Expect(len(spec.Mz.DecodedStream)).To(Equal(2522))
 		})
 
 		It("mzML 01 MS2 spectra Index", func() {
-			Expect(spec.Index).To(Equal("2"))
+			Expect(spec.Index).To(Equal("2135"))
 		})
 
 		It("mzML 01 MS2 spectra Scan", func() {
-			Expect(spec.Scan).To(Equal("3"))
+			Expect(spec.Scan).To(Equal("2136"))
 		})
 
-		// It("mzML 01 MS2 stream", func() {
-		// 	Expect(len(spec2.Spectrum)).To(Equal(231))
-		// })
-
 		It("mzML 01 MS1 intensities", func() {
-			Expect(spec.Intensity.DecodedStream[0]).To(Equal(371635.9375))
+			Expect(spec.Intensity.DecodedStream[0]).To(Equal(11408.326171875))
 		})
 
 		It("mzML 01 MS2 MZ", func() {
-			Expect(spec.Mz.DecodedStream[0]).To(Equal(110.07147216796875))
+			Expect(spec.Mz.DecodedStream[0]).To(Equal(300.06072998046875))
 		})
 
 		It("mzML 01 MS2 Parent Index", func() {
-			Expect(spec.Precursor.ParentIndex).To(Equal("1"))
+			Expect(spec.Precursor.ParentIndex).To(Equal(""))
 		})
 
 		It("mzML 01 MS2 Parent Scan", func() {
-			Expect(spec.Precursor.ParentScan).To(Equal("2"))
+			Expect(spec.Precursor.ParentScan).To(Equal(""))
 		})
 
 		It("mzML 01 MS2 Charge State", func() {
-			Expect(spec.Precursor.ChargeState).To(Equal(2))
+			Expect(spec.Precursor.ChargeState).To(Equal(0))
 		})
 
 		It("mzML 01 MS2 Parent Selected Ion", func() {
-			Expect(spec.Precursor.SelectedIon).To(Equal(391.201019287109))
+			Expect(spec.Precursor.SelectedIon).To(Equal(0.0))
 		})
 
 		It("mzML 01 MS2 Parent Target Ion", func() {
-			Expect(spec.Precursor.TargetIon).To(Equal(391.2))
+			Expect(spec.Precursor.TargetIon).To(Equal(0.0))
 		})
 
 		It("mzML 01 MS2 Charge Peak Intensity", func() {
-			Expect(spec.Precursor.PeakIntensity).To(Equal(3.58558525e+06))
+			Expect(spec.Precursor.PeakIntensity).To(Equal(0.0))
 		})
 
 		It("mzML 01 MS2 Parent Isolatio nWindow Lower Offset", func() {
-			Expect(spec.Precursor.IsolationWindowLowerOffset).To(Equal(0.34999999404))
+			Expect(spec.Precursor.IsolationWindowLowerOffset).To(Equal(0.0))
 		})
 
 		It("mzML 01 MS2 Charge Isolation Window Upper Offset", func() {
-			Expect(spec.Precursor.IsolationWindowUpperOffset).To(Equal(0.34999999404))
+			Expect(spec.Precursor.IsolationWindowUpperOffset).To(Equal(0.0))
 		})
 
 	})
