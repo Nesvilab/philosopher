@@ -16,136 +16,6 @@ type PeptideMap struct {
 	Proteins  map[string]int
 }
 
-// // UpdateMappedProteins updates the list of mapped proteins on the data structures
-// func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
-
-// 	var list = make(map[string]PeptideMap)
-// 	var ionList = make(map[string]PeptideMap)
-// 	var checkup = make(map[string]int)
-// 	var proteinMap = make(map[string]int8)
-
-// 	// The PSM exclusion list was implemented on July 19 because e noticed that the psm.tsv
-// 	// and protein tsv had a different number of unique protein IDs. The PSM tables had spectra
-// 	// mapping to decoys and/or other proteins that do not exist in the final protein tablevi. This
-// 	// is most likely an effect of the backtracking with the promotion fo sequences based on the
-// 	// alternative lists. Since these PSMs are mapping to proteins that do not enter the final
-// 	// protein list, we decided to remove them and make both lists compatible in quantity and quality.
-// 	var psmExclusion = make(map[string]uint8)
-// 	var pepExclusion = make(map[string]uint8)
-
-// 	for _, i := range evi.Proteins {
-// 		for _, v := range i.TotalPeptideIons {
-
-// 			_, ok := checkup[v.Sequence]
-// 			if !ok {
-// 				var pm PeptideMap
-
-// 				pm.Sequence = v.Sequence
-// 				pm.IonForm = v.IonForm
-// 				pm.Proteins = v.MappedProteins
-// 				pm.Proteins[i.PartHeader] = 0
-// 				pm.Protein = i.PartHeader
-// 				pm.ProteinID = i.ProteinID
-// 				pm.Gene = i.GeneNames
-
-// 				list[pm.Sequence] = pm
-// 				ionList[pm.IonForm] = pm
-// 				checkup[v.Sequence] = 0
-// 				proteinMap[i.PartHeader] = 0
-// 			}
-// 		}
-// 	}
-
-// 	// PSMs
-// 	for i := range evi.PSM {
-// 		v, ok := list[evi.PSM[i].Peptide]
-// 		if ok {
-// 			for k := range v.Proteins {
-// 				evi.PSM[i].MappedProteins[k]++
-// 			}
-// 			if !strings.HasPrefix(v.Protein, decoyTag) {
-// 				evi.PSM[i].Protein = v.Protein
-// 				evi.PSM[i].ProteinID = v.ProteinID
-// 				evi.PSM[i].GeneName = v.Gene
-// 			}
-// 		}
-// 		_, ok = proteinMap[evi.PSM[i].Protein]
-// 		if !ok {
-// 			psmExclusion[evi.PSM[i].Spectrum] = 0
-// 		}
-// 	}
-
-// 	var psm PSMEvidenceList
-// 	for _, i := range evi.PSM {
-// 		_, ok := psmExclusion[i.Spectrum]
-// 		if !ok {
-// 			psm = append(psm, i)
-// 		}
-// 	}
-
-// 	evi.PSM = psm
-
-// 	// Peptides
-// 	for i := range evi.Peptides {
-// 		v, ok := list[evi.Peptides[i].Sequence]
-// 		if ok {
-// 			for k := range v.Proteins {
-// 				evi.Peptides[i].MappedProteins[k]++
-// 			}
-// 			if !strings.HasPrefix(v.Protein, decoyTag) {
-// 				evi.Peptides[i].Protein = v.Protein
-// 				evi.Peptides[i].ProteinID = v.ProteinID
-// 				evi.Peptides[i].GeneName = v.Gene
-// 			}
-// 		}
-// 		_, ok = proteinMap[evi.Peptides[i].Sequence]
-// 		if !ok {
-// 			psmExclusion[evi.Peptides[i].Sequence] = 0
-// 		}
-// 	}
-
-// 	var pep PeptideEvidenceList
-// 	for _, i := range evi.Peptides {
-// 		_, ok := pepExclusion[i.Sequence]
-// 		if !ok {
-// 			pep = append(pep, i)
-// 		}
-// 	}
-
-// 	evi.Peptides = pep
-
-// 	// Ions
-// 	for i := range evi.Ions {
-// 		v, ok := list[evi.Ions[i].Sequence]
-// 		if ok {
-// 			for k := range v.Proteins {
-// 				evi.Ions[i].MappedProteins[k]++
-// 			}
-// 			if !strings.HasPrefix(v.Protein, decoyTag) {
-// 				evi.Ions[i].Protein = v.Protein
-// 				evi.Ions[i].ProteinID = v.ProteinID
-// 				evi.Ions[i].GeneName = v.Gene
-// 			}
-// 		}
-// 		// _, ok = proteinMap[evi.Ions[i].Sequence]
-// 		// if !ok {
-// 		// 	ionExclusion[evi.Ions[i].IonForm] = 0
-// 		// }
-// 	}
-
-// 	// var ion IonEvidenceList
-// 	// for _, i := range evi.Ions {
-// 	// 	_, ok := ionExclusion[i.IonForm]
-// 	// 	if !ok {
-// 	// 		ion = append(ion, i)
-// 	// 	}
-// 	// }
-
-// 	//evi.Ions = ion
-
-// 	return
-// }
-
 // UpdateMappedProteins updates the list of mapped proteins on the data structures
 func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 
@@ -188,7 +58,11 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 			for k := range v.Proteins {
 				evi.PSM[i].MappedProteins[k]++
 			}
-			if !strings.HasPrefix(v.Protein, decoyTag) {
+			if !strings.HasPrefix(v.Protein, decoyTag) && !strings.HasPrefix(evi.PSM[i].Protein, decoyTag) {
+				evi.PSM[i].Protein = v.Protein
+				evi.PSM[i].ProteinID = v.ProteinID
+				evi.PSM[i].GeneName = v.Gene
+			} else if strings.HasPrefix(v.Protein, decoyTag) && evi.PSM[i].IsDecoy {
 				evi.PSM[i].Protein = v.Protein
 				evi.PSM[i].ProteinID = v.ProteinID
 				evi.PSM[i].GeneName = v.Gene
@@ -376,91 +250,37 @@ func (evi *Evidence) UpdateGeneNames() {
 	}
 
 	for i := range evi.PSM {
-		evi.PSM[i].Protein = partHeaderMap[evi.PSM[i].ProteinID]
-		evi.PSM[i].ProteinID = proteinIDMap[evi.PSM[i].ProteinID]
-		evi.PSM[i].EntryName = entryNameMap[evi.PSM[i].ProteinID]
-		evi.PSM[i].GeneName = geneMap[evi.PSM[i].ProteinID]
-		evi.PSM[i].ProteinDescription = descriptionMap[evi.PSM[i].ProteinID]
+		if !evi.PSM[i].IsDecoy {
+			evi.PSM[i].Protein = partHeaderMap[evi.PSM[i].ProteinID]
+			evi.PSM[i].ProteinID = proteinIDMap[evi.PSM[i].ProteinID]
+			evi.PSM[i].EntryName = entryNameMap[evi.PSM[i].ProteinID]
+			evi.PSM[i].GeneName = geneMap[evi.PSM[i].ProteinID]
+			evi.PSM[i].ProteinDescription = descriptionMap[evi.PSM[i].ProteinID]
+		}
 	}
 
 	for i := range evi.Ions {
-		evi.Ions[i].Protein = partHeaderMap[evi.Ions[i].ProteinID]
-		evi.Ions[i].ProteinID = proteinIDMap[evi.Ions[i].ProteinID]
-		evi.Ions[i].EntryName = entryNameMap[evi.Ions[i].ProteinID]
-		evi.Ions[i].GeneName = geneMap[evi.Ions[i].ProteinID]
-		evi.Ions[i].ProteinDescription = descriptionMap[evi.Ions[i].ProteinID]
+		if !evi.Ions[i].IsDecoy {
+			evi.Ions[i].Protein = partHeaderMap[evi.Ions[i].ProteinID]
+			evi.Ions[i].ProteinID = proteinIDMap[evi.Ions[i].ProteinID]
+			evi.Ions[i].EntryName = entryNameMap[evi.Ions[i].ProteinID]
+			evi.Ions[i].GeneName = geneMap[evi.Ions[i].ProteinID]
+			evi.Ions[i].ProteinDescription = descriptionMap[evi.Ions[i].ProteinID]
+		}
 	}
 
 	for i := range evi.Peptides {
-		evi.Peptides[i].Protein = partHeaderMap[evi.Peptides[i].ProteinID]
-		evi.Peptides[i].ProteinID = proteinIDMap[evi.Peptides[i].ProteinID]
-		evi.Peptides[i].EntryName = entryNameMap[evi.Peptides[i].ProteinID]
-		evi.Peptides[i].GeneName = geneMap[evi.Peptides[i].ProteinID]
-		evi.Peptides[i].ProteinDescription = descriptionMap[evi.Peptides[i].ProteinID]
+		if !evi.Peptides[i].IsDecoy {
+			evi.Peptides[i].Protein = partHeaderMap[evi.Peptides[i].ProteinID]
+			evi.Peptides[i].ProteinID = proteinIDMap[evi.Peptides[i].ProteinID]
+			evi.Peptides[i].EntryName = entryNameMap[evi.Peptides[i].ProteinID]
+			evi.Peptides[i].GeneName = geneMap[evi.Peptides[i].ProteinID]
+			evi.Peptides[i].ProteinDescription = descriptionMap[evi.Peptides[i].ProteinID]
+		}
 	}
 
 	return
 }
-
-// // UpdateGeneNames will fix the gene name assignment after razor assingment
-// func (evi *Evidence) UpdateGeneNames() {
-
-// 	var dtb dat.Base
-// 	dtb.Restore()
-
-// 	var partHeaderMap = make(map[string]string)
-// 	var proteinIDMap = make(map[string]string)
-// 	var entryNameMap = make(map[string]string)
-// 	var GeneMap = make(map[string]string)
-
-// 	var dbMap = make(map[string]string)
-// 	var descMap = make(map[string]string)
-// 	var idMap = make(map[string]string)
-// 	var entryMap = make(map[string]string)
-
-// 	for _, j := range dtb.Records {
-// 		partHeaderMap[j.ID] = j.PartHeader
-// 		proteinIDMap[j.ID] = j.ID
-// 		entryNameMap[j.ID] = j.EntryName
-// 		GeneMap[j.ID] = j.GeneNames
-// 		// dbMap[j.PartHeader] = j.GeneNames
-// 		// descMap[j.PartHeader] = j.ProteinName
-// 		// idMap[j.PartHeader] = j.ID
-// 		// entryMap[j.PartHeader] = j.EntryName
-// 	}
-
-// 	for i := range evi.PSM {
-
-// 		if evi.PSM[i].Peptide == "YEDEINKR" {
-// 			fmt.Println(evi.PSM[i].Protein, evi.PSM[i].ProteinID, evi.PSM[i].EntryName, evi.PSM[i].GeneName)
-// 		}
-
-// 		evi.PSM[i].GeneName = dbMap[evi.PSM[i].Protein]
-// 		evi.PSM[i].ProteinDescription = descMap[evi.PSM[i].Protein]
-// 		evi.PSM[i].ProteinID = idMap[evi.PSM[i].Protein]
-// 		evi.PSM[i].EntryName = entryMap[evi.PSM[i].Protein]
-
-// 		if evi.PSM[i].Peptide == "YEDEINKR" {
-// 			fmt.Println(evi.PSM[i].Protein, evi.PSM[i].ProteinID, evi.PSM[i].EntryName, evi.PSM[i].GeneName)
-// 		}
-// 	}
-
-// 	for i := range evi.Ions {
-// 		evi.Ions[i].GeneName = dbMap[evi.Ions[i].Protein]
-// 		evi.Ions[i].ProteinDescription = descMap[evi.Ions[i].Protein]
-// 		evi.Ions[i].ProteinID = idMap[evi.Ions[i].Protein]
-// 		evi.Ions[i].EntryName = entryMap[evi.Ions[i].Protein]
-// 	}
-
-// 	for i := range evi.Peptides {
-// 		evi.Peptides[i].GeneName = dbMap[evi.Peptides[i].Protein]
-// 		evi.Peptides[i].ProteinDescription = descMap[evi.Peptides[i].Protein]
-// 		evi.Peptides[i].ProteinID = idMap[evi.Peptides[i].Protein]
-// 		evi.Peptides[i].EntryName = entryMap[evi.Peptides[i].Protein]
-// 	}
-
-// 	return
-// }
 
 // UpdateSupportingSpectra pushes back from SM to Protein the new supporting spectra from razor results
 func (evi *Evidence) UpdateSupportingSpectra() {
@@ -504,11 +324,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			if len(evi.Proteins[i].TotalPeptideIons[j].Spectra) == 0 {
 				delete(evi.Proteins[i].TotalPeptideIons, j)
 			}
-
-			// for k := range evi.Proteins[i].TotalPeptideIons[j].Spectra {
-			// 	delete(evi.Proteins[i].TotalPeptideIons[k].Spectra, k)
-			// }
-
 		}
 	}
 
