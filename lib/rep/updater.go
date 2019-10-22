@@ -24,7 +24,7 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 
 	// The PSM exclusion list was implemented on July 19 because e noticed that the psm.tsv
 	// and protein tsv had a different number of unique protein IDs. The PSM tables had spectra
-	// mapping to decoys and/or other proteins that do not exist in the final protein tablevi. This
+	// mapping to decoys and/or other proteins that do not exist in the final protein table. This
 	// is most likely an effect of the backtracking with the promotion fo sequences based on the
 	// alternative lists. Since these PSMs are mapping to proteins that do not enter the final
 	// protein list, we decided to remove them and make both lists compatible in quantity and quality.
