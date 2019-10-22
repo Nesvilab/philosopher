@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/msg"
 
 	"github.com/nesvilab/philosopher/lib/spc"
@@ -147,6 +148,12 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateGeneNames()
+
+	for _, x := range e.PSM {
+		if x.Spectrum == "2017_01_19_MB1-4_Glyco_rep1_Frac1.10177.10177.3" {
+			spew.Dump(x)
+		}
+	}
 
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
