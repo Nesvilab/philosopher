@@ -69,6 +69,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Nextscore = i.Nextscore
 		p.DiscriminantValue = i.DiscriminantValue
 		p.Intensity = i.Intensity
+		p.IonMobility = i.IonMobility
 		p.MappedProteins = make(map[string]int)
 		p.Modifications = i.Modifications
 
@@ -131,7 +132,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tIon Mobility\tAssigned Modifications\tObserved Modifications"
 
 	if hasLoc == true {
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
@@ -206,7 +207,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%.4f\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
@@ -215,6 +216,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			i.NTT,
 			i.NMC,
 			i.Intensity,
+			i.IonMobility,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)

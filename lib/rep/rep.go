@@ -151,6 +151,7 @@ type PSMEvidence struct {
 	Nextscore            float64
 	DiscriminantValue    float64
 	Intensity            float64
+	IonMobility          float64
 	Purity               float64
 	IsDecoy              bool
 	IsUnique             bool

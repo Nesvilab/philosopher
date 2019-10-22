@@ -190,6 +190,7 @@ type SpectrumQuery struct {
 	AssumedCharge        uint8        `xml:"assumed_charge,attr"`
 	Index                uint32       `xml:"index,attr"`
 	RetentionTimeSec     float64      `xml:"retention_time_sec,attr"`
+	IonMobility          float64      `xml:"ion_mobility,attr"`
 	SearchResult         SearchResult `xml:"search_result"`
 }
 
