@@ -294,21 +294,37 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 
 		for _, j := range i.Score {
 			if string(j.Name) == "expect" {
-				psm.Expectation = j.Value
+				eValue, _ := uti.ParseFloat(j.Value)
+				//eValueFloat := fmt.Sprintf("%.16f\n", eValue)
+				psm.Expectation = eValue
 			} else if string(j.Name) == "xcorr" {
-				psm.Xcorr = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.Xcorr = value
+				value = -99
 			} else if string(j.Name) == "deltacn" {
-				psm.DeltaCN = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.DeltaCN = value
+				value = -99
 			} else if string(j.Name) == "deltacnstar" {
-				psm.DeltaCNStar = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.DeltaCNStar = value
+				value = -99
 			} else if string(j.Name) == "spscore" {
-				psm.SPScore = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.SPScore = value
+				value = -99
 			} else if string(j.Name) == "sprank" {
-				psm.SPRank = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.SPRank = value
+				value = -99
 			} else if string(j.Name) == "hyperscore" {
-				psm.Hyperscore = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.Hyperscore = value
+				value = -99
 			} else if string(j.Name) == "nextscore" {
-				psm.Nextscore = j.Value
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.Nextscore = value
+				value = -99
 			}
 		}
 

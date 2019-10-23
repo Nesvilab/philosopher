@@ -285,7 +285,7 @@ type SearchScoreSummary struct {
 type SearchScore struct {
 	XMLName xml.Name `xml:"search_score"`
 	Name    []byte   `xml:"name,attr"`
-	Value   float64  `xml:"value,attr"`
+	Value   string   `xml:"value,attr"`
 }
 
 // ProphetModel struct
