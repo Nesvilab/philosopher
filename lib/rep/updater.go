@@ -81,7 +81,6 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 			psm = append(psm, i)
 		}
 	}
-
 	evi.PSM = psm
 
 	// Peptides
@@ -91,7 +90,11 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 			for k := range v.Proteins {
 				evi.Peptides[i].MappedProteins[k]++
 			}
-			if !strings.HasPrefix(v.Protein, decoyTag) {
+			if !strings.HasPrefix(v.Protein, decoyTag) && !strings.HasPrefix(evi.Peptides[i].Protein, decoyTag) {
+				evi.Peptides[i].Protein = v.Protein
+				evi.Peptides[i].ProteinID = v.ProteinID
+				evi.Peptides[i].GeneName = v.Gene
+			} else if strings.HasPrefix(v.Protein, decoyTag) && evi.Peptides[i].IsDecoy {
 				evi.Peptides[i].Protein = v.Protein
 				evi.Peptides[i].ProteinID = v.ProteinID
 				evi.Peptides[i].GeneName = v.Gene
@@ -103,7 +106,6 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 	for _, i := range evi.Peptides {
 		pep = append(pep, i)
 	}
-
 	evi.Peptides = pep
 
 	// Ions
@@ -113,13 +115,23 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 			for k := range v.Proteins {
 				evi.Ions[i].MappedProteins[k]++
 			}
-			if !strings.HasPrefix(v.Protein, decoyTag) {
+			if !strings.HasPrefix(v.Protein, decoyTag) && !strings.HasPrefix(evi.Ions[i].Protein, decoyTag) {
+				evi.Ions[i].Protein = v.Protein
+				evi.Ions[i].ProteinID = v.ProteinID
+				evi.Ions[i].GeneName = v.Gene
+			} else if strings.HasPrefix(v.Protein, decoyTag) && evi.Ions[i].IsDecoy {
 				evi.Ions[i].Protein = v.Protein
 				evi.Ions[i].ProteinID = v.ProteinID
 				evi.Ions[i].GeneName = v.Gene
 			}
 		}
 	}
+
+	var ion IonEvidenceList
+	for _, i := range evi.Ions {
+		ion = append(ion, i)
+	}
+	evi.Ions = ion
 
 	return
 }
