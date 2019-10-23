@@ -17,7 +17,6 @@ import (
 // MapMods maps PSMs to modifications based on their mass shifts
 func (evi *Evidence) MapMods() {
 
-	// 10 ppm
 	var tolerance = 0.01
 
 	o := obo.NewUniModOntology()
