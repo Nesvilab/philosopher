@@ -11,7 +11,7 @@ import (
 
 var _ = Describe("Spc", func() {
 
-	Context("Testing pepXML parsing", func() {
+	Context("Testing pepxml parsing", func() {
 
 		var p id.PepXML
 		var list id.PepIDList
@@ -163,4 +163,82 @@ var _ = Describe("Spc", func() {
 
 	})
 
+	Context("Testing protxml parsing", func() {
+
+		var p id.ProtXML
+		var groups id.GroupList
+		// var list id.ProtIDList
+		var e error
+
+		It("Accessing workspace", func() {
+			e = os.Chdir("../../test/wrksp/")
+			Expect(e).NotTo(HaveOccurred())
+		})
+
+		It("Reading interact.prot.xml", func() {
+			p.Read("interact.prot.xml")
+			Expect(e).NotTo(HaveOccurred())
+			groups = append(groups, p.Groups...)
+			// groups[0].Proteins[0].PeptideIons
+			// list = p.Groups
+		})
+
+		It("Checking the number of groups", func() {
+			Expect(len(groups)).To(Equal(7926))
+		})
+
+		It("Checking index of group 2", func() {
+			Expect(groups[1].GroupNumber).To(Equal(uint32(2)))
+		})
+
+		It("Checking the probability of group 2", func() {
+			Expect(groups[1].Probability).To(Equal(1.0))
+		})
+
+		It("Checking the probability of protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].Probability).To(Equal(1.0))
+		})
+
+		It("Checking HasRazor of protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].HasRazor).To(Equal(false))
+		})
+
+		It("Checking the length of protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].Length).To(Equal("268"))
+		})
+
+		It("Checking the number of peptide ions for protein 1 in group 2", func() {
+			Expect(len(groups[1].Proteins[0].PeptideIons)).To(Equal(3))
+		})
+
+		It("Checking percent coverage of protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].PercentCoverage).To(Equal(float32(6.300000190734863)))
+		})
+
+		It("Checking name of protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].ProteinName).To(Equal("sp|A0A0B4J2D5|GAL3B_HUMAN"))
+		})
+
+		It("Checking top peptide probability for protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].TopPepProb).To(Equal(float64(0.9989)))
+		})
+
+		It("Checking sequence of peptide 1 in protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].PeptideIons[0].PeptideSequence).To(Equal("EVVEAHVDQK"))
+			// spew.Dump(groups[1].Proteins[0].PeptideIons[0])
+		})
+
+		It("Checking charge of peptide 1 in protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].PeptideIons[0].Charge).To(Equal(uint8(2)))
+		})
+
+		It("Checking uniqueness of peptide 1 in protein 1 in group 2", func() {
+			Expect(groups[1].Proteins[0].PeptideIons[0].IsUnique).To(Equal(false))
+		})
+
+		It("Checking ModifiedPeptide for peptide 1 in protein 1 in group 17", func() {
+			Expect(groups[16].Proteins[0].PeptideIons[12].ModifiedPeptide).To(Equal("IAFIFNNLSQSNM[147]TQK"))
+		})
+
+	})
 })
