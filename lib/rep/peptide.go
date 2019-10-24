@@ -244,7 +244,7 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 					i.Labels.Channel11.Intensity,
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
@@ -257,11 +257,11 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 					i.Labels.Channel9.Intensity,
 					i.Labels.Channel10.Intensity,
 					i.Labels.Channel11.Intensity,
-					//i.Labels.Channel12.Intensity,
-					//i.Labels.Channel13.Intensity,
-					//i.Labels.Channel14.Intensity,
-					//i.Labels.Channel15.Intensity,
-					//i.Labels.Channel16.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
 				)
 			default:
 				header += ""

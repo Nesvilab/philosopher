@@ -3,7 +3,6 @@ package rep
 import (
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/dat"
 )
 
@@ -48,11 +47,6 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 
 				list[pm.Sequence] = pm
 				proteinMap[i.PartHeader] = 0
-
-				if v.Sequence == "GEEPWVPSGTDTTLSR" {
-					spew.Dump(pm)
-					spew.Dump(i.PartHeader)
-				}
 			}
 		}
 	}

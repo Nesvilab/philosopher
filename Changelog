@@ -17,6 +17,7 @@
 - The Database command will throw an error if no iput at all is provided.
 - The Observed modifications masses were mapping outside the tolerance window.
 - Wrong protein assignment in PSM tables
+- The ions report had an issue with missing mapped proteins.
 
 ## Snapcraft
 - `snap install philosopher`
