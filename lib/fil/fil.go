@@ -139,19 +139,18 @@ func Run(f met.Data) met.Data {
 		e.AssembleProteinReport(pro, f.Filter.Tag)
 		pro = nil
 
-		logrus.Info("Correcting PSM to Protein mappings")
-		e.UpdateMappedProteins(f.Filter.Tag)
+		//logrus.Info("Correcting PSM to Protein mappings")
+		//e.UpdateMappedProteins(f.Filter.Tag)
 
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
 
 	logrus.Info("Assingning protein identifications to layers")
-	e.UpdateGeneNames()
+	e.UpdateLayerswithDatabase()
 
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
 	if f.Filter.Razor == true {
-		//e.UpdateGeneNames()
 		e.UpdateSupportingSpectra()
 	}
 
