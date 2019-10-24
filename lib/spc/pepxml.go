@@ -181,17 +181,18 @@ type TerminalModification struct {
 
 // SpectrumQuery tag
 type SpectrumQuery struct {
-	XMLName              xml.Name     `xml:"spectrum_query"`
-	Spectrum             []byte       `xml:"spectrum,attr"`
-	SpectrumNativeID     []byte       `xml:"spectrumNativeID,attr"`
-	StartScan            int          `xml:"start_scan,attr"`
-	EndScan              int          `xml:"end_scan,attr"`
-	PrecursorNeutralMass float64      `xml:"precursor_neutral_mass,attr"`
-	AssumedCharge        uint8        `xml:"assumed_charge,attr"`
-	Index                uint32       `xml:"index,attr"`
-	RetentionTimeSec     float64      `xml:"retention_time_sec,attr"`
-	IonMobility          float64      `xml:"ion_mobility,attr"`
-	SearchResult         SearchResult `xml:"search_result"`
+	XMLName                          xml.Name     `xml:"spectrum_query"`
+	Spectrum                         []byte       `xml:"spectrum,attr"`
+	SpectrumNativeID                 []byte       `xml:"spectrumNativeID,attr"`
+	StartScan                        int          `xml:"start_scan,attr"`
+	EndScan                          int          `xml:"end_scan,attr"`
+	UncalibratedPrecursorNeutralMass float64      `xml:"uncalibrated_precursor_neutral_mass,attr"`
+	PrecursorNeutralMass             float64      `xml:"precursor_neutral_mass,attr"`
+	AssumedCharge                    uint8        `xml:"assumed_charge,attr"`
+	Index                            uint32       `xml:"index,attr"`
+	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr"`
+	IonMobility                      float64      `xml:"ion_mobility,attr"`
+	SearchResult                     SearchResult `xml:"search_result"`
 }
 
 // SearchResult tag
