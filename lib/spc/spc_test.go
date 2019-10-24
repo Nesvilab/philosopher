@@ -44,10 +44,6 @@ var _ = Describe("Spc", func() {
 			Expect(list[0].Spectrum).To(Equal("b1906_293T_proteinID_01A_QE3_122212.01882.01882.3"))
 		})
 
-		// It("Checking alternative proteins from search hit 1", func() {
-		// 	Expect(list[0].AlternativeProteins).To(Equal("KGPGRPTGSK"))
-		// })
-
 		It("Checking AssumedCharge from search hit 1", func() {
 			Expect(list[0].AssumedCharge).To(Equal(uint8(3)))
 		})
@@ -167,7 +163,6 @@ var _ = Describe("Spc", func() {
 
 		var p id.ProtXML
 		var groups id.GroupList
-		// var list id.ProtIDList
 		var e error
 
 		It("Accessing workspace", func() {
@@ -179,8 +174,6 @@ var _ = Describe("Spc", func() {
 			p.Read("interact.prot.xml")
 			Expect(e).NotTo(HaveOccurred())
 			groups = append(groups, p.Groups...)
-			// groups[0].Proteins[0].PeptideIons
-			// list = p.Groups
 		})
 
 		It("Checking the number of groups", func() {
@@ -225,7 +218,6 @@ var _ = Describe("Spc", func() {
 
 		It("Checking sequence of peptide 1 in protein 1 in group 2", func() {
 			Expect(groups[1].Proteins[0].PeptideIons[0].PeptideSequence).To(Equal("EVVEAHVDQK"))
-			// spew.Dump(groups[1].Proteins[0].PeptideIons[0])
 		})
 
 		It("Checking charge of peptide 1 in protein 1 in group 2", func() {
