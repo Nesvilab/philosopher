@@ -240,12 +240,11 @@ func (evi *Evidence) UpdateIonModCount() {
 }
 
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
-func (evi *Evidence) UpdateLayerswithDatabase() {
+func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 	var dtb dat.Base
 	dtb.Restore()
 
-	//var partHeaderMap = make(map[string]string)
 	var proteinIDMap = make(map[string]string)
 	var entryNameMap = make(map[string]string)
 	var geneMap = make(map[string]string)
@@ -253,7 +252,6 @@ func (evi *Evidence) UpdateLayerswithDatabase() {
 
 	for _, j := range dtb.Records {
 		if j.IsDecoy == false {
-			//partHeaderMap[j.ID] = j.PartHeader
 			proteinIDMap[j.PartHeader] = j.ID
 			entryNameMap[j.PartHeader] = j.EntryName
 			geneMap[j.PartHeader] = j.GeneNames
@@ -262,36 +260,54 @@ func (evi *Evidence) UpdateLayerswithDatabase() {
 	}
 
 	for i := range evi.PSM {
+
 		id := evi.PSM[i].Protein
 		if evi.PSM[i].IsDecoy {
-			id = strings.Replace(id, "rev_", "", 1)
+			id = strings.Replace(id, decoyTag, "", 1)
 		}
+
 		evi.PSM[i].ProteinID = proteinIDMap[id]
 		evi.PSM[i].EntryName = entryNameMap[id]
 		evi.PSM[i].GeneName = geneMap[id]
 		evi.PSM[i].ProteinDescription = descriptionMap[id]
+
+		for k := range evi.PSM[i].MappedProteins {
+			evi.PSM[i].MappedGenes[geneMap[k]] = 0
+		}
 	}
 
 	for i := range evi.Ions {
+
 		id := evi.Ions[i].Protein
 		if evi.Ions[i].IsDecoy {
-			id = strings.Replace(id, "rev_", "", 1)
+			id = strings.Replace(id, decoyTag, "", 1)
 		}
+
 		evi.Ions[i].ProteinID = proteinIDMap[id]
 		evi.Ions[i].EntryName = entryNameMap[id]
 		evi.Ions[i].GeneName = geneMap[id]
 		evi.Ions[i].ProteinDescription = descriptionMap[id]
+
+		for k := range evi.Ions[i].MappedProteins {
+			evi.Ions[i].MappedGenes[geneMap[k]] = 0
+		}
 	}
 
 	for i := range evi.Peptides {
+
 		id := evi.Peptides[i].Protein
 		if evi.Peptides[i].IsDecoy {
-			id = strings.Replace(id, "rev_", "", 1)
+			id = strings.Replace(id, decoyTag, "", 1)
 		}
+
 		evi.Peptides[i].ProteinID = proteinIDMap[id]
 		evi.Peptides[i].EntryName = entryNameMap[id]
 		evi.Peptides[i].GeneName = geneMap[id]
 		evi.Peptides[i].ProteinDescription = descriptionMap[id]
+
+		for k := range evi.Peptides[i].MappedProteins {
+			evi.Peptides[i].MappedGenes[geneMap[k]] = 0
+		}
 	}
 
 	return

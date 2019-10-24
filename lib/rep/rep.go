@@ -130,6 +130,7 @@ type PSMEvidence struct {
 	GeneName             string
 	ModifiedPeptide      string
 	MappedProteins       map[string]int
+	MappedGenes          map[string]int
 	AssumedCharge        uint8
 	HitRank              uint8
 	PrecursorNeutralMass float64
@@ -176,6 +177,7 @@ type IonEvidence struct {
 	ChargeState          uint8
 	Spectra              map[string]int
 	MappedProteins       map[string]int
+	MappedGenes          map[string]int
 	MZ                   float64
 	PeptideMass          float64
 	PrecursorNeutralMass float64
@@ -216,6 +218,7 @@ type PeptideEvidence struct {
 	EntryName              string
 	ProteinDescription     string
 	MappedProteins         map[string]int
+	MappedGenes            map[string]int
 	Spc                    int
 	Intensity              float64
 	Probability            float64

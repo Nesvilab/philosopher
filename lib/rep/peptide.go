@@ -26,6 +26,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 	var pepInt = make(map[string]float64)
 	var pepProt = make(map[string]string)
 	var spectra = make(map[string][]string)
+	var mappedGenes = make(map[string][]string)
 	var mappedProts = make(map[string][]string)
 	var bestProb = make(map[string]float64)
 	var pepMods = make(map[string][]mod.Modification)
@@ -55,6 +56,10 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 				mappedProts[i.Peptide] = append(mappedProts[i.Peptide], j)
 			}
 
+			for j := range i.MappedGenes {
+				mappedGenes[i.Peptide] = append(mappedGenes[i.Peptide], j)
+			}
+
 			for _, j := range i.Modifications.Index {
 				pepMods[i.Peptide] = append(pepMods[i.Peptide], j)
 			}
@@ -72,6 +77,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 		var pep PeptideEvidence
 		pep.Spectra = make(map[string]uint8)
 		pep.ChargeState = make(map[uint8]uint8)
+		pep.MappedGenes = make(map[string]int)
 		pep.MappedProteins = make(map[string]int)
 		pep.Modifications.Index = make(map[string]mod.Modification)
 
@@ -85,6 +91,10 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 		for _, i := range pepCSMap[k] {
 			pep.ChargeState[i] = 0
+		}
+
+		for _, i := range mappedGenes[k] {
+			pep.MappedGenes[i] = 0
 		}
 
 		for _, i := range mappedProts[k] {
@@ -145,7 +155,7 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 		}
 	}
 
-	header = "Peptide\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
+	header = "Peptide\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -190,12 +200,20 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 			cs = append(cs, strconv.Itoa(int(j)))
 		}
 
+		var mappedGenes []string
+		for j := range i.MappedGenes {
+			if j != i.GeneName && len(j) > 0 {
+				mappedGenes = append(mappedGenes, j)
+			}
+		}
+
+		sort.Strings(mappedGenes)
 		sort.Strings(mappedProteins)
 		sort.Strings(assL)
 		sort.Strings(obs)
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			len(i.Sequence),
 			strings.Join(cs, ", "),
@@ -209,6 +227,7 @@ func (evi Evidence) MetaPeptideReport(labels map[string]string, brand string, ch
 			i.EntryName,
 			i.GeneName,
 			i.ProteinDescription,
+			strings.Join(mappedGenes, ", "),
 			strings.Join(mappedProteins, ", "),
 		)
 
