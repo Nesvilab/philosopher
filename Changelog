@@ -15,13 +15,13 @@
 - The Delta Mass adjustment will only happen if there was no previous mass calibration during the search.
 - The Corrected DeltaMass value is now used to map Unimod.
 - Reports wont show isobaric labels that are not used for the analysis anymore (e.g. 10 TMT columns if only 8 are used).
-- When processing empty pepXML, Philosoper will emit a warning, not a fatal error.
+- When processing empty pepXML, Philosopher will emit a warning, not a fatal error.
 
 ### Fixed
 - The filter command was throwing an error when no protein data was present.
 - Report with TMT was breaking when no annotation file was present.
 - Minor bugs and issues.
-- The Database command will throw an error if no iput at all is provided.
+- The Database command will throw an error if no input at all is provided.
 - The Observed modifications masses were mapping outside the tolerance window.
 - Wrong protein assignment in PSM tables
 - The ions report had an issue with missing mapped proteins.
