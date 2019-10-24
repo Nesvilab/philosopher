@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/msg"
 
 	"github.com/nesvilab/philosopher/lib/spc"
@@ -105,6 +106,7 @@ func Run(f met.Data) met.Data {
 	var psm id.PepIDList
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
+	spew.Dump(e.PSM)
 	psm = nil
 
 	var ion id.PepIDList

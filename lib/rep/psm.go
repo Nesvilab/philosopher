@@ -206,11 +206,11 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			i.AssumedCharge,
 			i.RetentionTime,
 			i.PrecursorNeutralMass,
-			i.CalcNeutralPepMass,
 			i.UncalibratedPrecursorNeutralMass,
-			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
-			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			i.CalcNeutralPepMass,
 			((i.UncalibratedPrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			i.Massdiff,
 		)
 
