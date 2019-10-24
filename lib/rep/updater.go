@@ -3,6 +3,7 @@ package rep
 import (
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/dat"
 )
 
@@ -16,7 +17,7 @@ type PeptideMap struct {
 	Proteins  map[string]int
 }
 
-// UpdateMappedProteins updates the list of mapped proteins on the data structures
+// UpdateMappedProteins (DEPRECATED) updates the list of mapped proteins on the data structures
 func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 
 	var list = make(map[string]PeptideMap)
@@ -47,6 +48,11 @@ func (evi *Evidence) UpdateMappedProteins(decoyTag string) {
 
 				list[pm.Sequence] = pm
 				proteinMap[i.PartHeader] = 0
+
+				if v.Sequence == "GEEPWVPSGTDTTLSR" {
+					spew.Dump(pm)
+					spew.Dump(i.PartHeader)
+				}
 			}
 		}
 	}
@@ -239,13 +245,13 @@ func (evi *Evidence) UpdateIonModCount() {
 	return
 }
 
-// UpdateGeneNames will fix the gene name assignment after razor assingment
-func (evi *Evidence) UpdateGeneNames() {
+// UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
+func (evi *Evidence) UpdateLayerswithDatabase() {
 
 	var dtb dat.Base
 	dtb.Restore()
 
-	var partHeaderMap = make(map[string]string)
+	//var partHeaderMap = make(map[string]string)
 	var proteinIDMap = make(map[string]string)
 	var entryNameMap = make(map[string]string)
 	var geneMap = make(map[string]string)
@@ -253,42 +259,45 @@ func (evi *Evidence) UpdateGeneNames() {
 
 	for _, j := range dtb.Records {
 		if j.IsDecoy == false {
-			partHeaderMap[j.ID] = j.PartHeader
-			proteinIDMap[j.ID] = j.ID
-			entryNameMap[j.ID] = j.EntryName
-			geneMap[j.ID] = j.GeneNames
-			descriptionMap[j.ID] = j.Description
+			//partHeaderMap[j.ID] = j.PartHeader
+			proteinIDMap[j.PartHeader] = j.ID
+			entryNameMap[j.PartHeader] = j.EntryName
+			geneMap[j.PartHeader] = j.GeneNames
+			descriptionMap[j.PartHeader] = j.Description
 		}
 	}
 
 	for i := range evi.PSM {
-		if !evi.PSM[i].IsDecoy {
-			evi.PSM[i].Protein = partHeaderMap[evi.PSM[i].ProteinID]
-			evi.PSM[i].ProteinID = proteinIDMap[evi.PSM[i].ProteinID]
-			evi.PSM[i].EntryName = entryNameMap[evi.PSM[i].ProteinID]
-			evi.PSM[i].GeneName = geneMap[evi.PSM[i].ProteinID]
-			evi.PSM[i].ProteinDescription = descriptionMap[evi.PSM[i].ProteinID]
+		id := evi.PSM[i].Protein
+		if evi.PSM[i].IsDecoy {
+			id = strings.Replace(id, "rev_", "", 1)
 		}
+		evi.PSM[i].ProteinID = proteinIDMap[id]
+		evi.PSM[i].EntryName = entryNameMap[id]
+		evi.PSM[i].GeneName = geneMap[id]
+		evi.PSM[i].ProteinDescription = descriptionMap[id]
 	}
 
 	for i := range evi.Ions {
-		if !evi.Ions[i].IsDecoy {
-			evi.Ions[i].Protein = partHeaderMap[evi.Ions[i].ProteinID]
-			evi.Ions[i].ProteinID = proteinIDMap[evi.Ions[i].ProteinID]
-			evi.Ions[i].EntryName = entryNameMap[evi.Ions[i].ProteinID]
-			evi.Ions[i].GeneName = geneMap[evi.Ions[i].ProteinID]
-			evi.Ions[i].ProteinDescription = descriptionMap[evi.Ions[i].ProteinID]
+		id := evi.Ions[i].Protein
+		if evi.Ions[i].IsDecoy {
+			id = strings.Replace(id, "rev_", "", 1)
 		}
+		evi.Ions[i].ProteinID = proteinIDMap[id]
+		evi.Ions[i].EntryName = entryNameMap[id]
+		evi.Ions[i].GeneName = geneMap[id]
+		evi.Ions[i].ProteinDescription = descriptionMap[id]
 	}
 
 	for i := range evi.Peptides {
-		if !evi.Peptides[i].IsDecoy {
-			evi.Peptides[i].Protein = partHeaderMap[evi.Peptides[i].ProteinID]
-			evi.Peptides[i].ProteinID = proteinIDMap[evi.Peptides[i].ProteinID]
-			evi.Peptides[i].EntryName = entryNameMap[evi.Peptides[i].ProteinID]
-			evi.Peptides[i].GeneName = geneMap[evi.Peptides[i].ProteinID]
-			evi.Peptides[i].ProteinDescription = descriptionMap[evi.Peptides[i].ProteinID]
+		id := evi.Peptides[i].Protein
+		if evi.Peptides[i].IsDecoy {
+			id = strings.Replace(id, "rev_", "", 1)
 		}
+		evi.Peptides[i].ProteinID = proteinIDMap[id]
+		evi.Peptides[i].EntryName = entryNameMap[id]
+		evi.Peptides[i].GeneName = geneMap[id]
+		evi.Peptides[i].ProteinDescription = descriptionMap[id]
 	}
 
 	return

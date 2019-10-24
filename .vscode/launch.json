@@ -12,13 +12,16 @@
             "program": "/home/prvst/go/src/github.com/nesvilab/philosopher/main.go",
             "env": {},
             "showLog": true,
-            "cwd": "/data/cptac/Frozen/global",
+            "cwd": "/data/Gygi-lite/closed",
             "args": [
-                "pipeline",
-                "--config",
-                "philosopher.yml",
-                "01CPTAC_Ovarian_PTRC_Frozen",
-                "02CPTAC_Ovarian_PTRC_Frozen",
+                "filter",
+                "--pepxml",
+                "interact.pep.xml",
+                "--protxml",
+                "interact.prot.xml",
+                "--razor",
+                "--picked",
+                "--sequential"
             ],
         }
     ]
