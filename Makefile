@@ -86,6 +86,11 @@ linux:
 windows:
 	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
 
+.PHONY: all
+all:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
+	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
+
 .PHONY: draft
 draft:
 	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
