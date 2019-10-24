@@ -5,14 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Database",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "/home/hayse/go/src/github.com/nesvilab/philosopher/main.go",
+            "env": {},
+            "showLog": true,
+            "cwd": "/home/hayse/workspace/philosopher_test",
+            "args": [
+                "database",
+                "--id",
+                "UP000203899"
+            ],
+        },
+        {
             "name": "Filter",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "/home/prvst/go/src/github.com/nesvilab/philosopher/main.go",
+            "program": "/home/hayse/go/src/github.com/nesvilab/philosopher/main.go",
             "env": {},
             "showLog": true,
-            "cwd": "/data/Gygi-lite/closed",
+            "cwd": "/home/hayse/workspace/philosopher_test",
             "args": [
                 "filter",
                 "--pepxml",
