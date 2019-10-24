@@ -2,7 +2,7 @@
 - Support for TMT-16 plex.
 - Peptide FDR filtering to combined peptide reports in Abcaus.
 - Support for our custom pepXML schema containing extra fields.
-- Ion Mobility quantification added to PSM table.
+- Ion Mobility value added to PSM table.
 - Number of Enzimatic Termini to PSM table.
 - Number of Missed Cleavages to PSM table.
 - Uncalibrated Calculated M/Z to PSM table.
