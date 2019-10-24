@@ -55,6 +55,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 
 		pr.Spectra = make(map[string]int)
+		pr.MappedGenes = make(map[string]int)
 		pr.MappedProteins = make(map[string]int)
 		pr.Modifications.Index = make(map[string]mod.Modification)
 
@@ -130,7 +131,7 @@ func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channe
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -170,11 +171,19 @@ func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channe
 			}
 		}
 
+		var mappedGenes []string
+		for j := range i.MappedGenes {
+			if j != i.GeneName && len(j) > 0 {
+				mappedGenes = append(mappedGenes, j)
+			}
+		}
+
+		sort.Strings(mappedGenes)
 		sort.Strings(mappedProteins)
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			len(i.Sequence),
@@ -192,6 +201,7 @@ func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channe
 			i.EntryName,
 			i.GeneName,
 			i.ProteinDescription,
+			strings.Join(mappedGenes, ","),
 			strings.Join(mappedProteins, ","),
 		)
 

@@ -70,6 +70,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.DiscriminantValue = i.DiscriminantValue
 		p.Intensity = i.Intensity
 		p.IonMobility = i.IonMobility
+		p.MappedGenes = make(map[string]int)
 		p.MappedProteins = make(map[string]int)
 		p.Modifications = i.Modifications
 
@@ -138,7 +139,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
 	}
 
-	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Proteins"
+	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -173,11 +174,19 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
-			if j != i.Protein {
+			if j != i.Protein && len(j) > 0 {
 				mappedProteins = append(mappedProteins, j)
 			}
 		}
 
+		var mappedGenes []string
+		for j := range i.MappedGenes {
+			if j != i.GeneName && len(j) > 0 {
+				mappedGenes = append(mappedGenes, j)
+			}
+		}
+
+		sort.Strings(mappedGenes)
 		sort.Strings(mappedProteins)
 		sort.Strings(assL)
 		sort.Strings(obs)
@@ -229,7 +238,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
 			i.IsUnique,
 			i.Protein,
@@ -237,6 +246,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			i.EntryName,
 			i.GeneName,
 			i.ProteinDescription,
+			strings.Join(mappedGenes, ", "),
 			strings.Join(mappedProteins, ", "),
 		)
 

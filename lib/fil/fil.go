@@ -146,7 +146,7 @@ func Run(f met.Data) met.Data {
 	}
 
 	logrus.Info("Assingning protein identifications to layers")
-	e.UpdateLayerswithDatabase()
+	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assingment to Proteins")
