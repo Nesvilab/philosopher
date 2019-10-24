@@ -39,46 +39,47 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                uint32
-	Spectrum             string
-	Scan                 int
-	Peptide              string
-	Protein              string
-	ModifiedPeptide      string
-	AlternativeProteins  []string
-	AssumedCharge        uint8
-	PrevAA               string
-	NextAA               string
-	HitRank              uint8
-	MissedCleavages      uint8
-	NumberTolTerm        uint8
-	NumberTotalProteins  uint16
-	TotalNumberIons      uint16
-	NumberMatchedIons    uint16
-	NTT                  int
-	NMC                  int
-	PrecursorNeutralMass float64
-	PrecursorExpMass     float64
-	RetentionTime        float64
-	CalcNeutralPepMass   float64
-	Massdiff             float64
-	LocalizedPTMSites    map[string]int
-	LocalizedPTMMassDiff map[string]string
-	Probability          float64
-	IsoMassD             int
-	Expectation          float64
-	Xcorr                float64
-	DeltaCN              float64
-	DeltaCNStar          float64
-	SPScore              float64
-	SPRank               float64
-	Hyperscore           float64
-	Nextscore            float64
-	DiscriminantValue    float64
-	Intensity            float64
-	IonMobility          float64
-	IsRejected           uint8
-	Modifications        mod.Modifications
+	Index                            uint32
+	Spectrum                         string
+	Scan                             int
+	Peptide                          string
+	Protein                          string
+	ModifiedPeptide                  string
+	AlternativeProteins              []string
+	AssumedCharge                    uint8
+	PrevAA                           string
+	NextAA                           string
+	HitRank                          uint8
+	MissedCleavages                  uint8
+	NumberTolTerm                    uint8
+	NumberTotalProteins              uint16
+	TotalNumberIons                  uint16
+	NumberMatchedIons                uint16
+	NTT                              int
+	NMC                              int
+	UncalibratedPrecursorNeutralMass float64
+	PrecursorNeutralMass             float64
+	PrecursorExpMass                 float64
+	RetentionTime                    float64
+	CalcNeutralPepMass               float64
+	Massdiff                         float64
+	LocalizedPTMSites                map[string]int
+	LocalizedPTMMassDiff             map[string]string
+	Probability                      float64
+	IsoMassD                         int
+	Expectation                      float64
+	Xcorr                            float64
+	DeltaCN                          float64
+	DeltaCNStar                      float64
+	SPScore                          float64
+	SPRank                           float64
+	Hyperscore                       float64
+	Nextscore                        float64
+	DiscriminantValue                float64
+	Intensity                        float64
+	IonMobility                      float64
+	IsRejected                       uint8
+	Modifications                    mod.Modifications
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -238,10 +239,17 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 	psm.Index = sq.Index
 	psm.Spectrum = string(sq.Spectrum)
 	psm.Scan = sq.StartScan
-	psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
 	psm.AssumedCharge = sq.AssumedCharge
 	psm.RetentionTime = sq.RetentionTimeSec
 	psm.IonMobility = sq.IonMobility
+
+	if sq.UncalibratedPrecursorNeutralMass > 0 {
+		psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
+		psm.UncalibratedPrecursorNeutralMass = sq.UncalibratedPrecursorNeutralMass
+	} else {
+		psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
+		psm.UncalibratedPrecursorNeutralMass = sq.PrecursorNeutralMass
+	}
 
 	for _, i := range sq.SearchResult.SearchHit {
 
@@ -295,7 +303,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		for _, j := range i.Score {
 			if string(j.Name) == "expect" {
 				eValue, _ := uti.ParseFloat(j.Value)
-				//eValueFloat := fmt.Sprintf("%.16f\n", eValue)
 				psm.Expectation = eValue
 			} else if string(j.Name) == "xcorr" {
 				value, _ := strconv.ParseFloat(j.Value, 64)

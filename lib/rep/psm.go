@@ -53,7 +53,6 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.ModifiedPeptide = i.ModifiedPeptide
 		p.AssumedCharge = i.AssumedCharge
 		p.HitRank = i.HitRank
-		p.PrecursorNeutralMass = i.PrecursorNeutralMass
 		p.PrecursorExpMass = i.PrecursorExpMass
 		p.RetentionTime = i.RetentionTime
 		p.CalcNeutralPepMass = i.CalcNeutralPepMass
@@ -73,6 +72,14 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.MappedGenes = make(map[string]int)
 		p.MappedProteins = make(map[string]int)
 		p.Modifications = i.Modifications
+
+		if i.UncalibratedPrecursorNeutralMass > 0 {
+			p.PrecursorNeutralMass = i.PrecursorNeutralMass
+			p.UncalibratedPrecursorNeutralMass = i.UncalibratedPrecursorNeutralMass
+		} else {
+			p.PrecursorNeutralMass = i.PrecursorNeutralMass
+			p.UncalibratedPrecursorNeutralMass = i.PrecursorNeutralMass
+		}
 
 		for _, j := range i.AlternativeProteins {
 			p.MappedProteins[j]++
@@ -127,7 +134,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		}
 	}
 
-	header = "Spectrum\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tCalculated M/Z\tObserved M/Z\tDelta Mass\tExperimental Mass\tPeptide Mass"
+	header = "Spectrum\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tExperimental Mass\tUncalibrated Experimental Mass\tPeptide Mass\tCalculated M/Z\tUncalibrated Calculated M/Z\tObserved M/Z\tDelta Mass"
 
 	if isComet == true {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
@@ -191,18 +198,20 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.Peptide,
 			i.ModifiedPeptide,
 			len(i.Peptide),
 			i.AssumedCharge,
 			i.RetentionTime,
+			i.PrecursorNeutralMass,
+			i.UncalibratedPrecursorNeutralMass,
+			i.CalcNeutralPepMass,
 			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
+			((i.UncalibratedPrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			i.Massdiff,
-			i.PrecursorNeutralMass,
-			i.CalcNeutralPepMass,
 		)
 
 		if isComet == true {
