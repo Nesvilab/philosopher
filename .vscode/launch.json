@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Filter",
             "type": "go",
             "request": "launch",
-            "mode": "debug",
+            "mode": "auto",
             "program": "/home/prvst/go/src/github.com/nesvilab/philosopher/main.go",
             "env": {},
             "showLog": true,
@@ -22,6 +22,19 @@
                 "--razor",
                 "--picked",
                 "--sequential"
+            ],
+        },
+        {
+            "name": "Report",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "/home/prvst/go/src/github.com/nesvilab/philosopher/main.go",
+            "env": {},
+            "showLog": true,
+            "cwd": "/data/Gygi-lite/closed",
+            "args": [
+                "report",
             ],
         }
     ]

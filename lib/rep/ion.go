@@ -39,6 +39,10 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 			bestProb[i.IonForm] = i.Probability
 		}
 
+		for j := range i.MappedProteins {
+			psmPtMap[i.IonForm] = append(psmPtMap[i.IonForm], j)
+		}
+
 		for _, j := range i.Modifications.Index {
 			ionMods[i.IonForm] = append(ionMods[i.IonForm], j)
 		}
@@ -73,12 +77,9 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.Modifications = i.Modifications
 		pr.Probability = bestProb[pr.IonForm]
 
-		// get he list of indi proteins from pepXML data
-		v, ok = psmPtMap[i.Spectrum]
-		if ok {
-			for _, j := range v {
-				pr.MappedProteins[j] = 0
-			}
+		// get the mapped proteins
+		for _, j := range psmPtMap[pr.IonForm] {
+			pr.MappedProteins[j] = 0
 		}
 
 		mods, ok := ionMods[pr.IonForm]
@@ -160,104 +161,101 @@ func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channe
 
 	for _, i := range printSet {
 
-		if len(i.MappedProteins) > 0 {
+		assL, obs := getModsList(i.Modifications.Index)
 
-			assL, obs := getModsList(i.Modifications.Index)
-
-			var mappedProteins []string
-			for j := range i.MappedProteins {
-				if j != i.Protein {
-					mappedProteins = append(mappedProteins, j)
-				}
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein {
+				mappedProteins = append(mappedProteins, j)
 			}
+		}
 
-			sort.Strings(mappedProteins)
-			sort.Strings(assL)
-			sort.Strings(obs)
+		sort.Strings(mappedProteins)
+		sort.Strings(assL)
+		sort.Strings(obs)
 
-			line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
-				i.Sequence,
-				i.ModifiedSequence,
-				len(i.Sequence),
-				i.MZ,
-				i.ChargeState,
-				i.PeptideMass,
-				i.Probability,
-				i.Expectation,
-				len(i.Spectra),
-				i.Intensity,
-				strings.Join(assL, ", "),
-				strings.Join(obs, ", "),
-				i.Protein,
-				i.ProteinID,
-				i.EntryName,
-				i.GeneName,
-				i.ProteinDescription,
-				strings.Join(mappedProteins, ","),
-			)
+		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			i.Sequence,
+			i.ModifiedSequence,
+			len(i.Sequence),
+			i.MZ,
+			i.ChargeState,
+			i.PeptideMass,
+			i.Probability,
+			i.Expectation,
+			len(i.Spectra),
+			i.Intensity,
+			strings.Join(assL, ", "),
+			strings.Join(obs, ", "),
+			i.Protein,
+			i.ProteinID,
+			i.EntryName,
+			i.GeneName,
+			i.ProteinDescription,
+			strings.Join(mappedProteins, ","),
+		)
 
-			if brand == "tmt" {
-				switch channels {
-				case 10:
-					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-						line,
-						i.Labels.Channel1.Intensity,
-						i.Labels.Channel2.Intensity,
-						i.Labels.Channel3.Intensity,
-						i.Labels.Channel4.Intensity,
-						i.Labels.Channel5.Intensity,
-						i.Labels.Channel6.Intensity,
-						i.Labels.Channel7.Intensity,
-						i.Labels.Channel8.Intensity,
-						i.Labels.Channel9.Intensity,
-						i.Labels.Channel10.Intensity,
-					)
-				case 11:
-					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-						line,
-						i.Labels.Channel1.Intensity,
-						i.Labels.Channel2.Intensity,
-						i.Labels.Channel3.Intensity,
-						i.Labels.Channel4.Intensity,
-						i.Labels.Channel5.Intensity,
-						i.Labels.Channel6.Intensity,
-						i.Labels.Channel7.Intensity,
-						i.Labels.Channel8.Intensity,
-						i.Labels.Channel9.Intensity,
-						i.Labels.Channel10.Intensity,
-						i.Labels.Channel11.Intensity,
-					)
-				case 16:
-					line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-						line,
-						i.Labels.Channel1.Intensity,
-						i.Labels.Channel2.Intensity,
-						i.Labels.Channel3.Intensity,
-						i.Labels.Channel4.Intensity,
-						i.Labels.Channel5.Intensity,
-						i.Labels.Channel6.Intensity,
-						i.Labels.Channel7.Intensity,
-						i.Labels.Channel8.Intensity,
-						i.Labels.Channel9.Intensity,
-						i.Labels.Channel10.Intensity,
-						i.Labels.Channel11.Intensity,
-						//i.Labels.Channel12.Intensity,
-						//i.Labels.Channel13.Intensity,
-						//i.Labels.Channel14.Intensity,
-						//i.Labels.Channel15.Intensity,
-						//i.Labels.Channel16.Intensity,
-					)
-				default:
-					header += ""
-				}
+		if brand == "tmt" {
+			switch channels {
+			case 10:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
+				)
+			default:
+				header += ""
 			}
+		}
 
-			line += "\n"
+		line += "\n"
 
-			_, e = io.WriteString(file, line)
-			if e != nil {
-				msg.WriteToFile(errors.New("Cannot print Ions to file"), "fatal")
-			}
+		_, e = io.WriteString(file, line)
+		if e != nil {
+			msg.WriteToFile(errors.New("Cannot print Ions to file"), "fatal")
 		}
 	}
 
