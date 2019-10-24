@@ -8,7 +8,7 @@ philosopher
 # Folders
 _obj
 _test
-.vscode
+.vscode/
 
 # Architecture specific extensions/prefixes
 *.[568vq]
