@@ -139,9 +139,8 @@ func Run(f met.Data) met.Data {
 		e.AssembleProteinReport(pro, f.Filter.Tag)
 		pro = nil
 
-		//logrus.Info("Correcting PSM to Protein mappings")
-		//e.UpdateMappedProteins(f.Filter.Tag)
-
+		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
+		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
 

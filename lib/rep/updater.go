@@ -178,6 +178,8 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		if rOK {
 			evi.PSM[i].IsURazor = true
 			if !strings.Contains(rp, decoyTag) {
+				evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
+				delete(evi.PSM[i].MappedProteins, rp)
 				evi.PSM[i].Protein = rp
 			}
 		}
