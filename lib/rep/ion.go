@@ -131,7 +131,7 @@ func (evi Evidence) MetaIonReport(labels map[string]string, brand string, channe
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tExperimental Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
