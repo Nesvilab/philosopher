@@ -341,20 +341,10 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 	return psm
 }
 
-// mapModsFromPepXML receives a pepXML struct with modifications and adds them to
-// the given struct
+// mapModsFromPepXML receives a pepXML struct with modifications and adds them to the given struct
 func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods mod.Modifications) {
 
 	p.ModifiedPeptide = string(m.ModifiedPeptide)
-
-	// var isotopicCorr float64
-	// if p.IsoMassD != 0 {
-	// 	isotopicCorr = p.Massdiff - (bio.Proton * float64(p.IsoMassD))
-	// } else {
-	// 	isotopicCorr = p.Massdiff
-	// }
-
-	//fmt.Println(isotopicCorr)
 
 	for _, i := range m.ModAminoacidMass {
 		aa := strings.Split(p.Peptide, "")
@@ -394,7 +384,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		}
 	}
 
-	//if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
+	// if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
 	key := fmt.Sprintf("%.4f", p.Massdiff)
 	_, ok := p.Modifications.Index[key]
 	if !ok {
@@ -431,65 +421,75 @@ func getMassDeviation(sq []spc.SpectrumQuery) float64 {
 
 	adjustedMass = massZero / float64(countZero)
 
-	// // keep the original massdiff on the raw variable just in case
-	// for i := range p.PeptideIdentification {
-	// 	p.PeptideIdentification[i].Massdiff = (p.PeptideIdentification[i].Massdiff - adjustedMass)
-	// }
-
 	return adjustedMass
 }
 
-// // adjustMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
-// func (p *PepXML) adjustMassDeviation() {
-
-// 	var countZero int
-// 	var massZero float64
-// 	var adjustedMass float64
-
-// 	for _, i := range p.PeptideIdentification {
-// 		if math.Abs(i.Massdiff) >= -0.1 && math.Abs(i.Massdiff) <= 0.1 {
-// 			countZero++
-// 			massZero += i.Massdiff
-// 		}
-// 	}
-
-// 	adjustedMass = massZero / float64(countZero)
-
-// 	// keep the original massdiff on the raw variable just in case
-// 	for i := range p.PeptideIdentification {
-// 		p.PeptideIdentification[i].Massdiff = (p.PeptideIdentification[i].Massdiff - adjustedMass)
-// 	}
-
-// 	return
-// }
-
-// PromoteProteinIDs promotes protein identifications where the reference protein
-// is indistinguishable to other target proteins.
+// PromoteProteinIDs changes the identification in cases where the reference protein is a decoy and
+// the alternative proteins contains target proteins.
 func (p *PepXML) PromoteProteinIDs() {
 
 	for i := range p.PeptideIdentification {
 
-		var list []string
-		var ref string
+		var current string
+		var alt string
+		var list = make(map[string]int)
+		var isUniProt bool
 
 		if strings.Contains(p.PeptideIdentification[i].Protein, p.DecoyTag) {
+
+			current = p.PeptideIdentification[i].Protein
+
 			for j := range p.PeptideIdentification[i].AlternativeProteins {
+
+				if strings.Contains(p.PeptideIdentification[i].AlternativeProteins[j], "sp|") {
+					isUniProt = true
+				}
+
 				if !strings.HasPrefix(p.PeptideIdentification[i].AlternativeProteins[j], p.DecoyTag) {
-					list = append(list, p.PeptideIdentification[i].AlternativeProteins[j])
+					list[p.PeptideIdentification[i].AlternativeProteins[j]] = j
 				}
 			}
+
 		}
 
 		if len(list) > 0 {
-			for i := range list {
-				if strings.HasPrefix(list[i], "sp|") {
-					ref = list[i]
-					break
-				} else {
-					ref = list[i]
+
+			// if a Uniprot database is used we give preference to SwissProt proteins
+			if isUniProt == true {
+				for k := range list {
+					if strings.HasPrefix(k, "sp|") {
+						alt = k
+						break
+					} else {
+						alt = k
+					}
 				}
+				p.PeptideIdentification[i].Protein = alt
+
+				// remove the replaces protein from the alternative proteins list
+				p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
+				p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
+
+				// add the replaces current to the list
+				p.PeptideIdentification[i].AlternativeProteins = append(p.PeptideIdentification[i].AlternativeProteins, current)
+
+			} else {
+				for k := range list {
+					alt = k
+					break
+				}
+				p.PeptideIdentification[i].Protein = alt
+
+				// remove the replaces protein from the alternative proteins list
+				p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
+				p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
+
+				// add the replaces current to the list
+				p.PeptideIdentification[i].AlternativeProteins = append(p.PeptideIdentification[i].AlternativeProteins, current)
 			}
-			p.PeptideIdentification[i].Protein = ref
+
 		}
 	}
 
