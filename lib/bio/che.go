@@ -2,5 +2,5 @@ package bio
 
 const (
 	// Proton mass
-	Proton = 1.007316
+	Proton = 1.007276467
 )
