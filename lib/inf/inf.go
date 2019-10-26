@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/id"
 )
 
@@ -91,11 +90,11 @@ func ProteinInference(psm id.PepIDList) {
 		}
 	}
 
-	spew.Dump(proteinTNP)
+	//spew.Dump(proteinTNP)
 	// for _, i := range peptideList {
-	// 	if i.Weight >= 0.9 {
-	// 		fmt.Println(i.Sequence, "\t", i.Protein)
-	// 	}
+	// 	//if i.Weight >= 0.9 {
+	// 	fmt.Println(i.Sequence, "\t", i.Protein)
+	// 	//}
 	// }
 
 	return

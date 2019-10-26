@@ -107,7 +107,9 @@ func Run(f met.Data) met.Data {
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
 
+	logrus.Info("t1")
 	inf.ProteinInference(psm)
+	logrus.Info("t2")
 
 	psm = nil
 
