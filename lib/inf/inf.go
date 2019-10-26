@@ -10,23 +10,25 @@ import (
 
 // Peptide ...
 type Peptide struct {
-	Sequence            map[string]uint8
-	Charge              uint8
-	CalcNeutralPepMass  float64
-	Probability         float64
-	Spectra             map[string]uint8
-	Protein             map[string]uint8
-	AlternativeProteins map[string]uint8
-	Weight              float64
+	Sequence                      map[string]uint16
+	Charge                        uint8
+	CalcNeutralPepMass            float64
+	Probability                   float64
+	Weight                        float64
+	Spectra                       map[string]uint16
+	Protein                       map[string]uint16
+	AlternativeProteins           map[string]uint16
+	AlternativeProteinsWithDecoys map[string]uint16
 }
 
 // ProteinInference ...
 func ProteinInference(psm id.PepIDList) {
 
 	var peptideList []Peptide
-	var exclusionList = make(map[string]uint8)
+	var exclusionList = make(map[string]uint16)
 	var peptideIndex = make(map[string]Peptide)
-	var peptideCount = make(map[string]uint8)
+	var peptideCount = make(map[string]uint16)
+	var proteinTNP = make(map[string]uint16)
 
 	// build the peptide index
 	for _, i := range psm {
@@ -37,10 +39,11 @@ func ProteinInference(psm id.PepIDList) {
 		if !ok {
 			var p Peptide
 
-			p.Sequence = make(map[string]uint8)
-			p.Spectra = make(map[string]uint8)
-			p.Protein = make(map[string]uint8)
-			p.AlternativeProteins = make(map[string]uint8)
+			p.Sequence = make(map[string]uint16)
+			p.Spectra = make(map[string]uint16)
+			p.Protein = make(map[string]uint16)
+			p.AlternativeProteins = make(map[string]uint16)
+			p.AlternativeProteinsWithDecoys = make(map[string]uint16)
 
 			p.Sequence[i.Peptide]++
 			p.Charge = i.AssumedCharge
@@ -68,12 +71,14 @@ func ProteinInference(psm id.PepIDList) {
 			obj.Spectra[i.Spectrum]++
 			obj.Protein[i.Protein]++
 
+			proteinTNP[i.Protein] += obj.Spectra[i.Spectrum]
+
 			for _, j := range i.AlternativeProteins {
 				if !strings.Contains(j, "rev_") && i.Protein != j {
 					obj.AlternativeProteins[j]++
 				}
+				obj.AlternativeProteinsWithDecoys[j]++
 			}
-			//obj.AlternativeProteins[i.Protein]++
 
 			peptideIndex[i.Peptide] = obj
 		}
@@ -86,7 +91,12 @@ func ProteinInference(psm id.PepIDList) {
 		}
 	}
 
-	spew.Dump(peptideList)
+	spew.Dump(proteinTNP)
+	// for _, i := range peptideList {
+	// 	if i.Weight >= 0.9 {
+	// 		fmt.Println(i.Sequence, "\t", i.Protein)
+	// 	}
+	// }
 
 	return
 }
