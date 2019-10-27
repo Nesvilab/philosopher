@@ -4,30 +4,33 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/rep"
 )
 
 // Peptide ...
 type Peptide struct {
-	Sequence                      map[string]uint16
-	Charge                        uint8
-	CalcNeutralPepMass            float64
-	Probability                   float64
-	Weight                        float64
-	Spectra                       map[string]uint16
-	Protein                       map[string]uint16
-	AlternativeProteins           map[string]uint16
-	AlternativeProteinsWithDecoys map[string]uint16
+	IonForm                  string
+	Sequence                 map[string]uint16
+	Protein                  string
+	Charge                   uint8
+	CalcNeutralPepMass       float64
+	Probability              float64
+	Weight                   float64
+	Spectra                  map[string]uint16
+	MappedProteins           map[string]uint16
+	MappedProteinsWithDecoys map[string]uint16
 }
 
 // ProteinInference ...
-func ProteinInference(psm id.PepIDList) {
+func ProteinInference(psm rep.PSMEvidenceList) {
 
 	var peptideList []Peptide
 	var exclusionList = make(map[string]uint16)
 	var peptideIndex = make(map[string]Peptide)
 	var peptideCount = make(map[string]uint16)
+
 	var proteinTNP = make(map[string]uint16)
+	var probMap = make(map[string]map[string]float64)
 
 	// build the peptide index
 	for _, i := range psm {
@@ -38,16 +41,16 @@ func ProteinInference(psm id.PepIDList) {
 		if !ok {
 			var p Peptide
 
+			p.IonForm = ionForm
 			p.Sequence = make(map[string]uint16)
 			p.Spectra = make(map[string]uint16)
-			p.Protein = make(map[string]uint16)
-			p.AlternativeProteins = make(map[string]uint16)
-			p.AlternativeProteinsWithDecoys = make(map[string]uint16)
+			p.MappedProteins = make(map[string]uint16)
+			p.MappedProteinsWithDecoys = make(map[string]uint16)
 
 			p.Sequence[i.Peptide]++
 			p.Charge = i.AssumedCharge
 			p.CalcNeutralPepMass = i.CalcNeutralPepMass
-			p.Probability = i.Probability
+			p.Probability = -1.0
 			p.Weight = 1.0
 
 			exclusionList[ionForm] = 0
@@ -55,6 +58,19 @@ func ProteinInference(psm id.PepIDList) {
 
 			peptideList = append(peptideList, p)
 			peptideIndex[ionForm] = p
+
+			// build the peptide to protein prob map
+			v, okPM := probMap[i.Peptide]
+			if okPM {
+				inner := v
+				if i.Probability > inner[i.Protein] {
+					inner[i.Protein] = i.Probability
+				}
+				probMap[i.Peptide] = inner
+			} else {
+				probMap[i.Peptide] = map[string]float64{i.Protein: i.Probability}
+			}
+
 		}
 	}
 
@@ -68,16 +84,19 @@ func ProteinInference(psm id.PepIDList) {
 
 			obj.Sequence[i.Peptide] = peptideCount[i.Peptide]
 			obj.Spectra[i.Spectrum]++
-			obj.Protein[i.Protein]++
 
-			proteinTNP[i.Protein] += obj.Spectra[i.Spectrum]
+			obj.MappedProteins[i.Protein]++
+			obj.MappedProteinsWithDecoys[i.Protein]++
 
-			for _, j := range i.AlternativeProteins {
+			for j := range i.MappedProteins {
 				if !strings.Contains(j, "rev_") && i.Protein != j {
-					obj.AlternativeProteins[j]++
+					obj.MappedProteins[j]++
 				}
-				obj.AlternativeProteinsWithDecoys[j]++
+				obj.MappedProteinsWithDecoys[j]++
 			}
+
+			// total number of peptides per protein
+			proteinTNP[i.Protein] += obj.Spectra[i.Spectrum]
 
 			peptideIndex[i.Peptide] = obj
 		}
@@ -85,17 +104,18 @@ func ProteinInference(psm id.PepIDList) {
 
 	// update weight
 	for i := range peptideList {
-		if len(peptideList[i].AlternativeProteins) > 0 {
-			peptideList[i].Weight = (float64(1.0) / float64(len(peptideList[i].AlternativeProteins)))
+		if len(peptideList[i].MappedProteins) > 0 {
+			peptideList[i].Weight = (float64(1.0) / float64(len(peptideList[i].MappedProteins)))
 		}
+
 	}
 
-	//spew.Dump(proteinTNP)
-	// for _, i := range peptideList {
-	// 	//if i.Weight >= 0.9 {
-	// 	fmt.Println(i.Sequence, "\t", i.Protein)
-	// 	//}
-	// }
+	//spew.Dump(probMap)
+	for i := range probMap {
+		for j := range i {
+			fmt.Println(i, "\t", j)
+		}
+	}
 
 	return
 }
