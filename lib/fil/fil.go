@@ -106,11 +106,6 @@ func Run(f met.Data) met.Data {
 	var psm id.PepIDList
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
-
-	logrus.Info("t1")
-	inf.ProteinInference(e.PSM)
-	logrus.Info("t2")
-
 	psm = nil
 
 	var ion id.PepIDList
@@ -149,6 +144,10 @@ func Run(f met.Data) met.Data {
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
+
+	logrus.Info("t1")
+	inf.ProteinInference(e.PSM)
+	logrus.Info("t2")
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
