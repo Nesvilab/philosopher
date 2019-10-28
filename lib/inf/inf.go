@@ -2,7 +2,6 @@ package inf
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/rep"
@@ -31,6 +30,7 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	var peptideCount = make(map[string]int)
 
 	var proteinTNP = make(map[string]int)
+
 	var probMap = make(map[string]map[string]float64)
 
 	// build the peptide index
@@ -51,7 +51,7 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			p.Charge = i.AssumedCharge
 			p.CalcNeutralPepMass = i.CalcNeutralPepMass
 			p.Probability = -1.0
-			p.Weight = 1.0
+			p.Weight = -1.0
 
 			exclusionList[ionForm] = 0
 			peptideCount[i.Peptide]++
@@ -70,7 +70,12 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			} else {
 				probMap[i.Peptide] = map[string]float64{i.Protein: i.Probability}
 			}
+		}
 
+		// total number of peptides per protein
+		proteinTNP[i.Protein]++
+		for j := range i.MappedProteins {
+			proteinTNP[j]++
 		}
 	}
 
@@ -85,14 +90,12 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			obj.Sequence = i.Peptide
 			obj.Spectra[i.Spectrum]++
 
-			obj.MappedProteins[i.Protein]++
-			obj.MappedProteinsWithDecoys[i.Protein]++
+			obj.MappedProteins[i.Protein] = proteinTNP[i.Protein]
+			obj.MappedProteinsWithDecoys[i.Protein] = proteinTNP[i.Protein]
 
 			for j := range i.MappedProteins {
-				if !strings.Contains(j, "rev_") && i.Protein != j {
-					obj.MappedProteins[j]++
-				}
-				obj.MappedProteinsWithDecoys[j]++
+				obj.MappedProteins[j] = -1
+				obj.MappedProteinsWithDecoys[j] = -1
 			}
 
 			// assign razor for absolute mappings
@@ -102,18 +105,37 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			}
 
 			// total number of peptides per protein
-			proteinTNP[i.Protein] += int(obj.Spectra[i.Spectrum])
+			//proteinTNP[i.Protein] += int(obj.Spectra[i.Spectrum])
 
 			peptideIndex[i.Peptide] = obj
 		}
 	}
 
-	// update weight and assign razor
+	// update TNP
 	for i := range peptideList {
 
 		if len(peptideList[i].MappedProteins) > 0 {
 			peptideList[i].Weight = (float64(1.0) / float64(len(peptideList[i].MappedProteins)))
 		}
+
+		for k := range peptideList[i].MappedProteins {
+			_, ok := proteinTNP[k]
+			if ok {
+				peptideList[i].MappedProteins[k] = proteinTNP[k]
+			}
+		}
+
+		for k := range peptideList[i].MappedProteinsWithDecoys {
+			_, ok := proteinTNP[k]
+			if ok {
+				peptideList[i].MappedProteinsWithDecoys[k] = proteinTNP[k]
+			}
+		}
+
+	}
+
+	// assign razor
+	for i := range peptideList {
 
 		var protein string
 		var tnp int
