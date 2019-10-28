@@ -853,6 +853,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 			razor.MappedProtein = pt
 			r[k] = razor
 			//spew.Dump(r[k])
+			//fmt.Println(r[k].Sequence, "\t", r[k].MappedProtein)
 		}
 	}
 

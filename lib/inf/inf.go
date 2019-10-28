@@ -3,7 +3,6 @@ package inf
 import (
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nesvilab/philosopher/lib/rep"
 )
 
@@ -154,7 +153,14 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 
 	}
 
-	spew.Dump(peptideList)
+	//spew.Dump(peptideList)
+	var checkMap = make(map[string]string)
+	for _, i := range peptideList {
+		checkMap[i.Sequence] = i.Protein
+	}
+	for k,v := range checkMap {
+		fmt.Println(k, "\t", v)
+	}
 	// for k, v := range probMap {
 	// 	for i := range v {
 	// 		fmt.Println(k, "\t", i)
