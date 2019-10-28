@@ -328,6 +328,8 @@ type CombinedPeptideEvidence struct {
 	BestPSM            float64
 	Sequence           string
 	Protein            string
+	ProteinID          string
+	EntryName          string
 	Gene               string
 	ProteinDescription string
 	ChargeStates       []string

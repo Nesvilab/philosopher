@@ -92,6 +92,9 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	logrus.Info("Processing intensities")
 	evidences = getIntensities(evidences, datasets)
 
+	// logrus.Info("Collapsing entries")
+	// evidences = collapseEvidences(evidences)
+
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
 	return
@@ -143,6 +146,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 	var evidences rep.CombinedPeptideEvidenceList
 	var uniqPeptides = make(map[string]uint8)
 	var proteinMap = make(map[string]string)
+	var proteinIDMap = make(map[string]string)
 	var proteinDesc = make(map[string]string)
 	var geneMap = make(map[string]string)
 	var probMap = make(map[string]float64)
@@ -163,11 +167,13 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 				var uniqMds = make(map[string]uint8)
 
 				for _, j := range i.Modifications.Index {
-					mass := strconv.FormatFloat(j.MassDiff, 'f', 6, 64)
-					uniqMds[mass] = 0
+					if j.Type == "Assigned" {
+						mass := strconv.FormatFloat(j.MassDiff, 'f', 6, 64)
+						uniqMds[mass] = 0
+					}
 				}
 
-				// this forces the unmodified pepes to collapse with peps containing +16
+				// this forces the unmodified peps to collapse with peps containing +16
 				if len(uniqMds) == 0 || uniqMds["0"] == 0 {
 					uniqMds["15.994900"] = 0
 					delete(uniqMds, "0")
@@ -184,6 +190,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 				uniqPeptides[key] = 0
 
 				proteinMap[i.Peptide] = i.Protein
+				proteinIDMap[i.Peptide] = i.ProteinID
 				proteinDesc[i.Peptide] = i.ProteinDescription
 				geneMap[i.Peptide] = i.GeneName
 
@@ -223,8 +230,8 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 		v, ok := proteinMap[parts[0]]
 		if ok {
 			e.Protein = v
+			e.ProteinID = proteinIDMap[parts[0]]
 			e.ProteinDescription = proteinDesc[parts[0]]
-
 			e.Gene = geneMap[parts[0]]
 		}
 
@@ -250,8 +257,10 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			var uniqMds = make(map[string]uint8)
 
 			for _, k := range j.Modifications.Index {
-				mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
-				uniqMds[mass] = 0
+				if k.Type == "Assigned" {
+					mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
+					uniqMds[mass] = 0
+				}
 			}
 
 			// this forces the unmodified pepes to collapse with peps containing +16
@@ -299,8 +308,10 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 			var uniqMds = make(map[string]uint8)
 
 			for _, k := range j.Modifications.Index {
-				mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
-				uniqMds[mass] = 0
+				if k.Type == "Assigned" {
+					mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
+					uniqMds[mass] = 0
+				}
 			}
 
 			// this forces the unmodified pepes to collapse with peps containing +16
@@ -354,7 +365,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	}
 	defer file.Close()
 
-	line := "Sequence\tCharge States\tProbability\tAssigned Modifications\tGene\tProtein\tProtein Description\t"
+	line := "Sequence\tCharge States\tProbability\tAssigned Modifications\tGene\tProtein\tProtein ID\tProtein Description\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Spectral Count\t", i)
@@ -385,6 +396,8 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		line += fmt.Sprintf("%s\t", i.Gene)
 
 		line += fmt.Sprintf("%s\t", i.Protein)
+
+		line += fmt.Sprintf("%s\t", i.ProteinID)
 
 		line += fmt.Sprintf("%s\t", i.ProteinDescription)
 

@@ -47,7 +47,7 @@ func init() {
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
-		abacusCmd.Flags().BoolVarP(&m.Abacus.Protein, "protein", "", true, "global level protein report")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Protein, "protein", "", false, "global level protein report")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Peptide, "peptide", "", false, "global level peptide report")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")

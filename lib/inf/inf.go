@@ -154,13 +154,13 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	}
 
 	//spew.Dump(peptideList)
-	var checkMap = make(map[string]string)
-	for _, i := range peptideList {
-		checkMap[i.Sequence] = i.Protein
-	}
-	for k,v := range checkMap {
-		fmt.Println(k, "\t", v)
-	}
+	// var checkMap = make(map[string]string)
+	// for _, i := range peptideList {
+	// 	checkMap[i.Sequence] = i.Protein
+	// }
+	// for k,v := range checkMap {
+	// 	fmt.Println(k, "\t", v)
+	// }
 	// for k, v := range probMap {
 	// 	for i := range v {
 	// 		fmt.Println(k, "\t", i)

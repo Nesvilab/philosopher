@@ -212,7 +212,8 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	for i := range list {
 		for _, j := range database.Records {
-			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
+			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && !strings.Contains(j.OriginalHeader, a.Tag) {
+				list[i].ProteinName = j.PartHeader
 				list[i].ProteinID = j.ID
 				list[i].EntryName = j.EntryName
 				list[i].GeneNames = j.GeneNames
@@ -308,7 +309,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	line := "Protein Group\tSubGroup\tProtein ID\tEntry Name\tGene Names\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
+	line := "Protein Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene Names\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tUnique Stripped Peptides\tSummarized Total Spectral Count\tSummarized Unique Spectral Count\tSummarized Razor Spectral Count\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s Total Spectral Count\t", i)
@@ -376,6 +377,8 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		line += fmt.Sprintf("%d\t", i.GroupNumber)
 
 		line += fmt.Sprintf("%s\t", i.SiblingID)
+
+		line += fmt.Sprintf("%s\t", i.ProteinName)
 
 		line += fmt.Sprintf("%s\t", i.ProteinID)
 
