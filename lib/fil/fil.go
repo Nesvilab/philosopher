@@ -145,9 +145,7 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
 
-	logrus.Info("t1")
 	inf.ProteinInference(e.PSM)
-	logrus.Info("t2")
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)

@@ -141,7 +141,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
-	var ptMap = make(map[string]string)
+	//var ptMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
 
@@ -156,7 +156,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				urazorMap[j.IonForm] = i.PartHeader
 			}
 		}
-
 	}
 
 	for i := range evi.PSM {
@@ -184,10 +183,10 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 		}
 
-		v, ok := ptMap[evi.PSM[i].IonForm]
-		if ok {
-			evi.PSM[i].Protein = v
-		}
+		// v, ok := ptMap[evi.PSM[i].IonForm]
+		// if ok {
+		// 	evi.PSM[i].Protein = v
+		// }
 	}
 
 	for i := range evi.Ions {
@@ -197,11 +196,21 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.Ions[i].IsUnique = true
 		}
 
-		_, rOK := urazorMap[evi.Ions[i].IonForm]
+		// _, rOK := urazorMap[evi.Ions[i].IonForm]
+		// if rOK {
+		// 	evi.Ions[i].IsURazor = true
+		// }
+
+		// a razor decoy, this mchanism avoids the replacement
+		rp, rOK := urazorMap[evi.Ions[i].IonForm]
 		if rOK {
 			evi.Ions[i].IsURazor = true
+			if !strings.Contains(rp, decoyTag) {
+				evi.Ions[i].MappedProteins[evi.Ions[i].Protein] = 0
+				delete(evi.Ions[i].MappedProteins, rp)
+				evi.Ions[i].Protein = rp
+			}
 		}
-
 	}
 
 	return
