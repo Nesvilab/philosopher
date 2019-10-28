@@ -27,9 +27,7 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	var exclusionList = make(map[string]int)
 	var peptideIndex = make(map[string]Peptide)
 	var peptideCount = make(map[string]int)
-
 	var proteinTNP = make(map[string]int)
-
 	var probMap = make(map[string]map[string]float64)
 
 	// build the peptide index
@@ -49,10 +47,9 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			p.Sequence = i.Peptide
 			p.Charge = i.AssumedCharge
 			p.CalcNeutralPepMass = i.CalcNeutralPepMass
-			p.Probability = -1.0
+			p.Probability = i.Probability
 			p.Weight = -1.0
 
-			exclusionList[ionForm] = 0
 			peptideCount[i.Peptide]++
 
 			peptideList = append(peptideList, p)
@@ -67,8 +64,12 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 				}
 				probMap[i.Peptide] = inner
 			} else {
-				probMap[i.Peptide] = map[string]float64{i.Protein: i.Probability}
+				var obj = make(map[string]float64)
+				obj[i.Protein] = i.Probability
+				probMap[i.Peptide] = obj
 			}
+
+			exclusionList[ionForm] = 0
 		}
 
 		// total number of peptides per protein
@@ -100,17 +101,18 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			// assign razor for absolute mappings
 			if len(i.MappedProteins) == 1 {
 				obj.Protein = i.Protein
+			}
+
+			// get the highest probability
+			if i.Probability > obj.Probability {
 				obj.Probability = i.Probability
 			}
 
-			// total number of peptides per protein
-			//proteinTNP[i.Protein] += int(obj.Spectra[i.Spectrum])
-
-			peptideIndex[i.Peptide] = obj
+			peptideIndex[ionForm] = obj
 		}
 	}
 
-	// update TNP
+	// update Total Number of Peptides per Protein
 	for i := range peptideList {
 
 		if len(peptideList[i].MappedProteins) > 0 {
@@ -146,10 +148,14 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			}
 		}
 
-		pm := probMap[peptideList[i].Sequence]
+		//pm := probMap[peptideList[i].Sequence]
 
-		peptideList[i].Protein = protein
-		peptideList[i].Probability = pm[protein]
+		if len(protein) > 0 {
+			peptideList[i].Protein = protein
+			//peptideList[i].Probability = pm[protein]
+		} else {
+			//peptideList[i].Probability = pm[peptideList[i].Protein]
+		}
 
 	}
 
