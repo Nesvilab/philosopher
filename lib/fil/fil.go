@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nesvilab/philosopher/lib/inf"
 	"github.com/nesvilab/philosopher/lib/msg"
 
 	"github.com/nesvilab/philosopher/lib/spc"
@@ -143,10 +142,10 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
-	} else {
-		logrus.Info("Calculating Protein Inference")
-		inf.ProteinInference(e.PSM)
 	}
+
+	// logrus.Info("Calculating Protein Inference")
+	// inf.ProteinInference(e.PSM)
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)

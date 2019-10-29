@@ -92,9 +92,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	logrus.Info("Processing intensities")
 	evidences = getIntensities(evidences, datasets)
 
-	// logrus.Info("Collapsing entries")
-	// evidences = collapseEvidences(evidences)
-
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
 	return
@@ -109,7 +106,7 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		msg.NoParametersFound(errors.New("missing combined.pep.xml"), "fatal")
+		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
 
 	} else {
 
@@ -122,15 +119,22 @@ func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]str
 			pepID = append(pepID, i)
 		}
 
-		//uniqPsms := getUniquePSMs(p)
+		uniqPsms := fil.GetUniquePSMs(pepID)
 		uniqPeps := fil.GetUniquePeptides(pepID)
 
+		filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
 		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
 
 		// get all peptide sequences from combined file and collapse them
 		for _, i := range filteredPeptides {
 			if !strings.HasPrefix(i.Protein, a.Tag) {
 				seqMap[i.Peptide] = 0
+			}
+		}
+
+		// get all charge states
+		for _, i := range filteredPSMs {
+			if !strings.HasPrefix(i.Protein, a.Tag) {
 				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
 			}
 		}
