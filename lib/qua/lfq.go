@@ -67,7 +67,11 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
 				if ok {
-					mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
+					if isIso {
+						mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
+					} else {
+						mzMap[spectrum] = mz.Spectra[i].Precursor.SelectedIon
+					}
 				}
 			}
 		}
@@ -79,7 +83,8 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				var measured = make(map[float64]float64)
 				var retrieved bool
 
-				measured, retrieved = xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j], isIso)
+				measured, retrieved = xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
+				//measured, retrieved = xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j], isIso)
 
 				if retrieved == true {
 					var timeW = retentionTime[j] / 60
@@ -112,7 +117,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 }
 
 // xic extract ion chomatograms
-func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64, isIso bool) (map[float64]float64, bool) {
+func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
 

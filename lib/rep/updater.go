@@ -142,22 +142,19 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
 
-	var uniqueSeqMap = make(map[string]bool)
-	var urazorSeqMap = make(map[string]string)
+	var uniqueSeqMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
 			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
-				uniqueSeqMap[j.Sequence] = true
 			}
 		}
 
 		for _, j := range i.TotalPeptideIons {
 			if j.IsURazor == true {
 				urazorMap[j.IonForm] = i.PartHeader
-				urazorSeqMap[j.Sequence] = i.PartHeader
 			}
 		}
 	}
@@ -186,6 +183,8 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				evi.PSM[i].Protein = rp
 			}
 		}
+
+		uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
 	}
 
 	for i := range evi.Ions {
@@ -208,13 +207,13 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	for i := range evi.Peptides {
 
-		rp, rOK := urazorMap[evi.Peptides[i].Sequence]
-		if rOK {
-			if !strings.Contains(rp, decoyTag) {
-				evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
-				delete(evi.Peptides[i].MappedProteins, rp)
-				evi.Peptides[i].Protein = rp
-			}
+		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
+		if ok {
+			//if !strings.Contains(rp, decoyTag) {
+			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
+			delete(evi.Peptides[i].MappedProteins, v)
+			evi.Peptides[i].Protein = v
+			//}
 		}
 	}
 
