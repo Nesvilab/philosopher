@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
 	unix "github.com/nesvilab/philosopher/lib/ext/interprophet/unix"
 	wiPr "github.com/nesvilab/philosopher/lib/ext/interprophet/win"
 	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
@@ -118,6 +118,10 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
+
+	if cmd.ProcessState.ExitCode() != 0 {
+		msg.ExecutingBinary(errors.New("There was an error with iProphet, please check your parameters and input files"), "fatal")
+	}
 
 	// copy to work directory
 	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))

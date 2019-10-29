@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
 	unix "github.com/nesvilab/philosopher/lib/ext/proteinprophet/unix"
 	wPoP "github.com/nesvilab/philosopher/lib/ext/proteinprophet/win"
 	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
@@ -142,6 +142,10 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
+
+	if cmd.ProcessState.ExitCode() != 0 {
+		msg.ExecutingBinary(errors.New("There was an error with ProteinProphet, please check your parameters and input files"), "fatal")
+	}
 
 	// copy to work directory
 	dest := fmt.Sprintf("%s%s%s", home, string(filepath.Separator), filepath.Base(output))

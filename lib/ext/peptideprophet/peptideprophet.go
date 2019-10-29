@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
 	unix "github.com/nesvilab/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/nesvilab/philosopher/lib/ext/peptideprophet/win"
 	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
@@ -263,6 +263,10 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			msg.ExecutingBinary(e, "fatal")
 		}
 		_ = cmd.Wait()
+
+		if cmd.ProcessState.ExitCode() != 0 {
+			msg.ExecutingBinary(errors.New("There was an error with PeptideProphet, please check your parameters and input files"), "fatal")
+		}
 
 	}
 

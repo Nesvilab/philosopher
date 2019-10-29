@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
 	unix "github.com/nesvilab/philosopher/lib/ext/ptmprophet/unix"
 	wPeP "github.com/nesvilab/philosopher/lib/ext/ptmprophet/win"
 	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
@@ -105,6 +105,10 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
+
+	if cmd.ProcessState.ExitCode() != 0 {
+		msg.ExecutingBinary(errors.New("There was an error with PTMProphet, please check your parameters and input files"), "fatal")
+	}
 
 	// collect all resulting files
 	var processedOutput []string
