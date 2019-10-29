@@ -9,6 +9,7 @@
 - Uncalibrated Peptide Mass to PSM table.
 - Mapped Genes to PSM table.
 - Calibrated observed mass and m/z to PSM report.
+- Philosopher will stop if an error is reported by the Prophets.
 
 ### Changed
 - Updated to Go v1.13.1.
