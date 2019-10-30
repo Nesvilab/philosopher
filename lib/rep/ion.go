@@ -32,7 +32,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range evi.PSM {
 
-		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Protein)
+		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Spectrum)
 		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
 
 		if i.Probability > bestProb[i.IonForm] {

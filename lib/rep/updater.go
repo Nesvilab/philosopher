@@ -408,7 +408,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	return
 }
 
-// UpdateSupportingSpectra pushes back from SM to Protein the new supporting spectra from razor results
+// UpdateSupportingSpectra pushes back from PSM to Protein the new supporting spectra from razor results
 func (evi *Evidence) UpdateSupportingSpectra() {
 
 	var ptSupSpec = make(map[string][]string)

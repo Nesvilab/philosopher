@@ -58,6 +58,7 @@ type PeptideIonIdentification struct {
 	Weight                  float64
 	GroupWeight             float64
 	CalcNeutralPepMass      float64
+	NumberOfInstances       int
 	SharedParentProteins    int
 	Razor                   int
 	IsNondegenerateEvidence bool
@@ -152,6 +153,7 @@ func (p *ProtXML) Read(f string) {
 				pepid.CalcNeutralPepMass = k.CalcNeutralPepMass
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Modifications.Index = make(map[string]mod.Modification)
+				pepid.NumberOfInstances = k.NIstances
 				pepid.Razor = -1
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {

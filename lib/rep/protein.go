@@ -17,7 +17,7 @@ import (
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
-// AssembleProteinReport ...
+// AssembleProteinReport creates the post processed protein strcuture
 func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 
 	var list ProteinEvidenceList

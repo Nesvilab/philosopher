@@ -2,6 +2,7 @@ package qua
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/rep"
@@ -26,6 +27,10 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 	}
 
 	for i := range e.Proteins {
+
+		if e.Proteins[i].ProteinID == "A3KN83" {
+			fmt.Println(".")
+		}
 
 		e.Proteins[i].TotalSpC = len(e.Proteins[i].SupportingSpectra)
 
