@@ -2,6 +2,7 @@ package inf
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/nesvilab/philosopher/lib/rep"
 )
@@ -139,14 +140,28 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	for i := range peptideList {
 
 		var protein string
+		var candidateProteins []string
 		var tnp int
 
-		for k, v := range peptideList[i].MappedProteins {
-			if v > tnp {
-				tnp = v
-				protein = k
+		for k := range peptideList[i].MappedProteins {
+			candidateProteins = append(candidateProteins, k)
+		}
+
+		sort.Strings(candidateProteins)
+
+		for _, j := range candidateProteins {
+			if peptideList[i].MappedProteins[j] > tnp {
+				tnp = peptideList[i].MappedProteins[j]
+				protein = j
 			}
 		}
+
+		// for k, v := range peptideList[i].MappedProteins {
+		// 	if v > tnp {
+		// 		tnp = v
+		// 		protein = k
+		// 	}
+		// }
 
 		//pm := probMap[peptideList[i].Sequence]
 
@@ -160,13 +175,15 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	}
 
 	//spew.Dump(peptideList)
+
 	// var checkMap = make(map[string]string)
 	// for _, i := range peptideList {
 	// 	checkMap[i.Sequence] = i.Protein
 	// }
-	// for k,v := range checkMap {
+	// for k, v := range checkMap {
 	// 	fmt.Println(k, "\t", v)
 	// }
+
 	// for k, v := range probMap {
 	// 	for i := range v {
 	// 		fmt.Println(k, "\t", i)

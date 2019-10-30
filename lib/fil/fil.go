@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nesvilab/philosopher/lib/inf"
 	"github.com/nesvilab/philosopher/lib/msg"
 
 	"github.com/nesvilab/philosopher/lib/spc"
@@ -144,8 +145,8 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
 
-	// logrus.Info("Calculating Protein Inference")
-	// inf.ProteinInference(e.PSM)
+	logrus.Info("Calculating Protein Inference")
+	inf.ProteinInference(e.PSM)
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
