@@ -146,7 +146,7 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
 	}
 
-	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header += "\tIs Unique\tIs Used\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -247,9 +247,10 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
 			i.IsUnique,
+			i.Labels.IsUsed,
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,
