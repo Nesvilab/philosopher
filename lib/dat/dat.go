@@ -171,7 +171,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	}
 
 	if response.ContentLength != -1 {
-		msg.Custom(errors.New("Database could not be downloaded, check your proteome ID"), "fatal")
+		msg.Custom(errors.New("No sequences downloaded, check your proteome ID and parameters"), "fatal")
 	}
 	defer response.Body.Close()
 
