@@ -100,6 +100,12 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.IsDecoy = true
 		}
 
+		if len(i.AlternativeProteins) == 0 {
+			p.IsUnique = true
+		} else {
+			p.IsUnique = false
+		}
+
 		list = append(list, p)
 	}
 
@@ -146,16 +152,16 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
 	}
 
-	header += "\tIs Unique\tIs Used\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
 		case 10:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		default:
 			header += ""
 		}
@@ -247,10 +253,9 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
 			i.IsUnique,
-			i.Labels.IsUsed,
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,
@@ -263,8 +268,9 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		if brand == "tmt" {
 			switch channels {
 			case 10:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
+					i.Labels.IsUsed,
 					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,

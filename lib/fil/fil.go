@@ -57,14 +57,13 @@ func Run(f met.Data) met.Data {
 		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 
 	} else {
-
-		logrus.Info("Calculating Protein Inference")
 		pepid = inf.ProteinInference(pepid)
 
-		if f.Filter.Seq == true || f.Filter.TwoD == true {
-			processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
-		}
+		pepid.Serialize("psm")
+		pepid.Serialize("pep")
+		pepid.Serialize("ion")
 
+		processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 	}
 
 	if f.Filter.Seq == true {
@@ -139,7 +138,7 @@ func Run(f met.Data) met.Data {
 
 		logrus.Info("Processing Protein Inference")
 		pro.Restore()
-		e.AssembleProteinReport(pro, f.Filter.Tag)
+		e.AssembleProteinReport(pro, f.Filter.Weight, f.Filter.Tag)
 		pro = nil
 
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
@@ -590,10 +589,20 @@ func processProteinInferenceIdentifications(psm id.PepIDList, ptFDR, pepProb, pr
 	//var pid id.ProtIDList
 
 	for _, i := range psm {
+
 		proteinIndex[i.Protein]++
 		for j := range i.AlternativeProteinsIndexed {
 			proteinIndex[j]++
 		}
+
+		// var p id.ProteinIdentification
+		// p.GroupNumber = 0
+		// p.GroupSiblingID = "a"
+		// p.ProteinName = i.Protein
+		// p.Probability = i.Probability
+		// p.TopPepProb = i.Probability
+		// p.HasRazor = true
+		// p.Picked = 0
 	}
 
 	for i := range proteinIndex {

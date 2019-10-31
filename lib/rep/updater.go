@@ -161,14 +161,9 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	for i := range evi.PSM {
 
-		if len(evi.PSM[i].MappedProteins) == 0 {
-			evi.PSM[i].IsUnique = true
-		}
-
-		_, uOK := uniqueMap[evi.PSM[i].IonForm]
-		if uOK {
-			evi.PSM[i].IsUnique = true
-		}
+		// if evi.PSM[i].Peptide == "SHTGEKPYGCNECGK" {
+		// 	fmt.Println(".")
+		// }
 
 		// the decoy tag checking is a failsafe mechanism to avoid proteins
 		// with real complex razor case decisions to pass dowsntream
@@ -184,15 +179,19 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 		}
 
+		if len(evi.PSM[i].MappedProteins) == 0 {
+			evi.PSM[i].IsUnique = true
+		}
+
+		_, uOK := uniqueMap[evi.PSM[i].IonForm]
+		if uOK {
+			evi.PSM[i].IsUnique = true
+		}
+
 		uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
 	}
 
 	for i := range evi.Ions {
-
-		_, uOK := uniqueMap[evi.Ions[i].IonForm]
-		if uOK {
-			evi.Ions[i].IsUnique = true
-		}
 
 		rp, rOK := urazorMap[evi.Ions[i].IonForm]
 		if rOK {
@@ -203,17 +202,22 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				evi.Ions[i].Protein = rp
 			}
 		}
+
+		_, uOK := uniqueMap[evi.Ions[i].IonForm]
+		if uOK {
+			evi.Ions[i].IsUnique = true
+		} else {
+			evi.Ions[i].IsUnique = false
+		}
 	}
 
 	for i := range evi.Peptides {
 
 		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
 		if ok {
-			//if !strings.Contains(rp, decoyTag) {
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
 			delete(evi.Peptides[i].MappedProteins, v)
 			evi.Peptides[i].Protein = v
-			//}
 		}
 	}
 

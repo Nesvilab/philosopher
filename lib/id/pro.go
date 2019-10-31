@@ -158,8 +158,10 @@ func (p *ProtXML) Read(f string) {
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
 					pepid.IsNondegenerateEvidence = true
+					pepid.IsUnique = true
 				} else {
 					pepid.IsNondegenerateEvidence = false
+					pepid.IsUnique = false
 				}
 
 				// collect other proteins where this paptide maps to (this is different from the indistinguishable proteins list)

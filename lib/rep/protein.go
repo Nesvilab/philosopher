@@ -18,7 +18,7 @@ import (
 )
 
 // AssembleProteinReport creates the post processed protein strcuture
-func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
+func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, decoyTag string) {
 
 	var list ProteinEvidenceList
 	var protMods = make(map[string][]mod.Modification)
@@ -73,21 +73,41 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 					rep.SupportingSpectra[spec]++
 				}
 
-				v.MappedProteins = make(map[string]int)
+				//v.MappedProteins = make(map[string]int)
 
 				ref := v
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
 
-				ref.MappedProteins[i.ProteinName]++
-				ref.MappedProteins = make(map[string]int)
+				//ref.MappedProteins = make(map[string]int)
+				//ref.MappedProteins[i.ProteinName]++
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
 				}
 
+				_, ok := ref.MappedProteins[i.ProteinName]
+				if ok {
+					delete(ref.MappedProteins, i.ProteinName)
+				}
+
 				ref.Modifications = k.Modifications
 
-				ref.IsUnique = k.IsUnique
+				// if k.IsNondegenerateEvidence == true {
+				// 	ref.IsUnique = true
+				// } else {
+				// 	ref.IsUnique = false
+				// }
+
+				if len(ref.MappedProteins) == 0 {
+					ref.IsUnique = true
+				} else {
+					ref.IsUnique = false
+				}
+
+				if ref.Weight >= weight {
+					ref.IsUnique = true
+				}
+
 				if k.Razor == 1 {
 					ref.IsURazor = true
 				}
@@ -125,18 +145,38 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, decoyTag string) {
 				ref.GroupWeight = k.GroupWeight
 				ref.Labels = k.Labels
 
-				ref.MappedProteins[i.ProteinName]++
 				ref.MappedProteins = make(map[string]int)
+				//ref.MappedProteins[i.ProteinName]++
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
 				}
 
+				_, ok := ref.MappedProteins[i.ProteinName]
+				if ok {
+					delete(ref.MappedProteins, i.ProteinName)
+				}
+
 				ref.Modifications = k.Modifications
 
-				ref.IsUnique = k.IsUnique
-				if k.Razor == 1 {
-					ref.IsURazor = true
+				//ref.IsUnique = k.IsUnique
+				// if k.Razor == 1 {
+				// 	ref.IsURazor = true
+				// }
+				if len(ref.MappedProteins) == 0 {
+					ref.IsUnique = true
+				} else {
+					ref.IsUnique = false
 				}
+
+				if ref.Weight >= weight {
+					ref.IsUnique = true
+				}
+
+				// if k.IsNondegenerateEvidence == true {
+				// 	ref.IsUnique = true
+				// } else {
+				// 	ref.IsUnique = false
+				// }
 
 				mods, ok := protMods[ion]
 				if ok {
