@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nesvilab/philosopher/lib/inf"
 	"github.com/nesvilab/philosopher/lib/msg"
 
 	"github.com/nesvilab/philosopher/lib/spc"
@@ -46,44 +47,46 @@ func Run(f met.Data) met.Data {
 	f.SearchEngine = searchEngine
 
 	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	_ = psmT
+	_ = pepT
+	_ = ionT
 
 	if len(f.Filter.Pox) > 0 {
 
 		protXML := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
-
 		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 
-		if f.Filter.Seq == true {
+	} else {
 
-			// sequential analysis
-			// filtered psm list and filtered prot list
-			pep.Restore("psm")
-			pro.Restore()
-			sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-			pep = nil
-			pro = nil
+		logrus.Info("Calculating Protein Inference")
+		pepid = inf.ProteinInference(pepid)
 
-		} else if f.Filter.Cap == true {
-
-			// sequential analysis
-			// filtered psm list and filtered prot list
-			pep.Restore("psm")
-			pro.Restore()
-			cappedSequentialControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, psmT, pepT, ionT, f.Filter.Tag)
-			pep = nil
-			pro = nil
-
-		} else {
-
-			// two-dimensional analysis
-			// complete pep list and filtered mirror-image prot list
-			pepxml.Restore()
-			pro.Restore()
-			twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-			pepxml = id.PepXML{}
-			pro = nil
-
+		if f.Filter.Seq == true || f.Filter.TwoD == true {
+			processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
+
+	}
+
+	if f.Filter.Seq == true {
+
+		// sequential analysis
+		// filtered psm list and filtered prot list
+		pep.Restore("psm")
+		pro.Restore()
+		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+		pep = nil
+		pro = nil
+
+	} else if f.Filter.TwoD == true {
+
+		// two-dimensional analysis
+		// complete pep list and filtered mirror-image prot list
+		pepxml.Restore()
+		pro.Restore()
+		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+		pepxml = id.PepXML{}
+		pro = nil
+
 	}
 
 	var dtb dat.Base
@@ -143,9 +146,6 @@ func Run(f met.Data) met.Data {
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
-
-	// logrus.Info("Calculating Protein Inference")
-	// inf.ProteinInference(e.PSM)
 
 	logrus.Info("Assingning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
@@ -576,6 +576,45 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 	// save results on meta folder
 	pid.Serialize()
+
+	return
+}
+
+// processProteinInferenceIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
+// the inputed Philospher inference data is processed before filtered.
+func processProteinInferenceIdentifications(psm id.PepIDList, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
+
+	var t int
+	var d int
+	var proteinIndex = make(map[string]uint)
+	//var pid id.ProtIDList
+
+	for _, i := range psm {
+		proteinIndex[i.Protein]++
+		for j := range i.AlternativeProteinsIndexed {
+			proteinIndex[j]++
+		}
+	}
+
+	for i := range proteinIndex {
+		if strings.HasPrefix(i, decoyTag) {
+			d++
+		} else {
+			t++
+		}
+	}
+
+	// tagget / decoy / threshold
+	logrus.WithFields(logrus.Fields{
+		"target": t,
+		"decoy":  d,
+	}).Info("Protein inference results")
+
+	// // run the FDR filter for proteins
+	// pid = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
+
+	// // save results on meta folder
+	// pid.Serialize()
 
 	return
 }

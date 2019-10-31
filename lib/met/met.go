@@ -316,7 +316,7 @@ type Filter struct {
 	Razor    bool    `yaml:"razor"`
 	Picked   bool    `yaml:"picked"`
 	Seq      bool    `yaml:"sequential"`
-	Cap      bool    `yaml:"cappedsequential"`
+	TwoD     bool    `yaml:"two-dimensional"`
 	Mapmods  bool    `yaml:"mapMods"`
 	Fo       bool
 }

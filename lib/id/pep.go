@@ -46,6 +46,7 @@ type PeptideIdentification struct {
 	Protein                          string
 	ModifiedPeptide                  string
 	AlternativeProteins              []string
+	AlternativeProteinsIndexed       map[string]int
 	AssumedCharge                    uint8
 	PrevAA                           string
 	NextAA                           string
@@ -235,6 +236,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 
 	var psm PeptideIdentification
 	psm.Modifications.Index = make(map[string]mod.Modification)
+	psm.AlternativeProteinsIndexed = make(map[string]int)
 
 	psm.Index = sq.Index
 	psm.Spectrum = string(sq.Spectrum)
@@ -298,6 +300,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 
 		for _, j := range i.AlternativeProteins {
 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
+			psm.AlternativeProteinsIndexed[string(j.Protein)]++
+			psm.AlternativeProteinsIndexed[string(i.Protein)]++
 		}
 
 		for _, j := range i.Score {

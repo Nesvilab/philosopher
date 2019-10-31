@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/nesvilab/philosopher/lib/rep"
+	"github.com/nesvilab/philosopher/lib/id"
 )
 
 // Peptide ...
@@ -22,7 +22,7 @@ type Peptide struct {
 }
 
 // ProteinInference ...
-func ProteinInference(psm rep.PSMEvidenceList) {
+func ProteinInference(psm id.PepIDList) id.PepIDList {
 
 	var peptideList []Peptide
 	var exclusionList = make(map[string]int)
@@ -75,7 +75,7 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 
 		// total number of peptides per protein
 		proteinTNP[i.Protein]++
-		for j := range i.MappedProteins {
+		for j := range i.AlternativeProteinsIndexed {
 			proteinTNP[j]++
 		}
 	}
@@ -94,13 +94,13 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			obj.MappedProteins[i.Protein] = proteinTNP[i.Protein]
 			obj.MappedProteinsWithDecoys[i.Protein] = proteinTNP[i.Protein]
 
-			for j := range i.MappedProteins {
+			for j := range i.AlternativeProteinsIndexed {
 				obj.MappedProteins[j] = -1
 				obj.MappedProteinsWithDecoys[j] = -1
 			}
 
 			// assign razor for absolute mappings
-			if len(i.MappedProteins) == 1 {
+			if len(i.AlternativeProteinsIndexed) == 1 {
 				obj.Protein = i.Protein
 			}
 
@@ -156,20 +156,8 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 			}
 		}
 
-		// for k, v := range peptideList[i].MappedProteins {
-		// 	if v > tnp {
-		// 		tnp = v
-		// 		protein = k
-		// 	}
-		// }
-
-		//pm := probMap[peptideList[i].Sequence]
-
 		if len(protein) > 0 {
 			peptideList[i].Protein = protein
-			//peptideList[i].Probability = pm[protein]
-		} else {
-			//peptideList[i].Probability = pm[peptideList[i].Protein]
 		}
 
 	}
@@ -190,5 +178,5 @@ func ProteinInference(psm rep.PSMEvidenceList) {
 	// 	}
 	// }
 
-	return
+	return psm
 }
