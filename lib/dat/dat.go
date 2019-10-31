@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -170,16 +169,11 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	if e != nil {
 		msg.Custom(errors.New("UniProt query failed, please check your connection"), "fatal")
 	}
-	defer response.Body.Close()
 
-	bodyBytes, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(bodyBytes) == 0 {
+	if (response.Status) != "200 OK" {
 		msg.Custom(errors.New("Database could not be downloaded, check your proteome ID"), "fatal")
 	}
+	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
