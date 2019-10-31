@@ -170,7 +170,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 		msg.Custom(errors.New("UniProt query failed, please check your connection"), "fatal")
 	}
 
-	if (response.Status) != "200 OK" {
+	if response.ContentLength != -1 {
 		msg.Custom(errors.New("Database could not be downloaded, check your proteome ID"), "fatal")
 	}
 	defer response.Body.Close()
