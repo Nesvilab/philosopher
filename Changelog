@@ -10,6 +10,7 @@
 - Mapped Genes to PSM table.
 - Calibrated observed mass and m/z to PSM report.
 - Philosopher will stop if an error is reported by the Prophets.
+- Custom Protein Inference when no ProteinProphet data is provided.
 
 ### Changed
 - Updated to Go v1.13.1.
@@ -31,6 +32,7 @@
 - Missing charge states from combined peptide report.
 - Wrong assignment between PSMs and Ions in both reports.
 - Missing observed masses from PSM report.
+- Empty databases if ID was wrong.
 - Minor bugs and issues.
 
 
