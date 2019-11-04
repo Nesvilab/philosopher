@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/nesvilab/philosopher/lib/msg"
 
@@ -262,6 +264,98 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			//meta.Restore(sys.Meta())
 		}
 	}
+
+	return meta
+}
+
+// ParallelProphets execute the TPP Prophets
+func ParallelProphets(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	var wg sync.WaitGroup
+	wg.Add(len(data))
+
+	if p.Commands.PeptideProphet == "yes" || p.Commands.ProteinProphet == "yes" || p.Commands.PTMProphet == "yes" {
+
+		if p.Commands.PeptideProphet == "yes" {
+			for _, ds := range data {
+
+				db := p.Database.Annot
+
+				go func(ds, db string) {
+					defer wg.Done()
+
+					logrus.Info("Running the validation and inference on ", ds)
+
+					// getting inside de the dataset folder
+					dsAbs, _ := filepath.Abs(ds)
+					absMeta := fmt.Sprintf("%s%s%s", dsAbs, string(filepath.Separator), sys.Meta())
+
+					// reload the meta data
+					meta.Restore(absMeta)
+
+					// PeptideProphet
+					logrus.Info("Executing PeptideProphet on ", ds)
+					meta.PeptideProphet = p.PeptideProphet
+					meta.PeptideProphet.Database = p.Database.Annot
+					meta.PeptideProphet.Decoy = p.Database.Tag
+					meta.PeptideProphet.Output = "interact"
+					meta.PeptideProphet.Combine = true
+
+					gobExt := fmt.Sprintf("%s%s*.%s", dsAbs, string(filepath.Separator), p.PeptideProphet.FileExtension)
+
+					files, e := filepath.Glob(gobExt)
+					if e != nil {
+						msg.Custom(e, "fatal")
+					}
+
+					peptideprophet.Run(meta, files)
+
+					// give a chance to the execution to untangle the output
+					time.Sleep(time.Second * 1)
+
+					//meta.Serialize()
+
+				}(ds, db)
+			}
+
+			wg.Wait()
+		}
+
+		// 	// PTMProphet
+		// 	if p.Commands.PTMProphet == "yes" {
+		// 		logrus.Info("Executing PTMProphet on ", i)
+		// 		meta.PTMProphet = p.PTMProphet
+		// 		var files []string
+		// 		files = append(files, "interact.pep.xml")
+		// 		meta.PTMProphet.InputFiles = files
+		// 		ptmprophet.Run(meta, files)
+		// 		meta.Serialize()
+		// 	}
+
+		// 	// ProteinProphet
+		// 	if p.Commands.ProteinProphet == "yes" {
+		// 		logrus.Info("Executing ProteinProphet on ", i)
+		// 		meta.ProteinProphet = p.ProteinProphet
+		// 		meta.ProteinProphet.Output = "interact"
+		// 		var files []string
+		// 		if p.Commands.PTMProphet == "yes" {
+		// 			files = append(files, "interact.mod.pep.xml")
+		// 		} else {
+		// 			files = append(files, "interact.pep.xml")
+		// 		}
+		// 		proteinprophet.Run(meta, files)
+		// 		meta.Serialize()
+		// 	}
+
+		// return to the top level directory
+		//os.Chdir(dir)
+
+		// reload the meta data
+		//meta.Restore(sys.Meta())
+		// /}
+	}
+
+	os.Chdir(dir)
 
 	return meta
 }

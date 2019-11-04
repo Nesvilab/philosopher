@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	unix "github.com/nesvilab/philosopher/lib/ext/peptideprophet/unix"
 	wPeP "github.com/nesvilab/philosopher/lib/ext/peptideprophet/win"
 	"github.com/nesvilab/philosopher/lib/met"
@@ -52,6 +53,7 @@ func New(temp string) PeptideProphet {
 // Run is the main entry point for peptideprophet
 func Run(m met.Data, args []string) met.Data {
 
+	spew.Dump(m.PeptideProphet)
 	var pep = New(m.Temp)
 
 	if len(m.PeptideProphet.Database) < 1 {
@@ -255,13 +257,19 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			}
 		}
 		cmd.Env = env
-
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
+
 		e := cmd.Start()
 		if e != nil {
 			msg.ExecutingBinary(e, "fatal")
 		}
+
+		// out, e := cmd.CombinedOutput()
+		// if e != nil {
+		// 	msg.ExecutingBinary(e, "fatal")
+		// }
+
 		_ = cmd.Wait()
 
 		if cmd.ProcessState.ExitCode() != 0 {
