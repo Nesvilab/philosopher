@@ -272,6 +272,8 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 
 	if brand == "tmt" {
 		switch channels {
+		case 6:
+			header += "\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
@@ -338,12 +340,12 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 			reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
 			reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
 			reportIntensities[10] = i.UniqueLabels.Channel11.Intensity
-			// reportIntensities[11] = i.UniqueLabels.Channel12.Intensity
-			// reportIntensities[12] = i.UniqueLabels.Channel13.Intensity
-			// reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
-			// reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
-			// reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
-			// reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
+			reportIntensities[11] = i.UniqueLabels.Channel12.Intensity
+			reportIntensities[12] = i.UniqueLabels.Channel13.Intensity
+			reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
+			reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
+			reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
+
 		} else {
 			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
 			reportIntensities[1] = i.URazorLabels.Channel2.Intensity
@@ -356,12 +358,12 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
 			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
 			reportIntensities[10] = i.URazorLabels.Channel11.Intensity
-			// reportIntensities[11] = i.URazorLabels.Channel12.Intensity
-			// reportIntensities[12] = i.URazorLabels.Channel13.Intensity
-			// reportIntensities[13] = i.URazorLabels.Channel14.Intensity
-			// reportIntensities[14] = i.URazorLabels.Channel15.Intensity
-			// reportIntensities[15] = i.URazorLabels.Channel16.Intensity
-			// reportIntensities[16] = i.URazorLabels.Channel17.Intensity
+			reportIntensities[11] = i.URazorLabels.Channel12.Intensity
+			reportIntensities[12] = i.URazorLabels.Channel13.Intensity
+			reportIntensities[13] = i.URazorLabels.Channel14.Intensity
+			reportIntensities[14] = i.URazorLabels.Channel15.Intensity
+			reportIntensities[15] = i.URazorLabels.Channel16.Intensity
+
 		}
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
@@ -397,6 +399,16 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 
 		if brand == "tmt" {
 			switch channels {
+			case 6:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+				)
 			case 10:
 				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
@@ -427,7 +439,7 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 					reportIntensities[10],
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
 					reportIntensities[0],
 					reportIntensities[1],
@@ -440,11 +452,11 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 					reportIntensities[8],
 					reportIntensities[9],
 					reportIntensities[10],
-					//reportIntensities[11],
-					//reportIntensities[12],
-					//reportIntensities[13],
-					//reportIntensities[14],
-					//reportIntensities[15],
+					reportIntensities[11],
+					reportIntensities[12],
+					reportIntensities[13],
+					reportIntensities[14],
+					reportIntensities[15],
 				)
 			default:
 				header += ""
