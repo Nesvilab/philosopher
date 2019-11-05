@@ -69,10 +69,6 @@ Next, perform protein inference and generate a protXML file:
 ### 6. Filter and estimate FDR
 Now we have all necessary files to filter our data using the FDR approach:
 
-`philosopher filter --razor --mapmods --pepxml interact-06_CPTAC_TMTS1-NCI7_P_JHUZ_20170509_LUMOS.pep.xml`
-
-Running the above command with only a pepXML will give you the current levels for the pepXML file only. If you include a protXML file, Philosopher will use protein inference information to make the FDR score more precise:
-
 `philosopher filter --pepxml interact-06_CPTAC_TMTS1-NCI7_P_JHUZ_20170509_LUMOS.pep.xml --protxml interact.prot.xml`
 
 The **filter** algorithm can be applied in many different ways, use the `--help` flag and choose the best method to analyze your data. Scoring results will be shown in the console, and all processed data will be stored in your workspace for further analysis.
