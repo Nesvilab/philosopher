@@ -52,7 +52,7 @@ func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
-	logrus.Info("Restoring data")
+	// logrus.Info("Restoring data")
 
 	var evi rep.Evidence
 	evi.RestoreGranular()
