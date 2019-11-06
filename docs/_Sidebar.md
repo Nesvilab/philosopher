@@ -23,5 +23,5 @@
     * [Pipeline](Pipeline)
   * Tutorials
     * [Philosopher Basics](Philosopher-Basics)
-    * [Simple Data Analysis](Example-1)
-    * [Processing, Filtering and Analyzing Open Search results using Philosopher](Example-2)
+    * [Simple Data Analysis](Example-1a)
+    * [Open Search Analysis](Example-2a)
