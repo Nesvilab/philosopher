@@ -244,7 +244,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, channels int, hasDecoys, uniqueOnly bool) {
+func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, channels int, hasDecoys, hasRazor, uniqueOnly bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
@@ -328,7 +328,7 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 
 		// change between Unique+Razor and Unique only based on paramter defined on labelquant
 		var reportIntensities [16]float64
-		if uniqueOnly == true {
+		if uniqueOnly == true || hasRazor == false {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
 			reportIntensities[2] = i.UniqueLabels.Channel3.Intensity

@@ -90,7 +90,7 @@ var inspectCmd = &cobra.Command{
 
 			var o rep.ProteinEvidenceList
 
-			target := fmt.Sprintf(".meta%spro.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%sev.pro.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)

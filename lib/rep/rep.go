@@ -422,7 +422,7 @@ func Run(m met.Data) {
 
 	// Protein
 	if len(m.Filter.Pox) > 0 {
-		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Quantify.Unique)
+		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
 	}
 
 	// Modifications
