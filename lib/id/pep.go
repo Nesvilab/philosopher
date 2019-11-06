@@ -269,25 +269,34 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
 		psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
+		psm.NMC = int(i.MissedCleavages)
 
 		for _, j := range i.AnalysisResult {
+
 			if string(j.Analysis) == "peptideprophet" {
+
 				psm.Probability = j.PeptideProphetResult.Probability
+
 				for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
+
 					if k.Name == "massd" {
 						psm.IsoMassD, _ = strconv.Atoi(k.Value)
 					}
+
 					if k.Name == "ntt" {
 						psm.NTT, _ = strconv.Atoi(k.Value)
 					}
-					if k.Name == "nmc" {
-						psm.NMC, _ = strconv.Atoi(k.Value)
-					}
+
+					// if k.Name == "nmc" {
+					// 	psm.NMC, _ = strconv.Atoi(k.Value)
+					// }
 				}
 			}
+
 			if string(j.Analysis) == "interprophet" {
 				psm.Probability = j.InterProphetResult.Probability
 			}
+
 			if string(j.Analysis) == "ptmprophet" {
 				psm.LocalizedPTMSites = make(map[string]int)
 				psm.LocalizedPTMMassDiff = make(map[string]string)
@@ -301,7 +310,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		for _, j := range i.AlternativeProteins {
 			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
 			psm.AlternativeProteinsIndexed[string(j.Protein)]++
-			psm.AlternativeProteinsIndexed[string(i.Protein)]++
 		}
 
 		for _, j := range i.Score {
@@ -436,6 +444,7 @@ func (p *PepXML) PromoteProteinIDs() {
 
 		var current string
 		var alt string
+		//var altNTT int
 		var list = make(map[string]int)
 		var isUniProt bool
 
@@ -463,6 +472,7 @@ func (p *PepXML) PromoteProteinIDs() {
 				for k := range list {
 					if strings.HasPrefix(k, "sp|") {
 						alt = k
+
 						break
 					} else {
 						alt = k

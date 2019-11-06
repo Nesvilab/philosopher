@@ -76,7 +76,7 @@ func Run(f met.Data) met.Data {
 		pep = nil
 		pro = nil
 
-	} else if f.Filter.TwoD == true {
+	} else if (f.Filter.Seq == false && f.Filter.TwoD == false) || f.Filter.TwoD == true {
 
 		// two-dimensional analysis
 		// complete pep list and filtered mirror-image prot list
@@ -942,8 +942,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					}
 				}
 
-				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "LLESLIR" {
-				// 	fmt.Println(p.Groups[i].Proteins[j].ProteinName)
+				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "LLLLNLR" {
+				// 	fmt.Println(k, j, p.Groups[i].Proteins[k].HasRazor, p.Groups[i].Proteins[k].ProteinName, p.Groups[i].Proteins[j].ProteinName)
 				// }
 
 			}

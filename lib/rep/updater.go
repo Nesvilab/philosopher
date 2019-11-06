@@ -141,7 +141,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
-
 	var uniqueSeqMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
