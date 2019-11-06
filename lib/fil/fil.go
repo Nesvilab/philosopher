@@ -840,13 +840,27 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 
 				} else {
 
-					for pt, tnp := range r[k].MappedProteinsTNP {
-						if tnp >= topTNP {
-							topTNP = tnp
+					var tnpList []string
+					for pt := range r[k].MappedProteinsTNP {
+						tnpList = append(tnpList, pt)
+					}
+
+					sort.Strings(tnpList)
+
+					for _, pt := range tnpList {
+						if r[k].MappedProteinsTNP[pt] > topTNP {
+							topTNP = r[k].MappedProteinsTNP[pt]
 							topPT = pt
 							topTNPMap[topTNP]++
 						}
 					}
+					// for pt, tnp := range r[k].MappedProteinsTNP {
+					// 	if tnp >= topTNP {
+					// 		topTNP = tnp
+					// 		topPT = pt
+					// 		topTNPMap[topTNP]++
+					// 	}
+					// }
 
 					var tie bool
 					if topTNPMap[topTNP] >= 2 {

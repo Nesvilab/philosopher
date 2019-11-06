@@ -2,9 +2,13 @@ package inf
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
+	"strings"
 
+	"github.com/nesvilab/philosopher/lib/dat"
 	"github.com/nesvilab/philosopher/lib/id"
+	"github.com/nesvilab/philosopher/lib/uti"
 )
 
 // Peptide ...
@@ -27,9 +31,13 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 	var peptideList []Peptide
 	var exclusionList = make(map[string]int)
 	var peptideIndex = make(map[string]Peptide)
-	var peptideCount = make(map[string]int)
 	var proteinTNP = make(map[string]int)
 	var probMap = make(map[string]map[string]float64)
+	var proteinPepSeqMap = make(map[string][]string)
+
+	// collect database information
+	var db dat.Base
+	db.Restore()
 
 	// build the peptide index
 	for _, i := range psm {
@@ -50,8 +58,6 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 			p.CalcNeutralPepMass = i.CalcNeutralPepMass
 			p.Probability = i.Probability
 			p.Weight = -1.0
-
-			peptideCount[i.Peptide]++
 
 			peptideList = append(peptideList, p)
 			peptideIndex[ionForm] = p
@@ -75,9 +81,14 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 
 		// total number of peptides per protein
 		proteinTNP[i.Protein]++
+
 		for j := range i.AlternativeProteinsIndexed {
-			proteinTNP[j]++
+			if j != i.Protein {
+				proteinTNP[j]++
+			}
 		}
+
+		proteinPepSeqMap[i.Protein] = append(proteinPepSeqMap[i.Protein], i.Peptide)
 	}
 
 	for _, i := range psm {
@@ -136,12 +147,16 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 
 	}
 
+	proteinCoverageMap := calculateProteinCoverage(proteinPepSeqMap, db)
+
 	// assign razor
+	var razorMap = make(map[string]string)
 	for i := range peptideList {
 
 		var protein string
 		var candidateProteins []string
 		var tnp int
+		var coverage float64
 
 		for k := range peptideList[i].MappedProteins {
 			candidateProteins = append(candidateProteins, k)
@@ -150,8 +165,17 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 		sort.Strings(candidateProteins)
 
 		for _, j := range candidateProteins {
+
 			if peptideList[i].MappedProteins[j] > tnp {
 				tnp = peptideList[i].MappedProteins[j]
+				protein = j
+			}
+		}
+
+		for _, j := range candidateProteins {
+
+			if peptideList[i].MappedProteins[j] == tnp && proteinCoverageMap[j] > coverage {
+				coverage = proteinCoverageMap[j]
 				protein = j
 			}
 		}
@@ -160,23 +184,76 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 			peptideList[i].Protein = protein
 		}
 
+		razorMap[peptideList[i].Sequence] = peptideList[i].Protein
 	}
 
 	//spew.Dump(peptideList)
 
-	// var checkMap = make(map[string]string)
-	// for _, i := range peptideList {
-	// 	checkMap[i.Sequence] = i.Protein
-	// }
-	// for k, v := range checkMap {
-	// 	fmt.Println(k, "\t", v)
-	// }
+	// update PSMs
+	for i := range psm {
+		pt, ok := razorMap[psm[i].Peptide]
+		if ok {
 
-	// for k, v := range probMap {
-	// 	for i := range v {
-	// 		fmt.Println(k, "\t", i)
-	// 	}
-	// }
+			if pt != psm[i].Protein {
+
+				psm[i].AlternativeProteins = append(psm[i].AlternativeProteins, psm[i].Protein)
+
+				var toRemove int
+				for j := range psm[i].AlternativeProteins {
+					if psm[i].AlternativeProteins[j] == pt {
+						toRemove = j
+						break
+					}
+				}
+
+				psm[i].AlternativeProteins[toRemove] = psm[i].AlternativeProteins[len(psm[i].AlternativeProteins)-1] // Copy last element to index i.
+				psm[i].AlternativeProteins[len(psm[i].AlternativeProteins)-1] = ""                                   // Erase last element (write zero value).
+				psm[i].AlternativeProteins = psm[i].AlternativeProteins[:len(psm[i].AlternativeProteins)-1]          // Truncate slice.
+
+				psm[i].AlternativeProteinsIndexed[psm[i].Protein]++
+				delete(psm[i].AlternativeProteinsIndexed, pt)
+
+				psm[i].Protein = pt
+			}
+
+		}
+	}
 
 	return psm
+}
+
+// calculateProteinCoverage returns a percentage of coverage based on a set of peptides
+func calculateProteinCoverage(proteinPepSeqMap map[string][]string, db dat.Base) map[string]float64 {
+
+	var coverage = make(map[string]float64)
+	var protSeq = make(map[string]string)
+
+	for _, i := range db.Records {
+		protSeq[i.PartHeader] = i.Sequence
+	}
+
+	for k, v := range proteinPepSeqMap {
+
+		var peptides = make(map[string]uint8)
+		for _, i := range v {
+			peptides[i]++
+		}
+
+		CoveredSequence := protSeq[k]
+		for pep := range peptides {
+
+			re := regexp.MustCompile(pep)
+			loc := re.FindStringIndex(protSeq[k])
+
+			if len(loc) > 0 {
+				CoveredSequence = strings.ReplaceAll(protSeq[k], protSeq[k][loc[0]:loc[1]], strings.Repeat("X", len(pep)))
+			}
+		}
+
+		cov := regexp.MustCompile("X")
+		matches := cov.FindAllStringIndex(CoveredSequence, -1)
+		coverage[k] = uti.Round(float64(len(matches))/float64(len(CoveredSequence))*100, 5, 2)
+	}
+
+	return coverage
 }
