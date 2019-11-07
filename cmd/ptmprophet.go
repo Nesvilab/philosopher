@@ -48,7 +48,7 @@ func init() {
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.MaxFragZ, "maxfragz", "", 0, "limit maximum fragment charge (default: 0=precursor charge, negative values subtract from precursor charge)")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.Mino, "mino", "", 0, "use specified number of pseudo-counts when computing Oscore")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.MassOffset, "massoffset", "", 0, "adjust the massdiff by offset <number>")
-		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Static, "static", "", false, "use static fragppmtol for all PSMs instead of dynamically estimates offsets and tolerances")
+		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Static, "static", "", false, "use static fragppmtol for all PSMs instead of dynamically estimated offsets and tolerances")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.KeepOld, "keepold", "", false, "retain old PTMProphet results in the pepXML file")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Verbose, "verbose", "", false, "produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.Lability, "lability", "", false, "compute Lability of PTMs")
@@ -58,7 +58,7 @@ func init() {
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.NoMinoFactor, "nominofactor", "", false, "disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.PPMTol, "ppmtol", "", 1, "use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.MinProb, "minprob", "", 0.9, "use specified minimum probability to evaluate peptides")
-		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.MassDiffMode, "massdiffmode", "", false, "use the Mass Difference and localize")
+		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.MassDiffMode, "massdiffmode", "", false, "use the mass difference and localize")
 	}
 
 	RootCmd.AddCommand(ptmprophetCmd)

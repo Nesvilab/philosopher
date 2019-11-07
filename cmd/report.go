@@ -41,7 +41,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		reportCmd.Flags().BoolVarP(&m.Report.Decoys, "decoys", "", false, "add decoy observations to reports")
-		reportCmd.Flags().BoolVarP(&m.Report.MSstats, "msstats", "", false, "create an output compatible to MSstats")
+		reportCmd.Flags().BoolVarP(&m.Report.MSstats, "msstats", "", false, "create an output compatible with MSstats")
 		reportCmd.Flags().BoolVarP(&m.Report.MZID, "mzid", "", false, "create a mzID output")
 	}
 

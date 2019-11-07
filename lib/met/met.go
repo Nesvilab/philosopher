@@ -93,7 +93,7 @@ type Comet struct {
 // MSFragger options and parameters
 type MSFragger struct {
 	JarPath                            string  `yaml:"path"`
-	Memmory                            int     `yaml:"memmory"`
+	Memory                            int     `yaml:"memory"`
 	Threads                            int     `yaml:"num_threads"`
 	RawExtension                       string  `yaml:"raw"`
 	DatabaseName                       string  `yaml:"database_name"`
@@ -374,7 +374,7 @@ type Report struct {
 // TMTIntegrator options and parameters
 type TMTIntegrator struct {
 	JarPath   string `yaml:"path"`
-	Memmory   int    `yaml:"memmory"`
+	Memory   int    `yaml:"memory"`
 	Param     string `yaml:"param"`
 	Files     []string
 	ParamFile []byte

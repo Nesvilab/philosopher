@@ -42,7 +42,7 @@ func init() {
 
 		tmtintegratorCmd.Flags().StringVarP(&m.TMTIntegrator.JarPath, "path", "", "", "")
 		tmtintegratorCmd.Flags().StringVarP(&m.TMTIntegrator.Param, "param", "", "", "")
-		tmtintegratorCmd.Flags().IntVarP(&m.TMTIntegrator.Memmory, "memmory", "", 8, "")
+		tmtintegratorCmd.Flags().IntVarP(&m.TMTIntegrator.Memory, "memory", "", 8, "")
 	}
 
 	RootCmd.AddCommand(tmtintegratorCmd)
