@@ -77,7 +77,7 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 
 func appendParams(params met.MSFragger) *exec.Cmd {
 
-	mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
+	mem := fmt.Sprintf("-Xmx%dG", params.Memory)
 	dbPath, _ := filepath.Abs(params.DatabaseName)
 	jarPath, _ := filepath.Abs(params.JarPath)
 

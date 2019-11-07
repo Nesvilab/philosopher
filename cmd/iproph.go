@@ -53,7 +53,7 @@ func init() {
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonrs, "nonrs", "", false, "do not use NRS model")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsm, "nonsm", "", false, "do not use NSM model")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsp, "nonsp", "", false, "do not use NSP model")
-		iprophCmd.Flags().BoolVarP(&m.InterProphet.Sharpnse, "sharpnse", "", false, "Use more discriminating model for NSE in SWATH mode")
+		iprophCmd.Flags().BoolVarP(&m.InterProphet.Sharpnse, "sharpnse", "", false, "use more discriminating model for NSE in SWATH mode")
 		iprophCmd.Flags().BoolVarP(&m.InterProphet.Nonsi, "nonsi", "", false, "do not use NSI model")
 	}
 

@@ -40,7 +40,7 @@ func init() {
 		databaseCmd.Flags().StringVarP(&m.Database.Enz, "enzyme", "", "trypsin", "enzyme for digestion (trypsin, lys_c, lys_n, glu_c, chymotrypsin)")
 		databaseCmd.Flags().StringVarP(&m.Database.Tag, "prefix", "", "rev_", "define a decoy prefix")
 		databaseCmd.Flags().StringVarP(&m.Database.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
-		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre formatted custom database")
+		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre-formatted custom database")
 		databaseCmd.Flags().BoolVarP(&m.Database.Crap, "contam", "", false, "add common contaminants")
 		databaseCmd.Flags().BoolVarP(&m.Database.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
 		databaseCmd.Flags().BoolVarP(&m.Database.Iso, "isoform", "", false, "add isoform sequences")

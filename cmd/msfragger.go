@@ -42,7 +42,7 @@ func init() {
 
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.JarPath, "path", "", "", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.Param, "param", "", "", "")
-		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Memmory, "memmory", "", 8, "")
+		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Memory, "memory", "", 8, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Threads, "num_threads", "", 0, "CPU to set num threads; else specify num threads directly (max 64)")
 		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.RawExtension, "raw", "", "", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.DatabaseName, "database_name", "", "", "")
