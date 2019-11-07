@@ -21,7 +21,7 @@
 - When processing empty pepXML, Philosopher will emit a warning, not a fatal error.
 - Removed observed masses from combined peptide report.
 - The nomenclature 'Experimental' and "Calculated' were replaced by 'Observed' and 'Calculated' on the PSM table. 
-- The Cluster command is nor called Bioquant.
+- The Cluster command is now called Bioquant.
 
 ### Fixed
 - The filter command was throwing an error when no protein data was present.
