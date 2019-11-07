@@ -285,9 +285,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 						psm.IsoMassD, _ = strconv.Atoi(k.Value)
 					}
 
-					if k.Name == "ntt" {
-						psm.NumberOfEnzymaticTermini, _ = strconv.Atoi(k.Value)
-					}
+					// if k.Name == "ntt" {
+					// 	psm.NumberOfEnzymaticTermini, _ = strconv.Atoi(k.Value)
+					// }
 
 					// if k.Name == "nmc" {
 					// 	psm.NMC, _ = strconv.Atoi(k.Value)
