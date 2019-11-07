@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 
 	"github.com/nesvilab/philosopher/lib/msg"
-
 	"github.com/nesvilab/philosopher/lib/sys"
 )
 
