@@ -12,6 +12,15 @@ Organize PSM, peptide and protein reports for easy interpretation
 Add decoy observations to reports.
 
 
+`--msstats`
+
+Create an output compatible to MSstats
+
+`--mzid`
+
+Create a mzID output
+
+
 ## Example
 
 `philosopher report`
