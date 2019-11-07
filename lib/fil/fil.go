@@ -42,6 +42,7 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Processing peptide identification files")
 
+	// if no method is selected, force the 2D to be default
 	if len(f.Filter.Pox) > 0 && f.Filter.TwoD == false && f.Filter.Seq == false {
 		f.Filter.TwoD = true
 	}
