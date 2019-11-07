@@ -42,7 +42,7 @@ comet:
 
 msfragger:                                     # v
   path:                                        # path to MSFragger jar
-  memmory: 8                                   # how much memory in GB to use
+  memory: 8                                   # how much memory in GB to use
   param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
   num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
@@ -250,7 +250,7 @@ abacus:
 
 tmtintegrator:                                 # v1.8
   path:                                        # path to TMT-Integrator jar
-  memmory: 8                                   # memory allocation, in Gb
+  memory: 8                                   # memory allocation, in Gb
   output:                                      # the location of output files
   channel_num: 10                              # number of channels in the multiplex (e.g. 10, 11)
   ref_tag:                                     # unique tag for identifying the reference channel (Bridge sample added to each multiplex)

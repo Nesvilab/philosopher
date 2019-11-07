@@ -280,7 +280,7 @@ comet:
   raw: mzML                  # format of the spectra file
 msfragger:
   path: /workspace/6_CPTAC3_Clear_Cell_Renal_Cell_Carcinoma/bin/MSFragger-20180316.jar                   # path to MSFragger java file
-  memmory: 8                 # how much memory in GB to use
+  memory: 8                 # how much memory in GB to use
   param: /workspace/6_CPTAC3_Clear_Cell_Renal_Cell_Carcinoma/params/fragger.params                  # MSFragger parameter file
   raw: mzML                  # format of the spectra file
 peptideprophet:

@@ -77,7 +77,7 @@ func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) {
 
 func appendParams(params met.TMTIntegrator) *exec.Cmd {
 
-	mem := fmt.Sprintf("-Xmx%dG", params.Memmory)
+	mem := fmt.Sprintf("-Xmx%dG", params.Memory)
 	jarPath, _ := filepath.Abs(params.JarPath)
 
 	args := exec.Command("java",
