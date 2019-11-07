@@ -56,8 +56,8 @@ type PeptideIdentification struct {
 	NumberTotalProteins              uint16
 	TotalNumberIons                  uint16
 	NumberMatchedIons                uint16
-	NTT                              int
-	NMC                              int
+	NumberOfEnzymaticTermini         int
+	NumberofMissedCleavages          int
 	UncalibratedPrecursorNeutralMass float64
 	PrecursorNeutralMass             float64
 	PrecursorExpMass                 float64
@@ -269,7 +269,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
 		psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
-		psm.NMC = int(i.MissedCleavages)
+
+		psm.NumberofMissedCleavages = int(i.MissedCleavages)
+		psm.NumberOfEnzymaticTermini = int(i.TotalTerm)
 
 		for _, j := range i.AnalysisResult {
 
@@ -284,7 +286,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 					}
 
 					if k.Name == "ntt" {
-						psm.NTT, _ = strconv.Atoi(k.Value)
+						psm.NumberOfEnzymaticTermini, _ = strconv.Atoi(k.Value)
 					}
 
 					// if k.Name == "nmc" {

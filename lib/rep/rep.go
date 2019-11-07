@@ -117,8 +117,8 @@ type PSMEvidence struct {
 	Index                            uint32
 	Spectrum                         string
 	Scan                             int
-	NTT                              int
-	NMC                              int
+	NumberOfEnzymaticTermini         int
+	NumberOfMissedCleavages          int
 	PrevAA                           string
 	NextAA                           string
 	Peptide                          string

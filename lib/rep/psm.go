@@ -45,8 +45,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Scan = i.Scan
 		p.PrevAA = i.PrevAA
 		p.NextAA = i.NextAA
-		p.NTT = i.NTT
-		p.NMC = i.NMC
+		p.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
+		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
 		p.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
@@ -239,8 +239,8 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 			i.Hyperscore,
 			i.Nextscore,
 			i.Probability,
-			i.NTT,
-			i.NMC,
+			i.NumberOfEnzymaticTermini,
+			i.NumberOfMissedCleavages,
 			i.Intensity,
 			i.IonMobility,
 			strings.Join(assL, ", "),
