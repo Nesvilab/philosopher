@@ -77,13 +77,14 @@ func init() {
 		filterCmd.Flags().Float64VarP(&m.Filter.Weight, "weight", "", 1, "threshold for defining peptide uniqueness")
 		filterCmd.Flags().BoolVarP(&m.Filter.Seq, "sequential", "", false, "alternative algorithm that estimates FDR using both filtered PSM and Protein lists")
 		filterCmd.Flags().BoolVarP(&m.Filter.TwoD, "2d", "", false, "two-diomensional FDR filtering")
-		//filterCmd.Flags().BoolVarP(&m.Filter.Cap, "cappedsequential", "", false, "alternative algorithm that estimates FDR using both filtered PSM and Protein lists using a threshold cap from first pass")
 		filterCmd.Flags().BoolVarP(&m.Filter.Model, "models", "", false, "print model distribution")
 		filterCmd.Flags().BoolVarP(&m.Filter.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Mapmods, "mapmods", "", false, "map modifications aquired by an open search")
+		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "")
 		filterCmd.Flags().BoolVarP(&m.Filter.Fo, "fo", "", false, "")
 		filterCmd.Flags().MarkHidden("fo")
+		filterCmd.Flags().MarkHidden("inference")
 	}
 
 	RootCmd.AddCommand(filterCmd)

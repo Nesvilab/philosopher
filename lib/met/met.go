@@ -302,23 +302,24 @@ type PTMProphet struct {
 
 // Filter options and parameters
 type Filter struct {
-	Pex      string  `yaml:"pepxml"`
-	Pox      string  `yaml:"protxml"`
-	Tag      string  `yaml:"tag"`
-	PsmFDR   float64 `yaml:"psmFDR"`
-	PepFDR   float64 `yaml:"peptideFDR"`
-	IonFDR   float64 `yaml:"ionFDR"`
-	PtFDR    float64 `yaml:"proteinFDR"`
-	ProtProb float64 `yaml:"proteinProbability"`
-	PepProb  float64 `yaml:"peptideProbability"`
-	Weight   float64 `yaml:"peptideWeight"`
-	Model    bool    `yaml:"models"`
-	Razor    bool    `yaml:"razor"`
-	Picked   bool    `yaml:"picked"`
-	Seq      bool    `yaml:"sequential"`
-	TwoD     bool    `yaml:"two-dimensional"`
-	Mapmods  bool    `yaml:"mapMods"`
-	Fo       bool
+	Pex       string  `yaml:"pepxml"`
+	Pox       string  `yaml:"protxml"`
+	Tag       string  `yaml:"tag"`
+	PsmFDR    float64 `yaml:"psmFDR"`
+	PepFDR    float64 `yaml:"peptideFDR"`
+	IonFDR    float64 `yaml:"ionFDR"`
+	PtFDR     float64 `yaml:"proteinFDR"`
+	ProtProb  float64 `yaml:"proteinProbability"`
+	PepProb   float64 `yaml:"peptideProbability"`
+	Weight    float64 `yaml:"peptideWeight"`
+	Model     bool    `yaml:"models"`
+	Razor     bool    `yaml:"razor"`
+	Picked    bool    `yaml:"picked"`
+	Seq       bool    `yaml:"sequential"`
+	TwoD      bool    `yaml:"two-dimensional"`
+	Mapmods   bool    `yaml:"mapMods"`
+	Fo        bool
+	Inference bool
 }
 
 // Quantify options and parameters

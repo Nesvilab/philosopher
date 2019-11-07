@@ -42,6 +42,10 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Processing peptide identification files")
 
+	if len(f.Filter.Pox) > 0 && f.Filter.TwoD == false && f.Filter.Seq == false {
+		f.Filter.TwoD = true
+	}
+
 	pepid, searchEngine := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model, f.MSFragger.CalibrateMass)
 
 	f.SearchEngine = searchEngine
@@ -57,13 +61,17 @@ func Run(f met.Data) met.Data {
 		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 
 	} else {
-		pepid = inf.ProteinInference(pepid)
 
-		pepid.Serialize("psm")
-		pepid.Serialize("pep")
-		pepid.Serialize("ion")
+		if f.Filter.Inference == true {
+			pepid = inf.ProteinInference(pepid)
 
-		processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
+			pepid.Serialize("psm")
+			pepid.Serialize("pep")
+			pepid.Serialize("ion")
+
+			processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
+		}
+
 	}
 
 	if f.Filter.Seq == true {
@@ -76,7 +84,7 @@ func Run(f met.Data) met.Data {
 		pep = nil
 		pro = nil
 
-	} else if (f.Filter.Seq == false && f.Filter.TwoD == false) || f.Filter.TwoD == true {
+	} else if f.Filter.TwoD == true {
 
 		// two-dimensional analysis
 		// complete pep list and filtered mirror-image prot list
@@ -1186,65 +1194,6 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	filteredPeptides.Serialize("pep")
 
 	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
-	filteredIons.Serialize("ion")
-
-	return
-}
-
-// cappedSequentialControl estimates FDR levels by applying a second filter where all
-// proteins from the protein filtered list are matched against filtered PSMs
-// It will use the threshold of the first pass as a cap for the second pass
-func cappedSequentialControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion, psmT, pepT, ionT float64, decoyTag string) {
-
-	extPep := extractPSMfromPepXML(pep, pro)
-
-	// organize enties by score (probability or expectation)
-	sort.Sort(extPep)
-
-	uniqPsms := GetUniquePSMs(extPep)
-	uniqPeps := GetUniquePeptides(extPep)
-	uniqIons := getUniquePeptideIons(extPep)
-
-	logrus.WithFields(logrus.Fields{
-		"psms":     len(uniqPsms),
-		"peptides": len(uniqPeps),
-		"ions":     len(uniqIons),
-	}).Info("Applying capped sequential FDR estimation")
-
-	var cappedPSMMap = make(map[string]id.PepIDList)
-	for k, v := range uniqPsms {
-		for _, i := range v {
-			if i.Probability >= psmT {
-				cappedPSMMap[k] = append(cappedPSMMap[k], i)
-			}
-		}
-	}
-
-	var cappedPepMap = make(map[string]id.PepIDList)
-	for k, v := range uniqPeps {
-		for _, i := range v {
-			if i.Probability >= pepT {
-				cappedPepMap[k] = append(cappedPepMap[k], i)
-			}
-		}
-	}
-
-	var cappedIonMap = make(map[string]id.PepIDList)
-	for k, v := range uniqIons {
-		for _, i := range v {
-			if i.Probability >= ionT {
-				cappedIonMap[k] = append(cappedIonMap[k], i)
-			}
-		}
-	}
-
-	filteredPSM, _ := PepXMLFDRFilter(cappedPSMMap, psm, "PSM", decoyTag)
-	filteredPSM.Serialize("psm")
-
-	filteredPeptides, _ := PepXMLFDRFilter(cappedPepMap, peptide, "Peptide", decoyTag)
-	filteredPeptides.Serialize("pep")
-
-	filteredIons, _ := PepXMLFDRFilter(cappedIonMap, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
 	return
