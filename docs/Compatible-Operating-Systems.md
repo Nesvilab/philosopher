@@ -1,23 +1,27 @@
 ## Compatibility
 
-Philosopher is partially compatible with 16 different operating systems and architectures:
+Philosopher is partially compatible with 20 different operating systems and architectures:
 
+* linux/mipsle
 * darwin/386
-* darwin/amd64
-* linux/386
-* linux/amd64
 * linux/arm
 * freebsd/386
 * freebsd/amd64
 * openbsd/386
-* openbsd/amd64
 * windows/386
+* linux/amd64
+* openbsd/amd64
+* netbsd/arm
 * windows/amd64
 * freebsd/arm
 * netbsd/386
 * netbsd/amd64
-* netbsd/arm
-* plan9/386
+* linux/mips64le
+* linux/s390x
+* linux/mips64
+* darwin/amd64
+* linux/386
+* linux/mips
 
 
 ## Why partially ?

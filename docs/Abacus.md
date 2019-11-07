@@ -8,9 +8,13 @@ Aggregate data from multiple experiments and adjusts label-free quantification t
 
 ## flags
 
-`--comb`
+`--peptide`
 
-A pre formed combined protXML file. See below how to create one.
+Global level peptide report (needs a combined.pep.xml file).
+
+`--protein`
+
+Global level protien report (needs a combined.prot.xml file).
 
 `--labels`
 
@@ -40,6 +44,10 @@ Decoy tag (default "rev_").
 
 Report TMT quantification based on only unique peptides.
 
+`--reprint`
+
+Create abacus reports using the Reprint format
+
 
 ## Example
 
@@ -49,7 +57,7 @@ Aggregating data from 3 different experiments, in 3 different workspaces
 
 Aggregating data from 3 different experiments, in 3 different workspaces and using a pre existing protXML combined file.
 
-`philosopher abacus --comb combined.potxml control/ treatment_1/ treatment_2/`
+`philosopher abacus --protein control/ treatment_1/ treatment_2/`
 
 
 ## FAQ
@@ -57,6 +65,10 @@ Aggregating data from 3 different experiments, in 3 different workspaces and usi
 _What exactly do I need to do before running Abacus ?_
 
 You need to work on each individual experiment workspace before running Abacus. Each folder containing individual experimental data must be converted to a Workspace and must have its data analyzed by the filter command.
+
+_I don't have a combined pepXML file, how do I get one?_
+
+You need to execute iProphet using all interact.pep.xml files from each individual folder you are analyzing.
 
 _I don't have a combined protXML file, how do I get one?_
 
