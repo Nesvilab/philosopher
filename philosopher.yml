@@ -26,8 +26,8 @@ commands:
   filter: no                                   # statistical filtering, validation and False Discovery Rates assessment
   freequant: no                                # label-free Quantification
   labelquant: no                               # isobaric Labeling-Based Relative Quantification
+  bioquant: no                                 # protein report based on Uniprot protein clusters
   report: no                                   # multi-level reporting for both narrow-searches and open-searches
-  cluster: no                                  # protein report based on protein clusters
   abacus: no                                   # combined analysis of LC-MS/MS results
   tmtintegrator: no                            # integrates channel abundances from multiple TMT samples
 
@@ -236,7 +236,7 @@ report:
   withDecoys: false                            # add decoy observations to reports
   mzID: false                                  # create a mzID output
 
-cluster:
+bioquant:
   organismUniProtID:                           # UniProt proteome ID
   level: 0.9                                   # cluster identity level (default 0.9)
                   

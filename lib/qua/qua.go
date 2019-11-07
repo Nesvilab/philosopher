@@ -180,6 +180,33 @@ func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 	return p
 }
 
+// RunBioQuantification is the top function for functional-based quantification
+func RunBioQuantification(c met.Data) {
+
+	// create clean reference db for clustering
+	clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
+
+	// run cdhit, create cluster file
+	logrus.Info("Clustering")
+	clusterFile, clusterFasta := execute(c.BioQuant.Level)
+
+	// parse the cluster file
+	logrus.Info("Parsing clusters")
+	clusters := parseClusterFile(clusterFile, clusterFasta)
+
+	// maps all proteins from the db against the clusters
+	logrus.Info("Mapping proteins to clusters")
+	mappedClust := mapProtXML2Clusters(clusters)
+
+	logrus.Info("Retrieving Proteome data")
+	//mappedClust = retrieveInfoFromUniProtDB(mappedClust)
+
+	// mapping to functional annotation and save to disk
+	savetoDisk(mappedClust, c.Temp, c.BioQuant.UID)
+
+	return
+}
+
 // cleanPreviousData cleans previous label quantifications
 func cleanPreviousData(evi rep.Evidence, plex string) rep.Evidence {
 

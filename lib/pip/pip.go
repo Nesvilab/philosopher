@@ -15,7 +15,6 @@ import (
 	"github.com/nesvilab/philosopher/lib/ext/tmtintegrator"
 
 	"github.com/nesvilab/philosopher/lib/aba"
-	"github.com/nesvilab/philosopher/lib/clu"
 	"github.com/nesvilab/philosopher/lib/ext/peptideprophet"
 	"github.com/nesvilab/philosopher/lib/ext/proteinprophet"
 	"github.com/nesvilab/philosopher/lib/ext/ptmprophet"
@@ -51,7 +50,7 @@ type Directives struct {
 	Freequant      met.Quantify       `yaml:"freequant"`
 	LabelQuant     met.Quantify       `yaml:"labelquant"`
 	Report         met.Report         `yaml:"report"`
-	Cluster        met.Cluster        `yaml:"cluster"`
+	BioQuant       met.BioQuant       `yaml:"bioquant"`
 	Abacus         met.Abacus         `yaml:"abacus"`
 	TMTIntegrator  met.TMTIntegrator  `yaml:"tmtintegrator"`
 }
@@ -68,7 +67,7 @@ type Commands struct {
 	FreeQuant      string `yaml:"freequant"`
 	LabelQuant     string `yaml:"labelquant"`
 	Report         string `yaml:"report"`
-	Cluster        string `yaml:"cluster"`
+	BioQuant       string `yaml:"bioquant"`
 	Abacus         string `yaml:"abacus"`
 	TMTIntegrator  string `yaml:"tmtintegrator"`
 }
@@ -535,14 +534,15 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Serialize()
 		}
 
-		// Cluster
-		if p.Commands.Cluster == "yes" {
+		// BioQuant
+		if p.Commands.BioQuant == "yes" {
 
 			logrus.Info("Executing cluster on ", i)
 
-			meta.Cluster = p.Cluster
+			meta.BioQuant = p.BioQuant
 
-			clu.GenerateReport(meta)
+			//clu.GenerateReport(meta)
+			qua.RunBioQuantification(meta)
 			meta.Serialize()
 
 		}

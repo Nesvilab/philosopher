@@ -1,4 +1,4 @@
-package clu
+package qua
 
 import (
 	"bufio"
@@ -16,7 +16,6 @@ import (
 
 	"github.com/nesvilab/philosopher/lib/dat"
 	"github.com/nesvilab/philosopher/lib/ext/cdhit"
-	"github.com/nesvilab/philosopher/lib/met"
 	"github.com/nesvilab/philosopher/lib/rep"
 	"github.com/nesvilab/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
@@ -43,33 +42,6 @@ type Cluster struct {
 
 // List list
 type List []Cluster
-
-// GenerateReport creates the protein report output
-func GenerateReport(c met.Data) {
-
-	// create clean reference db for clustering
-	clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
-
-	// run cdhit, create cluster file
-	logrus.Info("Clustering")
-	clusterFile, clusterFasta := execute(c.Cluster.Level)
-
-	// parse the cluster file
-	logrus.Info("Parsing clusters")
-	clusters := parseClusterFile(clusterFile, clusterFasta)
-
-	// maps all proteins from the db against the clusters
-	logrus.Info("Mapping proteins to clusters")
-	mappedClust := mapProtXML2Clusters(clusters)
-
-	logrus.Info("Retrieving Proteome data")
-	//mappedClust = retrieveInfoFromUniProtDB(mappedClust)
-
-	// mapping to functional annotation and save to disk
-	savetoDisk(mappedClust, c.Temp, c.Cluster.UID)
-
-	return
-}
 
 // CreateCleanDataBaseReference removes decoys and contaminants from struct
 func createCleanDataBaseReference(uid, temp string) string {

@@ -43,7 +43,7 @@ type Data struct {
 	PTMProphet     PTMProphet
 	Filter         Filter
 	Quantify       Quantify
-	Cluster        Cluster
+	BioQuant       BioQuant
 	Abacus         Abacus
 	Report         Report
 	TMTIntegrator  TMTIntegrator
@@ -357,8 +357,8 @@ type Abacus struct {
 	Reprint  bool    `yaml:"reprint"`
 }
 
-// Cluster options and parameters
-type Cluster struct {
+// BioQuant options and parameters
+type BioQuant struct {
 	UID   string  `yaml:"organismUniProtID"`
 	Level float64 `yaml:"level"`
 }
