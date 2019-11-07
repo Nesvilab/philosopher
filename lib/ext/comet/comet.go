@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
 	ucomet "github.com/nesvilab/philosopher/lib/ext/comet/unix"
 	wcomet "github.com/nesvilab/philosopher/lib/ext/comet/win"
 	"github.com/nesvilab/philosopher/lib/met"
+	"github.com/nesvilab/philosopher/lib/msg"
 	"github.com/nesvilab/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
@@ -35,9 +35,9 @@ func New(temp string) Comet {
 
 	self.DefaultBin = ""
 	self.DefaultParam = ""
-	self.Win32 = temp + string(filepath.Separator) + "comet.2018014.win32.exe"
-	self.Win64 = temp + string(filepath.Separator) + "comet.2018014.win64.exe"
-	self.Unix64 = temp + string(filepath.Separator) + "comet.2018014.linux.exe"
+	self.Win32 = temp + string(filepath.Separator) + "comet.2019011.win32.exe"
+	self.Win64 = temp + string(filepath.Separator) + "comet.2019011.win64.exe"
+	self.Unix64 = temp + string(filepath.Separator) + "comet.2019011.linux.exe"
 	self.WinParam = temp + string(filepath.Separator) + "comet.params.txt"
 	self.UnixParam = temp + string(filepath.Separator) + "comet.params"
 

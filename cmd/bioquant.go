@@ -14,7 +14,7 @@ import (
 // bioquantCmd represents the bioquant command
 var bioquantCmd = &cobra.Command{
 	Use:   "bioquant",
-	Short: "Protein report based on protein clusters",
+	Short: "Protein report based on protein functional groups",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		m.FunctionInitCheckUp()

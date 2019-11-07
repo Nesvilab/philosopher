@@ -27,14 +27,14 @@ func WinParameterFile(winParam string) {
 // Win32 deploys win32 bits comt parameter file
 func Win32(win32 string) {
 
-	bin, e := Asset("comet.2018014.win32.exe")
+	bin, e := Asset("comet.2019011.win32.exe")
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+		msg.DeployAsset(errors.New("Comet Windows binary file"), "fatal")
 	}
 
 	e = ioutil.WriteFile(win32, bin, sys.FilePermission())
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+		msg.DeployAsset(errors.New("Comet Windows binary file"), "fatal")
 	}
 
 	return
@@ -43,11 +43,11 @@ func Win32(win32 string) {
 // Win64 deploys win64 bits comt parameter file
 func Win64(win64 string) {
 
-	bin, e := Asset("comet.2018014.win64.exe")
+	bin, e := Asset("comet.2019011.win64.exe")
 	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+		msg.DeployAsset(errors.New("Comet Windows binary file"), "fatal")
 	}
 
 	return

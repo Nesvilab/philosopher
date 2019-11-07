@@ -28,14 +28,14 @@ func UnixParameterFile(unixParam string) {
 // Unix64 ...
 func Unix64(unix64 string) {
 
-	bin, e := Asset("comet.2018014.linux.exe")
+	bin, e := Asset("comet.2019011.linux.exe")
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+		msg.DeployAsset(errors.New("Comet Linux binary"), "fatal")
 	}
 
 	e = ioutil.WriteFile(unix64, bin, sys.FilePermission())
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+		msg.DeployAsset(errors.New("Comet Linux binary"), "fatal")
 	}
 
 	return
