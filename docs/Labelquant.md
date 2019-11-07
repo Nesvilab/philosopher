@@ -20,6 +20,10 @@ Folder path containing the raw files.
 
 Number of channels.
 
+`--level`
+
+ MS level for the quantification (default 2)
+
 `--purity`
 
 Precursor ion purity threshold (default 0.5).
@@ -31,6 +35,10 @@ M/Z tolerance in PPM (default "10").
 `--uniqueonly`
 
 Report quantification based on only unique peptides.
+
+`--removelow`
+
+Ignore the lower % of PSMs based on their summed abundances. 0 Means no removal, entry value must be decimal.
 
 
 ## Example
