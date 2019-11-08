@@ -45,7 +45,7 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 
 
 ## How to Use
-A simple [tutorial](ttps://github.com/Nesvilab/philosopher/wiki) is also provided with an extensive example on how to use Philosopher.
+A simple [tutorial](https://github.com/Nesvilab/philosopher/wiki) is also provided with an extensive example on how to use Philosopher.
 
 
 ## Documentation
