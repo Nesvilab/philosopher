@@ -40,9 +40,9 @@ comet:
   param:                                       # comet parameter file (default "comet.params.txt")
   raw: mzML                                    # format of the spectra file
 
-msfragger:                                     # v
+msfragger:                                     # v2.2
   path:                                        # path to MSFragger jar
-  memory: 8                                   # how much memory in GB to use
+  memory: 8                                    # how much memory in GB to use
   param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
   num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
@@ -248,9 +248,9 @@ abacus:
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
   reprint: false                               # create abacus reports using the Reprint format
 
-tmtintegrator:                                 # v1.8
+tmtintegrator:                                 # v1.9
   path:                                        # path to TMT-Integrator jar
-  memory: 8                                   # memory allocation, in Gb
+  memory: 8                                    # memory allocation, in Gb
   output:                                      # the location of output files
   channel_num: 10                              # number of channels in the multiplex (e.g. 10, 11)
   ref_tag:                                     # unique tag for identifying the reference channel (Bridge sample added to each multiplex)
