@@ -225,7 +225,7 @@ var _ = Describe("Spc", func() {
 		})
 
 		It("Checking uniqueness of peptide 1 in protein 1 in group 2", func() {
-			Expect(groups[1].Proteins[0].PeptideIons[0].IsUnique).To(Equal(false))
+			Expect(groups[1].Proteins[0].PeptideIons[0].IsUnique).To(Equal(true))
 		})
 
 		It("Checking ModifiedPeptide for peptide 1 in protein 1 in group 17", func() {
