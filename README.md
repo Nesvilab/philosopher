@@ -65,7 +65,9 @@ Still in progress!
 
 ## About the developers
 [Felipe da Veiga leprevost](http://www.leprevost.com.br)
+
 Sarah Haynes
+
 Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
 
 
