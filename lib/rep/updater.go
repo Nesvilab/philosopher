@@ -60,6 +60,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			//delete(evi.PSM[i].MappedProteins, rp)
 			//evi.PSM[i].Protein = rp
 			//}
+
 			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
 			delete(evi.PSM[i].MappedProteins, rp)
 			evi.PSM[i].Protein = rp
@@ -194,7 +195,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		evi.PSM[i].ProteinDescription = descriptionMap[id]
 
 		for k := range evi.PSM[i].MappedProteins {
-			evi.PSM[i].MappedGenes[geneMap[k]] = 0
+			id = strings.Replace(k, decoyTag, "", 1)
+			evi.PSM[i].MappedGenes[geneMap[id]] = 0
 		}
 	}
 
@@ -211,7 +213,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		evi.Ions[i].ProteinDescription = descriptionMap[id]
 
 		for k := range evi.Ions[i].MappedProteins {
-			evi.Ions[i].MappedGenes[geneMap[k]] = 0
+			id = strings.Replace(k, decoyTag, "", 1)
+			evi.Ions[i].MappedGenes[geneMap[id]] = 0
 		}
 	}
 
@@ -228,7 +231,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		evi.Peptides[i].ProteinDescription = descriptionMap[id]
 
 		for k := range evi.Peptides[i].MappedProteins {
-			evi.Peptides[i].MappedGenes[geneMap[k]] = 0
+			id = strings.Replace(k, decoyTag, "", 1)
+			evi.Peptides[i].MappedGenes[geneMap[id]] = 0
 		}
 	}
 

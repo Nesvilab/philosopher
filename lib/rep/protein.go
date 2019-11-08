@@ -81,14 +81,15 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 				//ref.MappedProteins = make(map[string]int)
 				//ref.MappedProteins[i.ProteinName]++
+
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
 				}
 
-				_, ok := ref.MappedProteins[i.ProteinName]
-				if ok {
-					delete(ref.MappedProteins, i.ProteinName)
-				}
+				// _, ok := ref.MappedProteins[i.ProteinName]
+				// if ok {
+				// 	delete(ref.MappedProteins, i.ProteinName)
+				// }
 
 				ref.Modifications = k.Modifications
 
@@ -151,10 +152,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 					ref.MappedProteins[l] = 0
 				}
 
-				_, ok := ref.MappedProteins[i.ProteinName]
-				if ok {
-					delete(ref.MappedProteins, i.ProteinName)
-				}
+				// _, ok := ref.MappedProteins[i.ProteinName]
+				// if ok {
+				// 	delete(ref.MappedProteins, i.ProteinName)
+				// }
 
 				ref.Modifications = k.Modifications
 
