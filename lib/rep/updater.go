@@ -64,11 +64,11 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
 
 			delete(evi.PSM[i].MappedProteins, rp)
-			for j := range evi.PSM[i].MappedProteins {
-				if strings.Contains(j, decoyTag) {
-					delete(evi.PSM[i].MappedProteins, j)
-				}
-			}
+			// for j := range evi.PSM[i].MappedProteins {
+			// 	if strings.Contains(j, decoyTag) {
+			// 		delete(evi.PSM[i].MappedProteins, j)
+			// 	}
+			// }
 
 			evi.PSM[i].Protein = rp
 
@@ -77,11 +77,11 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 		}
 
-		for j := range evi.PSM[i].MappedProteins {
-			if strings.Contains(j, decoyTag) {
-				delete(evi.PSM[i].MappedProteins, j)
-			}
-		}
+		// for j := range evi.PSM[i].MappedProteins {
+		// 	if strings.Contains(j, decoyTag) {
+		// 		delete(evi.PSM[i].MappedProteins, j)
+		// 	}
+		// }
 
 		_, uOK := uniqueMap[evi.PSM[i].IonForm]
 		if uOK {
@@ -107,11 +107,11 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.Ions[i].MappedProteins[evi.Ions[i].Protein] = 0
 
 			delete(evi.Ions[i].MappedProteins, rp)
-			for j := range evi.Ions[i].MappedProteins {
-				if strings.Contains(j, decoyTag) {
-					delete(evi.Ions[i].MappedProteins, j)
-				}
-			}
+			// for j := range evi.Ions[i].MappedProteins {
+			// 	if strings.Contains(j, decoyTag) {
+			// 		delete(evi.Ions[i].MappedProteins, j)
+			// 	}
+			// }
 
 			evi.Ions[i].Protein = rp
 
@@ -121,11 +121,11 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 		}
 
-		for j := range evi.Ions[i].MappedProteins {
-			if strings.Contains(j, decoyTag) {
-				delete(evi.Ions[i].MappedProteins, j)
-			}
-		}
+		// for j := range evi.Ions[i].MappedProteins {
+		// 	if strings.Contains(j, decoyTag) {
+		// 		delete(evi.Ions[i].MappedProteins, j)
+		// 	}
+		// }
 
 		_, uOK := uniqueMap[evi.Ions[i].IonForm]
 		if uOK {
@@ -143,21 +143,21 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
 
 			delete(evi.Peptides[i].MappedProteins, v)
-			for j := range evi.Peptides[i].MappedProteins {
-				if strings.Contains(j, decoyTag) {
-					delete(evi.Peptides[i].MappedProteins, j)
-				}
-			}
+			// for j := range evi.Peptides[i].MappedProteins {
+			// 	if strings.Contains(j, decoyTag) {
+			// 		delete(evi.Peptides[i].MappedProteins, j)
+			// 	}
+			// }
 
 			evi.Peptides[i].Protein = v
 
 		}
 
-		for j := range evi.Peptides[i].MappedProteins {
-			if strings.Contains(j, decoyTag) {
-				delete(evi.Peptides[i].MappedProteins, j)
-			}
-		}
+		// for j := range evi.Peptides[i].MappedProteins {
+		// 	if strings.Contains(j, decoyTag) {
+		// 		delete(evi.Peptides[i].MappedProteins, j)
+		// 	}
+		// }
 
 		if strings.Contains(v, decoyTag) {
 			evi.Peptides[i].IsDecoy = true

@@ -1,9 +1,10 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg)
-![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?style=flat)
-[![CircleCI](https://circleci.com/gh/Nesvilab/philosopher-source.svg?style=svg&circle-token=8fc2895a5f10b2507a73d672ad89d50798b417ad)](https://circleci.com/gh/Nesvilab/philosopher-source)
+[![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/nesvilab/philosopher/releases/latest)
+![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
+![CircleCI](https://img.shields.io/circleci/build/github/Nesvilab/philosopher-source?style=for-the-badge&token=8fc2895a5f10b2507a73d672ad89d50798b417ad)
+![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 
 ## Features
 Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tunned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
@@ -48,6 +49,24 @@ A simple [tutorial](tutorial.md) is also provided with an extensive example on h
 
 ## Documentation
 Check the [documentation](documentation.md) for more details about the available commands.
+
+
+## Questions, requests and bug reports
+If you have any questions, remarks, or requests, or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
+
+
+## Analytics
+Check the [analytics](analytics.md) session for more information on the program usage report.
+
+
+## How to cite
+Still in progress!
+
+
+## About the developers
+[Felipe da Veiga leprevost](http://www.leprevost.com.br)
+Sarah Haynes
+Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
 
 
 ## Questions, requests and bug reports
