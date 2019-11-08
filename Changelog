@@ -38,6 +38,6 @@
 - Empty databases if ID was wrong.
 - Minor bugs and issues.
 
-
+ 
 ## Snapcraft
 - `snap install philosopher`
