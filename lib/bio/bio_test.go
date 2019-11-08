@@ -200,7 +200,7 @@ var _ = Describe("Bio", func() {
 		Context("Contant values", func() {
 			It("Proton", func() {
 				p := Proton
-				Expect(p).To(Equal(1.007316))
+				Expect(p).To(Equal(1.007276467))
 			})
 		})
 	})
