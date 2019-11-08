@@ -1,7 +1,8 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg)
+[![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?style=for-the-badge)](https://github.com/nesvilab/philosopher/releases/latest)
+![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
 
 ## Features
 Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop complete proteomics analyses, from peptide spectrum matching to annotated protein reports. Philosopher is also tuned for Open Search analysis, providing a modified version of the Prophets for peptide validation and protein inference. To date, Philosopher is the only proteomics toolkit that allows you to process and analyze both closed and open search results.

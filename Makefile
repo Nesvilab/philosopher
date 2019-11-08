@@ -40,7 +40,7 @@ deps:
 	go get -u github.com/onsi/gomega
 	go get -u github.com/onsi/ginkgo/ginkgo
 	go get -u github.com/konsorten/go-windows-terminal-sequences
-	go get github.com/blang/semver
+	go get -u github.com/blang/semver
 
 .PHONY: deploy
 deploy:
