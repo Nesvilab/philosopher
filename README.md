@@ -6,6 +6,7 @@ A data processing toolkit for shotgun proteomics.
 ![CircleCI](https://img.shields.io/circleci/build/github/Nesvilab/philosopher-source?style=for-the-badge&token=8fc2895a5f10b2507a73d672ad89d50798b417ad)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 
+
 ## Features
 Philosopher provides easy access to third-party tools and custom algorithms allowing users to develop proteomics analysis, from Peptide Spectrum Matching to annotated protein reports. Philosopher is also tunned for Open Search analysis, providing a modified version of the prophets for peptide validation and protein inference. To this date, Philosopher is the only proteomics toolkit that allows you to process and analyze close and open search results.
 
@@ -44,19 +45,15 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 
 
 ## How to Use
-A simple [tutorial](tutorial.md) is also provided with an extensive example on how to use Philosopher.
+A simple [tutorial](ttps://github.com/Nesvilab/philosopher/wiki) is also provided with an extensive example on how to use Philosopher.
 
 
 ## Documentation
-Check the [documentation](documentation.md) for more details about the available commands.
+Check the [documentation](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) for more details about the available commands.
 
 
 ## Questions, requests and bug reports
 If you have any questions, remarks, or requests, or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
-
-
-## Analytics
-Check the [analytics](analytics.md) session for more information on the program usage report.
 
 
 ## How to cite
