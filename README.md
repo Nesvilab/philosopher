@@ -32,7 +32,7 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 - Labeling-based quantification using TMT isobaric tags.
 
-- Clustering analysis for proteomics results.
+- Quantification based on functional protein groups.
 
 - Multi-level detailed reports including peptides, ions and proteins.
 
@@ -69,6 +69,7 @@ Still in progress!
 Sarah Haynes
 
 Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
+
 
 
 ## Questions, requests and bug reports
