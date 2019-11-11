@@ -144,7 +144,7 @@ func Run(f met.Data) met.Data {
 
 	if len(f.Filter.Pox) > 0 {
 
-		logrus.Info("Processing Protein Inference")
+		logrus.Info("Processing protein inference")
 		pro.Restore()
 		e.AssembleProteinReport(pro, f.Filter.Weight, f.Filter.Tag)
 		pro = nil
@@ -154,16 +154,16 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonStatus(f.Filter.Tag)
 	}
 
-	logrus.Info("Assingning protein identifications to layers")
+	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
 	// reorganizes the selected proteins and the alternative proteins list
-	logrus.Info("Updating razor PSM assingment to Proteins")
+	logrus.Info("Updating razor PSM assignment to proteins")
 	if f.Filter.Razor == true {
 		e.UpdateSupportingSpectra()
 	}
 
-	logrus.Info("Calculating Spectral Counts")
+	logrus.Info("Calculating spectral counts")
 	e = qua.CalculateSpectralCounts(e)
 
 	logrus.Info("Saving")
