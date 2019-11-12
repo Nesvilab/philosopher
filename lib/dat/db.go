@@ -79,7 +79,7 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 	// Length
 	e.Length = len(v)
 
-	if strings.Contains(k, decoyTag) {
+	if strings.HasPrefix(k, decoyTag) {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
@@ -173,7 +173,7 @@ func ProcessNCBI(k, v, decoyTag string) Record {
 	// Length
 	e.Length = len(v)
 
-	if strings.Contains(k, decoyTag) {
+	if strings.HasPrefix(k, decoyTag) {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
@@ -307,7 +307,7 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	e.Sequence = v
 	e.Length = len(v)
 
-	if strings.Contains(k, decoyTag) {
+	if strings.HasPrefix(k, decoyTag) {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
@@ -358,7 +358,7 @@ func ProcessUniRef(k, v, decoyTag string) Record {
 	e.Sequence = v
 	e.Length = len(v)
 
-	if strings.Contains(k, decoyTag) {
+	if strings.HasPrefix(k, decoyTag) {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
@@ -393,6 +393,12 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 
 	part := strings.Split(k, " ")
 	e.PartHeader = part[0]
+
+	if strings.HasPrefix(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
 
 	return e
 }

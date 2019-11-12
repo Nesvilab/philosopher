@@ -1,42 +1,9 @@
 ### Added
-- Support for TMT-16 plex.
-- Peptide FDR filtering to combined peptide reports in Abcaus.
-- Support for our custom pepXML schema containing extra fields.
-- Ion Mobility value added to PSM table.
-- Number of Enzimatic Termini to PSM table.
-- Number of Missed Cleavages to PSM table.
-- Uncalibrated Calculated M/Z to PSM table.
-- Uncalibrated Peptide Mass to PSM table.
-- Mapped Genes to PSM table.
-- Calibrated observed mass and m/z to PSM report.
-- Philosopher will stop if an error is reported by the Prophets.
 
 ### Changed
-- Updated to Go v1.13.1.
-- Updated Comet to version 2019011
-- Removed RawMassDiff from the reports.
-- The Delta Mass adjustment will only happen if there was no previous mass calibration during the search.
-- The Corrected DeltaMass value is now used to map Unimod.
-- Reports wont show isobaric labels that are not used for the analysis anymore (e.g. 10 TMT columns if only 8 are used).
-- When processing empty pepXML, Philosopher will emit a warning, not a fatal error.
-- Removed observed masses from combined peptide report.
-- The nomenclature 'Experimental' and "Calculated' were replaced by 'Observed' and 'Calculated' on the PSM table. 
-- The Cluster command is now called Bioquant.
-- Updated pipeline configuration file.
-- Updated documentation.
 
 ### Fixed
-- The filter command was throwing an error when no protein data was present.
-- Report with TMT was breaking when no annotation file was present.
-- The Database command will throw an error if no input at all is provided.
-- The Observed modifications masses were mapping outside the tolerance window.
-- Wrong protein assignment in PSM tables
-- The ions report had an issue with missing mapped proteins.
-- Missing charge states from combined peptide report.
-- Wrong assignment between PSMs and Ions in both reports.
-- Missing observed masses from PSM report.
-- Empty databases if ID was wrong.
-- Minor bugs and issues.
+- Generic FASTA parser is now checking the decoiy sttus of all entries.
 
  
 ## Snapcraft
