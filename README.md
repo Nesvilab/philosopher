@@ -42,8 +42,8 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 - [Philosopher basics](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) - general usage information
 - [Preparing protein databases](https://github.com/Nesvilab/philosopher/wiki/How-to-Prepare-a-Protein-Database)
 - [Simple data analysis](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic tutorial
-- [TMT quantification](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic tutorial with isobaric quantification
-- [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic tutorial for open searches
+- [TMT quantification](https://github.com/Nesvilab/philosopher/wiki/TMT-Analysis) - basic tutorial with isobaric quantification
+- [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Open-Search-Analysis) - basic tutorial for open searches
 
 ## Documentation
 See the [documentation](https://github.com/Nesvilab/philosopher/wiki/Home) for more details about the available commands.
