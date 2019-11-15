@@ -44,4 +44,4 @@ jobs:
       run: go test ./...
     
     - name: Build
-      run: make linux
+      run: go build -o philosopher main.go

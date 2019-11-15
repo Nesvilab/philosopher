@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
 
-      - run: go get -u ./...
+      - run: go mod download
 
       - run: go build ./...
 
@@ -27,4 +27,4 @@ jobs:
 
       - run: go test ./...
 
-      - run: make linux
+      - run: go build -o philosopher main.go
