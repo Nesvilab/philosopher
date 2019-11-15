@@ -76,6 +76,8 @@ coverage:
 
 .PHONY: test
 test:
+	go get -u github.com/onsi/ginkgo
+	go get -u github.com/onsi/gomega
 	ginkgo -r
 
 .PHONY: linux
