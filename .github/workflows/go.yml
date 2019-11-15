@@ -17,7 +17,12 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Get dependencies
-      run: make deps
+      run: |
+        go get -v -t -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
       
     - name: Deploy artifacts
       run: make deploy

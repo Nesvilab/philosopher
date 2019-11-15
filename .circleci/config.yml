@@ -12,6 +12,10 @@ jobs:
     steps:
       - checkout
 
+      - run:	go get -u github.com/onsi/ginkgo
+
+      - run: go get -u github.com/onsi/gomega
+
       - run: |
           go get -v -t -d ./...
           if [ -f Gopkg.toml ]; then
