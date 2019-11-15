@@ -397,7 +397,7 @@ func New(h string) Data {
 
 	var d Data
 
-	var fmtuuid, _ = uuid.NewV4()
+	var fmtuuid = uuid.NewV4()
 	var uuid = fmt.Sprintf("%s", fmtuuid)
 	d.UUID = uuid
 
