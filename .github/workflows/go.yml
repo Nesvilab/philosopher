@@ -18,9 +18,6 @@ jobs:
 
     - name: Get dependencies
       run: make deps
-
-    - name: where is ginkgo
-      run: which ginkgo
       
     - name: Deploy artifacts
       run: make deploy
