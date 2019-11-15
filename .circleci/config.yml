@@ -12,8 +12,12 @@ jobs:
     steps:
       - checkout
 
-      # specify any bash command here prefixed with `run: `
-      - run: make deps
+      - run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+          fi
 
       - run: make deploy
 

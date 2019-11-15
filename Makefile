@@ -15,33 +15,6 @@ LDFLAGS = -ldflags "-w -s -X main.version=${TAG} -X main.build=${BUILD}"
 $(BINARY): $(SOURCES)
 	go build ${LDFLAGS} -o ${BINARY} main.go
 
-.PHONY: deps
-deps:
-	go get -u github.com/mitchellh/gox
-	go get -u github.com/inconshreveable/mousetrap
-	go get -u github.com/sirupsen/logrus
-	go get -u gonum.org/v1/plot
-	go get -u github.com/mattn/go-colorable
-	go get -u github.com/montanaflynn/stats
-	go get -u github.com/pierrre/archivefile/zip
-	go get -u github.com/rogpeppe/go-charset/charset
-	go get -u github.com/rogpeppe/go-charset/data
-	go get -u github.com/satori/go.uuid
-	go get -u github.com/spf13/cobra
-	go get -u github.com/spf13/viper
-	go get -u golang.org/x/net/html/charset
-	go get -u github.com/spf13/cobra/cobra
-	go get -u github.com/nlopes/slack
-	go get -u github.com/google/go-github/github
-	go get -u github.com/vmihailenco/msgpack
-	go get -u github.com/davecgh/go-spew/spew
-	go get -u github.com/jpillora/go-ogle-analytics
-	go get -u github.com/onsi/ginkgo
-	go get -u github.com/onsi/gomega
-	go get -u github.com/onsi/ginkgo/ginkgo
-	go get -u github.com/konsorten/go-windows-terminal-sequences
-	go get -u github.com/blang/semver
-
 .PHONY: deploy
 deploy:
 	unzip -o lib/dat/bindata.go.zip -d  lib/dat/
