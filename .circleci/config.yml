@@ -12,16 +12,9 @@ jobs:
     steps:
       - checkout
 
-      - run: go get -u github.com/onsi/ginkgo
+      - run: go get -u ./...
 
-      - run: go get -u github.com/onsi/gomega
-
-      - run: |
-          go get -v -t -d ./...
-          if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-          fi
+      - run: go build ./...
 
       - run: make deploy
 
@@ -32,6 +25,6 @@ jobs:
       - run: wget -P /go/src/philosopher/test/wrksp https://github.com/prvst/philosopher-test/releases/download/0.0.1/interact.pep.xml
       - run: wget -P /go/src/philosopher/test/wrksp https://github.com/prvst/philosopher-test/releases/download/0.0.1/interact.prot.xml
 
-      - run: make test
+      - run: go test ./...
 
       - run: make linux
