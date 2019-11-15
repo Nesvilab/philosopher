@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 	"github.com/sirupsen/logrus"
 )
 
@@ -56,11 +56,11 @@ func UpdateChecker(v, b string) {
 			remote[0] = strings.Replace(remote[0], "v", "", 1)
 
 			if remote[0] > local[0] {
-				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/nesvilab/philosopher/releases")
+				logrus.Warning("There is a new version of Philosopher available for download: https://philosopher/releases")
 			}
 
 			if (remote[0] == local[0]) && (remote[1] > local[1]) {
-				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/nesvilab/philosopher/releases")
+				logrus.Warning("There is a new version of Philosopher available for download: https://philosopher/releases")
 			}
 
 		}

@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )

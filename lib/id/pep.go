@@ -9,13 +9,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/uti"
+	"philosopher/lib/uti"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/mod"
-	"github.com/nesvilab/philosopher/lib/spc"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/mod"
+	"philosopher/lib/spc"
+	"philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"

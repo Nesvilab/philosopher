@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "github.com/nesvilab/philosopher/lib/ext/peptideprophet/unix"
-	wPeP "github.com/nesvilab/philosopher/lib/ext/peptideprophet/win"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	unix "philosopher/lib/ext/peptideprophet/unix"
+	wPeP "philosopher/lib/ext/peptideprophet/win"
+	"philosopher/lib/met"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // PeptideProphet is the main tool data configuration structure

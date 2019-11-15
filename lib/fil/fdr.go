@@ -6,10 +6,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/cla"
-	"github.com/nesvilab/philosopher/lib/id"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/uti"
+	"philosopher/lib/cla"
+	"philosopher/lib/id"
+	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 	"github.com/sirupsen/logrus"
 )
 

@@ -3,7 +3,7 @@ package spc_test
 import (
 	"os"
 
-	"github.com/nesvilab/philosopher/lib/id"
+	"philosopher/lib/id"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

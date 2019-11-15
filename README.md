@@ -1,7 +1,7 @@
 # Philosopher
 A data processing toolkit for shotgun proteomics.
 
-[![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/nesvilab/philosopher/releases/latest)
+[![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://philosopher/releases/latest)
 ![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
 ![CircleCI](https://img.shields.io/circleci/build/github/Nesvilab/philosopher-source?style=for-the-badge&token=8fc2895a5f10b2507a73d672ad89d50798b417ad)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
@@ -41,19 +41,19 @@ Philosopher provides easy access to third-party tools and custom algorithms allo
 
 
 ## How to Download
-Download the latest version [here](https://github.com/nesvilab/philosopher/releases/latest)
+Download the latest version [here](https://philosopher/releases/latest)
 
 
 ## How to Use
-A simple [tutorial](ttps://github.com/Nesvilab/philosopher/wiki) is also provided with an extensive example on how to use Philosopher.
+A simple [tutorial](ttps://philosopher/wiki) is also provided with an extensive example on how to use Philosopher.
 
 
 ## Documentation
-Check the [documentation](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) for more details about the available commands.
+Check the [documentation](https://philosopher/wiki/Philosopher-Basics) for more details about the available commands.
 
 
 ## Questions, requests and bug reports
-If you have any questions, remarks, or requests, or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
+If you have any questions, remarks, or requests, or if you found a bug, please use the [Issue tracker](https://philosopher/issues).
 
 
 ## How to cite
@@ -70,7 +70,7 @@ Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
 
 
 ## Questions, requests and bug reports
-If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
+If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://philosopher/issues).
 
 
 ## License

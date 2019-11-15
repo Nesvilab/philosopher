@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/pierrre/archivefile/zip"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/gth"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/msg"
+	"philosopher/lib/gth"
+	"philosopher/lib/met"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )

@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/dat"
-	"github.com/nesvilab/philosopher/lib/id"
-	"github.com/nesvilab/philosopher/lib/mod"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/dat"
+	"philosopher/lib/id"
+	"philosopher/lib/mod"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // AssembleProteinReport creates the post processed protein strcuture

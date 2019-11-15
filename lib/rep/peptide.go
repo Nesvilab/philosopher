@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/cla"
-	"github.com/nesvilab/philosopher/lib/id"
-	"github.com/nesvilab/philosopher/lib/mod"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/cla"
+	"philosopher/lib/id"
+	"philosopher/lib/mod"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // AssemblePeptideReport reports consist on ion reporting

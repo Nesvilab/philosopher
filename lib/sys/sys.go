@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 )
 
 // GetHome returns the user home directory name

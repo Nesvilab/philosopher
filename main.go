@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/nesvilab/philosopher/cmd"
-)
+import "philosopher/cmd"
 
 var (
 	// Version code

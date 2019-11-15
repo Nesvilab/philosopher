@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/fas"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/fas"
+	"philosopher/lib/met"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )

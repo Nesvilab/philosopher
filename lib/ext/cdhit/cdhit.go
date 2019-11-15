@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	ucdhit "github.com/nesvilab/philosopher/lib/ext/cdhit/unix"
-	wcdhit "github.com/nesvilab/philosopher/lib/ext/cdhit/win"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/sys"
+	ucdhit "philosopher/lib/ext/cdhit/unix"
+	wcdhit "philosopher/lib/ext/cdhit/win"
+	"philosopher/lib/met"
+	"philosopher/lib/sys"
 )
 
 // CDhit represents the tool configuration

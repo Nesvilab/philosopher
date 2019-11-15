@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/bio"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/bio"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // Deploy deploys the OBO file to the temp folder

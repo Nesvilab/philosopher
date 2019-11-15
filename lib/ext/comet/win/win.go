@@ -4,8 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // WinParameterFile writes the parameter file to the disk

@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/nesvilab/philosopher/lib/uti"
+	. "philosopher/lib/uti"
 )
 
 var _ = Describe("Uti", func() {

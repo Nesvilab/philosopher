@@ -6,7 +6,7 @@ import (
 	"errors"
 	"syscall"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 )
 
 // HideFile makes the .meta folder hidden on Windows

@@ -5,11 +5,11 @@ import (
 	"runtime"
 
 	colorable "github.com/mattn/go-colorable"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"philosopher/lib/met"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 var m met.Data

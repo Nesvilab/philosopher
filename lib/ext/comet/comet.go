@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	ucomet "github.com/nesvilab/philosopher/lib/ext/comet/unix"
-	wcomet "github.com/nesvilab/philosopher/lib/ext/comet/win"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	ucomet "philosopher/lib/ext/comet/unix"
+	wcomet "philosopher/lib/ext/comet/win"
+	"philosopher/lib/met"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
 

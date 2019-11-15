@@ -3,7 +3,7 @@ package tmt
 import (
 	"errors"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 )
 
 // Labels main struct

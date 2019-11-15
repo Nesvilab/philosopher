@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/met"
-	unmd "github.com/nesvilab/philosopher/lib/obo/unimod"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/met"
+	unmd "philosopher/lib/obo/unimod"
+	"philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 )
 

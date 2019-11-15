@@ -12,15 +12,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/dat"
-	"github.com/nesvilab/philosopher/lib/fil"
-	"github.com/nesvilab/philosopher/lib/id"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/rep"
-	"github.com/nesvilab/philosopher/lib/sys"
-	"github.com/nesvilab/philosopher/lib/tmt"
+	"philosopher/lib/dat"
+	"philosopher/lib/fil"
+	"philosopher/lib/id"
+	"philosopher/lib/met"
+	"philosopher/lib/rep"
+	"philosopher/lib/sys"
+	"philosopher/lib/tmt"
 	"github.com/sirupsen/logrus"
 )
 

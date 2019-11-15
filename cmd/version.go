@@ -4,7 +4,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/nesvilab/philosopher/lib/gth"
+	"philosopher/lib/gth"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

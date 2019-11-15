@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 )
 
 // Enzyme struct

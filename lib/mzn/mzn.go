@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/psi"
+	"philosopher/lib/psi"
 	"github.com/sirupsen/logrus"
 )
 

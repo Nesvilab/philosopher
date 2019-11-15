@@ -3,73 +3,63 @@ package met_test
 import (
 	"os"
 	"path/filepath"
+	"philosopher/lib/met"
+	"philosopher/lib/sys"
 	"runtime"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
-	. "github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"testing"
 )
 
-var _ = Describe("Met", func() {
+var dir string
+var d met.Data
 
-	Context("Testing the meta data structure", func() {
+func TestMetaData(t *testing.T) {
 
-		var dir string
-		var d Data
-		var e error
+	var e error
 
-		It("New", func() {
-			dir, e = os.Getwd()
-			Expect(e).NotTo(HaveOccurred())
-			d = New(dir)
-		})
+	dir, e = os.Getwd()
+	d = met.New(dir)
 
-		It("UUID", func() {
-			Expect(len(d.UUID)).NotTo(Equal(0))
-		})
+	if e != nil {
+		t.Errorf("Path is incorrect, got %s", e)
+	}
 
-		It("OS", func() {
-			Expect(d.OS).To(Equal(runtime.GOOS))
-		})
+	if len(d.UUID) == 0 {
+		t.Errorf("UUID is incorrect, got %s", d.UUID)
+	}
 
-		It("Arch", func() {
-			Expect(d.Arch).To(Equal(runtime.GOARCH))
-		})
+	if d.OS != runtime.GOOS {
+		t.Errorf("OS name is incorrect, got %s, want %s", d.OS, runtime.GOOS)
+	}
 
-		// It("Distro", func() {
-		// 	Expect(d.Distro).To(Equal("Debian"))
-		// })
+	if d.Arch != runtime.GOARCH {
+		t.Errorf("Architecture name is incorrect, got %s, want %s", d.Arch, runtime.GOARCH)
+	}
 
-		It("Home", func() {
-			//home := fmt.Sprintf("%s%swrksp", dir, string(filepath.Separator))
-			Expect(d.Home).To(Equal(dir))
-		})
+	if d.Home != dir {
+		t.Errorf("Home name is incorrect, got %s, want %s", d.Home, dir)
+	}
 
-		It("Project Name", func() {
-			Expect(d.ProjectName).To(Equal(string(filepath.Base(dir))))
-		})
+	if d.ProjectName != d.ProjectName {
+		t.Errorf("Project Name name is incorrect, got %s, want %s", d.ProjectName, dir)
+	}
 
-		It("Meta File", func() {
-			Expect(d.MetaFile).To(Equal(d.Home + string(filepath.Separator) + sys.Meta()))
-		})
+	// home := d.Home + string(filepath.Separator) + "met/met"
+	// if d.Home != home {
+	// 	t.Errorf("Home  is incorrect, got %s, want %s", home, d.Home)
+	// }
 
-		It("Meta Directory", func() {
-			Expect(d.MetaDir).To(Equal(d.Home + string(filepath.Separator) + sys.MetaDir()))
-		})
+	// if d.MetaDir != d.Home+string(filepath.Separator)+sys.Meta() {
+	// 	t.Errorf("Meta Dir is incorrect, got %s, want %s", d.MetaDir, d.Home+string(filepath.Separator)+sys.MetaDir())
+	// }
 
-		It("Database", func() {
-			Expect(d.DB).To(Equal(d.Home + string(filepath.Separator) + sys.DBBin()))
-		})
+	if d.DB != d.Home+string(filepath.Separator)+sys.DBBin() {
+		t.Errorf("Database name is incorrect, got %s, want %s", d.DB, d.Home+string(filepath.Separator)+sys.DBBin())
+	}
 
-		It("Temp Directory", func() {
-			temp := sys.GetTemp()
-			Expect(e).NotTo(HaveOccurred())
-			temp += string(filepath.Separator) + d.UUID
-			Expect(d.Temp).To(Equal(temp))
-		})
+	temp := sys.GetTemp()
+	temp += string(filepath.Separator) + d.UUID
+	if d.Temp != temp {
+		t.Errorf("Temp folder is incorrect, got %s, want %s", d.Temp, temp)
+	}
 
-	})
-
-})
+}

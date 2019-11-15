@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/met"
+	"philosopher/lib/msg"
 )
 
 // DataSetLabelNames maps all custom names to each TMT tags

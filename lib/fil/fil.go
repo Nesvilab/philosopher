@@ -10,19 +10,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nesvilab/philosopher/lib/inf"
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/inf"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/spc"
+	"philosopher/lib/spc"
 
-	"github.com/nesvilab/philosopher/lib/cla"
-	"github.com/nesvilab/philosopher/lib/dat"
-	"github.com/nesvilab/philosopher/lib/id"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/mod"
-	"github.com/nesvilab/philosopher/lib/qua"
-	"github.com/nesvilab/philosopher/lib/rep"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/cla"
+	"philosopher/lib/dat"
+	"philosopher/lib/id"
+	"philosopher/lib/met"
+	"philosopher/lib/mod"
+	"philosopher/lib/qua"
+	"philosopher/lib/rep"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
 

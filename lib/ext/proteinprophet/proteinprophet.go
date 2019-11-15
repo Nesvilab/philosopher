@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "github.com/nesvilab/philosopher/lib/ext/proteinprophet/unix"
-	wPoP "github.com/nesvilab/philosopher/lib/ext/proteinprophet/win"
-	"github.com/nesvilab/philosopher/lib/met"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/sys"
+	unix "philosopher/lib/ext/proteinprophet/unix"
+	wPoP "philosopher/lib/ext/proteinprophet/win"
+	"philosopher/lib/met"
+	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // ProteinProphet is tool configuration

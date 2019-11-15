@@ -5,7 +5,7 @@ package cla
 import (
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/id"
+	"philosopher/lib/id"
 )
 
 // IsDecoyPSM identifies a PSM as target or Decoy based on the

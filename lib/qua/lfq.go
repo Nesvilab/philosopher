@@ -8,11 +8,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/bio"
-	"github.com/nesvilab/philosopher/lib/mzn"
-	"github.com/nesvilab/philosopher/lib/rep"
+	"philosopher/lib/bio"
+	"philosopher/lib/mzn"
+	"philosopher/lib/rep"
 	"github.com/sirupsen/logrus"
 )
 

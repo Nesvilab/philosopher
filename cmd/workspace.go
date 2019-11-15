@@ -6,8 +6,8 @@ import (
 	"os"
 
 	ga "github.com/jpillora/go-ogle-analytics"
-	"github.com/nesvilab/philosopher/lib/msg"
-	"github.com/nesvilab/philosopher/lib/wrk"
+	"philosopher/lib/msg"
+	"philosopher/lib/wrk"
 	"github.com/spf13/cobra"
 )
 

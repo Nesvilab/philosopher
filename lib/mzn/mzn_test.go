@@ -2,116 +2,108 @@ package mzn_test
 
 import (
 	"os"
+	"testing"
 
-	"github.com/nesvilab/philosopher/lib/mzn"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
+	"philosopher/lib/mzn"
 )
 
-var _ = Describe("Mzn", func() {
+var msd mzn.MsData
+var spec mzn.Spectrum
 
-	Context("Testing Raw file parsing", func() {
+func TestRawFileParsing(t *testing.T) {
 
-		var msd mzn.MsData
-		var spec mzn.Spectrum
-		var e error
+	os.Chdir("../../test/wrksp/")
+	msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML", false, false, false)
 
-		It("Accessing workspace", func() {
-			e = os.Chdir("../../test/wrksp/")
-			Expect(e).NotTo(HaveOccurred())
-		})
+}
 
-		It("Reading mzML 01A MS1", func() {
-			msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML", false, false, false)
-			Expect(e).NotTo(HaveOccurred())
-		})
+func TestMS1Spectra(t *testing.T) {
 
-		It("Read mzML 01A MS1 spectra", func() {
-			for _, i := range msd.Spectra {
-				if i.Index == "0" && i.Scan == "1" {
-					spec = i
-					spec.Decode()
-					break
-				}
-			}
-			Expect(len(msd.Spectra)).To(Equal(54357))
-		})
+	for _, i := range msd.Spectra {
+		if i.Index == "0" && i.Scan == "1" {
+			spec = i
+			spec.Decode()
+			break
+		}
+	}
 
-		It("mzML 01A MS1 spectra Index", func() {
-			Expect(spec.Index).To(Equal("0"))
-		})
+	if len(msd.Spectra) != 54357 {
+		t.Errorf("Spectra number is incorrect, got %d, want %d", len(msd.Spectra), 54357)
+	}
 
-		It("mzML 01A MS1 spectra Scan", func() {
-			Expect(spec.Scan).To(Equal("1"))
-		})
+	if spec.Index != "0" {
+		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
+	}
 
-		It("mzML 01A MS1 intensities", func() {
-			Expect(spec.Intensity.DecodedStream[0]).To(Equal(9104.91796875))
-		})
+	if spec.Intensity.DecodedStream[0] != 9104.91796875 {
+		t.Errorf("Spectrum Intensity Stream is incorrect, got %f, want %f", spec.Intensity.DecodedStream[0], 9104.91796875)
+	}
 
-		It("mzML 01A MS1 MZ", func() {
-			Expect(spec.Mz.DecodedStream[0]).To(Equal(350.1635437011719))
-		})
+	if spec.Mz.DecodedStream[0] != 350.1635437011719 {
+		t.Errorf("Spectrum index is incorrect, got %f, want %f", spec.Mz.DecodedStream[0], 350.1635437011719)
+	}
 
-		It("Read mzML 01A MS2 spectra", func() {
-			for _, i := range msd.Spectra {
-				if i.Index == "2" && i.Scan == "3" {
-					spec = i
-					spec.Decode()
-					break
-				}
-			}
-			Expect(len(spec.Mz.DecodedStream)).To(Equal(231))
-		})
+	if spec.Index != "0" {
+		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
+	}
 
-		It("mzML 01 MS2 spectra Index", func() {
-			Expect(spec.Index).To(Equal("2"))
-		})
+}
 
-		It("mzML 01 MS2 spectra Scan", func() {
-			Expect(spec.Scan).To(Equal("3"))
-		})
+func TestMS2Spectra(t *testing.T) {
 
-		It("mzML 01 MS1 intensities", func() {
-			Expect(spec.Intensity.DecodedStream[0]).To(Equal(371635.9375))
-		})
+	for _, i := range msd.Spectra {
+		if i.Index == "2" && i.Scan == "3" {
+			spec = i
+			spec.Decode()
+			break
+		}
+	}
 
-		It("mzML 01 MS2 MZ", func() {
-			Expect(spec.Mz.DecodedStream[0]).To(Equal(110.07147216796875))
-		})
+	if len(spec.Mz.DecodedStream) != 231 {
+		t.Errorf("MS2 Spectra number is incorrect, got %d, want %d", len(spec.Mz.DecodedStream), 231)
+	}
 
-		It("mzML 01 MS2 Parent Index", func() {
-			Expect(spec.Precursor.ParentIndex).To(Equal("1"))
-		})
+	if spec.Index != "2" {
+		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 2)
+	}
 
-		It("mzML 01 MS2 Parent Scan", func() {
-			Expect(spec.Precursor.ParentScan).To(Equal("2"))
-		})
+	if spec.Scan != "3" {
+		t.Errorf("Spectrum scan is incorrect, got %s, want %d", spec.Scan, 3)
+	}
 
-		It("mzML 01 MS2 Charge State", func() {
-			Expect(spec.Precursor.ChargeState).To(Equal(2))
-		})
+	if spec.Intensity.DecodedStream[0] != 371635.9375 {
+		t.Errorf("Spectrum Intensity is incorrect, got %f, want %f", spec.Intensity.DecodedStream[0], 371635.9375)
+	}
 
-		It("mzML 01 MS2 Parent Selected Ion", func() {
-			Expect(spec.Precursor.SelectedIon).To(Equal(391.201019287109))
-		})
+	if spec.Mz.DecodedStream[0] != 110.07147216796875 {
+		t.Errorf("Spectrum MZ is incorrect, got %f, want %f", spec.Mz.DecodedStream[0], 110.07147216796875)
+	}
 
-		It("mzML 01 MS2 Parent Target Ion", func() {
-			Expect(spec.Precursor.TargetIon).To(Equal(391.2))
-		})
+	if spec.Precursor.ParentIndex != "1" {
+		t.Errorf("Spectrum parent index is incorrect, got %s, want %d", spec.Precursor.ParentIndex, 1)
+	}
 
-		It("mzML 01 MS2 Charge Peak Intensity", func() {
-			Expect(spec.Precursor.PeakIntensity).To(Equal(3.58558525e+06))
-		})
+	if spec.Precursor.ParentScan != "2" {
+		t.Errorf("Spectrum parent scan is incorrect, got %s, want %d", spec.Precursor.ParentScan, 2)
+	}
 
-		It("mzML 01 MS2 Parent Isolatio nWindow Lower Offset", func() {
-			Expect(spec.Precursor.IsolationWindowLowerOffset).To(Equal(0.34999999404))
-		})
+	if spec.Precursor.ChargeState != 2 {
+		t.Errorf("Spectrum charge state is incorrect, got %d, want %d", spec.Precursor.ChargeState, 2)
+	}
 
-		It("mzML 01 MS2 Charge Isolation Window Upper Offset", func() {
-			Expect(spec.Precursor.IsolationWindowUpperOffset).To(Equal(0.34999999404))
-		})
+	if spec.Precursor.SelectedIon != 391.201019287109 {
+		t.Errorf("Spectrum selected ion is incorrect, got %f want %f", spec.Precursor.SelectedIon, 391.201019287109)
+	}
 
-	})
+	if spec.Precursor.TargetIon != 391.2 {
+		t.Errorf("Spectrum target ion is incorrect, got %f, want %f", spec.Precursor.TargetIon, 391.2)
+	}
 
-})
+	if spec.Precursor.PeakIntensity != 3.58558525e+06 {
+		t.Errorf("Spectrum precursor intensity is incorrect, got %f, want %f", spec.Precursor.PeakIntensity, 3.58558525e+06)
+	}
+
+	if spec.Precursor.IsolationWindowLowerOffset != 0.34999999404 {
+		t.Errorf("Spectrum number is incorrect, got %f, want %f", spec.Precursor.IsolationWindowLowerOffset, 0.34999999404)
+	}
+}

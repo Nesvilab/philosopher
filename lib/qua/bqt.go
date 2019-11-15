@@ -12,12 +12,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nesvilab/philosopher/lib/msg"
+	"philosopher/lib/msg"
 
-	"github.com/nesvilab/philosopher/lib/dat"
-	"github.com/nesvilab/philosopher/lib/ext/cdhit"
-	"github.com/nesvilab/philosopher/lib/rep"
-	"github.com/nesvilab/philosopher/lib/sys"
+	"philosopher/lib/dat"
+	"philosopher/lib/ext/cdhit"
+	"philosopher/lib/rep"
+	"philosopher/lib/sys"
 	"github.com/sirupsen/logrus"
 )
 
