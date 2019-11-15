@@ -19,7 +19,7 @@ jobs:
     - name: Get dependencies
       run: make deps
 
-    - NAME: TEST
+    - name: TEST
       run: which ginkgo
       shell: bash
          
