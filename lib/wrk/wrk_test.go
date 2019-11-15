@@ -2,43 +2,31 @@ package wrk_test
 
 import (
 	"os"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"philosopher/lib/sys"
-	. "philosopher/lib/wrk"
+	"philosopher/lib/wrk"
+	"testing"
 )
 
-var _ = Describe("Wrk", func() {
+func TestWorkspace(t *testing.T) {
 
-	Context("Testing workspace management", func() {
+	e := os.Chdir("../../test/wrksp")
+	if e != nil {
+		t.Errorf("Path is incorrect, got %s", e)
+	}
 
-		It("Accessing workspace", func() {
-			e := os.Chdir("../../test/wrksp")
-			Expect(e).NotTo(HaveOccurred())
-		})
+	wrk.Init("0000", "0000")
 
-		It("Init", func() {
-			Init("0000", "0000")
-		})
+	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
+		if e != nil {
+			t.Errorf("Meta Dir path is incorrect, got %s", e)
+		}
+	}
 
-		It("Checking Meta Folder", func() {
-			if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-				Expect(e).NotTo(HaveOccurred())
-			}
-		})
+	if _, e := os.Stat(sys.Meta()); os.IsNotExist(e) {
+		if e != nil {
+			t.Errorf("Meta file path is incorrect, got %s", e)
+		}
+	}
 
-		It("Checking Meta file", func() {
-			if _, e := os.Stat(sys.Meta()); os.IsNotExist(e) {
-				Expect(e).NotTo(HaveOccurred())
-			}
-		})
-
-		It("Clean", func() {
-			Clean()
-		})
-
-	})
-
-})
+	wrk.Clean()
+}
