@@ -43,13 +43,9 @@ deploy:
 
 	unzip -o lib/obo/unimod/bindata.go.zip -d  lib/obo/unimod/
 
-.PHONY: coverage
-coverage:
-	ginkgo -r -cover -outputdir test/profiles
-
 .PHONY: test
 test:
-	ginkgo -r
+	go test ./...
 
 .PHONY: linux
 linux:
@@ -70,7 +66,6 @@ draft:
 
 .PHONY: push
 push:
-	#ginkgo -r
 	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
 
