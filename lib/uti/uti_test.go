@@ -1,26 +1,20 @@
 package uti_test
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
-	. "philosopher/lib/uti"
+	"philosopher/lib/uti"
+	"testing"
 )
 
-var _ = Describe("Uti", func() {
+func TestUti(t *testing.T) {
 
-	Context("Testing utils functions", func() {
+	x := uti.Round(5.3557876867, 5, 2)
+	if x != 5.35 {
+		t.Errorf("Aminoacid name is incorrect, got %f, want %f", x, 5.35)
+	}
 
-		It("Roud", func() {
-			x := Round(5.3557876867, 5, 2)
-			Expect(x).To(Equal(5.35))
-		})
+	y := uti.ToFixed(5.3557876867, 3)
+	if y != 5.355 {
+		t.Errorf("Aminoacid name is incorrect, got %f, want %f", y, 5.3557876867)
+	}
 
-		It("ToFixed", func() {
-			x := ToFixed(5.3557876867, 3)
-			Expect(x).To(Equal(5.355))
-		})
-
-	})
-
-})
+}

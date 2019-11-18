@@ -2,167 +2,138 @@ package sys_test
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
-	. "philosopher/lib/sys"
+	"philosopher/lib/sys"
+	"testing"
 )
 
-var _ = Describe("Sys", func() {
+func TestSysMeta(t *testing.T) {
 
-	Context("meta locators and directories getters", func() {
+	p := fmt.Sprintf("%s%smeta.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.Meta() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.Meta())
+	}
 
-		It("Meta", func() {
-			p := fmt.Sprintf("%s%smeta.bin", MetaDir(), string(filepath.Separator))
-			Expect(Meta()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sraw.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.RawBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.RawBin())
+	}
 
-		It("RawBin", func() {
-			p := fmt.Sprintf("%s%sraw.bin", MetaDir(), string(filepath.Separator))
-			Expect(RawBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%spepxml.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.PepxmlBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PepxmlBin())
+	}
 
-		It("PepXML", func() {
-			p := fmt.Sprintf("%s%spepxml.bin", MetaDir(), string(filepath.Separator))
-			Expect(PepxmlBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sprotxml.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.ProtxmlBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.ProtxmlBin())
+	}
 
-		It("ProtXML", func() {
-			p := fmt.Sprintf("%s%sprotxml.bin", MetaDir(), string(filepath.Separator))
-			Expect(ProtxmlBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%spsm.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.PsmBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PsmBin())
+	}
 
-		It("PSMBin", func() {
-			p := fmt.Sprintf("%s%spsm.bin", MetaDir(), string(filepath.Separator))
-			Expect(PsmBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%spep.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.PepBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PepBin())
+	}
 
-		It("PepBin", func() {
-			p := fmt.Sprintf("%s%spep.bin", MetaDir(), string(filepath.Separator))
-			Expect(PepBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sion.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.IonBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.IonBin())
+	}
 
-		It("IonBin", func() {
-			p := fmt.Sprintf("%s%sion.bin", MetaDir(), string(filepath.Separator))
-			Expect(IonBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%spro.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.ProBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.ProBin())
+	}
 
-		It("ProBin", func() {
-			p := fmt.Sprintf("%s%spro.bin", MetaDir(), string(filepath.Separator))
-			Expect(ProBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvBin())
+	}
 
-		It("EvBin", func() {
-			p := fmt.Sprintf("%s%sev.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.meta.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvMetaBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvMetaBin())
+	}
 
-		It("EvBin", func() {
-			p := fmt.Sprintf("%s%sev.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.pep.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvPeptideBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvPeptideBin())
+	}
 
-		It("EvMetaBin", func() {
-			p := fmt.Sprintf("%s%sev.meta.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvMetaBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.pro.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvProteinBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvProteinBin())
+	}
 
-		It("EvPSMBin", func() {
-			p := fmt.Sprintf("%s%sev.psm.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvPSMBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.mod.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvModificationsBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvModificationsBin())
+	}
 
-		It("EvPeptideBin", func() {
-			p := fmt.Sprintf("%s%sev.pep.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvPeptideBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.mev.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvModificationsEvBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvModificationsEvBin())
+	}
 
-		It("EvProteinBin", func() {
-			p := fmt.Sprintf("%s%sev.pro.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvProteinBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.com.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvCombinedBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvCombinedBin())
+	}
 
-		It("EvModificationsBin", func() {
-			p := fmt.Sprintf("%s%sev.mod.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvModificationsBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sev.ion.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.EvIonBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvIonBin())
+	}
 
-		It("EvModificationsEvBin", func() {
-			p := fmt.Sprintf("%s%sev.mev.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvModificationsEvBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%sdb.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.DBBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.DBBin())
+	}
 
-		It("EvCombinedBin", func() {
-			p := fmt.Sprintf("%s%sev.com.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvCombinedBin()).To(Equal(p))
-		})
+	p = fmt.Sprintf("%s%smod.bin", sys.MetaDir(), string(filepath.Separator))
+	if p != sys.MODBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.MODBin())
+	}
+}
 
-		It("EvIonBin", func() {
-			p := fmt.Sprintf("%s%sev.ion.bin", MetaDir(), string(filepath.Separator))
-			Expect(EvIonBin()).To(Equal(p))
-		})
+func TestSysNames(t *testing.T) {
 
-		It("DBBin", func() {
-			p := fmt.Sprintf("%s%sdb.bin", MetaDir(), string(filepath.Separator))
-			Expect(DBBin()).To(Equal(p))
-		})
+	if ".meta" != sys.MetaDir() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", ".meta", sys.MetaDir())
+	}
+	if "linux" != sys.Linux() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "linux", sys.Linux())
+	}
+	if "windows" != sys.Windows() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", ".windows", sys.Windows())
+	}
+	if "darwin" != sys.Darwin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "darwin", sys.Darwin())
+	}
+	if "RedHat" != sys.Redhat() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "redhat", sys.Redhat())
+	}
+	if "Ubuntu" != sys.Ubuntu() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "ubuntu", sys.Ubuntu())
+	}
+	if "Mint" != sys.Mint() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "mint", sys.Mint())
+	}
+	if "Debian" != sys.Debian() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "debian", sys.Debian())
+	}
+	if "CentOS" != sys.Centos() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "centos", sys.Centos())
+	}
+	if "386" != sys.Arch386() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", "386", sys.Arch386())
+	}
+	if 0755 != sys.FilePermission() {
+		t.Errorf("Meta path or name is incorrect, got %d, want %s", 0755, sys.FilePermission())
+	}
 
-		It("MODBin", func() {
-			p := fmt.Sprintf("%s%smod.bin", MetaDir(), string(filepath.Separator))
-			Expect(MODBin()).To(Equal(p))
-		})
-
-	})
-
-	Context("system and meta file names", func() {
-
-		It("MetaDir", func() {
-			Expect(MetaDir()).To(Equal(".meta"))
-		})
-
-		It("Linux", func() {
-			Expect(Linux()).To(Equal("linux"))
-		})
-
-		It("Windows", func() {
-			Expect(Windows()).To(Equal("windows"))
-		})
-
-		It("Darwin", func() {
-			Expect(Darwin()).To(Equal("darwin"))
-		})
-
-		It("Redhat", func() {
-			Expect(Redhat()).To(Equal("RedHat"))
-		})
-
-		It("Ubuntu", func() {
-			Expect(Ubuntu()).To(Equal("Ubuntu"))
-		})
-
-		It("Mint", func() {
-			Expect(Mint()).To(Equal("Mint"))
-		})
-
-		It("Debian", func() {
-			Expect(Debian()).To(Equal("Debian"))
-		})
-
-		It("Centos", func() {
-			Expect(Centos()).To(Equal("CentOS"))
-		})
-
-		It("Arch386", func() {
-			Expect(Arch386()).To(Equal("386"))
-		})
-
-		It("FilePermission", func() {
-			Expect(FilePermission()).To(Equal(os.FileMode(0755)))
-		})
-
-	})
-
-})
+}
