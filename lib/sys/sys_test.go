@@ -137,3 +137,23 @@ func TestSysNames(t *testing.T) {
 	}
 
 }
+
+func TestMetaDir(t *testing.T) {
+	tests := []struct {
+		name string
+		want string
+	}{
+		{
+			name: "testy testy",
+			want: sys.MetaDir(),
+		},
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := sys.MetaDir(); got != tt.want {
+				t.Errorf("MetaDir() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

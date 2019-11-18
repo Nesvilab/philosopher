@@ -4,6 +4,8 @@ import (
 	"os"
 	"philosopher/lib/id"
 	"testing"
+
+	_ "github.com/rogpeppe/go-charset/data"
 )
 
 func TestSpCPepXML(t *testing.T) {
@@ -235,4 +237,4 @@ func TestSpCProtXML(t *testing.T) {
 // 		})
 
 // 	})
-// })
+// }

@@ -15,11 +15,11 @@ import (
 
 	"philosopher/lib/msg"
 
+	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/fas"
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
 )
 
 // Base main structure
@@ -97,7 +97,7 @@ func Run(m met.Data) met.Data {
 	return m
 }
 
-// ProcessDB ...
+// ProcessDB determines the type of sequence and sends it to the appropriate parsing function
 func (d *Base) ProcessDB(file, decoyTag string) {
 
 	fastaMap := fas.ParseFile(file)
