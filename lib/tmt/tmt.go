@@ -168,23 +168,6 @@ func New(plex string) Labels {
 
 	var o Labels
 
-	// o.Channel1.Name = "126"
-	// o.Channel2.Name = "127N"
-	// o.Channel3.Name = "127C"
-	// o.Channel4.Name = "128N"
-	// o.Channel5.Name = "128C"
-	// o.Channel6.Name = "129N"
-	// o.Channel7.Name = "129C"
-	// o.Channel8.Name = "130N"
-	// o.Channel9.Name = "130C"
-	// o.Channel10.Name = "131N"
-	// o.Channel11.Name = "131C"
-	// o.Channel12.Name = "132N"
-	// o.Channel13.Name = "132C"
-	// o.Channel14.Name = "133N"
-	// o.Channel15.Name = "133C"
-	// o.Channel16.Name = "134N"
-
 	if plex == "6" {
 
 		o.Channel1.Name = "126"
