@@ -37,3 +37,6 @@ bindata.go
 
 #release
 dist/
+
+#test
+test/wrksp/.meta/

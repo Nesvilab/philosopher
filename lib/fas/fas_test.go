@@ -34,6 +34,9 @@ import (
 // })
 
 func TestParseFile(t *testing.T) {
+
+	os.Chdir("../../test/db/")
+
 	type args struct {
 		filename string
 	}
@@ -44,13 +47,12 @@ func TestParseFile(t *testing.T) {
 	}{
 		{
 			name: "Testing Fasta file parsing",
-			args: args{filename: "db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta"},
+			args: args{filename: "uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta"},
 			want: 40896,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Chdir("../../test/")
 			if got := ParseFile(tt.args.filename); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("ParseFile() = %d, want %d", len(got), tt.want)
 			}

@@ -1,0 +1,61 @@
+package id
+
+import (
+	"os"
+	"philosopher/lib/wrk"
+	"testing"
+)
+
+func TestProtXML_MarkUniquePeptides(t *testing.T) {
+
+	var p ProtXML
+
+	os.Chdir("../../test/wrksp/")
+	wrk.Init("0000", "0000")
+
+	p.Read("interact.prot.xml")
+	p.DecoyTag = "rev_"
+
+	var unique int
+
+	type fields struct {
+		FileName   string
+		DecoyTag   string
+		Groups     GroupList
+		RunOptions string
+	}
+	type args struct {
+		w float64
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		{
+			name: "Testing protein Unique marking.",
+			args: args{w: 1.00},
+		},
+	}
+	for _, tt := range tests {
+
+		t.Run(tt.name, func(t *testing.T) {
+
+			p.MarkUniquePeptides(tt.args.w)
+			for _, i := range p.Groups {
+				for _, j := range i.Proteins {
+					for _, k := range j.PeptideIons {
+						if k.IsUnique == true {
+							unique++
+						}
+					}
+				}
+			}
+
+			if unique != 38412 {
+				t.Errorf("Number of Unque ions in ProtXML is wrong, got %v, want %v", unique, 38412)
+			}
+
+		})
+	}
+}
