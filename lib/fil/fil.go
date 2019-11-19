@@ -10,20 +10,18 @@ import (
 	"strings"
 	"time"
 
-	"philosopher/lib/inf"
-	"philosopher/lib/msg"
-
-	"philosopher/lib/spc"
-
+	"github.com/sirupsen/logrus"
 	"philosopher/lib/cla"
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
+	"philosopher/lib/inf"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
+	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
+	"philosopher/lib/spc"
 	"philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // Run executes the Filter processing
