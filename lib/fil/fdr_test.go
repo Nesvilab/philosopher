@@ -59,3 +59,63 @@ func TestPepXMLFDRFilter(t *testing.T) {
 
 	tes.ShutDowTestEnv()
 }
+
+func TestPickedFDR(t *testing.T) {
+
+	tes.SetupTestEnv()
+	proXML := readProtXMLInput("interact.prot.xml", "rev_", 1.00)
+
+	type args struct {
+		p id.ProtXML
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "Testing PickedFDR Filter",
+			args: args{p: proXML},
+			want: 7926,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := PickedFDR(tt.args.p); !reflect.DeepEqual(len(got.Groups), tt.want) {
+				t.Errorf("PickedFDR() = %v, want %v", len(got.Groups), tt.want)
+			}
+		})
+	}
+
+	tes.ShutDowTestEnv()
+}
+
+func TestRazorFilter(t *testing.T) {
+
+	tes.SetupTestEnv()
+	proXML := readProtXMLInput("interact.prot.xml", "rev_", 1.00)
+
+	type args struct {
+		p id.ProtXML
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "Testing Razor Filter",
+			args: args{p: proXML},
+			want: 7926,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := RazorFilter(tt.args.p); !reflect.DeepEqual(len(got.Groups), tt.want) {
+				t.Errorf("RazorFilter() = %v, want %v", len(got.Groups), tt.want)
+			}
+		})
+	}
+
+	tes.ShutDowTestEnv()
+}

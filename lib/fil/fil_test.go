@@ -11,6 +11,7 @@ import (
 
 var pepID id.PepIDList
 var proID id.ProtIDList
+var proXML id.ProtXML
 
 func Test_readPepXMLInput(t *testing.T) {
 
@@ -332,7 +333,8 @@ func Test_readProtXMLInput(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got := readProtXMLInput(tt.args.meta, tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+			got := readProtXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+			proXML = got
 
 			if len(got.Groups) != tt.want {
 				t.Errorf("readProtXMLInput() = %v, want %v", len(got.Groups), tt.want)
@@ -341,4 +343,58 @@ func Test_readProtXMLInput(t *testing.T) {
 	}
 
 	tes.ShutDowTestEnv()
+}
+
+func Test_proteinProfile(t *testing.T) {
+	type args struct {
+		p id.ProtXML
+	}
+	tests := []struct {
+		name  string
+		args  args
+		wantT int
+		wantD int
+	}{
+		{
+			name:  "Testing Protein Profile",
+			args:  args{p: proXML},
+			wantT: 8018,
+			wantD: 949,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotT, gotD := proteinProfile(tt.args.p)
+			if gotT != tt.wantT {
+				t.Errorf("proteinProfile() gotT = %v, want %v", gotT, tt.wantT)
+			}
+			if gotD != tt.wantD {
+				t.Errorf("proteinProfile() gotD = %v, want %v", gotD, tt.wantD)
+			}
+		})
+	}
+}
+
+func Test_processProteinIdentifications(t *testing.T) {
+	type args struct {
+		p        id.ProtXML
+		ptFDR    float64
+		pepProb  float64
+		protProb float64
+		isPicked bool
+		isRazor  bool
+		fo       bool
+		decoyTag string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			processProteinIdentifications(tt.args.p, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, tt.args.fo, tt.args.decoyTag)
+		})
+	}
 }

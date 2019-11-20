@@ -55,7 +55,7 @@ func Run(f met.Data) met.Data {
 
 	if len(f.Filter.Pox) > 0 {
 
-		protXML := readProtXMLInput(sys.MetaDir(), f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+		protXML := readProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
 
 	} else {
@@ -381,7 +381,7 @@ func GetUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 }
 
 // readProtXMLInput reads one or more fies and organize the data into PSM list
-func readProtXMLInput(meta, xmlFile, decoyTag string, weight float64) id.ProtXML {
+func readProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 	var protXML id.ProtXML
 
