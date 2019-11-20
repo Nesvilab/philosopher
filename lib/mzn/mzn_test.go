@@ -1,10 +1,10 @@
 package mzn_test
 
 import (
-	"os"
 	"testing"
 
 	"philosopher/lib/mzn"
+	"philosopher/test"
 )
 
 var msd mzn.MsData
@@ -12,8 +12,9 @@ var spec mzn.Spectrum
 
 func TestRawFileParsing(t *testing.T) {
 
-	os.Chdir("../../test/wrksp/")
+	test.SetupTestEnv()
 	msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML", false, false, false)
+	test.ShutDowTestEnv()
 
 }
 

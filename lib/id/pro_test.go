@@ -1,18 +1,16 @@
 package id
 
 import (
-	"os"
-	"philosopher/lib/wrk"
+	"philosopher/test"
 	"strings"
 	"testing"
 )
 
 func TestProtXML_MarkUniquePeptides(t *testing.T) {
 
-	var p ProtXML
+	test.SetupTestEnv()
 
-	os.Chdir("../../test/wrksp/")
-	wrk.Init("0000", "0000")
+	var p ProtXML
 
 	p.Read("interact.prot.xml")
 	p.DecoyTag = "rev_"
@@ -79,5 +77,5 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 		})
 	}
 
-	wrk.Clean()
+	test.ShutDowTestEnv()
 }

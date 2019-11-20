@@ -1,11 +1,10 @@
 package fil
 
 import (
-	"os"
 	"philosopher/lib/id"
 	"philosopher/lib/sys"
 	"philosopher/lib/uti"
-	"philosopher/lib/wrk"
+	"philosopher/test"
 	"reflect"
 	"testing"
 )
@@ -14,6 +13,9 @@ var pepID id.PepIDList
 var proID id.ProtIDList
 
 func Test_readPepXMLInput(t *testing.T) {
+
+	test.SetupTestEnv()
+
 	type args struct {
 		xmlFile        string
 		decoyTag       string
@@ -34,9 +36,6 @@ func Test_readPepXMLInput(t *testing.T) {
 			want1: "MSFragger",
 		},
 	}
-
-	os.Chdir("../../test/wrksp/")
-	wrk.Init("0000", "0000")
 
 	for _, tt := range tests {
 
@@ -102,9 +101,13 @@ func Test_readPepXMLInput(t *testing.T) {
 
 		})
 	}
+
+	test.ShutDowTestEnv()
 }
 
 func Test_processPeptideIdentifications(t *testing.T) {
+
+	test.SetupTestEnv()
 
 	type args struct {
 		p        id.PepIDList
@@ -129,8 +132,6 @@ func Test_processPeptideIdentifications(t *testing.T) {
 		},
 	}
 
-	os.Chdir("../../test/wrksp/")
-
 	for _, tt := range tests {
 
 		t.Run(tt.name, func(t *testing.T) {
@@ -146,6 +147,8 @@ func Test_processPeptideIdentifications(t *testing.T) {
 			}
 		})
 	}
+
+	test.ShutDowTestEnv()
 }
 
 func Test_chargeProfile(t *testing.T) {
@@ -192,8 +195,6 @@ func Test_chargeProfile(t *testing.T) {
 		},
 	}
 
-	os.Chdir("../../test/wrksp/")
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotT, gotD := chargeProfile(tt.args.p, tt.args.charge, tt.args.decoyTag)
@@ -223,8 +224,6 @@ func TestGetUniquePSMs(t *testing.T) {
 		},
 	}
 
-	os.Chdir("../../test/wrksp/")
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetUniquePSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -249,8 +248,6 @@ func Test_getUniquePeptideIons(t *testing.T) {
 			want: 39716,
 		},
 	}
-
-	os.Chdir("../../test/wrksp/")
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -277,8 +274,6 @@ func TestGetUniquePeptides(t *testing.T) {
 		},
 	}
 
-	os.Chdir("../../test/wrksp/")
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetUniquePeptides(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -304,8 +299,6 @@ func TestExtractIonsFromPSMs(t *testing.T) {
 		},
 	}
 
-	os.Chdir("../../test/wrksp/")
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ExtractIonsFromPSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -315,32 +308,37 @@ func TestExtractIonsFromPSMs(t *testing.T) {
 	}
 }
 
-// func Test_readProtXMLInput(t *testing.T) {
-// 	type args struct {
-// 		meta     string
-// 		xmlFile  string
-// 		decoyTag string
-// 		weight   float64
-// 	}
-// 	tests := []struct {
-// 		name string
-// 		args args
-// 		want int
-// 	}{
-// 		{
-// 			name: "Testting protXML reading and formating for the filter",
-// 			args: args{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
-// 			want: 7926,
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
+func Test_readProtXMLInput(t *testing.T) {
 
-// 			got := readProtXMLInput(tt.args.meta, tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+	test.SetupTestEnv()
 
-// 			if len(got.Groups) != tt.want {
-// 				t.Errorf("readProtXMLInput() = %v, want %v", len(got.Groups), tt.want)
-// 			}
-// 		})
-// 	}
-// }
+	type args struct {
+		meta     string
+		xmlFile  string
+		decoyTag string
+		weight   float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "Testting protXML reading and formating for the filter",
+			args: args{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
+			want: 7926,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got := readProtXMLInput(tt.args.meta, tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+
+			if len(got.Groups) != tt.want {
+				t.Errorf("readProtXMLInput() = %v, want %v", len(got.Groups), tt.want)
+			}
+		})
+	}
+
+	test.ShutDowTestEnv()
+}

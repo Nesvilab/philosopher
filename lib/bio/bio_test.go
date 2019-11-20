@@ -2,10 +2,13 @@ package bio_test
 
 import (
 	. "philosopher/lib/bio"
+	"philosopher/test"
 	"testing"
 )
 
 func TestAminoAcids(t *testing.T) {
+
+	test.SetupTestEnv()
 
 	a := New("Alanine")
 	if a.Name != "Alanine" {
@@ -106,6 +109,8 @@ func TestAminoAcids(t *testing.T) {
 	if a.Name != "Valine" {
 		t.Errorf("Aminoacid name is incorrect, got %s, want %s", a.Name, "Valine")
 	}
+
+	test.ShutDowTestEnv()
 }
 
 // func TestProtonMass(t *testing.T) {
@@ -116,6 +121,8 @@ func TestAminoAcids(t *testing.T) {
 // }
 
 func TestEnzymes(t *testing.T) {
+
+	test.SetupTestEnv()
 
 	var e Enzyme
 
@@ -138,4 +145,6 @@ func TestEnzymes(t *testing.T) {
 	if e.Name != "glu_c" {
 		t.Errorf("Enzyme is incorrect, got %s, want %s", e.Name, "glu_c")
 	}
+
+	test.ShutDowTestEnv()
 }

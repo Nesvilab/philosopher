@@ -1,8 +1,8 @@
 package spc_test
 
 import (
-	"os"
 	. "philosopher/lib/spc"
+	"philosopher/test"
 	"testing"
 
 	_ "github.com/rogpeppe/go-charset/data"
@@ -85,6 +85,9 @@ import (
 // }
 
 func TestPepXML_Parse(t *testing.T) {
+
+	test.SetupTestEnv()
+
 	type fields struct {
 		Name                 string
 		MsmsPipelineAnalysis MsmsPipelineAnalysis
@@ -102,13 +105,14 @@ func TestPepXML_Parse(t *testing.T) {
 			args: args{f: "interact.pep.xml"},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PepXML{
 				Name:                 tt.fields.Name,
 				MsmsPipelineAnalysis: tt.fields.MsmsPipelineAnalysis,
 			}
-			os.Chdir("../../test/wrksp/")
+
 			p.Parse(tt.args.f)
 
 			if len(p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery) != 64406 {
@@ -194,30 +198,6 @@ func TestPepXML_Parse(t *testing.T) {
 			// }
 		})
 	}
-}
 
-func TestProtXML_Parse(t *testing.T) {
-	type fields struct {
-		Name           string
-		ProteinSummary ProteinSummary
-	}
-	type args struct {
-		f string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p := &ProtXML{
-				Name:           tt.fields.Name,
-				ProteinSummary: tt.fields.ProteinSummary,
-			}
-			p.Parse(tt.args.f)
-		})
-	}
+	test.ShutDowTestEnv()
 }

@@ -1,18 +1,16 @@
 package fil
 
 import (
-	"os"
 	"philosopher/lib/id"
 	"philosopher/lib/sys"
-	"philosopher/lib/wrk"
+	"philosopher/test"
 	"reflect"
 	"testing"
 )
 
 func TestPepXMLFDRFilter(t *testing.T) {
 
-	os.Chdir("../../test/wrksp/")
-	wrk.Init("0000", "0000")
+	test.SetupTestEnv()
 
 	pepID, _ := readPepXMLInput("interact.pep.xml", "rev_", sys.GetTemp(), false, 0)
 
@@ -58,4 +56,6 @@ func TestPepXMLFDRFilter(t *testing.T) {
 			}
 		})
 	}
+
+	test.ShutDowTestEnv()
 }
