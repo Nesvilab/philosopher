@@ -129,6 +129,8 @@ func Test_processPeptideIdentifications(t *testing.T) {
 		},
 	}
 
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 
 		t.Run(tt.name, func(t *testing.T) {
@@ -189,6 +191,9 @@ func Test_chargeProfile(t *testing.T) {
 			wantD: 10,
 		},
 	}
+
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotT, gotD := chargeProfile(tt.args.p, tt.args.charge, tt.args.decoyTag)
@@ -217,6 +222,9 @@ func TestGetUniquePSMs(t *testing.T) {
 			want: 64406,
 		},
 	}
+
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetUniquePSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -241,6 +249,9 @@ func Test_getUniquePeptideIons(t *testing.T) {
 			want: 39716,
 		},
 	}
+
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getUniquePeptideIons(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -265,6 +276,9 @@ func TestGetUniquePeptides(t *testing.T) {
 			want: 30092,
 		},
 	}
+
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetUniquePeptides(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
@@ -289,6 +303,9 @@ func TestExtractIonsFromPSMs(t *testing.T) {
 			want: 39716,
 		},
 	}
+
+	os.Chdir("../../test/wrksp/")
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ExtractIonsFromPSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
