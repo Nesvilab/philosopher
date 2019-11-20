@@ -7,11 +7,11 @@ import (
 
 	"philosopher/lib/msg"
 
+	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/mod"
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 	"philosopher/lib/tmt"
-	"github.com/vmihailenco/msgpack"
 )
 
 // ProtXML struct
@@ -208,9 +208,9 @@ func (p *ProtXML) PromoteProteinIDs() {
 			var list []string
 			var ref string
 
-			if strings.Contains(string(p.Groups[i].Proteins[j].ProteinName), p.DecoyTag) {
+			if strings.HasPrefix(string(p.Groups[i].Proteins[j].ProteinName), p.DecoyTag) {
 				for k := range p.Groups[i].Proteins[j].IndistinguishableProtein {
-					if !strings.Contains(string(p.Groups[i].Proteins[j].IndistinguishableProtein[k]), p.DecoyTag) {
+					if !strings.HasPrefix(string(p.Groups[i].Proteins[j].IndistinguishableProtein[k]), p.DecoyTag) {
 						list = append(list, string(p.Groups[i].Proteins[j].IndistinguishableProtein[k]))
 					}
 				}

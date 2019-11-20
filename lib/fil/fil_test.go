@@ -34,10 +34,11 @@ func Test_readPepXMLInput(t *testing.T) {
 			want1: "MSFragger",
 		},
 	}
-	for _, tt := range tests {
 
-		os.Chdir("../../test/wrksp/")
-		wrk.Init("0000", "0000")
+	os.Chdir("../../test/wrksp/")
+	wrk.Init("0000", "0000")
+
+	for _, tt := range tests {
 
 		t.Run(tt.name, func(t *testing.T) {
 
@@ -104,6 +105,7 @@ func Test_readPepXMLInput(t *testing.T) {
 }
 
 func Test_processPeptideIdentifications(t *testing.T) {
+
 	type args struct {
 		p        id.PepIDList
 		decoyTag string
@@ -126,7 +128,9 @@ func Test_processPeptideIdentifications(t *testing.T) {
 			want2: 0.5155,
 		},
 	}
+
 	for _, tt := range tests {
+
 		t.Run(tt.name, func(t *testing.T) {
 			got, got1, got2 := processPeptideIdentifications(tt.args.p, tt.args.decoyTag, tt.args.psm, tt.args.peptide, tt.args.ion)
 			if got != tt.want {
@@ -294,29 +298,32 @@ func TestExtractIonsFromPSMs(t *testing.T) {
 	}
 }
 
-func Test_readProtXMLInput(t *testing.T) {
-	type args struct {
-		meta     string
-		xmlFile  string
-		decoyTag string
-		weight   float64
-	}
-	tests := []struct {
-		name string
-		args args
-		want int
-	}{
-		{
-			name: "Testting protXML reading and formating for the filter",
-			args: args{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
-			want: 7926,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := readProtXMLInput(tt.args.meta, tt.args.xmlFile, tt.args.decoyTag, tt.args.weight); !reflect.DeepEqual(len(got.Groups), tt.want) {
-				t.Errorf("readProtXMLInput() = %v, want %v", len(got.Groups), tt.want)
-			}
-		})
-	}
-}
+// func Test_readProtXMLInput(t *testing.T) {
+// 	type args struct {
+// 		meta     string
+// 		xmlFile  string
+// 		decoyTag string
+// 		weight   float64
+// 	}
+// 	tests := []struct {
+// 		name string
+// 		args args
+// 		want int
+// 	}{
+// 		{
+// 			name: "Testting protXML reading and formating for the filter",
+// 			args: args{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
+// 			want: 7926,
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+
+// 			got := readProtXMLInput(tt.args.meta, tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+
+// 			if len(got.Groups) != tt.want {
+// 				t.Errorf("readProtXMLInput() = %v, want %v", len(got.Groups), tt.want)
+// 			}
+// 		})
+// 	}
+// }

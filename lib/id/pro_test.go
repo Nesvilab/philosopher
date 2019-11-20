@@ -3,6 +3,7 @@ package id
 import (
 	"os"
 	"philosopher/lib/wrk"
+	"strings"
 	"testing"
 )
 
@@ -17,6 +18,7 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 	p.DecoyTag = "rev_"
 
 	var unique int
+	var flag bool
 
 	type fields struct {
 		FileName   string
@@ -42,12 +44,26 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			p.MarkUniquePeptides(tt.args.w)
+
+			p.PromoteProteinIDs()
+
 			for _, i := range p.Groups {
 				for _, j := range i.Proteins {
+
+					if strings.HasPrefix(string(j.ProteinName), p.DecoyTag) {
+						for _, k := range j.IndistinguishableProtein {
+							if !strings.HasPrefix(string(k), p.DecoyTag) {
+								flag = true
+							}
+						}
+					}
+
 					for _, k := range j.PeptideIons {
+
 						if k.IsUnique == true {
 							unique++
 						}
+
 					}
 				}
 			}
@@ -56,6 +72,12 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 				t.Errorf("Number of Unque ions in ProtXML is wrong, got %v, want %v", unique, 38412)
 			}
 
+			if flag == true {
+				t.Errorf("Protein Promotion is no working properly")
+			}
+
 		})
 	}
+
+	wrk.Clean()
 }

@@ -2,31 +2,29 @@ package wrk_test
 
 import (
 	"os"
-	"philosopher/lib/sys"
-	"philosopher/lib/wrk"
+	. "philosopher/lib/wrk"
 	"testing"
 )
 
-func TestWorkspace(t *testing.T) {
-
-	e := os.Chdir("../../test/wrksp")
-	if e != nil {
-		t.Errorf("Path is incorrect, got %s", e)
+func TestInit(t *testing.T) {
+	type args struct {
+		version string
+		build   string
 	}
-
-	wrk.Init("0000", "0000")
-
-	if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-		if e != nil {
-			t.Errorf("Meta Dir path is incorrect, got %s", e)
-		}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Testing workspace initialization",
+			args: args{version: "0000", build: "0000"},
+		},
 	}
-
-	if _, e := os.Stat(sys.Meta()); os.IsNotExist(e) {
-		if e != nil {
-			t.Errorf("Meta file path is incorrect, got %s", e)
-		}
+	for _, tt := range tests {
+		os.Chdir("../../test/wrksp")
+		t.Run(tt.name, func(t *testing.T) {
+			Init(tt.args.version, tt.args.build)
+			Clean()
+		})
 	}
-
-	wrk.Clean()
 }

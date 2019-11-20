@@ -3,40 +3,12 @@ package fas_test
 import (
 	"os"
 	. "philosopher/lib/fas"
+	"philosopher/lib/wrk"
 	"reflect"
 	"testing"
 )
 
-// 		It("Parsing UniProt Description", func() {
-// 			f := ParseUniProtDescriptionMap("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-// 			Expect(len(f)).To(Equal(20448))
-// 		})
-
-// 		It("Parsing UniProt Sequence", func() {
-// 			f := ParseUniProtSequencenMap("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-// 			Expect(len(f)).To(Equal(20448))
-// 		})
-
-// 		It("Parsing FASTA Description", func() {
-// 			f := ParseFastaDescription("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-// 			Expect(len(f)).To(Equal(20448))
-// 		})
-
-// 		It("Parsing FASTA File", func() {
-// 			f := ParseFile("db/uniprot/2019-02-05-td-hsa-reviewed-2019-02-04.fasta")
-
-// 			f = CleanDatabase(f, "rev_", "cont_")
-// 			Expect(len(f)).To(Equal(20448))
-// 		})
-
-// 	})
-
-// })
-
 func TestParseFile(t *testing.T) {
-
-	os.Chdir("../../test/db/")
-
 	type args struct {
 		filename string
 	}
@@ -52,10 +24,16 @@ func TestParseFile(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+
+		os.Chdir("../../test/db/")
+		wrk.Init("0000", "0000")
+
 		t.Run(tt.name, func(t *testing.T) {
 			if got := ParseFile(tt.args.filename); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("ParseFile() = %d, want %d", len(got), tt.want)
 			}
 		})
+
+		wrk.Clean()
 	}
 }
