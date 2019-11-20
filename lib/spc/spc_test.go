@@ -2,7 +2,7 @@ package spc_test
 
 import (
 	. "philosopher/lib/spc"
-	"philosopher/test"
+	"philosopher/lib/tes"
 	"testing"
 
 	_ "github.com/rogpeppe/go-charset/data"
@@ -86,7 +86,7 @@ import (
 
 func TestPepXML_Parse(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	type fields struct {
 		Name                 string
@@ -199,5 +199,5 @@ func TestPepXML_Parse(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }

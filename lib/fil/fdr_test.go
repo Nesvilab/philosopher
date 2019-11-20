@@ -3,14 +3,14 @@ package fil
 import (
 	"philosopher/lib/id"
 	"philosopher/lib/sys"
-	"philosopher/test"
+	"philosopher/lib/tes"
 	"reflect"
 	"testing"
 )
 
 func TestPepXMLFDRFilter(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	pepID, _ := readPepXMLInput("interact.pep.xml", "rev_", sys.GetTemp(), false, 0)
 
@@ -57,5 +57,5 @@ func TestPepXMLFDRFilter(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }

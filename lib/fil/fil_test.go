@@ -3,8 +3,8 @@ package fil
 import (
 	"philosopher/lib/id"
 	"philosopher/lib/sys"
+	"philosopher/lib/tes"
 	"philosopher/lib/uti"
-	"philosopher/test"
 	"reflect"
 	"testing"
 )
@@ -14,7 +14,7 @@ var proID id.ProtIDList
 
 func Test_readPepXMLInput(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	type args struct {
 		xmlFile        string
@@ -102,12 +102,12 @@ func Test_readPepXMLInput(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }
 
 func Test_processPeptideIdentifications(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	type args struct {
 		p        id.PepIDList
@@ -148,7 +148,7 @@ func Test_processPeptideIdentifications(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }
 
 func Test_chargeProfile(t *testing.T) {
@@ -310,7 +310,7 @@ func TestExtractIonsFromPSMs(t *testing.T) {
 
 func Test_readProtXMLInput(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	type args struct {
 		meta     string
@@ -340,5 +340,5 @@ func Test_readProtXMLInput(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }

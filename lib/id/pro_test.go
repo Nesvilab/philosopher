@@ -1,14 +1,14 @@
 package id
 
 import (
-	"philosopher/test"
+	"philosopher/lib/tes"
 	"strings"
 	"testing"
 )
 
 func TestProtXML_MarkUniquePeptides(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	var p ProtXML
 
@@ -77,5 +77,5 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }

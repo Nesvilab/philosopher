@@ -5,14 +5,14 @@ import (
 	"log"
 	"os"
 	. "philosopher/lib/fas"
-	"philosopher/test"
+	"philosopher/lib/tes"
 	"reflect"
 	"testing"
 )
 
 func TestParseFile(t *testing.T) {
 
-	test.SetupTestEnv()
+	tes.SetupTestEnv()
 
 	path, err := os.Getwd()
 	if err != nil {
@@ -49,5 +49,5 @@ func TestParseFile(t *testing.T) {
 		})
 	}
 
-	test.ShutDowTestEnv()
+	tes.ShutDowTestEnv()
 }
