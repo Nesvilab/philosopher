@@ -201,3 +201,48 @@ func TestPepXML_Parse(t *testing.T) {
 
 	tes.ShutDowTestEnv()
 }
+
+func TestProtXML_Parse(t *testing.T) {
+
+	tes.SetupTestEnv()
+
+	type fields struct {
+		Name           string
+		ProteinSummary ProteinSummary
+	}
+	type args struct {
+		f string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		{
+			name: "testing protXML parsing",
+			args: args{"interact.prot.xml"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &ProtXML{
+				Name:           tt.fields.Name,
+				ProteinSummary: tt.fields.ProteinSummary,
+			}
+
+			p.Parse(tt.args.f)
+
+			if len(p.ProteinSummary.ProteinGroup) != 7926 {
+				t.Errorf("Number of protein groups is incorrect, got %d, want %d", len(p.ProteinSummary.ProteinGroup), 7926)
+			}
+
+			if string(p.ProteinSummary.ProteinGroup[0].Protein[0].ProteinName) != "rev_sp|Q9P243|ZFAT_HUMAN" {
+				t.Errorf("Number of protein groups is incorrect, got %s, want %s", p.ProteinSummary.ProteinGroup[0].Protein[0].ProteinName, "rev_sp|Q9P243|ZFAT_HUMAN")
+			}
+
+		})
+	}
+
+	tes.ShutDowTestEnv()
+
+}
