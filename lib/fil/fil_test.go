@@ -342,7 +342,7 @@ func Test_readProtXMLInput(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
+	//tes.ShutDowTestEnv()
 }
 
 func Test_proteinProfile(t *testing.T) {

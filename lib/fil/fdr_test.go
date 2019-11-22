@@ -63,6 +63,7 @@ func TestPepXMLFDRFilter(t *testing.T) {
 func TestPickedFDR(t *testing.T) {
 
 	tes.SetupTestEnv()
+
 	proXML := readProtXMLInput("interact.prot.xml", "rev_", 1.00)
 
 	type args struct {
@@ -87,12 +88,13 @@ func TestPickedFDR(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
+	//tes.ShutDowTestEnv()
 }
 
 func TestRazorFilter(t *testing.T) {
 
 	tes.SetupTestEnv()
+
 	proXML := readProtXMLInput("interact.prot.xml", "rev_", 1.00)
 
 	type args struct {
@@ -117,5 +119,5 @@ func TestRazorFilter(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
+	//tes.ShutDowTestEnv()
 }
