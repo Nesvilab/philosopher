@@ -237,7 +237,27 @@ func TestProtXML_Parse(t *testing.T) {
 			}
 
 			if string(p.ProteinSummary.ProteinGroup[0].Protein[0].ProteinName) != "rev_sp|Q9P243|ZFAT_HUMAN" {
-				t.Errorf("Number of protein groups is incorrect, got %s, want %s", p.ProteinSummary.ProteinGroup[0].Protein[0].ProteinName, "rev_sp|Q9P243|ZFAT_HUMAN")
+				t.Errorf("Protein group 1 name is incorrect, got %s, want %s", p.ProteinSummary.ProteinGroup[0].Protein[0].ProteinName, "rev_sp|Q9P243|ZFAT_HUMAN")
+			}
+
+			if p.ProteinSummary.ProteinGroup[0].Protein[0].TotalNumberPeptides != 2 {
+				t.Errorf("Total peptides for protein group 1 is incorrect, got %d, want %d", p.ProteinSummary.ProteinGroup[0].Protein[0].TotalNumberPeptides, 2)
+			}
+
+			if p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides != 15 {
+				t.Errorf("Total peptides for protein group 6 is incorrect, got %d, want %d", p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides, 15)
+			}
+
+			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].ProteinName) != "sp|A0FGR8|ESYT2_HUMAN" {
+				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
+			}
+
+			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence) != "PEPTIDE" {
+				t.Errorf("Peptide sequence 1 in protein 1, group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence), "PEPTIDE")
+			}
+
+			if p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].Charge != 3 {
+				t.Errorf("Charge of peptide 1, protein 1, group 6 is incorrect, got %d, want %d", p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].Charge, 3)
 			}
 
 		})
