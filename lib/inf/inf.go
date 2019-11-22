@@ -26,7 +26,7 @@ type Peptide struct {
 }
 
 // ProteinInference ...
-func ProteinInference(psm id.PepIDList) id.PepIDList {
+func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[string]float64) {
 
 	var peptideList []Peptide
 	var exclusionList = make(map[string]int)
@@ -220,7 +220,7 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 		}
 	}
 
-	return psm
+	return psm, razorMap, proteinCoverageMap
 }
 
 // calculateProteinCoverage returns a percentage of coverage based on a set of peptides

@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/cla"
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
@@ -22,6 +21,8 @@ import (
 	"philosopher/lib/rep"
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Run executes the Filter processing
@@ -61,13 +62,13 @@ func Run(f met.Data) met.Data {
 	} else {
 
 		if f.Filter.Inference == true {
-			pepid = inf.ProteinInference(pepid)
+			pepid, razorMap, coverMap := inf.ProteinInference(pepid)
 
 			pepid.Serialize("psm")
 			pepid.Serialize("pep")
 			pepid.Serialize("ion")
 
-			processProteinInferenceIdentifications(pepid, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
+			processProteinInferenceIdentifications(pepid, razorMap, coverMap, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
 
 	}
@@ -140,7 +141,7 @@ func Run(f met.Data) met.Data {
 		e.UpdatePeptideModCount()
 	}
 
-	if len(f.Filter.Pox) > 0 {
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
 
 		logrus.Info("Processing protein inference")
 		pro.Restore()
@@ -464,36 +465,192 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 // processProteinInferenceIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed Philospher inference data is processed before filtered.
-func processProteinInferenceIdentifications(psm id.PepIDList, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
+func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[string]string, coverMap map[string]float64, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
 
 	var t int
 	var d int
-	var proteinIndex = make(map[string]uint)
-	//var pid id.ProtIDList
+	var proXML id.ProtXML
+	var proGrps id.GroupList
+	var proteinList = make(map[string]id.ProteinIdentification)
 
-	for _, i := range psm {
-
-		proteinIndex[i.Protein]++
-		for j := range i.AlternativeProteinsIndexed {
-			proteinIndex[j]++
-		}
-
-		// var p id.ProteinIdentification
-		// p.GroupNumber = 0
-		// p.GroupSiblingID = "a"
-		// p.ProteinName = i.Protein
-		// p.Probability = i.Probability
-		// p.TopPepProb = i.Probability
-		// p.HasRazor = true
-		// p.Picked = 0
+	// build the ProtXML strct
+	grpID := id.GroupIdentification{
+		GroupNumber: 0,
+		Probability: 1.00,
 	}
 
-	for i := range proteinIndex {
+	proGrps = append(proGrps, grpID)
+
+	proXML.DecoyTag = decoyTag
+	proXML.Groups = proGrps
+
+	for _, i := range psm {
+		_, ok := proteinList[i.Protein]
+		if !ok {
+
+			p := id.ProteinIdentification{
+				GroupNumber:    0,
+				GroupSiblingID: "a",
+				ProteinName:    i.Protein,
+				Picked:         0,
+				HasRazor:       false,
+			}
+
+			proteinList[i.Protein] = p
+		}
+	}
+
+	for i := range proteinList {
 		if strings.HasPrefix(i, decoyTag) {
 			d++
 		} else {
 			t++
 		}
+	}
+
+	// add the razor / non-razor marked proteins
+	var razorMarked = make(map[string]uint8)
+	for _, i := range psm {
+
+		pro := proteinList[i.Protein]
+		razorProtein, ok := razorMap[i.Peptide]
+
+		if ok && pro.ProteinName == razorProtein {
+
+			pro.Length = "0"
+			pro.PercentCoverage = float32(coverMap[pro.ProteinName])
+			pro.PctSpectrumIDs = 0.0
+			pro.GroupProbability = 1.00
+			pro.Confidence = 1.00
+			pro.HasRazor = true
+
+			if i.Probability > pro.Probability {
+				pro.Probability = i.Probability
+				pro.TopPepProb = i.Probability
+			}
+
+			razorMarked[pro.ProteinName] = 0
+
+		} else {
+
+			_, ok := razorMarked[pro.ProteinName]
+			if !ok {
+				pro.Length = "0"
+				pro.PercentCoverage = float32(coverMap[pro.ProteinName])
+				pro.PctSpectrumIDs = 0.0
+				pro.GroupProbability = 1.00
+				pro.Confidence = 1.00
+				pro.HasRazor = false
+
+				if i.Probability > pro.Probability {
+					pro.Probability = i.Probability
+					pro.TopPepProb = i.Probability
+				}
+
+			}
+		}
+
+		proteinList[i.Protein] = pro
+	}
+
+	// add the ions
+	//var addedIon = make(map[string]uint8)
+	for _, i := range psm {
+
+		//ionForm := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+		pro := proteinList[i.Protein]
+		razorProtein, ok := razorMap[i.Peptide]
+
+		if ok && pro.ProteinName == razorProtein {
+
+			pro.UniqueStrippedPeptides = append(pro.UniqueStrippedPeptides, i.Peptide)
+			pro.TotalNumberPeptides++
+
+			pep := id.PeptideIonIdentification{
+				PeptideSequence:      i.Peptide,
+				ModifiedPeptide:      i.ModifiedPeptide,
+				Charge:               i.AssumedCharge,
+				Weight:               1,
+				GroupWeight:          0,
+				CalcNeutralPepMass:   i.CalcNeutralPepMass,
+				SharedParentProteins: len(i.AlternativeProteins),
+				Razor:                1,
+			}
+
+			pep.PeptideParentProtein = i.AlternativeProteins
+
+			pep.NumberOfInstances++
+
+			if i.Probability > pep.InitialProbability {
+				pep.InitialProbability = i.Probability
+			}
+
+			if len(i.AlternativeProteins) < 2 {
+				pep.IsNondegenerateEvidence = true
+				pep.IsUnique = true
+			} else {
+				pep.IsNondegenerateEvidence = false
+				pep.IsUnique = false
+			}
+
+			pep.Modifications.Index = make(map[string]mod.Modification)
+			for k, v := range i.Modifications.Index {
+				pep.Modifications.Index[k] = v
+			}
+
+			pro.IndistinguishableProtein = i.AlternativeProteins
+			pro.HasRazor = true
+			pro.PeptideIons = append(pro.PeptideIons, pep)
+
+			proteinList[i.Protein] = pro
+
+		} else {
+
+			pro.UniqueStrippedPeptides = append(pro.UniqueStrippedPeptides, i.Peptide)
+			pro.TotalNumberPeptides++
+
+			pep := id.PeptideIonIdentification{
+				PeptideSequence:      i.Peptide,
+				ModifiedPeptide:      i.ModifiedPeptide,
+				Charge:               i.AssumedCharge,
+				Weight:               0,
+				GroupWeight:          0,
+				CalcNeutralPepMass:   i.CalcNeutralPepMass,
+				SharedParentProteins: len(i.AlternativeProteins),
+				Razor:                0,
+			}
+
+			if i.Probability > pep.InitialProbability {
+				pep.InitialProbability = i.Probability
+			}
+
+			pep.PeptideParentProtein = i.AlternativeProteins
+
+			pep.NumberOfInstances++
+
+			if len(i.AlternativeProteins) < 2 {
+				pep.IsNondegenerateEvidence = true
+				pep.IsUnique = true
+			} else {
+				pep.IsNondegenerateEvidence = false
+				pep.IsUnique = false
+			}
+
+			pep.Modifications.Index = make(map[string]mod.Modification)
+			for k, v := range i.Modifications.Index {
+				pep.Modifications.Index[k] = v
+			}
+
+			pro.IndistinguishableProtein = i.AlternativeProteins
+			pro.PeptideIons = append(pro.PeptideIons, pep)
+
+			proteinList[i.Protein] = pro
+
+		}
+	}
+
+	for _, i := range proteinList {
+		proXML.Groups[0].Proteins = append(proXML.Groups[0].Proteins, i)
 	}
 
 	// tagget / decoy / threshold
@@ -502,14 +659,146 @@ func processProteinInferenceIdentifications(psm id.PepIDList, ptFDR, pepProb, pr
 		"decoy":  d,
 	}).Info("Protein inference results")
 
-	// // run the FDR filter for proteins
-	// pid = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
+	// run the FDR filter for proteins
+	pid := ProtXMLFilter(proXML, ptFDR, pepProb, protProb, false, true, decoyTag)
 
-	// // save results on meta folder
-	// pid.Serialize()
+	// save results on meta folder
+	proXML.Serialize()
+	pid.Serialize()
 
 	return
 }
+
+// func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[string]string, coverMap map[string]float64, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
+
+// 	var t int
+// 	var d int
+// 	var proteinIndex = make(map[string]uint)
+// 	var proXML id.ProtXML
+// 	var proGrps id.GroupList
+// 	var proteinCheckList = make(map[string]id.ProteinIdentification)
+// 	var ionCheckList = make(map[string]id.PeptideIonIdentification)
+
+// 	// build the ProtXML strct
+// 	grpID := id.GroupIdentification{
+// 		GroupNumber: 0,
+// 		Probability: 1.00,
+// 	}
+
+// 	proGrps = append(proGrps, grpID)
+
+// 	proXML.DecoyTag = decoyTag
+// 	proXML.Groups = proGrps
+
+// 	for _, i := range psm {
+
+// 		v, ok := proteinCheckList[i.Protein]
+// 		if ok {
+
+// 			obj := v
+// 			obj.UniqueStrippedPeptides = append(obj.UniqueStrippedPeptides, i.Peptide)
+// 			obj.TotalNumberPeptides++
+
+// 			proteinCheckList[i.Protein] = obj
+
+// 		} else {
+
+// 			var p id.ProteinIdentification
+
+// 			p.GroupNumber = 0
+// 			p.GroupSiblingID = "a"
+// 			p.ProteinName = i.Protein
+// 			p.HasRazor = true
+// 			p.UniqueStrippedPeptides = append(p.UniqueStrippedPeptides, i.Peptide)
+// 			p.Length = "0"
+// 			p.PercentCoverage = float32(coverMap[p.ProteinName])
+// 			p.PctSpectrumIDs = 0.0
+// 			p.GroupProbability = 1.00
+// 			p.Probability = i.Probability
+// 			p.Confidence = 1.00
+// 			p.TopPepProb = i.Probability
+// 			p.TotalNumberPeptides++
+// 			//p.HasRazor = true
+// 			p.Picked = 0
+
+// 			ionForm := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+// 			ion, okIon := ionCheckList[ionForm]
+// 			if okIon {
+// 				obj := ion
+
+// 				obj.NumberOfInstances++
+
+// 				ionCheckList[ionForm] = obj
+
+// 			} else {
+
+// 				pep := id.PeptideIonIdentification{
+// 					PeptideSequence:      i.Peptide,
+// 					ModifiedPeptide:      i.ModifiedPeptide,
+// 					Charge:               i.AssumedCharge,
+// 					InitialProbability:   i.Probability,
+// 					Weight:               0,
+// 					GroupWeight:          0,
+// 					CalcNeutralPepMass:   i.CalcNeutralPepMass,
+// 					NumberOfInstances:    1,
+// 					SharedParentProteins: len(i.AlternativeProteins),
+// 					Razor:                0,
+// 					//IsNondegenerateEvidence: ,
+// 					//IsUnique: ,
+// 					Modifications: i.Modifications,
+// 				}
+
+// 				if pep.SharedParentProteins == 0 {
+// 					pep.IsUnique = true
+// 				}
+
+// 				_, okRazor := razorMap[pep.PeptideSequence]
+// 				if okRazor {
+// 					p.HasRazor = true
+// 					pep.Razor = 1
+// 				}
+
+// 				ionCheckList[ionForm] = pep
+// 				p.PeptideIons = append(p.PeptideIons, pep)
+// 			}
+
+// 			proteinIndex[i.Protein]++
+// 			for j := range i.AlternativeProteinsIndexed {
+// 				proteinIndex[j]++
+// 			}
+
+// 			proteinCheckList[i.Protein] = p
+// 		}
+// 	}
+
+// 	// collect all ProteinIdentifications and put them on the ProtIDList object
+// 	for _, i := range proteinCheckList {
+// 		proXML.Groups[0].Proteins = append(proXML.Groups[0].Proteins, i)
+// 	}
+
+// 	for i := range proteinIndex {
+// 		if strings.HasPrefix(i, decoyTag) {
+// 			d++
+// 		} else {
+// 			t++
+// 		}
+// 	}
+
+// 	// tagget / decoy / threshold
+// 	logrus.WithFields(logrus.Fields{
+// 		"target": t,
+// 		"decoy":  d,
+// 	}).Info("Protein inference results")
+
+// 	// run the FDR filter for proteins
+// 	pid := ProtXMLFilter(proXML, ptFDR, pepProb, protProb, false, true, decoyTag)
+
+// 	// save results on meta folder
+// 	proXML.Serialize()
+// 	pid.Serialize()
+
+// 	return
+// }
 
 // proteinProfile ...
 func proteinProfile(p id.ProtXML) (t, d int) {

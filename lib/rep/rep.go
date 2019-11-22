@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"philosopher/lib/id"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
 	"philosopher/lib/tmt"
-	"github.com/sirupsen/logrus"
 )
 
 // Evidence ...
@@ -421,7 +421,7 @@ func Run(m met.Data) {
 	repo.MetaPeptideReport(labels, isoBrand, isoChannels, m.Report.Decoys)
 
 	// Protein
-	if len(m.Filter.Pox) > 0 {
+	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
 		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
 	}
 
