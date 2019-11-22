@@ -6,11 +6,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/msg"
 	"philosopher/lib/uti"
+
+	"github.com/sirupsen/logrus"
 )
 
 // RazorCandidate is a peptide sequence to be evaluated as a razor

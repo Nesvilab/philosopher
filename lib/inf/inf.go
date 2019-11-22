@@ -188,6 +188,7 @@ func ProteinInference(psm id.PepIDList) id.PepIDList {
 	}
 
 	//spew.Dump(peptideList)
+	//spew.Dump(proteinCoverageMap)
 
 	// update PSMs
 	for i := range psm {
