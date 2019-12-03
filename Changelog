@@ -1,10 +1,13 @@
 ### Added
-- Philosopehr protein inference
+- Philosopher protein inference. This feature is new and might be unstable, the second pass filtering and the protein reports are enable.
 
 ### Changed
+-Added isotopic error to msfragger section in the pipeline configuration file.
 
 ### Fixed
 - Generic FASTA parser is now checking the decoiy sttus of all entries.
+- Unmodified peptides were being marked as being oxidated.
+- Missing terminal mods because of capitalization.
 
  
 ## Snapcraft

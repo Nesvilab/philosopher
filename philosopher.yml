@@ -54,7 +54,7 @@ msfragger:                                     # v2.2
   fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
   fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
   calibrate_mass: 0                            # 0=Off, 1=On, 2=On and find optimal parameters
-  isotope_error: 0                             # 0=off, -1/0/1/2/3 (standard C13 error)
+  isotope_error: 0/1/2                         # 0=off, -1/0/1/2/3 (standard C13 error)
   mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
   precursor_mass_mode: selected                # selected or isolated
   localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring

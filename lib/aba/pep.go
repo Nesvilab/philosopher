@@ -179,10 +179,16 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap 
 
 				// this forces the unmodified peps to collapse with peps containing +16
 				if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-					uniqMds["15.994900"] = 0
 					delete(uniqMds, "0")
 					delete(uniqMds, "0.000000")
 				}
+				delete(uniqMds, "15.994900")
+
+				// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+				// 	uniqMds["15.994900"] = 0
+				// 	delete(uniqMds, "0")
+				// 	delete(uniqMds, "0.000000")
+				// }
 
 				for j := range uniqMds {
 					keys = append(keys, j)
@@ -268,11 +274,16 @@ func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets
 			}
 
 			// this forces the unmodified pepes to collapse with peps containing +16
+			// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+			// 	uniqMds["15.994900"] = 0
+			// 	delete(uniqMds, "0")
+			// 	delete(uniqMds, "0.000000")
+			// }
 			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-				uniqMds["15.994900"] = 0
 				delete(uniqMds, "0")
 				delete(uniqMds, "0.000000")
 			}
+			delete(uniqMds, "15.994900")
 
 			for k := range uniqMds {
 				keys = append(keys, k)
@@ -319,11 +330,16 @@ func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[strin
 			}
 
 			// this forces the unmodified pepes to collapse with peps containing +16
+			// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
+			// 	uniqMds["15.994900"] = 0
+			// 	delete(uniqMds, "0")
+			// 	delete(uniqMds, "0.000000")
+			// }
 			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-				uniqMds["15.994900"] = 0
 				delete(uniqMds, "0")
 				delete(uniqMds, "0.000000")
 			}
+			delete(uniqMds, "15.994900")
 
 			for k := range uniqMds {
 				keys = append(keys, k)

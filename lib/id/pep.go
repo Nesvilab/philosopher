@@ -13,14 +13,14 @@ import (
 
 	"philosopher/lib/msg"
 
-	"philosopher/lib/mod"
-	"philosopher/lib/spc"
-	"philosopher/lib/sys"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
+	"philosopher/lib/mod"
+	"philosopher/lib/spc"
+	"philosopher/lib/sys"
 )
 
 // PepXML data
@@ -177,7 +177,7 @@ func (p *PepXML) Read(f string) {
 		// map terminal modifications from file
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
 
-			key := fmt.Sprintf("%s-term#%.4f", i.Terminus, i.Mass)
+			key := fmt.Sprintf("%s-term#%.4f", strings.ToUpper(string(i.Terminus)), i.Mass)
 
 			_, ok := p.Modifications.Index[key]
 			if !ok {
