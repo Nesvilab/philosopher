@@ -14,6 +14,7 @@ import (
 
 	"philosopher/lib/msg"
 
+	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/fil"
 	"philosopher/lib/id"
@@ -21,7 +22,6 @@ import (
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 	"philosopher/lib/tmt"
-	"github.com/sirupsen/logrus"
 )
 
 // Create protein combined report
@@ -89,7 +89,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		names = append(names, prjName)
 	}
 
-	// If the name starts with CONTROL_  or Control_ then we put CONTROL (regardless of what follows after first '_')
+	// If the name starts with CONTROL  or control then we put CONTROL (regardless of what follows after first '_')
 	// If the name starts with something else, then we first determine, for each experiment, if the annotation
 	// follows GENE_condition_replicate format (meaning there are two '_' in the name) or just GENE_replicate
 	// format (meaning there is only one '_')
@@ -99,11 +99,12 @@ func proteinLevelAbacus(m met.Data, args []string) {
 
 	var reprintLabels []string
 	if m.Abacus.Reprint == true {
-		for _, i := range names {
-			if strings.Contains(strings.ToUpper(i), "CONTROL") {
+		for i := range names {
+			if strings.Contains(strings.ToUpper(names[i]), "CONTROL") {
+				strings.Replace(names[i], "control", "CONTROL", 1)
 				reprintLabels = append(reprintLabels, "CONTROL")
 			} else {
-				parts := strings.Split(i, "_")
+				parts := strings.Split(names[i], "_")
 				if len(parts) == 3 {
 					label := fmt.Sprintf("%s_%s", parts[0], parts[1])
 					reprintLabels = append(reprintLabels, label)
