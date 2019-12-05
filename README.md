@@ -1,7 +1,7 @@
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://philosopher/releases/latest)
 ![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
-<!--[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FNesvilab%2Fphilosopher-source%2Fbadge%3Ftoken%3D9cc51271afa40cd95d91e910f257c7b72d7e9157&style=for-the-badge)](https://actions-badge.atrox.dev/Nesvilab/philosopher-source/goto?token=9cc51271afa40cd95d91e910f257c7b72d7e9157)-->
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
+<!--[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FNesvilab%2Fphilosopher-source%2Fbadge%3Ftoken%3D9cc51271afa40cd95d91e910f257c7b72d7e9157&style=for-the-badge)](https://actions-badge.atrox.dev/Nesvilab/philosopher-source/goto?token=9cc51271afa40cd95d91e910f257c7b72d7e9157)-->
 
 
 ## Features
