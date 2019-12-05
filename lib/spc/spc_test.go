@@ -252,8 +252,8 @@ func TestProtXML_Parse(t *testing.T) {
 				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
 			}
 
-			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence) != "PEPTIDE" {
-				t.Errorf("Peptide sequence 1 in protein 1, group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence), "PEPTIDE")
+			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence) != "AQPPEAGPQGLHDLGR" {
+				t.Errorf("Peptide sequence 1 in protein 1, group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence), "AQPPEAGPQGLHDLGR")
 			}
 
 			if p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].Charge != 3 {
