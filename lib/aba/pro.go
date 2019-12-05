@@ -12,16 +12,17 @@ import (
 	"strconv"
 	"strings"
 
+	"philosopher/lib/iso"
 	"philosopher/lib/msg"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/fil"
 	"philosopher/lib/id"
 	"philosopher/lib/met"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
-	"philosopher/lib/tmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Create protein combined report
@@ -189,9 +190,9 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				ce.UniqueIntensity = make(map[string]float64)
 				ce.UrazorIntensity = make(map[string]float64)
 
-				ce.TotalLabels = make(map[string]tmt.Labels)
-				ce.UniqueLabels = make(map[string]tmt.Labels)
-				ce.URazorLabels = make(map[string]tmt.Labels)
+				ce.TotalLabels = make(map[string]iso.Labels)
+				ce.UniqueLabels = make(map[string]iso.Labels)
+				ce.URazorLabels = make(map[string]iso.Labels)
 
 				ce.SupportingSpectra = make(map[string]string)
 				ce.ProteinName = j.ProteinName

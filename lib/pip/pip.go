@@ -22,13 +22,13 @@ import (
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 
+	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/ext/comet"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
 	"philosopher/lib/wrk"
-	"github.com/sirupsen/logrus"
 )
 
 // Directives contains the instructions to run a pipeline
@@ -518,7 +518,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Quantify.Format = "mzML"
 			meta.Quantify.Brand = "tmt"
 
-			meta.Quantify = qua.RunTMTQuantification(meta.Quantify, meta.Filter.Mapmods)
+			meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
 
 			meta.Serialize()
 		}

@@ -2,18 +2,21 @@ package qua
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 	"philosopher/lib/tmt"
 	"philosopher/lib/uti"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -45,14 +48,16 @@ func RunLabelFreeQuantification(p met.Quantify) {
 	return
 }
 
-// RunTMTQuantification is the top function for label quantification
-func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
+// RunIsobaricLabelQuantification is the top function for label quantification
+func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	var psmMap = make(map[string]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
-	// logrus.Info("Restoring data")
+	if p.Brand == "" {
+		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
+	}
 
 	var evi rep.Evidence
 	evi.RestoreGranular()
@@ -98,14 +103,12 @@ func RunTMTQuantification(p met.Quantify, mods bool) met.Quantify {
 
 		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 
-		//ms1 = raw.MS1{}
-
-		var labels = make(map[string]tmt.Labels)
+		var labels = make(map[string]iso.Labels)
 		if p.Level == 3 {
-			labels = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Plex, p.Tol, mz)
+			labels = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 
 		} else {
-			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Plex, p.Tol, mz)
+			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 		}
 
 		labels = assignLabelNames(labels, p.LabelNames)
@@ -257,7 +260,7 @@ func getLabelNames(annot string) map[string]string {
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName
-func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string) map[string]tmt.Labels {
+func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string) map[string]iso.Labels {
 
 	for _, i := range labels {
 
@@ -367,10 +370,10 @@ func assignLabelNames(labels map[string]tmt.Labels, labelNames map[string]string
 	return labels
 }
 
-func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[string]tmt.Labels, map[string]tmt.Labels) {
+func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[string]iso.Labels, map[string]iso.Labels) {
 
-	var spectrumMap = make(map[string]tmt.Labels)
-	var phosphoSpectrumMap = make(map[string]tmt.Labels)
+	var spectrumMap = make(map[string]iso.Labels)
+	var phosphoSpectrumMap = make(map[string]iso.Labels)
 
 	var bestMap = make(map[string]uint8)
 

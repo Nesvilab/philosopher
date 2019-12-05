@@ -5,13 +5,14 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"philosopher/lib/iso"
 	"philosopher/lib/msg"
 
-	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/mod"
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
-	"philosopher/lib/tmt"
+
+	"github.com/vmihailenco/msgpack"
 )
 
 // ProtXML struct
@@ -64,7 +65,7 @@ type PeptideIonIdentification struct {
 	IsNondegenerateEvidence bool
 	IsUnique                bool
 	PeptideParentProtein    []string
-	Labels                  tmt.Labels
+	Labels                  iso.Labels
 	Modifications           mod.Modifications
 }
 

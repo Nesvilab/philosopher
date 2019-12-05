@@ -9,12 +9,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/id"
+	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
-	"philosopher/lib/tmt"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Evidence ...
@@ -158,7 +159,7 @@ type PSMEvidence struct {
 	IsDecoy                          bool
 	IsUnique                         bool
 	IsURazor                         bool
-	Labels                           tmt.Labels
+	Labels                           iso.Labels
 	Modifications                    mod.Modifications
 }
 
@@ -196,8 +197,8 @@ type IonEvidence struct {
 	GeneName             string
 	EntryName            string
 	ProteinDescription   string
-	Labels               tmt.Labels
-	PhosphoLabels        tmt.Labels
+	Labels               iso.Labels
+	PhosphoLabels        iso.Labels
 	Modifications        mod.Modifications
 }
 
@@ -226,8 +227,8 @@ type PeptideEvidence struct {
 	ModifiedObservations   int
 	UnModifiedObservations int
 	IsDecoy                bool
-	Labels                 tmt.Labels
-	PhosphoLabels          tmt.Labels
+	Labels                 iso.Labels
+	PhosphoLabels          iso.Labels
 	Modifications          mod.Modifications
 }
 
@@ -268,12 +269,12 @@ type ProteinEvidence struct {
 	TopPepProb             float64
 	IsDecoy                bool
 	IsContaminant          bool
-	TotalLabels            tmt.Labels
-	UniqueLabels           tmt.Labels
-	URazorLabels           tmt.Labels // Unique + razor
-	PhosphoTotalLabels     tmt.Labels
-	PhosphoUniqueLabels    tmt.Labels
-	PhosphoURazorLabels    tmt.Labels // Unique + razor
+	TotalLabels            iso.Labels
+	UniqueLabels           iso.Labels
+	URazorLabels           iso.Labels // Unique + razor
+	PhosphoTotalLabels     iso.Labels
+	PhosphoUniqueLabels    iso.Labels
+	PhosphoURazorLabels    iso.Labels // Unique + razor
 	Modifications          mod.Modifications
 }
 
@@ -310,9 +311,9 @@ type CombinedProteinEvidence struct {
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64
-	TotalLabels            map[string]tmt.Labels
-	UniqueLabels           map[string]tmt.Labels
-	URazorLabels           map[string]tmt.Labels // Unique + razor
+	TotalLabels            map[string]iso.Labels
+	UniqueLabels           map[string]iso.Labels
+	URazorLabels           map[string]iso.Labels // Unique + razor
 }
 
 // CombinedProteinEvidenceList is a list of Combined Protein Evidences
@@ -423,7 +424,7 @@ func Run(m met.Data) {
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
 		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
-		repo.ProteinFastaReport(true)
+		repo.ProteinFastaReport(m.Report.Decoys)
 	}
 
 	// Modifications
