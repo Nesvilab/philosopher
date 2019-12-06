@@ -252,6 +252,15 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 		default:
 			header += ""
 		}
+	} else if brand == "itraq" {
+		switch channels {
+		case 4:
+			header += "\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+		case 8:
+			header += "\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+		default:
+			header += ""
+		}
 	}
 
 	header += "\n"
@@ -366,70 +375,88 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 			strings.Join(ip, ", "),   // Indistinguishable Proteins
 		)
 
-		if brand == "tmt" {
-			switch channels {
-			case 6:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-					line,
-					reportIntensities[0],
-					reportIntensities[1],
-					reportIntensities[2],
-					reportIntensities[3],
-					reportIntensities[4],
-					reportIntensities[5],
-				)
-			case 10:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-					line,
-					reportIntensities[0],
-					reportIntensities[1],
-					reportIntensities[2],
-					reportIntensities[3],
-					reportIntensities[4],
-					reportIntensities[5],
-					reportIntensities[6],
-					reportIntensities[7],
-					reportIntensities[8],
-					reportIntensities[9],
-				)
-			case 11:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-					line,
-					reportIntensities[0],
-					reportIntensities[1],
-					reportIntensities[2],
-					reportIntensities[3],
-					reportIntensities[4],
-					reportIntensities[5],
-					reportIntensities[6],
-					reportIntensities[7],
-					reportIntensities[8],
-					reportIntensities[9],
-					reportIntensities[10],
-				)
-			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-					line,
-					reportIntensities[0],
-					reportIntensities[1],
-					reportIntensities[2],
-					reportIntensities[3],
-					reportIntensities[4],
-					reportIntensities[5],
-					reportIntensities[6],
-					reportIntensities[7],
-					reportIntensities[8],
-					reportIntensities[9],
-					reportIntensities[10],
-					reportIntensities[11],
-					reportIntensities[12],
-					reportIntensities[13],
-					reportIntensities[14],
-					reportIntensities[15],
-				)
-			default:
-				header += ""
-			}
+		switch channels {
+		case 4:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+			)
+		case 6:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+			)
+		case 8:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+			)
+		case 10:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+			)
+		case 11:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				reportIntensities[10],
+			)
+		case 16:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				reportIntensities[10],
+				reportIntensities[11],
+				reportIntensities[12],
+				reportIntensities[13],
+				reportIntensities[14],
+				reportIntensities[15],
+			)
+		default:
+			header += ""
 		}
 
 		line += "\n"

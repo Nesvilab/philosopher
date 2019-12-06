@@ -1,5 +1,6 @@
 ### Added
 - Philosopher protein inference. This feature is new and might be unstable, the second pass filtering and the protein reports are enable.
+- Support for iTRAQ 4 and 8.
 
 ### Changed
 -Added isotopic error to msfragger section in the pipeline configuration file.
