@@ -554,7 +554,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	}
 
 	if curProb == 10 {
-		msg.Custom(errors.New("The protein FDR filter didn't reached the desired threshold, try a higher threshold using the --prot parameter"), "error")
+		msg.Custom(errors.New("The protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "error")
 	}
 
 	fmtScore := uti.ToFixed(curScore, 4)
