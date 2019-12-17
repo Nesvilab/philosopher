@@ -62,7 +62,12 @@ func Run(f met.Data) met.Data {
 	} else {
 
 		if f.Filter.Inference == true {
-			pepid, razorMap, coverMap := inf.ProteinInference(pepid)
+
+			var filteredPSM id.PepIDList
+			filteredPSM.Restore("psm")
+
+			pepid, razorMap, coverMap := inf.ProteinInference(filteredPSM)
+			filteredPSM = nil
 
 			pepid.Serialize("psm")
 			pepid.Serialize("pep")
