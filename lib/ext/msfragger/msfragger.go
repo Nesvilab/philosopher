@@ -213,7 +213,7 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		fmt.Sprintf("%f", params.MinimumRatio),
 		"--clear_mz_range",
 		fmt.Sprintf("%s", params.ClearMzRange),
-		"remove_precursor_peak",
+		"--remove_precursor_peak",
 		fmt.Sprintf("%d", params.RemovePrecursorPeak),
 		"--remove_precursor_range",
 		fmt.Sprintf("%s", params.RemovePrecursorRange),
