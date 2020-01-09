@@ -101,21 +101,22 @@ msfragger:                                     # v2.3
   remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
   remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
   intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
-  add_C_cysteine: 0.000000                     # cysteine fixed modifications 
   add_Cterm_peptide: 0.000000                  # c-term peptide fixed modifications
   add_Cterm_protein: 0.000000                  # c-term protein fixed modifications
+  add_Nterm_peptide: 0.000000                  # n-term peptide fixed modifications
+  add_Nterm_protein: 0.000000                  # n-term protein fixed modifications
+  add_A_alanine: 0.000000                      # alanine fixed modifications 
+  add_C_cysteine: 57.021464                    # cysteine fixed modifications 
   add_D_aspartic_acid: 0.000000                # aspartic acid fixed modifications
   add_E_glutamic_acid: 0.000000                # glutamic acid fixed modifications
   add_F_phenylalanine: 0.000000                # phenylalanine fixed modifications
   add_G_glycine: 0.000000                      # glycine fixed modifications
   add_H_histidine: 0.000000                    # histidine fixed modifications
   add_I_isoleucine: 0.000000                   # isoleucine fixed modifications
-  add_K_lysine: 0.000000                       # lysine fixed modifications
+  add_K_lysine: 229.162932                     # lysine fixed modifications
   add_L_leucine: 0.000000                      # leucine fixed modifications
   add_M_methionine: 0.000000                   # methionine fixed modifications
   add_N_asparagine: 0.000000                   # asparagine fixed modifications
-  add_Nterm_peptide: 0.000000                  # n-term peptide fixed modifications
-  add_Nterm_protein: 0.000000                  # n-term protein fixed modifications
   add_P_proline: 0.000000                      # proline fixed modifications
   add_Q_glutamine: 0.000000                    # glutamine fixed modifications
   add_R_arginine: 0.000000                     # arginine fixed modifications
@@ -124,6 +125,7 @@ msfragger:                                     # v2.3
   add_V_valine: 0.000000                       # valine fixed modifications
   add_W_tryptophan: 0.000000                   # tryptophan fixed modifications
   add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
+  
 
 peptideprophet:                                # v5.2
   extension: pepXML                            # pepXML file extension

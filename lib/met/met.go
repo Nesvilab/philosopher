@@ -153,9 +153,12 @@ type MSFragger struct {
 	VariableMod05                      string  `yaml:"variable_mod_05"`
 	VariableMod06                      string  `yaml:"variable_mod_06"`
 	VariableMod07                      string  `yaml:"variable_mod_07"`
-	AddCysteine                        float64 `yaml:"add_C_cysteine"`
 	AddCtermPeptide                    float64 `yaml:"add_Cterm_peptide"`
 	AddCtermProtein                    float64 `yaml:"add_Cterm_protein"`
+	AddNTermPeptide                    float64 `yaml:"add_Nterm_peptide"`
+	AddNtermProteine                   float64 `yaml:"add_Nterm_protein"`
+	AddAlanine                         float64 `yaml:"add_A_alanine"`
+	AddCysteine                        float64 `yaml:"add_C_cysteine"`
 	AddAsparticAcid                    float64 `yaml:"add_D_aspartic_acid"`
 	AddGlutamicAcid                    float64 `yaml:"add_E_glutamic_acid"`
 	AddPhenylAlnine                    float64 `yaml:"add_F_phenylalanine"`
@@ -166,8 +169,6 @@ type MSFragger struct {
 	AddLeucine                         float64 `yaml:"add_L_leucine"`
 	AddMethionine                      float64 `yaml:"add_M_methionine"`
 	AddAsparagine                      float64 `yaml:"add_N_asparagine"`
-	AddNTermPeptide                    float64 `yaml:"add_Nterm_peptide"`
-	AddNtermProteine                   float64 `yaml:"add_Nterm_protein"`
 	AddProline                         float64 `yaml:"add_P_proline"`
 	AddGlutamine                       float64 `yaml:"add_Q_glutamine"`
 	AddArginine                        float64 `yaml:"add_R_arginine"`
