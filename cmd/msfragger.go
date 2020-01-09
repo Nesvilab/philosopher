@@ -4,11 +4,11 @@ package cmd
 import (
 	"os"
 
+	"github.com/spf13/cobra"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
-	"github.com/spf13/cobra"
 )
 
 // msfraggerCmd represents the msfragger command
@@ -54,7 +54,8 @@ func init() {
 		msfraggerCmd.Flags().Float64VarP(&m.MSFragger.FragmentMassTolerance, "fragment_mass_tolerance", "", 20, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.FragmentMassUnits, "fragment_mass_units", "", 1, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.CalibrateMass, "calibrate_mass", "", 0, "0=Off, 1=On, 2=On and find optimal parameters")
-		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IsotopeError, "isotope_error", "", "0", "0=off, -1/0/1/2/3 (standard C13 error)")
+		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Deisotope, "deisotope", "", 0, "0=off, -1/0/1/2/3 (standard C13 error)")
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IsotopeError, "isotope_error", "-1/0/1/2/3", "0", "0=off, -1/0/1/2/3 (standard C13 error)")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MassOffsets, "mass_offsets", "", 0, "allow for additional precursor mass window shifts")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.LocalizeDeltaMass, "localize_delta_mass", "", 0, "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.PrecursorMassMode, "precursor_mass_mode", "", "selected", "")
@@ -74,7 +75,7 @@ func init() {
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.VariableMod06, "variable_mod_06", "", "", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.VariableMod07, "variable_mod_07", "", "", "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.AllowMultipleVariableModsOnResidue, "allow_multiple_variable_mods_on_residue", "", 1, "static mods are not considered")
-		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MaxVariableModsPerMod, "max_variable_mods_per_mod", "", 3, "maximun of 5")
+		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MaxVariableModsPerPeptide, "max_variable_mods_per_peptide", "", 3, "maximun of 5")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MaxVariableModsCombinations, "max_variable_mods_combinations", "", 5000, "maximum of 65534, limits number of modified peptides generated from sequence")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.OutputFileExtension, "output_file_extension", "", "pepXML", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.OutputFormat, "output_format", "", "pepXML", "")

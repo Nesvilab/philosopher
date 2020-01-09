@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"philosopher/lib/msg"
 	"philosopher/lib/met"
+	"philosopher/lib/msg"
 )
 
 // MSFragger represents the tool configuration
@@ -131,6 +131,8 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		fmt.Sprintf("%d", params.FragmentMassUnits),
 		"--calibrate_mass",
 		fmt.Sprintf("%d", params.CalibrateMass),
+		"--deisotope",
+		fmt.Sprintf("%d", params.Deisotope),
 		"--isotope_error",
 		fmt.Sprintf("%s", params.IsotopeError),
 		"--mass_offsets",
@@ -165,8 +167,8 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		fmt.Sprintf("%s", params.VariableMod04),
 		"--allow_multiple_variable_mods_on_residue",
 		fmt.Sprintf("%d", params.AllowMultipleVariableModsOnResidue),
-		"--max_variable_mods_per_mod",
-		fmt.Sprintf("%d", params.MaxVariableModsPerMod),
+		"--max_variable_mods_per_peptide",
+		fmt.Sprintf("%d", params.MaxVariableModsPerPeptide),
 		"--max_variable_mods_combinations",
 		fmt.Sprintf("%d", params.MaxVariableModsCombinations),
 		"--output_file_extension",

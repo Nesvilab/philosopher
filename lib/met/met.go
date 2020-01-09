@@ -11,9 +11,9 @@ import (
 
 	"philosopher/lib/msg"
 
-	"philosopher/lib/sys"
 	uuid "github.com/satori/go.uuid"
 	"github.com/vmihailenco/msgpack"
+	"philosopher/lib/sys"
 )
 
 // Data is the global parameter container
@@ -106,6 +106,7 @@ type MSFragger struct {
 	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
 	CalibrateMass                      int     `yaml:"calibrate_mass"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
+	Deisotope                          int     `yaml:"deisotope"`
 	IsotopeError                       string  `yaml:"isotope_error"`
 	MassOffsets                        int     `yaml:"mass_offsets"`
 	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
@@ -119,7 +120,7 @@ type MSFragger struct {
 	AllowedMissedCleavage              int     `yaml:"allowed_missed_cleavage"`
 	ClipNTermM                         int     `yaml:"clip_nTerm_M"`
 	AllowMultipleVariableModsOnResidue int     `yaml:"allow_multiple_variable_mods_on_residue"`
-	MaxVariableModsPerMod              int     `yaml:"max_variable_mods_per_mod"`
+	MaxVariableModsPerPeptide          int     `yaml:"max_variable_mods_per_peptide"`
 	MaxVariableModsCombinations        int     `yaml:"max_variable_mods_combinations"`
 	OutputFileExtension                string  `yaml:"output_file_extension"`
 	OutputFormat                       string  `yaml:"output_format"`

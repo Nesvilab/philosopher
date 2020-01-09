@@ -4,6 +4,7 @@
 
 ### Changed
 - Added isotopic error to msfragger section in the pipeline configuration file.
+- Updated to MSFragger 2.3 and TMT-Intewgrator 1.1.2
 
 ### Fixed
 - Generic FASTA parser is now checking the decoy status of all entries.
