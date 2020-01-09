@@ -143,6 +143,9 @@ type MSFragger struct {
 	MinMatchedFragments                int     `yaml:"min_matched_fragments"`
 	MinimumRatio                       float64 `yaml:"minimum_ratio"`
 	ClearMzRange                       string  `yaml:"clear_mz_range"`
+	RemovePrecursorPeak                int     `yaml:"remove_precursor_peak"`
+	RemovePrecursorRange               string  `yaml:"remove_precursor_range"`
+	IntensityTransform                 int     `yaml:"intensity_transform"`
 	VariableMod01                      string  `yaml:"variable_mod_01"`
 	VariableMod02                      string  `yaml:"variable_mod_02"`
 	VariableMod03                      string  `yaml:"variable_mod_03"`

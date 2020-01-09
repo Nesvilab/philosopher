@@ -98,6 +98,9 @@ msfragger:                                     # v2.3
   min_matched_fragments: 4                     # minimum number of matched peaks for PSM to be reported
   minimum_ratio: 0.01                          # filters out all peaks in experimental spectrum less intense than this multiple of the base peak intensity
   clear_mz_range: 0.0 0.0                      # for iTRAQ/TMT type data; will clear out all peaks in the specified m/z range
+  remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
+  remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
+  intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
   add_C_cysteine: 0.000000                     # cysteine fixed modifications 
   add_Cterm_peptide: 0.000000                  # c-term peptide fixed modifications
   add_Cterm_protein: 0.000000                  # c-term protein fixed modifications
