@@ -390,6 +390,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 		meta.InterProphet.InputFiles = files
 		meta.InterProphet.Decoy = "rev_"
 		meta.InterProphet.Threads = 6
+		meta.InterProphet.MinProb = p.Abacus.PepProb
 
 		// run
 		meta = interprophet.Run(meta, files)
@@ -422,6 +423,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		meta.ProteinProphet = p.ProteinProphet
 		meta.ProteinProphet.Output = "combined"
+		meta.ProteinProphet.Minprob = p.Abacus.ProtProb
 
 		var files []string
 
