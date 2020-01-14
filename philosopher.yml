@@ -1,12 +1,13 @@
 # Philosopher pipeline configuration file.
 #
-# The pipeline mode automates the processing done by Philosopher. First, check
+# The pipeline mode automates the processing done by Philosopher and other tools. First, check
 # the steps you want to execute in the commands section and change them to
 # 'yes'. For each selected command, go to its section and adjust the parameters
 # accordingly to your analysis.
 #
 # If you want to include MSFragger and TMT-Integrator into your analysis, you will
-# haver o download them separately and then add their location tot their configuration
+# have to download them separately, and then add their location in their 
+# configuration section.
 #
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
@@ -250,7 +251,7 @@ bioquant:
 abacus:
   protein: true                                # global level protein report
   peptide: true                                # global level peptide report
-  proteinprobability: 0.9                      # minimum protein probability (default 0.9)
+  proteinProbability: 0.9                      # minimum protein probability (default 0.9)
   peptideProbability: 0.5                      # minimum peptide probability (default 0.5)
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
   reprint: false                               # create abacus reports using the Reprint format

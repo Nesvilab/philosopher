@@ -12,6 +12,7 @@
 - Missing terminal mods because of capitalization.
 - Fixed the sorting of the Reprint headers.
 - FASTA protein report is back to the report command.
+- TYpo on ProteinProbability in Abacus pipeline command.
 
  
 ## Snapcraft
