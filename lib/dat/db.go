@@ -32,10 +32,16 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 
 	var e Record
 
-	idReg1 := regexp.MustCompile(`(ENSP\w+)`)
+	// idReg1 := regexp.MustCompile(`(ENSP\w+)`)
+	// idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
+	// desReg := regexp.MustCompile(`ENSP\w+(.*)`)
+	// geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
+
+	// this version accepts ENSEMBL headers from other souces like transcript and gene
+	idReg1 := regexp.MustCompile(`(ENS\w+)`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
-	desReg := regexp.MustCompile(`ENSP\w+(.*)`)
-	geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
+	desReg := regexp.MustCompile(`ENS\w+(.*)`)
+	geneReg := regexp.MustCompile(`ENS\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
 
 	e.OriginalHeader = k
 
