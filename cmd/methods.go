@@ -12,8 +12,9 @@ import (
 
 // methodsCmd represents the methods command
 var methodsCmd = &cobra.Command{
-	Use:   "methods",
-	Short: "A write-my-methods function",
+	Use:    "methods",
+	Hidden: true,
+	Short:  "A write-my-methods function",
 
 	Run: func(cmd *cobra.Command, args []string) {
 
