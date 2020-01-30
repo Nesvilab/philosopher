@@ -81,10 +81,10 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Razor, "razor", "", false, "use razor peptides for protein FDR scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Mapmods, "mapmods", "", false, "map modifications")
-		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "")
+		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
 		filterCmd.Flags().BoolVarP(&m.Filter.Fo, "fo", "", false, "")
 		filterCmd.Flags().MarkHidden("fo")
-		filterCmd.Flags().MarkHidden("inference")
+		//filterCmd.Flags().MarkHidden("inference")
 	}
 
 	RootCmd.AddCommand(filterCmd)

@@ -35,6 +35,28 @@ func PepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 	var peplist id.PepIDList
 	var minProb float64 = 10
 
+	// // Forces probability to 0 when slassifying only modified peptides.
+	// if modsOnly == true {
+	// 	for _, v := range input {
+	// 		for i := range v {
+	// 			if !strings.Contains(v[i].ModifiedPeptide, "[") {
+	// 				v[i].Probability = 0
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// // Forces probability to 0 when slassifying only phospho peptides.
+	// for _, v := range input {
+	// 	for i := range v {
+	// 		if strings.Contains(v[i].ModifiedPeptide, "S[") || strings.Contains(v[i].ModifiedPeptide, "T[") || strings.Contains(v[i].ModifiedPeptide, "Y[") {
+	// 			//
+	// 		} else {
+	// 			v[i].Probability = 0.1
+	// 		}
+	// 	}
+	// }
+
 	if strings.EqualFold(level, "PSM") {
 
 		// move all entries to list and count the number of targets and decoys
@@ -87,6 +109,7 @@ func PepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 
 	var scoreMap = make(map[float64]float64)
 	limit := (len(list) - 1)
+
 	for j := limit; j >= 0; j-- {
 		_, ok := scoreMap[list[j].Probability]
 		if !ok {
