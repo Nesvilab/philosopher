@@ -47,16 +47,16 @@ msfragger:                                     # v2.3
   param:                                       # MSFragger parameter file
   raw: mzML                                    # spectra format
   num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
-  precursor_mass_lower: -20                    # lower bound of the precursor mass window
-  precursor_mass_upper: 20                     # upper bound of the precursor mass window
+  precursor_mass_lower: -50                    # lower bound of the precursor mass window
+  precursor_mass_upper: 50                     # upper bound of the precursor mass window
   precursor_mass_units: 1                      # 0=Daltons, 1=ppm
   precursor_true_tolerance: 20                 # true precursor mass tolerance (window is +/- this value)
   precursor_true_units: 1                      # 0=Daltons, 1=ppm
   fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
   fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
-  calibrate_mass: 0                            # 0=Off, 1=On, 2=On and find optimal parameters
-  deisotope: 0                                 # activates deisotoping.
-  isotope_error: -1/0/1/2/3                    # 0=off, -1/0/1/2/3 (standard C13 error)
+  calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
+  deisotope: 1                                 # activates deisotoping.
+  isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
   mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
   precursor_mass_mode: selected                # selected or isolated
   localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
@@ -75,7 +75,7 @@ msfragger:                                     # v2.3
   variable_mod_05:                             # variable modification
   variable_mod_06:                             # variable modification
   variable_mod_07:                             # variable modification
-  allow_multiple_variable_mods_on_residue: 1   # static mods are not considered
+  allow_multiple_variable_mods_on_residue: 0   # static mods are not considered
   max_variable_mods_per_peptide: 3             # maximum of 5
   max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
   output_file_extension: pepXML                # file extension of output files
@@ -114,7 +114,7 @@ msfragger:                                     # v2.3
   add_G_glycine: 0.000000                      # glycine fixed modifications
   add_H_histidine: 0.000000                    # histidine fixed modifications
   add_I_isoleucine: 0.000000                   # isoleucine fixed modifications
-  add_K_lysine: 229.162932                     # lysine fixed modifications
+  add_K_lysine: 0.000000                       # lysine fixed modifications
   add_L_leucine: 0.000000                      # leucine fixed modifications
   add_M_methionine: 0.000000                   # methionine fixed modifications
   add_N_asparagine: 0.000000                   # asparagine fixed modifications
@@ -131,11 +131,11 @@ msfragger:                                     # v2.3
 peptideprophet:                                # v5.2
   extension: pepXML                            # pepXML file extension
   clevel: 0                                    # set Conservative Level in neg_stdev from the neg_mean, low numbers are less conservative, high numbers are more conservative
-  accmass: false                               # use Accurate Mass model binning
-  decoyprobs: false                            # compute possible non-zero probabilities for Decoy entries on the last iteration
+  accmass: true                                # use Accurate Mass model binning
+  decoyprobs: true                             # compute possible non-zero probabilities for Decoy entries on the last iteration
   enzyme: trypsin                              # enzyme used in sample (optional)
   exclude: false                               # exclude deltaCn*, Mascot*, and Comet* results from results (default Penalize * results)
-  expectscore: false                           # use expectation value as the only contributor to the f-value for modeling
+  expectscore: true                            # use expectation value as the only contributor to the f-value for modeling
   forcedistr: false                            # bypass quality control checks, report model despite bad modeling
   glyc: false                                  # enable peptide Glyco motif model
   icat: false                                  # apply ICAT model (default Autodetect ICAT)
@@ -153,12 +153,12 @@ peptideprophet:                                # v5.2
   noicat: false                                # do no apply ICAT model (default Autodetect ICAT)
   nomass: false                                # disable mass model
   nonmc: false                                 # disable NMC missed cleavage model
-  nonparam: false                              # use semi-parametric modeling, must be used in conjunction with --decoy option
+  nonparam: true                               # use semi-parametric modeling, must be used in conjunction with --decoy option
   nontt: false                                 # disable NTT enzymatic termini model
   optimizefval: false                          # (SpectraST only) optimize f-value function f(dot,delta) using PCA
   phospho: false                               # enable peptide Phospho motif model
   pi: false                                    # enable peptide pI model
-  ppm: false                                   # use PPM mass error instead of Dalton for mass modeling
+  ppm: true                                    # use PPM mass error instead of Dalton for mass modeling
   zero: false                                  # report results with minimum probability 0
 
 ptmprophet:                                    # v5.2
