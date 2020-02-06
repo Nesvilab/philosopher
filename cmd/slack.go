@@ -8,6 +8,7 @@ import (
 	"philosopher/lib/msg"
 	"philosopher/lib/sla"
 	"philosopher/lib/sys"
+
 	"github.com/spf13/cobra"
 )
 
@@ -17,9 +18,12 @@ import (
 // data structure, which gathers the users input, so your private data is not stored and shared!
 
 var name string
+var direct string
 var token string
 var message string
 var channel string
+
+//var log string
 
 // slackCmd represents the slack command
 var slackCmd = &cobra.Command{
@@ -31,7 +35,7 @@ var slackCmd = &cobra.Command{
 			msg.InputNotFound(errors.New("You need to specify your token in order to push a notification"), "error")
 		}
 
-		sla.Run(name, token, message, channel)
+		sla.Run(name, direct, token, message, channel)
 
 		return
 	},
@@ -43,9 +47,11 @@ func init() {
 		m.Restore(sys.Meta())
 
 		slackCmd.Flags().StringVarP(&name, "username", "", "Philosopher", "specify the name of the bot")
+		slackCmd.Flags().StringVarP(&direct, "direct", "", "", "send a direct message to a user ID")
 		slackCmd.Flags().StringVarP(&token, "token", "", "", "specify the Slack API token")
 		slackCmd.Flags().StringVarP(&message, "message", "", "", "specify the text of the message to send")
 		slackCmd.Flags().StringVarP(&channel, "channel", "", "", "specify the channel name")
+		//slackCmd.Flags().StringVarP(&log, "log", "", "", "upload a log file")
 	}
 
 	RootCmd.AddCommand(slackCmd)

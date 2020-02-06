@@ -12,6 +12,7 @@ import (
 	"philosopher/lib/pip"
 	"philosopher/lib/sla"
 	"philosopher/lib/sys"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
@@ -95,7 +96,7 @@ var pipelineCmd = &cobra.Command{
 		//pip.BackupAndClean(meta, p, dir, Version, Build, args)
 
 		if len(p.SlackToken) > 0 {
-			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
+			sla.Run("Philosopher", "", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
 		}
 
 		msg.Done()
