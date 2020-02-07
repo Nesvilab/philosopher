@@ -12,9 +12,10 @@
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
 
-analytics: true                                # reports when a workspace is created for usage estimation (default true)
-slackToken:                                    # specify the Slack API token
-slackChannel:                                  # specify the channel name
+analytics: true                                # reports when a workspace is created for usage statistics
+slackToken:                                    # specify the Slack API token (how to generate a token: https://api.slack.com/legacy/custom-integrations/legacy-tokens)
+slackChannel:                                  # specify the channel name, or
+slackUserID:                                   # specify a user ID for a direct message
 
 commands:
   workspace: yes                               # manage the experiment workspace for the analysis

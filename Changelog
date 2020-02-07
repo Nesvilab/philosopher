@@ -1,8 +1,12 @@
 ### Added
-
+- Added MGF writing and Decoy tags options to MSFragger.
+- The Pipeline can now send Slack direct messages to users. 
+ 
 ### Changed
+- Updated Slack API, direct messages can also ben sent now.
 
 ### Fixed
- 
+- The Pipeline Filter command will no work without a protein inference.
+
 ## Snapcraft
 - `snap install philosopher`

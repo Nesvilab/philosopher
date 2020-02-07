@@ -96,7 +96,7 @@ var pipelineCmd = &cobra.Command{
 		//pip.BackupAndClean(meta, p, dir, Version, Build, args)
 
 		if len(p.SlackToken) > 0 {
-			sla.Run("Philosopher", "", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel)
+			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
 		}
 
 		msg.Done()

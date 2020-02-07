@@ -22,13 +22,14 @@ import (
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/ext/comet"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
 	"philosopher/lib/wrk"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Directives contains the instructions to run a pipeline
@@ -39,6 +40,7 @@ type Directives struct {
 	Analtics       bool               `yaml:"analytics"`
 	SlackToken     string             `yaml:"slackToken"`
 	SlackChannel   string             `yaml:"slackChannel"`
+	SlackUserID    string             `yaml:"slackUserID"`
 	Commands       Commands           `yaml:"commands"`
 	Database       met.Database       `yaml:"database"`
 	MSFragger      met.MSFragger      `yaml:"msfragger"`
@@ -159,6 +161,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 
 			meta.MSFragger = p.MSFragger
 			meta.MSFragger.DatabaseName = p.Database.Annot
+			meta.MSFragger.DecoyPrefix = p.Database.Tag
 
 			gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
@@ -489,6 +492,8 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
+			} else if p.Commands.Abacus == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
+				meta.Filter.Pox = ""
 			}
 
 			meta := fil.Run(meta)

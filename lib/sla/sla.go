@@ -8,7 +8,7 @@ import (
 )
 
 // Run is the main entry point for Slack
-func Run(name, direct, token, message, channel string) {
+func Run(name, token, message, channel, userID string) {
 
 	var channelID string
 	var timestamp string
@@ -16,9 +16,9 @@ func Run(name, direct, token, message, channel string) {
 
 	api := slack.New(token)
 
-	if len(direct) > 0 {
+	if len(userID) > 0 {
 
-		_, _, channelID, e = api.OpenIMChannel(direct)
+		_, _, channelID, e = api.OpenIMChannel(userID)
 		if e != nil {
 			fmt.Printf("%s\n", e)
 			return

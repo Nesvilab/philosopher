@@ -4,11 +4,12 @@ package cmd
 import (
 	"os"
 
-	"github.com/spf13/cobra"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	"github.com/spf13/cobra"
 )
 
 // msfraggerCmd represents the msfragger command
@@ -54,6 +55,8 @@ func init() {
 		msfraggerCmd.Flags().Float64VarP(&m.MSFragger.FragmentMassTolerance, "fragment_mass_tolerance", "", 20, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.FragmentMassUnits, "fragment_mass_units", "", 1, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.CalibrateMass, "calibrate_mass", "", 0, "0=Off, 1=On, 2=On and find optimal parameters")
+		msfraggerCmd.Flags().IntVarP(&m.MSFragger.WriteCalibratedMGF, "write_calibrated_mgf", "", 0, "write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)")
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.DecoyPrefix, "decoy_prefix", "", "rev_", "prefix added to the decoy protein ID (used for parameter optimization only)")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Deisotope, "deisotope", "", 1, "Perform deisotoping or not (0=no, 1=yes and assume singleton peaks single charged, 2=yes and assume singleton")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IsotopeError, "isotope_error", "", "0/1/2", "0=off, 0/1/2 (standard C13 error)")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MassOffsets, "mass_offsets", "", 0, "allow for additional precursor mass window shifts")

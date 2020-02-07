@@ -11,9 +11,10 @@ import (
 
 	"philosopher/lib/msg"
 
+	"philosopher/lib/sys"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/vmihailenco/msgpack"
-	"philosopher/lib/sys"
 )
 
 // Data is the global parameter container
@@ -105,6 +106,8 @@ type MSFragger struct {
 	FragmentMassTolerance              float64 `yaml:"fragment_mass_tolerance"`
 	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
 	CalibrateMass                      int     `yaml:"calibrate_mass"`
+	WriteCalibratedMGF                 int     `yaml:"write_calibrated_mgf"`
+	DecoyPrefix                        string  `yaml:"decoy_prefix"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
 	Deisotope                          int     `yaml:"deisotope"`
 	IsotopeError                       string  `yaml:"isotope_error"`
