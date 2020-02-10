@@ -15,11 +15,12 @@ import (
 
 	"philosopher/lib/msg"
 
-	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/fas"
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
+
+	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Base main structure
@@ -72,6 +73,10 @@ func Run(m met.Data) met.Data {
 	if len(m.Database.Custom) < 1 {
 
 		logrus.Info("Fetching database")
+
+		currentTime := time.Now()
+		m.Database.TimeStamp = fmt.Sprintf("%s", currentTime.Format("2006.01.02 15:04:05"))
+
 		db.Fetch(m.Database.ID, m.Temp, m.Database.Iso, m.Database.Rev)
 
 	} else {
@@ -143,6 +148,7 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 func (d *Base) Fetch(id, temp string, iso, rev bool) {
 
 	var query string
+
 	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
 
 	if rev == true {
