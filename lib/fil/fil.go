@@ -823,37 +823,62 @@ func proteinProfile(p id.ProtXML) (t, d int) {
 
 // extractPSMfromPepXML retrieves all psm from protxml that maps into pepxml files
 // using protein names from <protein> and <alternative_proteins> tags
-func extractPSMfromPepXML(peplist id.PepIDList, pro id.ProtIDList) id.PepIDList {
+func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList) id.PepIDList {
 
 	var protmap = make(map[string]uint16)
 	var filterMap = make(map[string]id.PeptideIdentification)
 	var output id.PepIDList
 
-	// get all protein and peptide pairs from protxml
-	for _, i := range pro {
-		for _, j := range i.UniqueStrippedPeptides {
-			key := fmt.Sprintf("%s#%s", i.ProteinName, j)
-			protmap[string(key)] = 0
+	if filter == "sequential" {
+
+		// get all protein and peptide pairs from protxml
+		for _, i := range pro {
+			for _, j := range i.UniqueStrippedPeptides {
+				key := fmt.Sprintf("%s#%s", i.ProteinName, j)
+				protmap[string(key)] = 0
+			}
 		}
-	}
 
-	for _, i := range peplist {
+		for _, i := range peplist {
 
-		key := fmt.Sprintf("%s#%s", i.Protein, i.Peptide)
+			key := fmt.Sprintf("%s#%s", i.Protein, i.Peptide)
 
-		_, ok := protmap[key]
-		if ok {
-			filterMap[string(i.Spectrum)] = i
-		} else {
+			_, ok := protmap[key]
+			if ok {
+				filterMap[string(i.Spectrum)] = i
+			} else {
 
-			for _, j := range i.AlternativeProteins {
-				key := fmt.Sprintf("%s#%s", j, i.Peptide)
-				_, ap := protmap[key]
-				if ap {
-					filterMap[string(i.Spectrum)] = i
+				for _, j := range i.AlternativeProteins {
+					key := fmt.Sprintf("%s#%s", j, i.Peptide)
+					_, ap := protmap[key]
+					if ap {
+						filterMap[string(i.Spectrum)] = i
+					}
 				}
+
 			}
 
+		}
+
+	} else if filter == "2d" {
+
+		// get all protein names from protxml
+		for _, i := range pro {
+			protmap[string(i.ProteinName)] = 0
+		}
+
+		for _, i := range peplist {
+			_, ok := protmap[string(i.Protein)]
+			if ok {
+				filterMap[string(i.Spectrum)] = i
+			} else {
+				for _, j := range i.AlternativeProteins {
+					_, ap := protmap[string(j)]
+					if ap {
+						filterMap[string(i.Spectrum)] = i
+					}
+				}
+			}
 		}
 
 	}

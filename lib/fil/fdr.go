@@ -636,7 +636,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 // proteins from the protein filtered list are matched against filtered PSMs
 func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) {
 
-	extPep := extractPSMfromPepXML(pep, pro)
+	extPep := extractPSMfromPepXML("sequential", pep, pro)
 
 	// organize enties by score (probability or expectation)
 	sort.Sort(extPep)
@@ -680,7 +680,7 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	}).Info("2D FDR estimation: Protein mirror image")
 
 	// get PSM from the original pepXML using protein REGENERATED protein list, using protein names
-	extPep := extractPSMfromPepXML(pep, mirrorProteinList)
+	extPep := extractPSMfromPepXML("2d", pep, mirrorProteinList)
 
 	// organize enties by score (probability or expectation)
 	sort.Sort(extPep)

@@ -6,7 +6,8 @@
 - Updated Slack API, direct messages can also ben sent now.
 
 ### Fixed
-- The Pipeline Filter command will no work without a protein inference.
+- The Pipeline Filter command will now work without a protein inference.
+- 2D filter is now reporting the approved sequences again.
 
 ## Snapcraft
 - `snap install philosopher`
