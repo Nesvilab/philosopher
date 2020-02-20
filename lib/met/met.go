@@ -314,6 +314,7 @@ type Filter struct {
 	Pex       string  `yaml:"pepxml"`
 	Pox       string  `yaml:"protxml"`
 	Tag       string  `yaml:"tag"`
+	Mods      string  `yaml:"mods"`
 	PsmFDR    float64 `yaml:"psmFDR"`
 	PepFDR    float64 `yaml:"peptideFDR"`
 	IonFDR    float64 `yaml:"ionFDR"`

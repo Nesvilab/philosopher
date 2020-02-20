@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -49,7 +50,7 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
 	_ = psmT
 	_ = pepT
 	_ = ionT
@@ -252,7 +253,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide, ion float64) (float64, float64, float64) {
+func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, peptide, ion float64) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
@@ -311,6 +312,29 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag string, psm, peptide
 
 	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
+
+	if len(mods) > 0 {
+		logrus.Info("Filtering modified PSMs")
+
+		mods := strings.Split(mods, ",")
+		for i := range mods {
+
+			uniqModedPSMs := make(map[string]id.PepIDList)
+			mod := strings.Split(mods[i], ":")
+
+			for k, v := range uniqPsms {
+				for _, j := range v[0].Modifications.Index {
+					f, _ := strconv.ParseFloat(mod[1], 64)
+					if j.MassDiff == f && j.AminoAcid == mod[0] {
+						uniqModedPSMs[k] = v
+					}
+				}
+
+			}
+			PepXMLFDRFilter(uniqModedPSMs, psm, "PSM", decoyTag)
+		}
+
+	}
 
 	return psmThreshold, peptideThreshold, ionThreshold
 }

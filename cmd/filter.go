@@ -5,11 +5,12 @@ import (
 	"errors"
 	"os"
 
-	"github.com/spf13/cobra"
 	"philosopher/lib/fil"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	"github.com/spf13/cobra"
 )
 
 // filterCmd represents the filter command
@@ -68,6 +69,7 @@ func init() {
 		filterCmd.Flags().StringVarP(&m.Filter.Pex, "pepxml", "", "", "pepXML file or directory containing a set of pepXML files")
 		filterCmd.Flags().StringVarP(&m.Filter.Pox, "protxml", "", "", "protXML file path")
 		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "rev_", "decoy tag")
+		filterCmd.Flags().StringVarP(&m.Filter.Mods, "mods", "", "", "list of modifications for a stratified FDR filtering")
 		filterCmd.Flags().Float64VarP(&m.Filter.IonFDR, "ion", "", 0.01, "peptide ion FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PepFDR, "pep", "", 0.01, "peptide FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PsmFDR, "psm", "", 0.01, "psm FDR level")
@@ -84,6 +86,7 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
 		filterCmd.Flags().BoolVarP(&m.Filter.Fo, "fo", "", false, "")
 		filterCmd.Flags().MarkHidden("fo")
+		filterCmd.Flags().MarkHidden("mods")
 		//filterCmd.Flags().MarkHidden("inference")
 	}
 
