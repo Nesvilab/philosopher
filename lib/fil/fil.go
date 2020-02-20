@@ -313,30 +313,60 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, p
 	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
+	//
 	if len(mods) > 0 {
-		logrus.Info("Filtering modified PSMs")
-
-		mods := strings.Split(mods, ",")
-		for i := range mods {
-
-			uniqModedPSMs := make(map[string]id.PepIDList)
-			mod := strings.Split(mods[i], ":")
-
-			for k, v := range uniqPsms {
-				for _, j := range v[0].Modifications.Index {
-					f, _ := strconv.ParseFloat(mod[1], 64)
-					if j.MassDiff == f && j.AminoAcid == mod[0] {
-						uniqModedPSMs[k] = v
-					}
-				}
-
-			}
-			PepXMLFDRFilter(uniqModedPSMs, psm, "PSM", decoyTag)
-		}
-
+		ptmBasedPSMFiltering(uniqPsms, psm, decoyTag, mods)
 	}
 
 	return psmThreshold, peptideThreshold, ionThreshold
+}
+
+func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, decoyTag, mods string) {
+
+	logrus.Info("Separating PSMs based on the modification profile")
+
+	unModPSMs := make(map[string]id.PepIDList)
+	definedModPSMs := make(map[string]id.PepIDList)
+	restModPSMs := make(map[string]id.PepIDList)
+
+	modsMap := make(map[float64]string)
+
+	modsList := strings.Split(mods, ",")
+	for _, i := range modsList {
+		m := strings.Split(i, ":")
+		f, _ := strconv.ParseFloat(m[1], 64)
+		modsMap[f] = m[0]
+	}
+
+	for k, v := range uniqPsms {
+
+		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
+			unModPSMs[k] = v
+		} else {
+
+			for _, i := range v[0].Modifications.Index {
+				aa, ok := modsMap[i.MassDiff]
+
+				if ok && aa == i.AminoAcid {
+					definedModPSMs[k] = v
+				} else if len(v[0].Modifications.Index) > 0 {
+					restModPSMs[k] = v
+				}
+			}
+
+		}
+	}
+
+	logrus.Info("Filtering unmodified PSMs")
+	PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+
+	logrus.Info("Filtering defined modified PSMs")
+	PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+
+	logrus.Info("Filtering all modified PSMs")
+	PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+
+	return
 }
 
 // chargeProfile ...

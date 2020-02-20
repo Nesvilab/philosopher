@@ -12,13 +12,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/fil"
 	"philosopher/lib/id"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Create peptide combined report
