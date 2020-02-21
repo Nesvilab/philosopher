@@ -319,12 +319,14 @@ func (evi *Evidence) PlotMassHist() {
 	var y2var []string
 
 	for _, i := range evi.Modifications.MassBins {
-		xel := fmt.Sprintf("'%.2f',", i.MassCenter)
-		xvar = append(xvar, xel)
-		y1el := fmt.Sprintf("'%d',", len(i.AssignedMods))
-		y1var = append(y1var, y1el)
-		y2el := fmt.Sprintf("'%d',", len(i.ObservedMods))
-		y2var = append(y2var, y2el)
+		if i.MassCenter >= -501 && i.MassCenter <= 501 {
+			xel := fmt.Sprintf("'%.2f',", i.MassCenter)
+			xvar = append(xvar, xel)
+			y1el := fmt.Sprintf("'%d',", len(i.AssignedMods))
+			y1var = append(y1var, y1el)
+			y2el := fmt.Sprintf("'%d',", len(i.ObservedMods))
+			y2var = append(y2var, y2el)
+		}
 	}
 
 	xAxis := fmt.Sprintf("	  x: %s,", xvar)
