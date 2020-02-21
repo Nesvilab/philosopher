@@ -313,7 +313,7 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, p
 	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	//
+	// sug-group FDR filtering
 	if len(mods) > 0 {
 		ptmBasedPSMFiltering(uniqPsms, psm, decoyTag, mods)
 	}
