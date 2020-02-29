@@ -358,13 +358,16 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
-	PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+	filteredPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+	filteredPSM.Serialize("psm")
 
 	logrus.Info("Filtering defined modified PSMs")
-	PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+	filteredPeptides, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+	filteredPeptides.Serialize("pep")
 
 	logrus.Info("Filtering all modified PSMs")
-	PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+	filteredIons, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+	filteredIons.Serialize("ion")
 
 	return
 }
