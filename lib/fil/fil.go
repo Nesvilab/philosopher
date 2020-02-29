@@ -358,16 +358,29 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
-	filteredPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
-	filteredPSM.Serialize("psm")
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
 
 	logrus.Info("Filtering defined modified PSMs")
-	filteredPeptides, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
-	filteredPeptides.Serialize("pep")
+	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
 
 	logrus.Info("Filtering all modified PSMs")
-	filteredIons, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
-	filteredIons.Serialize("ion")
+	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+
+	var combinedFiltered id.PepIDList
+
+	for _, i := range filteredUnmodPSM {
+		combinedFiltered = append(combinedFiltered, i)
+	}
+
+	for _, i := range filteredDefinedPSM {
+		combinedFiltered = append(combinedFiltered, i)
+	}
+
+	for _, i := range filteredAllPSM {
+		combinedFiltered = append(combinedFiltered, i)
+	}
+
+	combinedFiltered.Serialize("psm")
 
 	return
 }
