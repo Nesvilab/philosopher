@@ -1,14 +1,9 @@
 ### Added
-- Added MGF writing and Decoy tags options to MSFragger.
-- The Pipeline can now send Slack direct messages to users. 
  
 ### Changed
-- Updated Slack API, direct messages can also ben sent now.
+- Updated to GO 1.14
 
 ### Fixed
-- The Pipeline Filter command will now work without a protein inference.
-- 2D filter is now reporting the approved sequences again.
-- The mass Histogram amplitude was too wide.
 
 ## Snapcraft
 - `snap install philosopher`
