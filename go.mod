@@ -9,7 +9,7 @@ require (
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/davecgh/go-spew v1.1.1
-	github.com/golang/protobuf v1.3.3 // indirect
+	github.com/golang/protobuf v1.3.4 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/jpillora/go-ogle-analytics v0.0.0-20161213085824-14b04e0594ef
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
@@ -17,9 +17,10 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/mattn/go-colorable v0.1.4
+	github.com/mattn/go-colorable v0.1.6
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mdempsky/unconvert v0.0.0-20190921185256-3ecd357795af // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nlopes/slack v0.6.0
 	github.com/onsi/ginkgo v1.10.3
 	github.com/onsi/gomega v1.7.1
@@ -33,14 +34,14 @@ require (
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
-	golang.org/x/exp v0.0.0-20200213203834-85f925bdd4d0 // indirect
+	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
-	golang.org/x/net v0.0.0-20200219183655-46282727080f // indirect
-	golang.org/x/sys v0.0.0-20200219091948-cb0a6d8edb6c // indirect
-	gonum.org/v1/netlib v0.0.0-20191229114700-bbb4dff026f8 // indirect
-	gonum.org/v1/plot v0.0.0-20200212202559-4d97eda4de95
+	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	gonum.org/v1/netlib v0.0.0-20200229103305-d71f404090bf // indirect
+	gonum.org/v1/plot v0.7.0
 	google.golang.org/appengine v1.6.5 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.2.8
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
 	mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b // indirect
