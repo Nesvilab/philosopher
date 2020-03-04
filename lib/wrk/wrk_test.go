@@ -2,11 +2,15 @@ package wrk_test
 
 import (
 	"os"
+	"philosopher/lib/tes"
 	. "philosopher/lib/wrk"
 	"testing"
 )
 
 func TestInit(t *testing.T) {
+
+	tes.SetupTestEnv()
+
 	type args struct {
 		version string
 		build   string
@@ -28,4 +32,6 @@ func TestInit(t *testing.T) {
 			Init(tt.args.version, tt.args.build)
 		})
 	}
+
+	tes.ShutDowTestEnv()
 }

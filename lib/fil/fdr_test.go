@@ -57,7 +57,7 @@ func TestPepXMLFDRFilter(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
+	//tes.ShutDowTestEnv()
 }
 
 func TestPickedFDR(t *testing.T) {
