@@ -130,17 +130,20 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
-	for _, i := range evi.PSM {
+	for i := range evi.PSM {
+
+		evi.PSM[i].Spectrum = evi.PSM[i].Spectrum[1:(len(evi.PSM[i].Spectrum) - 2)]
+
 		if hasDecoys == false {
-			if i.IsDecoy == false {
-				printSet = append(printSet, i)
+			if evi.PSM[i].IsDecoy == false {
+				printSet = append(printSet, evi.PSM[i])
 			}
 		} else {
-			printSet = append(printSet, i)
+			printSet = append(printSet, evi.PSM[i])
 		}
 	}
 
-	header = "Spectrum\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
+	header = "Spectrum\tHit Rank\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
 
 	if isComet == true {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
@@ -215,8 +218,9 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%d\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
+			i.HitRank,
 			i.Peptide,
 			i.ModifiedPeptide,
 			len(i.Peptide),

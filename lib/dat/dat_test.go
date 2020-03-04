@@ -73,8 +73,8 @@ func TestBase_ProcessDB(t *testing.T) {
 			}
 			d.ProcessDB(tt.args.file, tt.args.decoyTag)
 
-			if len(d.Records) != 20352 {
-				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20352)
+			if len(d.Records) != 20350 {
+				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20350)
 			}
 		})
 	}

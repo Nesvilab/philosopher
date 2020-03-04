@@ -13,14 +13,15 @@ import (
 
 	"philosopher/lib/msg"
 
+	"philosopher/lib/mod"
+	"philosopher/lib/spc"
+	"philosopher/lib/sys"
+
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
-	"philosopher/lib/mod"
-	"philosopher/lib/spc"
-	"philosopher/lib/sys"
 )
 
 // PepXML data
@@ -348,6 +349,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 				value = -99
 			}
 		}
+
+		psm.Spectrum = fmt.Sprintf("%s.%d", psm.Spectrum, psm.HitRank)
 
 		psm.mapModsFromPepXML(i.ModificationInfo, mods)
 	}
