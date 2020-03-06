@@ -3,9 +3,7 @@
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 <!--[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2FNesvilab%2Fphilosopher-source%2Fbadge%3Ftoken%3D9cc51271afa40cd95d91e910f257c7b72d7e9157&style=for-the-badge)](https://actions-badge.atrox.dev/Nesvilab/philosopher-source/goto?token=9cc51271afa40cd95d91e910f257c7b72d7e9157)-->
 
-
-## Features
-Philosopher provides easy access to third-party tools and custom algorithms for proteomics analysis, from database searching to functional protein reports. Philosopher is also well-equipped for open search analysis, providing extended versions of PeptideProphet and ProteinProphet for peptide validation and protein inference. To date, Philosopher is the only proteomics toolkit that allows you to process and analyze closed and open search results.
+#### Philosopher is fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. Philosopher is dependency-free and can analyze both traditional database searches and open searches for post-translational modification (PTM) discovery. 
 
 - Database downloading and formatting.
 
@@ -26,11 +24,11 @@ Philosopher provides easy access to third-party tools and custom algorithms for 
 
 - Label-free quantification via spectral counting and MS1 intensities.
 
-- Label-based quantification using TMT isobaric tags.
+- Label-based quantification using TMT and iTRAQ.
 
 - Quantification based on functional protein groups.
 
-- Multi-level detailed reports including peptides, ions, and proteins.
+- Multi-level detailed reports for peptides, ions, and proteins.
 
 
 
@@ -40,9 +38,9 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 
 ## How to Use
 - [Philosopher basics](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) - general usage information
-- [Preparing protein databases](https://github.com/Nesvilab/philosopher/wiki/How-to-Prepare-a-Protein-Database)
+- [Preparing protein databases](https://github.com/Nesvilab/philosopher/wiki/How-to-Prepare-a-Protein-Database) - download and format sequences
 - [Simple data analysis](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic tutorial
-- [TMT quantification](https://github.com/Nesvilab/philosopher/wiki/TMT-Analysis) - basic tutorial with isobaric quantification
+- [TMT quantification](https://github.com/Nesvilab/philosopher/wiki/TMT-Analysis) - step-by-step tutorial for isobaric quantification
 - [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Open-Search-Analysis) - basic tutorial for open searches
 
 ## Documentation
@@ -60,9 +58,9 @@ Still in progress!
 ## About the developers
 [Felipe da Veiga leprevost](http://www.leprevost.com.br)
 
-Sarah Haynes
+[Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
 
-Alexey Nesvizhskii's [nesvilab](http://www.nesvilab.org/)
+[Alexey Nesvizhskii's research group](http://www.nesvilab.org/)
 
 
 
