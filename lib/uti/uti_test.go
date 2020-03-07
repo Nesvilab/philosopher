@@ -1,11 +1,14 @@
 package uti_test
 
 import (
+	"philosopher/lib/tes"
 	"philosopher/lib/uti"
 	"testing"
 )
 
 func TestUti(t *testing.T) {
+
+	tes.SetupTestEnv()
 
 	x := uti.Round(5.3557876867, 5, 2)
 	if x != 5.35 {
@@ -16,5 +19,7 @@ func TestUti(t *testing.T) {
 	if y != 5.355 {
 		t.Errorf("Aminoacid name is incorrect, got %f, want %f", y, 5.3557876867)
 	}
+
+	tes.ShutDowTestEnv()
 
 }

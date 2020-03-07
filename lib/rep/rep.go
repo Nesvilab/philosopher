@@ -117,6 +117,7 @@ type PSMEvidence struct {
 	Source                           string
 	Index                            uint32
 	Spectrum                         string
+	SpectrumFile                     string
 	Scan                             int
 	NumberOfEnzymaticTermini         int
 	NumberOfMissedCleavages          int

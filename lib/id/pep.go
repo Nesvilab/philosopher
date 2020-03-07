@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -13,14 +14,15 @@ import (
 
 	"philosopher/lib/msg"
 
+	"philosopher/lib/mod"
+	"philosopher/lib/spc"
+	"philosopher/lib/sys"
+
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
-	"philosopher/lib/mod"
-	"philosopher/lib/spc"
-	"philosopher/lib/sys"
 )
 
 // PepXML data
@@ -41,6 +43,7 @@ type PepXML struct {
 type PeptideIdentification struct {
 	Index                            uint32
 	Spectrum                         string
+	SpectrumFile                     string
 	Scan                             int
 	Peptide                          string
 	Protein                          string
@@ -110,7 +113,7 @@ func (p *PepXML) Read(f string) {
 	var mpa = xml.MsmsPipelineAnalysis
 
 	if len(mpa.AnalysisSummary) > 0 {
-		p.FileName = f
+		p.FileName = path.Base(f)
 		p.Database = string(mpa.MsmsRunSummary.SearchSummary.SearchDatabase.LocalPath)
 		p.SpectraFile = fmt.Sprintf("%s%s", mpa.MsmsRunSummary.BaseName, mpa.MsmsRunSummary.RawData)
 
@@ -213,7 +216,7 @@ func (p *PepXML) Read(f string) {
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for _, i := range sq {
-			psm := processSpectrumQuery(i, massDeviation, p.Modifications, p.DecoyTag)
+			psm := processSpectrumQuery(i, massDeviation, p.Modifications, p.DecoyTag, p.FileName)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -221,7 +224,7 @@ func (p *PepXML) Read(f string) {
 		p.Prophet = string(mpa.AnalysisSummary[0].Analysis)
 		p.Models = models
 
-		//p.adjustMassDeviation()
+		// p.adjustMassDeviation()
 
 		if len(psmlist) == 0 {
 			msg.NoPSMFound(errors.New(f), "warning")
@@ -232,13 +235,14 @@ func (p *PepXML) Read(f string) {
 	return
 }
 
-func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.Modifications, decoyTag string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
 	psm.Modifications.Index = make(map[string]mod.Modification)
 	psm.AlternativeProteinsIndexed = make(map[string]int)
 
 	psm.Index = sq.Index
+	psm.SpectrumFile = FileName
 	psm.Spectrum = string(sq.Spectrum)
 	psm.Scan = sq.StartScan
 	psm.AssumedCharge = sq.AssumedCharge
@@ -348,6 +352,11 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 				value = -99
 			}
 		}
+
+		// to be able to accept multiple entries with the same spectrum name, we fuse the
+		// file name to the spectrum name. This is going to be used as an identifiable attribute
+		// Before reporting the filtered PSMs, the file name is removed from the spectrum name.
+		psm.Spectrum = fmt.Sprintf("%s#%s", psm.Spectrum, FileName)
 
 		psm.mapModsFromPepXML(i.ModificationInfo, mods)
 	}

@@ -11,7 +11,7 @@ import (
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 	if len(e.PSM) < 1 && len(e.Ions) < 1 {
-		msg.QuantifyingData(errors.New("The PSM list is enpty"), "fatal")
+		msg.QuantifyingData(errors.New("The PSM list is enpty"), "warning")
 	}
 
 	var uniqueIonPSM = make(map[string]string)
