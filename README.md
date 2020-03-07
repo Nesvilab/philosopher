@@ -1,4 +1,6 @@
-![GitHub Logo](/images/philosopher2.png)
+<p align="center">
+  <img src="/images/philosopher2.png">
+</p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://philosopher/releases/latest)
 ![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
