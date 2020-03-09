@@ -175,9 +175,9 @@ func (evi Evidence) MetaPSMReport(labels map[string]string, brand string, channe
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header += "\tIs Used\tPurity\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
 		case 8:
-			header += "\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header += "\tIs Used\tPurity\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
 		default:
 			header += ""
 		}
