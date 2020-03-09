@@ -494,6 +494,9 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
 			} else if p.Commands.Abacus == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
+				meta.Filter.Razor = false
+				meta.Filter.TwoD = false
+				meta.Filter.Seq = false
 			}
 
 			meta := fil.Run(meta)

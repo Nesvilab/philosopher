@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="/images/philosopher.png">
+  <img height="530" width="750" src="/images/philosopher.png">
 </p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://philosopher/releases/latest)
-![Golang](https://img.shields.io/badge/Go-1.13.1-blue.svg?style=for-the-badge)
+![Golang](https://img.shields.io/badge/Go-1.14.0-blue.svg?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 
 

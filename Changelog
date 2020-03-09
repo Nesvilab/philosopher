@@ -6,6 +6,7 @@
 - Philosopher wont stop at empty files.
 
 ### Fixed
+- Error preventing iTRAQ quantification.
 
 ## Snapcraft
 - `snap install philosopher`
