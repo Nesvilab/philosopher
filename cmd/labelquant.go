@@ -6,11 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/sys"
+
+	"github.com/spf13/cobra"
 )
 
 // labelquantCmd represents the labelquant command
@@ -33,7 +34,7 @@ var labelquantCmd = &cobra.Command{
 
 		// hardcoded tmt for now
 		msg.Executing("Isobaric-label quantification ", Version)
-		m.Quantify.Brand = "tmt"
+		//m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
 			m.Quantify.Format = "mzML"

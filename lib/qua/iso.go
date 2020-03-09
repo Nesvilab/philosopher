@@ -11,8 +11,6 @@ import (
 	"philosopher/lib/tmt"
 	"philosopher/lib/trq"
 	"philosopher/lib/uti"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -103,9 +101,6 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.PeakIntensity
 			isotopesInt := v2.Precursor.PeakIntensity
 
-			spew.Dump(mzRatio)
-			fmt.Println("TargetION:", v2.Precursor.TargetIon)
-
 			for k, v := range ions {
 				for _, m := range mzRatio {
 					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.02) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.02) {
@@ -116,11 +111,6 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 				}
 			}
 
-			fmt.Println("Spectrum:", evi[i].Spectrum)
-			fmt.Println("before Purity:", evi[i].Purity)
-
-			fmt.Println("before isotopesInt:", isotopesInt)
-
 			if isotopesInt == 0 {
 				evi[i].Purity = 0
 			} else {
@@ -130,10 +120,6 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			if evi[i].Purity > 1 {
 				evi[i].Purity = 1
 			}
-
-			fmt.Println("after Purity:", evi[i].Purity)
-			fmt.Println("before isotopesInt:", isotopesInt)
-
 		}
 
 	}
@@ -147,6 +133,8 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 	// get all spectra names from PSMs and create the label list
 	var labels = make(map[string]iso.Labels)
 	ppmPrecision := tol / math.Pow(10, 6)
+
+	fmt.Println(brand)
 
 	for _, i := range mz.Spectra {
 		if i.Level == "2" {
