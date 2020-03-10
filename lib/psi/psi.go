@@ -55,9 +55,9 @@ type CV struct {
 // CVParam is single entry from an ontology or a controlled vocabulary
 type CVParam struct {
 	XMLName       xml.Name `xml:"cvParam"`
-	Accession     string   `xml:"accession,attr,omitempty"`
+	Accession     string   `xml:"accession,attr"`
 	CVRef         string   `xml:"cvRef,attr,omitempty"`
-	Name          string   `xml:"name,attr,omitempty"`
+	Name          string   `xml:"name,attr"`
 	UnitAccession string   `xml:"unitAccession,attr,omitempty"`
 	UnitCvRef     string   `xml:"unitCvRef,attr,omitempty"`
 	UnitName      string   `xml:"unitName,attr,omitempty"`

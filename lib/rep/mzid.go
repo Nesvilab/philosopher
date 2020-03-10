@@ -229,6 +229,10 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 					},
 				}
 
+				if mod.Residues == "N-term" {
+					mod.Residues = ""
+				}
+
 				p.Modification = append(p.Modification, mod)
 			}
 		}
@@ -778,7 +782,18 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 									PeptideEvidenceRef: pepRef[j.Peptide],
 								},
 							},
-							//Fragmentation: psi.Fragmentation{},
+							Fragmentation: psi.Fragmentation{
+								IonType: []psi.IonType{
+									psi.IonType{
+										CVParam: []psi.CVParam{
+											psi.CVParam{},
+										},
+										UserParam: []psi.UserParam{
+											psi.UserParam{},
+										},
+									},
+								},
+							},
 							CVParam: []psi.CVParam{
 								psi.CVParam{
 									CVRef:     "PSI-MS",

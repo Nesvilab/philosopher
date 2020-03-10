@@ -755,7 +755,7 @@ type ProteinDetectionHypothesis struct {
 	DBSquenceRef      string              `xml:"dBSequence_ref,attr,omitempty"`
 	ID                string              `xml:"id,attr,omitempty"`
 	Name              string              `xml:"name,attr,omitempty"`
-	PassThreshold     string              `xml:"passThreasold,attr,omitempty"`
+	PassThreshold     string              `xml:"PassThreshold,attr"`
 	PeptideHypothesis []PeptideHypothesis `xml:"PeptideHypothesis"`
 	CVParam           []CVParam           `xml:"cvParam"`
 	UserParam         []UserParam         `xml:"userParam"`
@@ -775,7 +775,7 @@ type PeptideHypothesis struct {
 // evidence for this peptide identification in the given protein
 type SpectrumIdentificationItemRef struct {
 	XMLName                       xml.Name `xml:"SpectrumIdentificationItemRef"`
-	SpectrumIdentificationItemRef string   `xml:"spectrumIdentificationItem_ref,attr,omitempty"`
+	SpectrumIdentificationItemRef string   `xml:"spectrumIdentificationItem_ref,attr"`
 }
 
 // BibliographicReference is any bibliographic references associated with the
