@@ -47,8 +47,12 @@ func Run(m met.Data, args []string) met.Data {
 		m.MSFragger.ParamFile = binFile
 	}
 
-	// run comet
-	frg.Execute(m.MSFragger, args)
+	// run msfragger
+	if len(m.MSFragger.Param) > 0 {
+		frg.ExecutewithParameter(m.MSFragger, args)
+	} else {
+		frg.Execute(m.MSFragger, args)
+	}
 
 	return m
 }
@@ -57,6 +61,37 @@ func Run(m met.Data, args []string) met.Data {
 func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 
 	cmd := appendParams(params)
+
+	for _, i := range cmdArgs {
+		file, _ := filepath.Abs(i)
+		cmd.Args = append(cmd.Args, file)
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	e := cmd.Start()
+	if e != nil {
+		msg.ExecutingBinary(e, "fatal")
+	}
+
+	_ = cmd.Wait()
+
+	return
+}
+
+// ExecutewithParameter is the main fucntion to execute MSFragger
+func (c *MSFragger) ExecutewithParameter(params met.MSFragger, cmdArgs []string) {
+
+	mem := fmt.Sprintf("-Xmx%dG", params.Memory)
+	jarPath, _ := filepath.Abs(params.JarPath)
+	paramFile, _ := filepath.Abs(params.Param)
+
+	cmd := exec.Command("java",
+		"-jar",
+		mem,
+		jarPath,
+		paramFile,
+	)
 
 	for _, i := range cmdArgs {
 		file, _ := filepath.Abs(i)
