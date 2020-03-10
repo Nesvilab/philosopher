@@ -74,6 +74,8 @@ func init() {
 		peprophCmd.Flags().BoolVarP(&m.PeptideProphet.Combine, "combine", "", false, "combine the results from PeptideProphet into a single result file")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Database, "database", "", "", "path to the database")
 		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Enzyme, "enzyme", "", "", "enzyme used in sample")
+		peprophCmd.Flags().StringVarP(&m.PeptideProphet.Ignorechg, "ignorechg", "", "", "use comma to separate the charge states to exclude from modeling")
+
 		peprophCmd.Flags().MarkHidden("exclude")
 		peprophCmd.Flags().MarkHidden("forcedistr")
 		peprophCmd.Flags().MarkHidden("icat")

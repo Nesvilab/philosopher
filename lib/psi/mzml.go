@@ -304,6 +304,7 @@ type PrecursorList struct {
 type Precursor struct {
 	XMLName         xml.Name        `xml:"precursor"`
 	SpectrumRef     string          `xml:"spectrumRef,attr"`
+	UserParam       []UserParam     `xml:"userParam"`
 	IsolationWindow IsolationWindow `xml:"isolationWindow"`
 	SelectedIonList SelectedIonList `xml:"selectedIonList"`
 	Activation      Activation      `xml:"activation"`

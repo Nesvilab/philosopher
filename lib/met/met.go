@@ -195,6 +195,7 @@ type PeptideProphet struct {
 	Rtcat         string  `yaml:"rtcat"`
 	Decoy         string  `yaml:"decoy"`
 	Enzyme        string  `yaml:"enzyme"`
+	Ignorechg     string  `yaml:"ignorechg"`
 	Minpiprob     float64 `yaml:"minpiprob"`
 	Minrtprob     float64 `yaml:"minrtprob"`
 	Minprob       float64 `yaml:"minprob"`

@@ -464,6 +464,14 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 		cmd.Args = append(cmd.Args, v)
 	}
 
+	if len(params.Ignorechg) > 0 {
+		cs := strings.Split(params.Ignorechg, ",")
+		for _, i := range cs {
+			v := fmt.Sprintf("IGNORECHG=%s", i)
+			cmd.Args = append(cmd.Args, v)
+		}
+	}
+
 	cmd.Dir = filepath.Dir(file)
 
 	env := os.Environ()
