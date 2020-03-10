@@ -49,5 +49,5 @@ func TestParseFile(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
+	//tes.ShutDowTestEnv()
 }
