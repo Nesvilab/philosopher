@@ -56,8 +56,8 @@ func Test_readPepXMLInput(t *testing.T) {
 				t.Errorf("Index is incorrect, got %d, want %d", got[0].Index, uint32(18992))
 			}
 
-			if got[0].Spectrum != "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2.1" {
-				t.Errorf("Spectrum is incorrect, got %s, want %s", got[0].Spectrum, "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2.1")
+			if got[0].Spectrum != "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2#interact.pep.xml" {
+				t.Errorf("Spectrum is incorrect, got %s, want %s", got[0].Spectrum, "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2#interact.pep.xml")
 			}
 
 			if got[0].Scan != 60782 {
