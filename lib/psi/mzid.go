@@ -11,6 +11,9 @@ type MzIdentML struct {
 	Name                       string                     `xml:"name,attr,omitempty"`
 	ID                         string                     `xml:"id,attr,omitempty"`
 	Version                    string                     `xml:"version,attr,omitempty"`
+	Xmlns                      string                     `xml:"xmlns,attr"`
+	XmlnsXsi                   string                     `xml:"xmlns:xsi,attr"`
+	XsiSchemaLocation          string                     `xml:"xsi:schemaLocation,attr"`
 	CvList                     CvList                     `xml:"cvList"`
 	AnalysisSoftwareList       AnalysisSoftwareList       `xml:"AnalysisSoftwareList"`
 	Provider                   Provider                   `xml:"Provider"`

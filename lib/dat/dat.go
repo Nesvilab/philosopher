@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -25,6 +26,7 @@ import (
 
 // Base main structure
 type Base struct {
+	FileName  string
 	UniProtDB string
 	CrapDB    string
 	TaDeDB    map[string]string
@@ -106,6 +108,7 @@ func Run(m met.Data) met.Data {
 func (d *Base) ProcessDB(file, decoyTag string) {
 
 	fastaMap := fas.ParseFile(file)
+	d.FileName = path.Base(file)
 
 	for k, v := range fastaMap {
 

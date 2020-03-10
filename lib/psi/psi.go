@@ -11,6 +11,7 @@ import (
 	"philosopher/lib/msg"
 
 	"philosopher/lib/sys"
+
 	"github.com/rogpeppe/go-charset/charset"
 	"github.com/sirupsen/logrus"
 
@@ -156,7 +157,7 @@ func (p *MzIdentML) Write() {
 	file.WriteString(xml.Header)
 
 	enc := xml.NewEncoder(file)
-	enc.Indent("  ", "    ")
+	enc.Indent("", "   ")
 
 	if e := enc.Encode(p); e != nil {
 		msg.DecodeMsgPck(e, "trace")

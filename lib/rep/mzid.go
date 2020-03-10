@@ -47,10 +47,13 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	var proRef = make(map[string]string)
 
 	// Header
-	mzid.Name = "foo"
-	mzid.ID = "Philosopher toolkit"
-	mzid.Version = version
+	//mzid.Name = "foo"
+	mzid.ID = "Philosopher"
+	mzid.Version = "1.2.0"
 	mzid.CreationDate = t.Format(time.ANSIC)
+	mzid.Xmlns = "http://psidev.info/psi/pi/mzIdentML/1.2"
+	mzid.XmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance"
+	mzid.XsiSchemaLocation = "http://psidev.info/psi/pi/mzIdentML/1.2 http://www.psidev.info/files/mzIdentML1.2.0.xsd"
 
 	// CVlist
 	mzid.CvList.CV = append(mzid.CvList.CV, psi.CV{ID: "PSI-MS", URI: "https://raw.githubusercontent.com/HUPO-PSI/psi-ms-CV/master/psi-ms.obo", FullName: "PSI-MS"})
@@ -174,7 +177,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 		db := &psi.DBSequence{
 			ID:                fmt.Sprintf("DB_%d", idCounter),
 			Accession:         i.ID,
-			SearchDatabaseRef: "",
+			SearchDatabaseRef: dtb.FileName,
 			CVParam: []psi.CVParam{
 				psi.CVParam{
 					CVRef:     "PSI-MS",
@@ -275,7 +278,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 			},
 			SearchDatabaseRef: []psi.SearchDatabaseRef{
 				psi.SearchDatabaseRef{
-					SearchDatabaseRef: database,
+					SearchDatabaseRef: dtb.FileName,
 				},
 			},
 		}
