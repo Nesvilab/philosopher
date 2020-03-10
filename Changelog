@@ -1,5 +1,6 @@
 ### Added
 - File Name added to PSM reports.
+- New PeptideProphet parameter: --ignorechg can be used to ignore certain charge states.
  
 ### Changed
 - Updated to GO 1.14
