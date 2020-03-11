@@ -47,6 +47,7 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 - [Using pipeline for TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Pipeline-mode-for-TMT-analysis) - pipeline a large data set
 - [Step-by-step TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-TMT-analysis) - step-by-step tutorial for isobaric quantification of a small data set
 - [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Open-Search-Analysis) - step-by-step tutorial for open searches
+- [Step-by-step analysis with Comet](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-analysis-with-Comet)
 
 ## Documentation
 See the [documentation](https://github.com/Nesvilab/philosopher/wiki/Home) for more details about the available commands.
