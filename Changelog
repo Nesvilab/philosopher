@@ -1,13 +1,5 @@
-### Added
-- File Name added to PSM reports.
-- New PeptideProphet parameter: --ignorechg can be used to ignore certain charge states.
- 
-### Changed
-- Updated to GO 1.14
-- Philosopher wont stop at empty files.
-
 ### Fixed
-- Error preventing iTRAQ quantification.
+- Loop erorr when trying to run Comet wiht the pipeline.
 
 
 ## Snapcraft
