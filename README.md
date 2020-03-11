@@ -1,5 +1,5 @@
 <p align="center">
-  <img height="480" width="679" src="/images/philosopher.png">
+  <img height="440" width="622" src="/images/philosopher.png">
 </p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/Nesvilab/philosopher/releases/latest)
