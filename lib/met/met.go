@@ -471,7 +471,9 @@ func (d *Data) Restore(f string) {
 
 	e2 := msgpack.Unmarshal(b, &d)
 
-	if e1 != nil && e2 != nil && len(d.UUID) < 1 {
+	if e1 != nil && e2 != nil {
+		msg.Custom(errors.New("Workspace not detected"), "warning")
+	} else if len(d.UUID) < 1 {
 		msg.Custom(errors.New("The current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
 	}
 
