@@ -134,8 +134,6 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 	var labels = make(map[string]iso.Labels)
 	ppmPrecision := tol / math.Pow(10, 6)
 
-	fmt.Println(brand)
-
 	for _, i := range mz.Spectra {
 		if i.Level == "2" {
 
