@@ -536,7 +536,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Quantify = p.LabelQuant
 			meta.Quantify.Dir = dsAbs
 			meta.Quantify.Format = "mzML"
-			meta.Quantify.Brand = "tmt"
+			meta.Quantify.Brand = p.LabelQuant.Brand
 
 			meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
 
