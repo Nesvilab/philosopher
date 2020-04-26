@@ -116,10 +116,6 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 			meta.Serialize()
 		}
 
-		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-			msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
-		}
-
 		// return to the top level directory
 		os.Chdir(dir)
 	}
@@ -130,14 +126,18 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 // DatabaseSearch executes the search engines if requested
 func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
+	if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
+		msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
+	}
+
+	logrus.Info("Running the Database Search on all data")
+
+	// reload the meta data
+	meta.Restore(sys.Meta())
+
+	var mzFiles []string
+
 	if p.Commands.Comet == "yes" {
-
-		logrus.Info("Running the Database Search on all data")
-
-		// reload the meta data
-		meta.Restore(sys.Meta())
-
-		var mzFiles []string
 
 		for _, i := range data {
 
@@ -162,26 +162,15 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			// return to the top level directory
 			os.Chdir(dir)
 
-			// reload the meta data
-			//meta.Restore(sys.Meta())
 		}
 
-		// Comet
-		if p.Commands.Comet == "yes" {
-			comet.Run(meta, mzFiles)
-			meta.SearchEngine = "Comet"
-			//meta.Serialize()
-		}
+		comet.Run(meta, mzFiles)
+		meta.SearchEngine = "Comet"
+		//meta.Serialize()
+
 	}
 
 	if p.Commands.MSFragger == "yes" {
-
-		logrus.Info("Running the Database Search on all data")
-
-		// reload the meta data
-		meta.Restore(sys.Meta())
-
-		var mzFiles []string
 
 		for _, i := range data {
 
@@ -209,8 +198,6 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			// return to the top level directory
 			os.Chdir(dir)
 
-			// reload the meta data
-			//meta.Restore(sys.Meta())
 		}
 
 		// MSFragger
@@ -549,7 +536,7 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Quantify = p.LabelQuant
 			meta.Quantify.Dir = dsAbs
 			meta.Quantify.Format = "mzML"
-			meta.Quantify.Brand = "tmt"
+			meta.Quantify.Brand = p.LabelQuant.Brand
 
 			meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
 
