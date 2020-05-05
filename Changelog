@@ -1,6 +1,9 @@
 ### Fixed
 - Small bugs and fixes for the pipeline command.
+<<<<<<< HEAD
 - Bug preventing the reset of iTRAQ quantification structures.
+=======
+>>>>>>> 20f31345a9bbca9354edc905736f19f02503dc71
 
 
 ## Snapcraft
