@@ -487,9 +487,9 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
-				if p.Commands.PTMProphet == "yes" {
-					meta.Filter.Pex = "interact.mod.pep.xml"
-				}
+				// if p.Commands.PTMProphet == "yes" {
+				// 	meta.Filter.Pex = "interact.mod.pep.xml"
+				// }
 			} else {
 				meta.Filter.Pex = p.Filter.Pex
 			}
