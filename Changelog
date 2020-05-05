@@ -1,5 +1,6 @@
 ### Fixed
 - Small bugs and fixes for the pipeline command.
+- Bug preventing the reset of iTRAQ quantification structures.
 
 
 ## Snapcraft

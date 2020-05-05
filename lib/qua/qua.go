@@ -15,6 +15,7 @@ import (
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 	"philosopher/lib/tmt"
+	"philosopher/lib/trq"
 	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
@@ -63,7 +64,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	evi.RestoreGranular()
 
 	// removed all calculated defined values from before
-	evi = cleanPreviousData(evi, p.Plex)
+	evi = cleanPreviousData(evi, p.Brand, p.Plex)
 
 	// collect all used source file names
 	for _, i := range evi.PSM {
@@ -211,23 +212,34 @@ func RunBioQuantification(c met.Data) {
 }
 
 // cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(evi rep.Evidence, plex string) rep.Evidence {
+func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 
 	for i := range evi.PSM {
-		evi.PSM[i].Labels = tmt.New(plex)
+		if brand == "tmt" {
+			evi.PSM[i].Labels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.PSM[i].Labels = trq.New(plex)
+		}
 	}
 
 	for i := range evi.Ions {
-		evi.Ions[i].Labels = tmt.New(plex)
+		if brand == "tmt" {
+			evi.Ions[i].Labels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.Ions[i].Labels = trq.New(plex)
+		}
 	}
 
 	for i := range evi.Proteins {
-		evi.Proteins[i].TotalLabels = tmt.New(plex)
-
-		evi.Proteins[i].UniqueLabels = tmt.New(plex)
-
-		evi.Proteins[i].URazorLabels = tmt.New(plex)
-
+		if brand == "tmt" {
+			evi.Proteins[i].TotalLabels = tmt.New(plex)
+			evi.Proteins[i].UniqueLabels = tmt.New(plex)
+			evi.Proteins[i].URazorLabels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.Proteins[i].TotalLabels = trq.New(plex)
+			evi.Proteins[i].UniqueLabels = trq.New(plex)
+			evi.Proteins[i].URazorLabels = trq.New(plex)
+		}
 	}
 
 	return evi
