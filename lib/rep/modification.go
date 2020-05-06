@@ -15,7 +15,7 @@ import (
 )
 
 // MapMods maps PSMs to modifications based on their mass shifts
-func (evi *Evidence) MapMods() {
+func (evi *Evidence) MapMods(hasObserved bool) {
 
 	var tolerance = 0.01
 
@@ -40,7 +40,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name]++
 						evi.PSM[i].Modifications.Index[k] = updatedMod
 					}
-					if updatedMod.Type == "Observed" {
+					if hasObserved == true && updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
@@ -48,8 +48,10 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.PSM[i].Modifications.Index[k] = updatedMod
 					}
+					break
 				}
 			}
+
 		}
 	}
 
@@ -71,7 +73,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name]++
 						evi.Ions[i].Modifications.Index[k] = updatedMod
 					}
-					if updatedMod.Type == "Observed" {
+					if hasObserved == true && updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
@@ -79,6 +81,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.Ions[i].Modifications.Index[k] = updatedMod
 					}
+					break
 				}
 			}
 
@@ -104,7 +107,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name]++
 						evi.Peptides[i].Modifications.Index[k] = updatedMod
 					}
-					if updatedMod.Type == "Observed" {
+					if hasObserved == true && updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
@@ -112,7 +115,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
 						evi.Peptides[i].Modifications.Index[k] = updatedMod
 					}
-
+					break
 				}
 			}
 
@@ -138,7 +141,7 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name]++
 						evi.Proteins[i].Modifications.Index[k] = updatedMod
 					}
-					if updatedMod.Type == "Observed" {
+					if hasObserved == true && updatedMod.Type == "Observed" {
 						updatedMod.Name = j.Name
 						updatedMod.Definition = j.Definition
 						updatedMod.ID = j.ID
@@ -146,10 +149,9 @@ func (evi *Evidence) MapMods() {
 						updatedMod.IsobaricMods[j.Name]++
 						evi.Proteins[i].Modifications.Index[k] = updatedMod
 					}
-
+					break
 				}
 			}
-
 		}
 	}
 

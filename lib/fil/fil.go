@@ -128,12 +128,15 @@ func Run(f met.Data) met.Data {
 	ion = nil
 
 	// evaluate modifications in data set
+	logrus.Info("Mapping modifications")
 	if f.Filter.Mapmods == true {
-		logrus.Info("Mapping modifications")
-		e.MapMods()
+		//should include observed mods into mapping?
+		e.MapMods(true)
 
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
+	} else {
+		e.MapMods(false)
 	}
 
 	var pept id.PepIDList
@@ -182,6 +185,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 
 	var files = make(map[string]uint8)
 	var fileCheckList []string
+	var fileCheckFlag bool
 	var pepIdent id.PepIDList
 	var mods []mod.Modification
 	var params []spc.Parameter
@@ -203,17 +207,23 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 			absPath, _ := filepath.Abs(i)
 			files[absPath] = 0
 			fileCheckList = append(fileCheckList, absPath)
+
+			if strings.Contains(i, "mod") {
+				fileCheckFlag = true
+			}
 		}
 
 	}
 
 	// verify if the we have interact and interact.mod files for parsing.
 	// To avoid reading both files, we keep the mod one and discard the other.
-	for _, i := range fileCheckList {
-		i = strings.Replace(i, "mod.", "", 1)
-		_, ok := files[i]
-		if ok {
-			delete(files, i)
+	if fileCheckFlag == true {
+		for _, i := range fileCheckList {
+			i = strings.Replace(i, "mod.", "", 1)
+			_, ok := files[i]
+			if ok {
+				delete(files, i)
+			}
 		}
 	}
 
