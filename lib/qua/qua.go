@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -258,8 +259,14 @@ func getLabelNames(annot string) map[string]string {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		if len(scanner.Text()) > 0 {
-			names := strings.Split(scanner.Text(), " ")
+		// does the line has at least an iso tag?
+		if len(scanner.Text()) > 3 {
+
+			// replace tabs and multiple spaces by single space
+			space := regexp.MustCompile(`\s+`)
+			line := space.ReplaceAllString(scanner.Text(), " ")
+
+			names := strings.Split(line, " ")
 			labels[names[0]] = names[1]
 		}
 	}
