@@ -173,34 +173,35 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence             string
-	IonForm              string
-	ModifiedSequence     string
-	RetentionTime        string
-	ChargeState          uint8
-	Spectra              map[string]int
-	MappedProteins       map[string]int
-	MappedGenes          map[string]int
-	MZ                   float64
-	PeptideMass          float64
-	PrecursorNeutralMass float64
-	Weight               float64
-	GroupWeight          float64
-	Intensity            float64
-	Probability          float64
-	Expectation          float64
-	SummedLabelIntensity float64
-	IsUnique             bool
-	IsURazor             bool
-	IsDecoy              bool
-	Protein              string
-	ProteinID            string
-	GeneName             string
-	EntryName            string
-	ProteinDescription   string
-	Labels               iso.Labels
-	PhosphoLabels        iso.Labels
-	Modifications        mod.Modifications
+	Sequence                 string
+	IonForm                  string
+	ModifiedSequence         string
+	RetentionTime            string
+	ChargeState              uint8
+	NumberOfEnzymaticTermini uint8
+	Spectra                  map[string]int
+	MappedProteins           map[string]int
+	MappedGenes              map[string]int
+	MZ                       float64
+	PeptideMass              float64
+	PrecursorNeutralMass     float64
+	Weight                   float64
+	GroupWeight              float64
+	Intensity                float64
+	Probability              float64
+	Expectation              float64
+	SummedLabelIntensity     float64
+	IsUnique                 bool
+	IsURazor                 bool
+	IsDecoy                  bool
+	Protein                  string
+	ProteinID                string
+	GeneName                 string
+	EntryName                string
+	ProteinDescription       string
+	Labels                   iso.Labels
+	PhosphoLabels            iso.Labels
+	Modifications            mod.Modifications
 }
 
 // IonEvidenceList ...

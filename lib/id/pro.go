@@ -52,21 +52,22 @@ type ProteinIdentification struct {
 
 // PeptideIonIdentification struct
 type PeptideIonIdentification struct {
-	PeptideSequence         string
-	ModifiedPeptide         string
-	Charge                  uint8
-	InitialProbability      float64
-	Weight                  float64
-	GroupWeight             float64
-	CalcNeutralPepMass      float64
-	NumberOfInstances       int
-	SharedParentProteins    int
-	Razor                   int
-	IsNondegenerateEvidence bool
-	IsUnique                bool
-	PeptideParentProtein    []string
-	Labels                  iso.Labels
-	Modifications           mod.Modifications
+	PeptideSequence          string
+	ModifiedPeptide          string
+	Charge                   uint8
+	InitialProbability       float64
+	Weight                   float64
+	GroupWeight              float64
+	CalcNeutralPepMass       float64
+	NumberOfEnzymaticTermini uint8
+	NumberOfInstances        int
+	SharedParentProteins     int
+	Razor                    int
+	IsNondegenerateEvidence  bool
+	IsUnique                 bool
+	PeptideParentProtein     []string
+	Labels                   iso.Labels
+	Modifications            mod.Modifications
 }
 
 // GroupList represents a protein group list
@@ -155,6 +156,7 @@ func (p *ProtXML) Read(f string) {
 				pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Modifications.Index = make(map[string]mod.Modification)
 				pepid.NumberOfInstances = k.NIstances
+				pepid.NumberOfEnzymaticTermini = k.NEnzymaticTermini
 				pepid.Razor = -1
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {

@@ -1,10 +1,9 @@
+### Added
+- Added keepold flag for PTMProphet.
+
+### Changed
+- Philosopher will ignore the interact file when interact.mod is present.
+- Improved quantification mapping to all runs. The  --mapmods option is only necessary to print mod reports.
+
 ### Fixed
-- Small bugs and fixes for the pipeline command.
-<<<<<<< HEAD
-- Bug preventing the reset of iTRAQ quantification structures.
-=======
->>>>>>> 20f31345a9bbca9354edc905736f19f02503dc71
-
-
-## Snapcraft
-- `snap install philosopher`
+- Error preventing iTRAQ quantification.

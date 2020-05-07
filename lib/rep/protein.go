@@ -128,6 +128,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref.Probability = k.InitialProbability
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
+				ref.NumberOfEnzymaticTermini = k.NumberOfEnzymaticTermini
 				ref.Labels = k.Labels
 
 				ref.MappedProteins = make(map[string]int)

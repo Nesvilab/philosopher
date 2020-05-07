@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"fmt"
 	"strings"
 
 	"philosopher/lib/dat"
@@ -23,12 +24,18 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var urazorMap = make(map[string]string)
 	var uniqueSeqMap = make(map[string]string)
 
+	// collect the updated ntt for each peptide-protein pair
+	var nttPeptidetoProptein = make(map[string]uint8)
+
 	for _, i := range evi.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
 			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
 			}
+
+			key := fmt.Sprintf("%s#%s", j.Sequence, j.Protein)
+			nttPeptidetoProptein[key] = j.NumberOfEnzymaticTermini
 		}
 
 		for _, j := range i.TotalPeptideIons {
@@ -75,6 +82,14 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			if strings.Contains(rp, decoyTag) {
 				evi.PSM[i].IsDecoy = true
 			}
+
+			// update the number of enzymatic termini from the prot.xml
+			key := fmt.Sprintf("%s#%s", evi.PSM[i].Peptide, evi.PSM[i].Protein)
+			ntt, ok := nttPeptidetoProptein[key]
+			if ok {
+				evi.PSM[i].NumberOfEnzymaticTermini = int(ntt)
+			}
+
 		}
 
 		// for j := range evi.PSM[i].MappedProteins {
