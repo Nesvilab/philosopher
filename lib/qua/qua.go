@@ -1,12 +1,9 @@
 package qua
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -85,7 +82,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	// read the annotation file
 	p.LabelNames = make(map[string]string)
 	if len(p.Annot) > 0 {
-		p.LabelNames = getLabelNames(p.Annot)
+		p.LabelNames = uti.GetLabelNames(p.Annot)
 	}
 
 	logrus.Info("Calculating intensities and ion interference")
@@ -247,36 +244,36 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
+// func getLabelNames(annot string) map[string]string {
 
-	var labels = make(map[string]string)
+// 	var labels = make(map[string]string)
 
-	file, e := os.Open(annot)
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-	defer file.Close()
+// 	file, e := os.Open(annot)
+// 	if e != nil {
+// 		msg.ReadFile(e, "fatal")
+// 	}
+// 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		// does the line has at least an iso tag?
-		if len(scanner.Text()) > 3 {
+// 	scanner := bufio.NewScanner(file)
+// 	for scanner.Scan() {
+// 		// does the line has at least an iso tag?
+// 		if len(scanner.Text()) > 3 {
 
-			// replace tabs and multiple spaces by single space
-			space := regexp.MustCompile(`\s+`)
-			line := space.ReplaceAllString(scanner.Text(), " ")
+// 			// replace tabs and multiple spaces by single space
+// 			space := regexp.MustCompile(`\s+`)
+// 			line := space.ReplaceAllString(scanner.Text(), " ")
 
-			names := strings.Split(line, " ")
-			labels[names[0]] = names[1]
-		}
-	}
+// 			names := strings.Split(line, " ")
+// 			labels[names[0]] = names[1]
+// 		}
+// 	}
 
-	if e = scanner.Err(); e != nil {
-		msg.ReadFile(e, "fatal")
-	}
+// 	if e = scanner.Err(); e != nil {
+// 		msg.ReadFile(e, "fatal")
+// 	}
 
-	return labels
-}
+// 	return labels
+// }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName
 func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string) map[string]iso.Labels {

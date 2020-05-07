@@ -1,19 +1,15 @@
 package rep
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
-	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
 )
@@ -408,7 +404,7 @@ func Run(m met.Data) {
 		if len(m.Quantify.Annot) > 0 {
 			annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
 			annotfile, _ = filepath.Abs(annotfile)
-			labels = getLabelNames(annotfile)
+			labels = uti.GetLabelNames(annotfile)
 		}
 	}
 
@@ -453,29 +449,29 @@ func Run(m met.Data) {
 	return
 }
 
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
+// // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
+// func getLabelNames(annot string) map[string]string {
 
-	var labels = make(map[string]string)
+// 	var labels = make(map[string]string)
 
-	file, e := os.Open(annot)
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-	defer file.Close()
+// 	file, e := os.Open(annot)
+// 	if e != nil {
+// 		msg.ReadFile(e, "fatal")
+// 	}
+// 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
-	}
+// 	scanner := bufio.NewScanner(file)
+// 	for scanner.Scan() {
+// 		names := strings.Split(scanner.Text(), " ")
+// 		labels[names[0]] = names[1]
+// 	}
 
-	if e = scanner.Err(); e != nil {
-		msg.Custom(errors.New("Annotation file seems to be empty"), "error")
-	}
+// 	if e = scanner.Err(); e != nil {
+// 		msg.Custom(errors.New("Annotation file seems to be empty"), "error")
+// 	}
 
-	return labels
-}
+// 	return labels
+// }
 
 // prepares the list of modifications to be printed by the report functions
 func getModsList(m map[string]mod.Modification) ([]string, []string) {
