@@ -243,38 +243,6 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 	return evi
 }
 
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-// func getLabelNames(annot string) map[string]string {
-
-// 	var labels = make(map[string]string)
-
-// 	file, e := os.Open(annot)
-// 	if e != nil {
-// 		msg.ReadFile(e, "fatal")
-// 	}
-// 	defer file.Close()
-
-// 	scanner := bufio.NewScanner(file)
-// 	for scanner.Scan() {
-// 		// does the line has at least an iso tag?
-// 		if len(scanner.Text()) > 3 {
-
-// 			// replace tabs and multiple spaces by single space
-// 			space := regexp.MustCompile(`\s+`)
-// 			line := space.ReplaceAllString(scanner.Text(), " ")
-
-// 			names := strings.Split(line, " ")
-// 			labels[names[0]] = names[1]
-// 		}
-// 	}
-
-// 	if e = scanner.Err(); e != nil {
-// 		msg.ReadFile(e, "fatal")
-// 	}
-
-// 	return labels
-// }
-
 // checks for custom names and assign the normal channel or the custom name to the CustomName
 func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string) map[string]iso.Labels {
 
