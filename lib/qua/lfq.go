@@ -13,6 +13,7 @@ import (
 	"philosopher/lib/bio"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -129,6 +130,10 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 				highi := sort.Search(len(mz[j].Mz.DecodedStream), func(i int) bool { return mz[j].Mz.DecodedStream[i] >= mzValue+ppmPrecision*mzValue })
 
 				var maxI = 0.0
+
+				// if mz[j].Index == "3106" {
+				// 	spew.Dump(mzValue, mz[j].Intensity.DecodedStream[lowi:highi])
+				// }
 
 				for _, k := range mz[j].Intensity.DecodedStream[lowi:highi] {
 					if k > maxI {

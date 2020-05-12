@@ -171,6 +171,10 @@ func Run(f met.Data) met.Data {
 		e.UpdateSupportingSpectra()
 	}
 
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+		e.UpdateNumberOfEnzymaticTermini()
+	}
+
 	logrus.Info("Calculating spectral counts")
 	e = qua.CalculateSpectralCounts(e)
 
