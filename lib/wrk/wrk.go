@@ -9,11 +9,12 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/pierrre/archivefile/zip"
-	"philosopher/lib/msg"
 	"philosopher/lib/gth"
 	"philosopher/lib/met"
+	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	"github.com/pierrre/archivefile/zip"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )

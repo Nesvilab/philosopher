@@ -129,6 +129,7 @@ msfragger:                                     # v2.3
   add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
   
 peptideprophet:                                # v5.2
+  concurrent: false                            # Concurrent execution of multiple instaces
   extension: pepXML                            # pepXML file extension
   clevel: 0                                    # set Conservative Level in neg_stdev from the neg_mean, low numbers are less conservative, high numbers are more conservative
   accmass: true                                # use Accurate Mass model binning

@@ -10,7 +10,6 @@ import (
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/pip"
-	"philosopher/lib/sla"
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
@@ -40,9 +39,8 @@ var pipelineCmd = &cobra.Command{
 			msg.Custom(errors.New("Can't find temporary directory; check folder permissions"), "info")
 		}
 
-		param := pip.DeployParameterFile(meta.Temp)
-
 		if m.Pipeline.Print == true {
+			param := pip.DeployParameterFile(meta.Temp)
 			msg.Custom(errors.New("Printing parameter file"), "info")
 			sys.CopyFile(param, filepath.Base(param))
 			return
@@ -68,36 +66,47 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		// Workspace - Database
-		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
+		if p.Commands.Workspace == "yes" {
+			meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
+		}
 
 		// Comet - MSFragger
-		meta = pip.DatabaseSearch(meta, p, dir, args)
+		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
+			msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
+		} else if p.Commands.Comet == "yes" || p.Commands.MSFragger == "yes" {
+			meta = pip.DatabaseSearch(meta, p, dir, args)
+		}
 
 		// PeptideProphet - PTMProphet - ProteinProphet
-		meta = pip.Prophets(meta, p, dir, args)
-		//meta = pip.ParallelProphets(meta, p, dir, args)
+		if p.PeptideProphet.Concurrent == true {
+			meta = pip.ParallelProphets(meta, p, dir, args)
+		} else {
+			meta = pip.Prophets(meta, p, dir, args)
+		}
 
 		// Abacus - combined pepxml
-		meta = pip.CombinedPeptideList(meta, p, dir, args)
+		//meta = pip.CombinedPeptideList(meta, p, dir, args)
 
 		// Abacus - combined protxml
-		meta = pip.CombinedProteinList(meta, p, dir, args)
+		//meta = pip.CombinedProteinList(meta, p, dir, args)
 
 		// Filter - Quantification - Clustering - Report
-		meta = pip.FilterQuantifyReport(meta, p, dir, args)
+		//meta = pip.FilterQuantifyReport(meta, p, dir, args)
 
 		// Abacus
-		meta = pip.Abacus(meta, p, dir, args)
+		//meta = pip.Abacus(meta, p, dir, args)
 
 		// TMT-Integrator
-		meta = pip.TMTIntegrator(meta, p, dir, args)
+		//meta = pip.TMTIntegrator(meta, p, dir, args)
 
 		// Backup and Clean
 		//pip.BackupAndClean(meta, p, dir, Version, Build, args)
 
-		if len(p.SlackToken) > 0 {
-			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
-		}
+		// if len(p.SlackToken) > 0 {
+		// 	sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
+		// }
+
+		met.CleanTemp(meta.Temp)
 
 		msg.Done()
 		return
@@ -108,7 +117,7 @@ func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "pipeline" {
 
-		m.Restore(sys.Meta())
+		//m.Restore(sys.Meta())
 
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
