@@ -2,7 +2,11 @@
 package uti
 
 import (
+	"bufio"
 	"math"
+	"os"
+	"philosopher/lib/msg"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -73,4 +77,36 @@ func ParseFloat(str string) (float64, error) {
 	}
 
 	return baseVal * math.Pow10(int(expVal)), nil
+}
+
+// GetLabelNames add custom names adds to the label structures user-defined names to be used on the isobaric labels
+func GetLabelNames(annot string) map[string]string {
+
+	var labels = make(map[string]string)
+
+	file, e := os.Open(annot)
+	if e != nil {
+		msg.ReadFile(e, "fatal")
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		// does the line has at least an iso tag?
+		if len(scanner.Text()) > 3 {
+
+			// replace tabs and multiple spaces by single space
+			space := regexp.MustCompile(`\s+`)
+			line := space.ReplaceAllString(scanner.Text(), " ")
+
+			names := strings.Split(line, " ")
+			labels[names[0]] = names[1]
+		}
+	}
+
+	if e = scanner.Err(); e != nil {
+		msg.ReadFile(e, "fatal")
+	}
+
+	return labels
 }

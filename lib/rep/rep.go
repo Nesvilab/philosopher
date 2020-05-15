@@ -1,19 +1,15 @@
 package rep
 
 import (
-	"bufio"
-	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
-	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
 )
@@ -173,34 +169,35 @@ func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spect
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence             string
-	IonForm              string
-	ModifiedSequence     string
-	RetentionTime        string
-	ChargeState          uint8
-	Spectra              map[string]int
-	MappedProteins       map[string]int
-	MappedGenes          map[string]int
-	MZ                   float64
-	PeptideMass          float64
-	PrecursorNeutralMass float64
-	Weight               float64
-	GroupWeight          float64
-	Intensity            float64
-	Probability          float64
-	Expectation          float64
-	SummedLabelIntensity float64
-	IsUnique             bool
-	IsURazor             bool
-	IsDecoy              bool
-	Protein              string
-	ProteinID            string
-	GeneName             string
-	EntryName            string
-	ProteinDescription   string
-	Labels               iso.Labels
-	PhosphoLabels        iso.Labels
-	Modifications        mod.Modifications
+	Sequence                 string
+	IonForm                  string
+	ModifiedSequence         string
+	RetentionTime            string
+	ChargeState              uint8
+	NumberOfEnzymaticTermini uint8
+	Spectra                  map[string]int
+	MappedProteins           map[string]int
+	MappedGenes              map[string]int
+	MZ                       float64
+	PeptideMass              float64
+	PrecursorNeutralMass     float64
+	Weight                   float64
+	GroupWeight              float64
+	Intensity                float64
+	Probability              float64
+	Expectation              float64
+	SummedLabelIntensity     float64
+	IsUnique                 bool
+	IsURazor                 bool
+	IsDecoy                  bool
+	Protein                  string
+	ProteinID                string
+	GeneName                 string
+	EntryName                string
+	ProteinDescription       string
+	Labels                   iso.Labels
+	PhosphoLabels            iso.Labels
+	Modifications            mod.Modifications
 }
 
 // IonEvidenceList ...
@@ -407,7 +404,7 @@ func Run(m met.Data) {
 		if len(m.Quantify.Annot) > 0 {
 			annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
 			annotfile, _ = filepath.Abs(annotfile)
-			labels = getLabelNames(annotfile)
+			labels = uti.GetLabelNames(annotfile)
 		}
 	}
 
@@ -450,30 +447,6 @@ func Run(m met.Data) {
 	}
 
 	return
-}
-
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
-
-	var labels = make(map[string]string)
-
-	file, e := os.Open(annot)
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
-	}
-
-	if e = scanner.Err(); e != nil {
-		msg.Custom(errors.New("Annotation file seems to be empty"), "error")
-	}
-
-	return labels
 }
 
 // prepares the list of modifications to be printed by the report functions

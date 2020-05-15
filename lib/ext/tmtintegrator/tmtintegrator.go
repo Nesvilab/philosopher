@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"philosopher/lib/msg"
 	"philosopher/lib/met"
+	"philosopher/lib/msg"
 )
 
 // TMTIntegrator represents the tool configuration

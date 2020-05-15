@@ -12,10 +12,13 @@ import (
 func WinInteractParser(s string) {
 
 	bin, e := Asset("InteractParser.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
-
 	if e != nil {
-		msg.DeployAsset(errors.New("InteractParser"), "trace")
+		msg.DeployAsset(errors.New("InteractParser"), "Cannot read bin InteractParser")
+	}
+
+	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e != nil {
+		msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
 	}
 
 	return

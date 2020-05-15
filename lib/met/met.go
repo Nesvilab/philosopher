@@ -228,6 +228,7 @@ type PeptideProphet struct {
 	Neggamma      bool    `yaml:"neggamma"`
 	Forcedistr    bool    `yaml:"forcedistr"`
 	Optimizefval  bool    `yaml:"optimizefval"`
+	Concurrent    bool    `yaml:"concurrent"`
 }
 
 // InterProphet options and parameters

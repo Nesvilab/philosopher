@@ -8,6 +8,7 @@ import (
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +39,7 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Output, "output", "", "", "output prefix file name")
+		//ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Output, "output", "", "", "output prefix file name")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Mods, "mods", "", "", "<amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN>,<amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN> (overrides the modifications from the interact.pep.xml file)")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.NIons, "nions", "", "", "use specified N-term ions, separate multiple ions by commas (default: a,b for CID, c for ETD)")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.CIons, "cions", "", "", "use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)")

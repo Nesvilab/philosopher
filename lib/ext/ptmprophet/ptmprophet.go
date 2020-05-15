@@ -91,12 +91,16 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	// append output file
 	var output string
-	output = "interact.mod.pep.xml"
-	if len(params.Output) > 0 {
-		output = fmt.Sprintf("%s.pep.xml", params.Output)
+	if params.KeepOld == true {
+		output = "interact.mod.pep.xml"
+		if len(params.Output) > 0 {
+			output = fmt.Sprintf("%s.pep.xml", params.Output)
+		}
+
+		cmd.Args = append(cmd.Args, output)
+		cmd.Dir = filepath.Dir(output)
 	}
-	cmd.Args = append(cmd.Args, output)
-	cmd.Dir = filepath.Dir(output)
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -111,14 +115,19 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	}
 
 	// collect all resulting files
-	var processedOutput []string
-	for _, i := range cmd.Args {
-		if strings.Contains(i, output) || i == params.Output {
-			processedOutput = append(processedOutput, i)
+	var customOutput []string
+	if params.KeepOld == true {
+		for _, i := range cmd.Args {
+			if strings.Contains(i, output) || i == params.Output {
+				customOutput = append(customOutput, i)
+			}
 		}
 	}
 
-	return processedOutput
+	if params.KeepOld == true {
+		return customOutput
+	}
+	return args
 }
 
 func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd {

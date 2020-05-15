@@ -73,6 +73,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.PeptideMass = i.CalcNeutralPepMass
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
 		pr.Expectation = i.Expectation
+		pr.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
 		pr.Protein = i.Protein
 		pr.MappedProteins[i.Protein] = 0
 		pr.Modifications = i.Modifications

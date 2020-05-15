@@ -475,7 +475,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel16.Intensity = 0
 		} else {
 			for _, j := range evi.PSM[i].Modifications.Index {
-				if j.MassDiff >= 229.1629 {
+				if j.MassDiff >= 144.1020 || j.MassDiff >= 229.1629 {
 					flag++
 				}
 			}

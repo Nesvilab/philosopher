@@ -22,13 +22,7 @@ builds:
     - amd64
 
 archives:
-- replacements:
-    #darwin: darwin
-    #linux: linux
-    #windows: windows
-    #amd64: x86_64
-
-  name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+- name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
   format: zip
 
@@ -51,32 +45,23 @@ changelog:
     - '^test:'
 
 nfpms:
--
-  #id: "default"
+  - file_name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
-  name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    vendor: University of Michigan, Department of Pathology, Proteome Bioinformatics Laboratory
 
-  builds:
+    homepage: https://philosopher.nesvilab.org
 
-  replacements:
-    #amd64: 64-bit
-    #darwin: macOS
+    maintainer: Felipe da Veiga Leprevost <felipevl@umich.edu>
 
-  vendor: University of Michigan, Department of Pathology, Proteome Bioinformatics Laboratory
+    description: A complete toolkit for shotgun proteomics data analysis.
 
-  homepage: https://philosopher.nesvilab.org
+    license: GPL-3.0
 
-  maintainer: Felipe da Veiga Leprevost <felipevl@umich.edu>
+    bindir: "/usr/local/bin"
 
-  description: A complete toolkit for shotgun proteomics data analysis.
-
-  license: GPL-3.0
-
-  bindir: "/usr/local/bin"
-
-  formats:
-    - deb
-    - rpm
+    formats:
+      - deb
+      - rpm
 
 release:
 
@@ -107,7 +92,10 @@ release:
 
 
 dockers:
-  -
+  - image_templates:
+    - "prvst/philosopher:{{ .Version }}"
+    - "prvst/philosopher:latest"
+
     goos: linux
 
     goarch: amd64
@@ -116,10 +104,6 @@ dockers:
 
     binaries:
     - philosopher
-
-    image_templates:
-    - "prvst/philosopher:{{ .Version }}"
-    - "prvst/philosopher:latest"
     
     dockerfile: Dockerfile
 
@@ -131,58 +115,57 @@ dockers:
 
 
 snapcrafts:
--
   # You can change the name of the package.
   # Default: `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}`
-  name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+ - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
 
-  # Wether to publish the snap to the snapcraft store.
-  # Remember you need to `snapcraft login` first.
-  # Defaults to false.
-  publish: true
+   # Wether to publish the snap to the snapcraft store.
+   # Remember you need to `snapcraft login` first.
+   # Defaults to false.
+   publish: true
 
-  # Single-line elevator pitch for your amazing snap.
-  # 79 char long at most.
-  summary: A complete toolkit for shotgun proteomics data analysis.
+   # Single-line elevator pitch for your amazing snap.
+   # 79 char long at most.
+   summary: A complete toolkit for shotgun proteomics data analysis.
 
-  # This the description of your snap. You have a paragraph or two to tell the
-  # most important story about your snap. Keep it under 100 words though,
-  # we live in tweetspace and your description wants to look good in the snap
-  # store.
-  description:
+   # This the description of your snap. You have a paragraph or two to tell the
+   # most important story about your snap. Keep it under 100 words though,
+   # we live in tweetspace and your description wants to look good in the snap
+   # store.
+   description:
     Philosopher is a software designed for proteome bioinformatics analysis.
 
-  # A guardrail to prevent you from releasing a snap to all your users before
-  # it is ready.
-  # `devel` will let you release only to the `edge` and `beta` channels in the
-  # store. `stable` will let you release also to the `candidate` and `stable`
-  # channels. More info about channels here:
-  # https://snapcraft.io/docs/reference/channels
-  grade: stable
+   # A guardrail to prevent you from releasing a snap to all your users before
+   # it is ready.
+   # `devel` will let you release only to the `edge` and `beta` channels in the
+   # store. `stable` will let you release also to the `candidate` and `stable`
+   # channels. More info about channels here:
+   # https://snapcraft.io/docs/reference/channels
+   grade: stable
 
-  # Snaps can be setup to follow three different confinement policies:
-  # `strict`, `devmode` and `classic`. A strict confinement where the snap
-  # can only read and write in its own namespace is recommended. Extra
-  # permissions for strict snaps can be declared as `plugs` for the app, which
-  # are explained later. More info about confinement here:
-  # https://snapcraft.io/docs/reference/confinement
-  confinement: strict
+   # Snaps can be setup to follow three different confinement policies:
+   # `strict`, `devmode` and `classic`. A strict confinement where the snap
+   # can only read and write in its own namespace is recommended. Extra
+   # permissions for strict snaps can be declared as `plugs` for the app, which
+   # are explained later. More info about confinement here:
+   # https://snapcraft.io/docs/reference/confinement
+   confinement: strict
   
-  # Your app's license, based on SPDX license expressions: https://spdx.org/licenses
-  # Default is empty.
-  license: GPL-3.0
+   # Your app's license, based on SPDX license expressions: https://spdx.org/licenses
+   # Default is empty.
+   license: GPL-3.0
   
-  # A snap of type base to be used as the execution environment for this snap.
-  # Valid values are:
-  # * bare - Empty base snap;
-  # * core - Ubuntu Core 16;
-  # * core18 - Ubuntu Core 18.
-  # Default is empty.
-  #base: core18
+   # A snap of type base to be used as the execution environment for this snap.
+   # Valid values are:
+   # * bare - Empty base snap;
+   # * core - Ubuntu Core 16;
+   # * core18 - Ubuntu Core 18.
+   # Default is empty.
+   #base: core18
 
-  # Each binary built by GoReleaser is an app inside the snap. In this section
-  # you can declare extra details for those binaries. It is optional.
-  apps:
+   # Each binary built by GoReleaser is an app inside the snap. In this section
+   # you can declare extra details for those binaries. It is optional.
+   apps:
 
     # The name of the app must be the same name as the binary built or the snapcraft name.
     philosopher:

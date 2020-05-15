@@ -1,9 +1,11 @@
 package rep
 
 import (
+	"fmt"
 	"strings"
 
 	"philosopher/lib/dat"
+	"philosopher/lib/id"
 )
 
 // PeptideMap struct
@@ -14,6 +16,38 @@ type PeptideMap struct {
 	ProteinID string
 	Gene      string
 	Proteins  map[string]int
+}
+
+// UpdateNumberOfEnzymaticTermini collects the NTT from ProteinProphet
+// and passes along to the final Protein structure.
+func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
+
+	// restore the original prot.xml output
+	var p id.ProtIDList
+	p.Restore()
+
+	// collect the updated ntt for each peptide-protein pair
+	var nttPeptidetoProptein = make(map[string]uint8)
+
+	for _, i := range p {
+		for _, j := range i.PeptideIons {
+			if !strings.Contains(i.ProteinName, "rev_") {
+				key := fmt.Sprintf("%s#%s", j.PeptideSequence, i.ProteinName)
+				nttPeptidetoProptein[key] = j.NumberOfEnzymaticTermini
+			}
+		}
+	}
+
+	for i := range evi.PSM {
+
+		key := fmt.Sprintf("%s#%s", evi.PSM[i].Peptide, evi.PSM[i].Protein)
+		ntt, ok := nttPeptidetoProptein[key]
+		if ok {
+			evi.PSM[i].NumberOfEnzymaticTermini = int(ntt)
+		}
+	}
+
+	return
 }
 
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
@@ -41,9 +75,9 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	for i := range evi.PSM {
 
 		// the decoy tag checking is a failsafe mechanism to avoid proteins
-		// with real complex razor case decisions to pass dowsntream
+		// with real complex razor case decisions to pass downstream
 		// wrong classifications. If by any chance the protein gets assigned to
-		// a razor decoy, this mchanism avoids the replacement
+		// a razor decoy, this mechanism avoids the replacement
 
 		rp, rOK := urazorMap[evi.PSM[i].IonForm]
 		if rOK {
@@ -55,33 +89,14 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			// decoy by the target but it was removed because in some cases the protein
 			// does not pass the FDR filtering.
 
-			//if !strings.Contains(rp, decoyTag) {
-			//evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
-			//delete(evi.PSM[i].MappedProteins, rp)
-			//evi.PSM[i].Protein = rp
-			//}
-
 			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
-
 			delete(evi.PSM[i].MappedProteins, rp)
-			// for j := range evi.PSM[i].MappedProteins {
-			// 	if strings.Contains(j, decoyTag) {
-			// 		delete(evi.PSM[i].MappedProteins, j)
-			// 	}
-			// }
-
 			evi.PSM[i].Protein = rp
 
 			if strings.Contains(rp, decoyTag) {
 				evi.PSM[i].IsDecoy = true
 			}
 		}
-
-		// for j := range evi.PSM[i].MappedProteins {
-		// 	if strings.Contains(j, decoyTag) {
-		// 		delete(evi.PSM[i].MappedProteins, j)
-		// 	}
-		// }
 
 		_, uOK := uniqueMap[evi.PSM[i].IonForm]
 		if uOK {
@@ -98,21 +113,8 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 			evi.Ions[i].IsURazor = true
 
-			// if !strings.Contains(rp, decoyTag) {
-			// 	evi.Ions[i].MappedProteins[evi.Ions[i].Protein] = 0
-			// 	delete(evi.Ions[i].MappedProteins, rp)
-			// 	evi.Ions[i].Protein = rp
-			// }
-
 			evi.Ions[i].MappedProteins[evi.Ions[i].Protein] = 0
-
 			delete(evi.Ions[i].MappedProteins, rp)
-			// for j := range evi.Ions[i].MappedProteins {
-			// 	if strings.Contains(j, decoyTag) {
-			// 		delete(evi.Ions[i].MappedProteins, j)
-			// 	}
-			// }
-
 			evi.Ions[i].Protein = rp
 
 			if strings.Contains(rp, decoyTag) {
@@ -120,13 +122,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 
 		}
-
-		// for j := range evi.Ions[i].MappedProteins {
-		// 	if strings.Contains(j, decoyTag) {
-		// 		delete(evi.Ions[i].MappedProteins, j)
-		// 	}
-		// }
-
 		_, uOK := uniqueMap[evi.Ions[i].IonForm]
 		if uOK {
 			evi.Ions[i].IsUnique = true
@@ -139,25 +134,10 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
 		if ok {
-
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
-
 			delete(evi.Peptides[i].MappedProteins, v)
-			// for j := range evi.Peptides[i].MappedProteins {
-			// 	if strings.Contains(j, decoyTag) {
-			// 		delete(evi.Peptides[i].MappedProteins, j)
-			// 	}
-			// }
-
 			evi.Peptides[i].Protein = v
-
 		}
-
-		// for j := range evi.Peptides[i].MappedProteins {
-		// 	if strings.Contains(j, decoyTag) {
-		// 		delete(evi.Peptides[i].MappedProteins, j)
-		// 	}
-		// }
 
 		if strings.Contains(v, decoyTag) {
 			evi.Peptides[i].IsDecoy = true

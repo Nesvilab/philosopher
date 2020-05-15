@@ -76,6 +76,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref := v
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
+				//ref.NumberOfEnzymaticTermini = k.NumberOfEnzymaticTermini
 
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
@@ -121,6 +122,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref.MappedProteins = make(map[string]int)
 				ref.Spectra = make(map[string]int)
 
+				ref.Protein = i.ProteinName
+
 				ref.Sequence = k.PeptideSequence
 				ref.IonForm = ion
 				ref.ModifiedSequence = k.ModifiedPeptide
@@ -128,6 +131,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref.Probability = k.InitialProbability
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
+				ref.NumberOfEnzymaticTermini = k.NumberOfEnzymaticTermini
 				ref.Labels = k.Labels
 
 				ref.MappedProteins = make(map[string]int)
@@ -168,6 +172,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 		}
 
+		// if strings.Contains(rep.ProteinName, "Q8WXG9") {
+		// 	spew.Dump(rep)
+		// }
+
 		list = append(list, rep)
 	}
 
@@ -178,11 +186,12 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		msg.DatabaseNotFound(errors.New(""), "fatal")
 	}
 
-	// fix the name sand headers and pull database information into proteinreport
+	// fix the name sand headers and pull database information into protein report
 	for i := range list {
 		for _, j := range dtb.Records {
 			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
 				if (j.IsDecoy == true && list[i].IsDecoy == true) || (j.IsDecoy == false && list[i].IsDecoy == false) {
+
 					list[i].OriginalHeader = j.OriginalHeader
 					list[i].PartHeader = j.PartHeader
 					list[i].ProteinID = j.ID
@@ -198,6 +207,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 						list[i].Description = j.ProteinName
 					} else {
 						list[i].Description = j.Description
+					}
+
+					// updating the protein ions
+					for _, k := range list[i].TotalPeptideIons {
+						k.Protein = j.PartHeader
+						k.ProteinID = j.ID
+						k.GeneName = j.GeneNames
 					}
 
 					break

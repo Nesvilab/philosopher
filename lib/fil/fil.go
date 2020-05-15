@@ -128,12 +128,15 @@ func Run(f met.Data) met.Data {
 	ion = nil
 
 	// evaluate modifications in data set
+	logrus.Info("Mapping modifications")
 	if f.Filter.Mapmods == true {
-		logrus.Info("Mapping modifications")
-		e.MapMods()
+		//should include observed mods into mapping?
+		e.MapMods(true)
 
 		logrus.Info("Processing modifications")
 		e.AssembleModificationReport()
+	} else {
+		e.MapMods(false)
 	}
 
 	var pept id.PepIDList
@@ -168,6 +171,10 @@ func Run(f met.Data) met.Data {
 		e.UpdateSupportingSpectra()
 	}
 
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+		e.UpdateNumberOfEnzymaticTermini()
+	}
+
 	logrus.Info("Calculating spectral counts")
 	e = qua.CalculateSpectralCounts(e)
 
@@ -180,7 +187,9 @@ func Run(f met.Data) met.Data {
 // readPepXMLInput reads one or more fies and organize the data into PSM list
 func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass int) (id.PepIDList, string) {
 
-	var files []string
+	var files = make(map[string]uint8)
+	var fileCheckList []string
+	var fileCheckFlag bool
 	var pepIdent id.PepIDList
 	var mods []mod.Modification
 	var params []spc.Parameter
@@ -188,7 +197,8 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 	var searchEngine string
 
 	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
-		files = append(files, xmlFile)
+		fileCheckList = append(fileCheckList, xmlFile)
+		files[xmlFile] = 0
 	} else {
 		glob := fmt.Sprintf("%s/*pep.xml", xmlFile)
 		list, _ := filepath.Glob(glob)
@@ -199,12 +209,29 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 
 		for _, i := range list {
 			absPath, _ := filepath.Abs(i)
-			files = append(files, absPath)
+			files[absPath] = 0
+			fileCheckList = append(fileCheckList, absPath)
+
+			if strings.Contains(i, "mod") {
+				fileCheckFlag = true
+			}
 		}
 
 	}
 
-	for _, i := range files {
+	// verify if the we have interact and interact.mod files for parsing.
+	// To avoid reading both files, we keep the mod one and discard the other.
+	if fileCheckFlag == true {
+		for _, i := range fileCheckList {
+			i = strings.Replace(i, "mod.", "", 1)
+			_, ok := files[i]
+			if ok {
+				delete(files, i)
+			}
+		}
+	}
+
+	for i := range files {
 		var p id.PepXML
 		p.DecoyTag = decoyTag
 		p.Read(i)
@@ -744,137 +771,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 	return
 }
 
-// func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[string]string, coverMap map[string]float64, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
-
-// 	var t int
-// 	var d int
-// 	var proteinIndex = make(map[string]uint)
-// 	var proXML id.ProtXML
-// 	var proGrps id.GroupList
-// 	var proteinCheckList = make(map[string]id.ProteinIdentification)
-// 	var ionCheckList = make(map[string]id.PeptideIonIdentification)
-
-// 	// build the ProtXML strct
-// 	grpID := id.GroupIdentification{
-// 		GroupNumber: 0,
-// 		Probability: 1.00,
-// 	}
-
-// 	proGrps = append(proGrps, grpID)
-
-// 	proXML.DecoyTag = decoyTag
-// 	proXML.Groups = proGrps
-
-// 	for _, i := range psm {
-
-// 		v, ok := proteinCheckList[i.Protein]
-// 		if ok {
-
-// 			obj := v
-// 			obj.UniqueStrippedPeptides = append(obj.UniqueStrippedPeptides, i.Peptide)
-// 			obj.TotalNumberPeptides++
-
-// 			proteinCheckList[i.Protein] = obj
-
-// 		} else {
-
-// 			var p id.ProteinIdentification
-
-// 			p.GroupNumber = 0
-// 			p.GroupSiblingID = "a"
-// 			p.ProteinName = i.Protein
-// 			p.HasRazor = true
-// 			p.UniqueStrippedPeptides = append(p.UniqueStrippedPeptides, i.Peptide)
-// 			p.Length = "0"
-// 			p.PercentCoverage = float32(coverMap[p.ProteinName])
-// 			p.PctSpectrumIDs = 0.0
-// 			p.GroupProbability = 1.00
-// 			p.Probability = i.Probability
-// 			p.Confidence = 1.00
-// 			p.TopPepProb = i.Probability
-// 			p.TotalNumberPeptides++
-// 			//p.HasRazor = true
-// 			p.Picked = 0
-
-// 			ionForm := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
-// 			ion, okIon := ionCheckList[ionForm]
-// 			if okIon {
-// 				obj := ion
-
-// 				obj.NumberOfInstances++
-
-// 				ionCheckList[ionForm] = obj
-
-// 			} else {
-
-// 				pep := id.PeptideIonIdentification{
-// 					PeptideSequence:      i.Peptide,
-// 					ModifiedPeptide:      i.ModifiedPeptide,
-// 					Charge:               i.AssumedCharge,
-// 					InitialProbability:   i.Probability,
-// 					Weight:               0,
-// 					GroupWeight:          0,
-// 					CalcNeutralPepMass:   i.CalcNeutralPepMass,
-// 					NumberOfInstances:    1,
-// 					SharedParentProteins: len(i.AlternativeProteins),
-// 					Razor:                0,
-// 					//IsNondegenerateEvidence: ,
-// 					//IsUnique: ,
-// 					Modifications: i.Modifications,
-// 				}
-
-// 				if pep.SharedParentProteins == 0 {
-// 					pep.IsUnique = true
-// 				}
-
-// 				_, okRazor := razorMap[pep.PeptideSequence]
-// 				if okRazor {
-// 					p.HasRazor = true
-// 					pep.Razor = 1
-// 				}
-
-// 				ionCheckList[ionForm] = pep
-// 				p.PeptideIons = append(p.PeptideIons, pep)
-// 			}
-
-// 			proteinIndex[i.Protein]++
-// 			for j := range i.AlternativeProteinsIndexed {
-// 				proteinIndex[j]++
-// 			}
-
-// 			proteinCheckList[i.Protein] = p
-// 		}
-// 	}
-
-// 	// collect all ProteinIdentifications and put them on the ProtIDList object
-// 	for _, i := range proteinCheckList {
-// 		proXML.Groups[0].Proteins = append(proXML.Groups[0].Proteins, i)
-// 	}
-
-// 	for i := range proteinIndex {
-// 		if strings.HasPrefix(i, decoyTag) {
-// 			d++
-// 		} else {
-// 			t++
-// 		}
-// 	}
-
-// 	// tagget / decoy / threshold
-// 	logrus.WithFields(logrus.Fields{
-// 		"target": t,
-// 		"decoy":  d,
-// 	}).Info("Protein inference results")
-
-// 	// run the FDR filter for proteins
-// 	pid := ProtXMLFilter(proXML, ptFDR, pepProb, protProb, false, true, decoyTag)
-
-// 	// save results on meta folder
-// 	proXML.Serialize()
-// 	pid.Serialize()
-
-// 	return
-// }
-
 // proteinProfile ...
 func proteinProfile(p id.ProtXML) (t, d int) {
 
@@ -959,40 +855,6 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 
 	return output
 }
-
-// // extractPSMfromPepXML retrieves all psm from protxml that maps into pepxml files
-// // using protein names from <protein> and <alternative_proteins> tags
-// func extractPSMfromPepXML(peplist id.PepIDList, pro id.ProtIDList) id.PepIDList {
-
-// 	var protmap = make(map[string]uint16)
-// 	var filterMap = make(map[string]id.PeptideIdentification)
-// 	var output id.PepIDList
-
-// 	// get all protein names from protxml
-// 	for _, i := range pro {
-// 		protmap[string(i.ProteinName)] = 0
-// 	}
-
-// 	for _, i := range peplist {
-// 		_, ok := protmap[string(i.Protein)]
-// 		if ok {
-// 			filterMap[string(i.Spectrum)] = i
-// 		} else {
-// 			for _, j := range i.AlternativeProteins {
-// 				_, ap := protmap[string(j)]
-// 				if ap {
-// 					filterMap[string(i.Spectrum)] = i
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	for _, v := range filterMap {
-// 		output = append(output, v)
-// 	}
-
-// 	return output
-// }
 
 // proteinProfileWithList
 func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t, d int) {

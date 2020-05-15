@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"philosopher/lib/msg"
 	"github.com/sirupsen/logrus"
+	"philosopher/lib/msg"
 )
 
 // Release information from GitHub

@@ -1,10 +1,8 @@
 package qua
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -15,6 +13,7 @@ import (
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 	"philosopher/lib/tmt"
+	"philosopher/lib/trq"
 	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
@@ -63,7 +62,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	evi.RestoreGranular()
 
 	// removed all calculated defined values from before
-	evi = cleanPreviousData(evi, p.Plex)
+	evi = cleanPreviousData(evi, p.Brand, p.Plex)
 
 	// collect all used source file names
 	for _, i := range evi.PSM {
@@ -83,7 +82,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	// read the annotation file
 	p.LabelNames = make(map[string]string)
 	if len(p.Annot) > 0 {
-		p.LabelNames = getLabelNames(p.Annot)
+		p.LabelNames = uti.GetLabelNames(p.Annot)
 	}
 
 	logrus.Info("Calculating intensities and ion interference")
@@ -211,52 +210,37 @@ func RunBioQuantification(c met.Data) {
 }
 
 // cleanPreviousData cleans previous label quantifications
-func cleanPreviousData(evi rep.Evidence, plex string) rep.Evidence {
+func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 
 	for i := range evi.PSM {
-		evi.PSM[i].Labels = tmt.New(plex)
-	}
-
-	for i := range evi.Ions {
-		evi.Ions[i].Labels = tmt.New(plex)
-	}
-
-	for i := range evi.Proteins {
-		evi.Proteins[i].TotalLabels = tmt.New(plex)
-
-		evi.Proteins[i].UniqueLabels = tmt.New(plex)
-
-		evi.Proteins[i].URazorLabels = tmt.New(plex)
-
-	}
-
-	return evi
-}
-
-// addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
-
-	var labels = make(map[string]string)
-
-	file, e := os.Open(annot)
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		if len(scanner.Text()) > 0 {
-			names := strings.Split(scanner.Text(), " ")
-			labels[names[0]] = names[1]
+		if brand == "tmt" {
+			evi.PSM[i].Labels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.PSM[i].Labels = trq.New(plex)
 		}
 	}
 
-	if e = scanner.Err(); e != nil {
-		msg.ReadFile(e, "fatal")
+	for i := range evi.Ions {
+		if brand == "tmt" {
+			evi.Ions[i].Labels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.Ions[i].Labels = trq.New(plex)
+		}
 	}
 
-	return labels
+	for i := range evi.Proteins {
+		if brand == "tmt" {
+			evi.Proteins[i].TotalLabels = tmt.New(plex)
+			evi.Proteins[i].UniqueLabels = tmt.New(plex)
+			evi.Proteins[i].URazorLabels = tmt.New(plex)
+		} else if brand == "itraq" {
+			evi.Proteins[i].TotalLabels = trq.New(plex)
+			evi.Proteins[i].UniqueLabels = trq.New(plex)
+			evi.Proteins[i].URazorLabels = trq.New(plex)
+		}
+	}
+
+	return evi
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName

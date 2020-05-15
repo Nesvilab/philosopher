@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	ucomet "philosopher/lib/ext/comet/unix"
 	wcomet "philosopher/lib/ext/comet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // Comet represents the tool configuration

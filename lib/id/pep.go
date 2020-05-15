@@ -56,10 +56,10 @@ type PeptideIdentification struct {
 	HitRank                          uint8
 	MissedCleavages                  uint8
 	NumberTolTerm                    uint8
+	NumberOfEnzymaticTermini         uint8
 	NumberTotalProteins              uint16
 	TotalNumberIons                  uint16
 	NumberMatchedIons                uint16
-	NumberOfEnzymaticTermini         int
 	NumberofMissedCleavages          int
 	UncalibratedPrecursorNeutralMass float64
 	PrecursorNeutralMass             float64
@@ -275,7 +275,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
 
 		psm.NumberofMissedCleavages = int(i.MissedCleavages)
-		psm.NumberOfEnzymaticTermini = int(i.TotalTerm)
+		psm.NumberOfEnzymaticTermini = i.TotalTerm
 
 		for _, j := range i.AnalysisResult {
 

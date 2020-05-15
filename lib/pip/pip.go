@@ -34,10 +34,6 @@ import (
 
 // Directives contains the instructions to run a pipeline
 type Directives struct {
-	Initialize     bool               `yaml:"initialize"`
-	Clean          bool               `yaml:"clean"`
-	Backup         bool               `yaml:"backup"`
-	Analtics       bool               `yaml:"analytics"`
 	SlackToken     string             `yaml:"slackToken"`
 	SlackChannel   string             `yaml:"slackChannel"`
 	SlackUserID    string             `yaml:"slackUserID"`
@@ -55,10 +51,14 @@ type Directives struct {
 	BioQuant       met.BioQuant       `yaml:"bioquant"`
 	Abacus         met.Abacus         `yaml:"abacus"`
 	TMTIntegrator  met.TMTIntegrator  `yaml:"tmtintegrator"`
+	//Clean          bool               `yaml:"clean"`
+	//Backup         bool               `yaml:"backup"`
+	//Analtics       bool               `yaml:"analytics"`
 }
 
 // Commands struct {
 type Commands struct {
+	Workspace      string `yaml:"workspace"`
 	Database       string `yaml:"database"`
 	MSFragger      string `yaml:"msfragger"`
 	Comet          string `yaml:"comet"`
@@ -104,10 +104,10 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		os.Chdir(dsAbs)
 
 		// Workspace
-		wrk.Run(Version, Build, false, false, true, false)
+		wrk.Run(Version, Build, false, false, true, true)
 
 		// reload the meta data
-		meta.Restore(sys.Meta())
+		//meta.Restore(sys.Meta())
 
 		// Database
 		if p.Commands.Database == "yes" {
@@ -115,6 +115,8 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 			dat.Run(meta)
 			meta.Serialize()
 		}
+
+		met.CleanTemp(meta.Temp)
 
 		// return to the top level directory
 		os.Chdir(dir)
@@ -125,10 +127,6 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 
 // DatabaseSearch executes the search engines if requested
 func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
-
-	if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-		msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
-	}
 
 	logrus.Info("Running the Database Search on all data")
 
@@ -161,13 +159,10 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 
 			// return to the top level directory
 			os.Chdir(dir)
-
 		}
 
 		comet.Run(meta, mzFiles)
 		meta.SearchEngine = "Comet"
-		//meta.Serialize()
-
 	}
 
 	if p.Commands.MSFragger == "yes" {
@@ -197,16 +192,16 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 
 			// return to the top level directory
 			os.Chdir(dir)
-
 		}
 
 		// MSFragger
 		if p.Commands.MSFragger == "yes" {
 			msfragger.Run(meta, mzFiles)
 			meta.SearchEngine = "MSFragger"
-			//meta.Serialize()
 		}
 	}
+
+	met.CleanTemp(meta.Temp)
 
 	return meta
 }
@@ -267,13 +262,11 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 				}
 				proteinprophet.Run(meta, files)
 				meta.Serialize()
+				met.CleanTemp(meta.Temp)
 			}
 
 			// return to the top level directory
 			os.Chdir(dir)
-
-			// reload the meta data
-			//meta.Restore(sys.Meta())
 		}
 	}
 
@@ -285,6 +278,9 @@ func ParallelProphets(meta met.Data, p Directives, dir string, data []string) me
 
 	var wg sync.WaitGroup
 	wg.Add(len(data))
+
+	meta.Restore(sys.Meta())
+	meta.Database = p.Database
 
 	if p.Commands.PeptideProphet == "yes" || p.Commands.ProteinProphet == "yes" || p.Commands.PTMProphet == "yes" {
 
@@ -324,8 +320,6 @@ func ParallelProphets(meta met.Data, p Directives, dir string, data []string) me
 
 					// give a chance to the execution to untangle the output
 					time.Sleep(time.Second * 1)
-
-					//meta.Serialize()
 
 				}(ds, db)
 			}
@@ -412,8 +406,6 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 		// copy to work directory
 		sys.CopyFile(combinedPepXML, filepath.Base(combinedPepXML))
-
-		//meta.Serialize()
 	}
 
 	return meta
@@ -487,9 +479,9 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
-				if p.Commands.PTMProphet == "yes" {
-					meta.Filter.Pex = "interact.mod.pep.xml"
-				}
+				// if p.Commands.PTMProphet == "yes" {
+				// 	meta.Filter.Pex = "interact.mod.pep.xml"
+				// }
 			} else {
 				meta.Filter.Pex = p.Filter.Pex
 			}
@@ -606,33 +598,33 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 }
 
 // BackupAndClean stores the results in a zip file and removes all meta data
-func BackupAndClean(meta met.Data, p Directives, dir, Version, Build string, data []string) {
+// func BackupAndClean(meta met.Data, p Directives, dir, Version, Build string, data []string) {
 
-	logrus.Info("Savig results and cleaning the workspaces")
+// 	logrus.Info("Savig results and cleaning the workspaces")
 
-	for _, i := range data {
+// 	for _, i := range data {
 
-		// getting inside de the dataset folder
-		localDir, _ := filepath.Abs(i)
-		os.Chdir(localDir)
+// 		// getting inside de the dataset folder
+// 		localDir, _ := filepath.Abs(i)
+// 		os.Chdir(localDir)
 
-		// reload the meta data
-		meta.Restore(sys.Meta())
+// 		// reload the meta data
+// 		meta.Restore(sys.Meta())
 
-		// Backup
-		if p.Backup == true {
-			wrk.Run(Version, Build, true, false, false, true)
-		}
+// 		// Backup
+// 		if p.Backup == true {
+// 			wrk.Run(Version, Build, true, false, false, true)
+// 		}
 
-		// Clean
-		if p.Clean == true {
-			wrk.Run(Version, Build, false, true, false, true)
-		}
+// 		// Clean
+// 		if p.Clean == true {
+// 			wrk.Run(Version, Build, false, true, false, true)
+// 		}
 
-	}
+// 	}
 
-	return
-}
+// 	return
+// }
 
 // TMTIntegrator executes TMT-I on all PSM results
 func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.Data {
