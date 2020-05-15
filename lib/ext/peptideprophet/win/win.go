@@ -11,13 +11,13 @@ import (
 // WinInteractParser deploys InteractParser.exe
 func WinInteractParser(s string) {
 
-	bin, e := Asset("InteractParser.exe")
-	if e != nil {
+	bin, e1 := Asset("InteractParser.exe")
+	if e1 != nil {
 		msg.DeployAsset(errors.New("InteractParser"), "Cannot read bin InteractParser")
 	}
 
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
-	if e != nil {
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
 		msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
 	}
 
