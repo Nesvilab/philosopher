@@ -14,11 +14,11 @@ import (
 
 	"philosopher/lib/msg"
 
+	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/ext/cdhit"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
-	"github.com/sirupsen/logrus"
 )
 
 // Cluster struct

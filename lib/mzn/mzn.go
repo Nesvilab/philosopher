@@ -13,8 +13,8 @@ import (
 
 	"philosopher/lib/msg"
 
-	"philosopher/lib/psi"
 	"github.com/sirupsen/logrus"
+	"philosopher/lib/psi"
 )
 
 // MsData top struct

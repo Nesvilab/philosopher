@@ -12,10 +12,10 @@ import (
 
 	"philosopher/lib/msg"
 
+	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/met"
 	unmd "philosopher/lib/obo/unimod"
 	"philosopher/lib/sys"
-	"github.com/vmihailenco/msgpack"
 )
 
 // DataFormat defines different data type from PSI
