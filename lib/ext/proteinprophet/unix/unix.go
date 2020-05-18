@@ -11,11 +11,14 @@ import (
 // UnixBatchCoverage deploys batchcoverage
 func UnixBatchCoverage(s string) {
 
-	bin, e := Asset("batchcoverage")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("batchcoverage")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("batchcoverage"), "Cannot read batchcoverage bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("batchcoverage"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("batchcoverage"), "Cannot deploy batchcoverage binary")
 	}
 
 	return
@@ -24,11 +27,14 @@ func UnixBatchCoverage(s string) {
 // UnixDatabaseParser deploys DatabaseParser
 func UnixDatabaseParser(s string) {
 
-	bin, e := Asset("DatabaseParser")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("DatabaseParser")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot read batchcoverage bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("DatabaseParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot deploy batchcoverage binary")
 	}
 
 	return
@@ -37,11 +43,14 @@ func UnixDatabaseParser(s string) {
 // UnixProteinProphet deploys Proteinprophet
 func UnixProteinProphet(s string) {
 
-	bin, e := Asset("ProteinProphet")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("ProteinProphet")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot read ProteinProphet bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("ProteinProphet"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot deploy ProteinProphet binary")
 	}
 
 	return

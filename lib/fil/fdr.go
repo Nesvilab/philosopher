@@ -593,12 +593,12 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 				probList[probArray[i+1]] = 0
 				minProb = probArray[i+1]
 				calcFDR = scoreMap[probArray[i+1]]
-				if probArray[i+1] < curProb {
-					curProb = probArray[i+1]
-				}
-				if scoreMap[probArray[i+1]] > curScore {
-					curScore = scoreMap[probArray[i+1]]
-				}
+				// if probArray[i+1] < curProb {
+				// 	curProb = probArray[i+1]
+				// }
+				// if scoreMap[probArray[i+1]] > curScore {
+				// 	curScore = scoreMap[probArray[i+1]]
+				// }
 				break
 			}
 

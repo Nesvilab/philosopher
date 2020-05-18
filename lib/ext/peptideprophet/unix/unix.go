@@ -11,37 +11,46 @@ import (
 // UnixInteractParser deploys InteractParser
 func UnixInteractParser(s string) {
 
-	bin, e := Asset("InteractParser")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("InteractParser")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("InteractParser"), "Cannot read InteractParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("InteractParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
 	}
 
 	return
 }
 
-// UnixRefreshParser ...
+// UnixRefreshParser deploys RefreshParser
 func UnixRefreshParser(s string) {
 
-	bin, e := Asset("RefreshParser")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("RefreshParser")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("RefreshParser"), "Cannot read RefreshParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("RefreshParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("RefreshParser"), "Cannot deploy RefreshParser")
 	}
 
 	return
 }
 
-// UnixPeptideProphetParser ...
+// UnixPeptideProphetParser deployes PeptideProphetParser
 func UnixPeptideProphetParser(s string) {
 
-	bin, e := Asset("PeptideProphetParser")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("PeptideProphetParser")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphetParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("PeptideProphetParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphetParser bin")
 	}
 
 	return

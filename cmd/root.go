@@ -4,12 +4,13 @@ package cmd
 import (
 	"runtime"
 
-	colorable "github.com/mattn/go-colorable"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	colorable "github.com/mattn/go-colorable"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var m met.Data

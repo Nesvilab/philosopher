@@ -13,7 +13,8 @@ import (
 func IsDecoyPSM(p id.PeptideIdentification, tag string) bool {
 
 	// default for TRUE (DECOY)
-	var class = true
+	// updated to FALSE
+	var class bool
 
 	if strings.HasPrefix(p.Protein, tag) {
 		class = true
@@ -38,8 +39,9 @@ func IsDecoyPSM(p id.PeptideIdentification, tag string) bool {
 // IsDecoyProtein identifies a Protein as target or Decoy based on the decoy tag
 func IsDecoyProtein(p id.ProteinIdentification, tag string) bool {
 
-	// default for TRUE ( DECOY)
-	var class = true
+	// default for TRUE (DECOY)
+	// updated to FALSE
+	var class bool
 
 	if strings.HasPrefix(string(p.ProteinName), tag) {
 		class = true
@@ -53,8 +55,9 @@ func IsDecoyProtein(p id.ProteinIdentification, tag string) bool {
 // IsDecoy identifies a Protein as target or Decoy based on the decoy tag
 func IsDecoy(name string, tag string) bool {
 
-	// default for TRUE ( DECOY)
-	var class = true
+	// default for TRUE (DECOY)
+	// updated to FALSE
+	var class bool
 
 	if strings.HasPrefix(name, tag) {
 		class = true

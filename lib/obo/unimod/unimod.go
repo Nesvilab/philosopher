@@ -1,25 +1,24 @@
 package obo
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
 )
 
-// Deploy deploys the OBO file to the temp folder
+// Deploy deploys the Unimod OBO file
 func Deploy(f string) {
 
-	asset, e := Asset("unimod.obo")
-	if e != nil {
-		msg.DeployAsset(e, "trace")
+	asset, e1 := Asset("unimod.obo")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("Unimod"), "Cannot read unimod obo")
 	}
 
-	e = ioutil.WriteFile(f, asset, sys.FilePermission())
-	if e != nil {
-		fmt.Println(e.Error())
-		msg.DeployAsset(e, "trace")
+	e2 := ioutil.WriteFile(f, asset, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Unimod"), "Cannot deploy Unimod obo")
 	}
 
 	return

@@ -13,12 +13,13 @@ func WinInteractParser(s string) {
 
 	bin, e1 := Asset("InteractParser.exe")
 	if e1 != nil {
-		msg.DeployAsset(errors.New("InteractParser"), "Cannot read bin InteractParser")
-	}
+		msg.DeployAsset(errors.New("InteractParser"), "Cannot read InteractParser bin")
+	} else {
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
-	if e2 != nil {
-		msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
+		e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+		if e2 != nil {
+			msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
+		}
 	}
 
 	return
@@ -27,11 +28,14 @@ func WinInteractParser(s string) {
 // WinRefreshParser deploys Refreshparser.exe
 func WinRefreshParser(s string) {
 
-	bin, e := Asset("RefreshParser.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("RefreshParser.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("RefreshParser"), "Cannot read RefreshParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("RefreshParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("RefreshParser"), "Cannot deploy RefreshParser")
 	}
 
 	return
@@ -40,11 +44,14 @@ func WinRefreshParser(s string) {
 // WinPeptideProphetParser deploys Windows PeptideProphetParser
 func WinPeptideProphetParser(s string) {
 
-	bin, e := Asset("PeptideProphetParser.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("PeptideProphetParser.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphet bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("PeptideProphetParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot deploy PeptideProphet")
 	}
 
 	return
@@ -53,11 +60,14 @@ func WinPeptideProphetParser(s string) {
 // Mv deploys mv.exe
 func Mv(s string) {
 
-	bin, e := Asset("mv.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("mv.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("mv.exe"), "Cannot read mv.exe bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("mv.exe"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("mv.exe"), "Cannot deploy mv.exe")
 	}
 
 	return
@@ -66,11 +76,14 @@ func Mv(s string) {
 // LibgccDLL deploys libgcc_s_dw2.dll
 func LibgccDLL(s string) {
 
-	bin, e := Asset("libgcc_s_dw2-1.dll")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("libgcc_s_dw2-1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot read LibgccDLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot deploy LibgccDLL")
 	}
 
 	return
@@ -79,11 +92,14 @@ func LibgccDLL(s string) {
 // Zlib1DLL deploys zlib1.dll
 func Zlib1DLL(s string) {
 
-	bin, e := Asset("zlib1.dll")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("zlib1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("Zlib1DLL"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}
 
 	return

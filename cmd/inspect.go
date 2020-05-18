@@ -6,11 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/davecgh/go-spew/spew"
 	"philosopher/lib/dat"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/rep"
+
+	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack"
 )

@@ -81,10 +81,10 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if ok {
 			for _, j := range v {
 
-				var measured = make(map[float64]float64)
-				var retrieved bool
+				//var measured = make(map[float64]float64)
+				//var retrieved bool
 
-				measured, retrieved = xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
+				measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
 
 				if retrieved == true {
 					var timeW = retentionTime[j] / 60

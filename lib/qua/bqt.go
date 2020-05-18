@@ -14,11 +14,12 @@ import (
 
 	"philosopher/lib/msg"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/dat"
 	"philosopher/lib/ext/cdhit"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Cluster struct
@@ -106,8 +107,15 @@ func parseClusterFile(cls, database string) List {
 	}
 	defer f.Close()
 
-	reheader, e := regexp.Compile(`^>Cluster\s+(.*)`)
-	reseq, e := regexp.Compile(`\|(.*)\|.*`)
+	reheader, e1 := regexp.Compile(`^>Cluster\s+(.*)`)
+	if e1 != nil {
+		msg.Custom(errors.New("Cannot compile Cluster header regex"), "fatal")
+	}
+
+	reseq, e2 := regexp.Compile(`\|(.*)\|.*`)
+	if e2 != nil {
+		msg.Custom(errors.New("Cannot compile Cluster description regex"), "fatal")
+	}
 
 	scanner := bufio.NewScanner(f)
 
