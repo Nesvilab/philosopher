@@ -52,10 +52,10 @@ func ParseFloat(str string) (float64, error) {
 		return val, nil
 	}
 
-	//Some number may be seperated by comma, for example, 23,120,123, so remove the comma firstly
+	//Some number may be separated by comma, for example, 23,120,123, so remove the comma firstly
 	str = strings.Replace(str, ",", "", -1)
 
-	//Some number is specifed in scientific notation
+	//Some number is specified in scientific notation
 	pos := strings.IndexAny(str, "eE")
 	if pos < 0 {
 		return strconv.ParseFloat(str, 64)

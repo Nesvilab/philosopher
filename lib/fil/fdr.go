@@ -737,7 +737,7 @@ func mirrorProteinList(p id.ProtIDList, decoyTag string) id.ProtIDList {
 	}
 
 	// add decoys correspondent to the given targets.
-	// first check if the oposite list doesn't have an entry already.
+	// first check if the opposite list doesn't have an entry already.
 	// if not, search for the mirror entry on the original list, if found
 	// move it to the mirror list, otherwise add fake entry.
 	for _, k := range list {

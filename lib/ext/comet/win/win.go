@@ -11,14 +11,14 @@ import (
 // WinParameterFile writes the parameter file to the disk
 func WinParameterFile(winParam string) {
 
-	param, e := Asset("comet.params.txt")
-	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+	param, e1 := Asset("comet.params.txt")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot read Comet parameter bin")
 	}
 
-	e = ioutil.WriteFile(winParam, param, sys.FilePermission())
-	if e != nil {
-		msg.DeployAsset(errors.New("Comet parameter file"), "fatal")
+	e2 := ioutil.WriteFile(winParam, param, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot deploy Comet parameter")
 	}
 
 	return

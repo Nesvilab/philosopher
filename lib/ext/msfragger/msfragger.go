@@ -57,7 +57,7 @@ func Run(m met.Data, args []string) met.Data {
 	return m
 }
 
-// Execute is the main fucntion to execute MSFragger
+// Execute is the main function to execute MSFragger
 func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 
 	cmd := appendParams(params)
@@ -79,7 +79,7 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 	return
 }
 
-// ExecutewithParameter is the main fucntion to execute MSFragger
+// ExecutewithParameter is the main function to execute MSFragger
 func (c *MSFragger) ExecutewithParameter(params met.MSFragger, cmdArgs []string) {
 
 	mem := fmt.Sprintf("-Xmx%dG", params.Memory)

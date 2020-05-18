@@ -13,13 +13,12 @@ func UnixParameterFile(unixParam string) {
 
 	param, e1 := Asset("comet.params")
 	if e1 != nil {
-		msg.DeployAsset(errors.New("Unimod"), "Cannot read Comet parameter bin")
-	} else {
+		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot read Comet parameter bin")
+	}
 
-		e2 := ioutil.WriteFile(unixParam, param, sys.FilePermission())
-		if e2 != nil {
-			msg.DeployAsset(errors.New("Unimod"), "Cannot deploy Comet parameter")
-		}
+	e2 := ioutil.WriteFile(unixParam, param, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot deploy Comet parameter")
 	}
 
 	return

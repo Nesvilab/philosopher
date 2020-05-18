@@ -249,10 +249,14 @@ func (d *Base) Deploy(temp string) {
 
 	d.CrapDB = fmt.Sprintf("%s%scrap.fas", temp, string(filepath.Separator))
 
-	param, e := Asset("crap.fas")
-	e = ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
+	param, e1 := Asset("crap.fas")
+	if e1 != nil {
+		msg.WriteFile(e1, "fatal")
+	}
+
+	e2 := ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
+	if e2 != nil {
+		msg.WriteFile(e2, "fatal")
 	}
 
 	return
@@ -314,7 +318,7 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso, noD, Crap bool) strin
 	return outfile
 }
 
-// Serialize saves to disk a msgpack verison of the database data structure
+// Serialize saves to disk a msgpack version of the database data structure
 func (d *Base) Serialize() {
 
 	b, e := msgpack.Marshal(&d)

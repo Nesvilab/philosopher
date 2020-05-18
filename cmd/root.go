@@ -25,7 +25,7 @@ var (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "philosopher",
-	Short: "philospher: a proteomics data analysis toolkit",
+	Short: "philosopher: a proteomics data analysis toolkit",
 	Long:  "Philosopher: A toolkit for Proteomics data analysis and post-processing filtering",
 }
 

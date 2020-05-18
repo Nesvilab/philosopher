@@ -83,7 +83,7 @@ func execute(level float64) (string, string) {
 	cd.ClusterFasta = cd.FileName + ".fasta"
 	cd.ClusterFile = cd.ClusterFasta + ".clstr"
 
-	// deploy binary and paramter to workdir
+	// deploy binary and parameter to workdir
 	cd.Deploy()
 
 	// run cdhit and create the clusters

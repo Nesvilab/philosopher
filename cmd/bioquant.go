@@ -25,7 +25,7 @@ var bioquantCmd = &cobra.Command{
 		// run clustering
 		qua.RunBioQuantification(m)
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		// clean tmp

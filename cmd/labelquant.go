@@ -47,7 +47,7 @@ var labelquantCmd = &cobra.Command{
 
 		m.Quantify = qua.RunIsobaricLabelQuantification(m.Quantify, m.Filter.Mapmods)
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		// clean tmp

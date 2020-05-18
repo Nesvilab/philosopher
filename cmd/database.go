@@ -22,7 +22,7 @@ var databaseCmd = &cobra.Command{
 
 		m = dat.Run(m)
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		msg.Done()

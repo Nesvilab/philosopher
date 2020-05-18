@@ -509,14 +509,14 @@ type FilterType struct {
 	UserParam []UserParam `xml:"userParam"`
 }
 
-// Include is all sequences fulfilling the specifed criteria are included
+// Include is all sequences fulfilling the specified criteria are included
 type Include struct {
 	XMLName   xml.Name    `xml:"Include"`
 	CVParam   []CVParam   `xml:"cvParam"`
 	UserParam []UserParam `xml:"userParam"`
 }
 
-// Exclude all sequences fulfilling the specifed criteria are excluded
+// Exclude all sequences fulfilling the specified criteria are excluded
 type Exclude struct {
 	XMLName   xml.Name    `xml:"Exclude"`
 	CVParam   []CVParam   `xml:"cvParam"`

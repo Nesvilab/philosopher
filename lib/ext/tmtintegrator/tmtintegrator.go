@@ -53,7 +53,7 @@ func Run(m met.Data, args []string) met.Data {
 	return m
 }
 
-// Execute is the main fucntion to execute TMTIntegrator
+// Execute is the main function to execute TMTIntegrator
 func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) {
 
 	cmd := appendParams(params)
