@@ -647,7 +647,8 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 func tdclassifier(p PeptideIdentification, tag string) bool {
 
 	// default for TRUE ( DECOY)
-	var class = true
+	//var class = true
+	var class bool
 
 	if strings.HasPrefix(string(p.Protein), tag) {
 		class = true

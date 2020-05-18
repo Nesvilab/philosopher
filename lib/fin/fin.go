@@ -1241,7 +1241,7 @@ func binaryread(r io.Reader, data interface{}) {
 // data, and returns the position in the file afterwards
 func readAt(rs io.ReadSeeker, pos uint64, v Version, data reader) uint64 {
 
-	spos, e1 := rs.Seek(int64(pos), 0)
+	_, e1 := rs.Seek(int64(pos), 0)
 	if e1 != nil {
 		msg.Custom(errors.New("error seeking file"), "fatal")
 	}
