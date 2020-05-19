@@ -110,7 +110,6 @@ func TestAminoAcids(t *testing.T) {
 		t.Errorf("Aminoacid name is incorrect, got %s, want %s", a.Name, "Valine")
 	}
 
-	tes.ShutDowTestEnv()
 }
 
 // func TestProtonMass(t *testing.T) {
@@ -145,6 +144,4 @@ func TestEnzymes(t *testing.T) {
 	if e.Name != "glu_c" {
 		t.Errorf("Enzyme is incorrect, got %s, want %s", e.Name, "glu_c")
 	}
-
-	tes.ShutDowTestEnv()
 }

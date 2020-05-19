@@ -20,6 +20,4 @@ func TestUti(t *testing.T) {
 		t.Errorf("Aminoacid name is incorrect, got %f, want %f", y, 5.3557876867)
 	}
 
-	tes.ShutDowTestEnv()
-
 }

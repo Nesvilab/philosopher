@@ -9,41 +9,38 @@ import (
 	"testing"
 )
 
-var pepID id.PepIDList
-var proID id.ProtIDList
-var proXML id.ProtXML
-
 func Test_readPepXMLInput(t *testing.T) {
 
 	tes.SetupTestEnv()
+	var pepIDList id.PepIDList
 
-	type args struct {
+	type args1 struct {
 		xmlFile        string
 		decoyTag       string
 		temp           string
 		models         bool
 		calibratedMass int
 	}
-	tests := []struct {
+	test1 := []struct {
 		name  string
-		args  args
+		args  args1
 		want  int
 		want1 string
 	}{
 		{
 			name:  "Testting pepXML reading and formating for the filter",
-			args:  args{xmlFile: "interact.pep.xml", decoyTag: "rev_", temp: sys.GetTemp(), models: false, calibratedMass: 0},
+			args:  args1{xmlFile: "interact.pep.xml", decoyTag: "rev_", temp: sys.GetTemp(), models: false, calibratedMass: 0},
 			want:  64406,
 			want1: "MSFragger",
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test1 {
 
 		t.Run(tt.name, func(t *testing.T) {
 
 			got, got1 := readPepXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.temp, tt.args.models, tt.args.calibratedMass)
-			pepID = got
+			pepIDList = got
 
 			if !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("readPepXMLInput() got = %v, want %v", len(got), tt.want)
@@ -103,40 +100,32 @@ func Test_readPepXMLInput(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
-}
-
-func Test_processPeptideIdentifications(t *testing.T) {
-
-	tes.SetupTestEnv()
-
-	type args struct {
-		p        id.PepIDList
+	type args2 struct {
 		decoyTag string
 		psm      float64
 		peptide  float64
 		ion      float64
 	}
-	tests := []struct {
+	test2 := []struct {
 		name  string
-		args  args
+		args  args2
 		want  float64
 		want1 float64
 		want2 float64
 	}{
 		{
 			name:  "Testting pepXML reading and formating for the filter",
-			args:  args{p: pepID, decoyTag: "rev_", psm: 0.01, peptide: 0.01, ion: 0.01},
+			args:  args2{decoyTag: "rev_", psm: 0.01, peptide: 0.01, ion: 0.01},
 			want:  0.1914,
 			want1: 0.723,
 			want2: 0.5155,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test2 {
 
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, got2 := processPeptideIdentifications(tt.args.p, tt.args.decoyTag, "", tt.args.psm, tt.args.peptide, tt.args.ion)
+			got, got1, got2 := processPeptideIdentifications(pepIDList, tt.args.decoyTag, "", tt.args.psm, tt.args.peptide, tt.args.ion)
 			if got != tt.want {
 				t.Errorf("processPeptideIdentifications(psm) got = %v, want %v", got, tt.want)
 			}
@@ -149,56 +138,51 @@ func Test_processPeptideIdentifications(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
-}
-
-func Test_chargeProfile(t *testing.T) {
-	type args struct {
-		p        id.PepIDList
+	type args3 struct {
 		charge   uint8
 		decoyTag string
 	}
-	tests := []struct {
+	test3 := []struct {
 		name  string
-		args  args
+		args  args3
 		wantT int
 		wantD int
 	}{
 		{
 			name:  "Testing charge state 1 profile",
-			args:  args{p: pepID, charge: uint8(1), decoyTag: "rev_"},
+			args:  args3{charge: uint8(1), decoyTag: "rev_"},
 			wantT: 0,
 			wantD: 0,
 		},
 		{
 			name:  "Testing charge state 2 profile",
-			args:  args{p: pepID, charge: uint8(2), decoyTag: "rev_"},
+			args:  args3{charge: uint8(2), decoyTag: "rev_"},
 			wantT: 36174,
 			wantD: 457,
 		},
 		{
 			name:  "Testing charge state 3 profile",
-			args:  args{p: pepID, charge: uint8(3), decoyTag: "rev_"},
+			args:  args3{charge: uint8(3), decoyTag: "rev_"},
 			wantT: 22656,
 			wantD: 317,
 		},
 		{
 			name:  "Testing charge state 4 profile",
-			args:  args{p: pepID, charge: uint8(4), decoyTag: "rev_"},
+			args:  args3{charge: uint8(4), decoyTag: "rev_"},
 			wantT: 4272,
 			wantD: 88,
 		},
 		{
 			name:  "Testing charge state 5 profile",
-			args:  args{p: pepID, charge: uint8(5), decoyTag: "rev_"},
+			args:  args3{charge: uint8(5), decoyTag: "rev_"},
 			wantT: 432,
 			wantD: 10,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test3 {
 		t.Run(tt.name, func(t *testing.T) {
-			gotT, gotD := chargeProfile(tt.args.p, tt.args.charge, tt.args.decoyTag)
+			gotT, gotD := chargeProfile(pepIDList, tt.args.charge, tt.args.decoyTag)
 			if gotT != tt.wantT {
 				t.Errorf("chargeProfile() gotT = %v, want %v", gotT, tt.wantT)
 			}
@@ -207,130 +191,106 @@ func Test_chargeProfile(t *testing.T) {
 			}
 		})
 	}
-}
 
-func TestGetUniquePSMs(t *testing.T) {
-	type args struct {
-		p id.PepIDList
-	}
-	tests := []struct {
+	test4 := []struct {
 		name string
-		args args
 		want int
 	}{
 		{
 			name: "Testing the generation of Unique PSMs",
-			args: args{pepID},
 			want: 64406,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test4 {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetUniquePSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
+			if got := GetUniquePSMs(pepIDList); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("GetUniquePSMs() = %v, want %v", len(got), tt.want)
 			}
 		})
 	}
-}
 
-func Test_getUniquePeptideIons(t *testing.T) {
-	type args struct {
-		p id.PepIDList
-	}
-	tests := []struct {
+	test5 := []struct {
 		name string
-		args args
 		want int
 	}{
 		{
 			name: "Testing the generation of Unique Ions",
-			args: args{pepID},
 			want: 39716,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test5 {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getUniquePeptideIons(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
+			if got := getUniquePeptideIons(pepIDList); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("getUniquePeptideIons() = %v, want %v", len(got), tt.want)
 			}
 		})
 	}
-}
 
-func TestGetUniquePeptides(t *testing.T) {
-	type args struct {
-		p id.PepIDList
-	}
-	tests := []struct {
+	test6 := []struct {
 		name string
-		args args
 		want int
 	}{
 		{
 			name: "Testing the generation of Unique Peptides",
-			args: args{pepID},
 			want: 30092,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test6 {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetUniquePeptides(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
+			if got := GetUniquePeptides(pepIDList); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("GetUniquePeptides() = %v, want %v", len(got), tt.want)
 			}
 		})
 	}
-}
 
-func TestExtractIonsFromPSMs(t *testing.T) {
-	type args struct {
-		p id.PepIDList
-	}
-	tests := []struct {
+	test7 := []struct {
 		name string
-		args args
 		want int
 	}{
 		{
 			name: "Testing the Ion extraction from PSM",
-			args: args{pepID},
 			want: 39716,
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range test7 {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ExtractIonsFromPSMs(tt.args.p); !reflect.DeepEqual(len(got), tt.want) {
+			if got := ExtractIonsFromPSMs(pepIDList); !reflect.DeepEqual(len(got), tt.want) {
 				t.Errorf("ExtractIonsFromPSMs() = %v, want %v", len(got), tt.want)
 			}
 		})
 	}
+
+	//tes.ShutDowTestEnv()
 }
 
 func Test_readProtXMLInput(t *testing.T) {
 
 	tes.SetupTestEnv()
+	var proXML id.ProtXML
 
-	type args struct {
+	type args1 struct {
 		meta     string
 		xmlFile  string
 		decoyTag string
 		weight   float64
 	}
-	tests := []struct {
+	test1 := []struct {
 		name string
-		args args
+		args args1
 		want int
 	}{
 		{
 			name: "Testting protXML reading and formating for the filter",
-			args: args{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
+			args: args1{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
 			want: 7926,
 		},
 	}
-	for _, tt := range tests {
+
+	for _, tt := range test1 {
 		t.Run(tt.name, func(t *testing.T) {
 
 			got := readProtXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
@@ -342,29 +302,20 @@ func Test_readProtXMLInput(t *testing.T) {
 		})
 	}
 
-	//tes.ShutDowTestEnv()
-}
-
-func Test_proteinProfile(t *testing.T) {
-	type args struct {
-		p id.ProtXML
-	}
-	tests := []struct {
+	test2 := []struct {
 		name  string
-		args  args
 		wantT int
 		wantD int
 	}{
 		{
 			name:  "Testing Protein Profile",
-			args:  args{p: proXML},
 			wantT: 8018,
 			wantD: 949,
 		},
 	}
-	for _, tt := range tests {
+	for _, tt := range test2 {
 		t.Run(tt.name, func(t *testing.T) {
-			gotT, gotD := proteinProfile(tt.args.p)
+			gotT, gotD := proteinProfile(proXML)
 			if gotT != tt.wantT {
 				t.Errorf("proteinProfile() gotT = %v, want %v", gotT, tt.wantT)
 			}
@@ -373,11 +324,8 @@ func Test_proteinProfile(t *testing.T) {
 			}
 		})
 	}
-}
 
-func Test_processProteinIdentifications(t *testing.T) {
-	type args struct {
-		p        id.ProtXML
+	type args3 struct {
 		ptFDR    float64
 		pepProb  float64
 		protProb float64
@@ -386,15 +334,18 @@ func Test_processProteinIdentifications(t *testing.T) {
 		fo       bool
 		decoyTag string
 	}
-	tests := []struct {
+	test3 := []struct {
 		name string
-		args args
+		args args3
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Testing Protein Identifications",
+			args: args3{ptFDR: 0.01, pepProb: 0.7, protProb: 0.5, isPicked: false, isRazor: true, fo: false, decoyTag: "rev_"},
+		},
 	}
-	for _, tt := range tests {
+	for _, tt := range test3 {
 		t.Run(tt.name, func(t *testing.T) {
-			processProteinIdentifications(tt.args.p, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, tt.args.fo, tt.args.decoyTag)
+			processProteinIdentifications(proXML, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, tt.args.fo, tt.args.decoyTag)
 		})
 	}
 }

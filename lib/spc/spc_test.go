@@ -198,8 +198,6 @@ func TestPepXML_Parse(t *testing.T) {
 			// }
 		})
 	}
-
-	tes.ShutDowTestEnv()
 }
 
 func TestProtXML_Parse(t *testing.T) {
@@ -262,7 +260,5 @@ func TestProtXML_Parse(t *testing.T) {
 
 		})
 	}
-
-	tes.ShutDowTestEnv()
 
 }

@@ -77,5 +77,4 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 		})
 	}
 
-	tes.ShutDowTestEnv()
 }

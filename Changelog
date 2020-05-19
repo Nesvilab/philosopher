@@ -8,3 +8,4 @@
 
 ### Fixed
 - Error preventing iTRAQ quantification.
+- Several formatting, typoes and Go-Vet issues were fixed.

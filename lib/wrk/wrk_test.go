@@ -32,6 +32,4 @@ func TestInit(t *testing.T) {
 			Init(tt.args.version, tt.args.build)
 		})
 	}
-
-	tes.ShutDowTestEnv()
 }
