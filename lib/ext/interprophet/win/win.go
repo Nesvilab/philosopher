@@ -12,11 +12,14 @@ import (
 // WinInterProphetParser accessor
 func WinInterProphetParser(s string) {
 
-	bin, e := Asset("InterProphetParser.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("InterProphetParser.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("InterProphetParser.exe"), "Cannot read InterProphetParser.exe bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("InterProphetParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("InterProphetParser.exe"), "Cannot deploy InterProphetParser.exe")
 	}
 
 	return
@@ -25,11 +28,14 @@ func WinInterProphetParser(s string) {
 // LibgccDLL accessor
 func LibgccDLL(s string) {
 
-	bin, e := Asset("libgcc_s_dw2-1.dll")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("libgcc_s_dw2-1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot read LibgccDLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot deploy LibgccDLL")
 	}
 
 	return
@@ -38,11 +44,14 @@ func LibgccDLL(s string) {
 // Zlib1DLL accessor
 func Zlib1DLL(s string) {
 
-	bin, e := Asset("zlib1.dll")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("zlib1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("Zlib1DLL"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}
 
 	return

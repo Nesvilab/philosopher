@@ -12,11 +12,14 @@ import (
 // UnixInterProphetParser accessor
 func UnixInterProphetParser(s string) {
 
-	bin, e := Asset("InterProphetParser")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("InterProphetParser")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("InterProphetParser"), "Cannot read InterProphetParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("InterProphetParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("InterProphetParser"), "Cannot deploy InterProphetParser")
 	}
 
 	return

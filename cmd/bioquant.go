@@ -8,6 +8,7 @@ import (
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/sys"
+
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +25,7 @@ var bioquantCmd = &cobra.Command{
 		// run clustering
 		qua.RunBioQuantification(m)
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		// clean tmp

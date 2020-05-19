@@ -9,7 +9,12 @@ import (
 func SetupTestEnv() {
 
 	os.Chdir("../../test/wrksp/")
-	wrk.Init("0000", "0000")
+
+	if _, err := os.Stat(".meta"); err != nil {
+		if os.IsNotExist(err) {
+			wrk.Init("0000", "0000")
+		}
+	}
 
 	return
 }

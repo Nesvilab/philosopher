@@ -17,7 +17,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	var mzid psi.MzIdentML
 
 	t := time.Now()
-	var idCounter = 0
+	//var idCounter = 0
 
 	// collect source file names
 	var sourceMap = make(map[string]uint8)
@@ -168,7 +168,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	mzid.AuditCollection = *auditCol
 
 	// SequenceCollection - DBSequence
-	idCounter = 0
+	idCounter := 0
 	var seqs []psi.DBSequence
 	for _, i := range dtb.Records {
 
@@ -200,7 +200,6 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 		seqs = append(seqs, *db)
 	}
 	mzid.SequenceCollection.DBSequence = seqs
-	seqs = nil
 
 	// SequenceCollection - Peptide
 	var peps []psi.Peptide
@@ -240,7 +239,6 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 		peps = append(peps, p)
 	}
 	mzid.SequenceCollection.Peptide = peps
-	peps = nil
 
 	// SequenceCollection - PeptideEvidence
 	var pevs []psi.PeptideEvidence
@@ -262,7 +260,6 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 		pevs = append(pevs, evi)
 	}
 	mzid.SequenceCollection.PeptideEvidence = pevs
-	pevs = nil
 
 	// AnalysisCollection
 	idCounter = 0
@@ -651,7 +648,6 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	// DataCollection
 	dta := psi.DataCollection{}
 
-	idCounter = 0
 	for _, i := range sources {
 		sf := &psi.SourceFile{
 			ID:       i,

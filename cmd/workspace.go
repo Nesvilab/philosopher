@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	ga "github.com/jpillora/go-ogle-analytics"
 	"philosopher/lib/msg"
 	"philosopher/lib/wrk"
+
+	ga "github.com/jpillora/go-ogle-analytics"
 	"github.com/spf13/cobra"
 )
 

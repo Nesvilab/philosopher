@@ -320,7 +320,7 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 		sort.Strings(obs)
 		sort.Strings(ip)
 
-		// change between Unique+Razor and Unique only based on paramter defined on labelquant
+		// change between Unique+Razor and Unique only based on parameter defined on labelquant
 		var reportIntensities [16]float64
 		if uniqueOnly == true || hasRazor == false {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity

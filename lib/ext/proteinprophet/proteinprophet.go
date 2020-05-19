@@ -258,7 +258,7 @@ func (p ProteinProphet) appendParams(params met.ProteinProphet, cmd *exec.Cmd) *
 
 	// // there is an error in the way how the modified version was implemented.
 	// // The mod version is *always* active, and the tag makes it normal again.
-	// // it should be the oposite, so thats why this block looks like that.
+	// // it should be the opposite, so thats why this block looks like that.
 	// if c.Excludemods == true {
 	// 	// the program is always trying to process os'es
 	// 	//cmd.Args = append(cmd.Args, "ALLOWDIFFPROBS")

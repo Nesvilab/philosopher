@@ -9,12 +9,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	ucomet "philosopher/lib/ext/comet/unix"
 	wcomet "philosopher/lib/ext/comet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Comet represents the tool configuration
@@ -132,7 +133,7 @@ func (c *Comet) Deploy(os, arch string) {
 	return
 }
 
-// Execute is the main fucntion to execute Comet
+// Execute is the main function to execute Comet
 func (c *Comet) Execute(cmdArgs []string, param string) {
 
 	par := fmt.Sprintf("-P%s", param)

@@ -10,6 +10,7 @@ import (
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/sys"
+
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +44,7 @@ var freequant = &cobra.Command{
 		// run label-free quantification
 		qua.RunLabelFreeQuantification(m.Quantify)
 
-		// store paramters on meta data
+		// store parameters on meta data
 		m.Serialize()
 
 		// clean tmp

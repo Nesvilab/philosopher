@@ -102,7 +102,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 
-		var labels = make(map[string]iso.Labels)
+		var labels map[string]iso.Labels
 		if p.Level == 3 {
 			labels = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 
@@ -122,7 +122,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 				psmMap[j.Spectrum] = psm
 			}
 		}
-		mappedPurity = nil
+		//mappedPurity = nil
 
 		for _, j := range mappedPSM {
 			v, ok := psmMap[j.Spectrum]
@@ -132,7 +132,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 				psmMap[j.Spectrum] = psm
 			}
 		}
-		mappedPSM = nil
+		//mappedPSM = nil
 
 	}
 
@@ -143,7 +143,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 			evi.PSM[i].Labels = v.Labels
 		}
 	}
-	psmMap = nil
+	//psmMap = nil
 
 	// classification and filtering based on quality filters
 	logrus.Info("Filtering spectra for label quantification")
@@ -186,7 +186,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 func RunBioQuantification(c met.Data) {
 
 	// create clean reference db for clustering
-	clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
+	//clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")

@@ -5,16 +5,20 @@ import (
 	"io/ioutil"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 )
 
 // WinBatchCoverage deploys batchcoverage
 func WinBatchCoverage(s string) {
 
-	bin, e := Asset("batchcoverage.exe")
-	e = ioutil.WriteFile(s, bin, 0755)
+	bin, e1 := Asset("batchcoverage.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("batchcoverage"), "Cannot read batchcoverage bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("batchcoverage"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("batchcoverage"), "Cannot deploy batchcoverage")
 	}
 
 	return
@@ -23,11 +27,14 @@ func WinBatchCoverage(s string) {
 // WinDatabaseParser deploys DatabaseParser
 func WinDatabaseParser(s string) {
 
-	bin, e := Asset("DatabaseParser.exe")
-	e = ioutil.WriteFile(s, bin, 0755)
+	bin, e1 := Asset("DatabaseParser.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot read DatabaseParser bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("DatabaseParser"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot deploy DatabaseParser")
 	}
 
 	return
@@ -36,11 +43,14 @@ func WinDatabaseParser(s string) {
 // WinProteinProphet deploys ProteinProphet.exe
 func WinProteinProphet(s string) {
 
-	bin, e := Asset("ProteinProphet.exe")
-	e = ioutil.WriteFile(s, bin, 0755)
+	bin, e1 := Asset("ProteinProphet.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot read ProteinProphet bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("ProteinProphet"), "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot deploy ProteinProphet")
 	}
 
 	return
@@ -49,11 +59,14 @@ func WinProteinProphet(s string) {
 // LibgccDLL deploys libgcc_s_dw2.dll
 func LibgccDLL(s string) {
 
-	bin, e := Asset("libgcc_s_dw2-1.dll")
-	e = ioutil.WriteFile(s, bin, 0755)
+	bin, e1 := Asset("libgcc_s_dw2-1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("libgcc_s_dw2"), "Cannot read LibgccDLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("libgcc_s_dw2"), "trace")
+	e2 := ioutil.WriteFile(s, bin, 0755)
+	if e2 != nil {
+		msg.DeployAsset(errors.New("libgcc_s_dw2"), "Cannot deploy LibgccDLL")
 	}
 
 	return
@@ -62,11 +75,14 @@ func LibgccDLL(s string) {
 // Zlib1DLL deploys zlib1.dll
 func Zlib1DLL(s string) {
 
-	bin, e := Asset("zlib1.dll")
-	e = ioutil.WriteFile(s, bin, 0755)
+	bin, e1 := Asset("zlib1.dll")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
+	}
 
-	if e != nil {
-		msg.DeployAsset(errors.New("zlib1"), "trace")
+	e2 := ioutil.WriteFile(s, bin, 0755)
+	if e2 != nil {
+		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}
 
 	return

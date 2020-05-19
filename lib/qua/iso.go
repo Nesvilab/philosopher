@@ -1242,7 +1242,7 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		channelSum[15] += i.URazorLabels.Channel16.Intensity
 	}
 
-	// find the higest value amongst channels
+	// find the highest value amongst channels
 	for _, i := range channelSum {
 		if i > topValue {
 			topValue = i

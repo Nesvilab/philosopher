@@ -4,12 +4,13 @@ package cmd
 import (
 	"runtime"
 
-	colorable "github.com/mattn/go-colorable"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
+
+	colorable "github.com/mattn/go-colorable"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 var m met.Data
@@ -24,7 +25,7 @@ var (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "philosopher",
-	Short: "philospher: a proteomics data analysis toolkit",
+	Short: "philosopher: a proteomics data analysis toolkit",
 	Long:  "Philosopher: A toolkit for Proteomics data analysis and post-processing filtering",
 }
 

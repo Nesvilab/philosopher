@@ -428,7 +428,7 @@ func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
 	return t, d
 }
 
-//GetUniquePSMs selects only unique pepetide ions for the given data stucture
+//GetUniquePSMs selects only unique pepetide ions for the given data structure
 func GetUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := make(map[string]id.PepIDList)
@@ -440,7 +440,7 @@ func GetUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-//getUniquePeptideIons selects only unique pepetide ions for the given data stucture
+//getUniquePeptideIons selects only unique pepetide ions for the given data structure
 func getUniquePeptideIons(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := ExtractIonsFromPSMs(p)
@@ -466,7 +466,7 @@ func ExtractIonsFromPSMs(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-// GetUniquePeptides selects only unique pepetide for the given data stucture
+// GetUniquePeptides selects only unique pepetide for the given data structure
 func GetUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 
 	uniqMap := make(map[string]id.PepIDList)
@@ -566,7 +566,7 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 }
 
 // processProteinInferenceIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
-// the inputed Philospher inference data is processed before filtered.
+// the inputed Philosopher inference data is processed before filtered.
 func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[string]string, coverMap map[string]float64, ptFDR, pepProb, protProb float64, isPicked bool, decoyTag string) {
 
 	var t int

@@ -325,31 +325,24 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 			} else if string(j.Name) == "xcorr" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Xcorr = value
-				value = -99
 			} else if string(j.Name) == "deltacn" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.DeltaCN = value
-				value = -99
 			} else if string(j.Name) == "deltacnstar" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.DeltaCNStar = value
-				value = -99
 			} else if string(j.Name) == "spscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SPScore = value
-				value = -99
 			} else if string(j.Name) == "sprank" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SPRank = value
-				value = -99
 			} else if string(j.Name) == "hyperscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Hyperscore = value
-				value = -99
 			} else if string(j.Name) == "nextscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Nextscore = value
-				value = -99
 			}
 		}
 
@@ -654,7 +647,8 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 func tdclassifier(p PeptideIdentification, tag string) bool {
 
 	// default for TRUE ( DECOY)
-	var class = true
+	//var class = true
+	var class bool
 
 	if strings.HasPrefix(string(p.Protein), tag) {
 		class = true

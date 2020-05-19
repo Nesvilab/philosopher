@@ -9,14 +9,17 @@ import (
 	"philosopher/lib/sys"
 )
 
-// Win64 ...
+// Win64 CD-HIT Deploy
 func Win64(win64 string) {
 
-	bin, e := Asset("cd-hit.exe")
-	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
+	bin, e1 := Asset("cd-hit.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("CD-HIT"), "Cannot read CD-HIT 64-bit bin")
+	}
 
-	if e != nil {
-		msg.ExecutingBinary(errors.New("CD-hit"), "trace")
+	e2 := ioutil.WriteFile(win64, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("CD-HIT"), "Cannot deploy CD-HIT 64-bit")
 	}
 
 	return

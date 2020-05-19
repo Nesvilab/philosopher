@@ -1,6 +1,7 @@
 package ptmprophet
 
 import (
+	"errors"
 	"io/ioutil"
 
 	"philosopher/lib/msg"
@@ -10,11 +11,14 @@ import (
 // WinPTMProphetParser locates and extracts the PTMProphet binary
 func WinPTMProphetParser(s string) {
 
-	bin, e := Asset("PTMProphetParser.exe")
-	e = ioutil.WriteFile(s, bin, sys.FilePermission())
+	bin, e1 := Asset("PTMProphetParser.exe")
+	if e1 != nil {
+		msg.DeployAsset(errors.New("PTMProphetParser"), "Cannot read PTMProphet bin")
+	}
 
-	if e != nil {
-		msg.ExecutingBinary(e, "trace")
+	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	if e2 != nil {
+		msg.DeployAsset(errors.New("PTMProphetParser"), "Cannot deploy PTMProphet")
 	}
 
 	return
