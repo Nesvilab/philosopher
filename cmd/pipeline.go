@@ -10,6 +10,7 @@ import (
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/pip"
+	"philosopher/lib/sla"
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
@@ -77,34 +78,42 @@ var pipelineCmd = &cobra.Command{
 			meta = pip.DatabaseSearch(meta, p, dir, args)
 		}
 
-		// PeptideProphet - PTMProphet - ProteinProphet
-		if p.PeptideProphet.Concurrent == true {
-			meta = pip.ParallelProphets(meta, p, dir, args)
-		} else {
-			meta = pip.Prophets(meta, p, dir, args)
+		// PeptideProphet
+		if p.Commands.PeptideProphet == "yes" {
+			meta = pip.PeptideProphet(meta, p, dir, args)
+		}
+
+		// PTMProphet
+		if p.Commands.PTMProphet == "yes" {
+			meta = pip.PTMProphet(meta, p, dir, args)
+		}
+
+		// ProteinProphet
+		if p.Commands.ProteinProphet == "yes" {
+			meta = pip.ProteinProphet(meta, p, dir, args)
 		}
 
 		// Abacus - combined pepxml
-		//meta = pip.CombinedPeptideList(meta, p, dir, args)
+		meta = pip.CombinedPeptideList(meta, p, dir, args)
 
 		// Abacus - combined protxml
-		//meta = pip.CombinedProteinList(meta, p, dir, args)
+		meta = pip.CombinedProteinList(meta, p, dir, args)
 
 		// Filter - Quantification - Clustering - Report
-		//meta = pip.FilterQuantifyReport(meta, p, dir, args)
+		meta = pip.FilterQuantifyReport(meta, p, dir, args)
 
 		// Abacus
-		//meta = pip.Abacus(meta, p, dir, args)
+		meta = pip.Abacus(meta, p, dir, args)
 
 		// TMT-Integrator
-		//meta = pip.TMTIntegrator(meta, p, dir, args)
+		meta = pip.TMTIntegrator(meta, p, dir, args)
 
 		// Backup and Clean
 		//pip.BackupAndClean(meta, p, dir, Version, Build, args)
 
-		// if len(p.SlackToken) > 0 {
-		// 	sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
-		// }
+		if len(p.SlackToken) > 0 {
+			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
+		}
 
 		met.CleanTemp(meta.Temp)
 
