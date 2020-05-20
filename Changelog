@@ -1,11 +1,5 @@
 ### Added
-- Added keepold flag for PTMProphet.
-
 ### Changed
-- Philosopher will ignore the interact file when interact.mod is present.
-- Improved quantification mapping to all runs. The  --mapmods option is only necessary to print mod reports.
-- The number of tryptic ternmini is now determined by ProteinProphet.
 
 ### Fixed
-- Error preventing iTRAQ quantification.
-- Several formatting, typoes and Go-Vet issues were fixed.
+- Pipeline functions were restored.

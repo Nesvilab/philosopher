@@ -257,7 +257,7 @@ abacus:
   uniqueOnly: false                            # report TMT quantification based on only unique peptides
   reprint: false                               # create abacus reports using the Reprint format
 
-tmtintegrator:                                 # v1.1.8
+tmtintegrator:                                 # v1.1.10
   path:                                        # path to TMT-Integrator jar
   memory: 6                                    # memory allocation, in Gb
   output:                                      # the location of output files
@@ -283,3 +283,4 @@ tmtintegrator:                                 # v1.1.8
   print_RefInt: false                          # print individual reference sample abundance estimates for each multiplex in the final reports (in addition to the combined reference sample abundance estimate)
   add_Ref: -1                                  # add an artificial reference channel if there is no reference channel (-1: don't add the reference; 0: use summation as the reference; 1: use average as the reference; 2: use median as the reference)
   max_pep_prob_thres: 0                        # the threshold for maximum peptide probability
+  min_ntt: 0                                   # minimum allowed number of enzymatic termini
