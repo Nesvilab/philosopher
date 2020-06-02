@@ -122,7 +122,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 				psmMap[j.Spectrum] = psm
 			}
 		}
-		//mappedPurity = nil
 
 		for _, j := range mappedPSM {
 			v, ok := psmMap[j.Spectrum]
@@ -132,7 +131,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 				psmMap[j.Spectrum] = psm
 			}
 		}
-		//mappedPSM = nil
 
 	}
 
