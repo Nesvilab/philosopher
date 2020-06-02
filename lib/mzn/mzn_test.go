@@ -100,8 +100,8 @@ func TestMS2Spectra(t *testing.T) {
 		t.Errorf("Spectrum target ion is incorrect, got %f, want %f", spec.Precursor.TargetIon, 391.2)
 	}
 
-	if spec.Precursor.PeakIntensity != 3.58558525e+06 {
-		t.Errorf("Spectrum precursor intensity is incorrect, got %f, want %f", spec.Precursor.PeakIntensity, 3.58558525e+06)
+	if spec.Precursor.SelectedIonIntensity != 3.58558525e+06 {
+		t.Errorf("Spectrum precursor intensity is incorrect, got %f, want %f", spec.Precursor.SelectedIonIntensity, 3.58558525e+06)
 	}
 
 	if spec.Precursor.IsolationWindowLowerOffset != 0.34999999404 {

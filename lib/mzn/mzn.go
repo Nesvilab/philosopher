@@ -13,8 +13,9 @@ import (
 
 	"philosopher/lib/msg"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/psi"
+
+	"github.com/sirupsen/logrus"
 )
 
 // MsData top struct
@@ -46,8 +47,9 @@ type Precursor struct {
 	ParentScan                 string
 	ChargeState                int
 	SelectedIon                float64
+	SelectedIonIntensity       float64
 	TargetIon                  float64
-	PeakIntensity              float64
+	TargetIonIntensity         float64
 	IsolationWindowLowerOffset float64
 	IsolationWindowUpperOffset float64
 }
@@ -228,7 +230,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 				if e != nil {
 					msg.CastFloatToString(e, "fatal")
 				}
-				spec.Precursor.PeakIntensity = val
+				spec.Precursor.SelectedIonIntensity = val
 			}
 		}
 	}
