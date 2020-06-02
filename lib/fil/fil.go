@@ -200,7 +200,7 @@ func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass
 		fileCheckList = append(fileCheckList, xmlFile)
 		files[xmlFile] = 0
 	} else {
-		glob := fmt.Sprintf("%s/*pep.xml", xmlFile)
+		glob := fmt.Sprintf("%s%s*pep.xml", string(filepath.Separator), xmlFile)
 		list, _ := filepath.Glob(glob)
 
 		if len(list) == 0 {
