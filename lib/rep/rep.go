@@ -401,11 +401,9 @@ func Run(m met.Data) {
 
 	// get the labels from the annotation file
 	if len(m.Quantify.Annot) > 0 {
-		if len(m.Quantify.Annot) > 0 {
-			annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
-			annotfile, _ = filepath.Abs(annotfile)
-			labels = uti.GetLabelNames(annotfile)
-		}
+		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
+		annotfile, _ = filepath.Abs(annotfile)
+		labels = uti.GetLabelNames(annotfile)
 	}
 
 	logrus.Info("Creating reports")

@@ -3,8 +3,10 @@ package uti
 
 import (
 	"bufio"
+	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"philosopher/lib/msg"
 	"regexp"
 	"strconv"
@@ -109,4 +111,16 @@ func GetLabelNames(annot string) map[string]string {
 	}
 
 	return labels
+}
+
+// FindFile locates a file based on a name pattern
+func FindFile(targetDir string, pattern string) string {
+
+	match, e := filepath.Glob(targetDir + string(filepath.Separator) + pattern)
+
+	if e != nil {
+		fmt.Println(e)
+	}
+
+	return match[0]
 }

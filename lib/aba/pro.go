@@ -63,19 +63,27 @@ func proteinLevelAbacus(m met.Data, args []string) {
 				absPath, _ := filepath.Abs(interactFile)
 				xmlFiles = append(xmlFiles, absPath)
 			}
+			if strings.Contains(f.Name(), "annotation") {
+				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
+				labels.Name = annot
+
+				if len(m.Quantify.Annot) > 0 {
+					labels.LabelName = getLabelNames(annot)
+				}
+			}
 		}
 
-		var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
-		if strings.Contains(i, string(filepath.Separator)) {
-			i = strings.Replace(i, string(filepath.Separator), "", -1)
-			labels.Name = i
-		} else {
-			labels.Name = i
-		}
+		// var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
+		// if strings.Contains(i, string(filepath.Separator)) {
+		// 	i = strings.Replace(i, string(filepath.Separator), "", -1)
+		// 	labels.Name = i
+		// } else {
+		// 	labels.Name = i
+		// }
 
-		if len(m.Quantify.Annot) > 0 {
-			labels.LabelName = getLabelNames(annot)
-		}
+		// if len(m.Quantify.Annot) > 0 {
+		// 	labels.LabelName = getLabelNames(annot)
+		// }
 
 		// collect project names
 		prjName := i

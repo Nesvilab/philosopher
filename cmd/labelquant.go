@@ -32,9 +32,7 @@ var labelquantCmd = &cobra.Command{
 			msg.InputNotFound(errors.New("You need to specify the experiment Plex"), "fatal")
 		}
 
-		// hardcoded tmt for now
 		msg.Executing("Isobaric-label quantification ", Version)
-		//m.Quantify.Brand = "tmt"
 
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
 			m.Quantify.Format = "mzML"

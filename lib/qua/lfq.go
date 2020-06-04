@@ -8,16 +8,16 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/msg"
-
 	"philosopher/lib/bio"
+	"philosopher/lib/msg"
+	"philosopher/lib/uti"
+
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 
 	"github.com/sirupsen/logrus"
 )
 
-// // peakIntensity collects PSM intensities from the apex peak
 func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
@@ -31,8 +31,10 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	var retentionTime = make(map[string]float64)
 	var intensity = make(map[string]float64)
 
-	for _, i := range evi.PSM {
+	var charges = make(map[string]int)
 
+	// collect attributes from PSM
+	for _, i := range evi.PSM {
 		partName := strings.Split(i.Spectrum, ".")
 		sourceMap[partName[0]] = 0
 		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
@@ -42,13 +44,15 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		minRT[i.Spectrum] = (i.RetentionTime / 60) - rTWin
 		maxRT[i.Spectrum] = (i.RetentionTime / 60) + rTWin
 		retentionTime[i.Spectrum] = i.RetentionTime
+
+		charges[i.Spectrum] = int(i.AssumedCharge)
 	}
 
+	// get a sorted list of spectrum names
 	var sourceMapList []string
 	for source := range sourceMap {
 		sourceMapList = append(sourceMapList, source)
 	}
-
 	sort.Strings(sourceMapList)
 
 	logrus.Info("Reading spectra and tracing peaks")
@@ -59,7 +63,8 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
-		mz.Read(fileName, false, true, true)
+		// load MS1, ignore MS2 and MS3
+		mz.Read(fileName, false, false, true)
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
@@ -68,6 +73,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
 				if ok {
+					// update the MZ with the desired Precursor value from mzML
 					if isIso == true {
 						mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
 					} else {
@@ -81,12 +87,21 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if ok {
 			for _, j := range v {
 
-				//var measured = make(map[float64]float64)
-				//var retrieved bool
-
 				measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
 
+				// if j == "20180209_03_TP_1A.03130.03130.2#interact.pep.xml" {
+				// 	fmt.Println(measured)
+				// }
+
 				if retrieved == true {
+
+					// create the list of mz differences for each peak
+					var mzRatio []float64
+					for k := 1; k <= 6; k++ {
+						r := float64(k) * (float64(1) / float64(charges[j]))
+						mzRatio = append(mzRatio, uti.ToFixed(r, 2))
+					}
+
 					var timeW = retentionTime[j] / 60
 					var topI = 0.0
 
@@ -102,7 +117,6 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				}
 			}
 		}
-
 	}
 
 	for i := range evi.PSM {

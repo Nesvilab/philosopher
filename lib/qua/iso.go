@@ -24,6 +24,9 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 	var indexedMS1 = make(map[string]mzn.Spectrum)
 	var indexedMS2 = make(map[string]mzn.Spectrum)
 
+	var MS1Peaks = make(map[string][]float64)
+	var MS1Int = make(map[string][]float64)
+
 	for i := range mz.Spectra {
 
 		if mz.Spectra[i].Level == "1" {
@@ -38,6 +41,9 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			mz.Spectra[i].Scan = paddedScan
 
 			indexedMS1[paddedScan] = mz.Spectra[i]
+
+			MS1Peaks[paddedScan] = mz.Spectra[i].Mz.DecodedStream
+			MS1Int[paddedScan] = mz.Spectra[i].Intensity.DecodedStream
 
 		} else if mz.Spectra[i].Level == "2" {
 
@@ -63,10 +69,17 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			mz.Spectra[i].Precursor.ParentIndex = paddedPI
 			mz.Spectra[i].Precursor.ParentScan = paddedPS
 
+			stream := MS1Peaks[paddedPS]
+
+			for j := range stream {
+				if stream[j] >= (mz.Spectra[i].Precursor.TargetIon-mz.Spectra[i].Precursor.IsolationWindowLowerOffset) && stream[j] <= (mz.Spectra[i].Precursor.TargetIon+mz.Spectra[i].Precursor.IsolationWindowUpperOffset) {
+					mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
+					break
+				}
+			}
+
 			indexedMS2[paddedScan] = mz.Spectra[i]
-
 		}
-
 	}
 
 	for i := range evi {
@@ -98,14 +111,16 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 
 			var isotopePackage = make(map[float64]float64)
 
-			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.PeakIntensity
-			isotopesInt := v2.Precursor.PeakIntensity
+			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.TargetIonIntensity
+			isotopesInt := v2.Precursor.TargetIonIntensity
 
 			for k, v := range ions {
 				for _, m := range mzRatio {
 					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.02) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.02) {
-						isotopePackage[k] = v
-						isotopesInt += v
+						if v != v2.Precursor.TargetIonIntensity {
+							isotopePackage[k] = v
+							isotopesInt += v
+						}
 						break
 					}
 				}
@@ -117,11 +132,7 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
 			}
 
-			if evi[i].Purity > 1 {
-				evi[i].Purity = 1
-			}
 		}
-
 	}
 
 	return evi
