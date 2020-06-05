@@ -6,7 +6,7 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
-TAG = v3.2.6
+TAG = v3.2.7
 
 LDFLAGS = -ldflags "-w -s -X main.version=${TAG} -X main.build=${BUILD}"
 

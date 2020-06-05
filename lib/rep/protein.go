@@ -229,7 +229,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, channels int, hasDecoys, hasRazor, uniqueOnly bool) {
+func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, hasRazor, uniqueOnly bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
@@ -281,11 +281,23 @@ func (evi Evidence) MetaProteinReport(labels map[string]string, brand string, ch
 
 	header += "\n"
 
-	if len(labels) > 0 {
-		for k, v := range labels {
-			k = fmt.Sprintf("Channel %s", k)
-			header = strings.Replace(header, k, v, -1)
-		}
+	// verify if the structure has labels, if so, replace the original channel names by them.
+	if len(printSet[0].UniqueLabels.Channel1.CustomName) > 3 {
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel1.Name, printSet[0].UniqueLabels.Channel1.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel2.Name, printSet[0].UniqueLabels.Channel2.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel3.Name, printSet[0].UniqueLabels.Channel3.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel4.Name, printSet[0].UniqueLabels.Channel4.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel5.Name, printSet[0].UniqueLabels.Channel5.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel6.Name, printSet[0].UniqueLabels.Channel6.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel7.Name, printSet[0].UniqueLabels.Channel7.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel8.Name, printSet[0].UniqueLabels.Channel8.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel9.Name, printSet[0].UniqueLabels.Channel9.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel10.Name, printSet[0].UniqueLabels.Channel10.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel11.Name, printSet[0].UniqueLabels.Channel11.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel12.Name, printSet[0].UniqueLabels.Channel12.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel13.Name, printSet[0].UniqueLabels.Channel13.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel14.Name, printSet[0].UniqueLabels.Channel14.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel15.Name, printSet[0].UniqueLabels.Channel15.CustomName, -1)
 	}
 
 	_, e = io.WriteString(file, header)

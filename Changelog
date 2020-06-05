@@ -2,6 +2,4 @@
 ### Changed
 
 ### Fixed
-- Pipeline functions were restored.
-- Ion Purity calculation was fixed, and now supports msconvert 3.20
-- Fixed file discovery for filtering on Windows
+- Issue with the label assignment in labelquant.

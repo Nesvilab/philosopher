@@ -2,14 +2,12 @@ package rep
 
 import (
 	"fmt"
-	"path/filepath"
 	"strconv"
 
 	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
-	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
 )
@@ -379,7 +377,6 @@ func Run(m met.Data) {
 	var hasLoc bool
 	var isoBrand string
 	var isoChannels int
-	var labels = make(map[string]string)
 
 	if len(m.Comet.Param) > 0 {
 		isComet = true
@@ -399,27 +396,27 @@ func Run(m met.Data) {
 		isoChannels, _ = strconv.Atoi(m.Quantify.Plex)
 	}
 
-	// get the labels from the annotation file
-	if len(m.Quantify.Annot) > 0 {
-		annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
-		annotfile, _ = filepath.Abs(annotfile)
-		labels = uti.GetLabelNames(annotfile)
-	}
+	// // get the labels from the annotation file
+	// if len(m.Quantify.Annot) > 0 {
+	// 	annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
+	// 	annotfile, _ = filepath.Abs(annotfile)
+	// 	labels = uti.GetLabelNames(annotfile)
+	// }
 
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(labels, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
+	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
 
 	// Ion
-	repo.MetaIonReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys)
 
 	// Peptide
-	repo.MetaPeptideReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys)
 
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
-		repo.MetaProteinReport(labels, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
+		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
 		repo.ProteinFastaReport(m.Report.Decoys)
 	}
 
@@ -436,7 +433,7 @@ func Run(m met.Data) {
 
 	// MSstats
 	if m.Report.MSstats == true {
-		repo.MetaMSstatsReport(labels, isoBrand, isoChannels, m.Report.Decoys)
+		repo.MetaMSstatsReport(isoBrand, isoChannels, m.Report.Decoys)
 	}
 
 	// MzID

@@ -110,7 +110,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 		}
 
-		labels = assignLabelNames(labels, p.LabelNames)
+		labels = assignLabelNames(labels, p.LabelNames, p.Brand)
 
 		mappedPSM := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 
@@ -242,111 +242,162 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName
-func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string) map[string]iso.Labels {
+func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string, brand string) map[string]iso.Labels {
 
-	for _, i := range labels {
+	for k, v := range labels {
+		v2 := v
 
-		switch chnl := i.Channel1.Name; chnl {
-		case "126":
-			i.Channel1.CustomName = labelNames["126"]
+		if brand == "tmt" {
 
-			if len(i.Channel1.CustomName) < 1 {
-				i.Channel1.CustomName = "126"
+			if len(labelNames["126"]) < 1 {
+				v2.Channel1.CustomName = "126"
+			} else {
+				v2.Channel1.CustomName = labelNames["126"]
 			}
 
-		case "127N":
-			i.Channel2.CustomName = labelNames["127N"]
-			if len(i.Channel2.CustomName) < 1 {
-				i.Channel2.CustomName = "127N"
+			if len(labelNames["127N"]) < 1 {
+				v2.Channel2.CustomName = "127N"
+			} else {
+				v2.Channel2.CustomName = labelNames["127N"]
 			}
 
-		case "127C":
-			i.Channel3.CustomName = labelNames["127C"]
-			if len(i.Channel3.CustomName) < 1 {
-				i.Channel3.CustomName = "127C"
+			if len(labelNames["127C"]) < 1 {
+				v2.Channel3.CustomName = "127C"
+			} else {
+				v2.Channel3.CustomName = labelNames["127C"]
 			}
 
-		case "128N":
-			i.Channel4.CustomName = labelNames["128N"]
-			if len(i.Channel4.CustomName) < 1 {
-				i.Channel4.CustomName = "128N"
+			if len(labelNames["128N"]) < 1 {
+				v2.Channel4.CustomName = "128N"
+			} else {
+				v2.Channel4.CustomName = labelNames["128N"]
 			}
 
-		case "128C":
-			i.Channel5.CustomName = labelNames["128C"]
-			if len(i.Channel5.CustomName) < 1 {
-				i.Channel5.CustomName = "128C"
+			if len(labelNames["128C"]) < 1 {
+				v2.Channel5.CustomName = "128C"
+			} else {
+				v2.Channel5.CustomName = labelNames["128C"]
 			}
 
-		case "129N":
-			i.Channel6.CustomName = labelNames["129N"]
-			if len(i.Channel6.CustomName) < 1 {
-				i.Channel6.CustomName = "129N"
+			if len(labelNames["129N"]) < 1 {
+				v2.Channel6.CustomName = "129N"
+			} else {
+				v2.Channel6.CustomName = labelNames["129N"]
 			}
 
-		case "129C":
-			i.Channel7.CustomName = labelNames["129C"]
-			if len(i.Channel7.CustomName) < 1 {
-				i.Channel7.CustomName = "129C"
+			if len(labelNames["129C"]) < 1 {
+				v2.Channel7.CustomName = "129C"
+			} else {
+				v2.Channel7.CustomName = labelNames["129C"]
 			}
 
-		case "130N":
-			i.Channel8.CustomName = labelNames["130N"]
-			if len(i.Channel8.CustomName) < 1 {
-				i.Channel8.CustomName = "130N"
+			if len(labelNames["130N"]) < 1 {
+				v2.Channel8.CustomName = "130N"
+			} else {
+				v2.Channel8.CustomName = labelNames["130N"]
 			}
 
-		case "130C":
-			i.Channel9.CustomName = labelNames["130C"]
-			if len(i.Channel9.CustomName) < 1 {
-				i.Channel9.CustomName = "130C"
+			if len(labelNames["130C"]) < 1 {
+				v2.Channel9.CustomName = "130C"
+			} else {
+				v2.Channel9.CustomName = labelNames["130C"]
 			}
 
-		case "131N":
-			i.Channel10.CustomName = labelNames["131N"]
-			if len(i.Channel10.CustomName) < 1 {
-				i.Channel10.CustomName = "131N"
+			if len(labelNames["131N"]) < 1 {
+				v2.Channel10.CustomName = "131N"
+			} else {
+				v2.Channel10.CustomName = labelNames["131N"]
 			}
 
-		case "131C":
-			i.Channel11.CustomName = labelNames["131C"]
-			if len(i.Channel11.CustomName) < 1 {
-				i.Channel11.CustomName = "131C"
+			if len(labelNames["131C"]) < 1 {
+				v2.Channel11.CustomName = "131C"
+			} else {
+				v2.Channel11.CustomName = labelNames["131C"]
 			}
 
-		case "132N":
-			i.Channel11.CustomName = labelNames["132N"]
-			if len(i.Channel12.CustomName) < 1 {
-				i.Channel12.CustomName = "132N"
+			if len(labelNames["132N"]) < 1 {
+				v2.Channel12.CustomName = "132N"
+			} else {
+				v2.Channel12.CustomName = labelNames["132N"]
 			}
 
-		case "132C":
-			i.Channel13.CustomName = labelNames["132C"]
-			if len(i.Channel13.CustomName) < 1 {
-				i.Channel13.CustomName = "132C"
+			if len(labelNames["132C"]) < 1 {
+				v2.Channel13.CustomName = "132C"
+			} else {
+				v2.Channel13.CustomName = labelNames["132C"]
 			}
 
-		case "133N":
-			i.Channel14.CustomName = labelNames["133N"]
-			if len(i.Channel14.CustomName) < 1 {
-				i.Channel14.CustomName = "133N"
+			if len(labelNames["133N"]) < 1 {
+				v2.Channel14.CustomName = "133N"
+			} else {
+				v2.Channel14.CustomName = labelNames["133N"]
 			}
 
-		case "133C":
-			i.Channel15.CustomName = labelNames["133C"]
-			if len(i.Channel15.CustomName) < 1 {
-				i.Channel15.CustomName = "133C"
+			if len(labelNames["133C"]) < 1 {
+				v2.Channel15.CustomName = "133C"
+			} else {
+				v2.Channel15.CustomName = labelNames["133C"]
 			}
 
-		case "134N":
-			i.Channel16.CustomName = labelNames["134N"]
-			if len(i.Channel16.CustomName) < 1 {
-				i.Channel16.CustomName = "134N"
+			if len(labelNames["134N"]) < 1 {
+				v2.Channel16.CustomName = "134N"
+			} else {
+				v2.Channel16.CustomName = labelNames["134N"]
 			}
 
-		default:
+		} else if brand == "itraq" {
+
+			if len(labelNames["113"]) < 1 {
+				v2.Channel1.CustomName = "113"
+			} else {
+				v2.Channel1.CustomName = labelNames["113"]
+			}
+
+			if len(labelNames["114"]) < 1 {
+				v2.Channel2.CustomName = "114"
+			} else {
+				v2.Channel2.CustomName = labelNames["114"]
+			}
+
+			if len(labelNames["115"]) < 1 {
+				v2.Channel3.CustomName = "115"
+			} else {
+				v2.Channel3.CustomName = labelNames["115"]
+			}
+
+			if len(labelNames["116"]) < 1 {
+				v2.Channel4.CustomName = "116"
+			} else {
+				v2.Channel4.CustomName = labelNames["116"]
+			}
+
+			if len(labelNames["117"]) < 1 {
+				v2.Channel5.CustomName = "117"
+			} else {
+				v2.Channel5.CustomName = labelNames["117"]
+			}
+
+			if len(labelNames["118"]) < 1 {
+				v2.Channel6.CustomName = "118"
+			} else {
+				v2.Channel6.CustomName = labelNames["118"]
+			}
+
+			if len(labelNames["119"]) < 1 {
+				v2.Channel7.CustomName = "119"
+			} else {
+				v2.Channel7.CustomName = labelNames["119"]
+			}
+
+			if len(labelNames["121"]) < 1 {
+				v2.Channel8.CustomName = "121"
+			} else {
+				v2.Channel8.CustomName = labelNames["121"]
+			}
 
 		}
+
+		labels[k] = v2
 	}
 
 	return labels
