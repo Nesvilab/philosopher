@@ -110,7 +110,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 		}
 
-		labels = assignLabelNames(labels, p.LabelNames, p.Brand)
+		labels = assignLabelNames(labels, p.LabelNames, p.Brand, p.Plex)
 
 		mappedPSM := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 
@@ -242,7 +242,7 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName
-func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string, brand string) map[string]iso.Labels {
+func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string, brand, plex string) map[string]iso.Labels {
 
 	for k, v := range labels {
 		v2 := v
@@ -345,8 +345,33 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel16.CustomName = labelNames["134N"]
 			}
 
-		} else if brand == "itraq" {
+		} else if brand == "itraq" && plex == "4" {
 
+			if len(labelNames["114"]) < 1 {
+				v2.Channel1.CustomName = "114"
+			} else {
+				v2.Channel1.CustomName = labelNames["114"]
+			}
+
+			if len(labelNames["115"]) < 1 {
+				v2.Channel2.CustomName = "115"
+			} else {
+				v2.Channel2.CustomName = labelNames["115"]
+			}
+
+			if len(labelNames["116"]) < 1 {
+				v2.Channel3.CustomName = "116"
+			} else {
+				v2.Channel3.CustomName = labelNames["116"]
+			}
+
+			if len(labelNames["117"]) < 1 {
+				v2.Channel4.CustomName = "117"
+			} else {
+				v2.Channel4.CustomName = labelNames["117"]
+			}
+
+		} else if brand == "itraq" && plex == "8" {
 			if len(labelNames["113"]) < 1 {
 				v2.Channel1.CustomName = "113"
 			} else {
