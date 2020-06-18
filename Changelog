@@ -2,4 +2,4 @@
 ### Changed
 
 ### Fixed
-- Issue with the label assignment in labelquant.
+-- Wrong assignment for the subFDR filtering
