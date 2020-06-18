@@ -146,12 +146,15 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys bool
 	// building the printing set tat may or not contain decoys
 	var printSet PeptideEvidenceList
 	for _, i := range evi.Peptides {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
+		if i.Probability > 0 {
+			if hasDecoys == false {
+				if i.IsDecoy == false {
+					printSet = append(printSet, i)
+				}
+			} else {
 				printSet = append(printSet, i)
 			}
-		} else {
-			printSet = append(printSet, i)
 		}
 	}
 

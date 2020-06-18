@@ -6,7 +6,7 @@ BINARY = philosopher
 VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
-TAG = v3.2.7
+TAG = v3.2.8
 
 LDFLAGS = -ldflags "-w -s -X main.version=${TAG} -X main.build=${BUILD}"
 
@@ -46,6 +46,11 @@ deploy:
 .PHONY: test
 test:
 	go test ./... -v
+
+.PHONY: rc
+rc:
+	gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-RC
+	gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-RC
 
 .PHONY: linux
 linux:

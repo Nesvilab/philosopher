@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -350,37 +349,65 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, p
 
 func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, decoyTag, mods string) {
 
+	// unmodified = no ptms
+	// defined = only the ptms defined, nothing else
+	// remaining or all = one or more ptms that might include the combination of the defined + something else
+
 	logrus.Info("Separating PSMs based on the modification profile")
 
 	unModPSMs := make(map[string]id.PepIDList)
 	definedModPSMs := make(map[string]id.PepIDList)
 	restModPSMs := make(map[string]id.PepIDList)
 
-	modsMap := make(map[float64]string)
+	modsMap := make(map[string]string)
 
 	modsList := strings.Split(mods, ",")
 	for _, i := range modsList {
 		m := strings.Split(i, ":")
-		f, _ := strconv.ParseFloat(m[1], 64)
-		modsMap[f] = m[0]
+		modsMap[i] = m[0]
 	}
+
+	exclusionList := make(map[string]uint8)
+	psmsWithOtherPTMs := make(map[string]id.PepIDList)
 
 	for k, v := range uniqPsms {
 
 		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
+
 			unModPSMs[k] = v
+			exclusionList[v[0].Spectrum] = 0
+
 		} else {
 
+			// if PSM contains other mods than the ones defined by the flag, mark them to be ignored
 			for _, i := range v[0].Modifications.Index {
-				aa, ok := modsMap[i.MassDiff]
-
-				if ok && aa == i.AminoAcid {
-					definedModPSMs[k] = v
-				} else if len(v[0].Modifications.Index) > 0 {
-					restModPSMs[k] = v
+				if i.Variable == "Y" {
+					m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+					_, ok := modsMap[m]
+					if !ok {
+						psmsWithOtherPTMs[v[0].Spectrum] = v
+					}
 				}
 			}
 
+			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
+			// and mark it for being excluded from rest
+			for _, i := range v[0].Modifications.Index {
+				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+				aa, ok1 := modsMap[m]
+				_, ok2 := psmsWithOtherPTMs[v[0].Spectrum]
+
+				if ok1 && !ok2 && aa == i.AminoAcid {
+					definedModPSMs[k] = v
+					exclusionList[v[0].Spectrum] = 0
+				}
+			}
+
+		}
+
+		_, ok := exclusionList[v[0].Spectrum]
+		if !ok {
+			restModPSMs[k] = v
 		}
 	}
 
@@ -411,6 +438,98 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 
 	return
 }
+
+// func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, decoyTag, mods string) {
+
+// 	// unmodified = no ptms
+// 	// defined = only the ptms defined, nothing else
+// 	// remaining or all = one or more ptms that might include the combination of the defined + something else
+
+// 	logrus.Info("Separating PSMs based on the modification profile")
+
+// 	unModPSMs := make(map[string]id.PepIDList)
+// 	definedModPSMs := make(map[string]id.PepIDList)
+// 	restModPSMs := make(map[string]id.PepIDList)
+
+// 	modsMap := make(map[float64]string)
+
+// 	modsList := strings.Split(mods, ",")
+// 	for _, i := range modsList {
+// 		m := strings.Split(i, ":")
+// 		f, _ := strconv.ParseFloat(m[1], 64)
+// 		modsMap[f] = m[0]
+// 	}
+
+// 	exclusionList := make(map[string]uint8)
+
+// 	for k, v := range uniqPsms {
+
+// 		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
+
+// 			unModPSMs[k] = v
+// 			exclusionList[v[0].Spectrum] = 0
+
+// 		} else {
+
+// 			var psmsWithOtherPTMs = make(map[string]id.PepIDList)
+
+// 			// if PSM contains other mods than the ones defined by the flag, mark them to be ignored
+// 			for _, i := range v[0].Modifications.Index {
+// 				if i.Variable == "yes" {
+// 					_, ok := modsMap[i.MassDiff]
+// 					if !ok {
+// 						psmsWithOtherPTMs[v[0].Spectrum] = v
+// 					}
+// 				}
+// 			}
+
+// 			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
+// 			// and mark it for being excluded from rest
+// 			for _, i := range v[0].Modifications.Index {
+// 				aa, ok1 := modsMap[i.MassDiff]
+// 				_, ok2 := psmsWithOtherPTMs[v[0].Spectrum]
+
+// 				if ok1 && !ok2 && aa == i.AminoAcid {
+// 					definedModPSMs[k] = v
+// 					exclusionList[v[0].Spectrum] = 0
+// 				}
+// 			}
+
+// 		}
+
+// 		_, ok := exclusionList[v[0].Spectrum]
+// 		if !ok {
+// 			restModPSMs[k] = v
+// 		}
+// 	}
+
+// 	logrus.Info("Filtering unmodified PSMs")
+// 	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+
+// 	logrus.Info("Filtering defined modified PSMs")
+// 	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+
+// 	logrus.Info("Filtering all modified PSMs")
+// 	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+
+// 	var combinedFiltered id.PepIDList
+
+// 	for _, i := range filteredUnmodPSM {
+// 		combinedFiltered = append(combinedFiltered, i)
+// 	}
+
+// 	for _, i := range filteredDefinedPSM {
+// 		combinedFiltered = append(combinedFiltered, i)
+// 	}
+
+// 	for _, i := range filteredAllPSM {
+// 		combinedFiltered = append(combinedFiltered, i)
+// 	}
+
+// 	combinedFiltered.Serialize("psm")
+
+// 	return
+// }
 
 // chargeProfile ...
 func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {

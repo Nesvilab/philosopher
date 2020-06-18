@@ -123,12 +123,15 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys bool) {
 	// building the printing set tat may or not contain decoys
 	var printSet IonEvidenceList
 	for _, i := range evi.Ions {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
+		if i.Probability > 0 {
+			if hasDecoys == false {
+				if i.IsDecoy == false {
+					printSet = append(printSet, i)
+				}
+			} else {
 				printSet = append(printSet, i)
 			}
-		} else {
-			printSet = append(printSet, i)
 		}
 	}
 
