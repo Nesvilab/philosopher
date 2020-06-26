@@ -1,5 +1,7 @@
 ### Added
+-- Adding Zenodo DOI.
 ### Changed
 
 ### Fixed
--- Wrong assignment for the subFDR filtering
+-- Wrong assignment for the subFDR filtering.
+-- PTMPRophet was having issue in replacing the PeptideProphet file.

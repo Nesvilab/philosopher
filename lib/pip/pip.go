@@ -384,6 +384,7 @@ func PTMProphet(meta met.Data, p Directives, dir string, data []string) met.Data
 			var files []string
 			files = append(files, "interact.pep.xml")
 			meta.PTMProphet.InputFiles = files
+			meta.PTMProphet.KeepOld = true
 			ptmprophet.Run(meta, files)
 			meta.Serialize()
 		}
@@ -545,9 +546,9 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
-				// if p.Commands.PTMProphet == "yes" {
-				// 	meta.Filter.Pex = "interact.mod.pep.xml"
-				// }
+				if p.Commands.PTMProphet == "yes" {
+					meta.Filter.Pex = "interact.mod.pep.xml"
+				}
 			} else {
 				meta.Filter.Pex = p.Filter.Pex
 			}
