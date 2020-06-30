@@ -7,8 +7,10 @@ import (
 	"math"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"philosopher/lib/uti"
 
@@ -18,6 +20,7 @@ import (
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -233,6 +236,101 @@ func (p *PepXML) Read(f string) {
 	}
 
 	return
+}
+
+// ReadPepXMLInput reads one or more fies and organize the data into PSM list
+func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, string) {
+
+	var files = make(map[string]uint8)
+	var fileCheckList []string
+	var fileCheckFlag bool
+	var pepIdent PepIDList
+	var mods []mod.Modification
+	var params []spc.Parameter
+	var modsIndex = make(map[string]mod.Modification)
+	var searchEngine string
+
+	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
+		fileCheckList = append(fileCheckList, xmlFile)
+		files[xmlFile] = 0
+	} else {
+		glob := fmt.Sprintf("%s%s*pep.xml", xmlFile, string(filepath.Separator))
+		list, _ := filepath.Glob(glob)
+
+		if len(list) == 0 {
+			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
+		}
+
+		for _, i := range list {
+			absPath, _ := filepath.Abs(i)
+			files[absPath] = 0
+			fileCheckList = append(fileCheckList, absPath)
+
+			if strings.Contains(i, "mod") {
+				fileCheckFlag = true
+			}
+		}
+
+	}
+
+	// verify if the we have interact and interact.mod files for parsing.
+	// To avoid reading both files, we keep the mod one and discard the other.
+	if fileCheckFlag == true {
+		for _, i := range fileCheckList {
+			i = strings.Replace(i, "mod.", "", 1)
+			_, ok := files[i]
+			if ok {
+				delete(files, i)
+			}
+		}
+	}
+
+	for i := range files {
+		var p PepXML
+		p.DecoyTag = decoyTag
+		p.Read(i)
+
+		params = p.SearchParameters
+
+		// print models
+		if models == true {
+			if strings.EqualFold(p.Prophet, "interprophet") {
+				logrus.Error("Cannot print models for interprophet files")
+			} else {
+				logrus.Info("Printing models")
+				go p.ReportModels(temp, filepath.Base(i))
+				time.Sleep(time.Second * 3)
+			}
+		}
+
+		pepIdent = append(pepIdent, p.PeptideIdentification...)
+
+		for _, k := range p.Modifications.Index {
+			_, ok := modsIndex[k.Index]
+			if !ok {
+				mods = append(mods, k)
+				modsIndex[k.Index] = k
+			}
+		}
+
+		searchEngine = p.SearchEngine
+	}
+
+	// create a "fake" global pepXML comprising all data
+	var pepXML PepXML
+	pepXML.DecoyTag = decoyTag
+	pepXML.SearchParameters = params
+	pepXML.PeptideIdentification = pepIdent
+	pepXML.Modifications.Index = modsIndex
+
+	// promoting Spectra that matches to both decoys and targets to TRUE hits
+	pepXML.PromoteProteinIDs()
+
+	// serialize all pep files
+	sort.Sort(pepXML.PeptideIdentification)
+	pepXML.Serialize()
+
+	return pepIdent, searchEngine
 }
 
 func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {

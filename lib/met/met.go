@@ -336,6 +336,8 @@ type Filter struct {
 
 // Quantify options and parameters
 type Quantify struct {
+	Pex        string  `yaml:"pepxml"`
+	Tag        string  `yaml:"tag"`
 	Format     string  `yaml:"format"`
 	Dir        string  `yaml:"dir"`
 	Brand      string  `yaml:"brand"`

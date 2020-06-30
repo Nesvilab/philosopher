@@ -3,15 +3,18 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
+	"philosopher/lib/sys"
 	"philosopher/lib/tmt"
 	"philosopher/lib/trq"
 	"philosopher/lib/uti"
@@ -33,16 +36,32 @@ func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 // RunLabelFreeQuantification is the top function for label free quantification
+// This function can be used for both pre and post filtering quantification
 func RunLabelFreeQuantification(p met.Quantify) {
 
-	var evi rep.Evidence
-	evi.RestoreGranular()
+	var lfq = NewLFQ()
 
-	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
+	psm, _ := id.ReadPepXMLInput(p.Pex, p.Tag, sys.GetTemp(), false)
 
-	evi = calculateIntensities(evi)
+	//evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
+	psm = peakIntensity(psm, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 
-	evi.SerializeGranular()
+	for _, i := range psm {
+		lfq.Intensities[i.Spectrum] = i.Intensity
+	}
+
+	lfq.Serialize()
+
+	// checks if the Evidence structure exists, if so, update it.
+	if _, err := os.Stat(sys.EvPSMBin()); err == nil {
+
+		var evi rep.Evidence
+		evi.RestoreGranular()
+
+		evi = calculateIntensities(evi, lfq)
+		evi.SerializeGranular()
+
+	}
 
 	return
 }

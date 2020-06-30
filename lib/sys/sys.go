@@ -220,6 +220,12 @@ func DBBin() string {
 	return p
 }
 
+// LFQBin file
+func LFQBin() string {
+	p := fmt.Sprintf("%s%slfq.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
 // MODBin file
 func MODBin() string {
 	p := fmt.Sprintf("%s%smod.bin", MetaDir(), string(filepath.Separator))

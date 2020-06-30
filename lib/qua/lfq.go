@@ -3,22 +3,42 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"philosopher/lib/bio"
+	"philosopher/lib/id"
 	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 	"philosopher/lib/uti"
 
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
+	"github.com/vmihailenco/msgpack"
 )
 
-func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
+// LFQ main structure
+type LFQ struct {
+	Intensities map[string]float64
+}
+
+// NewLFQ constructor
+func NewLFQ() LFQ {
+
+	var self LFQ
+
+	self.Intensities = make(map[string]float64)
+
+	return self
+}
+
+func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float64, isIso bool) id.PepIDList {
 
 	logrus.Info("Indexing PSM information")
 
@@ -34,7 +54,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	var charges = make(map[string]int)
 
 	// collect attributes from PSM
-	for _, i := range evi.PSM {
+	for _, i := range psm {
 		partName := strings.Split(i.Spectrum, ".")
 		sourceMap[partName[0]] = 0
 		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
@@ -119,15 +139,15 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		}
 	}
 
-	for i := range evi.PSM {
-		partName := strings.Split(evi.PSM[i].Spectrum, ".")
+	for i := range psm {
+		partName := strings.Split(psm[i].Spectrum, ".")
 		_, ok := spectra[partName[0]]
 		if ok {
-			evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
+			psm[i].Intensity = intensity[psm[i].Spectrum]
 		}
 	}
 
-	return evi
+	return psm
 }
 
 // xic extract ion chomatograms
@@ -170,7 +190,7 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 	return list, false
 }
 
-func calculateIntensities(e rep.Evidence) rep.Evidence {
+func calculateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
 
 	logrus.Info("Assigning intensities to data layers")
 
@@ -181,24 +201,31 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	var peptideIntMap = make(map[string]float64)
 	var ionIntMap = make(map[string]float64)
 
-	for _, i := range e.PSM {
+	spew.Dump(lfq)
+
+	for i := range e.PSM {
+
+		v, ok1 := lfq.Intensities[e.PSM[i].Spectrum]
+		if ok1 {
+			e.PSM[i].Intensity = v
+		}
 
 		// peptide intensity : sum of all
-		_, ok := peptideIntMap[i.Peptide]
+		_, ok := peptideIntMap[e.PSM[i].Peptide]
 		if ok {
-			peptideIntMap[i.Peptide] += i.Intensity
+			peptideIntMap[e.PSM[i].Peptide] += e.PSM[i].Intensity
 		} else {
-			peptideIntMap[i.Peptide] += i.Intensity
+			peptideIntMap[e.PSM[i].Peptide] += e.PSM[i].Intensity
 		}
 
 		// ion intensity : most intense ion
-		ionV, ok := ionIntMap[i.IonForm]
+		ionV, ok := ionIntMap[e.PSM[i].IonForm]
 		if ok {
-			if i.Intensity > ionV {
-				ionIntMap[i.IonForm] = i.Intensity
+			if e.PSM[i].Intensity > ionV {
+				ionIntMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 			}
 		} else {
-			ionIntMap[i.IonForm] = i.Intensity
+			ionIntMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
 		}
 
 	}
@@ -272,4 +299,36 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	}
 
 	return e
+}
+
+// Serialize saves to disk a msgpack version of the LFQ data structure
+func (d *LFQ) Serialize() {
+
+	b, e := msgpack.Marshal(&d)
+	if e != nil {
+		msg.MarshalFile(e, "fatal")
+	}
+
+	e = ioutil.WriteFile(sys.LFQBin(), b, sys.FilePermission())
+	if e != nil {
+		msg.SerializeFile(e, "fatal")
+	}
+
+	return
+}
+
+// Restore reads philosopher results files and restore the data sctructure
+func (d *LFQ) Restore() {
+
+	b, e := ioutil.ReadFile(sys.LFQBin())
+	if e != nil {
+		msg.MarshalFile(e, "warning")
+	}
+
+	e = msgpack.Unmarshal(b, &d)
+	if e != nil {
+		msg.SerializeFile(e, "warning")
+	}
+
+	return
 }
