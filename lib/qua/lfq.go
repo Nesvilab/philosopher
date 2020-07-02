@@ -189,7 +189,8 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 	return list, false
 }
 
-func calculateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
+// PropagateIntensities propagates the PSM intensities to the other layers
+func PropagateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
 
 	logrus.Info("Assigning intensities to data layers")
 

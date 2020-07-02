@@ -33,25 +33,25 @@ type Labels struct {
 	Scan          string
 	RetentionTime float64
 	ChargeState   uint8
-	//IsUsed        bool
-	HasPhospho bool
-	Purity     float64
-	Channel1   Channel1
-	Channel2   Channel2
-	Channel3   Channel3
-	Channel4   Channel4
-	Channel5   Channel5
-	Channel6   Channel6
-	Channel7   Channel7
-	Channel8   Channel8
-	Channel9   Channel9
-	Channel10  Channel10
-	Channel11  Channel11
-	Channel12  Channel12
-	Channel13  Channel13
-	Channel14  Channel14
-	Channel15  Channel15
-	Channel16  Channel16
+	IsUsed        bool
+	HasPhospho    bool
+	Purity        float64
+	Channel1      Channel1
+	Channel2      Channel2
+	Channel3      Channel3
+	Channel4      Channel4
+	Channel5      Channel5
+	Channel6      Channel6
+	Channel7      Channel7
+	Channel8      Channel8
+	Channel9      Channel9
+	Channel10     Channel10
+	Channel11     Channel11
+	Channel12     Channel12
+	Channel13     Channel13
+	Channel14     Channel14
+	Channel15     Channel15
+	Channel16     Channel16
 }
 
 // Channel1 TMT

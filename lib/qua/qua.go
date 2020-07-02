@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"philosopher/lib/dat"
 	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
@@ -42,7 +43,11 @@ func RunLabelFreeQuantification(p met.Quantify) {
 
 	var lfq = NewLFQ()
 
-	psm, _ := id.ReadPepXMLInput(p.Pex, p.Tag, sys.GetTemp(), false)
+	// collect database information
+	var db dat.Base
+	db.Restore()
+
+	psm, _ := id.ReadPepXMLInput(".", db.Prefix, sys.GetTemp(), false)
 
 	//evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 	psm = peakIntensity(psm, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
@@ -59,7 +64,7 @@ func RunLabelFreeQuantification(p met.Quantify) {
 		var evi rep.Evidence
 		evi.RestoreGranular()
 
-		evi = calculateIntensities(evi, lfq)
+		evi = PropagateIntensities(evi, lfq)
 		evi.SerializeGranular()
 
 	}
@@ -70,6 +75,10 @@ func RunLabelFreeQuantification(p met.Quantify) {
 // RunIsobaricLabelQuantification is the top function for label quantification
 func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
+	// collect database information
+	var db dat.Base
+	db.Restore()
+
 	var labels = iso.NewIsoLabels()
 	var psmMap = make(map[string]id.PeptideIdentification)
 	var sourceMap = make(map[string][]id.PeptideIdentification)
@@ -79,7 +88,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
 	}
 
-	psm, _ := id.ReadPepXMLInput(p.Pex, p.Tag, sys.GetTemp(), false)
+	psm, _ := id.ReadPepXMLInput(".", db.Prefix, sys.GetTemp(), false)
 
 	// collect all used source file names
 	for _, i := range psm {
@@ -188,11 +197,11 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		// forces psms with no label to have 0 intensities
 		evi = correctUnlabelledSpectra(evi)
 
-		evi = rollUpPeptides(evi)
+		evi = RollUpPeptides(evi)
 
-		evi = rollUpPeptideIons(evi)
+		evi = RollUpPeptideIons(evi)
 
-		evi = rollUpProteins(evi)
+		evi = RollUpProteins(evi)
 
 		// normalize to the total protein levels
 		logrus.Info("Calculating normalized protein levels")
@@ -586,133 +595,14 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 		if best == true {
 			if ok2 {
-				evi.PSM[i].IsUsed = true
+				evi.PSM[i].Labels.IsUsed = true
 			}
 		} else {
 			if ok1 {
-				evi.PSM[i].IsUsed = true
+				evi.PSM[i].Labels.IsUsed = true
 			}
 		}
 	}
 
 	return evi
 }
-
-// func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) rep.Evidence {
-
-// 	var bestMap = make(map[string]uint8)
-// 	var psmLabelSumList PairList
-
-// 	// 1st check: Purity the score and the Probability levels
-// 	for i := range evi.PSM {
-
-// 		if evi.PSM[i].Probability >= probability && evi.PSM[i].Labels.Purity >= purity {
-
-// 			evi.PSM[i].Labels.IsUsed = true
-
-// 			if mods == true {
-// 				_, ok := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.9663"]
-// 				if ok {
-// 					evi.PSM[i].Labels.HasPhospho = true
-// 				}
-// 			}
-
-// 		}
-
-// 		if remove != 0 {
-// 			sum := evi.PSM[i].Labels.Channel1.Intensity +
-// 				evi.PSM[i].Labels.Channel2.Intensity +
-// 				evi.PSM[i].Labels.Channel3.Intensity +
-// 				evi.PSM[i].Labels.Channel4.Intensity +
-// 				evi.PSM[i].Labels.Channel5.Intensity +
-// 				evi.PSM[i].Labels.Channel6.Intensity +
-// 				evi.PSM[i].Labels.Channel7.Intensity +
-// 				evi.PSM[i].Labels.Channel8.Intensity +
-// 				evi.PSM[i].Labels.Channel9.Intensity +
-// 				evi.PSM[i].Labels.Channel10.Intensity +
-// 				evi.PSM[i].Labels.Channel11.Intensity +
-// 				evi.PSM[i].Labels.Channel12.Intensity +
-// 				evi.PSM[i].Labels.Channel13.Intensity +
-// 				evi.PSM[i].Labels.Channel14.Intensity +
-// 				evi.PSM[i].Labels.Channel15.Intensity +
-// 				evi.PSM[i].Labels.Channel16.Intensity
-// 			psmLabelSumList = append(psmLabelSumList, Pair{evi.PSM[i].Spectrum, sum})
-// 		}
-// 	}
-
-// 	// 2nd check: best PSM
-// 	// collect all ion-related spectra from the each fraction/file
-// 	// var bestMap = make(map[string]uint8)
-// 	if best == true {
-// 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
-// 		for _, i := range evi.PSM {
-// 			if i.Labels.IsUsed == true {
-// 				specName := strings.Split(i.Spectrum, ".")
-// 				fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm)
-// 				groupedPSMMap[fqn] = append(groupedPSMMap[fqn], i)
-// 			}
-// 		}
-
-// 		for _, v := range groupedPSMMap {
-// 			if len(v) == 1 {
-// 				bestMap[v[0].Spectrum] = 0
-// 			} else {
-
-// 				var bestPSM string
-// 				var bestPSMInt float64
-// 				for _, i := range v {
-// 					tmtSum := i.Labels.Channel1.Intensity +
-// 						i.Labels.Channel2.Intensity +
-// 						i.Labels.Channel3.Intensity +
-// 						i.Labels.Channel4.Intensity +
-// 						i.Labels.Channel5.Intensity +
-// 						i.Labels.Channel6.Intensity +
-// 						i.Labels.Channel7.Intensity +
-// 						i.Labels.Channel8.Intensity +
-// 						i.Labels.Channel9.Intensity +
-// 						i.Labels.Channel10.Intensity +
-// 						i.Labels.Channel11.Intensity +
-// 						i.Labels.Channel12.Intensity +
-// 						i.Labels.Channel13.Intensity +
-// 						i.Labels.Channel14.Intensity +
-// 						i.Labels.Channel15.Intensity +
-// 						i.Labels.Channel16.Intensity
-
-// 					if tmtSum > bestPSMInt {
-// 						bestPSM = i.Spectrum
-// 						bestPSMInt = tmtSum
-// 					}
-
-// 				}
-
-// 				bestMap[bestPSM] = 0
-
-// 			}
-// 		}
-// 	}
-
-// 	var toDelete = make(map[string]uint8)
-
-// 	// 3rd check: remove the lower 3%
-// 	// Ignore all PSMs that fall under the lower 3% based on their summed TMT labels
-// 	if remove != 0 {
-// 		sort.Sort(psmLabelSumList)
-// 		lowerFive := float64(len(psmLabelSumList)) * remove
-// 		lowerFiveInt := int(uti.Round(lowerFive, 5, 0))
-
-// 		for i := 0; i <= lowerFiveInt; i++ {
-// 			toDelete[psmLabelSumList[i].Key] = 0
-// 		}
-// 	}
-
-// 	logrus.Info("Removing ", len(toDelete), " PSMs from isobaric quantification")
-
-// 	for i := range evi.PSM {
-// 		_, ok := toDelete[evi.PSM[i].Spectrum]
-// 		if ok {
-// 			evi.PSM[i].Labels.IsUsed = false
-// 		}
-// 	}
-
-// 	return evi
-// }

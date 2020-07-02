@@ -464,7 +464,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 		var flag = 0
 
 		if len(evi.PSM[i].Modifications.Index) < 1 {
-			evi.PSM[i].IsUsed = false
+			evi.PSM[i].Labels.IsUsed = false
 			evi.PSM[i].Labels.Channel1.Intensity = 0
 			evi.PSM[i].Labels.Channel2.Intensity = 0
 			evi.PSM[i].Labels.Channel3.Intensity = 0
@@ -490,7 +490,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			}
 
 			if flag == 0 {
-				evi.PSM[i].IsUsed = false
+				evi.PSM[i].Labels.IsUsed = false
 				evi.PSM[i].Labels.Channel1.Intensity = 0
 				evi.PSM[i].Labels.Channel2.Intensity = 0
 				evi.PSM[i].Labels.Channel3.Intensity = 0
@@ -515,8 +515,8 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 	return evi
 }
 
-// rollUpPeptides gathers PSM info and filters them before summing the instensities to the peptide level
-func rollUpPeptides(evi rep.Evidence) rep.Evidence {
+// RollUpPeptides gathers PSM info and filters them before summing the instensities to the peptide level
+func RollUpPeptides(evi rep.Evidence) rep.Evidence {
 
 	var labels iso.Tag
 	labels.LabeledSpectra = make(map[string]iso.Labels)
@@ -702,8 +702,8 @@ func rollUpPeptides(evi rep.Evidence) rep.Evidence {
 	return evi
 }
 
-// rollUpPeptideIons gathers PSM info and filters them before summing the instensities to the peptide ION level
-func rollUpPeptideIons(evi rep.Evidence) rep.Evidence {
+// RollUpPeptideIons gathers PSM info and filters them before summing the instensities to the peptide ION level
+func RollUpPeptideIons(evi rep.Evidence) rep.Evidence {
 
 	var labels iso.Tag
 	labels.LabeledSpectra = make(map[string]iso.Labels)
@@ -889,8 +889,8 @@ func rollUpPeptideIons(evi rep.Evidence) rep.Evidence {
 	return evi
 }
 
-// rollUpProteins gathers PSM info and filters them before summing the instensities to the peptide ION level
-func rollUpProteins(evi rep.Evidence) rep.Evidence {
+// RollUpProteins gathers PSM info and filters them before summing the instensities to the peptide ION level
+func RollUpProteins(evi rep.Evidence) rep.Evidence {
 
 	var labels iso.Tag
 	labels.LabeledSpectra = make(map[string]iso.Labels)

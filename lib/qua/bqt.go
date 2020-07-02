@@ -13,10 +13,10 @@ import (
 	"strings"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/rep"
 
 	"philosopher/lib/dat"
 	"philosopher/lib/ext/cdhit"
-	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"

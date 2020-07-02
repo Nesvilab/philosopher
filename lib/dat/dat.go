@@ -29,6 +29,7 @@ type Base struct {
 	FileName  string
 	UniProtDB string
 	CrapDB    string
+	Prefix    string
 	TaDeDB    map[string]string
 	Records   []Record
 }
@@ -98,6 +99,8 @@ func Run(m met.Data) met.Data {
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
+
+	db.Prefix = m.Database.Tag
 
 	db.Serialize()
 

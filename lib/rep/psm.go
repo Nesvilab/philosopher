@@ -298,7 +298,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 4:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
@@ -308,7 +308,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 6:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
@@ -320,7 +320,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 8:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
@@ -334,7 +334,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 10:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
@@ -350,7 +350,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 11:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
@@ -367,7 +367,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		case 16:
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				i.IsUsed,
+				i.Labels.IsUsed,
 				i.Labels.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,

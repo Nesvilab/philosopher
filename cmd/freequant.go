@@ -61,8 +61,6 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		freequant.Flags().StringVarP(&m.Quantify.Pex, "pepxml", "", "", "pepXML file or directory containing a set of pepXML files")
-		freequant.Flags().StringVarP(&m.Quantify.Tag, "tag", "", "rev_", "decoy tag")
 		freequant.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
 		freequant.Flags().BoolVarP(&m.Quantify.Isolated, "isolated", "", false, "use the isolated ion instead of the selected ion for quantification")
 		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
