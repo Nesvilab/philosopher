@@ -300,7 +300,7 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 				}
 			}
 
-			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
+			// if PSM contains only the defined mod and the correct amino acid, the add to defined category
 			// and mark it for being excluded from rest
 			for _, i := range v[0].Modifications.Index {
 				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)

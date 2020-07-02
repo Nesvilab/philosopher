@@ -195,7 +195,7 @@ func PropagateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		msg.QuantifyingData(errors.New("The PSM list is enpty"), "fatal")
+		msg.QuantifyingData(errors.New("The PSM list is empty"), "fatal")
 	}
 
 	var peptideIntMap = make(map[string]float64)
