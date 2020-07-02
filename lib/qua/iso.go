@@ -454,10 +454,8 @@ func mapLabeledSpectra(labels map[string]iso.Labels, evi []rep.PSMEvidence) []re
 	return evi
 }
 
-// the assignment of usage is only done for general PSM, not for phosphoPSMs
-// func assignUsage(evi rep.Evidence, spectrumMap map[string]iso.Labels) rep.Evidence {
-
-func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
+// CorrectUnlabelledSpectra nullifies PSMs with no TMT or iTRAQ modifications
+func CorrectUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 	for i := range evi.PSM {
 

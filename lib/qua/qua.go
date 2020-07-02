@@ -192,10 +192,10 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 		// classification and filtering based on quality filters
 		logrus.Info("Filtering spectra for label quantification")
-		evi = classification(evi, mods, p.BestPSM, p.RemoveLow, p.Purity, p.MinProb)
+		evi = Classification(evi, mods, p.BestPSM, p.RemoveLow, p.Purity, p.MinProb)
 
 		// forces psms with no label to have 0 intensities
-		evi = correctUnlabelledSpectra(evi)
+		evi = CorrectUnlabelledSpectra(evi)
 
 		evi = RollUpPeptides(evi)
 
@@ -474,7 +474,8 @@ func assignLabelNames(labels iso.Tag, labelNames map[string]string, brand, plex 
 	return labels
 }
 
-func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) rep.Evidence {
+// Classification determines if PSMs should be used or not for isobaric tag quantification rollup
+func Classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) rep.Evidence {
 
 	var approvedPSMs = make(map[string]uint8)
 	var bestMap = make(map[string]uint8)

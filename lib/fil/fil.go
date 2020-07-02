@@ -180,7 +180,7 @@ func Run(f met.Data) met.Data {
 	e = LoadLFQ(e)
 
 	// Recover isobaric tag quantification
-	e = LoadIso(e)
+	e = LoadIso(e, f.Quantify)
 
 	logrus.Info("Saving")
 	e.SerializeGranular()
@@ -809,45 +809,64 @@ func proteinProfileWithList(list []id.ProteinIdentification, decoyTag string) (t
 // LoadLFQ recovers the MS1 quantification from data saved on workspace.
 func LoadLFQ(evi rep.Evidence) rep.Evidence {
 
-	lfq := qua.NewLFQ()
-	lfq.Restore()
+	if _, err := os.Stat(sys.LFQBin()); err == nil {
 
-	for i := range evi.PSM {
+		lfq := qua.NewLFQ()
+		lfq.Restore()
 
-		s := strings.Split(evi.PSM[i].Spectrum, "#")
+		for i := range evi.PSM {
 
-		v, ok := lfq.Intensities[s[0]]
-		if ok {
-			evi.PSM[i].Intensity = v
+			s := strings.Split(evi.PSM[i].Spectrum, "#")
+
+			v, ok := lfq.Intensities[s[0]]
+			if ok {
+				evi.PSM[i].Intensity = v
+			}
 		}
-	}
 
-	evi = qua.PropagateIntensities(evi, lfq)
+		evi = qua.PropagateIntensities(evi, lfq)
+
+	}
 
 	return evi
 }
 
 // LoadIso recovers the isobaric tag quantification from data saved on workspace.
-func LoadIso(evi rep.Evidence) rep.Evidence {
+func LoadIso(evi rep.Evidence, m met.Quantify) rep.Evidence {
 
-	iso := iso.NewIsoLabels()
-	iso.Restore()
+	if _, err := os.Stat(sys.IsoBin()); err == nil {
 
-	for i := range evi.PSM {
+		iso := iso.NewIsoLabels()
+		iso.Restore()
 
-		s := strings.Split(evi.PSM[i].Spectrum, "#")
+		for i := range evi.PSM {
 
-		v, ok := iso.LabeledSpectra[s[0]]
-		if ok {
-			evi.PSM[i].Labels = v
+			s := strings.Split(evi.PSM[i].Spectrum, "#")
+
+			v, ok := iso.LabeledSpectra[s[0]]
+			if ok {
+				evi.PSM[i].Labels = v
+			}
 		}
+
+		// classification and filtering based on quality filters
+		logrus.Info("Filtering spectra for label quantification")
+		evi = qua.Classification(evi, false, m.BestPSM, m.RemoveLow, m.Purity, m.MinProb)
+
+		// forces psms with no label to have 0 intensities
+		evi = qua.CorrectUnlabelledSpectra(evi)
+
+		evi = qua.RollUpPeptides(evi)
+
+		evi = qua.RollUpPeptideIons(evi)
+
+		evi = qua.RollUpProteins(evi)
+
+		// normalize to the total protein levels
+		logrus.Info("Calculating normalized protein levels")
+		evi = qua.NormToTotalProteins(evi)
+
 	}
-
-	evi = qua.RollUpPeptides(evi)
-
-	evi = qua.RollUpPeptideIons(evi)
-
-	evi = qua.RollUpProteins(evi)
 
 	return evi
 }
