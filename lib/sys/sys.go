@@ -226,6 +226,12 @@ func LFQBin() string {
 	return p
 }
 
+// IsoBin file
+func IsoBin() string {
+	p := fmt.Sprintf("%s%siso.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
 // MODBin file
 func MODBin() string {
 	p := fmt.Sprintf("%s%smod.bin", MetaDir(), string(filepath.Separator))

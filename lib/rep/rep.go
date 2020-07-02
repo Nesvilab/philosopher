@@ -150,12 +150,13 @@ type PSMEvidence struct {
 	DiscriminantValue                float64
 	Intensity                        float64
 	IonMobility                      float64
-	Purity                           float64
-	IsDecoy                          bool
-	IsUnique                         bool
-	IsURazor                         bool
-	Labels                           iso.Labels
-	Modifications                    mod.Modifications
+	//Purity                           float64
+	IsUsed        bool
+	IsDecoy       bool
+	IsUnique      bool
+	IsURazor      bool
+	Labels        iso.Labels
+	Modifications mod.Modifications
 }
 
 // PSMEvidenceList ...

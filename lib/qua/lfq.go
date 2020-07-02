@@ -18,7 +18,6 @@ import (
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
@@ -200,8 +199,6 @@ func calculateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
 
 	var peptideIntMap = make(map[string]float64)
 	var ionIntMap = make(map[string]float64)
-
-	spew.Dump(lfq)
 
 	for i := range e.PSM {
 

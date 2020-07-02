@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 
 	"philosopher/lib/dat"
+	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
+	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 
 	"github.com/davecgh/go-spew/spew"
@@ -86,6 +88,34 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Records)
+
+		} else if object == "lfq" {
+
+			var o qua.LFQ
+
+			target := fmt.Sprintf(".meta%slfq.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			e := dec.Decode(&o)
+			if e != nil {
+				msg.DecodeMsgPck(e, "fatal")
+			}
+			spew.Dump(o.Intensities)
+
+		} else if object == "iso" {
+
+			var o iso.Tag
+
+			target := fmt.Sprintf(".meta%siso.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			e := dec.Decode(&o)
+			if e != nil {
+				msg.DecodeMsgPck(e, "fatal")
+			}
+			spew.Dump(o.LabeledSpectra)
 
 		} else if object == "protein" {
 

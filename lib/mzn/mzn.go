@@ -6,8 +6,10 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"math"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -111,6 +113,12 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 		}
 
 		spectrum := processSpectrum(i)
+
+		// left-pad the spectrum scan
+		paddedScan := fmt.Sprintf("%05s", spectrum.Scan)
+
+		fileName := strings.Replace(filepath.Clean(f), ".mzML", "", 1)
+		spectrum.SpectrumName = fmt.Sprintf("%s.%s.%s.%d", fileName, paddedScan, paddedScan, spectrum.Precursor.ChargeState)
 
 		spectra = append(spectra, spectrum)
 	}
