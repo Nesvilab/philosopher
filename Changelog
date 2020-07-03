@@ -1,5 +1,9 @@
 ### Added
+- A new Workspace option allows the use of a custom folder as a temporary folder.
 
 ### Changed
+- The "master" GitHub repository was renamed to "main".
+- Freequant and Labelquant can now be executed before the Filter command.
 
 ### Fixed
+- Small bugs and fixes.
