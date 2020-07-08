@@ -39,10 +39,9 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	for _, i := range args {
 
-		// restoring the database
-		var e rep.Evidence
-		//e.RestoreGranularWithPath(i)
-		rep.RestoreEVPSMWithPath(&e, i)
+		// restoring the PSMs
+		var psm rep.Evidence
+		rep.RestoreEVPSM(&psm)
 
 		var labels DataSetLabelNames
 		labels.LabelName = make(map[string]string)
@@ -66,18 +65,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 			}
 		}
 
-		// var annot = fmt.Sprintf("%s%sannotation.txt", i, string(filepath.Separator))
-		// if strings.Contains(i, string(filepath.Separator)) {
-		// 	i = strings.Replace(i, string(filepath.Separator), "", -1)
-		// 	labels.Name = i
-		// } else {
-		// 	labels.Name = i
-		// }
-
-		// if len(m.Quantify.Annot) > 0 {
-		// 	labels.LabelName = getLabelNames(annot)
-		// }
-
 		// collect project names
 		prjName := i
 		if strings.Contains(prjName, string(filepath.Separator)) {
@@ -87,7 +74,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
-		datasets[prjName] = e
+		datasets[prjName] = psm
 		names = append(names, prjName)
 	}
 
@@ -105,53 +92,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
 	return
-}
-
-// processPeptideCombinedFile reads and filter the combined peptide report
-func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string) {
-
-	//var list rep.CombinedPeptideEvidenceList
-	var seqMap = make(map[string]int8)
-	var chargeMap = make(map[string][]string)
-
-	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
-
-		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
-
-	} else {
-
-		var pep id.PepXML
-		var pepID id.PepIDList
-		pep.Read("combined.pep.xml")
-		pep.DecoyTag = a.Tag
-
-		for _, i := range pep.PeptideIdentification {
-			pepID = append(pepID, i)
-		}
-
-		uniqPsms := fil.GetUniquePSMs(pepID)
-		uniqPeps := fil.GetUniquePeptides(pepID)
-
-		filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
-
-		// get all peptide sequences from combined file and collapse them
-		for _, i := range filteredPeptides {
-			if !strings.HasPrefix(i.Protein, a.Tag) {
-				seqMap[i.Peptide] = 0
-			}
-		}
-
-		// get all charge states
-		for _, i := range filteredPSMs {
-			if !strings.HasPrefix(i.Protein, a.Tag) {
-				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
-			}
-		}
-
-	}
-
-	return seqMap, chargeMap
 }
 
 // collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
@@ -447,4 +387,51 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
+}
+
+// processPeptideCombinedFile reads and filter the combined peptide report
+func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string) {
+
+	//var list rep.CombinedPeptideEvidenceList
+	var seqMap = make(map[string]int8)
+	var chargeMap = make(map[string][]string)
+
+	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
+
+		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
+
+	} else {
+
+		var pep id.PepXML
+		var pepID id.PepIDList
+		pep.Read("combined.pep.xml")
+		pep.DecoyTag = a.Tag
+
+		for _, i := range pep.PeptideIdentification {
+			pepID = append(pepID, i)
+		}
+
+		uniqPsms := fil.GetUniquePSMs(pepID)
+		uniqPeps := fil.GetUniquePeptides(pepID)
+
+		filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+
+		// get all peptide sequences from combined file and collapse them
+		for _, i := range filteredPeptides {
+			if !strings.HasPrefix(i.Protein, a.Tag) {
+				seqMap[i.Peptide] = 0
+			}
+		}
+
+		// get all charge states
+		for _, i := range filteredPSMs {
+			if !strings.HasPrefix(i.Protein, a.Tag) {
+				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
+			}
+		}
+
+	}
+
+	return seqMap, chargeMap
 }

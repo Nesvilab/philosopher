@@ -3,11 +3,13 @@ package spc
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/sys"
 
 	"github.com/rogpeppe/go-charset/charset"
 
@@ -97,6 +99,32 @@ func (p *ProtXML) Parse(f string) {
 
 	p.ProteinSummary = ps
 	p.Name = filepath.Base(f)
+
+	return
+}
+
+// Parse is the main function for parsing pepxml data
+func (p *PepXML) Write() {
+
+	output := fmt.Sprintf("%s%sphilosopher.pep.xml", sys.MetaDir(), string(filepath.Separator))
+
+	file, e := os.Create(output)
+	if e != nil {
+		msg.WriteFile(e, "fatal")
+	}
+	defer file.Close()
+
+	file.WriteString(xml.Header)
+
+	enc := xml.NewEncoder(file)
+	enc.Indent("", "   ")
+
+	if e := enc.Encode(p); e != nil {
+		msg.DecodeMsgPck(e, "trace")
+	}
+
+	// copy to work directory
+	sys.CopyFile(output, filepath.Base(output))
 
 	return
 }

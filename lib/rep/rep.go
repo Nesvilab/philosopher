@@ -404,6 +404,8 @@ func Run(m met.Data) {
 
 	logrus.Info("Creating reports")
 
+	repo.PepXMLReport()
+
 	// PSM
 	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
 
