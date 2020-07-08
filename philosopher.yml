@@ -42,7 +42,7 @@ comet:
   param:                                       # comet parameter file (default "comet.params.txt")
   raw: mzML                                    # format of the spectra file
 
-msfragger:                                     # v2.3
+msfragger:                                     # v3.0
   path:                                        # path to MSFragger jar
   memory: 8                                    # how much memory in GB to use
   param:                                       # MSFragger parameter file
@@ -226,7 +226,7 @@ freequant:
   peakTimeWindow: 0.4                          # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3                       # specify the retention time window for xic (minute) (default 3)
   tolerance: 10                                # m/z tolerance in ppm (default 10)
-  isolated: false                              # use the isolated ion instead of the selected ion for quantification
+  isolated: true                               # use the isolated ion instead of the selected ion for quantification
 
 labelquant:
   annotation:                                  # annotation file with custom names for the TMT channels
@@ -239,6 +239,7 @@ labelquant:
   removeLow: 0.0                               # ignore the lower 3% PSMs based on their summed abundances
   tolerance: 20                                # m/z tolerance in ppm (default 20)
   uniqueOnly: false                            # report quantification based on only unique peptides
+  brand:                                       # isobaric labeling brand (tmt, itraq)
 
 report:
   msstats: false                               # create an output compatible to MSstats
