@@ -28,8 +28,8 @@ func NewIsoLabels() Tag {
 
 // Labels main struct
 type Labels struct {
-	Spectrum      string
-	Index         string
+	Spectrum string
+	//Index         string
 	Scan          string
 	RetentionTime float64
 	ChargeState   uint8

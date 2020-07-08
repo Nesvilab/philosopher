@@ -44,7 +44,7 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                            uint32
+	Index                            int
 	Spectrum                         string
 	SpectrumFile                     string
 	Scan                             int

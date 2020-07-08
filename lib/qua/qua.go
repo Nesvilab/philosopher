@@ -77,7 +77,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	// collect database information
 	var db dat.Base
-	db.Restore()
 
 	var labels = iso.NewIsoLabels()
 	var psmMap = make(map[string]id.PeptideIdentification)
@@ -88,7 +87,20 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
 	}
 
-	psm, _ := id.ReadPepXMLInput(".", db.Prefix, sys.GetTemp(), false)
+	var input string
+	if len(p.Pex) > 0 {
+		input = p.Pex
+	} else {
+		input = "."
+	}
+
+	fmt.Println(input)
+
+	psm, _ := id.ReadPepXMLInput(input, db.Prefix, sys.GetTemp(), false)
+
+	if len(psm) < 1 {
+		msg.NoPSMFound(errors.New("PSMs not found in data set"), "fatal")
+	}
 
 	// collect all used source file names
 	for _, i := range psm {
@@ -103,7 +115,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		paddedScan := fmt.Sprintf("%05d", i.Scan)
 
 		// left-pad the spectrum index
-		paddedIndex := fmt.Sprintf("%05d", i.Index)
+		//paddedIndex := fmt.Sprintf("%05d", i.Index)
 
 		var l iso.Labels
 		if p.Brand == "tmt" {
@@ -113,7 +125,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		}
 
 		l.Spectrum = i.Spectrum
-		l.Index = paddedIndex
+		//l.Index = paddedIndex
 		l.Scan = paddedScan
 		l.RetentionTime = i.RetentionTime
 		l.ChargeState = i.AssumedCharge

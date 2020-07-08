@@ -189,7 +189,7 @@ type SpectrumQuery struct {
 	UncalibratedPrecursorNeutralMass float64      `xml:"uncalibrated_precursor_neutral_mass,attr,omitempty"`
 	PrecursorNeutralMass             float64      `xml:"precursor_neutral_mass,attr,omitempty"`
 	AssumedCharge                    uint8        `xml:"assumed_charge,attr,omitempty"`
-	Index                            uint32       `xml:"index,attr,omitempty"`
+	Index                            int          `xml:"index,attr,omitempty"`
 	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr,omitempty"`
 	PrecursorIntensity               float64      `xml:"precursor_intensity,attr,omitempty"`
 	IonMobility                      float64      `xml:"ion_mobility,attr,omitempty"`

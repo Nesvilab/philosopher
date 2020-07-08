@@ -30,12 +30,12 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 		if mz.Spectra[i].Level == "1" {
 
 			// left-pad the spectrum index
-			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
+			//paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
 
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
 
-			mz.Spectra[i].Index = paddedIndex
+			//mz.Spectra[i].Index = paddedIndex
 			mz.Spectra[i].Scan = paddedScan
 
 			indexedMS1[paddedScan] = mz.Spectra[i]
@@ -51,7 +51,7 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 			}
 
 			// left-pad the spectrum index
-			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
+			//paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
 
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
@@ -62,7 +62,7 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 			// left-pad the precursor spectrum scan
 			paddedPS := fmt.Sprintf("%05s", mz.Spectra[i].Precursor.ParentScan)
 
-			mz.Spectra[i].Index = paddedIndex
+			//mz.Spectra[i].Index = paddedIndex
 			mz.Spectra[i].Scan = paddedScan
 			mz.Spectra[i].Precursor.ParentIndex = paddedPI
 			mz.Spectra[i].Precursor.ParentScan = paddedPS
@@ -83,7 +83,7 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 	var purities []string
 	for kLabel, vLabel := range labels.LabeledSpectra {
 
-		v2, ok := indexedMS2[vLabel.Index]
+		v2, ok := indexedMS2[vLabel.Scan]
 		if ok {
 
 			v1 := indexedMS1[v2.Precursor.ParentScan]

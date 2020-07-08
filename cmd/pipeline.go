@@ -99,8 +99,27 @@ var pipelineCmd = &cobra.Command{
 		// Abacus - combined protxml
 		meta = pip.CombinedProteinList(meta, p, dir, args)
 
-		// Filter - Quantification - Clustering - Report
-		meta = pip.FilterQuantifyReport(meta, p, dir, args)
+		// FreeQuant
+		if p.Commands.FreeQuant == "yes" {
+			//if _, err := os.Stat(sys.LFQBin()); os.IsNotExist(err) {
+			meta = pip.FreeQuant(meta, p, dir, args)
+			//}
+		}
+
+		// LabelQuant
+		if p.Commands.LabelQuant == "yes" {
+			//if _, err := os.Stat(sys.IsoBin()); os.IsNotExist(err) {
+			meta = pip.LabelQuant(meta, p, dir, args)
+			//}
+		}
+
+		// Filter - Report
+		meta = pip.FilterAndReport(meta, p, dir, args)
+
+		// BioQuant
+		if p.Commands.BioQuant == "yes" {
+			meta = pip.BioQuant(meta, p, dir, args)
+		}
 
 		// Abacus
 		meta = pip.Abacus(meta, p, dir, args)

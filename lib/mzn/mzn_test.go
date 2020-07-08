@@ -21,7 +21,7 @@ func TestRawFileParsing(t *testing.T) {
 func TestMS1Spectra(t *testing.T) {
 
 	for _, i := range msd.Spectra {
-		if i.Index == "0" && i.Scan == "1" {
+		if i.Scan == "1" {
 			spec = i
 			spec.Decode()
 			break
@@ -32,9 +32,9 @@ func TestMS1Spectra(t *testing.T) {
 		t.Errorf("Spectra number is incorrect, got %d, want %d", len(msd.Spectra), 54357)
 	}
 
-	if spec.Index != "0" {
-		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
-	}
+	// if spec.Index != "0" {
+	// 	t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
+	// }
 
 	if spec.Intensity.DecodedStream[0] != 9104.91796875 {
 		t.Errorf("Spectrum Intensity Stream is incorrect, got %f, want %f", spec.Intensity.DecodedStream[0], 9104.91796875)
@@ -44,16 +44,16 @@ func TestMS1Spectra(t *testing.T) {
 		t.Errorf("Spectrum index is incorrect, got %f, want %f", spec.Mz.DecodedStream[0], 350.1635437011719)
 	}
 
-	if spec.Index != "0" {
-		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
-	}
+	// if spec.Index != "0" {
+	// 	t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 54357)
+	// }
 
 }
 
 func TestMS2Spectra(t *testing.T) {
 
 	for _, i := range msd.Spectra {
-		if i.Index == "2" && i.Scan == "3" {
+		if i.Scan == "3" {
 			spec = i
 			spec.Decode()
 			break
@@ -64,9 +64,9 @@ func TestMS2Spectra(t *testing.T) {
 		t.Errorf("MS2 Spectra number is incorrect, got %d, want %d", len(spec.Mz.DecodedStream), 231)
 	}
 
-	if spec.Index != "2" {
-		t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 2)
-	}
+	// if spec.Index != "2" {
+	// 	t.Errorf("Spectrum index is incorrect, got %s, want %d", spec.Index, 2)
+	// }
 
 	if spec.Scan != "3" {
 		t.Errorf("Spectrum scan is incorrect, got %s, want %d", spec.Scan, 3)

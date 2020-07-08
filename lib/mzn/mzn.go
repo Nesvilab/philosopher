@@ -32,7 +32,7 @@ type Spectra []Spectrum
 
 // Spectrum tag
 type Spectrum struct {
-	Index         string
+	//Index         string
 	Scan          string
 	Level         string
 	SpectrumName  string
@@ -82,7 +82,7 @@ type IonMobility struct {
 
 func (a Spectra) Len() int           { return len(a) }
 func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
+func (a Spectra) Less(i, j int) bool { return a[i].Scan < a[j].Scan }
 
 // Read is the main function for parsing mzML data
 func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
@@ -136,7 +136,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 
 	var spec Spectrum
 
-	spec.Index = string(mzSpec.Index)
+	//spec.Index = string(mzSpec.Index)
 
 	indexStr := string(mzSpec.Index)
 	indexInt, _ := strconv.Atoi(indexStr)

@@ -109,7 +109,7 @@ type SearchParametersEvidence struct {
 // PSMEvidence struct
 type PSMEvidence struct {
 	Source                           string
-	Index                            uint32
+	Index                            int
 	Spectrum                         string
 	SpectrumFile                     string
 	Scan                             int
@@ -404,7 +404,7 @@ func Run(m met.Data) {
 
 	logrus.Info("Creating reports")
 
-	repo.PepXMLReport()
+	//repo.PepXMLReport()
 
 	// PSM
 	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)

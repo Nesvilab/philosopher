@@ -106,8 +106,8 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		// Workspace
 		wrk.Run(Version, Build, "", false, false, true, true)
 
-		// reload the meta data
-		//meta.Restore(sys.Meta())
+		// reload the meta data to avoid being overwritten with black home
+		meta.Restore(sys.Meta())
 
 		// Database
 		if p.Commands.Database == "yes" {
@@ -452,9 +452,6 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 		for _, j := range data {
 			fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
-			// if p.Commands.PTMProphet == "yes" {
-			// 	fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
-			// }
 			fqn, _ = filepath.Abs(fqn)
 			files = append(files, fqn)
 		}
@@ -522,8 +519,100 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 	return meta
 }
 
-// FilterQuantifyReport executes the Filter, Quantify and Report commands in tandem
-func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string) met.Data {
+// FreeQuant executes the LFQ method
+func FreeQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	for _, i := range data {
+
+		// getting inside  each dataset folder again
+		dsAbs, _ := filepath.Abs(i)
+		os.Chdir(dsAbs)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		logrus.Info("Executing label-free quantification on ", i)
+
+		meta.Quantify = p.Freequant
+		meta.Quantify.Dir = dsAbs
+		meta.Quantify.Format = "mzML"
+
+		qua.RunLabelFreeQuantification(meta.Quantify)
+
+		meta.Serialize()
+
+		// return to the top level directory
+		os.Chdir(dir)
+
+	}
+
+	return meta
+}
+
+// LabelQuant executes the isobaric-tag quantification method
+func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	for _, i := range data {
+
+		// getting inside  each dataset folder again
+		dsAbs, _ := filepath.Abs(i)
+		os.Chdir(dsAbs)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		logrus.Info("Executing label-based quantification on ", i)
+
+		meta.Quantify = p.LabelQuant
+		meta.Quantify.Dir = dsAbs
+		meta.Quantify.Format = "mzML"
+		meta.Quantify.Brand = p.LabelQuant.Brand
+		meta.Quantify.Pex = fmt.Sprintf("%s%sinteract.pep.xml", dsAbs, string(filepath.Separator))
+		meta.Quantify.Tag = "rev_"
+
+		meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
+
+		meta.Serialize()
+
+		// return to the top level directory
+		os.Chdir(dir)
+	}
+
+	return meta
+}
+
+// BioQuant executes the bioquant quantification method
+func BioQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	for _, i := range data {
+
+		// getting inside  each dataset folder again
+		dsAbs, _ := filepath.Abs(i)
+		os.Chdir(dsAbs)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		logrus.Info("Executing cluster on ", i)
+
+		meta.BioQuant = p.BioQuant
+
+		//clu.GenerateReport(meta)
+		qua.RunBioQuantification(meta)
+
+		meta.Serialize()
+
+		// return to the top level directory
+		os.Chdir(dir)
+	}
+
+	// return to the top level directory
+	os.Chdir(dir)
+	return meta
+}
+
+// FilterAndReport executes the Filter, Quantify and Report commands in tandem
+func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	// this is the virtual home directory where the pipeline is being executed.
 	vHome := meta.Home
@@ -573,34 +662,34 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Serialize()
 		}
 
-		// FreeQuant
-		if p.Commands.FreeQuant == "yes" {
+		// // FreeQuant
+		// if p.Commands.FreeQuant == "yes" {
 
-			logrus.Info("Executing label-free quantification on ", i)
+		// 	logrus.Info("Executing label-free quantification on ", i)
 
-			meta.Quantify = p.Freequant
-			meta.Quantify.Dir = dsAbs
-			meta.Quantify.Format = "mzML"
+		// 	meta.Quantify = p.Freequant
+		// 	meta.Quantify.Dir = dsAbs
+		// 	meta.Quantify.Format = "mzML"
 
-			qua.RunLabelFreeQuantification(meta.Quantify)
+		// 	qua.RunLabelFreeQuantification(meta.Quantify)
 
-			meta.Serialize()
-		}
+		// 	meta.Serialize()
+		// }
 
-		// LabelQuant
-		if p.Commands.LabelQuant == "yes" {
+		// // LabelQuant
+		// if p.Commands.LabelQuant == "yes" {
 
-			logrus.Info("Executing label-based quantification on ", i)
+		// 	logrus.Info("Executing label-based quantification on ", i)
 
-			meta.Quantify = p.LabelQuant
-			meta.Quantify.Dir = dsAbs
-			meta.Quantify.Format = "mzML"
-			meta.Quantify.Brand = p.LabelQuant.Brand
+		// 	meta.Quantify = p.LabelQuant
+		// 	meta.Quantify.Dir = dsAbs
+		// 	meta.Quantify.Format = "mzML"
+		// 	meta.Quantify.Brand = p.LabelQuant.Brand
 
-			meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
+		// 	meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
 
-			meta.Serialize()
-		}
+		// 	meta.Serialize()
+		// }
 
 		// Report
 		if p.Commands.Report == "yes" {
@@ -613,18 +702,18 @@ func FilterQuantifyReport(meta met.Data, p Directives, dir string, data []string
 			meta.Serialize()
 		}
 
-		// BioQuant
-		if p.Commands.BioQuant == "yes" {
+		// // BioQuant
+		// if p.Commands.BioQuant == "yes" {
 
-			logrus.Info("Executing cluster on ", i)
+		// 	logrus.Info("Executing cluster on ", i)
 
-			meta.BioQuant = p.BioQuant
+		// 	meta.BioQuant = p.BioQuant
 
-			//clu.GenerateReport(meta)
-			qua.RunBioQuantification(meta)
-			meta.Serialize()
+		// 	//clu.GenerateReport(meta)
+		// 	qua.RunBioQuantification(meta)
+		// 	meta.Serialize()
 
-		}
+		// }
 
 		// return to the top level directory
 		os.Chdir(dir)
@@ -664,6 +753,29 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 	return meta
 }
 
+// TMTIntegrator executes TMT-I on all PSM results
+func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	if p.Commands.TMTIntegrator == "yes" {
+
+		logrus.Info("Running TMT-Integrator")
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
+
+		var psms []string
+
+		for _, i := range data {
+			meta.TMTIntegrator = p.TMTIntegrator
+			psms = append(psms, fmt.Sprintf("%s%spsm.tsv", i, string(filepath.Separator)))
+		}
+
+		tmtintegrator.Run(meta, psms)
+	}
+
+	return meta
+}
+
 // BackupAndClean stores the results in a zip file and removes all meta data
 // func BackupAndClean(meta met.Data, p Directives, dir, Version, Build string, data []string) {
 
@@ -692,26 +804,3 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 // 	return
 // }
-
-// TMTIntegrator executes TMT-I on all PSM results
-func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.Data {
-
-	if p.Commands.TMTIntegrator == "yes" {
-
-		logrus.Info("Running TMT-Integrator")
-
-		// reload the meta data
-		meta.Restore(sys.Meta())
-
-		var psms []string
-
-		for _, i := range data {
-			meta.TMTIntegrator = p.TMTIntegrator
-			psms = append(psms, fmt.Sprintf("%s%spsm.tsv", i, string(filepath.Separator)))
-		}
-
-		tmtintegrator.Run(meta, psms)
-	}
-
-	return meta
-}

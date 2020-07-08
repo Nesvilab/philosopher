@@ -139,8 +139,8 @@ func TestPepXML_Parse(t *testing.T) {
 				t.Errorf("Hit Rank is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].SearchResult.SearchHit[0].HitRank, uint8(1))
 			}
 
-			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index != uint32(1) {
-				t.Errorf("Index is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index, uint32(1))
+			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index != 1 {
+				t.Errorf("Index is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index, 1)
 			}
 
 			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].SearchResult.SearchHit[0].IsRejected != uint8(0) {
