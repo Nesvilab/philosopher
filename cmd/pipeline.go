@@ -62,34 +62,34 @@ var pipelineCmd = &cobra.Command{
 
 		if len(args) < 1 {
 			msg.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
-		} else if p.Commands.Abacus == "true" && len(args) < 2 {
+		} else if p.Steps.IntegratedReports == "true" && len(args) < 2 {
 			msg.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
 		}
 
 		// Workspace - Database
-		if p.Commands.Workspace == "yes" {
-			meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
-		}
+		//if p.Steps.Workspace == "yes" {
+		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
+		//}
 
 		// Comet - MSFragger
-		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-			msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
-		} else if p.Commands.Comet == "yes" || p.Commands.MSFragger == "yes" {
-			meta = pip.DatabaseSearch(meta, p, dir, args)
+		if p.DatabaseSearch.SearchEngine == "comet" || p.DatabaseSearch.SearchEngine == "msfragger" {
+			meta = pip.DBSearch(meta, p, dir, args)
+		} else {
+			msg.Custom(errors.New("Unknown database search engine"), "fatal")
 		}
 
 		// PeptideProphet
-		if p.Commands.PeptideProphet == "yes" {
+		if p.Steps.PeptideValidation == "yes" {
 			meta = pip.PeptideProphet(meta, p, dir, args)
 		}
 
 		// PTMProphet
-		if p.Commands.PTMProphet == "yes" {
+		if p.Steps.PTMLocalization == "yes" {
 			meta = pip.PTMProphet(meta, p, dir, args)
 		}
 
 		// ProteinProphet
-		if p.Commands.ProteinProphet == "yes" {
+		if p.Steps.ProteinInference == "yes" {
 			meta = pip.ProteinProphet(meta, p, dir, args)
 		}
 
@@ -100,12 +100,12 @@ var pipelineCmd = &cobra.Command{
 		meta = pip.CombinedProteinList(meta, p, dir, args)
 
 		// FreeQuant
-		if p.Commands.FreeQuant == "yes" {
+		if p.Steps.LabelFreeQuantification == "yes" {
 			meta = pip.FreeQuant(meta, p, dir, args)
 		}
 
 		// LabelQuant
-		if p.Commands.LabelQuant == "yes" {
+		if p.Steps.IsobaricQuantification == "yes" {
 			meta = pip.LabelQuant(meta, p, dir, args)
 		}
 
@@ -113,7 +113,7 @@ var pipelineCmd = &cobra.Command{
 		meta = pip.FilterAndReport(meta, p, dir, args)
 
 		// BioQuant
-		if p.Commands.BioQuant == "yes" {
+		if p.Steps.BioClusterQuantification == "yes" {
 			meta = pip.BioQuant(meta, p, dir, args)
 		}
 

@@ -37,10 +37,8 @@ type Directives struct {
 	SlackToken     string             `yaml:"slackToken"`
 	SlackChannel   string             `yaml:"slackChannel"`
 	SlackUserID    string             `yaml:"slackUserID"`
-	Commands       Commands           `yaml:"commands"`
-	Database       met.Database       `yaml:"database"`
-	MSFragger      met.MSFragger      `yaml:"msfragger"`
-	Comet          met.Comet          `yaml:"comet"`
+	Steps          Steps              `yaml:"commands"`
+	DatabaseSearch DatabaseSearch     `yaml:"database_search"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
 	PTMProphet     met.PTMProphet     `yaml:"ptmprophet"`
 	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
@@ -51,27 +49,29 @@ type Directives struct {
 	BioQuant       met.BioQuant       `yaml:"bioquant"`
 	Abacus         met.Abacus         `yaml:"abacus"`
 	TMTIntegrator  met.TMTIntegrator  `yaml:"tmtintegrator"`
-	//Clean          bool               `yaml:"clean"`
-	//Backup         bool               `yaml:"backup"`
-	//Analtics       bool               `yaml:"analytics"`
 }
 
-// Commands struct {
-type Commands struct {
-	Workspace      string `yaml:"workspace"`
-	Database       string `yaml:"database"`
-	MSFragger      string `yaml:"msfragger"`
-	Comet          string `yaml:"comet"`
-	PeptideProphet string `yaml:"peptideprophet"`
-	PTMProphet     string `yaml:"ptmprophet"`
-	ProteinProphet string `yaml:"proteinprophet"`
-	Filter         string `yaml:"filter"`
-	FreeQuant      string `yaml:"freequant"`
-	LabelQuant     string `yaml:"labelquant"`
-	Report         string `yaml:"report"`
-	BioQuant       string `yaml:"bioquant"`
-	Abacus         string `yaml:"abacus"`
-	TMTIntegrator  string `yaml:"tmtintegrator"`
+// Steps contains the high-level elements of the analysis to be executed
+type Steps struct {
+	DatabaseSearch           string `yaml:"database_search"`
+	PeptideValidation        string `yaml:"peptide_validation"`
+	PTMLocalization          string `yaml:"ptm_localization"`
+	ProteinInference         string `yaml:"protein_inference"`
+	LabelFreeQuantification  string `yaml:"label_free_quantification"`
+	IsobaricQuantification   string `yaml:"isobaric_quantification"`
+	BioClusterQuantification string `yaml:"bio_cluster_quantification"`
+	FDRFiltering             string `yaml:"fdr_filtering"`
+	IndividualReports        string `yaml:"individual_reports"`
+	IntegratedReports        string `yaml:"integrated_reports"`
+	TMTIntegrator            string `yaml:"tmt_integrator"`
+}
+
+// DatabaseSearch keeps the options related to the search step
+type DatabaseSearch struct {
+	SearchEngine string
+	Database     met.Database  `yaml:"database"`
+	MSFragger    met.MSFragger `yaml:"msfragger"`
+	Comet        met.Comet     `yaml:"comet"`
 }
 
 // DeployParameterFile deploys the pipeline yaml config file
@@ -110,11 +110,11 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		meta.Restore(sys.Meta())
 
 		// Database
-		if p.Commands.Database == "yes" {
-			meta.Database = p.Database
-			dat.Run(meta)
-			meta.Serialize()
-		}
+		//if p.Commands.Database == "yes" {
+		meta.Database = p.DatabaseSearch.Database
+		dat.Run(meta)
+		meta.Serialize()
+		//}
 
 		met.CleanTemp(meta.Temp)
 
@@ -125,8 +125,8 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 	return meta
 }
 
-// DatabaseSearch executes the search engines if requested
-func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
+// DBSearch executes the search engines if requested
+func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	logrus.Info("Running the Database Search on all data")
 
@@ -135,7 +135,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 
 	var mzFiles []string
 
-	if p.Commands.Comet == "yes" {
+	if p.DatabaseSearch.SearchEngine == "comet" {
 
 		for _, i := range data {
 
@@ -143,8 +143,8 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			dsAbs, _ := filepath.Abs(i)
 			os.Chdir(dsAbs)
 
-			meta.Comet = p.Comet
-			gobExtC := fmt.Sprintf("*.%s", p.Comet.RawExtension)
+			meta.Comet = p.DatabaseSearch.Comet
+			gobExtC := fmt.Sprintf("*.%s", p.DatabaseSearch.Comet.RawExtension)
 			filesC, e := filepath.Glob(gobExtC)
 			if e != nil {
 				msg.Custom(e, "fatal")
@@ -165,7 +165,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 		meta.SearchEngine = "Comet"
 	}
 
-	if p.Commands.MSFragger == "yes" {
+	if p.DatabaseSearch.SearchEngine == "msfragger" {
 
 		for _, i := range data {
 
@@ -173,11 +173,11 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 			dsAbs, _ := filepath.Abs(i)
 			os.Chdir(dsAbs)
 
-			meta.MSFragger = p.MSFragger
-			meta.MSFragger.DatabaseName = p.Database.Annot
-			meta.MSFragger.DecoyPrefix = p.Database.Tag
+			meta.MSFragger = p.DatabaseSearch.MSFragger
+			meta.MSFragger.DatabaseName = p.DatabaseSearch.Database.Annot
+			meta.MSFragger.DecoyPrefix = p.DatabaseSearch.Database.Tag
 
-			gobExtM := fmt.Sprintf("*.%s", p.MSFragger.RawExtension)
+			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
 				msg.Custom(e, "fatal")
@@ -195,7 +195,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 		}
 
 		// MSFragger
-		if p.Commands.MSFragger == "yes" {
+		if p.DatabaseSearch.SearchEngine == "msfragger" {
 			msfragger.Run(meta, mzFiles)
 			meta.SearchEngine = "MSFragger"
 		}
@@ -209,7 +209,7 @@ func DatabaseSearch(meta met.Data, p Directives, dir string, data []string) met.
 // Prophets execute the TPP Prophets
 func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.Commands.PeptideProphet == "yes" || p.Commands.ProteinProphet == "yes" || p.Commands.PTMProphet == "yes" {
+	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
 		for _, i := range data {
 
 			logrus.Info("Running the validation and inference on ", i)
@@ -222,11 +222,11 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			meta.Restore(sys.Meta())
 
 			// PeptideProphet
-			if p.Commands.PeptideProphet == "yes" {
+			if p.Steps.PeptideValidation == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.Database.Annot
-				meta.PeptideProphet.Decoy = p.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -239,7 +239,7 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			}
 
 			// PTMProphet
-			if p.Commands.PTMProphet == "yes" {
+			if p.Steps.PTMLocalization == "yes" {
 				logrus.Info("Executing PTMProphet on ", i)
 				meta.PTMProphet = p.PTMProphet
 				var files []string
@@ -250,12 +250,12 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			}
 
 			// ProteinProphet
-			if p.Commands.ProteinProphet == "yes" {
+			if p.Steps.ProteinInference == "yes" {
 				logrus.Info("Executing ProteinProphet on ", i)
 				meta.ProteinProphet = p.ProteinProphet
 				meta.ProteinProphet.Output = "interact"
 				var files []string
-				if p.Commands.PTMProphet == "yes" {
+				if p.Steps.PTMLocalization == "yes" {
 					files = append(files, "interact.mod.pep.xml")
 				} else {
 					files = append(files, "interact.pep.xml")
@@ -289,11 +289,11 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 			meta.Restore(sys.Meta())
 
 			// PeptideProphet
-			if p.Commands.PeptideProphet == "yes" {
+			if p.Steps.PeptideValidation == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.Database.Annot
-				meta.PeptideProphet.Decoy = p.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -314,11 +314,11 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 		wg.Add(len(data))
 
 		meta.Restore(sys.Meta())
-		meta.Database = p.Database
+		meta.Database = p.DatabaseSearch.Database
 
 		for _, ds := range data {
 
-			db := p.Database.Annot
+			db := p.DatabaseSearch.Database.Annot
 
 			go func(ds, db string) {
 				defer wg.Done()
@@ -335,8 +335,8 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 				// PeptideProphet
 				logrus.Info("Executing PeptideProphet on ", ds)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.Database.Annot
-				meta.PeptideProphet.Decoy = p.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 
@@ -378,7 +378,7 @@ func PTMProphet(meta met.Data, p Directives, dir string, data []string) met.Data
 		meta.Restore(sys.Meta())
 
 		// PTMProphet
-		if p.Commands.PTMProphet == "yes" {
+		if p.Steps.PTMLocalization == "yes" {
 			logrus.Info("Executing PTMProphet on ", i)
 			meta.PTMProphet = p.PTMProphet
 			var files []string
@@ -411,12 +411,12 @@ func ProteinProphet(meta met.Data, p Directives, dir string, data []string) met.
 		meta.Restore(sys.Meta())
 
 		// ProteinProphet
-		if p.Commands.ProteinProphet == "yes" {
+		if p.Steps.ProteinInference == "yes" {
 			logrus.Info("Executing ProteinProphet on ", i)
 			meta.ProteinProphet = p.ProteinProphet
 			meta.ProteinProphet.Output = "interact"
 			var files []string
-			if p.Commands.PTMProphet == "yes" {
+			if p.Steps.PTMLocalization == "yes" {
 				files = append(files, "interact.mod.pep.xml")
 			} else {
 				files = append(files, "interact.pep.xml")
@@ -438,7 +438,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 	var combinedPepXML string
 
-	if p.Commands.Abacus == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
 
 		logrus.Info("Integrating peptide validation")
 
@@ -480,7 +480,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 	var combinedProtXML string
 
-	if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
 
 		logrus.Info("Creating combined protein inference")
 
@@ -498,7 +498,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		for _, j := range data {
 			fqn := fmt.Sprintf("%s%sinteract.pep.xml", j, string(filepath.Separator))
-			if p.Commands.PTMProphet == "yes" {
+			if p.Steps.PTMLocalization == "yes" {
 				fqn = fmt.Sprintf("%s%sinteract.mod.pep.xml", j, string(filepath.Separator))
 			}
 			fqn, _ = filepath.Abs(fqn)
@@ -635,15 +635,15 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 		meta.Restore(sys.Meta())
 
 		// Filter
-		if p.Commands.Filter == "yes" {
+		if p.Steps.FDRFiltering == "yes" {
 
 			logrus.Info("Executing filter on ", i)
 			meta.Filter = p.Filter
-			meta.Filter.Tag = p.Database.Tag
+			meta.Filter.Tag = p.DatabaseSearch.Database.Tag
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
-				if p.Commands.PTMProphet == "yes" {
+				if p.Steps.PTMLocalization == "yes" {
 					meta.Filter.Pex = "interact.mod.pep.xml"
 				}
 			} else {
@@ -656,9 +656,9 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 				meta.Filter.Pox = p.Filter.Pox
 			}
 
-			if p.Commands.Abacus == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
+			if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
-			} else if p.Commands.Abacus == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
+			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false
@@ -671,7 +671,7 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 		}
 
 		// Report
-		if p.Commands.Report == "yes" {
+		if p.Steps.IndividualReports == "yes" {
 
 			logrus.Info("Executing report on ", i)
 
@@ -692,7 +692,7 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 // Abacus loads all data and creates the combined protein report
 func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.Commands.Abacus == "yes" {
+	if p.Steps.IntegratedReports == "yes" {
 
 		logrus.Info("Executing abacus")
 
@@ -703,7 +703,7 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 		meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
-		meta.Abacus.Tag = p.Database.Tag
+		meta.Abacus.Tag = p.DatabaseSearch.Database.Tag
 		meta.Abacus.Picked = p.Filter.Picked
 		meta.Abacus.Razor = p.Filter.Razor
 
@@ -720,7 +720,7 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 // TMTIntegrator executes TMT-I on all PSM results
 func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.Commands.TMTIntegrator == "yes" {
+	if p.Steps.TMTIntegrator == "yes" {
 
 		logrus.Info("Running TMT-Integrator")
 
@@ -739,32 +739,3 @@ func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.D
 
 	return meta
 }
-
-// BackupAndClean stores the results in a zip file and removes all meta data
-// func BackupAndClean(meta met.Data, p Directives, dir, Version, Build string, data []string) {
-
-// 	logrus.Info("Savig results and cleaning the workspaces")
-
-// 	for _, i := range data {
-
-// 		// getting inside de the dataset folder
-// 		localDir, _ := filepath.Abs(i)
-// 		os.Chdir(localDir)
-
-// 		// reload the meta data
-// 		meta.Restore(sys.Meta())
-
-// 		// Backup
-// 		if p.Backup == true {
-// 			wrk.Run(Version, Build, true, false, false, true)
-// 		}
-
-// 		// Clean
-// 		if p.Clean == true {
-// 			wrk.Run(Version, Build, false, true, false, true)
-// 		}
-
-// 	}
-
-// 	return
-// }

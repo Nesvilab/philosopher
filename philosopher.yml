@@ -12,121 +12,117 @@
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
 
-analytics: true                                # reports when a workspace is created for usage statistics
-slackToken:                                    # specify the Slack API token (how to generate a token: https://api.slack.com/legacy/custom-integrations/legacy-tokens)
-slackChannel:                                  # specify the channel name, or
-slackUserID:                                   # specify a user ID for a direct message
+analytics: true                                  # reports when a workspace is created for usage statistics
+slackToken:                                      # specify the Slack API token (how to generate a token: https://api.slack.com/legacy/custom-integrations/legacy-tokens)
+slackChannel:                                    # specify the channel name, or
+slackUserID:                                     # specify a user ID for a direct message
 
-commands:
-  workspace: yes                               # manage the experiment workspace for the analysis
-  database: yes                                # target-decoy database formatting
-  comet: no                                    # peptide spectrum matching with Comet
-  msfragger: no                                # peptide spectrum matching with MSFragger
-  peptideprophet: no                           # peptide assignment validation
-  ptmprophet: no                               # PTM site localization
-  proteinprophet: no                           # protein identification validation
-  freequant: no                                # label-free Quantification
-  labelquant: no                               # isobaric Labeling-Based Relative Quantification
-  filter: no                                   # statistical filtering, validation and False Discovery Rates assessment
-  bioquant: no                                 # protein report based on Uniprot protein clusters
-  report: no                                   # multi-level reporting for both narrow-searches and open-searches
-  abacus: no                                   # combined analysis of LC-MS/MS results
-  tmtintegrator: no                            # integrates channel abundances from multiple TMT samples
+steps:
+  database_search: yes                           # peptide to spectrum matching with Comet or MSFragger
+  peptide_validation: yes                        # peptide assignment validation with PeptideProphet
+  ptm_localization: yes                          # PTM site localization with PTMProphet
+  protein_inference: yes                         # protein identification validation with ProteinProphet
+  label_free_quantification: yes                 # precursor label-free quantification inspired by moFF
+  isobaric_quantification: yes                   # isobaric labeling-based relative quantification for TMT and iTRAQ
+  bio_cluster_quantification: yes                # protein report based on Uniprot protein clusters
+  fdr_filtering: yes                             # statistical filtering, validation and false discovery r ates assessment
+  individual_reports: yes                        # multi-level reporting for both narrow-searches and open-searches
+  integrated_reports: yes                        # combined analysis of LC-MS/MS results inspired by Abacus
+  integrated_isobaric_quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-database:
-  protein_database:                            # path to the target-decoy protein database
-  decoy_tag: rev_                              # prefix tag used added to decoy sequences
-
-comet:
-  noindex: true                                # skip raw file indexing
-  param:                                       # comet parameter file (default "comet.params.txt")
-  raw: mzML                                    # format of the spectra file
-
-msfragger:                                     # v3.0
-  path:                                        # path to MSFragger jar
-  memory: 8                                    # how much memory in GB to use
-  param:                                       # MSFragger parameter file
-  raw: mzML                                    # spectra format
-  num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
-  precursor_mass_lower: -50                    # lower bound of the precursor mass window
-  precursor_mass_upper: 50                     # upper bound of the precursor mass window
-  precursor_mass_units: 1                      # 0=Daltons, 1=ppm
-  precursor_true_tolerance: 20                 # true precursor mass tolerance (window is +/- this value)
-  precursor_true_units: 1                      # 0=Daltons, 1=ppm
-  fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
-  fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
-  calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
-  deisotope: 1                                 # activates deisotoping.
-  isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
-  mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
-  precursor_mass_mode: selected                # selected or isolated
-  localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
-  delta_mass_exclude_ranges: (-1.5,3.5)        # exclude mass range for shifted ions searching
-  fragment_ion_series: b,y                     # ion series used in search
-  search_enzyme_name: Trypsin                  # name of enzyme to be written to the pepXML file
-  search_enzyme_cutafter: KR                   # residues after which the enzyme cuts
-  search_enzyme_butnotafter: P                 # residues that the enzyme will not cut before
-  num_enzyme_termini: 2                        # 2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion
-  allowed_missed_cleavage: 1                   # maximum value is 5
-  clip_nTerm_M: 1                              # specifies the trimming of a protein N-terminal methionine as a variable modification (0 or 1)
-  variable_mod_01: 15.99490 M 3                # variable modification
-  variable_mod_02: 42.01060 [^ 1               # variable modification
-  variable_mod_03:                             # variable modification
-  variable_mod_04:                             # variable modification
-  variable_mod_05:                             # variable modification
-  variable_mod_06:                             # variable modification
-  variable_mod_07:                             # variable modification
-  allow_multiple_variable_mods_on_residue: 0   # static mods are not considered
-  max_variable_mods_per_peptide: 3             # maximum of 5
-  max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
-  output_file_extension: pepXML                # file extension of output files
-  output_format: pepXML                        # file format of output files (pepXML or tsv)
-  output_report_topN: 1                        # reports top N PSMs per input spectrum
-  output_max_expect: 50                        # suppresses reporting of PSM if top hit has expectation greater than this threshold
-  report_alternative_proteins: 0               # 0=no, 1=yes
-  precursor_charge: 1 4                        # assume range of potential precursor charge states. Only relevant when override_charge is set to 1
-  override_charge: 0                           # 0=no, 1=yes to override existing precursor charge states with precursor_charge parameter
-  digest_min_length: 7                         # minimum length of peptides to be generated during in-silico digestion
-  digest_max_length: 50                        # maximum length of peptides to be generated during in-silico digestion
-  digest_mass_range: 500.0 5000.0              # mass range of peptides to be generated during in-silico digestion in Daltons
-  max_fragment_charge: 2                       # maximum charge state for theoretical fragments to match (1-4)
-  track_zero_topN: 0                           # in addition to topN results, keep track of top results in zero bin
-  zero_bin_accept_expect: 0                    # boost top zero bin entry to top if it has expect under 0.01 - set to 0 to disable
-  zero_bin_mult_expect: 1                      # disabled if above passes - multiply expect of zero bin for ordering purposes (does not affect reported expect)
-  add_topN_complementary: 0                    # inserts complementary ions corresponding to the top N most intense fragments in each experimental spectra
-  minimum_peaks: 15                            # required minimum number of peaks in spectrum to search (default 10)
-  use_topN_peaks: 100                          # pre-process experimental spectrum to only use top N peaks
-  min_fragments_modelling: 2                   # minimum number of matched peaks in PSM for inclusion in statistical modeling
-  min_matched_fragments: 4                     # minimum number of matched peaks for PSM to be reported
-  minimum_ratio: 0.01                          # filters out all peaks in experimental spectrum less intense than this multiple of the base peak intensity
-  clear_mz_range: 0.0 0.0                      # for iTRAQ/TMT type data; will clear out all peaks in the specified m/z range
-  remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
-  remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
-  intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
-  add_Cterm_peptide: 0.000000                  # c-term peptide fixed modifications
-  add_Cterm_protein: 0.000000                  # c-term protein fixed modifications
-  add_Nterm_peptide: 0.000000                  # n-term peptide fixed modifications
-  add_Nterm_protein: 0.000000                  # n-term protein fixed modifications
-  add_A_alanine: 0.000000                      # alanine fixed modifications 
-  add_C_cysteine: 57.021464                    # cysteine fixed modifications 
-  add_D_aspartic_acid: 0.000000                # aspartic acid fixed modifications
-  add_E_glutamic_acid: 0.000000                # glutamic acid fixed modifications
-  add_F_phenylalanine: 0.000000                # phenylalanine fixed modifications
-  add_G_glycine: 0.000000                      # glycine fixed modifications
-  add_H_histidine: 0.000000                    # histidine fixed modifications
-  add_I_isoleucine: 0.000000                   # isoleucine fixed modifications
-  add_K_lysine: 0.000000                       # lysine fixed modifications
-  add_L_leucine: 0.000000                      # leucine fixed modifications
-  add_M_methionine: 0.000000                   # methionine fixed modifications
-  add_N_asparagine: 0.000000                   # asparagine fixed modifications
-  add_P_proline: 0.000000                      # proline fixed modifications
-  add_Q_glutamine: 0.000000                    # glutamine fixed modifications
-  add_R_arginine: 0.000000                     # arginine fixed modifications
-  add_S_serine: 0.000000                       # serine fixed modifications
-  add_T_threonine: 0.000000                    # threonine fixed modifications
-  add_V_valine: 0.000000                       # valine fixed modifications
-  add_W_tryptophan: 0.000000                   # tryptophan fixed modifications
-  add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
+database_search:
+  protein_database:                              # path to the target-decoy protein database
+  decoy_tag: rev_                                # prefix tag used added to decoy sequences
+  search_engine: comet                           # search engine options include comet and msfragger
+  comet:
+    noindex: true                                # skip mzML file indexing
+    param:                                       # comet parameter file (default "comet.params.txt")
+    raw: mzML                                    # format of the spectra file
+  msfragger:                                     # v3.0
+    path:                                        # path to MSFragger jar
+    memory: 8                                    # how much memory in GB to use
+    param:                                       # MSFragger parameter file
+    raw: mzML                                    # spectra format
+    num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
+    precursor_mass_lower: -50                    # lower bound of the precursor mass window
+    precursor_mass_upper: 50                     # upper bound of the precursor mass window
+    precursor_mass_units: 1                      # 0=Daltons, 1=ppm
+    precursor_true_tolerance: 20                 # true precursor mass tolerance (window is +/- this value)
+    precursor_true_units: 1                      # 0=Daltons, 1=ppm
+    fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
+    fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
+    calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
+    deisotope: 1                                 # activates deisotoping.
+    isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
+    mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
+    precursor_mass_mode: selected                # selected or isolated
+    localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
+    delta_mass_exclude_ranges: (-1.5,3.5)        # exclude mass range for shifted ions searching
+    fragment_ion_series: b,y                     # ion series used in search
+    search_enzyme_name: Trypsin                  # name of enzyme to be written to the pepXML file
+    search_enzyme_cutafter: KR                   # residues after which the enzyme cuts
+    search_enzyme_butnotafter: P                 # residues that the enzyme will not cut before
+    num_enzyme_termini: 2                        # 2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion
+    allowed_missed_cleavage: 1                   # maximum value is 5
+    clip_nTerm_M: 1                              # specifies the trimming of a protein N-terminal methionine as a variable modification (0 or 1)
+    variable_mod_01: 15.99490 M 3                # variable modification
+    variable_mod_02: 42.01060 [^ 1               # variable modification
+    variable_mod_03:                             # variable modification
+    variable_mod_04:                             # variable modification
+    variable_mod_05:                             # variable modification
+    variable_mod_06:                             # variable modification
+    variable_mod_07:                             # variable modification
+    allow_multiple_variable_mods_on_residue: 0   # static mods are not considered
+    max_variable_mods_per_peptide: 3             # maximum of 5
+    max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
+    output_file_extension: pepXML                # file extension of output files
+    output_format: pepXML                        # file format of output files (pepXML or tsv)
+    output_report_topN: 1                        # reports top N PSMs per input spectrum
+    output_max_expect: 50                        # suppresses reporting of PSM if top hit has expectation greater than this threshold
+    report_alternative_proteins: 0               # 0=no, 1=yes
+    precursor_charge: 1 4                        # assume range of potential precursor charge states. Only relevant when override_charge is set to 1
+    override_charge: 0                           # 0=no, 1=yes to override existing precursor charge states with precursor_charge parameter
+    digest_min_length: 7                         # minimum length of peptides to be generated during in-silico digestion
+    digest_max_length: 50                        # maximum length of peptides to be generated during in-silico digestion
+    digest_mass_range: 500.0 5000.0              # mass range of peptides to be generated during in-silico digestion in Daltons
+    max_fragment_charge: 2                       # maximum charge state for theoretical fragments to match (1-4)
+    track_zero_topN: 0                           # in addition to topN results, keep track of top results in zero bin
+    zero_bin_accept_expect: 0                    # boost top zero bin entry to top if it has expect under 0.01 - set to 0 to disable
+    zero_bin_mult_expect: 1                      # disabled if above passes - multiply expect of zero bin for ordering purposes (does not affect reported expect)
+    add_topN_complementary: 0                    # inserts complementary ions corresponding to the top N most intense fragments in each experimental spectra
+    minimum_peaks: 15                            # required minimum number of peaks in spectrum to search (default 10)
+    use_topN_peaks: 100                          # pre-process experimental spectrum to only use top N peaks
+    min_fragments_modelling: 2                   # minimum number of matched peaks in PSM for inclusion in statistical modeling
+    min_matched_fragments: 4                     # minimum number of matched peaks for PSM to be reported
+    minimum_ratio: 0.01                          # filters out all peaks in experimental spectrum less intense than this multiple of the base peak intensity
+    clear_mz_range: 0.0 0.0                      # for iTRAQ/TMT type data; will clear out all peaks in the specified m/z range
+    remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
+    remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
+    intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
+    add_Cterm_peptide: 0.000000                  # c-term peptide fixed modifications
+    add_Cterm_protein: 0.000000                  # c-term protein fixed modifications
+    add_Nterm_peptide: 0.000000                  # n-term peptide fixed modifications
+    add_Nterm_protein: 0.000000                  # n-term protein fixed modifications
+    add_A_alanine: 0.000000                      # alanine fixed modifications 
+    add_C_cysteine: 57.021464                    # cysteine fixed modifications 
+    add_D_aspartic_acid: 0.000000                # aspartic acid fixed modifications
+    add_E_glutamic_acid: 0.000000                # glutamic acid fixed modifications
+    add_F_phenylalanine: 0.000000                # phenylalanine fixed modifications
+    add_G_glycine: 0.000000                      # glycine fixed modifications
+    add_H_histidine: 0.000000                    # histidine fixed modifications
+    add_I_isoleucine: 0.000000                   # isoleucine fixed modifications
+    add_K_lysine: 0.000000                       # lysine fixed modifications
+    add_L_leucine: 0.000000                      # leucine fixed modifications
+    add_M_methionine: 0.000000                   # methionine fixed modifications
+    add_N_asparagine: 0.000000                   # asparagine fixed modifications
+    add_P_proline: 0.000000                      # proline fixed modifications
+    add_Q_glutamine: 0.000000                    # glutamine fixed modifications
+    add_R_arginine: 0.000000                     # arginine fixed modifications
+    add_S_serine: 0.000000                       # serine fixed modifications
+    add_T_threonine: 0.000000                    # threonine fixed modifications
+    add_V_valine: 0.000000                       # valine fixed modifications
+    add_W_tryptophan: 0.000000                   # tryptophan fixed modifications
+    add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
   
 peptideprophet:                                # v5.2
   concurrent: false                            # Concurrent execution of multiple instaces
