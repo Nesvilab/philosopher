@@ -37,7 +37,7 @@ type Directives struct {
 	SlackToken     string             `yaml:"slackToken"`
 	SlackChannel   string             `yaml:"slackChannel"`
 	SlackUserID    string             `yaml:"slackUserID"`
-	Steps          Steps              `yaml:"commands"`
+	Steps          Steps              `yaml:"steps"`
 	DatabaseSearch DatabaseSearch     `yaml:"database_search"`
 	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
 	PTMProphet     met.PTMProphet     `yaml:"ptmprophet"`
@@ -68,10 +68,11 @@ type Steps struct {
 
 // DatabaseSearch keeps the options related to the search step
 type DatabaseSearch struct {
-	SearchEngine string
-	Database     met.Database  `yaml:"database"`
-	MSFragger    met.MSFragger `yaml:"msfragger"`
-	Comet        met.Comet     `yaml:"comet"`
+	SearchEngine    string        `yaml:"search_engine"`
+	ProteinDatabase string        `yaml:"protein_database"`
+	DecoyTag        string        `yaml:"decoy_tag"`
+	MSFragger       met.MSFragger `yaml:"msfragger"`
+	Comet           met.Comet     `yaml:"comet"`
 }
 
 // DeployParameterFile deploys the pipeline yaml config file
@@ -111,7 +112,8 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 
 		// Database
 		//if p.Commands.Database == "yes" {
-		meta.Database = p.DatabaseSearch.Database
+		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+		meta.Database.Tag = p.DatabaseSearch.DecoyTag
 		dat.Run(meta)
 		meta.Serialize()
 		//}
@@ -174,8 +176,8 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 			os.Chdir(dsAbs)
 
 			meta.MSFragger = p.DatabaseSearch.MSFragger
-			meta.MSFragger.DatabaseName = p.DatabaseSearch.Database.Annot
-			meta.MSFragger.DecoyPrefix = p.DatabaseSearch.Database.Tag
+			meta.MSFragger.DatabaseName = p.DatabaseSearch.ProteinDatabase
+			meta.MSFragger.DecoyPrefix = p.DatabaseSearch.DecoyTag
 
 			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.RawExtension)
 			filesM, e := filepath.Glob(gobExtM)
@@ -225,8 +227,8 @@ func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 			if p.Steps.PeptideValidation == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
-				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -292,8 +294,8 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 			if p.Steps.PeptideValidation == "yes" {
 				logrus.Info("Executing PeptideProphet on ", i)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
-				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
@@ -314,11 +316,12 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 		wg.Add(len(data))
 
 		meta.Restore(sys.Meta())
-		meta.Database = p.DatabaseSearch.Database
+		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+		meta.Database.Tag = p.DatabaseSearch.DecoyTag
 
 		for _, ds := range data {
 
-			db := p.DatabaseSearch.Database.Annot
+			db := p.DatabaseSearch.ProteinDatabase
 
 			go func(ds, db string) {
 				defer wg.Done()
@@ -335,8 +338,8 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 				// PeptideProphet
 				logrus.Info("Executing PeptideProphet on ", ds)
 				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.DatabaseSearch.Database.Annot
-				meta.PeptideProphet.Decoy = p.DatabaseSearch.Database.Tag
+				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
 				meta.PeptideProphet.Output = "interact"
 				meta.PeptideProphet.Combine = true
 
@@ -540,6 +543,8 @@ func FreeQuant(meta met.Data, p Directives, dir string, data []string) met.Data 
 		meta.Quantify = p.Freequant
 		meta.Quantify.Dir = dsAbs
 		meta.Quantify.Format = "mzML"
+		meta.Quantify.Pex = fmt.Sprintf("%s%sinteract.pep.xml", dsAbs, string(filepath.Separator))
+		meta.Quantify.Tag = "rev_"
 
 		qua.RunLabelFreeQuantification(meta.Quantify)
 
@@ -623,7 +628,7 @@ func BioQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
 func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	// this is the virtual home directory where the pipeline is being executed.
-	vHome := meta.Home
+	//vHome := meta.Home
 
 	for _, i := range data {
 
@@ -639,7 +644,7 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 
 			logrus.Info("Executing filter on ", i)
 			meta.Filter = p.Filter
-			meta.Filter.Tag = p.DatabaseSearch.Database.Tag
+			meta.Filter.Tag = p.DatabaseSearch.DecoyTag
 
 			if len(p.Filter.Pex) == 0 {
 				meta.Filter.Pex = "interact.pep.xml"
@@ -656,8 +661,8 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 				meta.Filter.Pox = p.Filter.Pox
 			}
 
-			if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
-				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", vHome, string(filepath.Separator))
+			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
+				meta.Filter.Pox = fmt.Sprintf("..%scombined.prot.xml", string(filepath.Separator))
 			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
@@ -683,7 +688,6 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 
 		// return to the top level directory
 		os.Chdir(dir)
-
 	}
 
 	return meta
@@ -703,7 +707,7 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 		meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
-		meta.Abacus.Tag = p.DatabaseSearch.Database.Tag
+		meta.Abacus.Tag = p.DatabaseSearch.DecoyTag
 		meta.Abacus.Picked = p.Filter.Picked
 		meta.Abacus.Razor = p.Filter.Razor
 

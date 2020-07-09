@@ -47,9 +47,15 @@ func RunLabelFreeQuantification(p met.Quantify) {
 	var db dat.Base
 	db.Restore()
 
-	psm, _ := id.ReadPepXMLInput(".", db.Prefix, sys.GetTemp(), false)
+	var input string
+	if len(p.Pex) > 0 {
+		input = p.Pex
+	} else {
+		input = "."
+	}
 
-	//evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
+	psm, _ := id.ReadPepXMLInput(input, db.Prefix, sys.GetTemp(), false)
+
 	psm = peakIntensity(psm, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 
 	for _, i := range psm {

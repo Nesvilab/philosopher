@@ -72,10 +72,8 @@ var pipelineCmd = &cobra.Command{
 		//}
 
 		// Comet - MSFragger
-		if p.DatabaseSearch.SearchEngine == "comet" || p.DatabaseSearch.SearchEngine == "msfragger" {
+		if p.Steps.DatabaseSearch == "yes" {
 			meta = pip.DBSearch(meta, p, dir, args)
-		} else {
-			msg.Custom(errors.New("Unknown database search engine"), "fatal")
 		}
 
 		// PeptideProphet
@@ -93,11 +91,13 @@ var pipelineCmd = &cobra.Command{
 			meta = pip.ProteinProphet(meta, p, dir, args)
 		}
 
-		// Abacus - combined pepxml
-		meta = pip.CombinedPeptideList(meta, p, dir, args)
+		if p.Steps.IntegratedReports == "yes" {
+			// Abacus - combined pepxml
+			meta = pip.CombinedPeptideList(meta, p, dir, args)
 
-		// Abacus - combined protxml
-		meta = pip.CombinedProteinList(meta, p, dir, args)
+			// Abacus - combined protxml
+			meta = pip.CombinedProteinList(meta, p, dir, args)
+		}
 
 		// FreeQuant
 		if p.Steps.LabelFreeQuantification == "yes" {

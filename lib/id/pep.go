@@ -273,6 +273,8 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 
 	}
 
+	//spew.Dump(files)
+
 	// verify if the we have interact and interact.mod files for parsing.
 	// To avoid reading both files, we keep the mod one and discard the other.
 	if fileCheckFlag == true {
