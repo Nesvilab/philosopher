@@ -25,9 +25,9 @@ commands:
   peptideprophet: no                           # peptide assignment validation
   ptmprophet: no                               # PTM site localization
   proteinprophet: no                           # protein identification validation
-  filter: no                                   # statistical filtering, validation and False Discovery Rates assessment
   freequant: no                                # label-free Quantification
   labelquant: no                               # isobaric Labeling-Based Relative Quantification
+  filter: no                                   # statistical filtering, validation and False Discovery Rates assessment
   bioquant: no                                 # protein report based on Uniprot protein clusters
   report: no                                   # multi-level reporting for both narrow-searches and open-searches
   abacus: no                                   # combined analysis of LC-MS/MS results
@@ -208,20 +208,6 @@ proteinprophet:                                # v5.2
   softoccam: false                             # peptide weights are apportioned equally among proteins within each Protein Group (less conservative protein count estimate)
   unmapped: false                              # report results for UNMAPPED proteins
 
-filter:
-  psmFDR: 0.01                                 # psm FDR level (default 0.01)
-  peptideFDR: 0.01                             # peptide FDR level (default 0.01)
-  ionFDR: 0.01                                 # peptide ion FDR level (default 0.01)
-  proteinFDR: 0.01                             # protein FDR level (default 0.01)
-  peptideProbability: 0.7                      # top peptide probability threshold for the FDR filtering (default 0.7)
-  proteinProbability: 0.5                      # protein probability threshold for the FDR filtering (not used with the razor algorithm) (default 0.5)
-  peptideWeight: 1                             # threshold for defining peptide uniqueness (default 1)
-  razor: false                                 # use razor peptides for protein FDR scoring
-  picked: false                                # apply the picked FDR algorithm before the protein scoring
-  mapMods: false                               # map modifications acquired by an open search
-  models: false                                # print model distribution
-  sequential: false                            # alternative algorithm that estimates FDR using both filtered PSM and Protein lists
-
 freequant:
   peakTimeWindow: 0.4                          # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3                       # specify the retention time window for xic (minute) (default 3)
@@ -239,7 +225,21 @@ labelquant:
   removeLow: 0.0                               # ignore the lower 3% PSMs based on their summed abundances
   tolerance: 20                                # m/z tolerance in ppm (default 20)
   uniqueOnly: false                            # report quantification based on only unique peptides
-  brand:                                       # isobaric labeling brand (tmt, itraq)
+  brand: tmt                                   # isobaric labeling brand (tmt, itraq)
+
+filter:
+  psmFDR: 0.01                                 # psm FDR level (default 0.01)
+  peptideFDR: 0.01                             # peptide FDR level (default 0.01)
+  ionFDR: 0.01                                 # peptide ion FDR level (default 0.01)
+  proteinFDR: 0.01                             # protein FDR level (default 0.01)
+  peptideProbability: 0.7                      # top peptide probability threshold for the FDR filtering (default 0.7)
+  proteinProbability: 0.5                      # protein probability threshold for the FDR filtering (not used with the razor algorithm) (default 0.5)
+  peptideWeight: 1                             # threshold for defining peptide uniqueness (default 1)
+  razor: false                                 # use razor peptides for protein FDR scoring
+  picked: false                                # apply the picked FDR algorithm before the protein scoring
+  mapMods: false                               # map modifications acquired by an open search
+  models: false                                # print model distribution
+  sequential: false                            # alternative algorithm that estimates FDR using both filtered PSM and Protein lists
 
 report:
   msstats: false                               # create an output compatible to MSstats

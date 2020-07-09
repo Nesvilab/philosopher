@@ -94,8 +94,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		input = "."
 	}
 
-	fmt.Println(input)
-
 	psm, _ := id.ReadPepXMLInput(input, db.Prefix, sys.GetTemp(), false)
 
 	if len(psm) < 1 {

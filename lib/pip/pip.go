@@ -531,6 +531,10 @@ func FreeQuant(meta met.Data, p Directives, dir string, data []string) met.Data 
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
+		if _, err := os.Stat(sys.LFQBin()); err == nil {
+			return meta
+		}
+
 		logrus.Info("Executing label-free quantification on ", i)
 
 		meta.Quantify = p.Freequant
@@ -560,6 +564,10 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 
 		// reload the meta data
 		meta.Restore(sys.Meta())
+
+		if _, err := os.Stat(sys.IsoBin()); err == nil {
+			return meta
+		}
 
 		logrus.Info("Executing label-based quantification on ", i)
 
@@ -662,35 +670,6 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 			meta.Serialize()
 		}
 
-		// // FreeQuant
-		// if p.Commands.FreeQuant == "yes" {
-
-		// 	logrus.Info("Executing label-free quantification on ", i)
-
-		// 	meta.Quantify = p.Freequant
-		// 	meta.Quantify.Dir = dsAbs
-		// 	meta.Quantify.Format = "mzML"
-
-		// 	qua.RunLabelFreeQuantification(meta.Quantify)
-
-		// 	meta.Serialize()
-		// }
-
-		// // LabelQuant
-		// if p.Commands.LabelQuant == "yes" {
-
-		// 	logrus.Info("Executing label-based quantification on ", i)
-
-		// 	meta.Quantify = p.LabelQuant
-		// 	meta.Quantify.Dir = dsAbs
-		// 	meta.Quantify.Format = "mzML"
-		// 	meta.Quantify.Brand = p.LabelQuant.Brand
-
-		// 	meta.Quantify = qua.RunIsobaricLabelQuantification(meta.Quantify, meta.Filter.Mapmods)
-
-		// 	meta.Serialize()
-		// }
-
 		// Report
 		if p.Commands.Report == "yes" {
 
@@ -702,24 +681,9 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 			meta.Serialize()
 		}
 
-		// // BioQuant
-		// if p.Commands.BioQuant == "yes" {
-
-		// 	logrus.Info("Executing cluster on ", i)
-
-		// 	meta.BioQuant = p.BioQuant
-
-		// 	//clu.GenerateReport(meta)
-		// 	qua.RunBioQuantification(meta)
-		// 	meta.Serialize()
-
-		// }
-
 		// return to the top level directory
 		os.Chdir(dir)
 
-		// reload the meta data
-		//meta.Restore(sys.Meta())
 	}
 
 	return meta

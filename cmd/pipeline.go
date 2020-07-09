@@ -101,16 +101,12 @@ var pipelineCmd = &cobra.Command{
 
 		// FreeQuant
 		if p.Commands.FreeQuant == "yes" {
-			//if _, err := os.Stat(sys.LFQBin()); os.IsNotExist(err) {
 			meta = pip.FreeQuant(meta, p, dir, args)
-			//}
 		}
 
 		// LabelQuant
 		if p.Commands.LabelQuant == "yes" {
-			//if _, err := os.Stat(sys.IsoBin()); os.IsNotExist(err) {
 			meta = pip.LabelQuant(meta, p, dir, args)
-			//}
 		}
 
 		// Filter - Report

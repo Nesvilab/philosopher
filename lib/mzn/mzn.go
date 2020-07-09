@@ -117,6 +117,7 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 		// left-pad the spectrum scan
 		paddedScan := fmt.Sprintf("%05s", spectrum.Scan)
 
+		f := filepath.Base(f)
 		fileName := strings.Replace(filepath.Clean(f), ".mzML", "", 1)
 		spectrum.SpectrumName = fmt.Sprintf("%s.%s.%s.%d", fileName, paddedScan, paddedScan, spectrum.Precursor.ChargeState)
 
