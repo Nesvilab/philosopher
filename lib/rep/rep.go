@@ -164,6 +164,12 @@ func (a PSMEvidenceList) Len() int           { return len(a) }
 func (a PSMEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spectrum }
 
+// RemovePSMByIndex perfomrs a re-slicing by removing an element from a list
+func RemovePSMByIndex(s []PSMEvidence, i int) []PSMEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
 	Sequence                 string
@@ -204,6 +210,12 @@ func (a IonEvidenceList) Len() int           { return len(a) }
 func (a IonEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a IonEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
+// RemoveIonsByIndex perfomrs a re-slicing by removing an element from a list
+func RemoveIonsByIndex(s []IonEvidence, i int) []IonEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 // PeptideEvidence groups all valid info about peptide ions for reports
 type PeptideEvidence struct {
 	Sequence               string
@@ -233,6 +245,12 @@ type PeptideEvidenceList []PeptideEvidence
 func (a PeptideEvidenceList) Len() int           { return len(a) }
 func (a PeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
+
+// RemovePeptidesByIndex perfomrs a re-slicing by removing an element from a list
+func RemovePeptidesByIndex(s []PeptideEvidence, i int) []PeptideEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
 
 // ProteinEvidence ...
 type ProteinEvidence struct {

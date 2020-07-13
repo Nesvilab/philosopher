@@ -57,6 +57,10 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var urazorMap = make(map[string]string)
 	var uniqueSeqMap = make(map[string]string)
 
+	var PSMtoDelete []int
+	var PeptidetoDelete []int
+	var IontoDelete []int
+
 	for _, i := range evi.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
@@ -103,7 +107,16 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.PSM[i].IsUnique = true
 		}
 
-		uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+		if !rOK && !uOK {
+			PSMtoDelete = append(PSMtoDelete, i)
+		} else {
+			uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+		}
+	}
+
+	// remove PSMs mapping to Proteins that did not passed the FDR filter
+	for _, i := range PSMtoDelete {
+		evi.PSM = RemovePSMByIndex(evi.PSM, i)
 	}
 
 	for i := range evi.Ions {
@@ -128,6 +141,15 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		} else {
 			evi.Ions[i].IsUnique = false
 		}
+
+		if !rOK && !uOK {
+			IontoDelete = append(IontoDelete, i)
+		}
+	}
+
+	// remove PSMs mapping to Proteins that did not passed the FDR filter
+	for _, i := range IontoDelete {
+		evi.Ions = RemoveIonsByIndex(evi.Ions, i)
 	}
 
 	for i := range evi.Peptides {
@@ -143,10 +165,123 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.Peptides[i].IsDecoy = true
 		}
 
+		if !ok {
+			PeptidetoDelete = append(PeptidetoDelete, i)
+		}
+	}
+
+	// remove Peptides mapping to Proteins that did not passed the FDR filter
+	for _, i := range PeptidetoDelete {
+		evi.Peptides = RemovePeptidesByIndex(evi.Peptides, i)
 	}
 
 	return
 }
+
+// func (evi *Evidence) UpdateIonStatus(decoyTag string) {
+
+// 	var uniqueMap = make(map[string]bool)
+// 	var urazorMap = make(map[string]string)
+// 	var uniqueSeqMap = make(map[string]string)
+
+// 	for _, i := range evi.Proteins {
+
+// 		for _, j := range i.TotalPeptideIons {
+// 			if j.IsUnique == true {
+// 				uniqueMap[j.IonForm] = true
+// 			}
+// 		}
+
+// 		for _, j := range i.TotalPeptideIons {
+// 			if j.IsURazor == true {
+// 				urazorMap[j.IonForm] = i.PartHeader
+// 			}
+// 		}
+// 	}
+
+// 	for i := range evi.PSM {
+
+// 		// the decoy tag checking is a failsafe mechanism to avoid proteins
+// 		// with real complex razor case decisions to pass downstream
+// 		// wrong classifications. If by any chance the protein gets assigned to
+// 		// a razor decoy, this mechanism avoids the replacement
+
+// 		rp, rOK := urazorMap[evi.PSM[i].IonForm]
+// 		if rOK {
+
+// 			evi.PSM[i].IsURazor = true
+
+// 			// we found cases where the peptide maps to both target and decoy but is
+// 			// assigned as razor to the decoy. the IF statement below replaces the
+// 			// decoy by the target but it was removed because in some cases the protein
+// 			// does not pass the FDR filtering.
+
+// 			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
+// 			delete(evi.PSM[i].MappedProteins, rp)
+// 			evi.PSM[i].Protein = rp
+
+// 			if strings.Contains(rp, decoyTag) {
+// 				evi.PSM[i].IsDecoy = true
+// 			}
+// 		}
+
+// 		_, uOK := uniqueMap[evi.PSM[i].IonForm]
+// 		if uOK {
+// 			evi.PSM[i].IsUnique = true
+// 		}
+
+// 		uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+// 	}
+
+// 	var uniques1 = make(map[string]uint8)
+// 	for _, x := range evi.PSM {
+// 		if !x.IsDecoy {
+// 			uniques1[x.Protein] = 0
+// 		}
+// 	}
+// 	fmt.Println(len(uniques1))
+
+// 	for i := range evi.Ions {
+
+// 		rp, rOK := urazorMap[evi.Ions[i].IonForm]
+// 		if rOK {
+
+// 			evi.Ions[i].IsURazor = true
+
+// 			evi.Ions[i].MappedProteins[evi.Ions[i].Protein] = 0
+// 			delete(evi.Ions[i].MappedProteins, rp)
+// 			evi.Ions[i].Protein = rp
+
+// 			if strings.Contains(rp, decoyTag) {
+// 				evi.Ions[i].IsDecoy = true
+// 			}
+
+// 		}
+// 		_, uOK := uniqueMap[evi.Ions[i].IonForm]
+// 		if uOK {
+// 			evi.Ions[i].IsUnique = true
+// 		} else {
+// 			evi.Ions[i].IsUnique = false
+// 		}
+// 	}
+
+// 	for i := range evi.Peptides {
+
+// 		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
+// 		if ok {
+// 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
+// 			delete(evi.Peptides[i].MappedProteins, v)
+// 			evi.Peptides[i].Protein = v
+// 		}
+
+// 		if strings.Contains(v, decoyTag) {
+// 			evi.Peptides[i].IsDecoy = true
+// 		}
+
+// 	}
+
+// 	return
+// }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
 func (evi *Evidence) UpdateIonModCount() {

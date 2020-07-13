@@ -118,6 +118,13 @@ func Run(f met.Data) met.Data {
 	var psm id.PepIDList
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
+
+	// var uniques = make(map[string]uint8)
+	// for _, x := range e.PSM {
+	// 	uniques[x.Protein] = 0
+	// }
+	// fmt.Println(len(uniques))
+
 	psm = nil
 
 	var ion id.PepIDList
@@ -147,6 +154,8 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
+
+	psm = nil
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
 
