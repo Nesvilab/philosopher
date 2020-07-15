@@ -118,7 +118,6 @@ func Run(f met.Data) met.Data {
 	var psm id.PepIDList
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
-
 	psm = nil
 
 	var ion id.PepIDList
@@ -149,8 +148,6 @@ func Run(f met.Data) met.Data {
 		e.UpdatePeptideModCount()
 	}
 
-	psm = nil
-
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
 
 		logrus.Info("Processing protein inference")
@@ -161,12 +158,12 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
-
-		e.SyncPSMToProteins()
 	}
 
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
+
+	e.SyncPSMToProteins()
 
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assignment to proteins")
