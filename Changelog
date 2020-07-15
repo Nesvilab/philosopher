@@ -8,3 +8,4 @@
 
 ### Fixed
 - Small bugs and fixes.
+- PSMs lists often contained observations mapping to proteins that did not pass the FDR filter.

@@ -41,6 +41,9 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 // This function can be used for both pre and post filtering quantification
 func RunLabelFreeQuantification(p met.Quantify) {
 
+	// This parameter is hardcoded now because of the changes in the latest msconvert version 3.20.
+	p.Isolated = true
+
 	var lfq = NewLFQ()
 
 	// collect database information

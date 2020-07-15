@@ -208,7 +208,6 @@ freequant:
   peakTimeWindow: 0.4                            # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3                         # specify the retention time window for xic (minute) (default 3)
   tolerance: 10                                  # m/z tolerance in ppm (default 10)
-  isolated: true                                 # use the isolated ion instead of the selected ion for quantification
 
 labelquant:
   annotation:                                    # annotation file with custom names for the TMT channels

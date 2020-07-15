@@ -119,12 +119,6 @@ func Run(f met.Data) met.Data {
 	psm.Restore("psm")
 	e.AssemblePSMReport(psm, f.Filter.Tag)
 
-	// var uniques = make(map[string]uint8)
-	// for _, x := range e.PSM {
-	// 	uniques[x.Protein] = 0
-	// }
-	// fmt.Println(len(uniques))
-
 	psm = nil
 
 	var ion id.PepIDList
@@ -167,6 +161,8 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
+
+		e.SyncPSMToProteins()
 	}
 
 	logrus.Info("Assigning protein identifications to layers")

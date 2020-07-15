@@ -8,7 +8,7 @@
 ![GitHub](https://img.shields.io/github/license/Nesvilab/philosopher?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Nesvilab/philosopher/philosopher-build?style=for-the-badge)
-[![DOI](https://img.shields.io/badge/DOI-doi.org%2F10.5281%2Fzenodo.3909842-9cf?style=for-the-badge)](https://zenodo.org/record/3909842#.XvZXn5YpCAk)
+<!--[![DOI](https://img.shields.io/badge/DOI-doi.org%2F10.5281%2Fzenodo.3909842-9cf?style=for-the-badge)](https://zenodo.org/record/3909842#.XvZXn5YpCAk)-->
 
 #### Philosopher is fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. Philosopher is dependency-free and can analyze both traditional database searches and open searches for post-translational modification (PTM) discovery. 
 
