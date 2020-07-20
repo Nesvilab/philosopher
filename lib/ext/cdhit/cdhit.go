@@ -82,7 +82,7 @@ func (c *CDhit) Run(level float64) {
 	l := strconv.FormatFloat(level, 'E', -1, 64)
 
 	cmd := c.DefaultBin
-	args := []string{"-i", c.FastaDB, "-o", c.ClusterFasta, "-c", l}
+	args := []string{"-i", c.DB, "-o", c.ClusterFasta, "-c", l}
 
 	run := exec.Command(cmd, args...)
 	e := run.Start()
