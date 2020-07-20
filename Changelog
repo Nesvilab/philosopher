@@ -5,7 +5,7 @@
 ### Changed
 - The "master" GitHub repository was renamed to "main".
 - Freequant and Labelquant can now be executed before the Filter command.
-- The paramter file was updated, and the terms made more human-readable.
+- The parameter file was updated, and the terms made more human-readable.
 
 ### Fixed
 - Small bugs and fixes.
