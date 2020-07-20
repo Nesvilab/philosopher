@@ -34,36 +34,36 @@ import (
 
 // Directives contains the instructions to run a pipeline
 type Directives struct {
-	SlackToken     string             `yaml:"slackToken"`
-	SlackChannel   string             `yaml:"slackChannel"`
-	SlackUserID    string             `yaml:"slackUserID"`
-	Steps          Steps              `yaml:"steps"`
-	DatabaseSearch DatabaseSearch     `yaml:"database_search"`
-	PeptideProphet met.PeptideProphet `yaml:"peptideprophet"`
-	PTMProphet     met.PTMProphet     `yaml:"ptmprophet"`
-	ProteinProphet met.ProteinProphet `yaml:"proteinprophet"`
-	Filter         met.Filter         `yaml:"filter"`
-	Freequant      met.Quantify       `yaml:"freequant"`
-	LabelQuant     met.Quantify       `yaml:"labelquant"`
-	Report         met.Report         `yaml:"report"`
-	BioQuant       met.BioQuant       `yaml:"bioquant"`
-	Abacus         met.Abacus         `yaml:"abacus"`
-	TMTIntegrator  met.TMTIntegrator  `yaml:"tmtintegrator"`
+	SlackToken     string             `yaml:"Slack Token"`
+	SlackChannel   string             `yaml:"Slack Channel"`
+	SlackUserID    string             `yaml:"Slack User ID"`
+	Steps          Steps              `yaml:"Steps"`
+	DatabaseSearch DatabaseSearch     `yaml:"Database Search"`
+	PeptideProphet met.PeptideProphet `yaml:"Peptide Validation"`
+	PTMProphet     met.PTMProphet     `yaml:"PTM Localization"`
+	ProteinProphet met.ProteinProphet `yaml:"Protein Inference"`
+	Filter         met.Filter         `yaml:"FDR Filtering"`
+	Freequant      met.Quantify       `yaml:"Label-Free Quantification"`
+	LabelQuant     met.Quantify       `yaml:"Isobaric Quantification"`
+	Report         met.Report         `yaml:"Individual Reports"`
+	BioQuant       met.BioQuant       `yaml:"Bio Cluster Quantification"`
+	Abacus         met.Abacus         `yaml:"Integrated Reports"`
+	TMTIntegrator  met.TMTIntegrator  `yaml:"Integrated Isobaric Quantification"`
 }
 
 // Steps contains the high-level elements of the analysis to be executed
 type Steps struct {
-	DatabaseSearch           string `yaml:"database_search"`
-	PeptideValidation        string `yaml:"peptide_validation"`
-	PTMLocalization          string `yaml:"ptm_localization"`
-	ProteinInference         string `yaml:"protein_inference"`
-	LabelFreeQuantification  string `yaml:"label_free_quantification"`
-	IsobaricQuantification   string `yaml:"isobaric_quantification"`
-	BioClusterQuantification string `yaml:"bio_cluster_quantification"`
-	FDRFiltering             string `yaml:"fdr_filtering"`
-	IndividualReports        string `yaml:"individual_reports"`
-	IntegratedReports        string `yaml:"integrated_reports"`
-	TMTIntegrator            string `yaml:"tmt_integrator"`
+	DatabaseSearch           string `yaml:"Database Search"`
+	PeptideValidation        string `yaml:"Peptide Validation"`
+	PTMLocalization          string `yaml:"PTM Localization"`
+	ProteinInference         string `yaml:"Protein Inference"`
+	LabelFreeQuantification  string `yaml:"Label-Free Quantification"`
+	IsobaricQuantification   string `yaml:"Isobaric Quantification"`
+	BioClusterQuantification string `yaml:"Bio Cluster Quantification"`
+	FDRFiltering             string `yaml:"FDR Filtering"`
+	IndividualReports        string `yaml:"Individual Reports"`
+	IntegratedReports        string `yaml:"Integrated Reports"`
+	TMTIntegrator            string `yaml:"Integrated Isobaric Quantification"`
 }
 
 // DatabaseSearch keeps the options related to the search step

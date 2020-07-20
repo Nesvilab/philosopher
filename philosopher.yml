@@ -17,28 +17,28 @@ slackToken:                                      # specify the Slack API token (
 slackChannel:                                    # specify the channel name, or
 slackUserID:                                     # specify a user ID for a direct message
 
-steps:
-  database_search: yes                           # peptide to spectrum matching with Comet or MSFragger
-  peptide_validation: yes                        # peptide assignment validation with PeptideProphet
-  ptm_localization: yes                          # PTM site localization with PTMProphet
-  protein_inference: yes                         # protein identification validation with ProteinProphet
-  label_free_quantification: yes                 # precursor label-free quantification inspired by moFF
-  isobaric_quantification: yes                   # isobaric labeling-based relative quantification for TMT and iTRAQ
-  bio_cluster_quantification: yes                # protein report based on Uniprot protein clusters
-  fdr_filtering: yes                             # statistical filtering, validation and false discovery r ates assessment
-  individual_reports: yes                        # multi-level reporting for both narrow-searches and open-searches
-  integrated_reports: yes                        # combined analysis of LC-MS/MS results inspired by Abacus
-  integrated_isobaric_quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
+Steps:
+  Database Search: yes                           # peptide to spectrum matching with Comet or MSFragger
+  Peptide Validation: no                         # peptide assignment validation with PeptideProphet
+  PTM Localization: no                           # PTM site localization with PTMProphet
+  Protein Inference: no                          # protein identification validation with ProteinProphet
+  Label-Free Quantification: no                  # precursor label-free quantification inspired by moFF
+  Isobaric Quantification: no                    # isobaric labeling-based relative quantification for TMT and iTRAQ
+  Bio Cluster Quantification: no                 # protein report based on Uniprot protein clusters
+  FDR Filtering: no                              # statistical filtering, validation and false discovery r ates assessment
+  Individual Reports: no                         # multi-level reporting for both narrow-searches and open-searches
+  Integrated Reports: no                         # combined analysis of LC-MS/MS results inspired by Abacus
+  Integrated Isobaric Quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-database_search:
+Database Search:                                 # MSFragger & Comet
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
   search_engine: comet                           # search engine options include "comet" and "msfragger"
-  comet:
+  comet:                                         # Comet v2019011
     noindex: true                                # skip mzML file indexing
     param:                                       # comet parameter file (default "comet.params.txt")
     raw: mzML                                    # format of the spectra file
-  msfragger:                                     # v3.0
+  msfragger:                                     # MSFragger v3.0
     path:                                        # path to MSFragger jar
     memory: 8                                    # how much memory in GB to use
     param:                                       # MSFragger parameter file
@@ -124,7 +124,7 @@ database_search:
     add_W_tryptophan: 0.000000                   # tryptophan fixed modifications
     add_Y_tyrosine: 0.000000                     # tyrosine fixed modifications
   
-peptideprophet:                                  # v5.2
+Peptide Validation:                              # PeptideProphet v5.2
   concurrent: false                              # Concurrent execution of multiple instaces
   extension: pepXML                              # pepXML file extension
   clevel: 0                                      # set Conservative Level in neg_stdev from the neg_mean, low numbers are less conservative, high numbers are more conservative
@@ -158,7 +158,7 @@ peptideprophet:                                  # v5.2
   ppm: true                                      # use PPM mass error instead of Dalton for mass modeling
   zero: false                                    # report results with minimum probability 0
 
-ptmprophet:                                      # v5.2
+PTM Localization:                                # PTMProphet v5.2
   autodirect: false                              # use direct evidence when the lability is high, use in combination with LABILITY
   cions:                                         # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                  # use only direct evidence for evaluating PTM site probabilities
@@ -180,7 +180,7 @@ ptmprophet:                                      # v5.2
   ppmtol: 1                                      # use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters
   verbose: false                                 # produce Warnings to help troubleshoot potential PTM shuffling or mass difference issues
 
-proteinprophet:                                  # v5.2
+Protein Inference:                               # ProteinProphet v5.2
   accuracy: false                                # equivalent to --minprob 0
   allpeps: false                                 # consider all possible peptides in the database in the confidence model
   confem: false                                  # use the EM to compute probability given the confidence
@@ -204,12 +204,12 @@ proteinprophet:                                  # v5.2
   softoccam: false                               # peptide weights are apportioned equally among proteins within each Protein Group (less conservative protein count estimate)
   unmapped: false                                # report results for UNMAPPED proteins
 
-freequant:
+Label-Free Quantification:                       # Freequant
   peakTimeWindow: 0.4                            # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3                         # specify the retention time window for xic (minute) (default 3)
   tolerance: 10                                  # m/z tolerance in ppm (default 10)
 
-labelquant:
+Isobaric Quantification:                         # Labelquant
   annotation:                                    # annotation file with custom names for the TMT channels
   bestPSM: false                                 # select the best PSMs for protein quantification
   level: 2                                       # ms level for the quantification
@@ -221,7 +221,11 @@ labelquant:
   uniqueOnly: false                              # report quantification based on only unique peptides
   brand: tmt                                     # isobaric labeling brand (tmt, itraq)
 
-filter:
+Bio Cluster Quantification:                      # BioQuant
+  organismUniProtID:                             # UniProt proteome ID
+  level: 0.9                                     # cluster identity level (default 0.9)
+
+FDR Filtering:                                   # Filter
   psmFDR: 0.01                                   # psm FDR level (default 0.01)
   peptideFDR: 0.01                               # peptide FDR level (default 0.01)
   ionFDR: 0.01                                   # peptide ion FDR level (default 0.01)
@@ -235,16 +239,12 @@ filter:
   models: false                                  # print model distribution
   sequential: false                              # alternative algorithm that estimates FDR using both filtered PSM and Protein lists
 
-report:
+Individual Reports:                              # Report
   msstats: false                                 # create an output compatible to MSstats
   withDecoys: false                              # add decoy observations to reports
   mzID: false                                    # create a mzID output
-
-bioquant:
-  organismUniProtID:                             # UniProt proteome ID
-  level: 0.9                                     # cluster identity level (default 0.9)
-                  
-abacus:
+            
+Integrated Reports:                              # Abacus
   protein: true                                  # global level protein report
   peptide: true                                  # global level peptide report
   proteinProbability: 0.9                        # minimum protein probability (default 0.9)
@@ -252,7 +252,7 @@ abacus:
   uniqueOnly: false                              # report TMT quantification based on only unique peptides
   reprint: false                                 # create abacus reports using the Reprint format
 
-tmtintegrator:                                   # v1.1.10
+Integrated Isobaric Quantification:              # TMT-Integrator v1.1.10
   path:                                          # path to TMT-Integrator jar
   memory: 6                                      # memory allocation, in Gb
   output:                                        # the location of output files
