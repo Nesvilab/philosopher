@@ -46,10 +46,11 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 - [Philosopher basics](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) - general usage information
 - [Preparing protein databases](https://github.com/Nesvilab/philosopher/wiki/How-to-Prepare-a-Protein-Database) - download and format sequences
 - [Simple data analysis](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic step-by-step tutorial
-- [Using pipeline for TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Pipeline-mode-for-TMT-analysis) - pipeline a large data set
+- [Using pipeline for TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Pipeline-mode-for-TMT-analysis) - pipeline analysis of a large data set
 - [Step-by-step TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-TMT-analysis) - step-by-step tutorial for isobaric quantification of a small data set
 - [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Open-Search-Analysis) - step-by-step tutorial for open searches
-- [Step-by-step analysis with Comet](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-analysis-with-Comet)
+- [Step-by-step analysis with Comet](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-analysis-with-Comet) - step-by-step tutorial with Comet search
+- [Protein-protein interaction analysis](https://github.com/Nesvilab/philosopher/wiki/REPRINT-Analysis) - analyze AP-MS data for downstream use with REPRINT
 
 ## Documentation
 See the [documentation](https://github.com/Nesvilab/philosopher/wiki/Home) for more details about the available commands.
