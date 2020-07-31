@@ -29,9 +29,6 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 
 		if mz.Spectra[i].Level == "1" {
 
-			// left-pad the spectrum index
-			//paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
-
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
 
@@ -49,9 +46,6 @@ func calculateIonPurity(labels iso.Tag, d, f string, mz mzn.MsData) []string {
 				mz.Spectra[i].Precursor.IsolationWindowLowerOffset = mzDeltaWindow
 				mz.Spectra[i].Precursor.IsolationWindowUpperOffset = mzDeltaWindow
 			}
-
-			// left-pad the spectrum index
-			//paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
 
 			// left-pad the spectrum scan
 			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
@@ -142,6 +136,130 @@ func prepareLabelStructureWithMS2(labels iso.Tag, dir, format, brand, plex strin
 
 	for _, i := range mz.Spectra {
 		if i.Level == "2" {
+
+			v, ok := labels.LabeledSpectra[i.SpectrumName]
+			if ok {
+				labelData := v
+
+				for j := range i.Mz.DecodedStream {
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel1.Mz+(ppmPrecision*labelData.Channel1.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel1.Mz-(ppmPrecision*labelData.Channel1.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel1.Intensity {
+							labelData.Channel1.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel2.Mz+(ppmPrecision*labelData.Channel2.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel2.Mz-(ppmPrecision*labelData.Channel2.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel2.Intensity {
+							labelData.Channel2.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel3.Mz+(ppmPrecision*labelData.Channel3.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel3.Mz-(ppmPrecision*labelData.Channel3.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel3.Intensity {
+							labelData.Channel3.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel4.Mz+(ppmPrecision*labelData.Channel4.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel4.Mz-(ppmPrecision*labelData.Channel4.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel4.Intensity {
+							labelData.Channel4.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel5.Mz+(ppmPrecision*labelData.Channel5.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel5.Mz-(ppmPrecision*labelData.Channel5.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel5.Intensity {
+							labelData.Channel5.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel6.Mz+(ppmPrecision*labelData.Channel6.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel6.Mz-(ppmPrecision*labelData.Channel6.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel6.Intensity {
+							labelData.Channel6.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel7.Mz+(ppmPrecision*labelData.Channel7.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel7.Mz-(ppmPrecision*labelData.Channel7.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel7.Intensity {
+							labelData.Channel7.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel8.Mz+(ppmPrecision*labelData.Channel8.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel8.Mz-(ppmPrecision*labelData.Channel8.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel8.Intensity {
+							labelData.Channel8.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel9.Mz+(ppmPrecision*labelData.Channel9.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel9.Mz-(ppmPrecision*labelData.Channel9.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel9.Intensity {
+							labelData.Channel9.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel10.Mz+(ppmPrecision*labelData.Channel10.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel10.Mz-(ppmPrecision*labelData.Channel10.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel10.Intensity {
+							labelData.Channel10.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel11.Mz+(ppmPrecision*labelData.Channel11.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel11.Mz-(ppmPrecision*labelData.Channel11.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel11.Intensity {
+							labelData.Channel11.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel12.Mz+(ppmPrecision*labelData.Channel12.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel12.Mz-(ppmPrecision*labelData.Channel12.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel12.Intensity {
+							labelData.Channel12.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel13.Mz+(ppmPrecision*labelData.Channel13.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel13.Mz-(ppmPrecision*labelData.Channel13.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel13.Intensity {
+							labelData.Channel13.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel14.Mz+(ppmPrecision*labelData.Channel14.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel14.Mz-(ppmPrecision*labelData.Channel14.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel14.Intensity {
+							labelData.Channel14.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel15.Mz+(ppmPrecision*labelData.Channel15.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel15.Mz-(ppmPrecision*labelData.Channel15.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel15.Intensity {
+							labelData.Channel15.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] <= (labelData.Channel16.Mz+(ppmPrecision*labelData.Channel16.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel16.Mz-(ppmPrecision*labelData.Channel16.Mz)) {
+						if i.Intensity.DecodedStream[j] > labelData.Channel16.Intensity {
+							labelData.Channel16.Intensity = i.Intensity.DecodedStream[j]
+						}
+					}
+
+					if i.Mz.DecodedStream[j] > 135 {
+						break
+					}
+
+				}
+
+				labels.LabeledSpectra[i.SpectrumName] = labelData
+			}
+		}
+	}
+
+	return labels
+}
+
+// prepareLabelStructureWithMS instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
+func prepareLabelStructureWithMS(labels iso.Tag, dir, format, brand, plex string, tol float64, mz mzn.MsData) iso.Tag {
+
+	ppmPrecision := tol / math.Pow(10, 6)
+
+	for _, i := range mz.Spectra {
+		if i.Level == "2" || i.Level == "3" {
 
 			v, ok := labels.LabeledSpectra[i.SpectrumName]
 			if ok {
@@ -452,6 +570,61 @@ func mapLabeledSpectra(labels map[string]iso.Labels, evi []rep.PSMEvidence) []re
 	}
 
 	return evi
+}
+
+// mapMS3IsoToMS2 pushes the quantification done at the MS3 level to MS2 scans
+func mapMS3IsoToMS2(labels iso.Tag) iso.Tag {
+
+	var ms2 = make(map[string]iso.Labels)
+	var ms3 = make(map[string]iso.Labels)
+
+	// index the scans using the MS3 parent scan
+	for _, i := range labels.LabeledSpectra {
+		if i.Level == "2" {
+			ms2[i.Scan] = i
+		}
+		if i.Level == "3" {
+			ms3[i.ParentScan] = i
+		}
+	}
+
+	for _, v3 := range ms3 {
+		v2, ok := ms2[v3.ParentScan]
+		if ok {
+			newV2 := v2
+			newV2.Channel1 = v3.Channel1
+			newV2.Channel2 = v3.Channel2
+			newV2.Channel3 = v3.Channel3
+			newV2.Channel4 = v3.Channel4
+			newV2.Channel5 = v3.Channel5
+			newV2.Channel6 = v3.Channel6
+			newV2.Channel7 = v3.Channel7
+			newV2.Channel8 = v3.Channel8
+			newV2.Channel9 = v3.Channel9
+			newV2.Channel10 = v3.Channel10
+			newV2.Channel11 = v3.Channel11
+			newV2.Channel12 = v3.Channel12
+			newV2.Channel13 = v3.Channel13
+			newV2.Channel14 = v3.Channel14
+			newV2.Channel15 = v3.Channel15
+			newV2.Channel16 = v3.Channel16
+
+			ms2[v3.ParentScan] = newV2
+		}
+	}
+
+	var newLabels iso.Tag
+	newLabels.LabeledSpectra = make(map[string]iso.Labels)
+
+	for k, v := range ms2 {
+		newLabels.LabeledSpectra[k] = v
+	}
+
+	for k, v := range ms3 {
+		newLabels.LabeledSpectra[k] = v
+	}
+
+	return newLabels
 }
 
 // CorrectUnlabelledSpectra nullifies PSMs with no TMT or iTRAQ modifications

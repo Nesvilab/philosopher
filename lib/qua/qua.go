@@ -121,9 +121,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		// left-pad the spectrum scan
 		paddedScan := fmt.Sprintf("%05d", i.Scan)
 
-		// left-pad the spectrum index
-		//paddedIndex := fmt.Sprintf("%05d", i.Index)
-
 		var l iso.Labels
 		if p.Brand == "tmt" {
 			l = tmt.New(p.Plex)
@@ -131,9 +128,11 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 			l = trq.New(p.Plex)
 		}
 
-		l.Spectrum = i.Spectrum
-		//l.Index = paddedIndex
+		cleanSpecName := strings.Split(i.Spectrum, "#")
+
+		l.Spectrum = cleanSpecName[0]
 		l.Scan = paddedScan
+		l.Level = "2"
 		l.RetentionTime = i.RetentionTime
 		l.ChargeState = i.AssumedCharge
 
@@ -167,14 +166,32 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		mz.Read(fileName, false, false, false)
 
 		for i := range mz.Spectra {
+
+			if mz.Spectra[i].Level == "3" {
+				var l iso.Labels
+				if p.Brand == "tmt" {
+					l = tmt.New(p.Plex)
+				} else if p.Brand == "itraq" {
+					l = trq.New(p.Plex)
+				}
+
+				l.Spectrum = mz.Spectra[i].SpectrumName
+				l.Scan = fmt.Sprintf("%05s", mz.Spectra[i].Scan)
+				l.Level = mz.Spectra[i].Level
+				l.ParentScan = mz.Spectra[i].Precursor.ParentScan
+				l.RetentionTime = mz.Spectra[i].ScanStartTime
+				l.ChargeState = uint8(mz.Spectra[i].Precursor.ChargeState)
+
+				labels.LabeledSpectra[mz.Spectra[i].SpectrumName] = l
+			}
+
 			mz.Spectra[i].Decode()
 		}
 
-		if p.Level == 3 {
-			labels = prepareLabelStructureWithMS3(labels, p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
+		labels = prepareLabelStructureWithMS(labels, p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 
-		} else {
-			labels = prepareLabelStructureWithMS2(labels, p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
+		if p.Level == 3 {
+			labels = mapMS3IsoToMS2(labels)
 		}
 
 		purities = append(purities, calculateIonPurity(labels, p.Dir, p.Format, mz)...)
