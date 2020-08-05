@@ -83,7 +83,7 @@ func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
 		// load MS1, ignore MS2 and MS3
-		mz.Read(fileName, false, false, true)
+		mz.Read(fileName)
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {

@@ -584,12 +584,12 @@ func mapMS3IsoToMS2(labels iso.Tag) iso.Tag {
 			ms2[i.Scan] = i
 		}
 		if i.Level == "3" {
-			ms3[i.ParentScan] = i
+			ms3[i.Scan] = i
 		}
 	}
 
 	for _, v3 := range ms3 {
-		v2, ok := ms2[v3.ParentScan]
+		v2, ok := ms2[v3.MS2Fragment]
 		if ok {
 			newV2 := v2
 			newV2.Channel1 = v3.Channel1
@@ -609,19 +609,19 @@ func mapMS3IsoToMS2(labels iso.Tag) iso.Tag {
 			newV2.Channel15 = v3.Channel15
 			newV2.Channel16 = v3.Channel16
 
-			ms2[v3.ParentScan] = newV2
+			ms2[v3.MS2Fragment] = newV2
 		}
 	}
 
 	var newLabels iso.Tag
 	newLabels.LabeledSpectra = make(map[string]iso.Labels)
 
-	for k, v := range ms2 {
-		newLabels.LabeledSpectra[k] = v
+	for _, v := range ms2 {
+		newLabels.LabeledSpectra[v.Spectrum] = v
 	}
 
-	for k, v := range ms3 {
-		newLabels.LabeledSpectra[k] = v
+	for _, v := range ms3 {
+		newLabels.LabeledSpectra[v.Spectrum] = v
 	}
 
 	return newLabels

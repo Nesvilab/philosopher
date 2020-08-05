@@ -1,6 +1,7 @@
 ### Added
 - A new Workspace option allows the use of a custom folder as a temporary folder.
-- The Database now supports multiple database IDs (separate them with comma)
+- The Database now supports multiple database IDs (separate them with comma).
+- Support to Eclipse mzML files.
 
 ### Changed
 - The "master" GitHub repository was renamed to "main".

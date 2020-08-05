@@ -23,8 +23,7 @@ import (
 // MsData top struct
 type MsData struct {
 	FileName string
-	//	RefSpectra sync.Map
-	Spectra Spectra
+	Spectra  Spectra
 }
 
 // Spectra struct
@@ -32,10 +31,11 @@ type Spectra []Spectrum
 
 // Spectrum tag
 type Spectrum struct {
-	//Index         string
 	Scan          string
 	Level         string
 	SpectrumName  string
+	FilterString  string
+	MS2Fragment   string
 	ScanStartTime float64
 	Precursor     Precursor
 	Mz            Mz
@@ -85,7 +85,7 @@ func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Scan < a[j].Scan }
 
 // Read is the main function for parsing mzML data
-func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
+func (p *MsData) Read(f string) {
 
 	var xml psi.IndexedMzML
 	xml.Parse(f)
@@ -95,22 +95,10 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 	var spectra Spectra
 	sl := xml.MzML.Run.SpectrumList
 
+	var MS2FilterString = make(map[string]Precursor)
+	var MS2Scan = make(map[string]string)
+
 	for _, i := range sl.Spectrum {
-
-		var level string
-		for _, j := range i.CVParam {
-			if string(j.Accession) == "MS:1000511" {
-				level = j.Value
-			}
-		}
-
-		if skipMS1 == true && level == "1" {
-			continue
-		} else if skipMS2 == true && level == "2" {
-			continue
-		} else if skipMS3 == true && level == "3" {
-			continue
-		}
 
 		spectrum := processSpectrum(i)
 
@@ -121,7 +109,22 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 		fileName := strings.Replace(filepath.Clean(f), ".mzML", "", 1)
 		spectrum.SpectrumName = fmt.Sprintf("%s.%s.%s.%d", fileName, paddedScan, paddedScan, spectrum.Precursor.ChargeState)
 
+		if spectrum.Level == "2" {
+			MS2FilterString[spectrum.FilterString] = spectrum.Precursor
+			MS2Scan[spectrum.FilterString] = spectrum.Scan
+		}
+
 		spectra = append(spectra, spectrum)
+	}
+
+	for i := range spectra {
+		if spectra[i].Level == "3" {
+			v, ok := MS2FilterString[spectra[i].FilterString]
+			if ok {
+				spectra[i].MS2Fragment = MS2Scan[spectra[i].FilterString]
+				spectra[i].Precursor = v
+			}
+		}
 	}
 
 	if len(spectra) == 0 {
@@ -137,8 +140,6 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 
 	var spec Spectrum
 
-	//spec.Index = string(mzSpec.Index)
-
 	indexStr := string(mzSpec.Index)
 	indexInt, _ := strconv.Atoi(indexStr)
 	indexInt++
@@ -151,6 +152,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	}
 
 	for _, j := range mzSpec.ScanList.Scan[0].CVParam {
+
 		if string(j.Accession) == "MS:1000016" {
 			val, e := strconv.ParseFloat(j.Value, 64)
 			if e != nil {
@@ -158,6 +160,16 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			}
 			spec.ScanStartTime = val
 		}
+
+		if string(j.Accession) == "MS:1000512" {
+			val := strings.Split(j.Value, " ")
+			if spec.Level == "2" {
+				spec.FilterString = val[8]
+			} else if spec.Level == "3" {
+				spec.FilterString = val[7]
+			}
+		}
+
 	}
 
 	spec.Precursor = Precursor{}

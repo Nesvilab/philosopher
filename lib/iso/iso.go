@@ -32,6 +32,7 @@ type Labels struct {
 	Level         string
 	Scan          string
 	ParentScan    string
+	MS2Fragment   string
 	RetentionTime float64
 	ChargeState   uint8
 	IsUsed        bool
