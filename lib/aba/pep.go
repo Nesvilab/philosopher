@@ -37,7 +37,12 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	// recover all files
 	logrus.Info("Restoring peptide results")
 
+	local, _ := os.Getwd()
+	local, _ = filepath.Abs(local)
+
 	for _, i := range args {
+
+		os.Chdir(i)
 
 		// restoring the PSMs
 		var psm rep.Evidence
@@ -63,6 +68,8 @@ func peptideLevelAbacus(m met.Data, args []string) {
 					labels.LabelName = getLabelNames(annot)
 				}
 			}
+
+			os.Chdir(local)
 		}
 
 		// collect project names
@@ -88,6 +95,8 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	logrus.Info("Processing intensities")
 	evidences = getIntensities(evidences, datasets)
+
+	os.Chdir(local)
 
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
