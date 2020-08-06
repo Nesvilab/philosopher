@@ -12,3 +12,4 @@
 - Small bugs and fixes.
 - PSMs lists often contained observations mapping to proteins that did not pass the FDR filter.
 - Bio quant was failing because of the unassigned database path.
+- Some annotation files were being ignored.
