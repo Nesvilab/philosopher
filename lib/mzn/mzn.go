@@ -100,6 +100,9 @@ func (p *MsData) Read(f string) {
 
 	for _, i := range sl.Spectrum {
 
+		//var MS2FilterString = make(map[string]Precursor)
+		//var MS2Scan = make(map[string]string)
+
 		spectrum := processSpectrum(i)
 
 		// left-pad the spectrum scan
@@ -109,23 +112,37 @@ func (p *MsData) Read(f string) {
 		fileName := strings.Replace(filepath.Clean(f), ".mzML", "", 1)
 		spectrum.SpectrumName = fmt.Sprintf("%s.%s.%s.%d", fileName, paddedScan, paddedScan, spectrum.Precursor.ChargeState)
 
+		if spectrum.Level == "1" {
+			MS2FilterString = make(map[string]Precursor)
+			MS2Scan = make(map[string]string)
+		}
+
 		if spectrum.Level == "2" {
 			MS2FilterString[spectrum.FilterString] = spectrum.Precursor
 			MS2Scan[spectrum.FilterString] = spectrum.Scan
 		}
 
-		spectra = append(spectra, spectrum)
-	}
-
-	for i := range spectra {
-		if spectra[i].Level == "3" {
-			v, ok := MS2FilterString[spectra[i].FilterString]
+		if spectrum.Level == "3" {
+			v, ok := MS2FilterString[spectrum.FilterString]
 			if ok {
-				spectra[i].MS2Fragment = MS2Scan[spectra[i].FilterString]
-				spectra[i].Precursor = v
+				spectrum.MS2Fragment = MS2Scan[spectrum.FilterString]
+				spectrum.Precursor = v
 			}
 		}
+
+		spectra = append(spectra, spectrum)
+
 	}
+
+	// for i := range spectra {
+	// 	if spectra[i].Level == "3" {
+	// 		v, ok := MS2FilterString[spectra[i].FilterString]
+	// 		if ok {
+	// 			spectra[i].MS2Fragment = MS2Scan[spectra[i].FilterString]
+	// 			spectra[i].Precursor = v
+	// 		}
+	// 	}
+	// }
 
 	if len(spectra) == 0 {
 		msg.NoSpectraFound(errors.New(""), "fatal")
