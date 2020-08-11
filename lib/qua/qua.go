@@ -21,7 +21,6 @@ import (
 	"philosopher/lib/trq"
 	"philosopher/lib/uti"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -175,8 +174,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		// }
 
 		for i := range mz.Spectra {
-
-			spew.Dump(mz.Spectra[i])
 
 			if mz.Spectra[i].Level == "2" || mz.Spectra[i].Level == "3" {
 

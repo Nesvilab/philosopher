@@ -2,6 +2,7 @@
 - A new Workspace option allows the use of a custom folder as a temporary folder.
 - The Database now supports multiple database IDs (separate them with comma).
 - Support to Eclipse mzML files.
+- Output prefix flag added to PTMProphet.
 
 ### Changed
 - The "master" GitHub repository was renamed to "main".
