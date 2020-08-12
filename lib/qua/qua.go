@@ -165,14 +165,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 		mz.Read(fileName)
 
-		// if eclipse, link scans
-		// var indexedMS2 = make(map[string]mzn.Precursor)
-		// for _, i := range mz.Spectra {
-		// 	if i.Level == "2" {
-		// 		indexedMS2[i.FilterString] = i.Precursor
-		// 	}
-		// }
-
 		for i := range mz.Spectra {
 
 			if mz.Spectra[i].Level == "2" || mz.Spectra[i].Level == "3" {
@@ -195,19 +187,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 				l.MS2Fragment = fmt.Sprintf("%05s", mz.Spectra[i].MS2Fragment)
 				l.RetentionTime = mz.Spectra[i].ScanStartTime
 				l.ChargeState = uint8(mz.Spectra[i].Precursor.ChargeState)
-
-				// if mz.Spectra[i].Precursor.ChargeState == 0 && mz.Spectra[i].Level == "3" {
-				// 	v, ok := indexedMS2[mz.Spectra[i].FilterString]
-				// 	if ok {
-				// 		l.Scan = fmt.Sprintf("%05s", mz.Spectra[i].Scan)
-				// 		l.ChargeState = uint8(v.ChargeState)
-				// 		l.ParentScan = fmt.Sprintf("%05s", mz.Spectra[i].MS2Fragment)
-
-				// 		// fix the name
-				// 		name := strings.Split(l.Spectrum, ".")
-				// 		l.Spectrum = fmt.Sprintf("%s.%s.%s.%d", name[0], name[1], name[2], l.ChargeState)
-				// 	}
-				// }
 
 				labels.LabeledSpectra[mz.Spectra[i].SpectrumName] = l
 			}

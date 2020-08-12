@@ -134,16 +134,6 @@ func (p *MsData) Read(f string) {
 
 	}
 
-	// for i := range spectra {
-	// 	if spectra[i].Level == "3" {
-	// 		v, ok := MS2FilterString[spectra[i].FilterString]
-	// 		if ok {
-	// 			spectra[i].MS2Fragment = MS2Scan[spectra[i].FilterString]
-	// 			spectra[i].Precursor = v
-	// 		}
-	// 	}
-	// }
-
 	if len(spectra) == 0 {
 		msg.NoSpectraFound(errors.New(""), "fatal")
 	}
