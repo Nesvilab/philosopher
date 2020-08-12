@@ -91,23 +91,13 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	// append output file
 	var output string
 	if params.KeepOld == true {
-		//output = "interact.mod.pep.xml"
 
 		//if len(params.Output) > 0 {
-		if strings.Contains(args[0], "interact") {
+		if args[0] == "interact.pep.xml" {
 			output = "interact.mod.pep.xml"
 		} else {
-			output = fmt.Sprintf("%s-%s", params.Output, args[0])
+			output = strings.Replace(args[0], "pep.xml", "mod.pep.xml", 1)
 		}
-		// } else {
-		// 	output = "interact.mod.pep.xml"
-		// }
-
-		// if len(params.Output) > 0 {
-		// 	output = fmt.Sprintf("%s.pep.xml", params.Output)
-		// } else {
-		// 	output = "interact.mod.pep.xml"
-		// }
 
 		cmd.Args = append(cmd.Args, output)
 		cmd.Dir = filepath.Dir(output)
