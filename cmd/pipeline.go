@@ -109,8 +109,15 @@ var pipelineCmd = &cobra.Command{
 			meta = pip.LabelQuant(meta, p, dir, args)
 		}
 
-		// Filter - Report
-		meta = pip.FilterAndReport(meta, p, dir, args)
+		// Filter
+		if p.Steps.FDRFiltering == "yes" {
+			meta = pip.Filter(meta, p, dir, args)
+		}
+
+		// Report
+		if p.Steps.IndividualReports == "yes" {
+			meta = pip.Report(meta, p, dir, args)
+		}
 
 		// BioQuant
 		if p.Steps.BioClusterQuantification == "yes" {

@@ -567,6 +567,9 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		dsAbs, _ := filepath.Abs(i)
 		os.Chdir(dsAbs)
 
+		annotation, _ := filepath.Glob("*annotation*")
+		fullAnnotation, _ := filepath.Abs(annotation[0])
+
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
@@ -579,6 +582,7 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		meta.Quantify = p.LabelQuant
 		meta.Quantify.Dir = dsAbs
 		meta.Quantify.Format = "mzML"
+		meta.Quantify.Annot = fullAnnotation
 		meta.Quantify.Brand = p.LabelQuant.Brand
 		meta.Quantify.Pex = fmt.Sprintf("%s%sinteract.pep.xml", dsAbs, string(filepath.Separator))
 		meta.Quantify.Tag = "rev_"
@@ -624,8 +628,8 @@ func BioQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
 	return meta
 }
 
-// FilterAndReport executes the Filter, Quantify and Report commands in tandem
-func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met.Data {
+// Filter executes the Filter, Quantify and Report commands in tandem
+func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	// this is the virtual home directory where the pipeline is being executed.
 	//vHome := meta.Home
@@ -674,6 +678,25 @@ func FilterAndReport(meta met.Data, p Directives, dir string, data []string) met
 
 			meta.Serialize()
 		}
+
+		// return to the top level directory
+		os.Chdir(dir)
+	}
+
+	return meta
+}
+
+// Report executes the Report commands
+func Report(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	for _, i := range data {
+
+		// getting inside  each dataset folder again
+		dsAbs, _ := filepath.Abs(i)
+		os.Chdir(dsAbs)
+
+		// reload the meta data
+		meta.Restore(sys.Meta())
 
 		// Report
 		if p.Steps.IndividualReports == "yes" {

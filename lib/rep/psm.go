@@ -189,7 +189,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
 	if len(printSet) > 0 {
-		if len(printSet[0].Labels.Channel1.CustomName) > 3 {
+		if len(printSet[0].Labels.Channel1.CustomName) > 0 {
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)

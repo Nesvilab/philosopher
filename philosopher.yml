@@ -210,7 +210,6 @@ Label-Free Quantification:                       # Freequant
   tolerance: 10                                  # m/z tolerance in ppm (default 10)
 
 Isobaric Quantification:                         # Labelquant
-  annotation:                                    # annotation file with custom names for the TMT channels
   bestPSM: false                                 # select the best PSMs for protein quantification
   level: 2                                       # ms level for the quantification
   minProb: 0.7                                   # only use PSMs with a minimum probability score
