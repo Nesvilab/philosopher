@@ -1,6 +1,7 @@
 package spc_test
 
 import (
+	"fmt"
 	. "philosopher/lib/spc"
 	"philosopher/lib/tes"
 	"testing"
@@ -247,7 +248,7 @@ func TestProtXML_Parse(t *testing.T) {
 			}
 
 			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].ProteinName) != "sp|A0FGR8|ESYT2_HUMAN" {
-				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
+				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", fmt.Sprint(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
 			}
 
 			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence) != "AQPPEAGPQGLHDLGR" {
