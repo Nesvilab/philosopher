@@ -8,9 +8,11 @@
 - The "master" GitHub repository was renamed to "main".
 - Freequant and Labelquant can now be executed before the Filter command.
 - The parameter file was updated, and the terms made more human-readable.
+- The code compilation is now done with GO v1.15.
 
 ### Fixed
 - Small bugs and fixes.
 - PSMs lists often contained observations mapping to proteins that did not pass the FDR filter.
 - Bio quant was failing because of the unassigned database path.
 - Some annotation files were being ignored.
+- Added FASTA database file extension back again.

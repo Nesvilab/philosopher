@@ -3,7 +3,7 @@
 </p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/Nesvilab/philosopher/releases/latest)
-![Golang](https://img.shields.io/badge/Go-1.14.2-blue.svg?style=for-the-badge)
+![Golang](https://img.shields.io/badge/Go-1.15-blue.svg?style=for-the-badge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Nesvilab/philosopher?style=for-the-badge&color=red&logo=appveyor)](https://goreportcard.com/report/github.com/Nesvilab/philosopher)
 ![GitHub](https://img.shields.io/github/license/Nesvilab/philosopher?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
