@@ -306,10 +306,10 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 		baseName = baseName + "-contam"
 	}
 
-	workfile := fmt.Sprintf("%s%s-%s", temp, baseName, base)
-	outfile := fmt.Sprintf("%s%s-%s", home, baseName, base)
+	workfile := fmt.Sprintf("%s%s-%s.fas", temp, baseName, base)
+	outfile := fmt.Sprintf("%s%s-%s.fas", home, baseName, base)
 
-	// create decoy db file
+	// create db file
 	file, e := os.Create(workfile)
 	if e != nil {
 		msg.ReadFile(errors.New("Cannot open the database file"), "fatal")
