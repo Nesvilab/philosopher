@@ -158,7 +158,7 @@ Peptide Validation:                              # PeptideProphet v5.2
   ppm: true                                      # use PPM mass error instead of Dalton for mass modeling
   zero: false                                    # report results with minimum probability 0
 
-PTM Localization:                                # PTMProphet v5.2
+PTM Localization:                                # PTMProphet v6.0
   autodirect: false                              # use direct evidence when the lability is high, use in combination with LABILITY
   cions:                                         # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                  # use only direct evidence for evaluating PTM site probabilities
@@ -169,6 +169,8 @@ PTM Localization:                                # PTMProphet v5.2
   keepold: false                                 # retain old PTMProphet results in the pepXML file
   lability: false                                # compute Lability of PTMs
   massdiffmode: false                            # use the Mass Difference and localize
+  excludemassdiffmin: 0                          # Minimum mass difference excluded for MASSDIFFFMODE analysis (default=0)
+  excludemassdiffmax: 0                          # Maximun mass difference excluded for MASSDIFFFMODE analysis (default=0)
   massoffset: 0                                  # adjust the massdiff by offset (0 = use default)
   maxfragz: 0                                    # limit maximum fragment charge (default: 0=precursor charge, negative values subtract from precursor charge)
   maxthreads: 4                                  # use specified number of threads for processing

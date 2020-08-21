@@ -60,7 +60,7 @@ func writeMSFragger(d met.MSFragger, text string) string {
 	isotope errors %s. Cysteine carbamidomethylation (+57.0215) and lysine TMT labeling (+229.1629) were specified as fixed modifications, and methionine oxidation (+15.9949),
 	N-terminal protein acetylation (+42.0106), and TMT labeling of peptide N terminus and serine residues were specified as variable modifications. The search was restricted
 	to fully tryptic peptides, allowing up to two missed cleavage sites. For the analysis of phosphopeptide enriched data, the set of variable modifications also included
-	phosphorylation (+79.9663) of serine, threonine, and tyrosine residues
+	phosphorylation (+79.966331) of serine, threonine, and tyrosine residues
 	*/
 
 	var searchText string

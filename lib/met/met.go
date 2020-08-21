@@ -286,29 +286,31 @@ type ProteinProphet struct {
 
 // PTMProphet options and parameters
 type PTMProphet struct {
-	InputFiles   []string
-	Output       string  `yaml:"output"`
-	Mods         string  `yaml:"mods"`
-	NIons        string  `yaml:"nions"`
-	CIons        string  `yaml:"cions"`
-	EM           int     `yaml:"em"`
-	FragPPMTol   int     `yaml:"fragppmtol"`
-	MaxThreads   int     `yaml:"maxthreads"`
-	MaxFragZ     int     `yaml:"maxfragz"`
-	Mino         int     `yaml:"mino"`
-	MassOffset   int     `yaml:"massoffset"`
-	PPMTol       float64 `yaml:"ppmtol"`
-	MinProb      float64 `yaml:"minprob"`
-	Static       bool    `yaml:"static"`
-	NoUpdate     bool    `yaml:"noupdate"`
-	KeepOld      bool    `yaml:"keepold"`
-	Verbose      bool    `yaml:"verbose"`
-	MassDiffMode bool    `yaml:"massdiffmode"`
-	Lability     bool    `yaml:"lability"`
-	Direct       bool    `yaml:"direct"`
-	Ifrags       bool    `yaml:"ifrags"`
-	Autodirect   bool    `yaml:"autodirect"`
-	NoMinoFactor bool    `yaml:"nominofactor"`
+	InputFiles         []string
+	Output             string  `yaml:"output"`
+	Mods               string  `yaml:"mods"`
+	NIons              string  `yaml:"nions"`
+	CIons              string  `yaml:"cions"`
+	EM                 int     `yaml:"em"`
+	FragPPMTol         int     `yaml:"fragppmtol"`
+	MaxThreads         int     `yaml:"maxthreads"`
+	MaxFragZ           int     `yaml:"maxfragz"`
+	Mino               int     `yaml:"mino"`
+	MassOffset         int     `yaml:"massoffset"`
+	PPMTol             float64 `yaml:"ppmtol"`
+	MinProb            float64 `yaml:"minprob"`
+	ExcludeMassDiffMin float64 `yaml:"excludemassdiffmin"`
+	ExcludeMassDiffMax float64 `yaml:"excludemassdiffmax"`
+	Static             bool    `yaml:"static"`
+	NoUpdate           bool    `yaml:"noupdate"`
+	KeepOld            bool    `yaml:"keepold"`
+	Verbose            bool    `yaml:"verbose"`
+	MassDiffMode       bool    `yaml:"massdiffmode"`
+	Lability           bool    `yaml:"lability"`
+	Direct             bool    `yaml:"direct"`
+	Ifrags             bool    `yaml:"ifrags"`
+	Autodirect         bool    `yaml:"autodirect"`
+	NoMinoFactor       bool    `yaml:"nominofactor"`
 }
 
 // Filter options and parameters

@@ -9,6 +9,7 @@
 - Freequant and Labelquant can now be executed before the Filter command.
 - The parameter file was updated, and the terms made more human-readable.
 - The code compilation is now done with GO v1.15.
+- PTMProphet updated to v6.0
 
 ### Fixed
 - Small bugs and fixes.

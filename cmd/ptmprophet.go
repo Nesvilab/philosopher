@@ -59,6 +59,8 @@ func init() {
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.NoMinoFactor, "nominofactor", "", false, "disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.PPMTol, "ppmtol", "", 1, "use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.MinProb, "minprob", "", 0.9, "use specified minimum probability to evaluate peptides")
+		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.ExcludeMassDiffMin, "excludemassdiffmin", "", 0, "Minimum mass difference excluded for MASSDIFFFMODE analysis (default=0)")
+		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.ExcludeMassDiffMax, "excludemassdiffmax", "", 0, "Maximun mass difference excluded for MASSDIFFFMODE analysis (default=0)")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.MassDiffMode, "massdiffmode", "", false, "use the mass difference and localize")
 	}
 

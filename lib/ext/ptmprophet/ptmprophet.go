@@ -210,6 +210,16 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 		cmd.Args = append(cmd.Args, v)
 	}
 
+	if params.ExcludeMassDiffMin != 0 {
+		v := fmt.Sprintf("EXCLUDEMASSDIFFMIN=%.2f", params.ExcludeMassDiffMin)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.ExcludeMassDiffMax != 0 {
+		v := fmt.Sprintf("EXCLUDEMASSDIFFMAX=%.2f", params.ExcludeMassDiffMax)
+		cmd.Args = append(cmd.Args, v)
+	}
+
 	if len(params.NIons) > 0 {
 		v := fmt.Sprintf("NIONS=%s", params.NIons)
 		cmd.Args = append(cmd.Args, v)
