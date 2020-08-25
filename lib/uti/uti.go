@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"philosopher/lib/msg"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -98,10 +97,12 @@ func GetLabelNames(annot string) map[string]string {
 		if len(scanner.Text()) > 0 {
 
 			// replace tabs and multiple spaces by single space
-			space := regexp.MustCompile(`\s+`)
-			line := space.ReplaceAllString(scanner.Text(), " ")
+			// space := regexp.MustCompile(`\s+`)
+			// line := space.ReplaceAllString(scanner.Text(), " ")
 
-			names := strings.Split(line, " ")
+			// names := strings.Split(line, " ")
+
+			names := strings.Fields(scanner.Text())
 			labels[names[0]] = names[1]
 		}
 	}
