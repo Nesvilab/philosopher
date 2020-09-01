@@ -279,10 +279,22 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		)
 
 		if hasLoc == true {
+
+			var sites int
+			var md string
+
+			sites += i.LocalizedPTMSites["STY:79.9663"]
+			sites += i.LocalizedPTMSites["STY:79.96633"]
+			sites += i.LocalizedPTMSites["STY:79.966331"]
+
+			md += i.LocalizedPTMMassDiff["STY:79.9663"]
+			md += i.LocalizedPTMMassDiff["STY:79.96633"]
+			md += i.LocalizedPTMMassDiff["STY:79.966331"]
+
 			line = fmt.Sprintf("%s\t%d\t%s",
 				line,
-				i.LocalizedPTMSites["STY:79.9663"],
-				i.LocalizedPTMMassDiff["STY:79.9663"],
+				sites,
+				md,
 			)
 		}
 

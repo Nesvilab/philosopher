@@ -627,8 +627,10 @@ func Classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	for i := range evi.PSM {
 
 		if mods == true {
-			_, ok := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.9663"]
-			if ok {
+			_, ok1 := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.9663"]
+			_, ok2 := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.96633"]
+			_, ok3 := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.966331"]
+			if ok1 || ok2 || ok3 {
 				evi.PSM[i].Labels.HasPhospho = true
 			}
 		}
