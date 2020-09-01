@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	"philosopher/lib/dat"
-	"philosopher/lib/iso"
 	"philosopher/lib/met"
+	"philosopher/lib/mod"
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
@@ -103,11 +103,11 @@ var inspectCmd = &cobra.Command{
 			}
 			spew.Dump(o.Intensities)
 
-		} else if object == "iso" {
+		} else if object == "lfq" {
 
-			var o iso.Tag
+			var o qua.LFQ
 
-			target := fmt.Sprintf(".meta%siso.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%slfq.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -115,7 +115,21 @@ var inspectCmd = &cobra.Command{
 			if e != nil {
 				msg.DecodeMsgPck(e, "fatal")
 			}
-			spew.Dump(o.LabeledSpectra)
+			spew.Dump(o.Intensities)
+
+		} else if object == "mod" {
+
+			var o mod.Modifications
+
+			target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			e := dec.Decode(&o)
+			if e != nil {
+				msg.DecodeMsgPck(e, "fatal")
+			}
+			spew.Dump(o)
 
 		} else if object == "protein" {
 
