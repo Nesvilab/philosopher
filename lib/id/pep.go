@@ -388,6 +388,14 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 					if k.Name == "massd" {
 						psm.IsoMassD, _ = strconv.Atoi(k.Value)
 					}
+
+					// if k.Name == "ntt" {
+					// 	psm.NumberOfEnzymaticTermini, _ = strconv.Atoi(k.Value)
+					// }
+
+					// if k.Name == "nmc" {
+					// 	psm.NMC, _ = strconv.Atoi(k.Value)
+					// }
 				}
 			}
 
@@ -505,6 +513,8 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		}
 		p.Modifications.Index[key] = m
 	}
+
+	//}
 
 	return
 }
