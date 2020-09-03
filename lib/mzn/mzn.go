@@ -10,6 +10,7 @@ import (
 	"io"
 	"math"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -100,9 +101,6 @@ func (p *MsData) Read(f string) {
 
 	for _, i := range sl.Spectrum {
 
-		//var MS2FilterString = make(map[string]Precursor)
-		//var MS2Scan = make(map[string]string)
-
 		spectrum := processSpectrum(i)
 
 		// left-pad the spectrum scan
@@ -169,11 +167,20 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 		}
 
 		if string(j.Accession) == "MS:1000512" {
-			val := strings.Split(j.Value, " ")
+			//val := strings.Split(j.Value, " ")
 			if spec.Level == "2" {
-				spec.FilterString = val[8]
+
+				fs := regexp.MustCompile(`ms2\s(\d+\.\d{1,4})\@(cid|hcd)\d{1,2}?\.?\d{1,2}?`)
+				match := fs.FindStringSubmatch(j.Value)
+				spec.FilterString = match[1]
+				//fmt.Println(spec.Level, spec.Scan, spec.FilterString)
+
 			} else if spec.Level == "3" {
-				spec.FilterString = val[7]
+
+				fs := regexp.MustCompile(`ms3\s(\d+\.\d{1,4})\@(cid|hcd)\d{1,2}?\.?\d{1,2}?\s(\d+\.\d{1,4})\@(cid|hcd)`)
+				match := fs.FindStringSubmatch(j.Value)
+				spec.FilterString = match[1]
+				//fmt.Println(spec.Level, spec.Scan, spec.FilterString)
 			}
 		}
 

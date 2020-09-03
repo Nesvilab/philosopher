@@ -194,7 +194,12 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 			mz.Spectra[i].Decode()
 		}
 
+		//spew.Dump(mz)
+		//os.Exit(1)
+
 		labels = prepareLabelStructureWithMS(labels, p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
+
+		//spew.Dump(labels)
 
 		if p.Level == 3 {
 			labels = mapMS3IsoToMS2(labels)

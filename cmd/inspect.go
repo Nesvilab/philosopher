@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"philosopher/lib/iso"
 
 	"philosopher/lib/dat"
 	"philosopher/lib/met"
@@ -103,11 +104,11 @@ var inspectCmd = &cobra.Command{
 			}
 			spew.Dump(o.Intensities)
 
-		} else if object == "lfq" {
+		} else if object == "iso" {
 
-			var o qua.LFQ
+			var o iso.Labels
 
-			target := fmt.Sprintf(".meta%slfq.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%siso.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -115,7 +116,7 @@ var inspectCmd = &cobra.Command{
 			if e != nil {
 				msg.DecodeMsgPck(e, "fatal")
 			}
-			spew.Dump(o.Intensities)
+			spew.Dump(o)
 
 		} else if object == "mod" {
 
