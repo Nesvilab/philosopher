@@ -95,7 +95,7 @@ func GetLabelNames(annot string) map[string]string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		// does the line has at least an iso tag?
-		if len(scanner.Text()) > 3 {
+		if len(scanner.Text()) > 0 {
 
 			// replace tabs and multiple spaces by single space
 			space := regexp.MustCompile(`\s+`)
