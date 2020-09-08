@@ -1,43 +1,13 @@
 package iso
 
-import (
-	"io/ioutil"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
-
-	"github.com/vmihailenco/msgpack"
-)
-
-// Tag main structure
-type Tag struct {
-	LabeledSpectra map[string]Labels
-}
-
-// NewIsoLabels constructor
-func NewIsoLabels() Tag {
-
-	var self Tag
-
-	self.LabeledSpectra = make(map[string]Labels)
-
-	return self
-}
-
-// LabeledSpectra is a list of spectra lables
-//type LabeledSpectra map[string]Labels
-
 // Labels main struct
 type Labels struct {
 	Spectrum      string
-	Level         string
+	Index         string
 	Scan          string
-	ParentScan    string
-	MS2Fragment   string
 	RetentionTime float64
-	ChargeState   uint8
+	ChargeState   int
 	IsUsed        bool
-	HasPhospho    bool
-	Purity        float64
 	Channel1      Channel1
 	Channel2      Channel2
 	Channel3      Channel3
@@ -55,6 +25,9 @@ type Labels struct {
 	Channel15     Channel15
 	Channel16     Channel16
 }
+
+// LabeledSpectra is a list of spectra lables
+type LabeledSpectra map[string]Labels
 
 // Channel1 TMT
 type Channel1 struct {
@@ -182,36 +155,4 @@ type Channel16 struct {
 	CustomName string
 	Mz         float64
 	Intensity  float64
-}
-
-// Serialize saves to disk a msgpack version of the Isobaric data structure
-func (d *Tag) Serialize() {
-
-	b, e := msgpack.Marshal(&d)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.IsoBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.SerializeFile(e, "fatal")
-	}
-
-	return
-}
-
-// Restore reads philosopher results files and restore the data sctructure
-func (d *Tag) Restore() {
-
-	b, e := ioutil.ReadFile(sys.IsoBin())
-	if e != nil {
-		msg.MarshalFile(e, "warning")
-	}
-
-	e = msgpack.Unmarshal(b, &d)
-	if e != nil {
-		msg.SerializeFile(e, "warning")
-	}
-
-	return
 }

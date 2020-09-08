@@ -3,20 +3,15 @@ package qua
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/id"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
-	"philosopher/lib/sys"
 	"philosopher/lib/tmt"
 	"philosopher/lib/trq"
 	"philosopher/lib/uti"
@@ -38,45 +33,16 @@ func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
 func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 // RunLabelFreeQuantification is the top function for label free quantification
-// This function can be used for both pre and post filtering quantification
 func RunLabelFreeQuantification(p met.Quantify) {
 
-	// This parameter is hardcoded now because of the changes in the latest msconvert version 3.20.
-	p.Isolated = true
+	var evi rep.Evidence
+	evi.RestoreGranular()
 
-	var lfq = NewLFQ()
+	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
 
-	// collect database information
-	var db dat.Base
-	db.Restore()
+	evi = calculateIntensities(evi)
 
-	var input string
-	if len(p.Pex) > 0 {
-		input = p.Pex
-	} else {
-		input = "."
-	}
-
-	psm, _ := id.ReadPepXMLInput(input, db.Prefix, sys.GetTemp(), false)
-
-	psm = peakIntensity(psm, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
-
-	for _, i := range psm {
-		lfq.Intensities[i.Spectrum] = i.Intensity
-	}
-
-	lfq.Serialize()
-
-	// checks if the Evidence structure exists, if so, update it.
-	if _, err := os.Stat(sys.EvPSMBin()); err == nil {
-
-		var evi rep.Evidence
-		evi.RestoreGranular()
-
-		evi = PropagateIntensities(evi, lfq)
-		evi.SerializeGranular()
-
-	}
+	evi.SerializeGranular()
 
 	return
 }
@@ -84,59 +50,25 @@ func RunLabelFreeQuantification(p met.Quantify) {
 // RunIsobaricLabelQuantification is the top function for label quantification
 func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
-	// collect database information
-	var db dat.Base
-
-	var labels = iso.NewIsoLabels()
-	var psmMap = make(map[string]id.PeptideIdentification)
-	var sourceMap = make(map[string][]id.PeptideIdentification)
+	var psmMap = make(map[string]rep.PSMEvidence)
+	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
 	if p.Brand == "" {
 		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
 	}
 
-	var input string
-	if len(p.Pex) > 0 {
-		input = p.Pex
-	} else {
-		input = "."
-	}
+	var evi rep.Evidence
+	evi.RestoreGranular()
 
-	psm, _ := id.ReadPepXMLInput(input, db.Prefix, sys.GetTemp(), false)
-
-	if len(psm) < 1 {
-		msg.NoPSMFound(errors.New("PSMs not found in data set"), "fatal")
-	}
+	// removed all calculated defined values from before
+	evi = cleanPreviousData(evi, p.Brand, p.Plex)
 
 	// collect all used source file names
-	for _, i := range psm {
+	for _, i := range evi.PSM {
 		specName := strings.Split(i.Spectrum, ".")
 		sourceMap[specName[0]] = append(sourceMap[specName[0]], i)
 		psmMap[i.Spectrum] = i
-
-		// remove the pep.xml file name from the spectrum name
-		spectrumName := strings.Split(i.Spectrum, "#")
-
-		// left-pad the spectrum scan
-		paddedScan := fmt.Sprintf("%05d", i.Scan)
-
-		var l iso.Labels
-		if p.Brand == "tmt" {
-			l = tmt.New(p.Plex)
-		} else if p.Brand == "itraq" {
-			l = trq.New(p.Plex)
-		}
-
-		cleanSpecName := strings.Split(i.Spectrum, "#")
-
-		l.Spectrum = cleanSpecName[0]
-		l.Scan = paddedScan
-		l.Level = "2"
-		l.RetentionTime = i.RetentionTime
-		l.ChargeState = i.AssumedCharge
-
-		labels.LabeledSpectra[spectrumName[0]] = l
 	}
 
 	for i := range sourceMap {
@@ -155,7 +87,6 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	logrus.Info("Calculating intensities and ion interference")
 
-	var purities []string
 	for i := range sourceList {
 
 		var mz mzn.MsData
@@ -163,112 +94,88 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		mz.Read(fileName)
+		mz.Read(fileName, false, false, false)
 
 		for i := range mz.Spectra {
-
-			if mz.Spectra[i].Level == "2" || mz.Spectra[i].Level == "3" {
-
-				var l iso.Labels
-
-				if p.Brand == "tmt" {
-					l = tmt.New(p.Plex)
-				} else if p.Brand == "itraq" {
-					l = trq.New(p.Plex)
-				}
-
-				// fix the name
-				name := strings.Split(mz.Spectra[i].SpectrumName, ".")
-				l.Spectrum = fmt.Sprintf("%s.%s.%s.%d", name[0], name[1], name[2], mz.Spectra[i].Precursor.ChargeState)
-
-				l.Scan = fmt.Sprintf("%05s", mz.Spectra[i].Scan)
-				l.Level = mz.Spectra[i].Level
-				l.ParentScan = mz.Spectra[i].Precursor.ParentScan
-				l.MS2Fragment = fmt.Sprintf("%05s", mz.Spectra[i].MS2Fragment)
-				l.RetentionTime = mz.Spectra[i].ScanStartTime
-				l.ChargeState = uint8(mz.Spectra[i].Precursor.ChargeState)
-
-				labels.LabeledSpectra[mz.Spectra[i].SpectrumName] = l
-			}
-
 			mz.Spectra[i].Decode()
 		}
 
-		//spew.Dump(mz)
-		//os.Exit(1)
+		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
 
-		labels = prepareLabelStructureWithMS(labels, p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
-
-		//spew.Dump(labels)
-
+		var labels map[string]iso.Labels
 		if p.Level == 3 {
-			labels = mapMS3IsoToMS2(labels)
+			labels = prepareLabelStructureWithMS3(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
+
+		} else {
+			labels = prepareLabelStructureWithMS2(p.Dir, p.Format, p.Brand, p.Plex, p.Tol, mz)
 		}
 
-		purities = append(purities, calculateIonPurity(labels, p.Dir, p.Format, mz)...)
-	}
+		labels = assignLabelNames(labels, p.LabelNames, p.Brand, p.Plex)
 
-	for _, i := range purities {
-		s := strings.Split(i, "#")
-		v, ok := labels.LabeledSpectra[s[0]]
-		if ok {
-			v2 := v
-			f, _ := strconv.ParseFloat(s[1], 64)
-			v2.Purity = f
-			labels.LabeledSpectra[s[0]] = v2
-		}
-	}
+		mappedPSM := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 
-	labels = assignLabelNames(labels, p.LabelNames, p.Brand, p.Plex)
-
-	labels.Serialize()
-
-	// checks if the Evidence structure exists, if so, update it.
-	if _, err := os.Stat(sys.EvPSMBin()); err == nil {
-
-		var evi rep.Evidence
-		evi.RestoreGranular()
-
-		for i := range evi.PSM {
-			s := strings.Split(evi.PSM[i].Spectrum, "#")
-			v, ok := labels.LabeledSpectra[s[0]]
+		for _, j := range mappedPurity {
+			v, ok := psmMap[j.Spectrum]
 			if ok {
-				evi.PSM[i].Labels = v
+				psm := v
+				psm.Purity = j.Purity
+				psmMap[j.Spectrum] = psm
 			}
 		}
 
-		// classification and filtering based on quality filters
-		logrus.Info("Filtering spectra for label quantification")
-		evi = Classification(evi, mods, p.BestPSM, p.RemoveLow, p.Purity, p.MinProb)
-
-		// forces psms with no label to have 0 intensities
-		evi = CorrectUnlabelledSpectra(evi)
-
-		evi = RollUpPeptides(evi)
-
-		evi = RollUpPeptideIons(evi)
-
-		evi = RollUpProteins(evi)
-
-		// normalize to the total protein levels
-		logrus.Info("Calculating normalized protein levels")
-		evi = NormToTotalProteins(evi)
-
-		logrus.Info("Saving")
-
-		// create EV PSM
-		rep.SerializeEVPSM(&evi)
-
-		// create EV Ion
-		rep.SerializeEVIon(&evi)
-
-		// create EV Peptides
-		rep.SerializeEVPeptides(&evi)
-
-		// create EV Ion
-		rep.SerializeEVProteins(&evi)
+		for _, j := range mappedPSM {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Labels = j.Labels
+				psmMap[j.Spectrum] = psm
+			}
+		}
 
 	}
+
+	for i := range evi.PSM {
+		v, ok := psmMap[evi.PSM[i].Spectrum]
+		if ok {
+			evi.PSM[i].Purity = v.Purity
+			evi.PSM[i].Labels = v.Labels
+		}
+	}
+	//psmMap = nil
+
+	// classification and filtering based on quality filters
+	logrus.Info("Filtering spectra for label quantification")
+	spectrumMap, phosphoSpectrumMap := classification(evi, mods, p.BestPSM, p.RemoveLow, p.Purity, p.MinProb)
+
+	// assignment happens only for general PSMs
+	evi = assignUsage(evi, spectrumMap)
+
+	// forces psms with no label to have 0 intensities
+	evi = correctUnlabelledSpectra(evi)
+
+	evi = rollUpPeptides(evi, spectrumMap, phosphoSpectrumMap)
+
+	evi = rollUpPeptideIons(evi, spectrumMap, phosphoSpectrumMap)
+
+	evi = rollUpProteins(evi, spectrumMap, phosphoSpectrumMap)
+
+	// normalize to the total protein levels
+	logrus.Info("Calculating normalized protein levels")
+	evi = NormToTotalProteins(evi)
+
+	logrus.Info("Saving")
+
+	// create EV PSM
+	rep.SerializeEVPSM(&evi)
+
+	// create EV Ion
+	rep.SerializeEVIon(&evi)
+
+	// create EV Peptides
+	rep.SerializeEVPeptides(&evi)
+
+	// create EV Ion
+	rep.SerializeEVProteins(&evi)
 
 	return p
 }
@@ -335,9 +242,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 }
 
 // checks for custom names and assign the normal channel or the custom name to the CustomName
-func assignLabelNames(labels iso.Tag, labelNames map[string]string, brand, plex string) iso.Tag {
+func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string, brand, plex string) map[string]iso.Labels {
 
-	for k, v := range labels.LabeledSpectra {
+	for k, v := range labels {
 		v2 := v
 
 		if brand == "tmt" {
@@ -515,24 +422,35 @@ func assignLabelNames(labels iso.Tag, labelNames map[string]string, brand, plex 
 
 		}
 
-		labels.LabeledSpectra[k] = v2
+		labels[k] = v2
 	}
 
 	return labels
 }
 
-// Classification determines if PSMs should be used or not for isobaric tag quantification rollup
-func Classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) rep.Evidence {
+func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[string]iso.Labels, map[string]iso.Labels) {
 
-	var approvedPSMs = make(map[string]uint8)
+	var spectrumMap = make(map[string]iso.Labels)
+	var phosphoSpectrumMap = make(map[string]iso.Labels)
+
 	var bestMap = make(map[string]uint8)
+
 	var psmLabelSumList PairList
 
 	// 1st check: Purity the score and the Probability levels
 	for _, i := range evi.PSM {
+		if i.Probability >= probability && i.Purity >= purity {
 
-		if i.Probability >= probability && i.Labels.Purity >= purity {
-			approvedPSMs[i.Spectrum] = 0
+			spectrumMap[i.Spectrum] = i.Labels
+			bestMap[i.Spectrum] = 0
+
+			if mods == true {
+				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				if ok {
+					phosphoSpectrumMap[i.Spectrum] = i.Labels
+				}
+			}
+
 		}
 
 		if remove != 0 {
@@ -552,10 +470,8 @@ func Classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel14.Intensity +
 				i.Labels.Channel15.Intensity +
 				i.Labels.Channel16.Intensity
-
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
 		}
-
 	}
 
 	// 2nd check: best PSM
@@ -602,14 +518,16 @@ func Classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				}
 
 				bestMap[bestPSM] = 0
+
 			}
 		}
 	}
 
+	var toDelete = make(map[string]uint8)
+	var toDeletePhospho = make(map[string]uint8)
+
 	// 3rd check: remove the lower 3%
 	// Ignore all PSMs that fall under the lower 3% based on their summed TMT labels
-	var toDelete = make(map[string]uint8)
-
 	if remove != 0 {
 		sort.Sort(psmLabelSumList)
 		lowerFive := float64(len(psmLabelSumList)) * remove
@@ -617,40 +535,32 @@ func Classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 		for i := 0; i <= lowerFiveInt; i++ {
 			toDelete[psmLabelSumList[i].Key] = 0
+			toDeletePhospho[psmLabelSumList[i].Key] = 0
+		}
+	}
+
+	for k := range spectrumMap {
+		_, ok := bestMap[k]
+		if !ok {
+			toDelete[k] = 0
+		}
+	}
+
+	for i := range toDelete {
+		delete(spectrumMap, i)
+	}
+
+	for k := range phosphoSpectrumMap {
+		_, ok := bestMap[k]
+		if !ok {
+			toDeletePhospho[k] = 0
 		}
 	}
 
 	logrus.Info("Removing ", len(toDelete), " PSMs from isobaric quantification")
-
-	for _, i := range evi.PSM {
-		_, ok := toDelete[i.Spectrum]
-		if !ok {
-			approvedPSMs[i.Spectrum] = 0
-		}
+	for i := range toDeletePhospho {
+		delete(phosphoSpectrumMap, i)
 	}
 
-	for i := range evi.PSM {
-
-		if mods == true {
-			_, ok := evi.PSM[i].LocalizedPTMSites["PTMProphet_STY79.966331"]
-			if ok {
-				evi.PSM[i].Labels.HasPhospho = true
-			}
-		}
-
-		_, ok1 := approvedPSMs[evi.PSM[i].Spectrum]
-		_, ok2 := bestMap[evi.PSM[i].Spectrum]
-
-		if best == true {
-			if ok2 {
-				evi.PSM[i].Labels.IsUsed = true
-			}
-		} else {
-			if ok1 {
-				evi.PSM[i].Labels.IsUsed = true
-			}
-		}
-	}
-
-	return evi
+	return spectrumMap, phosphoSpectrumMap
 }

@@ -3,23 +3,19 @@ package qua
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"philosopher/lib/bio"
-	"philosopher/lib/id"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 	"philosopher/lib/uti"
 
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
 )
 
 // LFQ main structure
@@ -37,7 +33,7 @@ func NewLFQ() LFQ {
 	return self
 }
 
-func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float64, isIso bool) id.PepIDList {
+func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
 
@@ -53,7 +49,7 @@ func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float
 	var charges = make(map[string]int)
 
 	// collect attributes from PSM
-	for _, i := range psm {
+	for _, i := range evi.PSM {
 		partName := strings.Split(i.Spectrum, ".")
 		sourceMap[partName[0]] = 0
 		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
@@ -83,7 +79,7 @@ func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
 		// load MS1, ignore MS2 and MS3
-		mz.Read(fileName)
+		mz.Read(fileName, false, false, true)
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
@@ -138,15 +134,15 @@ func peakIntensity(psm id.PepIDList, dir, format string, rTWin, pTWin, tol float
 		}
 	}
 
-	for i := range psm {
-		partName := strings.Split(psm[i].Spectrum, ".")
+	for i := range evi.PSM {
+		partName := strings.Split(evi.PSM[i].Spectrum, ".")
 		_, ok := spectra[partName[0]]
 		if ok {
-			psm[i].Intensity = intensity[psm[i].Spectrum]
+			evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
 		}
 	}
 
-	return psm
+	return evi
 }
 
 // xic extract ion chomatograms
@@ -189,41 +185,35 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 	return list, false
 }
 
-// PropagateIntensities propagates the PSM intensities to the other layers
-func PropagateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
+func calculateIntensities(e rep.Evidence) rep.Evidence {
 
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		msg.QuantifyingData(errors.New("The PSM list is empty"), "fatal")
+		msg.QuantifyingData(errors.New("The PSM list is enpty"), "fatal")
 	}
 
 	var peptideIntMap = make(map[string]float64)
 	var ionIntMap = make(map[string]float64)
 
-	for i := range e.PSM {
-
-		v, ok1 := lfq.Intensities[e.PSM[i].Spectrum]
-		if ok1 {
-			e.PSM[i].Intensity = v
-		}
+	for _, i := range e.PSM {
 
 		// peptide intensity : sum of all
-		_, ok := peptideIntMap[e.PSM[i].Peptide]
+		_, ok := peptideIntMap[i.Peptide]
 		if ok {
-			peptideIntMap[e.PSM[i].Peptide] += e.PSM[i].Intensity
+			peptideIntMap[i.Peptide] += i.Intensity
 		} else {
-			peptideIntMap[e.PSM[i].Peptide] += e.PSM[i].Intensity
+			peptideIntMap[i.Peptide] += i.Intensity
 		}
 
 		// ion intensity : most intense ion
-		ionV, ok := ionIntMap[e.PSM[i].IonForm]
+		ionV, ok := ionIntMap[i.IonForm]
 		if ok {
-			if e.PSM[i].Intensity > ionV {
-				ionIntMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
+			if i.Intensity > ionV {
+				ionIntMap[i.IonForm] = i.Intensity
 			}
 		} else {
-			ionIntMap[e.PSM[i].IonForm] = e.PSM[i].Intensity
+			ionIntMap[i.IonForm] = i.Intensity
 		}
 
 	}
@@ -297,36 +287,4 @@ func PropagateIntensities(e rep.Evidence, lfq LFQ) rep.Evidence {
 	}
 
 	return e
-}
-
-// Serialize saves to disk a msgpack version of the LFQ data structure
-func (d *LFQ) Serialize() {
-
-	b, e := msgpack.Marshal(&d)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.LFQBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.SerializeFile(e, "fatal")
-	}
-
-	return
-}
-
-// Restore reads philosopher results files and restore the data sctructure
-func (d *LFQ) Restore() {
-
-	b, e := ioutil.ReadFile(sys.LFQBin())
-	if e != nil {
-		msg.MarshalFile(e, "warning")
-	}
-
-	e = msgpack.Unmarshal(b, &d)
-	if e != nil {
-		msg.SerializeFile(e, "warning")
-	}
-
-	return
 }

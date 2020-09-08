@@ -1,20 +1,21 @@
 package qua
 
 import (
+	"errors"
+
+	"philosopher/lib/msg"
 	"philosopher/lib/rep"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
-	// if len(e.PSM) < 1 && len(e.Ions) < 1 {
-	// 	fmt.Println("spc")
-	// 	msg.QuantifyingData(errors.New("The PSM list is enpty"), "warning")
-	// }
+	if len(e.PSM) < 1 && len(e.Ions) < 1 {
+		msg.QuantifyingData(errors.New("The PSM list is enpty"), "warning")
+	}
 
 	var uniqueIonPSM = make(map[string]string)
 	var razorIonPSM = make(map[string]string)
-
 	for _, i := range e.PSM {
 		if i.IsUnique {
 			uniqueIonPSM[i.Spectrum] = i.ProteinID

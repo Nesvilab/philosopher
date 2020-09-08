@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"philosopher/lib/msg"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -94,15 +95,13 @@ func GetLabelNames(annot string) map[string]string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		// does the line has at least an iso tag?
-		if len(scanner.Text()) > 0 {
+		if len(scanner.Text()) > 3 {
 
 			// replace tabs and multiple spaces by single space
-			// space := regexp.MustCompile(`\s+`)
-			// line := space.ReplaceAllString(scanner.Text(), " ")
+			space := regexp.MustCompile(`\s+`)
+			line := space.ReplaceAllString(scanner.Text(), " ")
 
-			// names := strings.Split(line, " ")
-
-			names := strings.Fields(scanner.Text())
+			names := strings.Split(line, " ")
 			labels[names[0]] = names[1]
 		}
 	}

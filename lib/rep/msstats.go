@@ -105,7 +105,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 			case 10:
 				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Labels.Purity,
+					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -120,7 +120,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 			case 11:
 				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Labels.Purity,
+					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -136,7 +136,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 			case 16:
 				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Labels.Purity,
+					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
