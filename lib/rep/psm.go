@@ -186,22 +186,24 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if len(printSet[0].Labels.Channel1.CustomName) > 3 {
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
+	if len(printSet) > 0 {
+		if len(printSet[0].Labels.Channel1.CustomName) > 3 {
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
+		}
 	}
 
 	_, e = io.WriteString(file, header)
@@ -457,3 +459,94 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 
 	return
 }
+
+// PepXMLReport report PSMs in pep.xml format
+// func (evi *Evidence) PepXMLReport() {
+
+// 	// collect database information
+// 	var dtb dat.Base
+// 	dtb.Restore()
+
+// 	var proteinDescription = make(map[string]string)
+// 	for _, j := range dtb.Records {
+// 		proteinDescription[j.PartHeader] = j.Description
+// 	}
+
+// 	t := time.Now()
+
+// 	// collect source file names
+// 	var sourceMap = make(map[string]uint8)
+// 	var sources []string
+// 	for _, i := range evi.PSM {
+// 		s := strings.Split(i.Spectrum, ".")
+// 		sourceMap[s[0]]++
+// 	}
+
+// 	for i := range sourceMap {
+// 		sources = append(sources, i)
+// 	}
+
+// 	sort.Strings(sources)
+
+// 	var p spc.PepXML
+
+// 	p.MsmsPipelineAnalysis.Date = t.Format(time.ANSIC)
+
+// 	as := &spc.AnalysisSummary{
+// 		Analysis: "philosopher",
+// 		Time:     t.Format(time.ANSIC),
+// 	}
+// 	p.MsmsPipelineAnalysis.AnalysisSummary = append(p.MsmsPipelineAnalysis.AnalysisSummary, *as)
+
+// 	for _, i := range evi.PSM {
+
+// 		spectrumName := strings.Split(i.Spectrum, "#")
+
+// 		sq := &spc.SpectrumQuery{
+// 			StartScan:            i.Scan,
+// 			EndScan:              i.Scan,
+// 			AssumedCharge:        i.AssumedCharge,
+// 			Spectrum:             spectrumName[0],
+// 			Index:                i.Index,
+// 			PrecursorNeutralMass: i.PrecursorNeutralMass,
+// 			RetentionTimeSec:     i.RetentionTime,
+// 			PrecursorIntensity:   i.Intensity,
+// 			SearchResult: spc.SearchResult{
+// 				SearchHit: []spc.SearchHit{
+// 					{
+// 						Peptide:            i.Peptide,
+// 						Massdiff:           i.Massdiff,
+// 						CalcNeutralPepMass: i.CalcNeutralPepMass,
+// 						NextAA:             i.NextAA,
+// 						PrevAA:             i.PrevAA,
+// 						IsRejected:         0,
+// 						ProteinDescr:       i.ProteinDescription,
+// 						HitRank:            i.HitRank,
+// 						Protein:            i.Protein,
+// 						AnalysisResult: []spc.AnalysisResult{
+// 							{
+// 								Analysis: "peptideprophet",
+// 								PeptideProphetResult: spc.PeptideProphetResult{
+// 									Probability: i.Probability,
+// 								},
+// 							},
+// 						},
+// 					},
+// 				},
+// 			},
+// 		}
+
+// 		for j := range i.MappedProteins {
+// 			ap := &spc.AlternativeProtein{
+// 				Protein:     j,
+// 				Description: proteinDescription[j],
+// 			}
+// 			sq.SearchResult.SearchHit[0].AlternativeProteins = append(sq.SearchResult.SearchHit[0].AlternativeProteins, *ap)
+// 		}
+
+// 		p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery = append(p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery, *sq)
+// 	}
+
+// 	p.Write()
+
+// }
