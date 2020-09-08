@@ -35,6 +35,9 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 // RunLabelFreeQuantification is the top function for label free quantification
 func RunLabelFreeQuantification(p met.Quantify) {
 
+	// This parameter is hardcoded now because of the changes in the latest msconvert version 3.20.
+	p.Isolated = true
+
 	var evi rep.Evidence
 	evi.RestoreGranular()
 

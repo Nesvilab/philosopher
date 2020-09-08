@@ -59,6 +59,8 @@ func Run(m met.Data) met.Data {
 
 		logrus.Info("Processing database")
 
+		m.DB = m.Database.Annot
+
 		db.ProcessDB(m.Database.Annot, m.Database.Tag)
 
 		db.Serialize()
@@ -75,6 +77,8 @@ func Run(m met.Data) met.Data {
 	}
 
 	if len(m.Database.Custom) < 1 {
+
+		m.DB = m.Database.Custom
 
 		dbs := strings.Split(m.Database.ID, ",")
 		for _, i := range dbs {
