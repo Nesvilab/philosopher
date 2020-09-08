@@ -20,27 +20,27 @@ import (
 )
 
 // Run is the workspace main entry point
-func Run(Version, Build string, b, c, i, n bool) {
+func Run(Version, Build, temp string, backup, clean, initialize, nocheck bool) {
 
-	if n == false {
+	if nocheck == false {
 		gth.UpdateChecker(Version, Build)
 	}
 
-	if (i == true && b == true && c == true) || (i == true && b == true) || (i == true && c == true) || (c == true && b == true) {
+	if (initialize == true && backup == true && clean == true) || (initialize == true && backup == true) || (initialize == true && clean == true) || (clean == true && backup == true) {
 		msg.Custom(errors.New("this command accepts only one parameter"), "fatal")
 	}
 
-	if i == true {
+	if initialize == true {
 
 		logrus.Info("Creating workspace")
-		Init(Version, Build)
+		Init(Version, Build, temp)
 
-	} else if b == true {
+	} else if backup == true {
 
 		logrus.Info("Creating backup")
 		Backup()
 
-	} else if c == true {
+	} else if clean == true {
 
 		logrus.Info("Removing workspace")
 		Clean()
@@ -50,7 +50,7 @@ func Run(Version, Build string, b, c, i, n bool) {
 }
 
 // Init creates a new workspace
-func Init(version, build string) {
+func Init(version, build, temp string) {
 
 	var m met.Data
 
@@ -71,6 +71,12 @@ func Init(version, build string) {
 
 		da.Version = version
 		da.Build = build
+
+		// if a custom temp is required, check if the path is correct, then assign it
+		if len(temp) > 0 {
+			sys.VerifyTemp(temp)
+			da.Temp, _ = filepath.Abs(temp)
+		}
 
 		os.Mkdir(da.MetaDir, sys.FilePermission())
 		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {

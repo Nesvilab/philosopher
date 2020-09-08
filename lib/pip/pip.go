@@ -105,7 +105,7 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		os.Chdir(dsAbs)
 
 		// Workspace
-		wrk.Run(Version, Build, false, false, true, true)
+		wrk.Run(Version, Build, "", false, false, true, true)
 
 		// reload the meta data to avoid being overwritten with black home
 		meta.Restore(sys.Meta())

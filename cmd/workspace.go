@@ -23,7 +23,7 @@ var workspaceCmd = &cobra.Command{
 
 		msg.Executing("Workspace ", Version)
 
-		wrk.Run(Version, Build, backup, clean, initialize, nocheck)
+		wrk.Run(Version, Build, temp, backup, clean, initialize, nocheck)
 
 		msg.Done()
 		return
