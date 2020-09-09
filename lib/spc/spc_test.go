@@ -1,6 +1,7 @@
 package spc_test
 
 import (
+	"fmt"
 	. "philosopher/lib/spc"
 	"philosopher/lib/tes"
 	"testing"
@@ -139,8 +140,8 @@ func TestPepXML_Parse(t *testing.T) {
 				t.Errorf("Hit Rank is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].SearchResult.SearchHit[0].HitRank, uint8(1))
 			}
 
-			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index != uint32(1) {
-				t.Errorf("Index is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index, uint32(1))
+			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index != 1 {
+				t.Errorf("Index is incorrect, got %d, want %d", p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].Index, 1)
 			}
 
 			if p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery[0].SearchResult.SearchHit[0].IsRejected != uint8(0) {
@@ -247,7 +248,7 @@ func TestProtXML_Parse(t *testing.T) {
 			}
 
 			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].ProteinName) != "sp|A0FGR8|ESYT2_HUMAN" {
-				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", string(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
+				t.Errorf("Protein 1 name in protein group 6 is incorrect, got %s, want %s", fmt.Sprint(p.ProteinSummary.ProteinGroup[5].Protein[0].TotalNumberPeptides), "sp|A0FGR8|ESYT2_HUMAN")
 			}
 
 			if string(p.ProteinSummary.ProteinGroup[5].Protein[0].Peptide[0].PeptideSequence) != "AQPPEAGPQGLHDLGR" {
