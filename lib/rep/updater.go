@@ -185,9 +185,6 @@ func (evi *Evidence) SyncPSMToProteins() {
 	var newPSM PSMEvidenceList
 	var newIons IonEvidenceList
 	var newPeptides PeptideEvidenceList
-	//var uniquePSMProteins = make(map[string]uint8)
-	//var uniqueIonsProteins = make(map[string]uint8)
-	//var uniquePeptidesProteins = make(map[string]uint8)
 
 	for _, i := range evi.Proteins {
 		if !i.IsDecoy {

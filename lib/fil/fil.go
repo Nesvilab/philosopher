@@ -166,6 +166,10 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+		e.SyncPSMToProteins()
+	}
+
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assignment to proteins")
 	if f.Filter.Razor == true {
