@@ -659,17 +659,10 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 				meta.Filter.Pex = p.Filter.Pex
 			}
 
-			if p.Steps.ProteinInference == "yes" {
-				if len(p.Filter.Pox) == 0 {
-					meta.Filter.Pox = "interact.prot.xml"
-				} else {
-					meta.Filter.Pox = p.Filter.Pox
-				}
+			if len(p.Filter.Pox) == 0 {
+				meta.Filter.Pox = "interact.prot.xml"
 			} else {
-				meta.Filter.Pox = ""
-				meta.Filter.Razor = false
-				meta.Filter.TwoD = false
-				meta.Filter.Seq = false
+				meta.Filter.Pox = p.Filter.Pox
 			}
 
 			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
