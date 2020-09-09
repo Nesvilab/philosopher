@@ -160,7 +160,6 @@ func Run(f met.Data) met.Data {
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
 
-		e.SyncPSMToProteins()
 	}
 
 	logrus.Info("Assigning protein identifications to layers")
