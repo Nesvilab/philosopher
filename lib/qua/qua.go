@@ -448,8 +448,10 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 			bestMap[i.Spectrum] = 0
 
 			if mods == true {
-				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
-				if ok {
+				_, ok1 := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				_, ok2 := i.LocalizedPTMSites["PTMProphet_STY79.96633"]
+				_, ok3 := i.LocalizedPTMSites["PTMProphet_STY79.966331"]
+				if ok1 || ok2 || ok3 {
 					phosphoSpectrumMap[i.Spectrum] = i.Labels
 				}
 			}
