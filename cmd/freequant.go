@@ -39,6 +39,7 @@ var freequant = &cobra.Command{
 		}
 
 		//forcing the larger time window to be the same as the smaller one
+		//m.Quantify.RTWin = 3
 		m.Quantify.RTWin = m.Quantify.PTWin
 
 		// run label-free quantification
