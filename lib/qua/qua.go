@@ -97,7 +97,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		mz.Read(fileName, false, false, false)
+		mz.Read(fileName)
 
 		for i := range mz.Spectra {
 			mz.Spectra[i].Decode()

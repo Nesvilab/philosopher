@@ -71,15 +71,39 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 
 			stream := MS1Peaks[paddedPS]
 
+			// if mz.Spectra[i].Scan == "03428" {
+			// 	fmt.Println("index", mz.Spectra[i].Index)
+			// 	fmt.Println("scan", mz.Spectra[i].Scan)
+			// 	fmt.Println("targetIon", mz.Spectra[i].Precursor.TargetIon)
+			// 	fmt.Println("low", mz.Spectra[i].Precursor.IsolationWindowLowerOffset)
+			// 	fmt.Println("up", mz.Spectra[i].Precursor.IsolationWindowUpperOffset)
+			// }
+
+			// for j := range stream {
+			// 	if stream[j] >= (mz.Spectra[i].Precursor.TargetIon-mz.Spectra[i].Precursor.IsolationWindowLowerOffset) && stream[j] <= (mz.Spectra[i].Precursor.TargetIon+mz.Spectra[i].Precursor.IsolationWindowUpperOffset) {
+			// 		mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
+			// 		break
+			// 	}
+			// }
+
 			for j := range stream {
 				if stream[j] >= (mz.Spectra[i].Precursor.TargetIon-mz.Spectra[i].Precursor.IsolationWindowLowerOffset) && stream[j] <= (mz.Spectra[i].Precursor.TargetIon+mz.Spectra[i].Precursor.IsolationWindowUpperOffset) {
-					mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
-					break
+					if MS1Int[mz.Spectra[i].Precursor.ParentScan][j] > mz.Spectra[i].Precursor.TargetIonIntensity {
+						mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
+					}
 				}
 			}
 
 			indexedMS2[paddedScan] = mz.Spectra[i]
 		}
+
+		// if mz.Spectra[i].Scan == "3428" || mz.Spectra[i].Scan == "03428" {
+		// 	fmt.Println("index", mz.Spectra[i].Index)
+		// 	fmt.Println("scan", mz.Spectra[i].Scan)
+		// 	fmt.Println("parentIndex", mz.Spectra[i].Precursor.ParentIndex)
+		// 	fmt.Println("parentScan", mz.Spectra[i].Precursor.ParentScan)
+		// 	fmt.Println("targetIon", mz.Spectra[i].Precursor.TargetIonIntensity)
+		// }
 	}
 
 	for i := range evi {
