@@ -99,6 +99,11 @@ var pipelineCmd = &cobra.Command{
 			meta = pip.CombinedProteinList(meta, p, dir, args)
 		}
 
+		// Filter
+		if p.Steps.FDRFiltering == "yes" {
+			meta = pip.Filter(meta, p, dir, args)
+		}
+
 		// FreeQuant
 		if p.Steps.LabelFreeQuantification == "yes" {
 			meta = pip.FreeQuant(meta, p, dir, args)
@@ -107,11 +112,6 @@ var pipelineCmd = &cobra.Command{
 		// LabelQuant
 		if p.Steps.IsobaricQuantification == "yes" {
 			meta = pip.LabelQuant(meta, p, dir, args)
-		}
-
-		// Filter
-		if p.Steps.FDRFiltering == "yes" {
-			meta = pip.Filter(meta, p, dir, args)
 		}
 
 		// Report
