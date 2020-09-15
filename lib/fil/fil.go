@@ -45,7 +45,7 @@ func Run(f met.Data) met.Data {
 		f.Filter.TwoD = true
 	}
 
-	pepid, searchEngine := readPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model, f.MSFragger.CalibrateMass)
+	pepid, searchEngine := ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
 
 	f.SearchEngine = searchEngine
 
@@ -188,8 +188,8 @@ func Run(f met.Data) met.Data {
 	return f
 }
 
-// readPepXMLInput reads one or more fies and organize the data into PSM list
-func readPepXMLInput(xmlFile, decoyTag, temp string, models bool, calibratedMass int) (id.PepIDList, string) {
+// ReadPepXMLInput reads one or more fies and organize the data into PSM list
+func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string) {
 
 	var files = make(map[string]uint8)
 	var fileCheckList []string

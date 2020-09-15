@@ -39,7 +39,7 @@ func Test_readPepXMLInput(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, got1 := readPepXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.temp, tt.args.models, tt.args.calibratedMass)
+			got, got1 := ReadPepXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.temp, tt.args.models)
 			pepIDList = got
 
 			if !reflect.DeepEqual(len(got), tt.want) {

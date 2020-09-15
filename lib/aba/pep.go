@@ -32,7 +32,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
-	seqMap, chargeMap := processPeptideCombinedFile(m.Abacus)
+	processPeptideCombinedFile(m.Abacus)
 
 	// recover all files
 	logrus.Info("Restoring peptide results")
@@ -85,16 +85,15 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		names = append(names, prjName)
 	}
 
+	os.Chdir(local)
+
 	sort.Strings(names)
 
 	logrus.Info("Collecting data from individual experiments")
-	evidences := collectPeptideDatafromExperiments(datasets, seqMap, chargeMap)
+	evidences := collectPeptideDatafromExperiments(datasets, m.Abacus.Tag)
 
-	logrus.Info("Processing spectral counts")
-	evidences = getPeptideSpectralCounts(evidences, datasets)
-
-	logrus.Info("Processing intensities")
-	evidences = getIntensities(evidences, datasets)
+	logrus.Info("Summarizing the quantification")
+	evidences = SummarizeAttributes(evidences, datasets, local)
 
 	os.Chdir(local)
 
@@ -103,232 +102,153 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	return
 }
 
-// collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
-func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, seqMap map[string]int8, chargeMap map[string][]string) rep.CombinedPeptideEvidenceList {
+// processPeptideCombinedFile reads and filter the combined peptide report
+func processPeptideCombinedFile(a met.Abacus) {
 
-	var evidences rep.CombinedPeptideEvidenceList
-	var uniqPeptides = make(map[string]uint8)
-	var proteinMap = make(map[string]string)
-	var proteinIDMap = make(map[string]string)
-	var proteinDesc = make(map[string]string)
-	var geneMap = make(map[string]string)
-	var probMap = make(map[string]float64)
+	var pepID id.PepIDList
 
-	for _, v := range datasets {
-		for _, i := range v.PSM {
+	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-			_, ok := seqMap[i.Peptide]
-			if ok {
+		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
 
-				var keys []string
-				keys = append(keys, i.Peptide)
+	} else {
 
-				if i.Probability > probMap[i.Peptide] {
-					probMap[i.Peptide] = i.Probability
-				}
+		var pep id.PepXML
+		pep.DecoyTag = a.Tag
 
-				var uniqMds = make(map[string]uint8)
+		pepID, _ = fil.ReadPepXMLInput("combined.pep.xml", a.Tag, sys.GetTemp(), false)
 
-				for _, j := range i.Modifications.Index {
-					if j.Type == "Assigned" {
-						mass := strconv.FormatFloat(j.MassDiff, 'f', 6, 64)
-						uniqMds[mass] = 0
-					}
-				}
+		//uniqPsms := fil.GetUniquePSMs(pepID)
+		uniqPeps := fil.GetUniquePeptides(pepID)
 
-				// this forces the unmodified peps to collapse with peps containing +16
-				if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-					delete(uniqMds, "0")
-					delete(uniqMds, "0.000000")
-				}
-				delete(uniqMds, "15.994900")
+		//filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+		filteredPeptides.Serialize("pep")
 
-				// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-				// 	uniqMds["15.994900"] = 0
-				// 	delete(uniqMds, "0")
-				// 	delete(uniqMds, "0.000000")
-				// }
-
-				for j := range uniqMds {
-					keys = append(keys, j)
-				}
-
-				sort.Strings(keys[1:])
-
-				key := strings.Join(keys, "#")
-				uniqPeptides[key] = 0
-
-				proteinMap[i.Peptide] = i.Protein
-				proteinIDMap[i.Peptide] = i.ProteinID
-				proteinDesc[i.Peptide] = i.ProteinDescription
-				geneMap[i.Peptide] = i.GeneName
-
-			}
-		}
 	}
 
-	for k := range uniqPeptides {
+	return
+}
 
-		var e rep.CombinedPeptideEvidence
-		e.Spc = make(map[string]int)
-		e.Intensity = make(map[string]float64)
+// collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
+func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, decoyTag string) rep.CombinedPeptideEvidenceList {
 
-		parts := strings.Split(k, "#")
+	var pep id.PepIDList
+	pep.Restore("pep")
 
-		e.Key = k
-		e.Sequence = parts[0]
-		e.BestPSM = probMap[parts[0]]
+	var evidences rep.CombinedPeptideEvidenceList
 
-		sort.Strings(parts[1:])
-		e.AssignedMassDiffs = parts[1:]
+	for _, i := range pep {
+		if !strings.HasPrefix(i.Protein, decoyTag) {
+			var e rep.CombinedPeptideEvidence
+			e.Spc = make(map[string]int)
+			e.Intensity = make(map[string]float64)
+			e.AssignedMassDiffs = make(map[string]uint8)
+			e.ChargeStates = make(map[uint8]uint8)
 
-		charges, ok := chargeMap[parts[0]]
-		if ok {
+			e.Sequence = i.Peptide
+			e.Protein = i.Protein
 
-			var uniqCharges = make(map[string]uint8)
-			for _, ch := range charges {
-				uniqCharges[ch] = 0
-			}
-
-			for ch := range uniqCharges {
-				e.ChargeStates = append(e.ChargeStates, ch)
-			}
-			sort.Strings(e.ChargeStates)
+			evidences = append(evidences, e)
 		}
-
-		v, ok := proteinMap[parts[0]]
-		if ok {
-			e.Protein = v
-			e.ProteinID = proteinIDMap[parts[0]]
-			e.ProteinDescription = proteinDesc[parts[0]]
-			e.Gene = geneMap[parts[0]]
-		}
-
-		evidences = append(evidences, e)
-
 	}
 
 	return evidences
 }
 
-// getPeptideSpectralCounts collects spectral counts from the individual data sets for the combined peptide report
-func getPeptideSpectralCounts(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
+// SummarizeAttributes collects spectral counts and intensities from the individual data sets for the combined peptide report
+func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, local string) rep.CombinedPeptideEvidenceList {
 
-	for k, v := range datasets {
+	var chargeMap = make(map[string][]uint8)
+	var bestPSM = make(map[string]float64)
 
-		var keyMaps = make(map[string]int)
+	for k := range datasets {
 
-		for _, j := range v.PSM {
+		os.Chdir(k)
 
-			var keys []string
-			keys = append(keys, j.Peptide)
+		var evi rep.Evidence
+		evi.RestoreGranular()
 
-			var uniqMds = make(map[string]uint8)
+		SpcMap := make(map[string]int)
+		IntMap := make(map[string]float64)
+		ModsMap := make(map[string][]string)
 
-			for _, k := range j.Modifications.Index {
-				if k.Type == "Assigned" {
-					mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
-					uniqMds[mass] = 0
-				}
-			}
+		protIDMap := make(map[string]string)
+		protDescMap := make(map[string]string)
+		GeneMap := make(map[string]string)
 
-			// this forces the unmodified pepes to collapse with peps containing +16
-			// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-			// 	uniqMds["15.994900"] = 0
-			// 	delete(uniqMds, "0")
-			// 	delete(uniqMds, "0.000000")
-			// }
-			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-				delete(uniqMds, "0")
-				delete(uniqMds, "0.000000")
-			}
-			delete(uniqMds, "15.994900")
-
-			for k := range uniqMds {
-				keys = append(keys, k)
-			}
-
-			sort.Strings(keys[1:])
-
-			key := strings.Join(keys, "#")
-
-			keyMaps[key]++
-		}
-
-		for i := range combined {
-			count, ok := keyMaps[combined[i].Key]
-			if ok {
-				combined[i].Spc[k] = count
-			}
-		}
-
-	}
-
-	return combined
-}
-
-// getIntensities collects intensities from the individual data sets for the combined peptide report
-func getIntensities(combined rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence) rep.CombinedPeptideEvidenceList {
-
-	for k, v := range datasets {
-
-		var keyMaps = make(map[string]float64)
-
-		for _, j := range v.PSM {
-
-			var keys []string
-			keys = append(keys, j.Peptide)
-
-			var uniqMds = make(map[string]uint8)
+		for _, j := range evi.Peptides {
 
 			for _, k := range j.Modifications.Index {
 				if k.Type == "Assigned" {
 					mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
-					uniqMds[mass] = 0
+					ModsMap[j.Sequence] = append(ModsMap[j.Sequence], mass)
 				}
 			}
 
-			// this forces the unmodified pepes to collapse with peps containing +16
-			// if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-			// 	uniqMds["15.994900"] = 0
-			// 	delete(uniqMds, "0")
-			// 	delete(uniqMds, "0.000000")
-			// }
-			if len(uniqMds) == 0 || uniqMds["0"] == 0 {
-				delete(uniqMds, "0")
-				delete(uniqMds, "0.000000")
-			}
-			delete(uniqMds, "15.994900")
+			SpcMap[j.Sequence] = j.Spc
+			IntMap[j.Sequence] = j.Intensity
 
-			for k := range uniqMds {
-				keys = append(keys, k)
+			protIDMap[j.Sequence] = j.ProteinID
+			protDescMap[j.Sequence] = j.ProteinDescription
+			GeneMap[j.Sequence] = j.GeneName
+
+			// get all charge states
+			for l := range j.ChargeState {
+				chargeMap[j.Sequence] = append(chargeMap[j.Sequence], l)
 			}
 
-			sort.Strings(keys[1:])
-
-			key := strings.Join(keys, "#")
-
-			v, ok := keyMaps[key]
-			if !ok {
-				keyMaps[key] = j.Intensity
-			} else {
-				if j.Intensity > v {
-					keyMaps[key] = j.Intensity
-				}
+			if j.Probability > bestPSM[j.Sequence] {
+				bestPSM[j.Sequence] = j.Probability
 			}
 
 		}
 
-		for i := range combined {
-			int, ok := keyMaps[combined[i].Key]
+		for i := range evidences {
+			spc, ok := SpcMap[evidences[i].Sequence]
 			if ok {
-				combined[i].Intensity[k] = int
+				evidences[i].Spc[k] = spc
+			}
+			it, ok := IntMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].Intensity[k] = it
+			}
+			m, ok := ModsMap[evidences[i].Sequence]
+			if ok {
+				for _, l := range m {
+					evidences[i].AssignedMassDiffs[l] = 0
+				}
+			}
+			c, ok := chargeMap[evidences[i].Sequence]
+			if ok {
+				for _, l := range c {
+					evidences[i].ChargeStates[l] = 0
+				}
+			}
+			id, ok := protIDMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].ProteinID = id
+			}
+			desc, ok := protDescMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].ProteinDescription = desc
+			}
+			gene, ok := GeneMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].Gene = gene
+			}
+			prob, ok := bestPSM[evidences[i].Sequence]
+			if ok {
+				evidences[i].BestPSM = prob
 			}
 		}
 
+		os.Chdir(local)
 	}
 
-	return combined
+	os.Chdir(local)
+
+	return evidences
 }
 
 // savePeptideAbacusResult creates a single report using 1 or more philosopher result files
@@ -366,11 +286,20 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 
 		line += fmt.Sprintf("%s\t", i.Sequence)
 
-		line += fmt.Sprintf("%v\t", strings.Join(i.ChargeStates, ","))
+		var c []string
+		for j := range i.ChargeStates {
+			c = append(c, strconv.Itoa(int(j)))
+		}
+		line += fmt.Sprintf("%s\t", strings.Join(c, ","))
 
 		line += fmt.Sprintf("%f\t", i.BestPSM)
 
-		line += fmt.Sprintf("%v\t", strings.Join(i.AssignedMassDiffs, ","))
+		var m []string
+		for j := range i.AssignedMassDiffs {
+			m = append(m, j)
+		}
+		sort.Strings(m)
+		line += fmt.Sprintf("%v\t", strings.Join(m, ","))
 
 		line += fmt.Sprintf("%s\t", i.Gene)
 
@@ -396,51 +325,4 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	sys.CopyFile(output, filepath.Base(output))
 
 	return
-}
-
-// processPeptideCombinedFile reads and filter the combined peptide report
-func processPeptideCombinedFile(a met.Abacus) (map[string]int8, map[string][]string) {
-
-	//var list rep.CombinedPeptideEvidenceList
-	var seqMap = make(map[string]int8)
-	var chargeMap = make(map[string][]string)
-
-	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
-
-		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
-
-	} else {
-
-		var pep id.PepXML
-		var pepID id.PepIDList
-		pep.Read("combined.pep.xml")
-		pep.DecoyTag = a.Tag
-
-		for _, i := range pep.PeptideIdentification {
-			pepID = append(pepID, i)
-		}
-
-		uniqPsms := fil.GetUniquePSMs(pepID)
-		uniqPeps := fil.GetUniquePeptides(pepID)
-
-		filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
-
-		// get all peptide sequences from combined file and collapse them
-		for _, i := range filteredPeptides {
-			if !strings.HasPrefix(i.Protein, a.Tag) {
-				seqMap[i.Peptide] = 0
-			}
-		}
-
-		// get all charge states
-		for _, i := range filteredPSMs {
-			if !strings.HasPrefix(i.Protein, a.Tag) {
-				chargeMap[i.Peptide] = append(chargeMap[i.Peptide], strconv.Itoa(int(i.AssumedCharge)))
-			}
-		}
-
-	}
-
-	return seqMap, chargeMap
 }
