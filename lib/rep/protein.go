@@ -298,6 +298,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel13.Name, printSet[0].UniqueLabels.Channel13.CustomName, -1)
 		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel14.Name, printSet[0].UniqueLabels.Channel14.CustomName, -1)
 		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel15.Name, printSet[0].UniqueLabels.Channel15.CustomName, -1)
+		header = strings.Replace(header, "Channel "+printSet[0].UniqueLabels.Channel16.Name, printSet[0].UniqueLabels.Channel16.CustomName, -1)
 	}
 
 	_, e = io.WriteString(file, header)

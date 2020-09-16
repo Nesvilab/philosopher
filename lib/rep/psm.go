@@ -203,6 +203,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
 			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
+			header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel16.Name, printSet[0].Labels.Channel16.CustomName, -1)
 		}
 	}
 
