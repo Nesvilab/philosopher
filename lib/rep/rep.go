@@ -393,6 +393,7 @@ func Run(m met.Data) {
 
 	var isComet bool
 	var hasLoc bool
+	var hasLabels bool
 	var isoBrand string
 	var isoChannels int
 
@@ -414,6 +415,10 @@ func Run(m met.Data) {
 		isoChannels, _ = strconv.Atoi(m.Quantify.Plex)
 	}
 
+	if len(m.Quantify.Annot) > 0 {
+		hasLabels = true
+	}
+
 	// // get the labels from the annotation file
 	// if len(m.Quantify.Annot) > 0 {
 	// 	annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
@@ -424,17 +429,17 @@ func Run(m met.Data) {
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
+	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
 
 	// Ion
-	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Peptide
-	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
-		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
+		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repo.ProteinFastaReport(m.Report.Decoys)
 	}
 
