@@ -116,7 +116,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 		var pep id.PepXML
 		pep.DecoyTag = a.Tag
 
-		pepID, _ = fil.ReadPepXMLInput("combined.pep.xml", a.Tag, sys.GetTemp(), false)
+		pepID, _ = id.ReadPepXMLInput("combined.pep.xml", a.Tag, sys.GetTemp(), false)
 
 		//uniqPsms := fil.GetUniquePSMs(pepID)
 		uniqPeps := fil.GetUniquePeptides(pepID)

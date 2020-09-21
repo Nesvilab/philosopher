@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"philosopher/lib/cla"
 	"philosopher/lib/dat"
@@ -19,7 +18,6 @@ import (
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
-	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
@@ -45,7 +43,7 @@ func Run(f met.Data) met.Data {
 		f.Filter.TwoD = true
 	}
 
-	pepid, searchEngine := ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
+	pepid, searchEngine := id.ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
 
 	f.SearchEngine = searchEngine
 
@@ -186,101 +184,6 @@ func Run(f met.Data) met.Data {
 	e.SerializeGranular()
 
 	return f
-}
-
-// ReadPepXMLInput reads one or more fies and organize the data into PSM list
-func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (id.PepIDList, string) {
-
-	var files = make(map[string]uint8)
-	var fileCheckList []string
-	var fileCheckFlag bool
-	var pepIdent id.PepIDList
-	var mods []mod.Modification
-	var params []spc.Parameter
-	var modsIndex = make(map[string]mod.Modification)
-	var searchEngine string
-
-	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
-		fileCheckList = append(fileCheckList, xmlFile)
-		files[xmlFile] = 0
-	} else {
-		glob := fmt.Sprintf("%s%s*pep.xml", xmlFile, string(filepath.Separator))
-		list, _ := filepath.Glob(glob)
-
-		if len(list) == 0 {
-			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
-		}
-
-		for _, i := range list {
-			absPath, _ := filepath.Abs(i)
-			files[absPath] = 0
-			fileCheckList = append(fileCheckList, absPath)
-
-			if strings.Contains(i, "mod") {
-				fileCheckFlag = true
-			}
-		}
-
-	}
-
-	// verify if the we have interact and interact.mod files for parsing.
-	// To avoid reading both files, we keep the mod one and discard the other.
-	if fileCheckFlag == true {
-		for _, i := range fileCheckList {
-			i = strings.Replace(i, "mod.", "", 1)
-			_, ok := files[i]
-			if ok {
-				delete(files, i)
-			}
-		}
-	}
-
-	for i := range files {
-		var p id.PepXML
-		p.DecoyTag = decoyTag
-		p.Read(i)
-
-		params = p.SearchParameters
-
-		// print models
-		if models == true {
-			if strings.EqualFold(p.Prophet, "interprophet") {
-				logrus.Error("Cannot print models for interprophet files")
-			} else {
-				logrus.Info("Printing models")
-				go p.ReportModels(temp, filepath.Base(i))
-				time.Sleep(time.Second * 3)
-			}
-		}
-
-		pepIdent = append(pepIdent, p.PeptideIdentification...)
-
-		for _, k := range p.Modifications.Index {
-			_, ok := modsIndex[k.Index]
-			if !ok {
-				mods = append(mods, k)
-				modsIndex[k.Index] = k
-			}
-		}
-
-		searchEngine = p.SearchEngine
-	}
-
-	// create a "fake" global pepXML comprising all data
-	var pepXML id.PepXML
-	pepXML.DecoyTag = decoyTag
-	pepXML.SearchParameters = params
-	pepXML.PeptideIdentification = pepIdent
-	pepXML.Modifications.Index = modsIndex
-
-	// promoting Spectra that matches to both decoys and targets to TRUE hits
-	pepXML.PromoteProteinIDs()
-
-	// serialize all pep files
-	sort.Sort(pepXML.PeptideIdentification)
-	pepXML.Serialize()
-
-	return pepIdent, searchEngine
 }
 
 // processPeptideIdentifications reads and process pepXML
@@ -443,98 +346,6 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 
 	return
 }
-
-// func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, decoyTag, mods string) {
-
-// 	// unmodified = no ptms
-// 	// defined = only the ptms defined, nothing else
-// 	// remaining or all = one or more ptms that might include the combination of the defined + something else
-
-// 	logrus.Info("Separating PSMs based on the modification profile")
-
-// 	unModPSMs := make(map[string]id.PepIDList)
-// 	definedModPSMs := make(map[string]id.PepIDList)
-// 	restModPSMs := make(map[string]id.PepIDList)
-
-// 	modsMap := make(map[float64]string)
-
-// 	modsList := strings.Split(mods, ",")
-// 	for _, i := range modsList {
-// 		m := strings.Split(i, ":")
-// 		f, _ := strconv.ParseFloat(m[1], 64)
-// 		modsMap[f] = m[0]
-// 	}
-
-// 	exclusionList := make(map[string]uint8)
-
-// 	for k, v := range uniqPsms {
-
-// 		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
-
-// 			unModPSMs[k] = v
-// 			exclusionList[v[0].Spectrum] = 0
-
-// 		} else {
-
-// 			var psmsWithOtherPTMs = make(map[string]id.PepIDList)
-
-// 			// if PSM contains other mods than the ones defined by the flag, mark them to be ignored
-// 			for _, i := range v[0].Modifications.Index {
-// 				if i.Variable == "yes" {
-// 					_, ok := modsMap[i.MassDiff]
-// 					if !ok {
-// 						psmsWithOtherPTMs[v[0].Spectrum] = v
-// 					}
-// 				}
-// 			}
-
-// 			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
-// 			// and mark it for being excluded from rest
-// 			for _, i := range v[0].Modifications.Index {
-// 				aa, ok1 := modsMap[i.MassDiff]
-// 				_, ok2 := psmsWithOtherPTMs[v[0].Spectrum]
-
-// 				if ok1 && !ok2 && aa == i.AminoAcid {
-// 					definedModPSMs[k] = v
-// 					exclusionList[v[0].Spectrum] = 0
-// 				}
-// 			}
-
-// 		}
-
-// 		_, ok := exclusionList[v[0].Spectrum]
-// 		if !ok {
-// 			restModPSMs[k] = v
-// 		}
-// 	}
-
-// 	logrus.Info("Filtering unmodified PSMs")
-// 	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
-
-// 	logrus.Info("Filtering defined modified PSMs")
-// 	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
-
-// 	logrus.Info("Filtering all modified PSMs")
-// 	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
-
-// 	var combinedFiltered id.PepIDList
-
-// 	for _, i := range filteredUnmodPSM {
-// 		combinedFiltered = append(combinedFiltered, i)
-// 	}
-
-// 	for _, i := range filteredDefinedPSM {
-// 		combinedFiltered = append(combinedFiltered, i)
-// 	}
-
-// 	for _, i := range filteredAllPSM {
-// 		combinedFiltered = append(combinedFiltered, i)
-// 	}
-
-// 	combinedFiltered.Serialize("psm")
-
-// 	return
-// }
 
 // chargeProfile ...
 func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
