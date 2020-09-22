@@ -30,7 +30,7 @@ Steps:
   Integrated Reports: no                         # combined analysis of LC-MS/MS results inspired by Abacus
   Integrated Isobaric Quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-Database Search:                                 # MSFragger & Comet
+Database Search:                                 # MSFragger 3.1 & Comet
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
   search_engine: comet                           # search engine options include "comet" and "msfragger"
@@ -99,6 +99,12 @@ Database Search:                                 # MSFragger & Comet
     remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
     remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
     intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
+    mass_diff_to_variable_mod: 0			           # Put mass diff as a variable modification. 0 for no; 1 for yes and change the original mass diff and the calculated mass accordingly; 2 for yes but do not change the original mass diff.
+    labile_search_mode: off 			               # type of search (nglycan, labile, or off). Off means non-labile/typical search.
+    restrict_deltamass_to: all                   # Specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
+    diagnostic_intensity_filter: 0			         # [nglycan/labile search_mode only]. Minimum relative intensity for SUM of all detected oxonium ions to achieve for spectrum to contain diagnostic fragment evidence. Calculated relative to spectrum base peak. 0 <= value.
+    Y_type_masses:                               # [nglycan/labile search_mode only]. Specify fragments of labile mods that are commonly retained on intact peptides (e.g. Y ions for glycans). Only used if 'Y' is included in fragment_ion_series.
+    diagnostic_fragments:                        # [nglycan/labile search_mode only]. Specify diagnostic fragments of labile mods that appear in the low m/z region. Only used if diagnostic_intensity_filter > 0.
     add_Cterm_peptide: 0.000000                  # c-term peptide fixed modifications
     add_Cterm_protein: 0.000000                  # c-term protein fixed modifications
     add_Nterm_peptide: 0.000000                  # n-term peptide fixed modifications

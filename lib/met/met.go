@@ -150,6 +150,12 @@ type MSFragger struct {
 	RemovePrecursorPeak                int     `yaml:"remove_precursor_peak"`
 	RemovePrecursorRange               string  `yaml:"remove_precursor_range"`
 	IntensityTransform                 int     `yaml:"intensity_transform"`
+	MassDiffToVariableMod              int     `yaml:"mass_diff_to_variable_mod"`
+	LabileSearchMode                   string  `yaml:"labile_search_mode"`
+	RestrictDeltaMassTo                string  `yaml:"restrict_deltamass_to"`
+	DiagnosticIntensityFilter          int     `yaml:"diagnostic_intensity_filter"`
+	DiagnosticFragments                string  `yaml:"diagnostic_fragments"`
+	YTypeMasses                        string  `yaml:"Y_type_masses"`
 	VariableMod01                      string  `yaml:"variable_mod_01"`
 	VariableMod02                      string  `yaml:"variable_mod_02"`
 	VariableMod03                      string  `yaml:"variable_mod_03"`
