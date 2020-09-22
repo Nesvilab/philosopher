@@ -20,6 +20,7 @@ import (
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
@@ -243,7 +244,6 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 
 	var files = make(map[string]uint8)
 	var fileCheckList []string
-	var fileCheckFlag bool
 	var pepIdent PepIDList
 	var mods []mod.Modification
 	var params []spc.Parameter
@@ -254,37 +254,25 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 		fileCheckList = append(fileCheckList, xmlFile)
 		files[xmlFile] = 0
 	} else {
-		glob := fmt.Sprintf("%s%s*pep.xml", xmlFile, string(filepath.Separator))
-		list, _ := filepath.Glob(glob)
+		//glob := fmt.Sprintf("%s%s*pep.xml", xmlFile, string(filepath.Separator))
+		//list, _ := filepath.Glob(glob)
+
+		list, err := uti.WalkMatch(xmlFile, "*.pep.xml")
+		if err != nil {
+			spew.Dump(err)
+		}
 
 		if len(list) == 0 {
 			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
 		}
 
 		for _, i := range list {
-			absPath, _ := filepath.Abs(i)
-			files[absPath] = 0
-			fileCheckList = append(fileCheckList, absPath)
-
-			if strings.Contains(i, "mod") {
-				fileCheckFlag = true
+			base := filepath.Base(i)
+			if !strings.Contains(base, ".mod.") {
+				files[i] = 0
 			}
 		}
 
-	}
-
-	//spew.Dump(files)
-
-	// verify if the we have interact and interact.mod files for parsing.
-	// To avoid reading both files, we keep the mod one and discard the other.
-	if fileCheckFlag == true {
-		for _, i := range fileCheckList {
-			i = strings.Replace(i, "mod.", "", 1)
-			_, ok := files[i]
-			if ok {
-				delete(files, i)
-			}
-		}
 	}
 
 	for i := range files {
