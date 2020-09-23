@@ -1,15 +1,14 @@
 ### Added
 - A new Workspace option allows the use of a custom folder as a temporary folder.
-- The Database now supports multiple database IDs (separate them with comma).
-- Support to Eclipse mzML files.
+- The Database now supports multiple database IDs (separate them with a comma).
+- Support for the latest msconvert mzML format.
 - Output prefix flag added to PTMProphet.
 
 ### Changed
-- The "master" GitHub repository was renamed to "main".
-- Freequant and Labelquant can now be executed before the Filter command.
-- The parameter file was updated, and the terms made more human-readable.
+- The parameter file was updated, and the terms were made more human-readable.
 - The code compilation is now done with GO v1.15.
 - PTMProphet updated to v6.0
+- The Abacus memory footprint as significantly reduced.
 
 ### Fixed
 - Small bugs and fixes.

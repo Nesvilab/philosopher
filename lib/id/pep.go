@@ -20,7 +20,6 @@ import (
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
@@ -259,7 +258,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 
 		list, err := uti.WalkMatch(xmlFile, "*.pep.xml")
 		if err != nil {
-			spew.Dump(err)
+			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
 		}
 
 		if len(list) == 0 {
