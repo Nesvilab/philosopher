@@ -100,7 +100,7 @@ Database Search:                                 # MSFragger 3.1 & Comet
     remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
     intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
     mass_diff_to_variable_mod: 0			           # Put mass diff as a variable modification. 0 for no; 1 for yes and change the original mass diff and the calculated mass accordingly; 2 for yes but do not change the original mass diff.
-    labile_search_mode: off 			               # type of search (nglycan, labile, or off). Off means non-labile/typical search.
+    labile_search_mode: "off"                    # type of search (nglycan, labile, or off). Off means non-labile/typical search.
     restrict_deltamass_to: all                   # Specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
     diagnostic_intensity_filter: 0			         # [nglycan/labile search_mode only]. Minimum relative intensity for SUM of all detected oxonium ions to achieve for spectrum to contain diagnostic fragment evidence. Calculated relative to spectrum base peak. 0 <= value.
     Y_type_masses:                               # [nglycan/labile search_mode only]. Specify fragments of labile mods that are commonly retained on intact peptides (e.g. Y ions for glycans). Only used if 'Y' is included in fragment_ion_series.

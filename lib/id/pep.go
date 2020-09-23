@@ -266,10 +266,22 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
 		}
 
+		// in case both PeptideProphet and PTMProphet files are rpesent, use
+		// PTMProphet results and ignore peptide prophet.
 		for _, i := range list {
 			base := filepath.Base(i)
-			if !strings.Contains(base, ".mod.") {
+			if strings.Contains(base, ".mod.") {
 				files[i] = 0
+			}
+		}
+
+		// if no PptideProphet results are present, then use all PeptideProphet files.
+		if len(files) == 0 {
+			for _, i := range list {
+				base := filepath.Base(i)
+				if !strings.Contains(base, ".mod.") {
+					files[i] = 0
+				}
 			}
 		}
 
