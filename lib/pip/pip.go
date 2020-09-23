@@ -209,71 +209,71 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 }
 
 // Prophets execute the TPP Prophets
-func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
+// func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
-		for _, i := range data {
+// 	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
+// 		for _, i := range data {
 
-			logrus.Info("Running the validation and inference on ", i)
+// 			logrus.Info("Running the validation and inference on ", i)
 
-			// getting inside de the dataset folder
-			dsAbs, _ := filepath.Abs(i)
-			os.Chdir(dsAbs)
+// 			// getting inside de the dataset folder
+// 			dsAbs, _ := filepath.Abs(i)
+// 			os.Chdir(dsAbs)
 
-			// reload the meta data
-			meta.Restore(sys.Meta())
+// 			// reload the meta data
+// 			meta.Restore(sys.Meta())
 
-			// PeptideProphet
-			if p.Steps.PeptideValidation == "yes" {
-				logrus.Info("Executing PeptideProphet on ", i)
-				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
-				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
-				meta.PeptideProphet.Output = "interact"
-				meta.PeptideProphet.Combine = true
-				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-				files, e := filepath.Glob(gobExt)
-				if e != nil {
-					msg.Custom(e, "fatal")
-				}
-				peptideprophet.Run(meta, files)
-				meta.Serialize()
-			}
+// 			// PeptideProphet
+// 			if p.Steps.PeptideValidation == "yes" {
+// 				logrus.Info("Executing PeptideProphet on ", i)
+// 				meta.PeptideProphet = p.PeptideProphet
+// 				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+// 				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
+// 				meta.PeptideProphet.Output = "interact"
+// 				meta.PeptideProphet.Combine = true
+// 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+// 				files, e := filepath.Glob(gobExt)
+// 				if e != nil {
+// 					msg.Custom(e, "fatal")
+// 				}
+// 				peptideprophet.Run(meta, files)
+// 				meta.Serialize()
+// 			}
 
-			// PTMProphet
-			if p.Steps.PTMLocalization == "yes" {
-				logrus.Info("Executing PTMProphet on ", i)
-				meta.PTMProphet = p.PTMProphet
-				var files []string
-				files = append(files, "interact.pep.xml")
-				meta.PTMProphet.InputFiles = files
-				ptmprophet.Run(meta, files)
-				meta.Serialize()
-			}
+// 			// PTMProphet
+// 			if p.Steps.PTMLocalization == "yes" {
+// 				logrus.Info("Executing PTMProphet on ", i)
+// 				meta.PTMProphet = p.PTMProphet
+// 				var files []string
+// 				files = append(files, "interact.pep.xml")
+// 				meta.PTMProphet.InputFiles = files
+// 				ptmprophet.Run(meta, files)
+// 				meta.Serialize()
+// 			}
 
-			// ProteinProphet
-			if p.Steps.ProteinInference == "yes" {
-				logrus.Info("Executing ProteinProphet on ", i)
-				meta.ProteinProphet = p.ProteinProphet
-				meta.ProteinProphet.Output = "interact"
-				var files []string
-				if p.Steps.PTMLocalization == "yes" {
-					files = append(files, "interact.mod.pep.xml")
-				} else {
-					files = append(files, "interact.pep.xml")
-				}
-				proteinprophet.Run(meta, files)
-				meta.Serialize()
-				met.CleanTemp(meta.Temp)
-			}
+// 			// ProteinProphet
+// 			if p.Steps.ProteinInference == "yes" {
+// 				logrus.Info("Executing ProteinProphet on ", i)
+// 				meta.ProteinProphet = p.ProteinProphet
+// 				meta.ProteinProphet.Output = "interact"
+// 				var files []string
+// 				if p.Steps.PTMLocalization == "yes" {
+// 					files = append(files, "interact.mod.pep.xml")
+// 				} else {
+// 					files = append(files, "interact.pep.xml")
+// 				}
+// 				proteinprophet.Run(meta, files)
+// 				meta.Serialize()
+// 				met.CleanTemp(meta.Temp)
+// 			}
 
-			// return to the top level directory
-			os.Chdir(dir)
-		}
-	}
+// 			// return to the top level directory
+// 			os.Chdir(dir)
+// 		}
+// 	}
 
-	return meta
-}
+// 	return meta
+// }
 
 // PeptideProphet executes PeptideProphet in Parallel mode
 func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.Data {
@@ -459,6 +459,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 			files = append(files, fqn)
 		}
 
+		meta.Home = dir
 		meta.InterProphet.Output = "combined"
 		meta.InterProphet.Nonsp = true
 		meta.InterProphet.InputFiles = files
@@ -493,6 +494,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
+		meta.Home = dir
 		meta.ProteinProphet = p.ProteinProphet
 		meta.ProteinProphet.Output = "combined"
 		meta.ProteinProphet.Minprob = p.Abacus.ProtProb
@@ -515,8 +517,6 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		// copy to work directory
 		sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
-
-		//meta.Serialize()
 	}
 
 	return meta
