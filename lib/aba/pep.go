@@ -106,6 +106,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 func processPeptideCombinedFile(a met.Abacus) {
 
 	var pepID id.PepIDList
+	var filteredPeptides id.PepIDList
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
@@ -122,7 +123,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 		uniqPeps := fil.GetUniquePeptides(pepID)
 
 		//filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+		filteredPeptides, _ = fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
 		filteredPeptides.Serialize("pep")
 
 	}

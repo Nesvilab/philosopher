@@ -96,6 +96,9 @@ func DeployParameterFile(temp string) string {
 // InitializeWorkspaces moves inside each data folder and initializes the Workspace with a database
 func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build string, data []string) met.Data {
 
+	// Top-level Workspace
+	wrk.Run(Version, Build, "", false, false, true, true)
+
 	for _, i := range data {
 
 		logrus.Info("Initiating the workspace on ", i)
@@ -207,73 +210,6 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	return meta
 }
-
-// Prophets execute the TPP Prophets
-// func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
-
-// 	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
-// 		for _, i := range data {
-
-// 			logrus.Info("Running the validation and inference on ", i)
-
-// 			// getting inside de the dataset folder
-// 			dsAbs, _ := filepath.Abs(i)
-// 			os.Chdir(dsAbs)
-
-// 			// reload the meta data
-// 			meta.Restore(sys.Meta())
-
-// 			// PeptideProphet
-// 			if p.Steps.PeptideValidation == "yes" {
-// 				logrus.Info("Executing PeptideProphet on ", i)
-// 				meta.PeptideProphet = p.PeptideProphet
-// 				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
-// 				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
-// 				meta.PeptideProphet.Output = "interact"
-// 				meta.PeptideProphet.Combine = true
-// 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-// 				files, e := filepath.Glob(gobExt)
-// 				if e != nil {
-// 					msg.Custom(e, "fatal")
-// 				}
-// 				peptideprophet.Run(meta, files)
-// 				meta.Serialize()
-// 			}
-
-// 			// PTMProphet
-// 			if p.Steps.PTMLocalization == "yes" {
-// 				logrus.Info("Executing PTMProphet on ", i)
-// 				meta.PTMProphet = p.PTMProphet
-// 				var files []string
-// 				files = append(files, "interact.pep.xml")
-// 				meta.PTMProphet.InputFiles = files
-// 				ptmprophet.Run(meta, files)
-// 				meta.Serialize()
-// 			}
-
-// 			// ProteinProphet
-// 			if p.Steps.ProteinInference == "yes" {
-// 				logrus.Info("Executing ProteinProphet on ", i)
-// 				meta.ProteinProphet = p.ProteinProphet
-// 				meta.ProteinProphet.Output = "interact"
-// 				var files []string
-// 				if p.Steps.PTMLocalization == "yes" {
-// 					files = append(files, "interact.mod.pep.xml")
-// 				} else {
-// 					files = append(files, "interact.pep.xml")
-// 				}
-// 				proteinprophet.Run(meta, files)
-// 				meta.Serialize()
-// 				met.CleanTemp(meta.Temp)
-// 			}
-
-// 			// return to the top level directory
-// 			os.Chdir(dir)
-// 		}
-// 	}
-
-// 	return meta
-// }
 
 // PeptideProphet executes PeptideProphet in Parallel mode
 func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.Data {
@@ -723,11 +659,11 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 		logrus.Info("Executing abacus")
 
-		// return to the top level directory
+		// // return to the top level directory
 		os.Chdir(dir)
 
-		// reload the meta data
-		meta.Restore(sys.Meta())
+		// // reload the meta data
+		//meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
 		meta.Abacus.Tag = p.DatabaseSearch.DecoyTag
@@ -766,3 +702,70 @@ func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.D
 
 	return meta
 }
+
+// Prophets execute the TPP Prophets
+// func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+// 	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
+// 		for _, i := range data {
+
+// 			logrus.Info("Running the validation and inference on ", i)
+
+// 			// getting inside de the dataset folder
+// 			dsAbs, _ := filepath.Abs(i)
+// 			os.Chdir(dsAbs)
+
+// 			// reload the meta data
+// 			meta.Restore(sys.Meta())
+
+// 			// PeptideProphet
+// 			if p.Steps.PeptideValidation == "yes" {
+// 				logrus.Info("Executing PeptideProphet on ", i)
+// 				meta.PeptideProphet = p.PeptideProphet
+// 				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+// 				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
+// 				meta.PeptideProphet.Output = "interact"
+// 				meta.PeptideProphet.Combine = true
+// 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
+// 				files, e := filepath.Glob(gobExt)
+// 				if e != nil {
+// 					msg.Custom(e, "fatal")
+// 				}
+// 				peptideprophet.Run(meta, files)
+// 				meta.Serialize()
+// 			}
+
+// 			// PTMProphet
+// 			if p.Steps.PTMLocalization == "yes" {
+// 				logrus.Info("Executing PTMProphet on ", i)
+// 				meta.PTMProphet = p.PTMProphet
+// 				var files []string
+// 				files = append(files, "interact.pep.xml")
+// 				meta.PTMProphet.InputFiles = files
+// 				ptmprophet.Run(meta, files)
+// 				meta.Serialize()
+// 			}
+
+// 			// ProteinProphet
+// 			if p.Steps.ProteinInference == "yes" {
+// 				logrus.Info("Executing ProteinProphet on ", i)
+// 				meta.ProteinProphet = p.ProteinProphet
+// 				meta.ProteinProphet.Output = "interact"
+// 				var files []string
+// 				if p.Steps.PTMLocalization == "yes" {
+// 					files = append(files, "interact.mod.pep.xml")
+// 				} else {
+// 					files = append(files, "interact.pep.xml")
+// 				}
+// 				proteinprophet.Run(meta, files)
+// 				meta.Serialize()
+// 				met.CleanTemp(meta.Temp)
+// 			}
+
+// 			// return to the top level directory
+// 			os.Chdir(dir)
+// 		}
+// 	}
+
+// 	return meta
+// }
