@@ -82,7 +82,6 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	// append pepxml files
 	for i := range args {
 		file, _ := filepath.Abs(args[i])
-		//cmd.Args = append(cmd.Args, file)
 		cmd.Args = append(cmd.Args, args[i])
 		cmd.Dir = filepath.Dir(file)
 	}
@@ -92,9 +91,12 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	// append output file
 	var output string
 	if params.KeepOld == true {
-		output = "interact.mod.pep.xml"
-		if len(params.Output) > 0 {
-			output = fmt.Sprintf("%s.pep.xml", params.Output)
+
+		//if len(params.Output) > 0 {
+		if args[0] == "interact.pep.xml" {
+			output = "interact.mod.pep.xml"
+		} else {
+			output = strings.Replace(args[0], "pep.xml", "mod.pep.xml", 1)
 		}
 
 		cmd.Args = append(cmd.Args, output)
@@ -205,6 +207,16 @@ func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd
 
 	if params.MinProb != 0.9 {
 		v := fmt.Sprintf("MINPROB=%.4f", params.MinProb)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.ExcludeMassDiffMin != 0 {
+		v := fmt.Sprintf("EXCLUDEMASSDIFFMIN=%.2f", params.ExcludeMassDiffMin)
+		cmd.Args = append(cmd.Args, v)
+	}
+
+	if params.ExcludeMassDiffMax != 0 {
+		v := fmt.Sprintf("EXCLUDEMASSDIFFMAX=%.2f", params.ExcludeMassDiffMax)
 		cmd.Args = append(cmd.Args, v)
 	}
 

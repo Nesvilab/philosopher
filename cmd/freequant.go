@@ -39,6 +39,7 @@ var freequant = &cobra.Command{
 		}
 
 		//forcing the larger time window to be the same as the smaller one
+		//m.Quantify.RTWin = 3
 		m.Quantify.RTWin = m.Quantify.PTWin
 
 		// run label-free quantification
@@ -62,9 +63,10 @@ func init() {
 		m.Restore(sys.Meta())
 
 		freequant.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
-		freequant.Flags().BoolVarP(&m.Quantify.Isolated, "isolated", "", false, "use the isolated ion instead of the selected ion for quantification")
 		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
 		freequant.Flags().Float64VarP(&m.Quantify.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
+		freequant.Flags().BoolVarP(&m.Quantify.Isolated, "isolated", "", true, "use the isolated ion instead of the selected ion for quantification")
+		filterCmd.Flags().MarkHidden("isolated")
 	}
 
 	RootCmd.AddCommand(freequant)

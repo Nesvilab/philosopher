@@ -150,6 +150,12 @@ type MSFragger struct {
 	RemovePrecursorPeak                int     `yaml:"remove_precursor_peak"`
 	RemovePrecursorRange               string  `yaml:"remove_precursor_range"`
 	IntensityTransform                 int     `yaml:"intensity_transform"`
+	MassDiffToVariableMod              int     `yaml:"mass_diff_to_variable_mod"`
+	LabileSearchMode                   string  `yaml:"labile_search_mode"`
+	RestrictDeltaMassTo                string  `yaml:"restrict_deltamass_to"`
+	DiagnosticIntensityFilter          int     `yaml:"diagnostic_intensity_filter"`
+	DiagnosticFragments                string  `yaml:"diagnostic_fragments"`
+	YTypeMasses                        string  `yaml:"Y_type_masses"`
 	VariableMod01                      string  `yaml:"variable_mod_01"`
 	VariableMod02                      string  `yaml:"variable_mod_02"`
 	VariableMod03                      string  `yaml:"variable_mod_03"`
@@ -286,29 +292,31 @@ type ProteinProphet struct {
 
 // PTMProphet options and parameters
 type PTMProphet struct {
-	InputFiles   []string
-	Output       string  `yaml:"output"`
-	Mods         string  `yaml:"mods"`
-	NIons        string  `yaml:"nions"`
-	CIons        string  `yaml:"cions"`
-	EM           int     `yaml:"em"`
-	FragPPMTol   int     `yaml:"fragppmtol"`
-	MaxThreads   int     `yaml:"maxthreads"`
-	MaxFragZ     int     `yaml:"maxfragz"`
-	Mino         int     `yaml:"mino"`
-	MassOffset   int     `yaml:"massoffset"`
-	PPMTol       float64 `yaml:"ppmtol"`
-	MinProb      float64 `yaml:"minprob"`
-	Static       bool    `yaml:"static"`
-	NoUpdate     bool    `yaml:"noupdate"`
-	KeepOld      bool    `yaml:"keepold"`
-	Verbose      bool    `yaml:"verbose"`
-	MassDiffMode bool    `yaml:"massdiffmode"`
-	Lability     bool    `yaml:"lability"`
-	Direct       bool    `yaml:"direct"`
-	Ifrags       bool    `yaml:"ifrags"`
-	Autodirect   bool    `yaml:"autodirect"`
-	NoMinoFactor bool    `yaml:"nominofactor"`
+	InputFiles         []string
+	Output             string  `yaml:"output"`
+	Mods               string  `yaml:"mods"`
+	NIons              string  `yaml:"nions"`
+	CIons              string  `yaml:"cions"`
+	EM                 int     `yaml:"em"`
+	FragPPMTol         int     `yaml:"fragppmtol"`
+	MaxThreads         int     `yaml:"maxthreads"`
+	MaxFragZ           int     `yaml:"maxfragz"`
+	Mino               int     `yaml:"mino"`
+	MassOffset         int     `yaml:"massoffset"`
+	PPMTol             float64 `yaml:"ppmtol"`
+	MinProb            float64 `yaml:"minprob"`
+	ExcludeMassDiffMin float64 `yaml:"excludemassdiffmin"`
+	ExcludeMassDiffMax float64 `yaml:"excludemassdiffmax"`
+	Static             bool    `yaml:"static"`
+	NoUpdate           bool    `yaml:"noupdate"`
+	KeepOld            bool    `yaml:"keepold"`
+	Verbose            bool    `yaml:"verbose"`
+	MassDiffMode       bool    `yaml:"massdiffmode"`
+	Lability           bool    `yaml:"lability"`
+	Direct             bool    `yaml:"direct"`
+	Ifrags             bool    `yaml:"ifrags"`
+	Autodirect         bool    `yaml:"autodirect"`
+	NoMinoFactor       bool    `yaml:"nominofactor"`
 }
 
 // Filter options and parameters
@@ -336,6 +344,8 @@ type Filter struct {
 
 // Quantify options and parameters
 type Quantify struct {
+	Pex        string  `yaml:"pepxml"`
+	Tag        string  `yaml:"tag"`
 	Format     string  `yaml:"format"`
 	Dir        string  `yaml:"dir"`
 	Brand      string  `yaml:"brand"`

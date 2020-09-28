@@ -14,6 +14,7 @@ func TestInit(t *testing.T) {
 	type args struct {
 		version string
 		build   string
+		temp    string
 	}
 	tests := []struct {
 		name string
@@ -21,7 +22,7 @@ func TestInit(t *testing.T) {
 	}{
 		{
 			name: "Testing workspace initialization",
-			args: args{version: "0000", build: "0000"},
+			args: args{version: "0000", build: "0000", temp: ""},
 		},
 	}
 
@@ -29,7 +30,7 @@ func TestInit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			Init(tt.args.version, tt.args.build)
+			Init(tt.args.version, tt.args.build, tt.args.temp)
 		})
 	}
 }

@@ -39,10 +39,10 @@ func init() {
 
 		m.Restore(sys.Meta())
 
-		//ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Output, "output", "", "", "output prefix file name")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Mods, "mods", "", "", "<amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN>,<amino acids, n, or c>:<mass_shift>:<neut_loss1>:...:<neut_lossN> (overrides the modifications from the interact.pep.xml file)")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.NIons, "nions", "", "", "use specified N-term ions, separate multiple ions by commas (default: a,b for CID, c for ETD)")
 		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.CIons, "cions", "", "", "use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)")
+		ptmprophetCmd.Flags().StringVarP(&m.PTMProphet.Output, "output", "", "interact", "output name prefix")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.EM, "em", "", 2, "set EM models to 0 (no EM), 1 (Intensity EM Model Applied) or 2 (Intensity and Matched Peaks EM Models Applied)")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.FragPPMTol, "fragppmtol", "", 15, "when computing PSM-specific mass_offset and mass_tolerance, use specified default +/- MS2 mz tolerance on fragment ions")
 		ptmprophetCmd.Flags().IntVarP(&m.PTMProphet.MaxThreads, "maxthreads", "", 1, "use specified number of threads for processing")
@@ -59,6 +59,8 @@ func init() {
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.NoMinoFactor, "nominofactor", "", false, "disable MINO factor correction when MINO= is set greater than 0 (default: apply MINO factor correction)")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.PPMTol, "ppmtol", "", 1, "use specified +/- MS1 ppm tolerance on peptides which may have a slight offset depending on search parameters")
 		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.MinProb, "minprob", "", 0.9, "use specified minimum probability to evaluate peptides")
+		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.ExcludeMassDiffMin, "excludemassdiffmin", "", 0, "Minimum mass difference excluded for MASSDIFFFMODE analysis (default=0)")
+		ptmprophetCmd.Flags().Float64VarP(&m.PTMProphet.ExcludeMassDiffMax, "excludemassdiffmax", "", 0, "Maximun mass difference excluded for MASSDIFFFMODE analysis (default=0)")
 		ptmprophetCmd.Flags().BoolVarP(&m.PTMProphet.MassDiffMode, "massdiffmode", "", false, "use the mass difference and localize")
 	}
 

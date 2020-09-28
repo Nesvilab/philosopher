@@ -12,7 +12,7 @@ func SetupTestEnv() {
 
 	if _, err := os.Stat(".meta"); err != nil {
 		if os.IsNotExist(err) {
-			wrk.Init("0000", "0000")
+			wrk.Init("0000", "0000", "")
 		}
 	}
 

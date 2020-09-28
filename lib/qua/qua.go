@@ -35,6 +35,9 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 // RunLabelFreeQuantification is the top function for label free quantification
 func RunLabelFreeQuantification(p met.Quantify) {
 
+	// This parameter is hardcoded now because of the changes in the latest msconvert version 3.20.
+	p.Isolated = true
+
 	var evi rep.Evidence
 	evi.RestoreGranular()
 
@@ -94,7 +97,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		mz.Read(fileName, false, false, false)
+		mz.Read(fileName)
 
 		for i := range mz.Spectra {
 			mz.Spectra[i].Decode()
@@ -445,8 +448,10 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 			bestMap[i.Spectrum] = 0
 
 			if mods == true {
-				_, ok := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
-				if ok {
+				_, ok1 := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				_, ok2 := i.LocalizedPTMSites["PTMProphet_STY79.96633"]
+				_, ok3 := i.LocalizedPTMSites["PTMProphet_STY79.966331"]
+				if ok1 || ok2 || ok3 {
 					phosphoSpectrumMap[i.Spectrum] = i.Labels
 				}
 			}

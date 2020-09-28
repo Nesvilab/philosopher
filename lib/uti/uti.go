@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"philosopher/lib/msg"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -95,13 +94,15 @@ func GetLabelNames(annot string) map[string]string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		// does the line has at least an iso tag?
-		if len(scanner.Text()) > 3 {
+		if len(scanner.Text()) > 0 {
 
 			// replace tabs and multiple spaces by single space
-			space := regexp.MustCompile(`\s+`)
-			line := space.ReplaceAllString(scanner.Text(), " ")
+			// space := regexp.MustCompile(`\s+`)
+			// line := space.ReplaceAllString(scanner.Text(), " ")
 
-			names := strings.Split(line, " ")
+			// names := strings.Split(line, " ")
+
+			names := strings.Fields(scanner.Text())
 			labels[names[0]] = names[1]
 		}
 	}
@@ -123,4 +124,27 @@ func FindFile(targetDir string, pattern string) string {
 	}
 
 	return match[0]
+}
+
+// WalkMatch looks for files with a certain extension in a specofoc folder
+func WalkMatch(root, pattern string) ([]string, error) {
+	var matches []string
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if matched, err := filepath.Match(pattern, filepath.Base(path)); err != nil {
+			return err
+		} else if matched {
+			matches = append(matches, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
 }

@@ -165,6 +165,12 @@ func (a PSMEvidenceList) Len() int           { return len(a) }
 func (a PSMEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spectrum }
 
+// RemovePSMByIndex perfomrs a re-slicing by removing an element from a list
+func RemovePSMByIndex(s []PSMEvidence, i int) []PSMEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
 	Sequence                 string
@@ -205,6 +211,12 @@ func (a IonEvidenceList) Len() int           { return len(a) }
 func (a IonEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a IonEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
+// RemoveIonsByIndex perfomrs a re-slicing by removing an element from a list
+func RemoveIonsByIndex(s []IonEvidence, i int) []IonEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
 // PeptideEvidence groups all valid info about peptide ions for reports
 type PeptideEvidence struct {
 	Sequence               string
@@ -234,6 +246,12 @@ type PeptideEvidenceList []PeptideEvidence
 func (a PeptideEvidenceList) Len() int           { return len(a) }
 func (a PeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a PeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
+
+// RemovePeptidesByIndex perfomrs a re-slicing by removing an element from a list
+func RemovePeptidesByIndex(s []PeptideEvidence, i int) []PeptideEvidence {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
 
 // ProteinEvidence ...
 type ProteinEvidence struct {
@@ -321,7 +339,7 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	Key                string
+	//Key                string
 	BestPSM            float64
 	Sequence           string
 	Protein            string
@@ -329,8 +347,8 @@ type CombinedPeptideEvidence struct {
 	EntryName          string
 	Gene               string
 	ProteinDescription string
-	ChargeStates       []string
-	AssignedMassDiffs  []string
+	ChargeStates       map[uint8]uint8
+	AssignedMassDiffs  map[string]uint8
 	Spc                map[string]int
 	Intensity          map[string]float64
 }
@@ -375,6 +393,7 @@ func Run(m met.Data) {
 
 	var isComet bool
 	var hasLoc bool
+	var hasLabels bool
 	var isoBrand string
 	var isoChannels int
 
@@ -396,6 +415,10 @@ func Run(m met.Data) {
 		isoChannels, _ = strconv.Atoi(m.Quantify.Plex)
 	}
 
+	if len(m.Quantify.Annot) > 0 {
+		hasLabels = true
+	}
+
 	// // get the labels from the annotation file
 	// if len(m.Quantify.Annot) > 0 {
 	// 	annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
@@ -406,17 +429,17 @@ func Run(m met.Data) {
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc)
+	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
 
 	// Ion
-	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Peptide
-	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys)
+	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
-		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique)
+		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repo.ProteinFastaReport(m.Report.Decoys)
 	}
 

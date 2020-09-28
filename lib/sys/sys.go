@@ -47,6 +47,16 @@ func GetTemp() string {
 	return tmp
 }
 
+// VerifyTemp allows the definition of a custom folder to be used for deplyments and file creations
+func VerifyTemp(f string) {
+
+	if _, err := os.Stat(f); os.IsNotExist(err) {
+		msg.Custom(errors.New("Cannot find the custom temporary folder"), "fatal")
+	}
+
+	return
+}
+
 // GetLinuxFlavor returns the Linux flavor by looking into the lsb_release
 func GetLinuxFlavor() string {
 
@@ -217,6 +227,18 @@ func EvIonBin() string {
 // DBBin file
 func DBBin() string {
 	p := fmt.Sprintf("%s%sdb.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
+// LFQBin file
+func LFQBin() string {
+	p := fmt.Sprintf("%s%slfq.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
+// IsoBin file
+func IsoBin() string {
+	p := fmt.Sprintf("%s%siso.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
 

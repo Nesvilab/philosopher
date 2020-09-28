@@ -8,8 +8,8 @@ import (
 	"errors"
 	"io"
 	"math"
+	"regexp"
 	"strconv"
-	"strings"
 
 	"philosopher/lib/msg"
 
@@ -83,7 +83,7 @@ func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
 // Read is the main function for parsing mzML data
-func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
+func (p *MsData) Read(f string) {
 
 	var xml psi.IndexedMzML
 	xml.Parse(f)
@@ -94,21 +94,6 @@ func (p *MsData) Read(f string, skipMS1, skipMS2, skipMS3 bool) {
 	sl := xml.MzML.Run.SpectrumList
 
 	for _, i := range sl.Spectrum {
-
-		var level string
-		for _, j := range i.CVParam {
-			if string(j.Accession) == "MS:1000511" {
-				level = j.Value
-			}
-		}
-
-		if skipMS1 == true && level == "1" {
-			continue
-		} else if skipMS2 == true && level == "2" {
-			continue
-		} else if skipMS3 == true && level == "3" {
-			continue
-		}
 
 		spectrum := processSpectrum(i)
 
@@ -155,30 +140,54 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	if len(mzSpec.PrecursorList.Precursor) > 0 {
 
 		// parent index and parent scan
-		var ref []string
-		var precRef []string
+		//var ref []string
+		//var precRef []string
 
-		if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
+		if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) > 0 {
 
-			precRef = append(precRef, "-1")
-			precRef = append(precRef, "-1")
+			scanRG := regexp.MustCompile(`scan=(.+)`)
+			match := scanRG.FindStringSubmatch(mzSpec.PrecursorList.Precursor[0].SpectrumRef)
 
-		} else {
-
-			ref = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
-			precRef = strings.Split(ref[2], "=")
-
-			// ABSCIEX has a different way of reporting the prcursor reference spectrum
-			if len(ref) < 1 || len(precRef) < 1 {
-				precRef = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
-			}
-
+			spec.Precursor.ParentScan = match[1]
+			pi, _ := strconv.Atoi(match[1])
+			pi = (pi - 1)
+			spec.Precursor.ParentIndex = strconv.Itoa(pi)
 		}
 
-		spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
-		pi, _ := strconv.Atoi(precRef[1])
-		pi = (pi - 1)
-		spec.Precursor.ParentIndex = strconv.Itoa(pi)
+		// if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
+
+		// 	precRef = append(precRef, "-1")
+		// 	precRef = append(precRef, "-1")
+
+		// } else {
+
+		// 	scanRG := regexp.MustCompile(`scan=(.+)`)
+		// 	match := scanRG.FindStringSubmatch(mzSpec.PrecursorList.Precursor[0].SpectrumRef)
+
+		// 	spec.Precursor.ParentScan = match[1]
+		// 	pi, _ := strconv.Atoi(match[1])
+		// 	pi = (pi - 1)
+		// 	spec.Precursor.ParentIndex = strconv.Itoa(pi)
+
+		// ref = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
+		// precRef = strings.Split(ref[2], "=")
+
+		// // ABSCIEX has a different way of reporting the prcursor reference spectrum
+		// if len(ref) < 1 || len(precRef) < 1 {
+		// 	precRef = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
+		// }
+
+		//}
+
+		// if spec.Scan == "34280" {
+		// 	fmt.Println(spec.Scan, mzSpec.PrecursorList.Precursor[0].SpectrumRef, spec.Precursor.ParentScan, spec.Precursor.ParentIndex)
+		// 	os.Exit(1)
+		// }
+
+		// spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
+		// pi, _ := strconv.Atoi(precRef[1])
+		// pi = (pi - 1)
+		// spec.Precursor.ParentIndex = strconv.Itoa(pi)
 
 		for _, j := range mzSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
 

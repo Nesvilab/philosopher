@@ -13,7 +13,7 @@ var spec mzn.Spectrum
 func TestRawFileParsing(t *testing.T) {
 
 	tes.SetupTestEnv()
-	msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML", false, false, false)
+	msd.Read("01_CPTAC_TMTS1-NCI7_Z_JHUZ_20170502_LUMOS.mzML")
 	tes.ShutDowTestEnv()
 
 }

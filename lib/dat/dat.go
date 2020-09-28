@@ -26,11 +26,13 @@ import (
 
 // Base main structure
 type Base struct {
-	FileName  string
-	UniProtDB string
-	CrapDB    string
-	TaDeDB    map[string]string
-	Records   []Record
+	FileName        string
+	UniProtDB       string
+	CrapDB          string
+	Prefix          string
+	DownloadedFiles []string
+	TaDeDB          map[string]string
+	Records         []Record
 }
 
 // New constructor
@@ -57,6 +59,8 @@ func Run(m met.Data) met.Data {
 
 		logrus.Info("Processing database")
 
+		m.DB = m.Database.Annot
+
 		db.ProcessDB(m.Database.Annot, m.Database.Tag)
 
 		db.Serialize()
@@ -74,12 +78,17 @@ func Run(m met.Data) met.Data {
 
 	if len(m.Database.Custom) < 1 {
 
-		logrus.Info("Fetching database")
+		m.DB = m.Database.Custom
 
-		currentTime := time.Now()
-		m.Database.TimeStamp = fmt.Sprintf("%s", currentTime.Format("2006.01.02 15:04:05"))
+		dbs := strings.Split(m.Database.ID, ",")
+		for _, i := range dbs {
+			logrus.Info("Fetching database ", i)
 
-		db.Fetch(m.Database.ID, m.Temp, m.Database.Iso, m.Database.Rev)
+			currentTime := time.Now()
+			m.Database.TimeStamp = fmt.Sprintf("%s", currentTime.Format("2006.01.02 15:04:05"))
+
+			db.Fetch(i, m.Temp, m.Database.Iso, m.Database.Rev)
+		}
 
 	} else {
 		db.UniProtDB = m.Database.Custom
@@ -89,7 +98,7 @@ func Run(m met.Data) met.Data {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
-	customDB := db.Save(m.Home, m.Temp, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
+	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
 
 	db.ProcessDB(customDB, m.Database.Tag)
 
@@ -97,7 +106,9 @@ func Run(m met.Data) met.Data {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
 
 	logrus.Info("Creating file")
-	db.Save(m.Home, m.Temp, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
+	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
+
+	db.Prefix = m.Database.Tag
 
 	db.Serialize()
 
@@ -190,6 +201,8 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 		msg.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
 	}
 
+	d.DownloadedFiles = append(d.DownloadedFiles, d.UniProtDB)
+
 	return
 }
 
@@ -198,45 +211,49 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD bool) {
 
 	d.TaDeDB = make(map[string]string)
 
-	dbfile, _ := filepath.Abs(d.UniProtDB)
-	db := fas.ParseFile(dbfile)
+	for _, i := range d.DownloadedFiles {
 
-	if len(add) > 0 {
-		add := fas.ParseFile(add)
+		dbfile, _ := filepath.Abs(i)
+		db := fas.ParseFile(dbfile)
 
-		for k, v := range add {
-			db[k] = v
-		}
-	}
+		if len(add) > 0 {
+			add := fas.ParseFile(add)
 
-	// adding contaminants to database before reversion
-	// repeated entries are removed and substituted by contaminants
-	if crap == true {
-
-		d.Deploy(temp)
-
-		crapMap := fas.ParseFile(d.CrapDB)
-
-		for k, v := range crapMap {
-			split := strings.Split(k, "|")
-			for i := range db {
-				if strings.Contains(i, split[1]) {
-					delete(db, i)
-				}
+			for k, v := range add {
+				db[k] = v
 			}
-			db[k] = v
 		}
 
-	}
+		// adding contaminants to database before reversion
+		// repeated entries are removed and substituted by contaminants
+		if crap == true {
 
-	for h, s := range db {
+			d.Deploy(temp)
 
-		th := ">" + h
-		d.TaDeDB[th] = s
+			crapMap := fas.ParseFile(d.CrapDB)
 
-		if noD == false {
-			dh := ">" + tag + h
-			d.TaDeDB[dh] = reverseSeq(s)
+			for k, v := range crapMap {
+				split := strings.Split(k, "|")
+				for i := range db {
+					if strings.Contains(i, split[1]) {
+						delete(db, i)
+					}
+				}
+				db[k] = v
+			}
+
+		}
+
+		for h, s := range db {
+
+			th := ">" + h
+			d.TaDeDB[th] = s
+
+			if noD == false {
+				dh := ">" + tag + h
+				d.TaDeDB[dh] = reverseSeq(s)
+			}
+
 		}
 
 	}
@@ -263,9 +280,10 @@ func (d *Base) Deploy(temp string) {
 }
 
 // Save fasta file to disk
-func (d *Base) Save(home, temp, tag string, isRev, hasIso, noD, Crap bool) string {
+func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) string {
 
-	base := filepath.Base(d.UniProtDB)
+	base := strings.Replace(ids, ",", "-", -1)
+	//base := filepath.Base(d.UniProtDB)
 
 	t := time.Now()
 	stamp := fmt.Sprintf(t.Format("2006-01-02"))
@@ -288,10 +306,10 @@ func (d *Base) Save(home, temp, tag string, isRev, hasIso, noD, Crap bool) strin
 		baseName = baseName + "-contam"
 	}
 
-	workfile := fmt.Sprintf("%s%s-%s", temp, baseName, base)
-	outfile := fmt.Sprintf("%s%s-%s", home, baseName, base)
+	workfile := fmt.Sprintf("%s%s-%s.fas", temp, baseName, base)
+	outfile := fmt.Sprintf("%s%s-%s.fas", home, baseName, base)
 
-	// create decoy db file
+	// create db file
 	file, e := os.Create(workfile)
 	if e != nil {
 		msg.ReadFile(errors.New("Cannot open the database file"), "fatal")

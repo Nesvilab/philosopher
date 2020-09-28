@@ -58,7 +58,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var uniqueSeqMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
-
 		for _, j := range i.TotalPeptideIons {
 			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
@@ -73,7 +72,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	}
 
 	for i := range evi.PSM {
-
 		// the decoy tag checking is a failsafe mechanism to avoid proteins
 		// with real complex razor case decisions to pass downstream
 		// wrong classifications. If by any chance the protein gets assigned to
@@ -107,7 +105,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	}
 
 	for i := range evi.Ions {
-
 		rp, rOK := urazorMap[evi.Ions[i].IonForm]
 		if rOK {
 
@@ -131,7 +128,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	}
 
 	for i := range evi.Peptides {
-
 		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
 		if ok {
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
@@ -178,6 +174,54 @@ func (evi *Evidence) UpdateIonModCount() {
 
 		}
 	}
+
+	return
+}
+
+// SyncPSMToProteins ...
+func (evi *Evidence) SyncPSMToProteins() {
+
+	var proteinIndex = make(map[string]uint8)
+	var newPSM PSMEvidenceList
+	var newIons IonEvidenceList
+	var newPeptides PeptideEvidenceList
+
+	for _, i := range evi.Proteins {
+		if !i.IsDecoy {
+			proteinIndex[i.ProteinID] = 0
+		}
+	}
+	//fmt.Println("Proteins: ", len(proteinIndex))
+
+	for _, i := range evi.PSM {
+		_, ok := proteinIndex[i.ProteinID]
+		if ok {
+			//uniquePSMProteins[i.ProteinID] = 0
+			newPSM = append(newPSM, i)
+		}
+	}
+	//fmt.Println("in PSM: ", len(uniquePSMProteins))
+	evi.PSM = newPSM
+
+	for _, i := range evi.Ions {
+		_, ok := proteinIndex[i.ProteinID]
+		if ok {
+			//uniqueIonsProteins[i.ProteinID] = 0
+			newIons = append(newIons, i)
+		}
+	}
+	evi.Ions = newIons
+	//fmt.Println("in Ions: ", len(uniqueIonsProteins))
+
+	for _, i := range evi.Peptides {
+		_, ok := proteinIndex[i.ProteinID]
+		if ok {
+			//uniquePeptidesProteins[i.ProteinID] = 0
+			newPeptides = append(newPeptides, i)
+		}
+	}
+	evi.Peptides = newPeptides
+	//fmt.Println("in Peptides: ", len(uniquePeptidesProteins))
 
 	return
 }

@@ -12,7 +12,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var a, b, c, i, n bool
+var analytics, backup, clean, initialize, nocheck bool
+var temp string
 
 // workspaceCmd represents the workspace command
 var workspaceCmd = &cobra.Command{
@@ -22,7 +23,7 @@ var workspaceCmd = &cobra.Command{
 
 		msg.Executing("Workspace ", Version)
 
-		wrk.Run(Version, Build, b, c, i, n)
+		wrk.Run(Version, Build, temp, backup, clean, initialize, nocheck)
 
 		msg.Done()
 		return
@@ -31,13 +32,14 @@ var workspaceCmd = &cobra.Command{
 
 func init() {
 
-	workspaceCmd.Flags().BoolVarP(&i, "init", "", false, "initialize the workspace")
-	workspaceCmd.Flags().BoolVarP(&b, "backup", "", false, "create a backup of the experiment meta data")
-	workspaceCmd.Flags().BoolVarP(&c, "clean", "", false, "remove the workspace and all meta data. Experimental file are kept intact")
-	workspaceCmd.Flags().BoolVarP(&a, "analytics", "", true, "reports when a workspace is created for usage estimation")
-	workspaceCmd.Flags().BoolVarP(&n, "nocheck", "", false, "do not check for new versions")
+	workspaceCmd.Flags().BoolVarP(&initialize, "init", "", false, "initialize the workspace")
+	workspaceCmd.Flags().BoolVarP(&backup, "backup", "", false, "create a backup of the experiment meta data")
+	workspaceCmd.Flags().BoolVarP(&clean, "clean", "", false, "remove the workspace and all meta data. Experimental file are kept intact")
+	workspaceCmd.Flags().BoolVarP(&analytics, "analytics", "", true, "reports when a workspace is created for usage estimation")
+	workspaceCmd.Flags().BoolVarP(&nocheck, "nocheck", "", false, "do not check for new versions")
+	workspaceCmd.Flags().StringVarP(&temp, "temp", "", "", "define a custom temporary folder for Philosopher")
 
-	if len(os.Args) > 1 && os.Args[1] == "workspace" && a == true {
+	if len(os.Args) > 1 && os.Args[1] == "workspace" && analytics == true {
 
 		// do not change this! This is for metric colletion, no user data is gatter, the software just reports back
 		// the number of people using it and the geo location, just like any other website does.

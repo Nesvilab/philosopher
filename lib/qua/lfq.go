@@ -18,6 +18,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// LFQ main structure
+type LFQ struct {
+	Intensities map[string]float64
+}
+
+// NewLFQ constructor
+func NewLFQ() LFQ {
+
+	var self LFQ
+
+	self.Intensities = make(map[string]float64)
+
+	return self
+}
+
 func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
@@ -64,7 +79,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 
 		// load MS1, ignore MS2 and MS3
-		mz.Read(fileName, false, false, true)
+		mz.Read(fileName)
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {

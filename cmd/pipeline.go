@@ -62,45 +62,67 @@ var pipelineCmd = &cobra.Command{
 
 		if len(args) < 1 {
 			msg.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
-		} else if p.Commands.Abacus == "true" && len(args) < 2 {
+		} else if p.Steps.IntegratedReports == "true" && len(args) < 2 {
 			msg.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
 		}
 
 		// Workspace - Database
-		if p.Commands.Workspace == "yes" {
-			meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
-		}
+		//if p.Steps.Workspace == "yes" {
+		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
+		//}
 
 		// Comet - MSFragger
-		if p.Commands.Comet == "yes" && p.Commands.MSFragger == "yes" {
-			msg.Custom(errors.New("You can only specify one search engine at a time"), "fatal")
-		} else if p.Commands.Comet == "yes" || p.Commands.MSFragger == "yes" {
-			meta = pip.DatabaseSearch(meta, p, dir, args)
+		if p.Steps.DatabaseSearch == "yes" {
+			meta = pip.DBSearch(meta, p, dir, args)
 		}
 
 		// PeptideProphet
-		if p.Commands.PeptideProphet == "yes" {
+		if p.Steps.PeptideValidation == "yes" {
 			meta = pip.PeptideProphet(meta, p, dir, args)
 		}
 
 		// PTMProphet
-		if p.Commands.PTMProphet == "yes" {
+		if p.Steps.PTMLocalization == "yes" {
 			meta = pip.PTMProphet(meta, p, dir, args)
 		}
 
 		// ProteinProphet
-		if p.Commands.ProteinProphet == "yes" {
+		if p.Steps.ProteinInference == "yes" {
 			meta = pip.ProteinProphet(meta, p, dir, args)
 		}
 
-		// Abacus - combined pepxml
-		meta = pip.CombinedPeptideList(meta, p, dir, args)
+		if p.Steps.IntegratedReports == "yes" {
+			// Abacus - combined pepxml
+			meta = pip.CombinedPeptideList(meta, p, dir, args)
 
-		// Abacus - combined protxml
-		meta = pip.CombinedProteinList(meta, p, dir, args)
+			// Abacus - combined protxml
+			meta = pip.CombinedProteinList(meta, p, dir, args)
+		}
 
-		// Filter - Quantification - Clustering - Report
-		meta = pip.FilterQuantifyReport(meta, p, dir, args)
+		// Filter
+		if p.Steps.FDRFiltering == "yes" {
+			meta = pip.Filter(meta, p, dir, args)
+		}
+
+		// FreeQuant
+		if p.Steps.LabelFreeQuantification == "yes" {
+			meta = pip.FreeQuant(meta, p, dir, args)
+		}
+
+		// LabelQuant
+		if p.Steps.IsobaricQuantification == "yes" {
+			meta = pip.LabelQuant(meta, p, dir, args)
+		}
+
+		// Report
+		if p.Steps.IndividualReports == "yes" {
+			meta = pip.Report(meta, p, dir, args)
+		}
+
+		// BioQuant
+		if p.Steps.BioClusterQuantification == "yes" {
+			meta = pip.BioQuant(meta, p, dir, args)
+		}
 
 		// Abacus
 		meta = pip.Abacus(meta, p, dir, args)
