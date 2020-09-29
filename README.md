@@ -61,7 +61,7 @@ If you have any questions, remarks, or requests, or if you found a bug, please u
 
 
 ## How to cite
-Still in progress!
+da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacheruvu D, Kong AT, Nesvizhskii AI. Philosopher: a versatile toolkit for shotgun proteomics data analysis. Nat Methods. 2020 Sep;17(9):869-870. doi: 10.1038/s41592-020-0912-y. PMID: 32669682; PMCID: PMC7509848.
 
 
 ## About the developers
