@@ -1,18 +1,6 @@
 ### Added
-- A new Workspace option allows the use of a custom folder as a temporary folder.
-- The Database now supports multiple database IDs (separate them with a comma).
-- Support for the latest msconvert mzML format.
-- Output prefix flag added to PTMProphet.
 
 ### Changed
-- The parameter file was updated, and the terms were made more human-readable.
-- The code compilation is now done with GO v1.15.
-- PTMProphet updated to v6.0
-- The Abacus memory footprint as significantly reduced.
 
 ### Fixed
-- Small bugs and fixes.
-- PSMs lists often contained observations mapping to proteins that did not pass the FDR filter.
-- Bio quant was failing because of the unassigned database path.
-- Some annotation files were being ignored.
-- Added FASTA database file extension back again.
+- Fixed issue with empty custom database.

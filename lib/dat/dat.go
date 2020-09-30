@@ -91,7 +91,9 @@ func Run(m met.Data) met.Data {
 		}
 
 	} else {
-		db.UniProtDB = m.Database.Custom
+		dbPath, _ := filepath.Abs(m.Database.Custom)
+		db.UniProtDB = dbPath
+		db.DownloadedFiles = append(db.DownloadedFiles, dbPath)
 	}
 
 	logrus.Info("Processing decoys")
@@ -282,8 +284,13 @@ func (d *Base) Deploy(temp string) {
 // Save fasta file to disk
 func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) string {
 
-	base := strings.Replace(ids, ",", "-", -1)
-	//base := filepath.Base(d.UniProtDB)
+	var base string
+
+	if len(ids) > 0 {
+		base = strings.Replace(ids, ",", "-", -1)
+	} else {
+		base = filepath.Base(d.UniProtDB)
+	}
 
 	t := time.Now()
 	stamp := fmt.Sprintf(t.Format("2006-01-02"))
