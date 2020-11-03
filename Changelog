@@ -1,6 +1,9 @@
 ### Added
 
 ### Changed
+- Updated parallelization for PeptideProphet.
+- Updated pipeline configuration file.
+-When using a GENCODe database, the Gene name will now be the ENSG key from the header.
 
 ### Fixed
 - Fixed issue with empty custom database.

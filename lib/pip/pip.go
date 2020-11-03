@@ -4,10 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
-	"sync"
-	"time"
 
 	"philosopher/lib/msg"
 
@@ -29,6 +28,7 @@ import (
 	"philosopher/lib/sys"
 	"philosopher/lib/wrk"
 
+	"github.com/ryanskidmore/parallel"
 	"github.com/sirupsen/logrus"
 )
 
@@ -248,53 +248,102 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 		}
 	} else {
 
-		var wg sync.WaitGroup
-		wg.Add(len(data))
+		pll := parallel.New()
+		worker, err := pll.NewWorker("worker", &parallel.WorkerConfig{Parallelism: len(data)})
 
-		meta.Restore(sys.Meta())
-		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
-		meta.Database.Tag = p.DatabaseSearch.DecoyTag
-
-		for _, ds := range data {
-
-			db := p.DatabaseSearch.ProteinDatabase
-
-			go func(ds, db string) {
-				defer wg.Done()
-
-				logrus.Info("Running the validation and inference on ", ds)
-
-				// getting inside de the dataset folder
-				dsAbs, _ := filepath.Abs(ds)
-				absMeta := fmt.Sprintf("%s%s%s", dsAbs, string(filepath.Separator), sys.Meta())
-
-				// reload the meta data
-				meta.Restore(absMeta)
-
-				// PeptideProphet
-				logrus.Info("Executing PeptideProphet on ", ds)
-				meta.PeptideProphet = p.PeptideProphet
-				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
-				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
-				meta.PeptideProphet.Output = "interact"
-				meta.PeptideProphet.Combine = true
-
-				gobExt := fmt.Sprintf("%s%s*.%s", dsAbs, string(filepath.Separator), p.PeptideProphet.FileExtension)
-
-				files, e := filepath.Glob(gobExt)
-				if e != nil {
-					msg.Custom(e, "fatal")
-				}
-
-				peptideprophet.Run(meta, files)
-
-				// give a chance to the execution to untangle the output
-				time.Sleep(time.Second * 1)
-
-			}(ds, db)
+		if err != nil {
+			log.Fatalf("FATAL: Failed to create new worker: %v", err)
 		}
 
-		wg.Wait()
+		worker.SetExecution(func(wh *parallel.WorkerHelper, args interface{}) {
+
+			ds := fmt.Sprintf("%v", args)
+
+			logrus.Info("Running the validation and inference on ", ds)
+
+			meta.Restore(sys.Meta())
+			meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+			meta.Database.Tag = p.DatabaseSearch.DecoyTag
+
+			// getting inside de the dataset folder
+			dsAbs, _ := filepath.Abs(ds)
+			absMeta := fmt.Sprintf("%s%s%s", dsAbs, string(filepath.Separator), sys.Meta())
+
+			// reload the meta data
+			meta.Restore(absMeta)
+
+			// PeptideProphet
+			logrus.Info("Executing PeptideProphet on ", ds)
+			meta.PeptideProphet = p.PeptideProphet
+			meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+			meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
+			meta.PeptideProphet.Output = "interact"
+			meta.PeptideProphet.Combine = true
+
+			gobExt := fmt.Sprintf("%s%s*.%s", dsAbs, string(filepath.Separator), p.PeptideProphet.FileExtension)
+
+			files, e := filepath.Glob(gobExt)
+			if e != nil {
+				msg.Custom(e, "fatal")
+			}
+
+			peptideprophet.Run(meta, files)
+
+			wh.Done()
+		})
+
+		for _, ds := range data {
+			worker.Start(interface{}(ds))
+		}
+		worker.Wait()
+
+		// var wg sync.WaitGroup
+		// wg.Add(len(data))
+
+		// meta.Restore(sys.Meta())
+		// meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+		// meta.Database.Tag = p.DatabaseSearch.DecoyTag
+
+		// for _, ds := range data {
+
+		// 	db := p.DatabaseSearch.ProteinDatabase
+
+		// 	go func(ds, db string) {
+		// 		defer wg.Done()
+
+		// 		logrus.Info("Running the validation and inference on ", ds)
+
+		// 		// getting inside de the dataset folder
+		// 		dsAbs, _ := filepath.Abs(ds)
+		// 		absMeta := fmt.Sprintf("%s%s%s", dsAbs, string(filepath.Separator), sys.Meta())
+
+		// 		// reload the meta data
+		// 		meta.Restore(absMeta)
+
+		// 		// PeptideProphet
+		// 		logrus.Info("Executing PeptideProphet on ", ds)
+		// 		meta.PeptideProphet = p.PeptideProphet
+		// 		meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
+		// 		meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
+		// 		meta.PeptideProphet.Output = "interact"
+		// 		meta.PeptideProphet.Combine = true
+
+		// 		gobExt := fmt.Sprintf("%s%s*.%s", dsAbs, string(filepath.Separator), p.PeptideProphet.FileExtension)
+
+		// 		files, e := filepath.Glob(gobExt)
+		// 		if e != nil {
+		// 			msg.Custom(e, "fatal")
+		// 		}
+
+		// 		peptideprophet.Run(meta, files)
+
+		// 		// give a chance to the execution to untangle the output
+		// 		time.Sleep(time.Second * 1)
+
+		// 	}(ds, db)
+		// }
+
+		// wg.Wait()
 	}
 
 	os.Chdir(dir)
