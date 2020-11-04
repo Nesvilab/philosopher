@@ -1,4 +1,5 @@
 ### Added
+- Fix to PTProphet mod_nterm_mass change when using TMT-16 plex.
 
 ### Changed
 - Updated parallelization for PeptideProphet.
