@@ -265,7 +265,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
 		}
 
-		// in case both PeptideProphet and PTMProphet files are rpesent, use
+		// in case both PeptideProphet and PTMProphet files are present, use
 		// PTMProphet results and ignore peptide prophet.
 		for _, i := range list {
 			base := filepath.Base(i)
@@ -485,6 +485,20 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			m.IsobaricMods = make(map[string]float64)
 			p.Modifications.Index[key] = m
 		}
+
+		// this rule was added because PTMProphet is changing the mod_nterm_mass
+		// in the PSM to something that does not exists in the header table.
+		if strings.Contains(key, "305") {
+			key = "N-term#305.2150"
+			v, ok := mods.Index[key]
+			if ok {
+				m := v
+				m.AminoAcid = "N-term"
+				m.IsobaricMods = make(map[string]float64)
+				p.Modifications.Index[key] = m
+			}
+		}
+
 	}
 
 	// c-terminal modifications
