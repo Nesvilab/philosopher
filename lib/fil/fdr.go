@@ -285,7 +285,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 
 	var razorPair = make(map[string]string)
 
-	// get the best protein candidate for each pepetide sequence and make the razor pair
+	// get the best protein candidate for each peptide sequence and make the razor pair
 	for _, k := range rList {
 		// 1st pass: mark all cases with weight > 0.5
 		for pt, w := range r[k].MappedProteinsW {
@@ -430,14 +430,15 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 		for j := range p.Groups[i].Proteins {
 			var r float64
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
+
 				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
 					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
 				}
 
-				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "LLLLNLR" {
-				// 	fmt.Println(k, j, p.Groups[i].Proteins[j].HasRazor, p.Groups[i].Proteins[k].HasRazor, p.Groups[i].Proteins[k].ProteinName, p.Groups[i].Proteins[j].ProteinName)
+				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "GEASRLAHY" {
+				// 	fmt.Println(p.Groups[i].Proteins[j].HasRazor, p.Groups[i].Proteins[k].HasRazor, p.Groups[i].Proteins[k].ProteinName, p.Groups[i].Proteins[j].ProteinName)
 				// }
 
 			}

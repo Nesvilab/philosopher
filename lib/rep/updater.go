@@ -55,6 +55,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	var uniqueMap = make(map[string]bool)
 	var urazorMap = make(map[string]string)
+	var sequenceMap = make(map[string]string)
 	var uniqueSeqMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
@@ -67,6 +68,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		for _, j := range i.TotalPeptideIons {
 			if j.IsURazor == true {
 				urazorMap[j.IonForm] = i.PartHeader
+				sequenceMap[j.Sequence] = i.PartHeader
 			}
 		}
 	}
@@ -96,12 +98,33 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 		}
 
-		_, uOK := uniqueMap[evi.PSM[i].IonForm]
-		if uOK {
-			evi.PSM[i].IsUnique = true
-		}
+		if evi.PSM[i].IsURazor == false {
+			sp, sOK := sequenceMap[evi.PSM[i].Peptide]
+			if sOK {
 
-		uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+				evi.PSM[i].IsURazor = true
+
+				// we found cases where the peptide maps to both target and decoy but is
+				// assigned as razor to the decoy. the IF statement below replaces the
+				// decoy by the target but it was removed because in some cases the protein
+				// does not pass the FDR filtering.
+
+				evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
+				delete(evi.PSM[i].MappedProteins, sp)
+				evi.PSM[i].Protein = sp
+
+				if strings.Contains(sp, decoyTag) {
+					evi.PSM[i].IsDecoy = true
+				}
+			}
+
+			_, uOK := uniqueMap[evi.PSM[i].IonForm]
+			if uOK {
+				evi.PSM[i].IsUnique = true
+			}
+
+			uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+		}
 	}
 
 	for i := range evi.Ions {

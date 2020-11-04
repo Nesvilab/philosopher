@@ -190,6 +190,9 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	for i := range list {
 		for _, j := range dtb.Records {
 			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
+
+				//fmt.Println("A:", j.OriginalHeader, "\t", "B:", list[i].ProteinName)
+
 				if (j.IsDecoy == true && list[i].IsDecoy == true) || (j.IsDecoy == false && list[i].IsDecoy == false) {
 
 					list[i].OriginalHeader = j.OriginalHeader

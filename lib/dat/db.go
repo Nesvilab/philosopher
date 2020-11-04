@@ -38,10 +38,11 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 	// geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
 
 	// this version accepts ENSEMBL headers from other souces like transcript and gene
-	idReg1 := regexp.MustCompile(`(ENS\w+)`)
+	idReg1 := regexp.MustCompile(`(ENS\w+\.?\d{1,})`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
 	desReg := regexp.MustCompile(`ENS\w+(.*)`)
 	geneReg := regexp.MustCompile(`ENS\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
+	ensgReg := regexp.MustCompile(`(ENSG\w+\.?\d{1,})`)
 
 	e.OriginalHeader = k
 
@@ -70,6 +71,13 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 		e.GeneNames = ""
 	} else {
 		e.GeneNames = gene[1]
+	}
+
+	ensGene := ensgReg.FindStringSubmatch(k)
+	if ensGene == nil {
+		e.GeneNames = ""
+	} else {
+		e.GeneNames = ensGene[1]
 	}
 
 	e.EntryName = ""
