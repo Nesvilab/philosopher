@@ -8,7 +8,7 @@ import (
 	"github.com/vmihailenco/msgpack"
 )
 
-// Modifications is a collections of modification
+// Modifications is a collection of modifications
 type Modifications struct {
 	Index map[string]Modification
 }
