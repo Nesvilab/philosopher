@@ -2,6 +2,7 @@
 - Added support to compensation Voltage. 
 
 ### Changed
-- Tabular spaces in FASTA headers will be replaces by spaces.
+- Tabular spaces in FASTA headers will be replaced by a simple space character.
 
 ### Fixed
+- Fix a bug that would miscalculate the number of peptides to be reported.
