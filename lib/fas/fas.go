@@ -30,6 +30,7 @@ func ParseFile(filename string) map[string]string {
 		if strings.HasPrefix(scanner.Text(), ">") {
 			header := reHeader.FindStringSubmatch(scanner.Text())
 			fastaHeader = header[1]
+			fastaHeader = strings.Replace(fastaHeader, "\t", " ", -1)
 			fastaMap[fastaHeader] = ""
 		} else {
 			fastaSeq = fastaMap[fastaHeader]

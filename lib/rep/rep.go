@@ -151,6 +151,7 @@ type PSMEvidence struct {
 	Intensity                        float64
 	IonMobility                      float64
 	Purity                           float64
+	CompensationVoltage              float64
 	IsDecoy                          bool
 	IsUnique                         bool
 	IsURazor                         bool

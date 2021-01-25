@@ -1,10 +1,8 @@
 ### Added
-- Fix to PTProphet mod_nterm_mass change when using TMT-16 plex.
+- Added support to compensation Voltage. 
 
 ### Changed
-- Updated parallelization for PeptideProphet.
-- Updated pipeline configuration file.
--When using a GENCODe database, the Gene name will now be the ENSG key from the header.
+- Tabular spaces in FASTA headers will be replaced by a simple space character.
 
 ### Fixed
-- Fixed issue with empty custom database.
+- Fix a bug that would miscalculate the number of peptides to be reported.

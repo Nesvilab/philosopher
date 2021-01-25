@@ -86,6 +86,7 @@ type PeptideIdentification struct {
 	Intensity                        float64
 	IonMobility                      float64
 	IsRejected                       uint8
+	CompesationVoltage               float64
 	Modifications                    mod.Modifications
 }
 
@@ -347,6 +348,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 	psm.AssumedCharge = sq.AssumedCharge
 	psm.RetentionTime = sq.RetentionTimeSec
 	psm.IonMobility = sq.IonMobility
+	psm.CompesationVoltage = sq.CompensationVoltage
 
 	if sq.UncalibratedPrecursorNeutralMass > 0 {
 		psm.PrecursorNeutralMass = sq.PrecursorNeutralMass

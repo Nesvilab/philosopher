@@ -59,6 +59,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var uniqueSeqMap = make(map[string]string)
 
 	for _, i := range evi.Proteins {
+
 		for _, j := range i.TotalPeptideIons {
 			if j.IsUnique == true {
 				uniqueMap[j.IonForm] = true
@@ -151,7 +152,8 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	}
 
 	for i := range evi.Peptides {
-		v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
+		//v, ok := uniqueSeqMap[evi.Peptides[i].Sequence]
+		v, ok := sequenceMap[evi.Peptides[i].Sequence]
 		if ok {
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
 			delete(evi.Peptides[i].MappedProteins, v)
