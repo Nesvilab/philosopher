@@ -175,6 +175,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 		ModsMap := make(map[string][]string)
 
 		protIDMap := make(map[string]string)
+		protMap := make(map[string]string)
 		protDescMap := make(map[string]string)
 		GeneMap := make(map[string]string)
 
@@ -191,6 +192,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 			IntMap[j.Sequence] = j.Intensity
 
 			protIDMap[j.Sequence] = j.ProteinID
+			protMap[j.Sequence] = j.Protein
 			protDescMap[j.Sequence] = j.ProteinDescription
 			GeneMap[j.Sequence] = j.GeneName
 
@@ -229,6 +231,10 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 			id, ok := protIDMap[evidences[i].Sequence]
 			if ok {
 				evidences[i].ProteinID = id
+			}
+			pro, ok := protMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].Protein = pro
 			}
 			desc, ok := protDescMap[evidences[i].Sequence]
 			if ok {
