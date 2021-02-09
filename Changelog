@@ -4,4 +4,5 @@
 - Removed the zero-bin delta mass correction.
 
 ### Fixed
-- Fixed support for mass offset for MSFragger
+- Fixed support for mass offset for MSFragger.
+- Rounding issue that can prevent the mapping between masses from MSFragger and PTMProphet.

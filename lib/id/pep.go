@@ -254,8 +254,6 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 		fileCheckList = append(fileCheckList, xmlFile)
 		files[xmlFile] = 0
 	} else {
-		//glob := fmt.Sprintf("%s%s*pep.xml", xmlFile, string(filepath.Separator))
-		//list, _ := filepath.Glob(glob)
 
 		list, err := uti.WalkMatch(xmlFile, "*.pep.xml")
 		if err != nil {
@@ -389,14 +387,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 					if k.Name == "massd" {
 						psm.IsoMassD, _ = strconv.Atoi(k.Value)
 					}
-
-					// if k.Name == "ntt" {
-					// 	psm.NumberOfEnzymaticTermini, _ = strconv.Atoi(k.Value)
-					// }
-
-					// if k.Name == "nmc" {
-					// 	psm.NMC, _ = strconv.Atoi(k.Value)
-					// }
 				}
 			}
 
@@ -464,8 +454,15 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 	p.ModifiedPeptide = string(m.ModifiedPeptide)
 
 	for _, i := range m.ModAminoacidMass {
+
 		aa := strings.Split(p.Peptide, "")
 		key := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass)
+
+		// This is related to a rounding issue that prevents the correct mapping between
+		// PTMProphet and MSFragger masses
+		keyPlus := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass+0.0001)
+		keyMinus := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass-0.0001)
+
 		v, ok := mods.Index[key]
 		if ok {
 			m := v
@@ -474,6 +471,27 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			m.Position = strconv.Itoa(i.Position)
 			m.IsobaricMods = make(map[string]float64)
 			p.Modifications.Index[newKey] = m
+		} else {
+
+			v, ok = mods.Index[keyPlus]
+			if ok {
+				m := v
+				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
+				m.Index = newKey
+				m.Position = strconv.Itoa(i.Position)
+				m.IsobaricMods = make(map[string]float64)
+				p.Modifications.Index[newKey] = m
+			}
+
+			v, ok = mods.Index[keyMinus]
+			if ok {
+				m := v
+				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
+				m.Index = newKey
+				m.Position = strconv.Itoa(i.Position)
+				m.IsobaricMods = make(map[string]float64)
+				p.Modifications.Index[newKey] = m
+			}
 		}
 	}
 
