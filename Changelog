@@ -1,8 +1,7 @@
 ### Added
-- Added support to compensation Voltage. 
 
 ### Changed
-- Tabular spaces in FASTA headers will be replaced by a simple space character.
+- Removed the zero-bin delta mass correction.
 
 ### Fixed
-- Fix a bug that would miscalculate the number of peptides to be reported.
+- Fixed support for mass offset for MSFragger

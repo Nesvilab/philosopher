@@ -112,7 +112,7 @@ type MSFragger struct {
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
 	Deisotope                          int     `yaml:"deisotope"`
 	IsotopeError                       string  `yaml:"isotope_error"`
-	MassOffsets                        int     `yaml:"mass_offsets"`
+	MassOffsets                        string  `yaml:"mass_offsets"`
 	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
 	LocalizeDeltaMass                  int     `yaml:"localize_delta_mass"`
 	DeltaMassExcludeRanges             string  `yaml:"delta_mass_exclude_ranges"`

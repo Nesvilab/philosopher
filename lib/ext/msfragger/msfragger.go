@@ -175,7 +175,7 @@ func appendParams(params met.MSFragger) *exec.Cmd {
 		"--isotope_error",
 		fmt.Sprintf("%s", params.IsotopeError),
 		"--mass_offsets",
-		fmt.Sprintf("%d", params.MassOffsets),
+		fmt.Sprintf("%s", params.MassOffsets),
 		"--localize_delta_mass",
 		fmt.Sprintf("%d", params.LocalizeDeltaMass),
 		"--precursor_mass_mode",

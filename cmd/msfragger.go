@@ -59,7 +59,7 @@ func init() {
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.DecoyPrefix, "decoy_prefix", "", "rev_", "prefix added to the decoy protein ID (used for parameter optimization only)")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Deisotope, "deisotope", "", 1, "Perform deisotoping or not (0=no, 1=yes and assume singleton peaks single charged, 2=yes and assume singleton")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IsotopeError, "isotope_error", "", "0/1/2", "0=off, 0/1/2 (standard C13 error)")
-		msfraggerCmd.Flags().IntVarP(&m.MSFragger.MassOffsets, "mass_offsets", "", 0, "allow for additional precursor mass window shifts")
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.MassOffsets, "mass_offsets", "", "", "allow for additional precursor mass window shifts")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.LocalizeDeltaMass, "localize_delta_mass", "", 0, "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.PrecursorMassMode, "precursor_mass_mode", "", "selected", "")
 		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.DeltaMassExcludeRanges, "delta_mass_exclude_ranges", "", "(-1.5,3.5)", "")
