@@ -156,7 +156,7 @@ type SearchDatabase struct {
 type EnzymaticSearchConstraint struct {
 	XMLName                 xml.Name `xml:"enzymatic_search_constraint"`
 	Enzyme                  []byte   `xml:"enzyme,attr"`
-	MaxNumInternalCleavages uint32   `xml:"max_num_internal_cleavages,attr"`
+	MaxNumInternalCleavages int8     `xml:"max_num_internal_cleavages,attr"`
 	MinNumTermini           uint8    `xml:"min_number_termini,attr"`
 }
 
