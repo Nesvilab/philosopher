@@ -2,7 +2,9 @@
 
 ### Changed
 - Removed the zero-bin delta mass correction.
+- Updated the compiler to Go v1.16
 
 ### Fixed
 - Fixed support for mass offset for MSFragger.
 - Rounding issue that can prevent the mapping between masses from MSFragger and PTMProphet.
+- Minor bugs and issues.
