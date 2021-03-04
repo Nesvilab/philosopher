@@ -10,6 +10,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"philosopher/lib/msg"
 
@@ -82,6 +83,86 @@ func (a Spectra) Len() int           { return len(a) }
 func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
+// ReadRaw is the main function for parsing Thermo Raw data
+func (p *MsData) ReadRaw(f string) {
+
+	p.FileName = f
+	var spectra Spectra
+
+	lines := strings.Split(f, "%")
+
+	for _, i := range lines {
+		parts := strings.Split(i, "#")
+
+		if len(parts) >= 8 {
+
+			var spec Spectrum
+
+			if strings.Contains(parts[0], "ms3") {
+				spec.Level = "3"
+			} else if strings.Contains(parts[0], "ms2") {
+				spec.Level = "2"
+			} else {
+				spec.Level = "1"
+			}
+
+			spec.Scan = parts[1]
+
+			//indexInt, _ := strconv.Atoi(parts[1])
+			//indexInt--
+			//spec.Index = string(strconv.Itoa(indexInt))
+
+			spec.Precursor.ParentScan = parts[2]
+
+			//parentIndexInt, _ := strconv.Atoi(parts[2])
+			//parentIndexInt--
+			spec.Precursor.ParentScan = parts[3]
+
+			siVal1, e := strconv.ParseFloat(parts[5], 64)
+			if e != nil {
+				msg.CastFloatToString(e, "fatal")
+			} else {
+				spec.Precursor.SelectedIon = siVal1
+			}
+
+			siVal2, e := strconv.ParseFloat(parts[6], 64)
+			if e != nil {
+				msg.CastFloatToString(e, "fatal")
+			} else {
+				spec.Precursor.SelectedIonIntensity = siVal2
+			}
+
+			peaks := parts[7]
+			for _, arg := range peaks[1:] {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
+				}
+			}
+
+			intensities := parts[8]
+			for _, arg := range intensities[1:] {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Intensity.DecodedStream = append(spec.Mz.DecodedStream, n)
+				}
+			}
+
+			spectra = append(spectra, spec)
+
+			parts = nil
+		}
+	}
+
+	lines = nil
+
+	if len(spectra) == 0 {
+		msg.NoSpectraFound(errors.New(""), "fatal")
+	}
+
+	p.Spectra = spectra
+
+	return
+}
+
 // Read is the main function for parsing mzML data
 func (p *MsData) Read(f string) {
 
@@ -139,10 +220,6 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	spec.Precursor = Precursor{}
 	if len(mzSpec.PrecursorList.Precursor) > 0 {
 
-		// parent index and parent scan
-		//var ref []string
-		//var precRef []string
-
 		if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) > 0 {
 
 			scanRG := regexp.MustCompile(`scan=(.+)`)
@@ -153,41 +230,6 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			pi = (pi - 1)
 			spec.Precursor.ParentIndex = strconv.Itoa(pi)
 		}
-
-		// if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
-
-		// 	precRef = append(precRef, "-1")
-		// 	precRef = append(precRef, "-1")
-
-		// } else {
-
-		// 	scanRG := regexp.MustCompile(`scan=(.+)`)
-		// 	match := scanRG.FindStringSubmatch(mzSpec.PrecursorList.Precursor[0].SpectrumRef)
-
-		// 	spec.Precursor.ParentScan = match[1]
-		// 	pi, _ := strconv.Atoi(match[1])
-		// 	pi = (pi - 1)
-		// 	spec.Precursor.ParentIndex = strconv.Itoa(pi)
-
-		// ref = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
-		// precRef = strings.Split(ref[2], "=")
-
-		// // ABSCIEX has a different way of reporting the prcursor reference spectrum
-		// if len(ref) < 1 || len(precRef) < 1 {
-		// 	precRef = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
-		// }
-
-		//}
-
-		// if spec.Scan == "34280" {
-		// 	fmt.Println(spec.Scan, mzSpec.PrecursorList.Precursor[0].SpectrumRef, spec.Precursor.ParentScan, spec.Precursor.ParentIndex)
-		// 	os.Exit(1)
-		// }
-
-		// spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
-		// pi, _ := strconv.Atoi(precRef[1])
-		// pi = (pi - 1)
-		// spec.Precursor.ParentIndex = strconv.Itoa(pi)
 
 		for _, j := range mzSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
 

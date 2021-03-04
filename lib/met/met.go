@@ -363,6 +363,7 @@ type Quantify struct {
 	IntNorm    bool    `yaml:"intNorm"`
 	Unique     bool    `yaml:"uniqueOnly"`
 	BestPSM    bool    `yaml:"bestPSM"`
+	Raw        bool    `yaml:"raw"`
 	LabelNames map[string]string
 }
 

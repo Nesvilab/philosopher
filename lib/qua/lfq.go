@@ -3,12 +3,14 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"log"
 	"math"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"philosopher/lib/bio"
+	"philosopher/lib/ext/rawfilereader"
 	"philosopher/lib/msg"
 	"philosopher/lib/uti"
 
@@ -33,7 +35,7 @@ func NewLFQ() LFQ {
 	return self
 }
 
-func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso bool) rep.Evidence {
+func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso, isRaw bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
 
@@ -76,14 +78,24 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		logrus.Info("Processing ", s)
 		var mz mzn.MsData
 
-		fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
+		if isRaw == true {
+			log.Println("in")
+			stream := rawfilereader.Run(s)
+			mz.ReadRaw(stream)
+			log.Println("out")
 
-		// load MS1, ignore MS2 and MS3
-		mz.Read(fileName)
+		} else {
+
+			fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
+			// load MS1, ignore MS2 and MS3
+			mz.Read(fileName)
+		}
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
-				mz.Spectra[i].Decode()
+				if isRaw == false {
+					mz.Spectra[i].Decode()
+				}
 			} else if mz.Spectra[i].Level == "2" {
 				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
