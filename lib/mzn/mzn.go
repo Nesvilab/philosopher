@@ -2,6 +2,7 @@ package mzn
 
 import (
 	"bytes"
+	"compress/gzip"
 	"compress/zlib"
 	"encoding/base64"
 	"encoding/binary"
@@ -94,7 +95,7 @@ func (p *MsData) ReadRaw(f string) {
 	for _, i := range lines {
 		parts := strings.Split(i, "#")
 
-		if len(parts) >= 8 {
+		if len(parts) == 8 {
 
 			var spec Spectrum
 
@@ -112,47 +113,58 @@ func (p *MsData) ReadRaw(f string) {
 			//indexInt--
 			//spec.Index = string(strconv.Itoa(indexInt))
 
-			spec.Precursor.ParentScan = parts[2]
+			if parts[2] == "-1" {
+				parts[2] = "0"
+			}
+			parts2, _ := strconv.Atoi(parts[2])
+			spec.Precursor.ChargeState = parts2
+
+			spec.Precursor.ParentScan = parts[3]
 
 			//parentIndexInt, _ := strconv.Atoi(parts[2])
 			//parentIndexInt--
-			spec.Precursor.ParentScan = parts[3]
 
 			siVal1, e := strconv.ParseFloat(parts[5], 64)
 			if e != nil {
 				msg.CastFloatToString(e, "fatal")
 			} else {
 				spec.Precursor.SelectedIon = siVal1
+				spec.Precursor.TargetIon = siVal1
 			}
 
-			siVal2, e := strconv.ParseFloat(parts[6], 64)
-			if e != nil {
-				msg.CastFloatToString(e, "fatal")
-			} else {
-				spec.Precursor.SelectedIonIntensity = siVal2
-			}
+			spec.Mz.Stream = []byte(parts[6])
+			spec.Mz.Precision = "64"
+			spec.Mz.Compression = "1"
 
-			peaks := parts[7]
-			for _, arg := range peaks[1:] {
-				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
-					spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
-				}
-			}
+			spec.Intensity.Stream = []byte(parts[7])
+			spec.Intensity.Precision = "64"
+			spec.Intensity.Compression = "1"
 
-			intensities := parts[8]
-			for _, arg := range intensities[1:] {
-				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
-					spec.Intensity.DecodedStream = append(spec.Mz.DecodedStream, n)
-				}
-			}
+			// siVal2, e := strconv.ParseFloat(parts[6], 64)
+			// if e != nil {
+			// 	msg.CastFloatToString(e, "fatal")
+			// } else {
+			// 	spec.Precursor.SelectedIonIntensity = siVal2
+			// }
+
+			// peaks := parts[6]
+			// for _, arg := range peaks[1:] {
+			// 	if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+			// 		spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
+			// 	}
+			// }
+
+			// intensities := parts[7]
+			// for _, arg := range intensities[1:] {
+			// 	if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+			// 		spec.Intensity.DecodedStream = append(spec.Mz.DecodedStream, n)
+			// 	}
+			// }
 
 			spectra = append(spectra, spec)
 
-			parts = nil
 		}
 	}
-
-	lines = nil
 
 	if len(spectra) == 0 {
 		msg.NoSpectraFound(errors.New(""), "fatal")
@@ -334,6 +346,83 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	}
 
 	return spec
+}
+
+// DecodeRaw processes the binary data from the raw reader
+func (s *Spectrum) DecodeRaw() {
+
+	if len(s.Mz.Stream) > 0 && len(s.Intensity.Stream) > 0 {
+		s.Mz.DecodedStream = readEncodedRaw(s.Mz.Stream, s.Mz.Precision, s.Mz.Compression)
+		s.Mz.Stream = nil
+
+		s.Intensity.DecodedStream = readEncodedRaw(s.Intensity.Stream, s.Intensity.Precision, s.Intensity.Compression)
+		s.Intensity.Stream = nil
+	}
+
+	if len(s.IonMobility.Stream) > 0 {
+		s.IonMobility.DecodedStream = readEncodedRaw(s.IonMobility.Stream, s.IonMobility.Precision, s.IonMobility.Compression)
+		s.IonMobility.Stream = nil
+	}
+
+	return
+}
+
+// readEncodedRaw transforms the binary data into float64 values
+func readEncodedRaw(bin []byte, precision, isCompressed string) []float64 {
+
+	var stream []uint8
+	var floatArray []float64
+
+	b := bytes.NewReader(bin)
+	b64 := base64.NewDecoder(base64.StdEncoding, b)
+
+	var bytestream bytes.Buffer
+	if isCompressed == "1" {
+		r, e := gzip.NewReader(b64)
+		if e != nil {
+			msg.ReadingMzMLZlib(e, "error")
+			var emptyArray []float64
+			emptyArray = append(emptyArray, 0.0)
+			return emptyArray
+		}
+		io.Copy(&bytestream, r)
+	} else {
+		io.Copy(&bytestream, b64)
+	}
+
+	dataArray := bytestream.Bytes()
+
+	var counter int
+
+	if precision == "32" {
+		for i := range dataArray {
+			counter++
+			stream = append(stream, dataArray[i])
+			if counter == 4 {
+				bits := binary.LittleEndian.Uint32(stream)
+				converted := math.Float32frombits(bits)
+				floatArray = append(floatArray, float64(converted))
+				stream = nil
+				counter = 0
+			}
+		}
+	} else if precision == "64" {
+		for i := range dataArray {
+			counter++
+			stream = append(stream, dataArray[i])
+			if counter == 8 {
+				bits := binary.LittleEndian.Uint64(stream)
+				converted := math.Float64frombits(bits)
+				floatArray = append(floatArray, float64(converted))
+				stream = nil
+				counter = 0
+			}
+		}
+	} else {
+		logrus.Trace("Error trying to define mzML binary precision")
+	}
+
+	return floatArray
 }
 
 // Decode processes the binary data

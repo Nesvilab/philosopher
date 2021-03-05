@@ -1,6 +1,7 @@
 package rawfilereader
 
 import (
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"philosopher/lib/met"
@@ -96,6 +97,7 @@ func (c *RawFileReader) Execute(args string) string {
 	cmd := exec.Command(bin)
 
 	file, _ := filepath.Abs(args)
+	file = fmt.Sprintf("%s.raw", file)
 	cmd.Args = append(cmd.Args, file)
 
 	//cmd.Stdout = os.Stdout
