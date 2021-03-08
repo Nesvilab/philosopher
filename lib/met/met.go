@@ -77,6 +77,7 @@ type Database struct {
 	Custom    string `yaml:"custom"`
 	TimeStamp string `yaml:"timestamp"`
 	Crap      bool   `yaml:"contam"`
+	CrapTag   bool   `yaml:"contaminant_tag"`
 	Rev       bool   `yaml:"reviewed"`
 	Iso       bool   `yaml:"isoform"`
 	NoD       bool   `yaml:"nodecoys"`

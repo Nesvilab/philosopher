@@ -33,6 +33,7 @@ Steps:
 Database Search:                                 # MSFragger 3.1 & Comet
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
+  contaminant_tag: false                         # prefix tag used added to decoy sequences
   search_engine: comet                           # search engine options include "comet" and "msfragger"
   comet:                                         # Comet v2019011
     noindex: true                                # skip mzML file indexing

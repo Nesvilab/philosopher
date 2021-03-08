@@ -96,8 +96,8 @@ func Run(m met.Data) met.Data {
 		db.DownloadedFiles = append(db.DownloadedFiles, dbPath)
 	}
 
-	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
+	logrus.Info("Generating the target-decoy database")
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag)
 
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -105,7 +105,7 @@ func Run(m met.Data) met.Data {
 	db.ProcessDB(customDB, m.Database.Tag)
 
 	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -209,7 +209,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap, noD bool) {
+func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -235,6 +235,11 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD bool) {
 			crapMap := fas.ParseFile(d.CrapDB)
 
 			for k, v := range crapMap {
+
+				if cTag == true {
+					k = "contam_" + k
+				}
+
 				split := strings.Split(k, "|")
 				for i := range db {
 					if strings.Contains(i, split[1]) {
