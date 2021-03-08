@@ -4,6 +4,7 @@ package uti
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -126,7 +127,7 @@ func FindFile(targetDir string, pattern string) string {
 	return match[0]
 }
 
-// WalkMatch looks for files with a certain extension in a specofoc folder
+// WalkMatch recursively looks for files with a certain extension in a specific folder
 func WalkMatch(root, pattern string) ([]string, error) {
 	var matches []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -147,4 +148,22 @@ func WalkMatch(root, pattern string) ([]string, error) {
 		return nil, err
 	}
 	return matches, nil
+}
+
+// IOReadDir looks for files with a certain extension in a specific folder
+func IOReadDir(root, ext string) []string {
+
+	var files []string
+
+	fileInfo, err := ioutil.ReadDir(root)
+	if err != nil {
+		return files
+	}
+	for _, file := range fileInfo {
+		if strings.Contains(file.Name(), ext) {
+			files = append(files, file.Name())
+		}
+	}
+
+	return files
 }
