@@ -17,7 +17,6 @@ import (
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -82,7 +81,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if isRaw == true {
 			log.Println("in")
 			stream := rawfilereader.Run(s)
-			mz.ReadRaw(stream)
+			mz.ReadRaw(s, stream)
 			log.Println("out")
 
 		} else {
@@ -94,8 +93,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
 				if isRaw == true {
-					spew.Dump(mz.Spectra[i])
-					//mz.Spectra[i].DecodeRaw()
+					//spew.Dump(mz.Spectra[i])
 				} else {
 					mz.Spectra[i].Decode()
 				}

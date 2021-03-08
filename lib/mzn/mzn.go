@@ -85,9 +85,9 @@ func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
 // ReadRaw is the main function for parsing Thermo Raw data
-func (p *MsData) ReadRaw(f string) {
+func (p *MsData) ReadRaw(fileName, f string) {
 
-	p.FileName = f
+	p.FileName = fileName
 	var spectra Spectra
 
 	lines := strings.Split(f, "%")
@@ -95,7 +95,7 @@ func (p *MsData) ReadRaw(f string) {
 	for _, i := range lines {
 		parts := strings.Split(i, "#")
 
-		if len(parts) == 8 {
+		if len(parts) >= 8 {
 
 			var spec Spectrum
 
@@ -108,10 +108,9 @@ func (p *MsData) ReadRaw(f string) {
 			}
 
 			spec.Scan = parts[1]
-
-			//indexInt, _ := strconv.Atoi(parts[1])
-			//indexInt--
-			//spec.Index = string(strconv.Itoa(indexInt))
+			indexInt, _ := strconv.Atoi(parts[1])
+			indexInt--
+			spec.Index = string(strconv.Itoa(indexInt))
 
 			if parts[2] == "-1" {
 				parts[2] = "0"
@@ -120,9 +119,12 @@ func (p *MsData) ReadRaw(f string) {
 			spec.Precursor.ChargeState = parts2
 
 			spec.Precursor.ParentScan = parts[3]
+			parentIndexInt, _ := strconv.Atoi(parts[3])
+			parentIndexInt--
+			spec.Precursor.ParentIndex = string(strconv.Itoa(parentIndexInt))
 
-			//parentIndexInt, _ := strconv.Atoi(parts[2])
-			//parentIndexInt--
+			rtVal, _ := strconv.ParseFloat(parts[4], 64)
+			spec.ScanStartTime = rtVal
 
 			siVal1, e := strconv.ParseFloat(parts[5], 64)
 			if e != nil {
@@ -132,34 +134,35 @@ func (p *MsData) ReadRaw(f string) {
 				spec.Precursor.TargetIon = siVal1
 			}
 
-			spec.Mz.Stream = []byte(parts[6])
+			siVal2, e := strconv.ParseFloat(parts[6], 64)
+			if e != nil {
+				msg.CastFloatToString(e, "fatal")
+			} else {
+				spec.Precursor.SelectedIonIntensity = siVal2
+				spec.Precursor.TargetIonIntensity = siVal2
+			}
+
+			spec.Mz.Stream = []byte(parts[7])
 			spec.Mz.Precision = "64"
 			spec.Mz.Compression = "1"
 
-			spec.Intensity.Stream = []byte(parts[7])
+			spec.Intensity.Stream = []byte(parts[8])
 			spec.Intensity.Precision = "64"
 			spec.Intensity.Compression = "1"
 
-			// siVal2, e := strconv.ParseFloat(parts[6], 64)
-			// if e != nil {
-			// 	msg.CastFloatToString(e, "fatal")
-			// } else {
-			// 	spec.Precursor.SelectedIonIntensity = siVal2
-			// }
+			peaks := parts[6]
+			for _, arg := range peaks[1:] {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
+				}
+			}
 
-			// peaks := parts[6]
-			// for _, arg := range peaks[1:] {
-			// 	if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
-			// 		spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
-			// 	}
-			// }
-
-			// intensities := parts[7]
-			// for _, arg := range intensities[1:] {
-			// 	if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
-			// 		spec.Intensity.DecodedStream = append(spec.Mz.DecodedStream, n)
-			// 	}
-			// }
+			intensities := parts[7]
+			for _, arg := range intensities[1:] {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Intensity.DecodedStream = append(spec.Mz.DecodedStream, n)
+				}
+			}
 
 			spectra = append(spectra, spec)
 
