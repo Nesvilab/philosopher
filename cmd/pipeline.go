@@ -67,9 +67,7 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		// Workspace - Database
-		//if p.Steps.Workspace == "yes" {
 		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
-		//}
 
 		// Comet - MSFragger
 		if p.Steps.DatabaseSearch == "yes" {

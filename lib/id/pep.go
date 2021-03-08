@@ -257,11 +257,11 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 
 		list, err := uti.WalkMatch(xmlFile, "*.pep.xml")
 		if err != nil {
-			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
+			msg.NoParametersFound(errors.New("missing PeptideProphet pepXML files"), "fatal")
 		}
 
 		if len(list) == 0 {
-			msg.NoParametersFound(errors.New("missing pepXML files"), "fatal")
+			msg.NoParametersFound(errors.New("missing PeptideProphet pepXML files"), "fatal")
 		}
 
 		// in case both PeptideProphet and PTMProphet files are present, use

@@ -101,7 +101,7 @@ func Run(f met.Data) met.Data {
 	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
-		msg.Custom(errors.New("Database data not available, interrupting processing"), "fatal")
+		msg.Custom(errors.New("Database annotation not found, interrupting the processing"), "fatal")
 	}
 
 	logrus.Info("Post processing identifications")

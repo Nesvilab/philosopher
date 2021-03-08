@@ -54,9 +54,9 @@ func Run(m met.Data, args []string) met.Data {
 
 	var pep = New(m.Temp)
 
-	if len(m.PeptideProphet.Database) < 1 {
-		msg.Custom(errors.New("You need to provide a protein database"), "fatal")
-	}
+	// if len(m.PeptideProphet.Database) < 1 {
+	// 	msg.Custom(errors.New("You need to provide a protein database"), "fatal")
+	// }
 
 	// get the database tag from database command
 	if len(m.PeptideProphet.Decoy) == 0 {
