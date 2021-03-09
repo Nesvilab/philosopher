@@ -3,7 +3,6 @@ package qua
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"path/filepath"
 	"sort"
@@ -79,11 +78,8 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		var mz mzn.MsData
 
 		if isRaw == true {
-			log.Println("in")
-			stream := rawfilereader.Run(s)
+			stream := rawfilereader.Run(s, "")
 			mz.ReadRaw(s, stream)
-			log.Println("out")
-
 		} else {
 			fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 			// load MS1, ignore MS2 and MS3
@@ -93,7 +89,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
 				if isRaw == true {
-					//spew.Dump(mz.Spectra[i])
+
 				} else {
 					mz.Spectra[i].Decode()
 				}
@@ -101,12 +97,14 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
 				if ok {
+
+					mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
 					// update the MZ with the desired Precursor value from mzML
-					if isIso == true {
-						mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
-					} else {
-						mzMap[spectrum] = mz.Spectra[i].Precursor.SelectedIon
-					}
+					// if isIso == true {
+					// 	mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
+					// } else {
+					// 	mzMap[spectrum] = mz.Spectra[i].Precursor.SelectedIon
+					// }
 				}
 			}
 		}
@@ -116,10 +114,6 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 			for _, j := range v {
 
 				measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
-
-				// if j == "20180209_03_TP_1A.03130.03130.2#interact.pep.xml" {
-				// 	fmt.Println(measured)
-				// }
 
 				if retrieved == true {
 
@@ -172,10 +166,6 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 				highi := sort.Search(len(mz[j].Mz.DecodedStream), func(i int) bool { return mz[j].Mz.DecodedStream[i] >= mzValue+ppmPrecision*mzValue })
 
 				var maxI = 0.0
-
-				// if mz[j].Index == "3106" {
-				// 	spew.Dump(mzValue, mz[j].Intensity.DecodedStream[lowi:highi])
-				// }
 
 				for _, k := range mz[j].Intensity.DecodedStream[lowi:highi] {
 					if k > maxI {

@@ -51,7 +51,7 @@ func New() RawFileReader {
 }
 
 // Run is the main entry point for rawfilereader
-func Run(args string) string {
+func Run(rawFileName, scanQuery string) string {
 
 	var reader = New()
 
@@ -59,7 +59,7 @@ func Run(args string) string {
 	reader.Deploy()
 
 	// run
-	stream := reader.Execute(args)
+	stream := reader.Execute(rawFileName, scanQuery)
 
 	return stream
 }
@@ -91,17 +91,18 @@ func (c *RawFileReader) Deploy() {
 }
 
 // Execute is the main function to execute RawFileReader
-func (c *RawFileReader) Execute(args string) string {
+func (c *RawFileReader) Execute(rawFileName, scanQuery string) string {
 
 	bin := c.DefaultBin
 	cmd := exec.Command(bin)
 
-	file, _ := filepath.Abs(args)
+	file, _ := filepath.Abs(rawFileName)
 	file = fmt.Sprintf("%s.raw", file)
 	cmd.Args = append(cmd.Args, file)
 
-	//cmd.Stdout = os.Stdout
-	//cmd.Stderr = os.Stderr
+	if len(scanQuery) > 0 {
+		cmd.Args = append(cmd.Args, scanQuery)
+	}
 
 	out, e := cmd.CombinedOutput()
 	if e != nil {
