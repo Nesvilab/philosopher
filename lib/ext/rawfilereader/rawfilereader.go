@@ -10,44 +10,50 @@ import (
 	"runtime"
 
 	uDeb "philosopher/lib/ext/rawfilereader/deb64"
+	uRH "philosopher/lib/ext/rawfilereader/reh64"
+	wRaw "philosopher/lib/ext/rawfilereader/win"
 )
 
 // RawFileReader represents the tool configuration
 type RawFileReader struct {
 	met.Data
-	OS         string
-	Arch       string
-	Deb64Bin   string
-	ReH64Bin   string
-	WinBin     string
-	DefaultBin string
+	OS                                     string
+	Arch                                   string
+	Deb64Bin                               string
+	ReH64Bin                               string
+	WinBin                                 string
+	DefaultBin                             string
+	ThermoFisherCommonCoreDataDLL          string
+	ThermoFisherCommonCoreRawFileReaderDLL string
 }
 
 // New constructor
 func New() RawFileReader {
 
-	var o RawFileReader
+	var self RawFileReader
 	var m met.Data
 	m.Restore(sys.Meta())
 
-	o.UUID = m.UUID
-	o.Distro = m.Distro
-	o.Home = m.Home
-	o.MetaFile = m.MetaFile
-	o.MetaDir = m.MetaDir
-	o.DB = m.DB
-	o.Temp = m.Temp
-	o.TimeStamp = m.TimeStamp
-	o.OS = m.OS
-	o.Arch = m.Arch
+	self.UUID = m.UUID
+	self.Distro = m.Distro
+	self.Home = m.Home
+	self.MetaFile = m.MetaFile
+	self.MetaDir = m.MetaDir
+	self.DB = m.DB
+	self.Temp = m.Temp
+	self.TimeStamp = m.TimeStamp
+	self.OS = m.OS
+	self.Arch = m.Arch
 
-	o.OS = runtime.GOOS
-	o.Arch = runtime.GOARCH
-	o.Deb64Bin = m.Temp + string(filepath.Separator) + "rawFileReaderDeb"
-	o.ReH64Bin = m.Temp + string(filepath.Separator) + "rawFileReaderReH"
-	//o.WinBin = m.Temp + string(filepath.Separator) + "rawFileReader"
+	self.OS = runtime.GOOS
+	self.Arch = runtime.GOARCH
+	self.Deb64Bin = m.Temp + string(filepath.Separator) + "rawFileReaderDeb"
+	self.ReH64Bin = m.Temp + string(filepath.Separator) + "rawFileReaderReH"
+	self.WinBin = m.Temp + string(filepath.Separator) + "RawFileReader.exe"
+	self.ThermoFisherCommonCoreDataDLL = m.Temp + string(filepath.Separator) + "ThermoFisher.CommonCore.Data.dll"
+	self.ThermoFisherCommonCoreRawFileReaderDLL = m.Temp + string(filepath.Separator) + "ThermoFisher.CommonCore.RawFileReader.dll"
 
-	return o
+	return self
 }
 
 // Run is the main entry point for rawfilereader
@@ -69,21 +75,23 @@ func (c *RawFileReader) Deploy() {
 
 	if c.OS == sys.Windows() {
 
-		// deploy cd-hit binary
-		//wcdhit.Win64(c.WinBin)
-		//c.DefaultBin = c.WinBin
+		// deploy windows binary
+		wRaw.Win(c.WinBin)
+		wRaw.ThermoFisherCommonCoreDataDLL(c.ThermoFisherCommonCoreDataDLL)
+		wRaw.ThermoFisherCommonCoreRawFileReaderDLL(c.ThermoFisherCommonCoreRawFileReaderDLL)
+		c.DefaultBin = c.WinBin
 
 	} else if c.OS == "linux" && c.Distro == sys.Debian() {
 
-		// deploy cd-hit binary
+		// deploy debian binary
 		uDeb.Deb64(c.Deb64Bin)
 		c.DefaultBin = c.Deb64Bin
 
-	} else if c.OS == "linux" && c.Distro == sys.Centos() {
+	} else {
 
-		// deploy cd-hit binary
-		//uRH.Deb64(c.Deb64Bin)
-		//c.DefaultBin = c.Deb64Bin
+		// deploy red hat binary
+		uRH.Reh64(c.ReH64Bin)
+		c.DefaultBin = c.ReH64Bin
 
 	}
 
