@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"philosopher/lib/ext/rawfilereader"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
@@ -97,10 +98,18 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		mz.Read(fileName)
+		if p.Raw == true {
 
-		for i := range mz.Spectra {
-			mz.Spectra[i].Decode()
+			stream := rawfilereader.Run(sourceList[i], "")
+			mz.ReadRaw(sourceList[i], stream)
+
+		} else {
+
+			mz.Read(fileName)
+
+			for i := range mz.Spectra {
+				mz.Spectra[i].Decode()
+			}
 		}
 
 		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])

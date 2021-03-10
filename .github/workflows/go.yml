@@ -34,9 +34,9 @@ jobs:
         unzip -o lib/ext/ptmprophet/win/bindata.go.zip -d lib/ext/ptmprophet/win/
         unzip -o lib/ext/proteinprophet/unix/bindata.go.zip -d lib/ext/proteinprophet/unix/
         unzip -o lib/ext/proteinprophet/win/bindata.go.zip -d lib/ext/proteinprophet/win/
-        unzip -o lib/ext/rawfilereader/deb64/bindata.go.zip -d  lib/ext/proteinprophet/deb64/
-       	unzip -o lib/ext/rawfilereader/reh64/bindata.go.zip -d  lib/ext/proteinprophet/reh64/
-	      unzip -o lib/ext/rawfilereader/win/bindata.go.zip -d  lib/ext/proteinprophet/win/
+        unzip -o lib/ext/rawfilereader/deb64/bindata.go.zip -d lib/ext/proteinprophet/deb64/
+       	unzip -o lib/ext/rawfilereader/reh64/bindata.go.zip -d lib/ext/proteinprophet/reh64/
+	      unzip -o lib/ext/rawfilereader/win/bindata.go.zip -d lib/ext/proteinprophet/win/
         unzip -o lib/pip/bindata.go.zip -d lib/pip/
         unzip -o lib/dat/bindata.go.zip -d lib/dat/
         unzip -o lib/obo/unimod/bindata.go.zip -d lib/obo/unimod/
