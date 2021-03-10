@@ -413,6 +413,7 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Print      bool
+	Verbose    bool
 }
 
 // New initializes the structure with the system information needed

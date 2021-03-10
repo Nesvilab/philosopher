@@ -69,6 +69,10 @@ var pipelineCmd = &cobra.Command{
 		// Workspace - Database
 		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
 
+		if m.Pipeline.Verbose == true {
+			meta.Pipeline.Verbose = true
+		}
+
 		// Comet - MSFragger
 		if p.Steps.DatabaseSearch == "yes" {
 			meta = pip.DBSearch(meta, p, dir, args)
@@ -146,9 +150,8 @@ func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "pipeline" {
 
-		//m.Restore(sys.Meta())
-
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
+		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Verbose, "verbose", "", false, "show the parameters for each command that is executed")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
 
 	}

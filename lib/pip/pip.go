@@ -114,12 +114,10 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		meta.Restore(sys.Meta())
 
 		// Database
-		//if p.Commands.Database == "yes" {
 		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
 		meta.Database.Tag = p.DatabaseSearch.DecoyTag
 		dat.Run(meta)
 		meta.Serialize()
-		//}
 
 		met.CleanTemp(meta.Temp)
 
@@ -133,7 +131,7 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 // DBSearch executes the search engines if requested
 func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	logrus.Info("Running the Database Search on all data")
+	logrus.Info("Running the Database Search")
 
 	// reload the meta data
 	meta.Restore(sys.Meta())

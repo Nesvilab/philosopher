@@ -102,10 +102,23 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.IsDecoy = true
 		}
 
+		// the redudnancy check was introduced because of inconsistencies with
+		// PeptideProphet. The Windows version is printing the same protein
+		// as alternative when the peptide maps to the same protein multiple times
+		var redudantMapping = 0
 		if len(i.AlternativeProteins) == 0 {
 			p.IsUnique = true
 		} else {
+			for _, k := range i.AlternativeProteins {
+				if k == i.Protein {
+					redudantMapping++
+				}
+			}
 			p.IsUnique = false
+		}
+
+		if redudantMapping == len(i.AlternativeProteins) {
+			p.IsUnique = true
 		}
 
 		list = append(list, p)
