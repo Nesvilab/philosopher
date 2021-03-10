@@ -1,6 +1,8 @@
 ### Added
+- Native support for Thermo raw files (Windows, and Linux).
+- Option to tag contaminant sequences with a prefix tag.
 
 ### Changed
 
-
 ### Fixed
+- Minor bugs and fixes.
