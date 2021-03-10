@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"philosopher/lib/sys"
 
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -511,6 +513,50 @@ func (d Data) FunctionInitCheckUp() {
 		os.Mkdir(d.Temp, sys.FilePermission())
 		msg.LocatingTemDirecotry(e, "warning")
 	}
+
+	return
+}
+
+// ToCmdString converts the MSFragger struct into a CMD string
+func (d MSFragger) ToCmdString() {
+
+	var cmd = "CMD string: philosopher msfragger"
+
+	v := reflect.ValueOf(d)
+	typeOfS := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+
+		if typeOfS.Field(i).Name == "Param" || typeOfS.Field(i).Name == "RawFiles" || typeOfS.Field(i).Name == "ParamFile" {
+			continue
+		}
+
+		cmd = fmt.Sprintf("%s --%s %v", cmd, typeOfS.Field(i).Name, v.Field(i).Interface())
+	}
+
+	logrus.Info(cmd)
+
+	return
+}
+
+// ToCmdString converts the PeptideProphet struct into a CMD string
+func (d PeptideProphet) ToCmdString() {
+
+	var cmd = "CMD string: philosopher peptideprophet"
+
+	v := reflect.ValueOf(d)
+	typeOfS := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+
+		// if typeOfS.Field(i).Name == "Param" || typeOfS.Field(i).Name == "RawFiles" || typeOfS.Field(i).Name == "ParamFile" {
+		// 	continue
+		// }
+
+		cmd = fmt.Sprintf("%s --%s %v", cmd, typeOfS.Field(i).Name, v.Field(i).Interface())
+	}
+
+	logrus.Info(cmd)
 
 	return
 }

@@ -153,6 +153,7 @@ func init() {
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Verbose, "verbose", "", false, "show the parameters for each command that is executed")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
+		pipelineCmd.Flags().MarkHidden("verbose")
 
 	}
 

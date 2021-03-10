@@ -133,6 +133,10 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	logrus.Info("Running the Database Search")
 
+	// if meta.Pipeline.Verbose == true {
+	// 	p.DatabaseSearch.MSFragger.ToCmdString()
+	// }
+
 	// reload the meta data
 	meta.Restore(sys.Meta())
 
@@ -237,6 +241,7 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 				if e != nil {
 					msg.Custom(e, "fatal")
 				}
+
 				peptideprophet.Run(meta, files)
 				meta.Serialize()
 			}
