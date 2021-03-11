@@ -57,7 +57,7 @@ func Run(m met.Data) met.Data {
 
 	if len(m.Database.Annot) > 0 {
 
-		logrus.Info("Processing database")
+		logrus.Info("Annotating the database")
 
 		m.DB = m.Database.Annot
 

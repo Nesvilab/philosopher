@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"philosopher/lib/dat"
 	"philosopher/lib/msg"
 
 	"philosopher/lib/ext/interprophet"
@@ -21,7 +22,6 @@ import (
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 
-	"philosopher/lib/dat"
 	"philosopher/lib/ext/comet"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
@@ -97,14 +97,14 @@ func DeployParameterFile(temp string) string {
 func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build string, data []string) met.Data {
 
 	// Top-level Workspace
-	wrk.Run(Version, Build, "", false, false, true, true)
+	//wrk.Run(Version, Build, "", false, false, true, true)
 
-	for _, i := range data {
+	for i := range data {
 
-		logrus.Info("Initiating the workspace on ", i)
+		logrus.Info("Initiating the workspace on ", data[i])
 
 		// getting inside de the dataset folder
-		dsAbs, _ := filepath.Abs(i)
+		dsAbs, _ := filepath.Abs(data[i])
 		os.Chdir(dsAbs)
 
 		// Workspace
@@ -113,17 +113,55 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 		// reload the meta data to avoid being overwritten with black home
 		meta.Restore(sys.Meta())
 
-		// Database
-		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
-		meta.Database.Tag = p.DatabaseSearch.DecoyTag
-		dat.Run(meta)
-		meta.Serialize()
-
 		met.CleanTemp(meta.Temp)
 
 		// return to the top level directory
 		os.Chdir(dir)
 	}
+
+	return meta
+}
+
+// AnnotateDatabase annotates the database on the first ds, and copy the bin data to the other folders
+func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	var source string
+
+	// getting inside de the dataset folder
+	dsAbs, _ := filepath.Abs(data[0])
+	os.Chdir(dsAbs)
+
+	// reload the meta data to avoid being overwritten with black home
+	meta.Restore(sys.Meta())
+
+	meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+	meta.Database.Tag = p.DatabaseSearch.DecoyTag
+	dat.Run(meta)
+	meta.Serialize()
+	source = fmt.Sprintf("%s%s.meta%sdb.bin", dsAbs, string(filepath.Separator), string(filepath.Separator))
+
+	// return to the top level directory
+	os.Chdir(dir)
+
+	for i := 1; i < len(data); i++ {
+		//source := fmt.Sprintf("%s%s.meta%sdb.bin", data[0], string(filepath.Separator), string(filepath.Separator))
+		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
+
+		// Read all content of src to data
+		data, e := ioutil.ReadFile(source)
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		e = ioutil.WriteFile(destination, data, 0644)
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		//meta.Serialize()
+	}
+
+	met.CleanTemp(meta.Temp)
 
 	return meta
 }

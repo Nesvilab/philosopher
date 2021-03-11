@@ -69,9 +69,11 @@ var pipelineCmd = &cobra.Command{
 		// Workspace - Database
 		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
 
-		if m.Pipeline.Verbose == true {
-			meta.Pipeline.Verbose = true
-		}
+		meta = pip.AnnotateDatabase(meta, p, dir, args)
+
+		// if m.Pipeline.Verbose == true {
+		// 	meta.Pipeline.Verbose = true
+		// }
 
 		// Comet - MSFragger
 		if p.Steps.DatabaseSearch == "yes" {

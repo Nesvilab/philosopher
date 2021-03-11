@@ -1,4 +1,5 @@
-# Philosopher pipeline configuration file.
+# Philosopher pipeline configuration file
+# Version 3.6.0
 #
 # The pipeline mode automates the processing done by Philosopher and other tools. First, check
 # the steps you want to execute in the commands section and change them to
@@ -217,6 +218,7 @@ Label-Free Quantification:                       # Freequant
   peakTimeWindow: 0.4                            # specify the time windows for the peak (minute) (default 0.4)
   retentionTimeWindow: 3                         # specify the retention time window for xic (minute) (default 3)
   tolerance: 10                                  # m/z tolerance in ppm (default 10)
+  raw: false                                     # read raw files instead of converted mzML, or mzXML
 
 Isobaric Quantification:                         # Labelquant
   bestPSM: false                                 # select the best PSMs for protein quantification
@@ -228,6 +230,7 @@ Isobaric Quantification:                         # Labelquant
   tolerance: 20                                  # m/z tolerance in ppm (default 20)
   uniqueOnly: false                              # report quantification based on only unique peptides
   brand: tmt                                     # isobaric labeling brand (tmt, itraq)
+  raw: false                                     # read raw files instead of converted mzML, or mzXML
 
 Bio Cluster Quantification:                      # BioQuant
   organismUniProtID:                             # UniProt proteome ID
