@@ -3,6 +3,7 @@
 - Option to tag contaminant sequences with a prefix tag.
 
 ### Changed
+- Improovements to the pipeline processing speed.
 
 ### Fixed
 - Minor bugs and fixes.
