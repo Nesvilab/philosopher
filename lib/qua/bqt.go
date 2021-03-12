@@ -127,7 +127,7 @@ func parseClusterFile(cls, database string) List {
 			num := cluster[1]
 			i, e := strconv.Atoi(num)
 			if e != nil {
-				msg.Custom(errors.New("FAST header not found"), "fatal")
+				msg.Custom(errors.New("FASTA header not found"), "fatal")
 			}
 			clusterNumber = i
 
@@ -136,19 +136,19 @@ func parseClusterFile(cls, database string) List {
 
 		} else {
 
-			if strings.Contains(scanner.Text(), "*") {
+			if strings.Contains(scanner.Text(), "*") && !strings.Contains(scanner.Text(), "rev_") {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
 				if len(centroid) < 2 {
 					msg.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "fatal")
 				}
 				centroidmap[clusterNumber] = centroid[1]
-			}
 
-			seq := reseq.FindStringSubmatch(scanner.Text())
-			seqsName = clustermap[clusterNumber]
-			seqsName = append(seqsName, seq[1])
-			clustermap[clusterNumber] = seqsName
+				seq := reseq.FindStringSubmatch(scanner.Text())
+				seqsName = clustermap[clusterNumber]
+				seqsName = append(seqsName, seq[1])
+				clustermap[clusterNumber] = seqsName
+			}
 		}
 	}
 
@@ -194,7 +194,8 @@ func mapProtXML2Clusters(clusters List) List {
 					}
 
 					for _, k := range i.TotalPeptideIons {
-						clusters[j].Peptides = append(clusters[j].Peptides, k.Sequence)
+						ion := fmt.Sprintf("%s_%d", k.Sequence, k.ChargeState)
+						clusters[j].Peptides = append(clusters[j].Peptides, ion)
 					}
 
 					for _, k := range i.TotalPeptideIons {
@@ -214,11 +215,14 @@ func mapProtXML2Clusters(clusters List) List {
 	pepMap := make(map[string]uint8)
 	for _, i := range e.Proteins {
 		for _, j := range i.TotalPeptideIons {
-			_, ok := pepMap[j.Sequence]
+
+			ion := fmt.Sprintf("%s_%d", j.Sequence, j.ChargeState)
+
+			_, ok := pepMap[ion]
 			if ok {
-				pepMap[j.Sequence]++
+				pepMap[ion]++
 			} else {
-				pepMap[j.Sequence] = 1
+				pepMap[ion] = 1
 			}
 		}
 	}
