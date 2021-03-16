@@ -382,6 +382,7 @@ type Abacus struct {
 	Labels   bool    `yaml:"labels"`
 	Unique   bool    `yaml:"uniqueOnly"`
 	Reprint  bool    `yaml:"reprint"`
+	Full     bool    `yaml:"full"`
 }
 
 // BioQuant options and parameters
