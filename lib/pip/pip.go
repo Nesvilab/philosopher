@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 
 	"philosopher/lib/dat"
@@ -254,7 +255,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 // PeptideProphet executes PeptideProphet in Parallel mode
 func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.PeptideProphet.Concurrent == false {
+	if p.PeptideProphet.Concurrent {
 		for _, i := range data {
 
 			logrus.Info("Running the validation and inference on ", i)
@@ -419,7 +420,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 	var combinedPepXML string
 
-	if p.Steps.IntegratedReports == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Peptide && len(p.Filter.Pex) == 0 {
 
 		logrus.Info("Integrating peptide validation")
 
@@ -461,8 +462,9 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 func CombinedProteinList(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	var combinedProtXML string
+	var topMeta met.Data
 
-	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 
 		logrus.Info("Creating combined protein inference")
 
@@ -471,6 +473,8 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		// reload the meta data
 		meta.Restore(sys.Meta())
+
+		topMeta = meta
 
 		meta.Home = dir
 		meta.ProteinProphet = p.ProteinProphet
@@ -495,6 +499,23 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		// copy to work directory
 		sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
+	}
+
+	// when running the pipeline, we want to run the inference only once
+	// and them copy the meta data to all data folders.
+	os.Chdir(dir)
+
+	protXML := fil.ReadProtXMLInput("combined.prot.xml", topMeta.Filter.Tag, topMeta.Filter.Weight)
+	proBin := fil.ProcessProteinIdentifications(protXML, topMeta.Filter.PtFDR, topMeta.Filter.PepFDR, topMeta.Filter.ProtProb, topMeta.Abacus.Picked, topMeta.Abacus.Razor, topMeta.Filter.Fo, true, topMeta.Filter.Tag)
+
+	for _, i := range data {
+		dest := fmt.Sprintf("%s%s.meta%spro.bin", i, string(filepath.Separator), string(filepath.Separator))
+		sys.CopyFile(proBin, dest)
+	}
+
+	e := os.RemoveAll(path.Dir(proBin))
+	if e != nil {
+		log.Fatal(e)
 	}
 
 	return meta
@@ -646,8 +667,8 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 			}
 
 			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
-				meta.Filter.Pox = fmt.Sprintf("..%scombined.prot.xml", string(filepath.Separator))
-			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
+				meta.Filter.Pox = "combined"
+			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false
@@ -703,11 +724,8 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 		logrus.Info("Executing abacus")
 
-		// // return to the top level directory
+		// return to the top level directory
 		os.Chdir(dir)
-
-		// // reload the meta data
-		//meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
 		meta.Abacus.Tag = p.DatabaseSearch.DecoyTag

@@ -32,8 +32,6 @@ func Run(m met.Data, args []string) {
 	if m.Abacus.Protein == true {
 		proteinLevelAbacus(m, args)
 	}
-
-	return
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels

@@ -39,7 +39,7 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Processing peptide identification files")
 
 	// if no method is selected, force the 2D to be default
-	if len(f.Filter.Pox) > 0 && f.Filter.TwoD == false && f.Filter.Seq == false {
+	if len(f.Filter.Pox) > 0 && f.Filter.TwoD && f.Filter.Seq {
 		f.Filter.TwoD = true
 	}
 
@@ -52,14 +52,14 @@ func Run(f met.Data) met.Data {
 	_ = pepT
 	_ = ionT
 
-	if len(f.Filter.Pox) > 0 {
+	if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
 
-		protXML := readProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
-		processProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, f.Filter.Tag)
+		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, false, f.Filter.Tag)
 
 	} else {
 
-		if f.Filter.Inference == true {
+		if f.Filter.Inference {
 
 			var filteredPSM id.PepIDList
 			filteredPSM.Restore("psm")
@@ -76,7 +76,7 @@ func Run(f met.Data) met.Data {
 
 	}
 
-	if f.Filter.Seq == true {
+	if f.Filter.Seq {
 
 		// sequential analysis
 		// filtered psm list and filtered prot list
@@ -86,7 +86,7 @@ func Run(f met.Data) met.Data {
 		pep = nil
 		pro = nil
 
-	} else if f.Filter.TwoD == true {
+	} else if f.Filter.TwoD {
 
 		// two-dimensional analysis
 		// complete pep list and filtered mirror-image prot list
@@ -101,7 +101,7 @@ func Run(f met.Data) met.Data {
 	var dtb dat.Base
 	dtb.Restore()
 	if len(dtb.Records) < 1 {
-		msg.Custom(errors.New("Database annotation not found, interrupting the processing"), "fatal")
+		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	}
 
 	logrus.Info("Post processing identifications")
@@ -125,7 +125,7 @@ func Run(f met.Data) met.Data {
 	ion = nil
 
 	// evaluate modifications in data set
-	if f.Filter.Mapmods == true {
+	if f.Filter.Mapmods {
 		logrus.Info("Mapping modifications")
 		//should include observed mods into mapping?
 		e.MapMods()
@@ -141,13 +141,13 @@ func Run(f met.Data) met.Data {
 	pept = nil
 
 	// evaluate modifications in data set
-	if f.Filter.Mapmods == true {
+	if f.Filter.Mapmods {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
 	//spew.Dump(e.PSM)
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
 		logrus.Info("Processing protein inference")
 		pro.Restore()
@@ -163,17 +163,17 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 		e.SyncPSMToProteins()
 	}
 
 	// reorganizes the selected proteins and the alternative proteins list
 	logrus.Info("Updating razor PSM assignment to proteins")
-	if f.Filter.Razor == true {
+	if f.Filter.Razor {
 		e.UpdateSupportingSpectra()
 	}
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 		e.UpdateNumberOfEnzymaticTermini()
 	}
 
@@ -344,7 +344,6 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 
 	combinedFiltered.Serialize("psm")
 
-	return
 }
 
 // chargeProfile ...
@@ -418,8 +417,8 @@ func GetUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
 	return uniqMap
 }
 
-// readProtXMLInput reads one or more fies and organize the data into PSM list
-func readProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
+// ReadProtXMLInput reads one or more fies and organize the data into PSM list
+func ReadProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 	var protXML id.ProtXML
 
@@ -431,14 +430,14 @@ func readProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 	protXML.PromoteProteinIDs()
 
-	protXML.Serialize()
+	//protXML.Serialize()
 
 	return protXML
 }
 
-// processProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
+// ProcessProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo bool, decoyTag string) {
+func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo, isCombined bool, decoyTag string) string {
 
 	var pid id.ProtIDList
 
@@ -450,19 +449,19 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	}).Info("Protein inference results")
 
 	// applies pickedFDR algorithm
-	if isPicked == true {
+	if isPicked {
 		p = PickedFDR(p)
 	}
 
 	// applies razor algorithm
-	if isRazor == true {
+	if isRazor {
 		p = RazorFilter(p)
 	}
 
 	// run the FDR filter for proteins
 	pid = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
 
-	if fo == true {
+	if fo {
 		output := fmt.Sprintf("%s%spep_pro_mappings.tsv", sys.MetaDir(), string(filepath.Separator))
 
 		file, e := os.Create(output)
@@ -495,9 +494,14 @@ func processProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	}
 
 	// save results on meta folder
-	pid.Serialize()
+	if isCombined {
+		proBin := pid.SerializeToTemp()
+		return proBin
+	} else {
+		pid.Serialize()
+	}
 
-	return
+	return ""
 }
 
 // processProteinInferenceIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
@@ -703,7 +707,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 	proXML.Serialize()
 	pid.Serialize()
 
-	return
 }
 
 // proteinProfile ...

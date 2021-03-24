@@ -327,7 +327,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					tie = true
 				}
 
-				if tie == false {
+				if tie {
 					razorPair[k] = topPT
 
 				} else {
@@ -359,7 +359,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						tie = true
 					}
 
-					if tie == false {
+					if tie {
 
 						var mplist []string
 						for pt := range r[k].MappedProteinsTNP {
@@ -461,21 +461,21 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 
-			if isRazor == true {
+			if isRazor {
 
-				if isPicked == true {
-					if p.Groups[i].Proteins[j].Picked == 1 && p.Groups[i].Proteins[j].HasRazor == true {
+				if isPicked {
+					if p.Groups[i].Proteins[j].Picked == 1 && p.Groups[i].Proteins[j].HasRazor {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
 				} else {
-					if p.Groups[i].Proteins[j].HasRazor == true {
+					if p.Groups[i].Proteins[j].HasRazor {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
 				}
 
 			} else {
 
-				if isPicked == true {
+				if isPicked {
 					if p.Groups[i].Proteins[j].Probability >= protProb && p.Groups[i].Proteins[j].Picked == 1 {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
@@ -554,7 +554,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	}
 
 	if curProb == 10 {
-		msg.Custom(errors.New("The protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "error")
+		msg.Custom(errors.New("the protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "error")
 	}
 
 	fmtScore := uti.ToFixed(curScore, 4)
@@ -637,7 +637,6 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return
 }
 
 // twoDFDRFilter estimates FDR levels by applying a second filter by regenerating
@@ -681,7 +680,6 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 	filteredIons.Serialize("ion")
 
-	return
 }
 
 // mirrorProteinList takes a filtered list and regenerate the correspondedn decoys
