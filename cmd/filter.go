@@ -23,7 +23,7 @@ var filterCmd = &cobra.Command{
 
 		msg.Executing("Filter ", Version)
 
-		// clean, clean clean
+		// clean, clean, clean
 		os.RemoveAll(sys.EvBin())
 		os.RemoveAll(sys.EvIonBin())
 		os.RemoveAll(sys.EvModificationsBin())

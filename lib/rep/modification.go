@@ -4,159 +4,252 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 
 	"philosopher/lib/msg"
-
 	"philosopher/lib/obo"
+
 	"philosopher/lib/sys"
 	"philosopher/lib/uti"
 )
 
-// MapMods maps PSMs to modifications based on their mass shifts
-func (evi *Evidence) MapMods(hasObserved bool) {
+// int[] matched_unimod_idx = new int[delta_mass_from_psm.length];
+// for (int i = 0; i < delta_mass_from_psm.length; ++i) {
+// 	double gap = 9999999;
+// 	double matched_mass;
+// 	int matched_idx;
+//   for (int j = 0; j < unimod.length; ++j) { // can be optimized with binary search
+//     if (Math.abs(delta_mass_from_psm[i] - unimod[j]) < gap) {
+//     	gap = Math.abs(delta_mass_from_psm[i] - unimod[j])
+//     	matched_mass = unimod[j];
+// 		matched_idx = j;
+//     }
+//   }
+// ​
+//   if (gap < ppm * 1e-6 * matched_mass) {
+//   	matched_unimod_idx[i] = matched_idx;
+//   } else {
+//   	matched_unimod_idx[i] = null;
+//   }
+// }
 
-	var tolerance = 0.01
+// MapMods maps PSMs to modifications based on their mass shifts
+func (evi *Evidence) MapMods() {
+
+	var modMap = make(map[float64]obo.Term)
+	var modList []float64
+	var ppm = float64(20)
 
 	o := obo.NewUniModOntology()
 
+	for _, i := range evi.PSM {
+		modMap[i.Massdiff] = obo.Term{}
+	}
+
+	for k := range modMap {
+		modList = append(modList, k)
+	}
+
+	for i := 0; i <= len(modList)-1; i++ {
+
+		var gap = float64(9999999)
+		var obo obo.Term
+		var mass float64
+
+		for j := range o.Terms {
+
+			if math.Abs(modList[i]-o.Terms[j].MonoIsotopicMass) < gap {
+				gap = math.Abs(modList[i] - o.Terms[j].MonoIsotopicMass)
+				obo = o.Terms[j]
+				mass = modList[i]
+			}
+		}
+
+		if gap < (1e-6 * ppm * mass) {
+			modMap[mass] = obo
+		} else {
+			delete(modMap, mass)
+		}
+	}
+
 	for i := range evi.PSM {
+		// for fixed and variable modifications
+		for k, v := range evi.PSM[i].Modifications.Index {
 
-		for _, j := range o.Terms {
+			obo, ok := modMap[v.MassDiff]
+			if ok {
+				updatedMod := v
 
-			// for fixed and variable modifications
-			for k, v := range evi.PSM[i].Modifications.Index {
-				if j.MonoIsotopicMass >= (v.MassDiff-tolerance) && j.MonoIsotopicMass <= (v.MassDiff+tolerance) {
-
-					updatedMod := v
-
-					_, ok := j.Sites[v.AminoAcid]
-					if ok {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
-						evi.PSM[i].Modifications.Index[k] = updatedMod
-					}
-					if hasObserved == true && updatedMod.Type == "Observed" {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-						evi.PSM[i].Modifications.Index[k] = updatedMod
-					}
-					break
+				_, ok := obo.Sites[v.AminoAcid]
+				if ok {
+					updatedMod.Name = obo.Name
+					updatedMod.Definition = obo.Definition
+					updatedMod.ID = obo.ID
+					updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					updatedMod.IsobaricMods[obo.Name]++
+					evi.PSM[i].Modifications.Index[k] = updatedMod
 				}
-			}
-
-		}
-	}
-
-	for i := range evi.Ions {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range evi.Ions[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-					updatedMod := v
-
-					_, ok := j.Sites[v.AminoAcid]
-					if ok {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
-						evi.Ions[i].Modifications.Index[k] = updatedMod
-					}
-					if hasObserved == true && updatedMod.Type == "Observed" {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-						evi.Ions[i].Modifications.Index[k] = updatedMod
-					}
-					break
+				if updatedMod.Type == "Observed" {
+					updatedMod.Name = obo.Name
+					updatedMod.Definition = obo.Definition
+					updatedMod.ID = obo.ID
+					updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					updatedMod.IsobaricMods[obo.Name] = obo.MonoIsotopicMass
+					evi.PSM[i].Modifications.Index[k] = updatedMod
 				}
-			}
-
-		}
-	}
-
-	for i := range evi.Peptides {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range evi.Peptides[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-					updatedMod := v
-
-					_, ok := j.Sites[v.AminoAcid]
-					if ok {
-
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
-						evi.Peptides[i].Modifications.Index[k] = updatedMod
-					}
-					if hasObserved == true && updatedMod.Type == "Observed" {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-						evi.Peptides[i].Modifications.Index[k] = updatedMod
-					}
-					break
-				}
-			}
-
-		}
-	}
-
-	for i := range evi.Proteins {
-		for _, j := range o.Terms {
-
-			// for fixed and variable modifications
-			for k, v := range evi.Proteins[i].Modifications.Index {
-				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-					updatedMod := v
-
-					_, ok := j.Sites[v.AminoAcid]
-					if ok {
-
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
-						evi.Proteins[i].Modifications.Index[k] = updatedMod
-					}
-					if hasObserved == true && updatedMod.Type == "Observed" {
-						updatedMod.Name = j.Name
-						updatedMod.Definition = j.Definition
-						updatedMod.ID = j.ID
-						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-						updatedMod.IsobaricMods[j.Name]++
-						evi.Proteins[i].Modifications.Index[k] = updatedMod
-					}
-					break
-				}
+				break
 			}
 		}
 	}
 
 	return
 }
+
+// // MapMods maps PSMs to modifications based on their mass shifts
+// func (evi *Evidence) MapMods(hasObserved bool) {
+
+// 	var tolerance = 0.01
+
+// 	o := obo.NewUniModOntology()
+
+// 	for i := range evi.PSM {
+
+// 		for _, j := range o.Terms {
+
+// 			// for fixed and variable modifications
+// 			for k, v := range evi.PSM[i].Modifications.Index {
+// 				if j.MonoIsotopicMass >= (v.MassDiff-tolerance) && j.MonoIsotopicMass <= (v.MassDiff+tolerance) {
+
+// 					updatedMod := v
+
+// 					_, ok := j.Sites[v.AminoAcid]
+// 					if ok {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name]++
+// 						evi.PSM[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					if hasObserved == true && updatedMod.Type == "Observed" {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
+// 						evi.PSM[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					break
+// 				}
+// 			}
+
+// 		}
+// 	}
+
+// 	for i := range evi.Ions {
+// 		for _, j := range o.Terms {
+
+// 			// for fixed and variable modifications
+// 			for k, v := range evi.Ions[i].Modifications.Index {
+// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+// 					updatedMod := v
+
+// 					_, ok := j.Sites[v.AminoAcid]
+// 					if ok {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name]++
+// 						evi.Ions[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					if hasObserved == true && updatedMod.Type == "Observed" {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
+// 						evi.Ions[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					break
+// 				}
+// 			}
+
+// 		}
+// 	}
+
+// 	for i := range evi.Peptides {
+// 		for _, j := range o.Terms {
+
+// 			// for fixed and variable modifications
+// 			for k, v := range evi.Peptides[i].Modifications.Index {
+// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+// 					updatedMod := v
+
+// 					_, ok := j.Sites[v.AminoAcid]
+// 					if ok {
+
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name]++
+// 						evi.Peptides[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					if hasObserved == true && updatedMod.Type == "Observed" {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
+// 						evi.Peptides[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					break
+// 				}
+// 			}
+
+// 		}
+// 	}
+
+// 	for i := range evi.Proteins {
+// 		for _, j := range o.Terms {
+
+// 			// for fixed and variable modifications
+// 			for k, v := range evi.Proteins[i].Modifications.Index {
+// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
+
+// 					updatedMod := v
+
+// 					_, ok := j.Sites[v.AminoAcid]
+// 					if ok {
+
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name]++
+// 						evi.Proteins[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					if hasObserved == true && updatedMod.Type == "Observed" {
+// 						updatedMod.Name = j.Name
+// 						updatedMod.Definition = j.Definition
+// 						updatedMod.ID = j.ID
+// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
+// 						updatedMod.IsobaricMods[j.Name]++
+// 						evi.Proteins[i].Modifications.Index[k] = updatedMod
+// 					}
+// 					break
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	return
+// }
 
 // AssembleModificationReport cretaes the modifications lists
 func (evi *Evidence) AssembleModificationReport() {

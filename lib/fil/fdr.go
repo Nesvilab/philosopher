@@ -111,15 +111,13 @@ func PepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, de
 	for i := range keys {
 
 		//f := fmt.Sprintf("%.2f", scoreMap[keys[i]]*100)
-		//f := uti.Round(scoreMap[keys[i]]*100, 5, 2)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
+		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 6))
 
 		if uti.ToFixed(scoreMap[keys[i]], 4) <= targetFDR {
 			probList[keys[i]] = 0
 			minProb = keys[i]
 			calcFDR = uti.ToFixed(scoreMap[keys[i]], 4)
 		}
-
 	}
 
 	var cleanlist id.PepIDList

@@ -125,16 +125,15 @@ func Run(f met.Data) met.Data {
 	ion = nil
 
 	// evaluate modifications in data set
-	logrus.Info("Mapping modifications")
 	if f.Filter.Mapmods == true {
+		logrus.Info("Mapping modifications")
 		//should include observed mods into mapping?
-		e.MapMods(true)
-
-		logrus.Info("Processing modifications")
-		e.AssembleModificationReport()
-	} else {
-		e.MapMods(false)
+		e.MapMods()
+		//e.AssembleModificationReport()
 	}
+	//else {
+	//e.MapMods(false)
+	//}
 
 	var pept id.PepIDList
 	pept.Restore("pep")
@@ -146,6 +145,7 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
+	//spew.Dump(e.PSM)
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference == true {
 
