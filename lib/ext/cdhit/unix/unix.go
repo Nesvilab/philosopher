@@ -22,5 +22,4 @@ func Unix64(unix64 string) {
 		msg.DeployAsset(errors.New("CD-HIT"), "Cannot deploy CD-HIT 64-bit")
 	}
 
-	return
 }

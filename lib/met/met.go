@@ -461,8 +461,6 @@ func CleanTemp(dir string) {
 	if e != nil {
 		msg.Custom(e, "error")
 	}
-
-	return
 }
 
 // Serialize converts the whole structure to a gob file
@@ -478,7 +476,6 @@ func (d *Data) Serialize() {
 		msg.WriteFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -489,9 +486,9 @@ func (d *Data) Restore(f string) {
 	e2 := msgpack.Unmarshal(b, &d)
 
 	if e1 != nil && e2 != nil {
-		msg.Custom(errors.New("Workspace not detected"), "warning")
+		msg.Custom(errors.New("workspace not detected"), "warning")
 	} else if len(d.UUID) < 1 {
-		msg.Custom(errors.New("The current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
+		msg.Custom(errors.New("the current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
 	}
 
 	// checks if the temp is still there, if not recreate it
@@ -499,7 +496,6 @@ func (d *Data) Restore(f string) {
 		os.Mkdir(d.Temp, sys.FilePermission())
 	}
 
-	return
 }
 
 // FunctionInitCheckUp does initilization checkup and verification if meta and temp folders are up.
@@ -507,7 +503,7 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		msg.WorkspaceNotFound(errors.New("Failed to checkup the initialization"), "fatal")
+		msg.WorkspaceNotFound(errors.New("failed to checkup the initialization"), "fatal")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
@@ -515,7 +511,6 @@ func (d Data) FunctionInitCheckUp() {
 		msg.LocatingTemDirecotry(e, "warning")
 	}
 
-	return
 }
 
 // ToCmdString converts the MSFragger struct into a CMD string
@@ -537,7 +532,6 @@ func (d MSFragger) ToCmdString() {
 
 	logrus.Info(cmd)
 
-	return
 }
 
 // ToCmdString converts the PeptideProphet struct into a CMD string
@@ -549,15 +543,9 @@ func (d PeptideProphet) ToCmdString() {
 	typeOfS := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {
-
-		// if typeOfS.Field(i).Name == "Param" || typeOfS.Field(i).Name == "RawFiles" || typeOfS.Field(i).Name == "ParamFile" {
-		// 	continue
-		// }
-
 		cmd = fmt.Sprintf("%s --%s %v", cmd, typeOfS.Field(i).Name, v.Field(i).Interface())
 	}
 
 	logrus.Info(cmd)
 
-	return
 }

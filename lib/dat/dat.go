@@ -52,7 +52,7 @@ func Run(m met.Data) met.Data {
 	var db = New()
 
 	if len(m.Database.ID) == 0 && (len(m.Database.Annot) == 0 || m.Database.Annot == "--contam" || m.Database.Annot == "--prefix") && (len(m.Database.Custom) == 0 || m.Database.Custom == "--contam" || m.Database.Custom == "--prefix") {
-		msg.InputNotFound(errors.New("Provide a protein FASTA file or Proteome ID"), "fatal")
+		msg.InputNotFound(errors.New("provide a protein FASTA file or Proteome ID"), "fatal")
 	}
 
 	if len(m.Database.Annot) > 0 {
@@ -69,11 +69,11 @@ func Run(m met.Data) met.Data {
 	}
 
 	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
-		msg.InputNotFound(errors.New("You need to provide a taxon ID or a custom FASTA file"), "fatal")
+		msg.InputNotFound(errors.New("you need to provide a taxon ID or a custom FASTA file"), "fatal")
 	}
 
-	if m.Database.Crap == false {
-		msg.Custom(errors.New("Contaminants are not going to be added to database"), "warning")
+	if !m.Database.Crap {
+		msg.Custom(errors.New("contaminants are not going to be added to database"), "warning")
 	}
 
 	if len(m.Database.Custom) < 1 {
@@ -85,7 +85,7 @@ func Run(m met.Data) met.Data {
 			logrus.Info("Fetching database ", i)
 
 			currentTime := time.Now()
-			m.Database.TimeStamp = fmt.Sprintf("%s", currentTime.Format("2006.01.02 15:04:05"))
+			m.Database.TimeStamp = currentTime.Format("2006.01.02 15:04:05")
 
 			db.Fetch(i, m.Temp, m.Database.Iso, m.Database.Rev)
 		}
@@ -157,7 +157,6 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 		}
 	}
 
-	return
 }
 
 // Fetch downloads a database file from UniProt
@@ -167,13 +166,13 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 
 	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
 
-	if rev == true {
+	if rev {
 		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=reviewed:yes+AND+proteome:", id, "&format=fasta")
 	} else {
 		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=proteome:", id, "&format=fasta")
 	}
 
-	if iso == true {
+	if iso {
 		query = fmt.Sprintf("%s&include=yes", query)
 	} else {
 		query = fmt.Sprintf("%s&include=no", query)
@@ -182,18 +181,18 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	// tries to create an output file
 	output, e := os.Create(d.UniProtDB)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create a local database file"), "fatal")
+		msg.WriteFile(errors.New("cannot create a local database file"), "fatal")
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		msg.Custom(errors.New("UniProt query failed, please check your connection"), "fatal")
+		msg.Custom(errors.New("uniProt query failed, please check your connection"), "fatal")
 	}
 
 	if response.ContentLength != -1 {
-		msg.Custom(errors.New("No sequences downloaded, check your proteome ID and parameters"), "fatal")
+		msg.Custom(errors.New("no sequences downloaded, check your proteome ID and parameters"), "fatal")
 	}
 	defer response.Body.Close()
 
@@ -205,7 +204,6 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 
 	d.DownloadedFiles = append(d.DownloadedFiles, d.UniProtDB)
 
-	return
 }
 
 // Create processes the given fasta file and add decoy sequences
@@ -228,7 +226,7 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 
 		// adding contaminants to database before reversion
 		// repeated entries are removed and substituted by contaminants
-		if crap == true {
+		if crap {
 
 			d.Deploy(temp)
 
@@ -236,7 +234,7 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 
 			for k, v := range crapMap {
 
-				if cTag == true {
+				if cTag {
 					k = "contam_" + k
 				}
 
@@ -256,7 +254,7 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 			th := ">" + h
 			d.TaDeDB[th] = s
 
-			if noD == false {
+			if !noD {
 				dh := ">" + tag + h
 				d.TaDeDB[dh] = reverseSeq(s)
 			}
@@ -265,7 +263,6 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 
 	}
 
-	return
 }
 
 // Deploy crap file to session folder
@@ -283,7 +280,6 @@ func (d *Base) Deploy(temp string) {
 		msg.WriteFile(e2, "fatal")
 	}
 
-	return
 }
 
 // Save fasta file to disk
@@ -298,23 +294,23 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 	}
 
 	t := time.Now()
-	stamp := fmt.Sprintf(t.Format("2006-01-02"))
+	stamp := t.Format("2006-01-02")
 
 	baseName := fmt.Sprintf("%s%s", string(filepath.Separator), stamp)
 
-	if noD == false {
+	if !noD {
 		baseName = baseName + "-decoys"
 	}
 
-	if isRev == true {
+	if isRev {
 		baseName = baseName + "-reviewed"
 	}
 
-	if hasIso == true {
+	if hasIso {
 		baseName = baseName + "-isoforms"
 	}
 
-	if Crap == true {
+	if Crap {
 		baseName = baseName + "-contam"
 	}
 
@@ -324,7 +320,7 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 	// create db file
 	file, e := os.Create(workfile)
 	if e != nil {
-		msg.ReadFile(errors.New("Cannot open the database file"), "fatal")
+		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
 	}
 	defer file.Close()
 
@@ -361,7 +357,6 @@ func (d *Base) Serialize() {
 		msg.SerializeFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -377,7 +372,6 @@ func (d *Base) Restore() {
 		msg.SerializeFile(e, "warning")
 	}
 
-	return
 }
 
 // RestoreWithPath reads philosopher results files and restore the data sctructure
@@ -394,7 +388,6 @@ func (d *Base) RestoreWithPath(p string) {
 		msg.DecodeMsgPck(e, "fatal")
 	}
 
-	return
 }
 
 // reverseSeq returns its argument string reversed rune-wise left to right.

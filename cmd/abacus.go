@@ -22,7 +22,7 @@ var abacusCmd = &cobra.Command{
 		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {
-			msg.InputNotFound(errors.New("The combined analysis needs at least 2 result files to work"), "fatal")
+			msg.InputNotFound(errors.New("the combined analysis needs at least 2 result files to work"), "fatal")
 		}
 
 		msg.Executing("Abacus", Version)
@@ -35,7 +35,6 @@ var abacusCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 

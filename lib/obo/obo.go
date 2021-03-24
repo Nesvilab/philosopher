@@ -12,10 +12,11 @@ import (
 
 	"philosopher/lib/msg"
 
-	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/met"
 	unmd "philosopher/lib/obo/unimod"
 	"philosopher/lib/sys"
+
+	"github.com/vmihailenco/msgpack"
 )
 
 // DataFormat defines different data type from PSI
@@ -87,7 +88,6 @@ func (m *Onto) Deploy() {
 
 	unmd.Deploy(m.OboFile)
 
-	return
 }
 
 // Parse reads the unimod.obo file and creates the data structure
@@ -175,8 +175,6 @@ func (m *Onto) Parse() {
 	if e := scanner.Err(); e != nil {
 		log.Fatal(e)
 	}
-
-	return
 }
 
 // Serialize UniMod data structure
@@ -192,7 +190,6 @@ func (m Onto) Serialize() {
 		msg.WriteFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -208,7 +205,6 @@ func (m *Onto) Restore() {
 		msg.DecodeMsgPck(e, "fatal")
 	}
 
-	return
 }
 
 func splitAndCollect(s string, target string) string {

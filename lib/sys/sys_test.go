@@ -102,37 +102,37 @@ func TestSysMeta(t *testing.T) {
 
 func TestSysNames(t *testing.T) {
 
-	if ".meta" != sys.MetaDir() {
+	if sys.MetaDir() != ".meta" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", ".meta", sys.MetaDir())
 	}
-	if "linux" != sys.Linux() {
+	if sys.Linux() != "linux" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "linux", sys.Linux())
 	}
-	if "windows" != sys.Windows() {
+	if sys.Windows() != "windows" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", ".windows", sys.Windows())
 	}
-	if "darwin" != sys.Darwin() {
+	if sys.Darwin() != "darwin" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "darwin", sys.Darwin())
 	}
-	if "RedHat" != sys.Redhat() {
+	if sys.Redhat() != "RedHat" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "redhat", sys.Redhat())
 	}
-	if "Ubuntu" != sys.Ubuntu() {
+	if sys.Ubuntu() != "Ubuntu" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "ubuntu", sys.Ubuntu())
 	}
-	if "Mint" != sys.Mint() {
+	if sys.Mint() != "Mint" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "mint", sys.Mint())
 	}
-	if "Debian" != sys.Debian() {
+	if sys.Debian() != "Debian" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "debian", sys.Debian())
 	}
-	if "CentOS" != sys.Centos() {
+	if sys.Centos() != "CentOS" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "centos", sys.Centos())
 	}
-	if "386" != sys.Arch386() {
+	if sys.Arch386() != "386" {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", "386", sys.Arch386())
 	}
-	if 0755 != sys.FilePermission() {
+	if sys.FilePermission() != 0755 {
 		t.Errorf("Meta path or name is incorrect, got %d, want %s", 0755, sys.FilePermission())
 	}
 

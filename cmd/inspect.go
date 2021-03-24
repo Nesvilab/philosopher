@@ -158,7 +158,6 @@ var inspectCmd = &cobra.Command{
 
 		}
 
-		return
 	},
 }
 

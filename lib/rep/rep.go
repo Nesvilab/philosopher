@@ -439,7 +439,7 @@ func Run(m met.Data) {
 	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Protein
-	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
+	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
 		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repo.ProteinFastaReport(m.Report.Decoys)
 	}
@@ -456,16 +456,15 @@ func Run(m met.Data) {
 	}
 
 	// MSstats
-	if m.Report.MSstats == true {
+	if m.Report.MSstats {
 		repo.MetaMSstatsReport(isoBrand, isoChannels, m.Report.Decoys)
 	}
 
 	// MzID
-	if m.Report.MZID == true {
+	if m.Report.MZID {
 		repo.MzIdentMLReport(m.Version, m.Database.Annot)
 	}
 
-	return
 }
 
 // prepares the list of modifications to be printed by the report functions

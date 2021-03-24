@@ -236,22 +236,18 @@ func (p *PepXML) Read(f string) {
 
 	}
 
-	return
 }
 
 // ReadPepXMLInput reads one or more fies and organize the data into PSM list
 func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, string) {
 
 	var files = make(map[string]uint8)
-	var fileCheckList []string
 	var pepIdent PepIDList
-	var mods []mod.Modification
 	var params []spc.Parameter
 	var modsIndex = make(map[string]mod.Modification)
 	var searchEngine string
 
 	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
-		fileCheckList = append(fileCheckList, xmlFile)
 		files[xmlFile] = 0
 	} else {
 
@@ -290,7 +286,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 		params = p.SearchParameters
 
 		// print models
-		if models == true {
+		if models {
 			if strings.EqualFold(p.Prophet, "interprophet") {
 				logrus.Error("Cannot print models for interprophet files")
 			} else {
@@ -305,7 +301,6 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 		for _, k := range p.Modifications.Index {
 			_, ok := modsIndex[k.Index]
 			if !ok {
-				mods = append(mods, k)
 				modsIndex[k.Index] = k
 			}
 		}
@@ -544,9 +539,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		p.Modifications.Index[key] = m
 	}
 
-	//}
-
-	return
 }
 
 // getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
@@ -602,7 +594,7 @@ func (p *PepXML) PromoteProteinIDs() {
 		if len(list) > 0 {
 
 			// if a Uniprot database is used we give preference to SwissProt proteins
-			if isUniProt == true {
+			if isUniProt {
 				for k := range list {
 					if strings.HasPrefix(k, "sp|") {
 						alt = k
@@ -641,7 +633,6 @@ func (p *PepXML) PromoteProteinIDs() {
 		}
 	}
 
-	return
 }
 
 // ReportModels creates PNG images using the PeptideProphet TD score distribution
@@ -726,7 +717,6 @@ func (p *PepXML) ReportModels(session, name string) {
 		}
 	}
 
-	return
 }
 
 func printModel(v, path string, xAxis, obs, pos, neg []float64) {
@@ -769,32 +759,31 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 		sys.CopyFile(path, filepath.Base(path))
 	}
 
-	return
 }
 
 // tdclassifier identifies a PSM as target or Decoy based on the
 // presence of the TAG string on <protein> and <alternative_proteins>
-func tdclassifier(p PeptideIdentification, tag string) bool {
+// func tdclassifier(p PeptideIdentification, tag string) bool {
 
-	// default for TRUE ( DECOY)
-	//var class = true
-	var class bool
+// 	// default for TRUE ( DECOY)
+// 	//var class = true
+// 	var class bool
 
-	if strings.HasPrefix(string(p.Protein), tag) {
-		class = true
-	} else {
-		class = false
-	}
+// 	if strings.HasPrefix(string(p.Protein), tag) {
+// 		class = true
+// 	} else {
+// 		class = false
+// 	}
 
-	for i := range p.AlternativeProteins {
-		if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
-			class = false
-		}
-		break
-	}
+// 	for i := range p.AlternativeProteins {
+// 		if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
+// 			class = false
+// 			break
+// 		}
+// 	}
 
-	return class
-}
+// 	return class
+// }
 
 // Serialize converts the whle structure to a gob file
 func (p *PepXML) Serialize() {
@@ -809,7 +798,6 @@ func (p *PepXML) Serialize() {
 		msg.WriteFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -825,7 +813,6 @@ func (p *PepXML) Restore() {
 		msg.DecodeMsgPck(e, "warning")
 	}
 
-	return
 }
 
 // Serialize converts the whle structure to a gob file
@@ -840,7 +827,7 @@ func (p *PepIDList) Serialize(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		msg.Custom(errors.New("Cannot determine binary data class"), "fatal")
+		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
 	}
 
 	b, e := msgpack.Marshal(&p)
@@ -853,7 +840,6 @@ func (p *PepIDList) Serialize(level string) {
 		msg.WriteFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -868,7 +854,7 @@ func (p *PepIDList) Restore(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		msg.Custom(errors.New("Cannot determine binary data class"), "fatal")
+		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
 	}
 
 	b, e := ioutil.ReadFile(dest)
@@ -881,5 +867,4 @@ func (p *PepIDList) Restore(level string) {
 		msg.DecodeMsgPck(e, "fatal")
 	}
 
-	return
 }

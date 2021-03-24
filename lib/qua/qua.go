@@ -48,7 +48,6 @@ func RunLabelFreeQuantification(p met.Quantify) {
 
 	evi.SerializeGranular()
 
-	return
 }
 
 // RunIsobaricLabelQuantification is the top function for label quantification
@@ -59,7 +58,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	var sourceList []string
 
 	if p.Brand == "" {
-		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
+		msg.NoParametersFound(errors.New("you need to specify a brand type (tmt or itraq)"), "fatal")
 	}
 
 	var evi rep.Evidence
@@ -98,7 +97,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		if p.Raw == true {
+		if p.Raw {
 
 			stream := rawfilereader.Run(sourceList[i], "")
 			mz.ReadRaw(sourceList[i], stream)
@@ -216,7 +215,6 @@ func RunBioQuantification(c met.Data) {
 	// mapping to functional annotation and save to disk
 	savetoDisk(mappedClust, c.Temp, c.BioQuant.UID)
 
-	return
 }
 
 // cleanPreviousData cleans previous label quantifications
@@ -456,7 +454,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 			spectrumMap[i.Spectrum] = i.Labels
 			bestMap[i.Spectrum] = 0
 
-			if mods == true {
+			if mods {
 				_, ok1 := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
 				_, ok2 := i.LocalizedPTMSites["PTMProphet_STY79.96633"]
 				_, ok3 := i.LocalizedPTMSites["PTMProphet_STY79.966331"]
@@ -491,7 +489,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	// 2nd check: best PSM
 	// collect all ion-related spectra from the each fraction/file
 	// var bestMap = make(map[string]uint8)
-	if best == true {
+	if best {
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
 			specName := strings.Split(i.Spectrum, ".")

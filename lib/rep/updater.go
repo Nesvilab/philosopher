@@ -47,7 +47,6 @@ func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
 		}
 	}
 
-	return
 }
 
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
@@ -61,13 +60,13 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	for _, i := range evi.Proteins {
 
 		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
+			if j.IsUnique {
 				uniqueMap[j.IonForm] = true
 			}
 		}
 
 		for _, j := range i.TotalPeptideIons {
-			if j.IsURazor == true {
+			if j.IsURazor {
 				urazorMap[j.IonForm] = i.PartHeader
 				sequenceMap[j.Sequence] = i.PartHeader
 			}
@@ -99,7 +98,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 		}
 
-		if evi.PSM[i].IsURazor == false {
+		if !evi.PSM[i].IsURazor {
 			sp, sOK := sequenceMap[evi.PSM[i].Peptide]
 			if sOK {
 
@@ -166,7 +165,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
 	}
 
-	return
 }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
@@ -200,7 +198,6 @@ func (evi *Evidence) UpdateIonModCount() {
 		}
 	}
 
-	return
 }
 
 // SyncPSMToProteins ...
@@ -248,7 +245,6 @@ func (evi *Evidence) SyncPSMToProteins() {
 	evi.Peptides = newPeptides
 	//fmt.Println("in Peptides: ", len(uniquePeptidesProteins))
 
-	return
 }
 
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
@@ -263,7 +259,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var descriptionMap = make(map[string]string)
 
 	for _, j := range dtb.Records {
-		if j.IsDecoy == false {
+		if !j.IsDecoy {
 			proteinIDMap[j.PartHeader] = j.ID
 			entryNameMap[j.PartHeader] = j.EntryName
 			geneMap[j.PartHeader] = j.GeneNames
@@ -331,7 +327,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 	}
 
-	return
 }
 
 // UpdateSupportingSpectra pushes back from PSM to Protein the new supporting spectra from razor results
@@ -350,7 +345,7 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
 		}
 
-		if i.IsUnique == true {
+		if i.IsUnique {
 			_, ok := uniqueSpec[i.IonForm]
 			if !ok {
 				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
@@ -359,7 +354,7 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			}
 		}
 
-		if i.IsURazor == true {
+		if i.IsURazor {
 			_, ok := razorSpec[i.IonForm]
 			if !ok {
 				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
@@ -391,14 +386,14 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 		for k := range evi.Proteins[i].TotalPeptideIons {
 
 			Up, UOK := uniqueSpec[evi.Proteins[i].TotalPeptideIons[k].IonForm]
-			if UOK && evi.Proteins[i].TotalPeptideIons[k].IsUnique == true {
+			if UOK && evi.Proteins[i].TotalPeptideIons[k].IsUnique {
 				for _, l := range Up {
 					evi.Proteins[i].TotalPeptideIons[k].Spectra[l] = 0
 				}
 			}
 
 			Rp, ROK := razorSpec[evi.Proteins[i].TotalPeptideIons[k].IonForm]
-			if ROK && evi.Proteins[i].TotalPeptideIons[k].IsURazor == true {
+			if ROK && evi.Proteins[i].TotalPeptideIons[k].IsURazor {
 				for _, l := range Rp {
 					evi.Proteins[i].TotalPeptideIons[k].Spectra[l] = 0
 				}
@@ -408,7 +403,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 
 	}
 
-	return
 }
 
 // UpdatePeptideModCount counts how many times each peptide is observed modified and not modified
@@ -455,5 +449,4 @@ func (evi *Evidence) UpdatePeptideModCount() {
 
 	}
 
-	return
 }

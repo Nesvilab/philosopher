@@ -103,153 +103,7 @@ func (evi *Evidence) MapMods() {
 			}
 		}
 	}
-
-	return
 }
-
-// // MapMods maps PSMs to modifications based on their mass shifts
-// func (evi *Evidence) MapMods(hasObserved bool) {
-
-// 	var tolerance = 0.01
-
-// 	o := obo.NewUniModOntology()
-
-// 	for i := range evi.PSM {
-
-// 		for _, j := range o.Terms {
-
-// 			// for fixed and variable modifications
-// 			for k, v := range evi.PSM[i].Modifications.Index {
-// 				if j.MonoIsotopicMass >= (v.MassDiff-tolerance) && j.MonoIsotopicMass <= (v.MassDiff+tolerance) {
-
-// 					updatedMod := v
-
-// 					_, ok := j.Sites[v.AminoAcid]
-// 					if ok {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name]++
-// 						evi.PSM[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					if hasObserved == true && updatedMod.Type == "Observed" {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-// 						evi.PSM[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					break
-// 				}
-// 			}
-
-// 		}
-// 	}
-
-// 	for i := range evi.Ions {
-// 		for _, j := range o.Terms {
-
-// 			// for fixed and variable modifications
-// 			for k, v := range evi.Ions[i].Modifications.Index {
-// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-// 					updatedMod := v
-
-// 					_, ok := j.Sites[v.AminoAcid]
-// 					if ok {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name]++
-// 						evi.Ions[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					if hasObserved == true && updatedMod.Type == "Observed" {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-// 						evi.Ions[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					break
-// 				}
-// 			}
-
-// 		}
-// 	}
-
-// 	for i := range evi.Peptides {
-// 		for _, j := range o.Terms {
-
-// 			// for fixed and variable modifications
-// 			for k, v := range evi.Peptides[i].Modifications.Index {
-// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-// 					updatedMod := v
-
-// 					_, ok := j.Sites[v.AminoAcid]
-// 					if ok {
-
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name]++
-// 						evi.Peptides[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					if hasObserved == true && updatedMod.Type == "Observed" {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name] = j.MonoIsotopicMass
-// 						evi.Peptides[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					break
-// 				}
-// 			}
-
-// 		}
-// 	}
-
-// 	for i := range evi.Proteins {
-// 		for _, j := range o.Terms {
-
-// 			// for fixed and variable modifications
-// 			for k, v := range evi.Proteins[i].Modifications.Index {
-// 				if v.MassDiff >= (j.MonoIsotopicMass-tolerance) && v.MassDiff <= (j.MonoIsotopicMass+tolerance) {
-
-// 					updatedMod := v
-
-// 					_, ok := j.Sites[v.AminoAcid]
-// 					if ok {
-
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name]++
-// 						evi.Proteins[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					if hasObserved == true && updatedMod.Type == "Observed" {
-// 						updatedMod.Name = j.Name
-// 						updatedMod.Definition = j.Definition
-// 						updatedMod.ID = j.ID
-// 						updatedMod.MonoIsotopicMass = j.MonoIsotopicMass
-// 						updatedMod.IsobaricMods[j.Name]++
-// 						evi.Proteins[i].Modifications.Index[k] = updatedMod
-// 					}
-// 					break
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return
-// }
 
 // AssembleModificationReport cretaes the modifications lists
 func (evi *Evidence) AssembleModificationReport() {
@@ -353,7 +207,6 @@ func (evi *Evidence) AssembleModificationReport() {
 	modEvi.MassBins = bins
 	evi.Modifications = modEvi
 
-	return
 }
 
 // ModificationReport ...
@@ -365,11 +218,11 @@ func (evi *Evidence) ModificationReport() {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Could not create report files"), "error")
+		msg.WriteFile(errors.New("could not create report files"), "error")
 	}
 	defer file.Close()
 
-	line := fmt.Sprintf("Mass Bin\tPSMs with Assigned Modifications\tPSMs with Observed Modifications\n")
+	line := "Mass Bin\tPSMs with Assigned Modifications\tPSMs with Observed Modifications\n"
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
@@ -394,8 +247,6 @@ func (evi *Evidence) ModificationReport() {
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }
 
 // PlotMassHist plots the delta mass histogram
@@ -405,7 +256,7 @@ func (evi *Evidence) PlotMassHist() {
 
 	file, e := os.Create(outfile)
 	if e != nil {
-		msg.WriteFile(errors.New("Could not create output for delta mass binning"), "fatal")
+		msg.WriteFile(errors.New("could not create output for delta mass binning"), "fatal")
 	}
 	defer file.Close()
 
@@ -453,11 +304,10 @@ func (evi *Evidence) PlotMassHist() {
 	io.WriteString(file, "</body>")
 
 	if e != nil {
-		msg.Custom(errors.New("There was an error trying to plot the mass distribution"), "fatal")
+		msg.Custom(errors.New("there was an error trying to plot the mass distribution"), "fatal")
 	}
 
 	// copy to work directory
 	sys.CopyFile(outfile, filepath.Base(outfile))
 
-	return
 }

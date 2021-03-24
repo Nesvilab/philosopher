@@ -26,7 +26,7 @@ func GetHome() string {
 	} else if runtime.GOOS == Linux() {
 		home = os.Getenv("HOME")
 	} else {
-		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "fatal")
 	}
 
 	return home
@@ -41,7 +41,7 @@ func GetTemp() string {
 	} else if runtime.GOOS == Linux() {
 		tmp = "/tmp"
 	} else {
-		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "fatal")
 	}
 
 	return tmp
@@ -51,10 +51,9 @@ func GetTemp() string {
 func VerifyTemp(f string) {
 
 	if _, err := os.Stat(f); os.IsNotExist(err) {
-		msg.Custom(errors.New("Cannot find the custom temporary folder"), "fatal")
+		msg.Custom(errors.New("cannot find the custom temporary folder"), "fatal")
 	}
 
-	return
 }
 
 // GetLinuxFlavor returns the Linux flavor by looking into the lsb_release
@@ -113,7 +112,6 @@ func CopyFile(from, to string) {
 		msg.Custom(e, "fatal")
 	}
 
-	return
 }
 
 // Meta file

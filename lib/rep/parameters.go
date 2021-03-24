@@ -163,5 +163,4 @@ func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) {
 		}
 	}
 
-	return
 }

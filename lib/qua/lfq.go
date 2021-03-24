@@ -77,7 +77,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		logrus.Info("Processing ", s)
 		var mz mzn.MsData
 
-		if isRaw == true {
+		if isRaw {
 			stream := rawfilereader.Run(s, "")
 			mz.ReadRaw(s, stream)
 		} else {
@@ -88,7 +88,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 		for i := range mz.Spectra {
 			if mz.Spectra[i].Level == "1" {
-				if isRaw == true {
+				if isRaw {
 
 				} else {
 					mz.Spectra[i].Decode()
@@ -115,7 +115,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 				measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
 
-				if retrieved == true {
+				if retrieved {
 
 					// create the list of mz differences for each peak
 					var mzRatio []float64
@@ -193,7 +193,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		msg.QuantifyingData(errors.New("The PSM list is enpty"), "fatal")
+		msg.QuantifyingData(errors.New("the PSM list is enpty"), "fatal")
 	}
 
 	var peptideIntMap = make(map[string]float64)
@@ -248,11 +248,11 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 
 				totalInt = append(totalInt, v)
 
-				if k.IsUnique == true {
+				if k.IsUnique {
 					uniqueInt = append(uniqueInt, v)
 				}
 
-				if k.IsURazor == true {
+				if k.IsURazor {
 					razorInt = append(razorInt, v)
 				}
 

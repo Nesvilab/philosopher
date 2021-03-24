@@ -21,15 +21,15 @@ type DataSetLabelNames struct {
 // TODO update error methos on the abacus function
 func Run(m met.Data, args []string) {
 
-	if m.Abacus.Peptide == false && m.Abacus.Protein == false {
-		msg.Custom(errors.New("You need to specify a peptide or protein combined file for the Abacus analysis"), "fatal")
+	if !m.Abacus.Peptide && !m.Abacus.Protein {
+		msg.Custom(errors.New("you need to specify a peptide or protein combined file for the Abacus analysis"), "fatal")
 	}
 
-	if m.Abacus.Peptide == true {
+	if m.Abacus.Peptide {
 		peptideLevelAbacus(m, args)
 	}
 
-	if m.Abacus.Protein == true {
+	if m.Abacus.Protein {
 		proteinLevelAbacus(m, args)
 	}
 }
@@ -41,7 +41,7 @@ func getLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		msg.ReadFile(errors.New("Cannot open annotation file"), "error")
+		msg.ReadFile(errors.New("cannot open annotation file"), "error")
 	}
 	defer file.Close()
 
@@ -52,7 +52,7 @@ func getLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		msg.Custom(errors.New("The annotation file looks to be empty"), "fatal")
+		msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
 	}
 
 	return labels

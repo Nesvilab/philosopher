@@ -184,8 +184,6 @@ func (p *MsData) ReadRaw(fileName, f string) {
 	}
 
 	p.Spectra = spectra
-
-	return
 }
 
 // Read is the main function for parsing mzML data
@@ -212,7 +210,6 @@ func (p *MsData) Read(f string) {
 
 	p.Spectra = spectra
 
-	return
 }
 
 func processSpectrum(mzSpec psi.Spectrum) Spectrum {
@@ -377,7 +374,6 @@ func (s *Spectrum) Decode() {
 		s.IonMobility.Stream = nil
 	}
 
-	return
 }
 
 // readEncoded transforms the binary data into float64 values

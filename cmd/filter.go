@@ -40,11 +40,11 @@ var filterCmd = &cobra.Command{
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {
-			msg.InputNotFound(errors.New("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
+			msg.InputNotFound(errors.New("you must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
 		}
 
-		if len(m.Filter.Pox) == 0 && m.Filter.Razor == true {
-			msg.Custom(errors.New("Razor option will be ignored because there is no protein inference data"), "warning")
+		if len(m.Filter.Pox) == 0 && m.Filter.Razor {
+			msg.Custom(errors.New("razor option will be ignored because there is no protein inference data"), "warning")
 			m.Filter.Razor = false
 		}
 
@@ -56,7 +56,6 @@ var filterCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 

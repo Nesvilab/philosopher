@@ -193,7 +193,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 				//fmt.Println("A:", j.OriginalHeader, "\t", "B:", list[i].ProteinName)
 
-				if (j.IsDecoy == true && list[i].IsDecoy == true) || (j.IsDecoy == false && list[i].IsDecoy == false) {
+				if (j.IsDecoy && list[i].IsDecoy) || (!j.IsDecoy && !list[i].IsDecoy) {
 
 					list[i].OriginalHeader = j.OriginalHeader
 					list[i].PartHeader = j.PartHeader
@@ -228,7 +228,6 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	sort.Sort(list)
 	evi.Proteins = list
 
-	return
 }
 
 // MetaProteinReport creates the TSV Protein report
@@ -240,15 +239,15 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create protein report"), "error")
+		msg.WriteFile(errors.New("cannot create protein report"), "error")
 	}
 	defer file.Close()
 
 	// building the printing set tat may or not contain decoys
 	var printSet ProteinEvidenceList
 	for _, i := range evi.Proteins {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -256,7 +255,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 		}
 	}
 
-	header = fmt.Sprintf("Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins")
+	header = "Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -285,7 +284,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels == true {
+	if hasLabels {
 
 		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
 
@@ -345,14 +344,14 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 
 		var uniqIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsUnique == true {
+			if j.IsUnique {
 				uniqIons++
 			}
 		}
 
 		var urazorIons int
 		for _, j := range i.TotalPeptideIons {
-			if j.IsURazor == true {
+			if j.IsURazor {
 				urazorIons++
 			}
 		}
@@ -363,7 +362,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 
 		// change between Unique+Razor and Unique only based on parameter defined on labelquant
 		var reportIntensities [16]float64
-		if uniqueOnly == true || hasRazor == false {
+		if uniqueOnly || !hasRazor {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
 			reportIntensities[2] = i.UniqueLabels.Channel3.Intensity
@@ -528,7 +527,6 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }
 
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
@@ -545,8 +543,8 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 	// building the printing set tat may or not contain decoys
 	var printSet ProteinEvidenceList
 	for _, i := range evi.Proteins {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -566,5 +564,4 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }

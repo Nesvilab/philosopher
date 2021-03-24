@@ -43,8 +43,6 @@ func (m *Modifications) Serialize() {
 	if e != nil {
 		msg.SerializeFile(e, "fatal")
 	}
-
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -59,6 +57,4 @@ func (m *Modifications) Restore() {
 	if e != nil {
 		msg.SerializeFile(e, "warning")
 	}
-
-	return
 }

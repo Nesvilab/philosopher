@@ -115,7 +115,7 @@ func New(plex string) iso.Labels {
 		o.Channel16.Mz = 134.148245
 
 	} else {
-		msg.Custom(errors.New("Unknown multiplex setting, please define the plex number used in your experiment"), "error")
+		msg.Custom(errors.New("unknown multiplex setting, please define the plex number used in your experiment"), "error")
 	}
 
 	return o

@@ -1481,33 +1481,3 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 
 	return evi
 }
-
-func calculateRatios(evi rep.Evidence) rep.Evidence {
-
-	var psmSum = make(map[string]float64)
-	var psmLog2 = make(map[string]float64)
-
-	// calculate the sum of all intensities for each PSM and then the log2 from the intensities
-	for i := range evi.PSM {
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel1.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel2.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel3.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel4.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel5.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel6.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel7.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel8.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel9.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel10.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel11.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel12.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel13.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel14.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel15.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel16.Intensity
-
-		psmLog2[evi.PSM[i].Spectrum] = math.Log2(psmSum[evi.PSM[i].Spectrum])
-	}
-
-	return evi
-}

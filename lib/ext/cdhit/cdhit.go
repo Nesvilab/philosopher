@@ -73,7 +73,6 @@ func (c *CDhit) Deploy() {
 
 	}
 
-	return
 }
 
 // Run runs the cdhit binary with user's information
@@ -92,5 +91,4 @@ func (c *CDhit) Run(level float64) {
 		msg.ExecutingBinary(e, "fatal")
 	}
 
-	return
 }

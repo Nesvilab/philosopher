@@ -41,5 +41,4 @@ func (e *Enzyme) Synth(t string) {
 		msg.Custom(errors.New("Enzyme not supported"), "warning")
 	}
 
-	return
 }

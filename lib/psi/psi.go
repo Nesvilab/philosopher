@@ -47,7 +47,7 @@ type CvList struct {
 type CV struct {
 	XMLName  xml.Name `xml:"cv"`
 	ID       string   `xml:"id,attr,omitempty"`
-	Version  string   `xml:"version,attr,omitempty,omitempty"`
+	Version  string   `xml:"version,attr,omitempty"`
 	URI      string   `xml:"URI,attr,omitempty"`
 	FullName string   `xml:"fullName,attr,omitempty"`
 }
@@ -118,7 +118,6 @@ func (p *IndexedMzML) Parse(f string) {
 	p.MzML = mzml.MzML
 	p.Name = filepath.Base(f)
 
-	return
 }
 
 // Parse is the main function for parsing MzIdentML data
@@ -140,7 +139,6 @@ func (p *MzIdentML) Parse(f string) {
 		logrus.Trace("Cannot decode XML file:", e)
 	}
 
-	return
 }
 
 // Parse is the main function for parsing pepxml data
@@ -166,5 +164,4 @@ func (p *MzIdentML) Write() {
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }

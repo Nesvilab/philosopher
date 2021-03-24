@@ -37,12 +37,12 @@ var pipelineCmd = &cobra.Command{
 
 		os.Mkdir(meta.Temp, sys.FilePermission())
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
-			msg.Custom(errors.New("Can't find temporary directory; check folder permissions"), "info")
+			msg.Custom(errors.New("can't find temporary directory; check folder permissions"), "info")
 		}
 
-		if m.Pipeline.Print == true {
+		if m.Pipeline.Print {
 			param := pip.DeployParameterFile(meta.Temp)
-			msg.Custom(errors.New("Printing parameter file"), "info")
+			msg.Custom(errors.New("printing parameter file"), "info")
 			sys.CopyFile(param, filepath.Base(param))
 			return
 		}
@@ -61,9 +61,9 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		if len(args) < 1 {
-			msg.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
+			msg.NoParametersFound(errors.New("you need to provide at least one dataset for the analysis"), "fatal")
 		} else if p.Steps.IntegratedReports == "true" && len(args) < 2 {
-			msg.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
+			msg.NoParametersFound(errors.New("you need to provide at least two datasets for the abacus integrative analysis"), "fatal")
 		}
 
 		// Workspace - Database
@@ -144,7 +144,6 @@ var pipelineCmd = &cobra.Command{
 		met.CleanTemp(meta.Temp)
 
 		msg.Done()
-		return
 	},
 }
 

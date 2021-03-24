@@ -39,19 +39,6 @@ func TestMetaData(t *testing.T) {
 		t.Errorf("Home name is incorrect, got %s, want %s", d.Home, dir)
 	}
 
-	if d.ProjectName != d.ProjectName {
-		t.Errorf("Project Name name is incorrect, got %s, want %s", d.ProjectName, dir)
-	}
-
-	// home := d.Home + string(filepath.Separator) + "met/met"
-	// if d.Home != home {
-	// 	t.Errorf("Home  is incorrect, got %s, want %s", home, d.Home)
-	// }
-
-	// if d.MetaDir != d.Home+string(filepath.Separator)+sys.Meta() {
-	// 	t.Errorf("Meta Dir is incorrect, got %s, want %s", d.MetaDir, d.Home+string(filepath.Separator)+sys.MetaDir())
-	// }
-
 	if d.DB != d.Home+string(filepath.Separator)+sys.DBBin() {
 		t.Errorf("Database name is incorrect, got %s, want %s", d.DB, d.Home+string(filepath.Separator)+sys.DBBin())
 	}

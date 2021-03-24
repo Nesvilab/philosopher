@@ -25,11 +25,11 @@ var labelquantCmd = &cobra.Command{
 		m.Quantify.Format = "mzML"
 
 		if len(m.Quantify.Format) < 1 || len(m.Quantify.Dir) < 1 {
-			msg.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
+			msg.InputNotFound(errors.New("you need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
 		if len(m.Quantify.Plex) < 1 {
-			msg.InputNotFound(errors.New("You need to specify the experiment Plex"), "fatal")
+			msg.InputNotFound(errors.New("you need to specify the experiment Plex"), "fatal")
 		}
 
 		msg.Executing("Isobaric-label quantification ", Version)
@@ -37,10 +37,10 @@ var labelquantCmd = &cobra.Command{
 		if strings.EqualFold(strings.ToLower(m.Quantify.Format), "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			msg.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
+			msg.InputNotFound(errors.New("only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			msg.InputNotFound(errors.New("Unknown file format"), "fatal")
+			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
 		m.Quantify = qua.RunIsobaricLabelQuantification(m.Quantify, m.Filter.Mapmods)
@@ -52,7 +52,6 @@ var labelquantCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 

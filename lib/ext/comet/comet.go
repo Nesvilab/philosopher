@@ -50,14 +50,14 @@ func Run(m met.Data, args []string) met.Data {
 
 	var cmt = New(m.Temp)
 
-	if len(m.Comet.Param) < 1 || m.Comet.Print == false && len(args) < 1 {
+	if len(m.Comet.Param) < 1 || !m.Comet.Print && len(args) < 1 {
 		msg.Comet(errors.New(""), "fatal")
 	}
 
 	// deploy the binaries
 	cmt.Deploy(m.OS, m.Arch)
 
-	if m.Comet.Print == true {
+	if m.Comet.Print {
 		logrus.Info("Printing parameter file")
 		sys.CopyFile(cmt.DefaultParam, filepath.Base(cmt.DefaultParam))
 		return m
@@ -75,7 +75,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 	m.Comet.ParamFile = binFile
 
-	if m.Comet.NoIndex == false {
+	if !m.Comet.NoIndex {
 		var extFlag = true
 
 		// the indexing will help later in case other commands are used for qunatification
@@ -86,7 +86,7 @@ func Run(m met.Data, args []string) met.Data {
 			}
 		}
 
-		if extFlag == false {
+		if !extFlag {
 			//logrus.Info("Indexing spectra: please wait, this can take a few minutes")
 			//raw.IndexMz(args)
 		} else {
@@ -130,7 +130,6 @@ func (c *Comet) Deploy(os, arch string) {
 
 	}
 
-	return
 }
 
 // Execute is the main function to execute Comet
@@ -150,5 +149,4 @@ func (c *Comet) Execute(cmdArgs []string, param string) {
 	run.Start()
 	_ = run.Wait()
 
-	return
 }

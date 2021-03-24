@@ -30,8 +30,6 @@ var msfraggerCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
-
 	},
 }
 

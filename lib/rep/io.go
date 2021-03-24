@@ -5,9 +5,10 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"philosopher/lib/sys"
+
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
-	"philosopher/lib/sys"
 )
 
 // Serialize converts the whole structure to a gob file
@@ -23,7 +24,6 @@ func (evi *Evidence) Serialize() {
 		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return
 }
 
 // SerializeGranular converts the whole structure into sevral small gob files
@@ -53,7 +53,6 @@ func (evi *Evidence) SerializeGranular() {
 	// create EV Combined
 	SerializeEVCombined(evi)
 
-	return
 }
 
 // SerializeEVParameters creates an ev serial with Parameter data
@@ -69,7 +68,6 @@ func SerializeEVParameters(evi *Evidence) {
 		logrus.Trace("Cannot serialize Parameters data:", e)
 	}
 
-	return
 }
 
 // SerializeEVPSM creates an ev serial with Evidence data
@@ -85,7 +83,6 @@ func SerializeEVPSM(evi *Evidence) {
 		logrus.Trace("Cannot serialize PSM data:", e)
 	}
 
-	return
 }
 
 // SerializeEVIon creates an ev serial with Evidence data
@@ -100,8 +97,6 @@ func SerializeEVIon(evi *Evidence) {
 	if e != nil {
 		logrus.Trace("Cannot serialize Ions data:", e)
 	}
-
-	return
 }
 
 // SerializeEVPeptides creates an ev serial with Evidence data
@@ -117,7 +112,6 @@ func SerializeEVPeptides(evi *Evidence) {
 		logrus.Trace("Cannot serialize Peptides data:", e)
 	}
 
-	return
 }
 
 // SerializeEVProteins creates an ev serial with Evidence data
@@ -133,7 +127,6 @@ func SerializeEVProteins(evi *Evidence) {
 		logrus.Trace("Cannot serialize Proteins data:", e)
 	}
 
-	return
 }
 
 // SerializeEVMods creates an ev serial with Evidence data
@@ -149,7 +142,6 @@ func SerializeEVMods(evi *Evidence) {
 		logrus.Trace("Cannot serialize Modifications data:", e)
 	}
 
-	return
 }
 
 // SerializeEVModifications creates an ev serial with Evidence data
@@ -165,7 +157,6 @@ func SerializeEVModifications(evi *Evidence) {
 		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return
 }
 
 // SerializeEVCombined creates an ev serial with Evidence data
@@ -181,7 +172,6 @@ func SerializeEVCombined(evi *Evidence) {
 		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -197,7 +187,6 @@ func (evi *Evidence) Restore() {
 		logrus.Trace("Cannot serialize data:", e)
 	}
 
-	return
 }
 
 // RestoreGranular reads philosopher results files and restore the data sctructure
@@ -227,7 +216,6 @@ func (evi *Evidence) RestoreGranular() {
 	// Combined
 	RestoreEVCombined(evi)
 
-	return
 }
 
 // RestoreEVParameters restores Ev PSM data
@@ -242,7 +230,7 @@ func RestoreEVParameters(evi *Evidence) {
 	if e != nil {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
-	return
+
 }
 
 // RestoreEVPSM restores Ev PSM data
@@ -257,7 +245,7 @@ func RestoreEVPSM(evi *Evidence) {
 	if e != nil {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
-	return
+
 }
 
 // RestoreEVIon restores Ev Ion data
@@ -273,7 +261,6 @@ func RestoreEVIon(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVPeptide restores Ev Ion data
@@ -289,7 +276,6 @@ func RestoreEVPeptide(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVProtein restores Ev Protein data
@@ -305,7 +291,6 @@ func RestoreEVProtein(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVMods restores Ev Mods data
@@ -321,7 +306,6 @@ func RestoreEVMods(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVModifications restores Ev Mods data
@@ -337,7 +321,6 @@ func RestoreEVModifications(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVCombined restores Ev Mods data
@@ -353,7 +336,6 @@ func RestoreEVCombined(evi *Evidence) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreGranularWithPath reads philosopher results files and restore the data sctructure
@@ -383,7 +365,6 @@ func (evi *Evidence) RestoreGranularWithPath(p string) {
 	// Combined
 	RestoreEVCombinedWithPath(evi, p)
 
-	return
 }
 
 // RestoreEVParametersWithPath restores Ev PSM data
@@ -401,7 +382,6 @@ func RestoreEVParametersWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVPSMWithPath restores Ev PSM data
@@ -419,7 +399,6 @@ func RestoreEVPSMWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVIonWithPath restores Ev Ion data
@@ -437,7 +416,6 @@ func RestoreEVIonWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVPeptideWithPath restores Ev Ion data
@@ -455,7 +433,6 @@ func RestoreEVPeptideWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVProteinWithPath restores Ev Protein data
@@ -473,7 +450,6 @@ func RestoreEVProteinWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVModsWithPath restores Ev Mods data
@@ -491,7 +467,6 @@ func RestoreEVModsWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVModificationsWithPath restores Ev Mods data
@@ -509,7 +484,6 @@ func RestoreEVModificationsWithPath(evi *Evidence, p string) {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
 
-	return
 }
 
 // RestoreEVCombinedWithPath restores Ev Mods data
@@ -526,6 +500,4 @@ func RestoreEVCombinedWithPath(evi *Evidence, p string) {
 	if e != nil {
 		logrus.Fatal("Cannot unmarshal file:", e)
 	}
-
-	return
 }

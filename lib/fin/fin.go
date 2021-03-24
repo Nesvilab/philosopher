@@ -558,7 +558,6 @@ func (rd *RawData) ProcessRaw(f string) {
 	rd.Scanevents = scanevents
 	rd.Scanindex = scanindex
 
-	return
 }
 
 // ScanEventData ...
@@ -671,7 +670,6 @@ func (rd *RawData) AllScans(fun func(scan Scan)) {
 		fun(rd.Scan(i))
 	}
 
-	return
 }
 
 // Scan returns the scan at the scan number in argument
@@ -772,13 +770,11 @@ func (data *RunHeader) Retrieve(rs io.ReadSeeker, info RawFileInfo, ver Version)
 		msg.Custom(errors.New(""), "fatal")
 	}
 
-	return
 }
 
 // Retrieve ...
 func (data *InstID) Retrieve(rs io.ReadSeeker, pos uint64, ver Version) {
 	data.Address = readAt(rs, pos, ver, data)
-	return
 }
 
 //// Readers
@@ -1271,7 +1267,6 @@ func readBetween(rs io.ReadSeeker, begin uint64, end uint64, v Version, data rea
 
 	data.Read(bytes.NewReader(b), v)
 
-	return
 }
 
 // Spectrum returns an ms.Spectrum belonging to the scan number in argument

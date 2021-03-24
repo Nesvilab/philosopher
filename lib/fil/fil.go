@@ -330,17 +330,11 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 
 	var combinedFiltered id.PepIDList
 
-	for _, i := range filteredUnmodPSM {
-		combinedFiltered = append(combinedFiltered, i)
-	}
+	combinedFiltered = append(combinedFiltered, filteredUnmodPSM...)
 
-	for _, i := range filteredDefinedPSM {
-		combinedFiltered = append(combinedFiltered, i)
-	}
+	combinedFiltered = append(combinedFiltered, filteredDefinedPSM...)
 
-	for _, i := range filteredAllPSM {
-		combinedFiltered = append(combinedFiltered, i)
-	}
+	combinedFiltered = append(combinedFiltered, filteredAllPSM...)
 
 	combinedFiltered.Serialize("psm")
 

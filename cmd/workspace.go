@@ -26,7 +26,6 @@ var workspaceCmd = &cobra.Command{
 		wrk.Run(Version, Build, temp, backup, clean, initialize, nocheck)
 
 		msg.Done()
-		return
 	},
 }
 
@@ -39,7 +38,7 @@ func init() {
 	workspaceCmd.Flags().BoolVarP(&nocheck, "nocheck", "", false, "do not check for new versions")
 	workspaceCmd.Flags().StringVarP(&temp, "temp", "", "", "define a custom temporary folder for Philosopher")
 
-	if len(os.Args) > 1 && os.Args[1] == "workspace" && analytics == true {
+	if len(os.Args) > 1 && os.Args[1] == "workspace" && analytics {
 
 		// do not change this! This is for metric colletion, no user data is gatter, the software just reports back
 		// the number of people using it and the geo location, just like any other website does.

@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sirupsen/logrus"
 	"philosopher/lib/msg"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Release information from GitHub
@@ -33,7 +34,7 @@ func UpdateChecker(v, b string) {
 	// GET request
 	res, e := http.Get("https://api.github.com/repos/prvst/philosopher/releases")
 	if e != nil {
-		msg.Custom(errors.New("Can't check for updates, server unreachable"), "warning")
+		msg.Custom(errors.New("can't check for updates, server unreachable"), "warning")
 	} else {
 
 		body, e := ioutil.ReadAll(res.Body)

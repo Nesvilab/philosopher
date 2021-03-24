@@ -26,7 +26,6 @@ var databaseCmd = &cobra.Command{
 		m.Serialize()
 
 		msg.Done()
-		return
 	},
 }
 

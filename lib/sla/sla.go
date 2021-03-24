@@ -38,5 +38,4 @@ func Run(name, token, message, channel, userID string) {
 
 	logrus.Info("Message successfully sent to channel", channelID, "at", timestamp)
 
-	return
 }

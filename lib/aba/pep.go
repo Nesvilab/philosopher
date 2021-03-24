@@ -26,7 +26,7 @@ import (
 func peptideLevelAbacus(m met.Data, args []string) {
 
 	var names []string
-	var xmlFiles []string
+	//var xmlFiles []string
 	var datasets = make(map[string]rep.Evidence)
 	var labelList []DataSetLabelNames
 
@@ -55,11 +55,11 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 		// collect interact full file names
 		for _, f := range files {
-			if strings.Contains(f.Name(), "pep.xml") {
-				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-				absPath, _ := filepath.Abs(interactFile)
-				xmlFiles = append(xmlFiles, absPath)
-			}
+			//if strings.Contains(f.Name(), "pep.xml") {
+			//interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
+			//absPath, _ := filepath.Abs(interactFile)
+			//xmlFiles = append(xmlFiles, absPath)
+			//}
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				labels.Name = annot
@@ -89,17 +89,16 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	sort.Strings(names)
 
-	logrus.Info("Collecting data from individual experiments")
+	logrus.Info("collecting data from individual experiments")
 	evidences := collectPeptideDatafromExperiments(datasets, m.Abacus.Tag)
 
-	logrus.Info("Summarizing the quantification")
+	logrus.Info("summarizing the quantification")
 	evidences = SummarizeAttributes(evidences, datasets, local)
 
 	os.Chdir(local)
 
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
-	return
 }
 
 // processPeptideCombinedFile reads and filter the combined peptide report
@@ -110,7 +109,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
+		msg.NoParametersFound(errors.New("cannot find the combined.pep.xml file"), "fatal")
 
 	} else {
 
@@ -128,7 +127,6 @@ func processPeptideCombinedFile(a met.Abacus) {
 
 	}
 
-	return
 }
 
 // collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
@@ -331,5 +329,4 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }

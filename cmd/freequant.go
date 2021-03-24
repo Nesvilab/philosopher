@@ -24,7 +24,7 @@ var freequant = &cobra.Command{
 
 		m.Quantify.Format = "mzML"
 		if len(m.Quantify.Dir) < 1 {
-			msg.InputNotFound(errors.New("You need to provide the path to the mz files and the correct extension"), "fatal")
+			msg.InputNotFound(errors.New("you need to provide the path to the mz files and the correct extension"), "fatal")
 		}
 
 		msg.Executing("Label-free quantification ", Version)
@@ -32,10 +32,10 @@ var freequant = &cobra.Command{
 		if strings.EqualFold(m.Quantify.Format, "mzml") {
 			m.Quantify.Format = "mzML"
 		} else if strings.EqualFold(m.Quantify.Format, "mzxml") {
-			msg.InputNotFound(errors.New("Only the mzML format is supported"), "fatal")
+			msg.InputNotFound(errors.New("only the mzML format is supported"), "fatal")
 			m.Quantify.Format = "mzXML"
 		} else {
-			msg.InputNotFound(errors.New("Unknown file format"), "fatal")
+			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
 		//forcing the larger time window to be the same as the smaller one
@@ -52,7 +52,6 @@ var freequant = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 

@@ -30,11 +30,11 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 		for _, j := range e.Proteins[i].TotalPeptideIons {
 
-			if j.IsUnique == true {
+			if j.IsUnique {
 				e.Proteins[i].UniqueSpC += len(j.Spectra)
 			}
 
-			if j.IsURazor == true {
+			if j.IsURazor {
 				e.Proteins[i].URazorSpC += len(j.Spectra)
 			}
 

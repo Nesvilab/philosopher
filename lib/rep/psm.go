@@ -126,8 +126,6 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
 	sort.Sort(list)
 	evi.PSM = list
-
-	return
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
@@ -139,7 +137,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create report file"), "fatal")
+		msg.WriteFile(errors.New("cannot create report file"), "fatal")
 	}
 	defer file.Close()
 
@@ -150,8 +148,8 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		compositeName := strings.Split(evi.PSM[i].Spectrum, "#")
 		evi.PSM[i].Spectrum = compositeName[0]
 
-		if hasDecoys == false {
-			if evi.PSM[i].IsDecoy == false {
+		if !hasDecoys {
+			if !evi.PSM[i].IsDecoy {
 				printSet = append(printSet, evi.PSM[i])
 			}
 		} else {
@@ -161,13 +159,13 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
 
-	if isComet == true {
+	if isComet {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
 	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tIon Mobility\tCompensation Voltage\tAssigned Modifications\tObserved Modifications"
 
-	if hasLoc == true {
+	if hasLoc {
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
 	}
 
@@ -200,7 +198,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels == true {
+	if hasLabels {
 
 		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
 
@@ -246,7 +244,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -289,7 +287,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			i.Massdiff,
 		)
 
-		if isComet == true {
+		if isComet {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Xcorr,
@@ -315,7 +313,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			strings.Join(obs, ", "),
 		)
 
-		if hasLoc == true {
+		if hasLoc {
 
 			var sites int
 			var md string
@@ -454,7 +452,6 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }
 
 // PSMLocalizationReport report ptm localization based on PTMProphet outputs
@@ -477,8 +474,8 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range evi.PSM {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -508,96 +505,4 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }
-
-// PepXMLReport report PSMs in pep.xml format
-// func (evi *Evidence) PepXMLReport() {
-
-// 	// collect database information
-// 	var dtb dat.Base
-// 	dtb.Restore()
-
-// 	var proteinDescription = make(map[string]string)
-// 	for _, j := range dtb.Records {
-// 		proteinDescription[j.PartHeader] = j.Description
-// 	}
-
-// 	t := time.Now()
-
-// 	// collect source file names
-// 	var sourceMap = make(map[string]uint8)
-// 	var sources []string
-// 	for _, i := range evi.PSM {
-// 		s := strings.Split(i.Spectrum, ".")
-// 		sourceMap[s[0]]++
-// 	}
-
-// 	for i := range sourceMap {
-// 		sources = append(sources, i)
-// 	}
-
-// 	sort.Strings(sources)
-
-// 	var p spc.PepXML
-
-// 	p.MsmsPipelineAnalysis.Date = t.Format(time.ANSIC)
-
-// 	as := &spc.AnalysisSummary{
-// 		Analysis: "philosopher",
-// 		Time:     t.Format(time.ANSIC),
-// 	}
-// 	p.MsmsPipelineAnalysis.AnalysisSummary = append(p.MsmsPipelineAnalysis.AnalysisSummary, *as)
-
-// 	for _, i := range evi.PSM {
-
-// 		spectrumName := strings.Split(i.Spectrum, "#")
-
-// 		sq := &spc.SpectrumQuery{
-// 			StartScan:            i.Scan,
-// 			EndScan:              i.Scan,
-// 			AssumedCharge:        i.AssumedCharge,
-// 			Spectrum:             spectrumName[0],
-// 			Index:                i.Index,
-// 			PrecursorNeutralMass: i.PrecursorNeutralMass,
-// 			RetentionTimeSec:     i.RetentionTime,
-// 			PrecursorIntensity:   i.Intensity,
-// 			SearchResult: spc.SearchResult{
-// 				SearchHit: []spc.SearchHit{
-// 					{
-// 						Peptide:            i.Peptide,
-// 						Massdiff:           i.Massdiff,
-// 						CalcNeutralPepMass: i.CalcNeutralPepMass,
-// 						NextAA:             i.NextAA,
-// 						PrevAA:             i.PrevAA,
-// 						IsRejected:         0,
-// 						ProteinDescr:       i.ProteinDescription,
-// 						HitRank:            i.HitRank,
-// 						Protein:            i.Protein,
-// 						AnalysisResult: []spc.AnalysisResult{
-// 							{
-// 								Analysis: "peptideprophet",
-// 								PeptideProphetResult: spc.PeptideProphetResult{
-// 									Probability: i.Probability,
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		}
-
-// 		for j := range i.MappedProteins {
-// 			ap := &spc.AlternativeProtein{
-// 				Protein:     j,
-// 				Description: proteinDescription[j],
-// 			}
-// 			sq.SearchResult.SearchHit[0].AlternativeProteins = append(sq.SearchResult.SearchHit[0].AlternativeProteins, *ap)
-// 		}
-
-// 		p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery = append(p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery, *sq)
-// 	}
-
-// 	p.Write()
-
-// }

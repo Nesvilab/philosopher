@@ -22,15 +22,15 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create MSstats report"), "error")
+		msg.WriteFile(errors.New("cannot create MSstats report"), "error")
 	}
 	defer file.Close()
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range evi.PSM {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -77,7 +77,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -135,7 +135,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 					i.Labels.Channel11.Intensity,
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
 					i.Purity,
 					i.Labels.Channel1.Intensity,
@@ -149,11 +149,11 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 					i.Labels.Channel9.Intensity,
 					i.Labels.Channel10.Intensity,
 					i.Labels.Channel11.Intensity,
-					//i.Labels.Channel12.Intensity,
-					//i.Labels.Channel13.Intensity,
-					//i.Labels.Channel14.Intensity,
-					//i.Labels.Channel15.Intensity,
-					//i.Labels.Channel16.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
 				)
 			default:
 				header += ""
@@ -164,12 +164,11 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+			msg.WriteToFile(errors.New("cannot write to MSstats report"), "fatal")
 		}
 	}
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }
