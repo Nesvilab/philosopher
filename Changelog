@@ -3,7 +3,7 @@
 - Option to tag contaminant sequences with a prefix tag.
 
 ### Changed
-- Improovements to the pipeline processing speed.
+- Improvements to the pipeline processing speed.
 - Major code cleaning and refactoring.
 - The pipeline protein inference is now calculated once for all data sets.
 
