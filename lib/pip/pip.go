@@ -255,7 +255,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 // PeptideProphet executes PeptideProphet in Parallel mode
 func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.PeptideProphet.Concurrent {
+	if !p.PeptideProphet.Concurrent {
 		for _, i := range data {
 
 			logrus.Info("Running the validation and inference on ", i)
@@ -668,7 +668,7 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = "combined"
-			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein && len(p.Filter.Pox) == 0 {
+			} else if p.Steps.IntegratedReports == "no" && !p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false

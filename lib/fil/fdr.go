@@ -327,7 +327,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					tie = true
 				}
 
-				if tie {
+				if !tie {
 					razorPair[k] = topPT
 
 				} else {
@@ -359,7 +359,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						tie = true
 					}
 
-					if tie {
+					if !tie {
 
 						var mplist []string
 						for pt := range r[k].MappedProteinsTNP {
