@@ -11,7 +11,6 @@ import (
 	"philosopher/lib/bio"
 	"philosopher/lib/ext/rawfilereader"
 	"philosopher/lib/msg"
-	"philosopher/lib/uti"
 
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
@@ -118,11 +117,11 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 				if retrieved {
 
 					// create the list of mz differences for each peak
-					var mzRatio []float64
-					for k := 1; k <= 6; k++ {
-						r := float64(k) * (float64(1) / float64(charges[j]))
-						mzRatio = append(mzRatio, uti.ToFixed(r, 2))
-					}
+					// var mzRatio []float64
+					// for k := 1; k <= 6; k++ {
+					// 	r := float64(k) * (float64(1) / float64(charges[j]))
+					// 	mzRatio = append(mzRatio, uti.ToFixed(r, 2))
+					// }
 
 					var timeW = retentionTime[j] / 60
 					var topI = 0.0

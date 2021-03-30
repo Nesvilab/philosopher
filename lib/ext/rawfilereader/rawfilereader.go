@@ -1,7 +1,6 @@
 package rawfilereader
 
 import (
-	"fmt"
 	"os/exec"
 	"path/filepath"
 	"philosopher/lib/met"
@@ -95,7 +94,6 @@ func (c *RawFileReader) Deploy() {
 
 	}
 
-	return
 }
 
 // Execute is the main function to execute RawFileReader
@@ -105,7 +103,6 @@ func (c *RawFileReader) Execute(rawFileName, scanQuery string) string {
 	cmd := exec.Command(bin)
 
 	file, _ := filepath.Abs(rawFileName)
-	file = fmt.Sprintf("%s.raw", file)
 	cmd.Args = append(cmd.Args, file)
 
 	if len(scanQuery) > 0 {
