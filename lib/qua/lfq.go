@@ -75,13 +75,14 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 		logrus.Info("Processing ", s)
 		var mz mzn.MsData
+		var fileName string
 
 		if isRaw {
-			stream := rawfilereader.Run(s, "")
+			fileName = fmt.Sprintf("%s%s%s.raw", dir, string(filepath.Separator), s)
+			stream := rawfilereader.Run(fileName, "")
 			mz.ReadRaw(s, stream)
 		} else {
-			fileName := fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
-			// load MS1, ignore MS2 and MS3
+			fileName = fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 			mz.Read(fileName)
 		}
 
