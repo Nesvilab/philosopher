@@ -1,6 +1,7 @@
 ### Added
 - Native support for Thermo raw files (Windows, and Linux).
 - Option to tag contaminant sequences with a prefix tag.
+- New parameters added to MSFragger.
 
 ### Changed
 - Improvements to the pipeline processing speed.

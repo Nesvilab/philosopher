@@ -43,7 +43,6 @@ func init() {
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.Param, "param", "", "", "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Memory, "memory", "", 8, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Threads, "num_threads", "", 0, "CPU to set num threads; else specify num threads directly (max 64)")
-		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.RawExtension, "raw", "", "", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.DatabaseName, "database_name", "", "", "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.PrecursorMassLower, "precursor_mass_lower", "", -20, "")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.PrecursorMassUpper, "precursor_mass_upper", "", 20, "")
@@ -56,12 +55,15 @@ func init() {
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.WriteCalibratedMGF, "write_calibrated_mgf", "", 0, "write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.DecoyPrefix, "decoy_prefix", "", "rev_", "prefix added to the decoy protein ID (used for parameter optimization only)")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Deisotope, "deisotope", "", 1, "Perform deisotoping or not (0=no, 1=yes and assume singleton peaks single charged, 2=yes and assume singleton")
+		msfraggerCmd.Flags().IntVarP(&m.MSFragger.Deneutralloss, "deneutralloss", "", 0, "Perform deneutrallossing or not (0=no, 1=yes)")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IsotopeError, "isotope_error", "", "0/1/2", "0=off, 0/1/2 (standard C13 error)")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.MassOffsets, "mass_offsets", "", "", "allow for additional precursor mass window shifts")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.LocalizeDeltaMass, "localize_delta_mass", "", 0, "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.PrecursorMassMode, "precursor_mass_mode", "", "selected", "")
-		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.DeltaMassExcludeRanges, "delta_mass_exclude_ranges", "", "(-1.5,3.5)", "")
-		msfraggerCmd.Flags().StringVarP(&m.MSFragger.FragmentIonSeries, "fragment_ion_series", "", "b,y", "")
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.FragmentIonSeries, "fragment_ion_series", "", "b,y", "Ion series used in search, specify any of a,b,c,x,y,z,b~,y~,Y,b-18,y-18 (comma separated)")
+
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.IonSeriesDefinitions, "ion_series_definitions", "", "", "User defined ion series. (Example: b* N -17.026548;b0 N -18.010565)")
+
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeName, "search_enzyme_name", "", "Trypsin", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeCutafter, "search_enzyme_cutafter", "", "KR", "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeButNotAfter, "search_enzyme_butnotafter", "", "P", "")
@@ -132,7 +134,8 @@ func init() {
 		msfraggerCmd.Flags().Float64VarP(&m.MSFragger.AddValine, "add_V_valine", "", 0.000000, "")
 		msfraggerCmd.Flags().Float64VarP(&m.MSFragger.AddTryptophan, "add_W_tryptophan", "", 0.000000, "")
 		msfraggerCmd.Flags().Float64VarP(&m.MSFragger.AddTyrosine, "add_Y_tyrosine", "", 0.000000, "")
-
+		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.DeltaMassExcludeRanges, "delta_mass_exclude_ranges", "", "(-1.5,3.5)", "")
+		//msfraggerCmd.Flags().StringVarP(&m.MSFragger.RawExtension, "raw", "", "", "")
 	}
 
 	RootCmd.AddCommand(msfraggerCmd)

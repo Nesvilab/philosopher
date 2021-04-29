@@ -114,12 +114,14 @@ type MSFragger struct {
 	DecoyPrefix                        string  `yaml:"decoy_prefix"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
 	Deisotope                          int     `yaml:"deisotope"`
+	Deneutralloss                      int     `yaml:"deneutralloss"`
 	IsotopeError                       string  `yaml:"isotope_error"`
 	MassOffsets                        string  `yaml:"mass_offsets"`
 	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
 	LocalizeDeltaMass                  int     `yaml:"localize_delta_mass"`
 	DeltaMassExcludeRanges             string  `yaml:"delta_mass_exclude_ranges"`
 	FragmentIonSeries                  string  `yaml:"fragment_ion_series"`
+	IonSeriesDefinitions               string  `yaml:"ion_series_definitions"`
 	SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
 	SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`
 	SearchEnzymeButNotAfter            string  `yaml:"search_enzyme_butnotafter"`

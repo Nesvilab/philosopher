@@ -31,7 +31,7 @@ Steps:
   Integrated Reports: no                         # combined analysis of LC-MS/MS results inspired by Abacus
   Integrated Isobaric Quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-Database Search:                                 # MSFragger 3.1 & Comet
+Database Search:                                 # MSFragger 3.2 & Comet
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
   contaminant_tag: false                         # prefix tag used added to decoy sequences
@@ -54,6 +54,7 @@ Database Search:                                 # MSFragger 3.1 & Comet
     fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
     fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
     calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
+    deneutralloss: 0                             # Perform deneutrallossing or not (0=no, 1=yes)
     deisotope: 1                                 # activates deisotoping.
     isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
     mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
@@ -61,6 +62,7 @@ Database Search:                                 # MSFragger 3.1 & Comet
     localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
     delta_mass_exclude_ranges: (-1.5,3.5)        # exclude mass range for shifted ions searching
     fragment_ion_series: b,y                     # ion series used in search
+    ion_series_definitions:                      # User defined ion series. (Example: b* N -17.026548;b0 N -18.010565)
     search_enzyme_name: Trypsin                  # name of enzyme to be written to the pepXML file
     search_enzyme_cutafter: KR                   # residues after which the enzyme cuts
     search_enzyme_butnotafter: P                 # residues that the enzyme will not cut before
@@ -79,6 +81,7 @@ Database Search:                                 # MSFragger 3.1 & Comet
     max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
     output_file_extension: pepXML                # file extension of output files
     output_format: pepXML                        # file format of output files (pepXML or tsv)
+    write_calibrated_mgf: 0                      # Write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)
     output_report_topN: 1                        # reports top N PSMs per input spectrum
     output_max_expect: 50                        # suppresses reporting of PSM if top hit has expectation greater than this threshold
     report_alternative_proteins: 0               # 0=no, 1=yes
@@ -102,7 +105,7 @@ Database Search:                                 # MSFragger 3.1 & Comet
     remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
     intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
     mass_diff_to_variable_mod: 0			           # Put mass diff as a variable modification. 0 for no; 1 for yes and change the original mass diff and the calculated mass accordingly; 2 for yes but do not change the original mass diff.
-    labile_search_mode: "off"                    # type of search (nglycan, labile, or off). Off means non-labile/typical search.
+    labile_search_mode: off                      # type of search (nglycan, labile, or off). Off means non-labile/typical search.
     restrict_deltamass_to: all                   # Specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
     diagnostic_intensity_filter: 0			         # [nglycan/labile search_mode only]. Minimum relative intensity for SUM of all detected oxonium ions to achieve for spectrum to contain diagnostic fragment evidence. Calculated relative to spectrum base peak. 0 <= value.
     Y_type_masses:                               # [nglycan/labile search_mode only]. Specify fragments of labile mods that are commonly retained on intact peptides (e.g. Y ions for glycans). Only used if 'Y' is included in fragment_ion_series.
