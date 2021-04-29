@@ -1,4 +1,4 @@
-FROM biocontainers/biocontainers:latest
+FROM ubuntu:18.04
 
 LABEL base.image="biocontainers:latest"
 LABEL version="1"
