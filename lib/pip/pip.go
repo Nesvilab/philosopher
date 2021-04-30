@@ -462,19 +462,16 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 func CombinedProteinList(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	var combinedProtXML string
-	var topMeta met.Data
+
+	logrus.Info("Creating combined protein inference")
 
 	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein && len(p.Filter.Pox) == 0 {
-
-		logrus.Info("Creating combined protein inference")
 
 		// return to the top level directory
 		os.Chdir(dir)
 
 		// reload the meta data
 		meta.Restore(sys.Meta())
-
-		topMeta = meta
 
 		meta.Home = dir
 		meta.ProteinProphet = p.ProteinProphet
@@ -505,8 +502,8 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 	// and them copy the meta data to all data folders.
 	os.Chdir(dir)
 
-	protXML := fil.ReadProtXMLInput("combined.prot.xml", topMeta.Filter.Tag, topMeta.Filter.Weight)
-	proBin := fil.ProcessProteinIdentifications(protXML, topMeta.Filter.PtFDR, topMeta.Filter.PepFDR, topMeta.Filter.ProtProb, topMeta.Abacus.Picked, topMeta.Abacus.Razor, topMeta.Filter.Fo, true, topMeta.Filter.Tag)
+	protXML := fil.ReadProtXMLInput("combined.prot.xml", p.DatabaseSearch.DecoyTag, p.Filter.Weight)
+	proBin := fil.ProcessProteinIdentifications(protXML, p.Filter.PtFDR, p.Filter.PepFDR, p.Filter.ProtProb, p.Abacus.Picked, p.Abacus.Razor, p.Filter.Fo, true, p.DatabaseSearch.DecoyTag)
 
 	for _, i := range data {
 		dest := fmt.Sprintf("%s%s.meta%spro.bin", i, string(filepath.Separator), string(filepath.Separator))

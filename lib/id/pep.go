@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"os"
 	"path"
 	"path/filepath"
 	"sort"
@@ -20,6 +21,7 @@ import (
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
@@ -234,8 +236,11 @@ func (p *PepXML) Read(f string) {
 			msg.NoPSMFound(errors.New(f), "warning")
 		}
 
-	}
+	} else {
 
+		spew.Dump(p)
+		os.Exit(1)
+	}
 }
 
 // ReadPepXMLInput reads one or more fies and organize the data into PSM list
