@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -549,12 +548,12 @@ func (rd *RawData) ProcessRaw(f string) {
 	rd.StartTime = rh.SampleInfo.Starttime
 	rd.EndTime = rh.SampleInfo.Endtime
 	rd.Manufacturer = "Thermo Scientific"
-	rd.Model = fmt.Sprintf("%s", inst.Model2)
+	rd.Model = inst.Model2.String()
 	rd.Ionization = ScanEventData(scanevents, "ionization")
 	rd.Analyzer = ScanEventData(scanevents, "analyzer")
 	rd.Detector = ScanEventData(scanevents, "detector")
 	rd.SoftwareName = "XCalibur"
-	rd.SoftwareVersion = fmt.Sprintf("%s", inst.Tag1)
+	rd.SoftwareVersion = inst.Tag1.String()
 	rd.Scanevents = scanevents
 	rd.Scanindex = scanindex
 

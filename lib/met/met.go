@@ -428,7 +428,7 @@ func New(h string) Data {
 	var d Data
 
 	var fmtuuid = uuid.NewV4()
-	var uuid = fmt.Sprintf("%s", fmtuuid)
+	var uuid = fmtuuid.String()
 	d.UUID = uuid
 
 	d.OS = runtime.GOOS
