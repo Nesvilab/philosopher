@@ -451,7 +451,6 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
-
 }
 
 // PSMLocalizationReport report ptm localization based on PTMProphet outputs
@@ -504,5 +503,4 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
-
 }
