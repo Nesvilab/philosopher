@@ -169,27 +169,27 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
 	}
 
-	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header += "\tPurity\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
+			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		default:
 			header += ""
 		}
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tIs Used\tPurity\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header += "\tIs Used\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
 		case 8:
-			header += "\tIs Used\tPurity\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header += "\tIs Used\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
 		default:
 			header += ""
 		}
@@ -333,8 +333,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.2f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
+			i.Purity,
 			i.IsUnique,
 			i.Protein,
 			i.ProteinID,
@@ -347,20 +348,18 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 		switch channels {
 		case 4:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
 				i.Labels.Channel4.Intensity,
 			)
 		case 6:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -369,10 +368,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel6.Intensity,
 			)
 		case 8:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -383,10 +381,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel8.Intensity,
 			)
 		case 10:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -399,10 +396,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel10.Intensity,
 			)
 		case 11:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -416,10 +412,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel11.Intensity,
 			)
 		case 16:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,

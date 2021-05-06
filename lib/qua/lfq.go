@@ -37,7 +37,8 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 	logrus.Info("Indexing PSM information")
 
-	var sourceMap = make(map[string]uint8)
+	var psmMap = make(map[string]rep.PSMEvidence)
+	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var spectra = make(map[string][]string)
 	var ppmPrecision = make(map[string]float64)
 	var mzMap = make(map[string]float64)
@@ -51,7 +52,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	// collect attributes from PSM
 	for _, i := range evi.PSM {
 		partName := strings.Split(i.Spectrum, ".")
-		sourceMap[partName[0]] = 0
+		sourceMap[partName[0]] = append(sourceMap[partName[0]], i)
 		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
 
 		ppmPrecision[i.Spectrum] = tol / math.Pow(10, 6)
@@ -61,17 +62,21 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		retentionTime[i.Spectrum] = i.RetentionTime
 
 		charges[i.Spectrum] = int(i.AssumedCharge)
+
+		psmMap[i.Spectrum] = i
 	}
 
 	// get a sorted list of spectrum names
-	var sourceMapList []string
-	for source := range sourceMap {
-		sourceMapList = append(sourceMapList, source)
+	var sourceList []string
+	for i := range sourceMap {
+		sourceList = append(sourceList, i)
 	}
-	sort.Strings(sourceMapList)
+
+	sort.Strings(sourceList)
 
 	logrus.Info("Reading spectra and tracing peaks")
-	for _, s := range sourceMapList {
+
+	for _, s := range sourceList {
 
 		logrus.Info("Processing ", s)
 		var mz mzn.MsData
@@ -106,6 +111,17 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 					// 	mzMap[spectrum] = mz.Spectra[i].Precursor.SelectedIon
 					// }
 				}
+			}
+		}
+
+		mappedPurity := calculateIonPurity(dir, format, mz, sourceMap[s])
+
+		for _, j := range mappedPurity {
+			v, ok := psmMap[j.Spectrum]
+			if ok {
+				psm := v
+				psm.Purity = j.Purity
+				psmMap[j.Spectrum] = psm
 			}
 		}
 
@@ -147,6 +163,12 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if ok {
 			evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
 		}
+
+		v, ok := psmMap[evi.PSM[i].Spectrum]
+		if ok {
+			evi.PSM[i].Purity = v.Purity
+		}
+
 	}
 
 	return evi
