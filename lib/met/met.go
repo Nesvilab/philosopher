@@ -100,7 +100,8 @@ type MSFragger struct {
 	JarPath                            string  `yaml:"path"`
 	Memory                             int     `yaml:"memory"`
 	Threads                            int     `yaml:"num_threads"`
-	RawExtension                       string  `yaml:"raw"`
+	Extension                          string  `yaml:"extension"`
+	DataType                           int     `yaml:"data_type"`
 	DatabaseName                       string  `yaml:"database_name"`
 	PrecursorMassLower                 int     `yaml:"precursor_mass_lower"`
 	PrecursorMassUpper                 int     `yaml:"precursor_mass_upper"`

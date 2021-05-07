@@ -223,7 +223,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 			meta.MSFragger.DatabaseName = p.DatabaseSearch.ProteinDatabase
 			meta.MSFragger.DecoyPrefix = p.DatabaseSearch.DecoyTag
 
-			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.RawExtension)
+			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.Extension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
 				msg.Custom(e, "fatal")

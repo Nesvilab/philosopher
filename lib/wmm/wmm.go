@@ -63,7 +63,7 @@ func writeMSFragger(d met.MSFragger, text string) string {
 	phosphorylation (+79.9663) of serine, threonine, and tyrosine residues
 	*/
 
-	searchText := fmt.Sprintf("Database searching was performed on %s files with MSFragger [CITATION] using a precursor tolerance of", d.RawExtension)
+	searchText := fmt.Sprintf("Database searching was performed on %s files with MSFragger [CITATION] using a precursor tolerance of", d.Extension)
 
 	text = text + searchText
 
