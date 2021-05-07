@@ -129,11 +129,8 @@ func Run(f met.Data) met.Data {
 		logrus.Info("Mapping modifications")
 		//should include observed mods into mapping?
 		e.MapMods()
-		//e.AssembleModificationReport()
+
 	}
-	//else {
-	//e.MapMods(false)
-	//}
 
 	var pept id.PepIDList
 	pept.Restore("pep")
@@ -145,7 +142,6 @@ func Run(f met.Data) met.Data {
 		e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
-	//spew.Dump(e.PSM)
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 

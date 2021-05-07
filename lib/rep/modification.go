@@ -15,26 +15,6 @@ import (
 	"philosopher/lib/uti"
 )
 
-// int[] matched_unimod_idx = new int[delta_mass_from_psm.length];
-// for (int i = 0; i < delta_mass_from_psm.length; ++i) {
-// 	double gap = 9999999;
-// 	double matched_mass;
-// 	int matched_idx;
-//   for (int j = 0; j < unimod.length; ++j) { // can be optimized with binary search
-//     if (Math.abs(delta_mass_from_psm[i] - unimod[j]) < gap) {
-//     	gap = Math.abs(delta_mass_from_psm[i] - unimod[j])
-//     	matched_mass = unimod[j];
-// 		matched_idx = j;
-//     }
-//   }
-// ​
-//   if (gap < ppm * 1e-6 * matched_mass) {
-//   	matched_unimod_idx[i] = matched_idx;
-//   } else {
-//   	matched_unimod_idx[i] = null;
-//   }
-// }
-
 // MapMods maps PSMs to modifications based on their mass shifts
 func (evi *Evidence) MapMods() {
 
@@ -206,7 +186,6 @@ func (evi *Evidence) AssembleModificationReport() {
 
 	modEvi.MassBins = bins
 	evi.Modifications = modEvi
-
 }
 
 // ModificationReport ...
@@ -309,5 +288,4 @@ func (evi *Evidence) PlotMassHist() {
 
 	// copy to work directory
 	sys.CopyFile(outfile, filepath.Base(outfile))
-
 }
