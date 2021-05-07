@@ -2,6 +2,7 @@ package rep
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"philosopher/lib/dat"
@@ -257,6 +258,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var entryNameMap = make(map[string]string)
 	var geneMap = make(map[string]string)
 	var descriptionMap = make(map[string]string)
+	var sequenceMap = make(map[string]string)
 
 	for _, j := range dtb.Records {
 		if !j.IsDecoy {
@@ -264,6 +266,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			entryNameMap[j.PartHeader] = j.EntryName
 			geneMap[j.PartHeader] = j.GeneNames
 			descriptionMap[j.PartHeader] = j.Description
+			sequenceMap[j.PartHeader] = j.Sequence
 		}
 	}
 
@@ -285,6 +288,32 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.PSM[i].MappedGenes[geneMap[k]] = 0
 			}
 		}
+
+		// map the peptide to the protein
+		re := regexp.MustCompile(evi.PSM[i].Peptide)
+		reMatch := re.FindStringIndex(sequenceMap[id])
+		if len(reMatch) > 0 {
+			evi.PSM[i].ProteinStart = reMatch[0]
+			evi.PSM[i].ProteinEnd = reMatch[1]
+		} else {
+
+			var peptide string
+
+			if strings.Contains(evi.PSM[i].Peptide, "I") {
+				peptide = strings.Replace(evi.PSM[i].Peptide, "I", "L", -1)
+			}
+			if strings.Contains(evi.PSM[i].Peptide, "L") {
+				peptide = strings.Replace(evi.PSM[i].Peptide, "L", "I", -1)
+			}
+
+			re := regexp.MustCompile(peptide)
+			reMatch := re.FindStringIndex(sequenceMap[id])
+			if len(reMatch) > 0 {
+				evi.PSM[i].ProteinStart = reMatch[0]
+				evi.PSM[i].ProteinEnd = reMatch[1]
+			}
+		}
+
 	}
 
 	for i := range evi.Ions {

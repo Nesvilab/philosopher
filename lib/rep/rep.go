@@ -115,6 +115,8 @@ type PSMEvidence struct {
 	Scan                             int
 	NumberOfEnzymaticTermini         int
 	NumberOfMissedCleavages          int
+	ProteinStart                     int
+	ProteinEnd                       int
 	PrevAA                           string
 	NextAA                           string
 	Peptide                          string

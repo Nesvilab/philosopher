@@ -6,10 +6,12 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"philosopher/lib/bio"
 	"philosopher/lib/cla"
@@ -132,6 +134,9 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
 
 	var header string
+	var modMap = make(map[string]string)
+	var modList []string
+
 	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
 
 	// create result file
@@ -155,7 +160,22 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		} else {
 			printSet = append(printSet, evi.PSM[i])
 		}
+
+		for k := range evi.PSM[i].LocalizedPTMMassDiff {
+			_, ok := modMap[k]
+			if !ok {
+				modMap[k] = ""
+			} else {
+				modMap[k] = ""
+			}
+		}
 	}
+
+	for k := range modMap {
+		modList = append(modList, k)
+	}
+
+	sort.Strings(modList)
 
 	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
 
@@ -163,11 +183,17 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tIon Mobility\tCompensation Voltage\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tIon Mobility\tCompensation Voltage\tAssigned Modifications\tObserved Modifications"
 
-	if hasLoc {
-		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
+	if len(modList) > 0 {
+		for _, i := range modList {
+			header += "\t" + i + "\t" + i + " Best Localization"
+		}
 	}
+
+	// if hasLoc {
+	// 	header += "\tNumber of Phospho Sites\tPhospho Site Localization"
+	// }
 
 	header += "\tPurity\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -298,7 +324,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%.4f\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
@@ -306,6 +332,8 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			i.Probability,
 			i.NumberOfEnzymaticTermini,
 			i.NumberOfMissedCleavages,
+			i.ProteinStart,
+			i.ProteinEnd,
 			i.Intensity,
 			i.IonMobility,
 			i.CompensationVoltage,
@@ -313,25 +341,40 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			strings.Join(obs, ", "),
 		)
 
-		if hasLoc {
+		if len(modList) > 0 {
+			for _, j := range modList {
 
-			var sites int
-			var md string
+				r := regexp.MustCompile(`\d\.\d{3}`)
+				matches := r.FindAllString(i.LocalizedPTMMassDiff[j], -1)
+				max := uti.GetMaxNumber(matches)
 
-			sites += i.LocalizedPTMSites["STY:79.9663"]
-			sites += i.LocalizedPTMSites["STY:79.96633"]
-			sites += i.LocalizedPTMSites["STY:79.966331"]
-
-			md += i.LocalizedPTMMassDiff["STY:79.9663"]
-			md += i.LocalizedPTMMassDiff["STY:79.96633"]
-			md += i.LocalizedPTMMassDiff["STY:79.966331"]
-
-			line = fmt.Sprintf("%s\t%d\t%s",
-				line,
-				sites,
-				md,
-			)
+				line = fmt.Sprintf("%s\t%s\t%s",
+					line,
+					i.LocalizedPTMMassDiff[j],
+					max,
+				)
+			}
 		}
+
+		// if hasLoc {
+
+		// 	var sites int
+		// 	var md string
+
+		// 	sites += i.LocalizedPTMSites["STY:79.9663"]
+		// 	sites += i.LocalizedPTMSites["STY:79.96633"]
+		// 	sites += i.LocalizedPTMSites["STY:79.966331"]
+
+		// 	md += i.LocalizedPTMMassDiff["STY:79.9663"]
+		// 	md += i.LocalizedPTMMassDiff["STY:79.96633"]
+		// 	md += i.LocalizedPTMMassDiff["STY:79.966331"]
+
+		// 	line = fmt.Sprintf("%s\t%d\t%s",
+		// 		line,
+		// 		sites,
+		// 		md,
+		// 	)
+		// }
 
 		line = fmt.Sprintf("%s\t%.2f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,

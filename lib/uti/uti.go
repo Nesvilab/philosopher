@@ -167,3 +167,24 @@ func IOReadDir(root, ext string) []string {
 
 	return files
 }
+
+// GetMaxNumber returns the highest (string) number from an array in string format
+func GetMaxNumber(list []string) string {
+
+	var max = -1.0
+
+	for _, i := range list {
+		f, _ := strconv.ParseFloat(i, 64)
+		if f > max {
+			max = f
+		}
+	}
+
+	s := fmt.Sprintf("%f", max)
+
+	if s == "-1.000000" {
+		return ""
+	}
+
+	return s
+}
