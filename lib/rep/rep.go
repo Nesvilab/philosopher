@@ -140,6 +140,7 @@ type PSMEvidence struct {
 	Massdiff                         float64
 	LocalizedPTMSites                map[string]int
 	LocalizedPTMMassDiff             map[string]string
+	LocalizationRange                string
 	Probability                      float64
 	Expectation                      float64
 	Xcorr                            float64
@@ -404,7 +405,7 @@ func Run(m met.Data) {
 		isComet = true
 	}
 
-	if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
+	if m.MSFragger.LocalizeDeltaMass == 1 {
 		hasLoc = true
 	}
 

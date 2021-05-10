@@ -74,6 +74,7 @@ type PeptideIdentification struct {
 	Massdiff                         float64
 	LocalizedPTMSites                map[string]int
 	LocalizedPTMMassDiff             map[string]string
+	LocalizationRange                string
 	Probability                      float64
 	IsoMassD                         int
 	Expectation                      float64
@@ -433,6 +434,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 				psm.Nextscore = value
 			}
 		}
+
+		psm.LocalizationRange = i.PTMResult.LocalizationPeptide
 
 		// to be able to accept multiple entries with the same spectrum name, we fuse the
 		// file name to the spectrum name. This is going to be used as an identifiable attribute

@@ -191,9 +191,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		}
 	}
 
-	// if hasLoc {
-	// 	header += "\tNumber of Phospho Sites\tPhospho Site Localization"
-	// }
+	if hasLoc {
+		header += "\tLocalization Range"
+	}
 
 	header += "\tPurity\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -356,25 +356,12 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			}
 		}
 
-		// if hasLoc {
-
-		// 	var sites int
-		// 	var md string
-
-		// 	sites += i.LocalizedPTMSites["STY:79.9663"]
-		// 	sites += i.LocalizedPTMSites["STY:79.96633"]
-		// 	sites += i.LocalizedPTMSites["STY:79.966331"]
-
-		// 	md += i.LocalizedPTMMassDiff["STY:79.9663"]
-		// 	md += i.LocalizedPTMMassDiff["STY:79.96633"]
-		// 	md += i.LocalizedPTMMassDiff["STY:79.966331"]
-
-		// 	line = fmt.Sprintf("%s\t%d\t%s",
-		// 		line,
-		// 		sites,
-		// 		md,
-		// 	)
-		// }
+		if hasLoc {
+			line = fmt.Sprintf("%s\t%s",
+				line,
+				i.LocalizationRange,
+			)
+		}
 
 		line = fmt.Sprintf("%s\t%.2f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
