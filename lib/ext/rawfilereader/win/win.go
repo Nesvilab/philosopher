@@ -21,8 +21,6 @@ func Win(win string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("rawFileReader.exe"), "Cannot deploy rawFileReader.exe 64-bit")
 	}
-
-	return
 }
 
 // ThermoFisherCommonCoreDataDLL deploys libgcc_s_dw2.dll
@@ -37,8 +35,6 @@ func ThermoFisherCommonCoreDataDLL(s string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("ThermoFisherCommonCoreData"), "Cannot deploy ThermoFisherCommonCoreData.dll.dllcDLL")
 	}
-
-	return
 }
 
 // ThermoFisherCommonCoreRawFileReaderDLL deploys libgcc_s_dw2.dll
@@ -53,6 +49,4 @@ func ThermoFisherCommonCoreRawFileReaderDLL(s string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("ThermoFisher.CommonCore.RawFileReader.dll"), "Cannot deploy ThermoFisher.CommonCore.RawFileReader.dll")
 	}
-
-	return
 }

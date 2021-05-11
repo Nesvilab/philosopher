@@ -77,8 +77,6 @@ func (i *InterProphet) Deploy(os, distro string) {
 			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
-
-	return
 }
 
 // Execute IProphet
@@ -120,7 +118,7 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	_ = cmd.Wait()
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		msg.ExecutingBinary(errors.New("There was an error with iProphet, please check your parameters and input files"), "fatal")
+		msg.ExecutingBinary(errors.New("there was an error with iProphet, please check your parameters and input files"), "fatal")
 	}
 
 	// copy to work directory
@@ -140,39 +138,39 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 
 func (i InterProphet) appendParams(params met.InterProphet, cmd *exec.Cmd) *exec.Cmd {
 
-	if params.Length == true {
+	if params.Length {
 		cmd.Args = append(cmd.Args, "LENGTH")
 	}
 
-	if params.Nofpkm == true {
+	if params.Nofpkm {
 		cmd.Args = append(cmd.Args, "NOFPKM")
 	}
 
-	if params.Nonss == true {
+	if params.Nonss {
 		cmd.Args = append(cmd.Args, "NONSS")
 	}
 
-	if params.Nonse == true {
+	if params.Nonse {
 		cmd.Args = append(cmd.Args, "NONSE")
 	}
 
-	if params.Nonrs == true {
+	if params.Nonrs {
 		cmd.Args = append(cmd.Args, "NONRS")
 	}
 
-	if params.Nonsm == true {
+	if params.Nonsm {
 		cmd.Args = append(cmd.Args, "NONSM")
 	}
 
-	if params.Nonsp == true {
+	if params.Nonsp {
 		cmd.Args = append(cmd.Args, "NONSP")
 	}
 
-	if params.Sharpnse == true {
+	if params.Sharpnse {
 		cmd.Args = append(cmd.Args, "SHARPNSE")
 	}
 
-	if params.Nonsi == true {
+	if params.Nonsi {
 		cmd.Args = append(cmd.Args, "NONSI")
 	}
 

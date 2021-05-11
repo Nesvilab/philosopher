@@ -21,6 +21,4 @@ func Reh64(unix64 string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("rawFileReaderReH"), "Cannot deploy rawFileReaderDeb 64-bit")
 	}
-
-	return
 }

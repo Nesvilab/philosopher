@@ -21,6 +21,4 @@ func UnixInterProphetParser(s string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("InterProphetParser"), "Cannot deploy InterProphetParser")
 	}
-
-	return
 }

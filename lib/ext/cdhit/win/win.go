@@ -21,6 +21,4 @@ func Win64(win64 string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("CD-HIT"), "Cannot deploy CD-HIT 64-bit")
 	}
-
-	return
 }
