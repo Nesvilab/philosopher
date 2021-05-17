@@ -71,8 +71,6 @@ func (c *TMTIntegrator) Execute(params met.TMTIntegrator, cmdArgs []string) {
 	}
 
 	_ = cmd.Wait()
-
-	return
 }
 
 func appendParams(params met.TMTIntegrator) *exec.Cmd {

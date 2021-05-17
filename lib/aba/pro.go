@@ -529,7 +529,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	}
 	defer file.Close()
 
-	line := "PROTID\t"
+	line := "PROTID\tGENEID\tPROTLEN"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s_SPC\t", i)
@@ -556,7 +556,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 
 		var line string
 
-		line += fmt.Sprintf("%s\t", i.ProteinID)
+		line += fmt.Sprintf("%s\t%s\t%d\t", i.ProteinID, i.GeneNames, i.Length)
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
@@ -588,7 +588,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	}
 	defer file.Close()
 
-	line := "PROTID\t"
+	line := "PROTID\tGENEID\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s_INT\t", i)
@@ -615,7 +615,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 
 		var line string
 
-		line += fmt.Sprintf("%s\t", i.ProteinID)
+		line += fmt.Sprintf("%s\t%s\t", i.ProteinID, i.GeneNames)
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%f\t", i.UrazorIntensity[j])

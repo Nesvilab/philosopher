@@ -20,6 +20,4 @@ func WinPTMProphetParser(s string) {
 	if e2 != nil {
 		msg.DeployAsset(errors.New("PTMProphetParser"), "Cannot deploy PTMProphet")
 	}
-
-	return
 }

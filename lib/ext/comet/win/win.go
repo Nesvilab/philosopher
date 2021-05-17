@@ -13,15 +13,13 @@ func WinParameterFile(winParam string) {
 
 	param, e1 := Asset("comet.params.txt")
 	if e1 != nil {
-		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot read Comet parameter bin")
+		msg.DeployAsset(errors.New("comet Parameter File"), "cannot read Comet parameter bin")
 	}
 
 	e2 := ioutil.WriteFile(winParam, param, sys.FilePermission())
 	if e2 != nil {
-		msg.DeployAsset(errors.New("Comet Parameter File"), "Cannot deploy Comet parameter")
+		msg.DeployAsset(errors.New("comet Parameter File"), "cannot deploy Comet parameter")
 	}
-
-	return
 }
 
 // Win32 deploys win32 bits comet parameter file
@@ -29,15 +27,13 @@ func Win32(win32 string) {
 
 	bin, e := Asset("comet.2019011.win32.exe")
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet Windows binary file"), "Cannot read Comet bin")
+		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot read Comet bin")
 	}
 
 	e = ioutil.WriteFile(win32, bin, sys.FilePermission())
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet Windows binary file"), "Cannot deploy Comet")
+		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot deploy Comet")
 	}
-
-	return
 }
 
 // Win64 deploys win64 bits comet parameter file
@@ -45,13 +41,11 @@ func Win64(win64 string) {
 
 	bin, e := Asset("comet.2019011.win64.exe")
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet Windows binary file"), "Cannot read Comet bin")
+		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot read Comet bin")
 	}
 
 	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
 	if e != nil {
-		msg.DeployAsset(errors.New("Comet Windows binary file"), "Cannot deploy Comet")
+		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot deploy Comet")
 	}
-
-	return
 }
