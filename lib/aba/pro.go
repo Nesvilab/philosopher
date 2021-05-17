@@ -529,14 +529,14 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 	}
 	defer file.Close()
 
-	line := "PROTID\tGENEID\tPROTLEN"
+	line := "PROTID\tGENEID\tPROTLEN\t"
 
 	for _, i := range namesList {
 		line += fmt.Sprintf("%s_SPC\t", i)
 	}
 
 	line += "\n"
-	line += "na\t"
+	line += "na\tna\tna\t"
 
 	for _, i := range labelList {
 		line += fmt.Sprintf("%s\t", i)
@@ -595,7 +595,7 @@ func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidence
 	}
 
 	line += "\n"
-	line += "na\t"
+	line += "na\tna\t"
 
 	for _, i := range labelList {
 		line += fmt.Sprintf("%s\t", i)
