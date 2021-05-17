@@ -322,7 +322,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	header := "Protein\tProtein ID\tEntry Name\tGene Names\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tUnique Peptides\tSummarized Spectral Count\tSummarized Unique Spectral Count\tSummarized Total Spectral Count"
+	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tSummarized total Peptides\tSummarized Spectral Count\tSummarized Unique Spectral Count\tSummarized Total Spectral Count"
 
 	// Add Unique+Razor SPC
 	for _, i := range namesList {
