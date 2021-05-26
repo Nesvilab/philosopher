@@ -445,10 +445,9 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 	var spectrumMap = make(map[string]iso.Labels)
 	var phosphoSpectrumMap = make(map[string]iso.Labels)
-
 	var bestMap = make(map[string]uint8)
-
 	var psmLabelSumList PairList
+	var quantCheckUp bool
 
 	// 1st check: Purity the score and the Probability levels
 	for _, i := range evi.PSM {
@@ -486,7 +485,15 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel15.Intensity +
 				i.Labels.Channel16.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
+
+			if sum > 0 {
+				quantCheckUp = true
+			}
 		}
+	}
+
+	if !quantCheckUp {
+		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "fatal")
 	}
 
 	// 2nd check: best PSM
