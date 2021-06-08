@@ -187,6 +187,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	if len(modList) > 0 {
 		for _, i := range modList {
+			if strings.Contains(i, "STY:79.966331") {
+				i = "STY:79.9663"
+			}
 			header += "\t" + i + "\t" + i + " Best Localization"
 		}
 	}
