@@ -119,8 +119,8 @@ func (p *MsData) ReadRaw(fileName, f string) {
 			parentIndexInt--
 			spec.Precursor.ParentIndex = string(strconv.Itoa(parentIndexInt))
 
-			spec.Precursor.IsolationWindowLowerOffset = 0.5
-			spec.Precursor.IsolationWindowUpperOffset = 0.5
+			spec.Precursor.IsolationWindowLowerOffset = 0.6
+			spec.Precursor.IsolationWindowUpperOffset = 0.6
 
 			siVal1, e := strconv.ParseFloat(parts[5], 64)
 			if e != nil {
@@ -146,8 +146,8 @@ func (p *MsData) ReadRaw(fileName, f string) {
 				spec.Precursor.SelectedIonIntensity = 0
 				spec.Precursor.TargetIon = 0
 				spec.Precursor.TargetIonIntensity = 0
-				spec.Precursor.IsolationWindowLowerOffset = 0
-				spec.Precursor.IsolationWindowUpperOffset = 0
+				spec.Precursor.IsolationWindowLowerOffset = 0.6
+				spec.Precursor.IsolationWindowUpperOffset = 0.6
 			}
 
 			rtVal, _ := strconv.ParseFloat(parts[4], 64)
