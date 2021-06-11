@@ -492,7 +492,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 		}
 	}
 
-	if !quantCheckUp {
+	if remove != 0 && !quantCheckUp {
 		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "fatal")
 	}
 
