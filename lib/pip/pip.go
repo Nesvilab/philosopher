@@ -502,6 +502,9 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 	// and them copy the meta data to all data folders.
 	os.Chdir(dir)
 
+	p.Abacus.Picked = p.Filter.Picked
+	p.Abacus.Razor = p.Filter.Razor
+
 	protXML := fil.ReadProtXMLInput("combined.prot.xml", p.DatabaseSearch.DecoyTag, p.Filter.Weight)
 	proBin := fil.ProcessProteinIdentifications(protXML, p.Filter.PtFDR, p.Filter.PepFDR, p.Filter.ProtProb, p.Abacus.Picked, p.Abacus.Razor, p.Filter.Fo, true, p.DatabaseSearch.DecoyTag)
 

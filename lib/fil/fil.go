@@ -52,7 +52,11 @@ func Run(f met.Data) met.Data {
 	_ = pepT
 	_ = ionT
 
-	if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
+	if _, err := os.Stat(sys.ProBin()); err == nil {
+
+		pro.Restore()
+
+	} else if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
 
 		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, false, f.Filter.Tag)
