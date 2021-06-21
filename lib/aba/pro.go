@@ -58,11 +58,6 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		// collect interact full file names
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
-			// if strings.Contains(f.Name(), "pep.xml") {
-			// 	interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-			// 	absPath, _ := filepath.Abs(interactFile)
-			// 	xmlFiles = append(xmlFiles, absPath)
-			// }
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				labels.Name = annot
@@ -117,14 +112,14 @@ func proteinLevelAbacus(m met.Data, args []string) {
 	sort.Strings(reprintLabels)
 
 	logrus.Info("Processing spectral counts")
-	evidences = getProteinSpectralCounts(evidences, datasets)
+	evidences = getProteinSpectralCounts(evidences, datasets, m.Abacus.Tag)
 
 	logrus.Info("Processing intensities")
 	evidences = sumProteinIntensities(evidences, datasets)
 
 	// collect TMT labels
 	if m.Abacus.Labels {
-		evidences = getProteinLabelIntensities(evidences, datasets)
+		evidences = getProteinLabelIntensities(evidences, datasets, m.Abacus.Tag)
 	}
 
 	if m.Abacus.Labels {
@@ -155,6 +150,8 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 		var protxml id.ProtXML
 		protxml.Read("combined.prot.xml")
 		protxml.DecoyTag = a.Tag
+
+		protxml.MarkUniquePeptides(1)
 
 		// promote decoy proteins with indistinguishable target proteins
 		protxml.PromoteProteinIDs()
@@ -226,13 +223,13 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 }
 
 // getProteinSpectralCounts collects protein spectral counts from the individual data sets for the combined protein report
-func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
+func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
 
 		for i := range combined {
 			for _, j := range v.Proteins {
-				if combined[i].ProteinID == j.ProteinID {
+				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
 					combined[i].UniqueSpc[k] = j.UniqueSpC
 					combined[i].TotalSpc[k] = j.TotalSpC
 					combined[i].UrazorSpc[k] = j.URazorSpC
@@ -247,13 +244,13 @@ func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets
 }
 
 // getProteinLabelIntensities collects protein isobaric quantification from the individual data sets for the combined protein report
-func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence) rep.CombinedProteinEvidenceList {
+func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
 
 	for k, v := range datasets {
 
 		for i := range combined {
 			for _, j := range v.Proteins {
-				if combined[i].ProteinID == j.ProteinID {
+				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
 					combined[i].TotalLabels[k] = j.TotalLabels
 					combined[i].UniqueLabels[k] = j.UniqueLabels
 					combined[i].URazorLabels[k] = j.URazorLabels
