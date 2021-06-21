@@ -255,7 +255,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 		}
 	}
 
-	header = "Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tStripped Peptides\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+	header = "Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tTotal Peptide Ions\tUnique Peptide Ions\tRazor Peptide Ions\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -402,7 +402,7 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+		line := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
 			i.ProteinGroup,           // Group
 			i.ProteinSubGroup,        // SubGroup
 			i.PartHeader,             // Protein
@@ -416,7 +416,6 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 			i.ProteinExistence,       // Protein Existence
 			i.Probability,            // Protein Probability
 			i.TopPepProb,             // Top Peptide Probability
-			i.UniqueStrippedPeptides, // Stripped Peptides
 			len(i.TotalPeptideIons),  // Total Peptide Ions
 			uniqIons,                 // Unique Peptide Ions
 			urazorIons,               // Razor Peptide Ions

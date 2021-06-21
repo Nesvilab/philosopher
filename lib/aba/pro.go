@@ -193,7 +193,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				ce.GroupNumber = j.GroupNumber
 				ce.SiblingID = j.GroupSiblingID
 				ce.IndiProtein = j.IndistinguishableProtein
-				ce.UniqueStrippedPeptides = len(j.UniqueStrippedPeptides)
+				ce.UniqueStrippedPeptides = 0
 				ce.PeptideIons = j.PeptideIons
 				ce.ProteinProbability = j.Probability
 				ce.TopPepProb = j.TopPepProb
@@ -233,6 +233,9 @@ func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets
 					combined[i].UniqueSpc[k] = j.UniqueSpC
 					combined[i].TotalSpc[k] = j.TotalSpC
 					combined[i].UrazorSpc[k] = j.URazorSpC
+
+					combined[i].UniqueStrippedPeptides += j.UniqueSpC
+
 					break
 				}
 			}
@@ -319,7 +322,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Total Peptides\tSummarized Spectral Count\tSummarized Unique Spectral Count\tSummarized Total Spectral Count"
+	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tSummarized Spectral Count\tSummarized Unique Spectral Count\tSummarized Total Spectral Count"
 
 	// Add Unique+Razor SPC
 	for _, i := range namesList {
@@ -419,7 +422,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
 
-		line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
+		//line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
 
 		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
 
