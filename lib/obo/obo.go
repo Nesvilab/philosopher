@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"philosopher/lib/met"
 	unmd "philosopher/lib/obo/unimod"
@@ -143,7 +144,7 @@ func (m *Onto) Parse() {
 			term.RecordID = i
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_mono_mass") && flag == 1 {
 			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
-			term.MonoIsotopicMass = i
+			term.MonoIsotopicMass = uti.ToFixed(i, 4)
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_avge_mass") && flag == 1 {
 			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
 			term.AverageMass = i

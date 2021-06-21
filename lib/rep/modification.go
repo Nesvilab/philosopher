@@ -24,8 +24,15 @@ func (evi *Evidence) MapMods() {
 
 	o := obo.NewUniModOntology()
 
+	// for _, i := range evi.PSM {
+	// 	modMap[i.Massdiff] = obo.Term{}
+	// }
+
 	for _, i := range evi.PSM {
-		modMap[i.Massdiff] = obo.Term{}
+		for _, j := range i.Modifications.Index {
+			modMap[j.MassDiff] = obo.Term{}
+			//modMap[i.Massdiff] = obo.Term{}
+		}
 	}
 
 	for k := range modMap {
@@ -56,6 +63,7 @@ func (evi *Evidence) MapMods() {
 
 	for i := range evi.PSM {
 		// for fixed and variable modifications
+
 		for k, v := range evi.PSM[i].Modifications.Index {
 
 			obo, ok := modMap[v.MassDiff]
@@ -79,7 +87,7 @@ func (evi *Evidence) MapMods() {
 					updatedMod.IsobaricMods[obo.Name] = obo.MonoIsotopicMass
 					evi.PSM[i].Modifications.Index[k] = updatedMod
 				}
-				break
+				//break
 			}
 		}
 	}

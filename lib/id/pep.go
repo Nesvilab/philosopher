@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
-	"os"
 	"path"
 	"path/filepath"
 	"sort"
@@ -21,7 +20,6 @@ import (
 	"philosopher/lib/spc"
 	"philosopher/lib/sys"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
@@ -174,7 +172,7 @@ func (p *PepXML) Read(f string) {
 					Index:            key,
 					Type:             "Assigned",
 					MonoIsotopicMass: i.Mass,
-					MassDiff:         i.MassDiff,
+					MassDiff:         uti.ToFixed(i.MassDiff, 4),
 					Variable:         string(i.Variable),
 					AminoAcid:        string(i.AminoAcid),
 					IsobaricMods:     make(map[string]float64),
@@ -196,7 +194,7 @@ func (p *PepXML) Read(f string) {
 					Index:             key,
 					Type:              "Assigned",
 					MonoIsotopicMass:  i.Mass,
-					MassDiff:          i.MassDiff,
+					MassDiff:          uti.ToFixed(i.MassDiff, 4),
 					Variable:          string(i.Variable),
 					AminoAcid:         fmt.Sprintf("%s-term", i.Terminus),
 					IsProteinTerminus: string(i.ProteinTerminus),
@@ -237,10 +235,6 @@ func (p *PepXML) Read(f string) {
 			msg.NoPSMFound(errors.New(f), "warning")
 		}
 
-	} else {
-
-		spew.Dump(p)
-		os.Exit(1)
 	}
 }
 
