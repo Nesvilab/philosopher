@@ -410,7 +410,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 		line += fmt.Sprintf("%d\t", i.Length)
 
-		line += fmt.Sprintf("%d\t", int(i.Coverage))
+		line += fmt.Sprintf("%.2f\t", i.Coverage)
 
 		line += fmt.Sprintf("%s\t", i.Organism)
 
