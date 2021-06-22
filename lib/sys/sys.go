@@ -246,6 +246,12 @@ func MODBin() string {
 	return p
 }
 
+// RazorBin file
+func RazorBin() string {
+	p := fmt.Sprintf("%s%srazor.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
 // MetaDir dir
 func MetaDir() string {
 	return ".meta"

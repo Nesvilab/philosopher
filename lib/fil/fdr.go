@@ -14,16 +14,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// RazorCandidate is a peptide sequence to be evaluated as a razor
-type RazorCandidate struct {
-	Sequence          string
-	MappedProteinsW   map[string]float64
-	MappedProteinsGW  map[string]float64
-	MappedProteinsTNP map[string]int
-	MappedproteinsSID map[string]string
-	MappedProtein     string
-}
-
 // PepXMLFDRFilter processes and calculates the FDR at the PSM, Ion or Peptide level
 func PepXMLFDRFilter(input map[string]id.PepIDList, targetFDR float64, level, decoyTag string) (id.PepIDList, float64) {
 
@@ -220,7 +210,7 @@ type RazorCandidateMap map[string]RazorCandidate
 // RazorFilter classifies peptides as razor
 func RazorFilter(p id.ProtXML) id.ProtXML {
 
-	var r = make(map[string]RazorCandidate)
+	var r RazorMap = make(map[string]RazorCandidate)
 	var rList []string
 
 	// for each peptide sequence, collapse all parent protein peptides from ions originated from the same sequence
@@ -350,13 +340,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 							topTNPMap[topTNP]++
 						}
 					}
-					// for pt, tnp := range r[k].MappedProteinsTNP {
-					// 	if tnp >= topTNP {
-					// 		topTNP = tnp
-					// 		topPT = pt
-					// 		topTNPMap[topTNP]++
-					// 	}
-					// }
 
 					var tie bool
 					if topTNPMap[topTNP] >= 2 {
@@ -381,14 +364,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						razorPair[k] = topPT
 
 					} else {
-
-						// for pt, tnp := range r[k].MappedProteinsW {
-						// 	if tnp >= topGW {
-						// 		topGW = tnp
-						// 		topPT = pt
-						// 		topGWMap[topGW]++
-						// 	}
-						// }
 
 						var idList []string
 						for _, id := range r[k].MappedproteinsSID {
@@ -416,8 +391,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 			razor := r[k]
 			razor.MappedProtein = pt
 			r[k] = razor
-			//spew.Dump(r[k])
-			//fmt.Println(r[k].Sequence, "\t", r[k].MappedProtein)
 		}
 	}
 
@@ -455,6 +428,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
 	}
+
+	r.Serialize()
 
 	return p
 }
@@ -684,14 +659,39 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	}).Info("Second filtering results")
 
 	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM = correctRazorAssignment(filteredPSM)
 	filteredPSM.Serialize("psm")
 
 	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides = correctRazorAssignment(filteredPeptides)
 	filteredPeptides.Serialize("pep")
 
 	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons = correctRazorAssignment(filteredIons)
 	filteredIons.Serialize("ion")
 
+}
+
+// correctRazorAssignment updates the razor assignment for the PSMs recovered from the 2D filter
+func correctRazorAssignment(list id.PepIDList) id.PepIDList {
+
+	var rm RazorMap = make(map[string]RazorCandidate)
+	rm.Restore()
+
+	for i := range list {
+		v, ok := rm[list[i].Peptide]
+		if ok {
+			if list[i].Protein != v.MappedProtein {
+
+				list[i].AlternativeProteinsIndexed[list[i].Protein]++
+				delete(list[i].AlternativeProteinsIndexed, v.MappedProtein)
+
+				list[i].Protein = v.MappedProtein
+			}
+		}
+	}
+
+	return list
 }
 
 // mirrorProteinList takes a filtered list and regenerate the correspondedn decoys

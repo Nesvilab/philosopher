@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"philosopher/lib/dat"
+	"philosopher/lib/fil"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
@@ -99,6 +100,18 @@ var inspectCmd = &cobra.Command{
 			var o mod.Modifications
 
 			target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			e := dec.Decode(&o)
+			if e != nil {
+				msg.DecodeMsgPck(e, "fatal")
+			}
+			spew.Dump(o)
+		case "razor":
+			var o fil.RazorMap
+
+			target := fmt.Sprintf(".meta%srazor.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
