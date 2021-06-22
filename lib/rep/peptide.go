@@ -116,9 +116,6 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 			}
 		}
 
-		pep.Spc = len(spectra[k])
-		pep.Intensity = pepInt[k]
-
 		// is this a decoy ?
 		pep.IsDecoy = v
 
@@ -157,7 +154,7 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 		}
 	}
 
-	header = "Peptide\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -264,8 +261,10 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 		sort.Strings(obs)
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Sequence),
 			strings.Join(cs, ", "),
 			i.Probability,

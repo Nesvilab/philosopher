@@ -46,8 +46,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Spectrum = i.Spectrum
 		p.SpectrumFile = i.SpectrumFile
 		p.Scan = i.Scan
-		p.PrevAA = i.PrevAA
-		p.NextAA = i.NextAA
+		p.PrevAA = ""
+		p.NextAA = ""
 		p.NumberOfEnzymaticTermini = int(i.NumberOfEnzymaticTermini)
 		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
@@ -177,7 +177,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	sort.Strings(modList)
 
-	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
+	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPrev AA\tNext AA\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
 
 	if isComet {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
@@ -299,11 +299,13 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.SpectrumFile,
 			i.Peptide,
 			i.ModifiedPeptide,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Peptide),
 			i.AssumedCharge,
 			i.RetentionTime,

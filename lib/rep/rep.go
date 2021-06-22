@@ -183,6 +183,8 @@ type IonEvidence struct {
 	RetentionTime            string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
+	PrevAA                   string
+	NextAA                   string
 	Spectra                  map[string]int
 	MappedProteins           map[string]int
 	MappedGenes              map[string]int
@@ -226,6 +228,8 @@ type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
 	Spectra                map[string]uint8
+	PrevAA                 string
+	NextAA                 string
 	Protein                string
 	ProteinID              string
 	GeneName               string

@@ -134,7 +134,7 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -235,9 +235,11 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Sequence),
 			i.MZ,
 			i.ChargeState,

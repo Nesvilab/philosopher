@@ -253,6 +253,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var geneMap = make(map[string]string)
 	var descriptionMap = make(map[string]string)
 	var sequenceMap = make(map[string]string)
+	var pepPrevAA = make(map[string]string)
+	var pepNextAA = make(map[string]string)
 
 	for _, j := range dtb.Records {
 		if !j.IsDecoy {
@@ -287,8 +289,22 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		re := regexp.MustCompile(evi.PSM[i].Peptide)
 		reMatch := re.FindStringIndex(sequenceMap[id])
 		if len(reMatch) > 0 {
+
 			evi.PSM[i].ProteinStart = reMatch[0]
 			evi.PSM[i].ProteinEnd = reMatch[1]
+
+			if (reMatch[0]) <= 0 {
+				evi.PSM[i].PrevAA = string(sequenceMap[id][0])
+			} else {
+				evi.PSM[i].PrevAA = string(sequenceMap[id][reMatch[0]-1])
+			}
+
+			if (reMatch[1] + 1) >= len(sequenceMap[id]) {
+				evi.PSM[i].NextAA = string(sequenceMap[id][len(sequenceMap[id])-1])
+			} else {
+				evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
+			}
+
 		} else {
 
 			var peptide string
@@ -305,8 +321,23 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			if len(reMatch) > 0 {
 				evi.PSM[i].ProteinStart = reMatch[0]
 				evi.PSM[i].ProteinEnd = reMatch[1]
+
+				if (reMatch[0]) <= 0 {
+					evi.PSM[i].PrevAA = string(sequenceMap[id][0])
+				} else {
+					evi.PSM[i].PrevAA = string(sequenceMap[id][reMatch[0]-1])
+				}
+
+				if (reMatch[1] + 1) >= len(sequenceMap[id]) {
+					evi.PSM[i].NextAA = string(sequenceMap[id][len(sequenceMap[id])-1])
+				} else {
+					evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
+				}
 			}
 		}
+
+		pepPrevAA[evi.PSM[i].Peptide] = evi.PSM[i].PrevAA
+		pepNextAA[evi.PSM[i].Peptide] = evi.PSM[i].NextAA
 	}
 
 	for i := range evi.Ions {
@@ -327,6 +358,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Ions[i].MappedGenes[geneMap[k]] = 0
 			}
 		}
+
+		evi.Ions[i].PrevAA = pepPrevAA[evi.Ions[i].Sequence]
+		evi.Ions[i].NextAA = pepNextAA[evi.Ions[i].Sequence]
 	}
 
 	for i := range evi.Peptides {
@@ -347,6 +381,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Peptides[i].MappedGenes[geneMap[k]] = 0
 			}
 		}
+
+		evi.Peptides[i].PrevAA = pepPrevAA[evi.Peptides[i].Sequence]
+		evi.Peptides[i].NextAA = pepNextAA[evi.Peptides[i].Sequence]
 	}
 
 }
