@@ -192,6 +192,13 @@ func (p *MsData) Read(f string) {
 	var xml psi.IndexedMzML
 	xml.Parse(f)
 
+	if xml.MzML.SoftwareList.Software[0].ID == "pwiz" {
+		version, _ := strconv.Atoi(strings.Replace(xml.MzML.SoftwareList.Software[0].Version, ".", "", -1))
+		if version <= 3019127 {
+			msg.Custom(errors.New("the pwiz version used to convert this file is not supported, or deprecated. Please update your pwiz and convert the raw files again"), "warning")
+		}
+	}
+
 	p.FileName = f
 
 	var spectra Spectra
