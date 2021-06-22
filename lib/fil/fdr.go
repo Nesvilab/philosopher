@@ -289,6 +289,10 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 		for pt, w := range r[k].MappedProteinsW {
 			if w > 0.5 {
 				razorPair[k] = pt
+			} else if w == 0 {
+				delete(r[k].MappedProteinsGW, pt)
+				delete(r[k].MappedProteinsTNP, pt)
+				delete(r[k].MappedproteinsSID, pt)
 			}
 		}
 	}
@@ -377,6 +381,14 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						razorPair[k] = topPT
 
 					} else {
+
+						// for pt, tnp := range r[k].MappedProteinsW {
+						// 	if tnp >= topGW {
+						// 		topGW = tnp
+						// 		topPT = pt
+						// 		topGWMap[topGW]++
+						// 	}
+						// }
 
 						var idList []string
 						for _, id := range r[k].MappedproteinsSID {
