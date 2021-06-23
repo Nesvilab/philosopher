@@ -80,25 +80,22 @@ func Run(f met.Data) met.Data {
 
 	}
 
+	pepxml.Restore()
+	pro.Restore()
+
 	if f.Filter.Seq {
 
 		// sequential analysis
 		// filtered psm list and filtered prot list
 		pep.Restore("psm")
-		pro.Restore()
 		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
 		pep = nil
-		pro = nil
 
 	} else if f.Filter.TwoD {
 
 		// two-dimensional analysis
 		// complete pep list and filtered mirror-image prot list
-		pepxml.Restore()
-		pro.Restore()
 		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-		pepxml = id.PepXML{}
-		pro = nil
 
 	}
 
@@ -111,12 +108,10 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Post processing identifications")
 
 	// restoring for the modifications
-	var pxml id.PepXML
-	pxml.Restore()
-
-	e.Mods = pxml.Modifications
-	e.AssembleSearchParameters(pxml.SearchParameters)
-	pxml = id.PepXML{}
+	e.Mods = pepxml.Modifications
+	e.AssembleSearchParameters(pepxml.SearchParameters)
+	pepxml = id.PepXML{}
+	os.RemoveAll(sys.PepxmlBin())
 
 	var psm id.PepIDList
 	psm.Restore("psm")
@@ -133,7 +128,6 @@ func Run(f met.Data) met.Data {
 		logrus.Info("Mapping modifications")
 		//should include observed mods into mapping?
 		e.MapMods()
-
 	}
 
 	var pept id.PepIDList
@@ -157,7 +151,6 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
-
 	}
 
 	logrus.Info("Assigning protein identifications to layers")
@@ -698,7 +691,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 	pid := ProtXMLFilter(proXML, ptFDR, pepProb, protProb, false, true, decoyTag)
 
 	// save results on meta folder
-	proXML.Serialize()
 	pid.Serialize()
 
 }

@@ -14,7 +14,6 @@ import (
 	"philosopher/lib/id"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // AssembleProteinReport creates the post processed protein strcuture
@@ -525,9 +524,9 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 }
 
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
-func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
+func (evi *Evidence) ProteinFastaReport(workspace string, hasDecoys bool) {
 
-	output := fmt.Sprintf("%s%sprotein.fas", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sprotein.fas", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {

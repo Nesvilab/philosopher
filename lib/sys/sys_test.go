@@ -24,14 +24,9 @@ func TestSysMeta(t *testing.T) {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PepxmlBin())
 	}
 
-	p = fmt.Sprintf("%s%sprotxml.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.ProtxmlBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.ProtxmlBin())
-	}
-
 	p = fmt.Sprintf("%s%spsm.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.PsmBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PsmBin())
+	if p != sys.PSMBin() {
+		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.PSMBin())
 	}
 
 	p = fmt.Sprintf("%s%spep.bin", sys.MetaDir(), string(filepath.Separator))
@@ -49,54 +44,9 @@ func TestSysMeta(t *testing.T) {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.ProBin())
 	}
 
-	p = fmt.Sprintf("%s%sev.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.EvBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvBin())
-	}
-
-	p = fmt.Sprintf("%s%sev.meta.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.EvMetaBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvMetaBin())
-	}
-
-	p = fmt.Sprintf("%s%sev.pep.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.EvPeptideBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvPeptideBin())
-	}
-
-	p = fmt.Sprintf("%s%sev.pro.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.EvProteinBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvProteinBin())
-	}
-
-	// p = fmt.Sprintf("%s%sev.mod.bin", sys.MetaDir(), string(filepath.Separator))
-	// if p != sys.EvModificationsBin() {
-	// 	t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvModificationsBin())
-	// }
-
-	// p = fmt.Sprintf("%s%sev.mev.bin", sys.MetaDir(), string(filepath.Separator))
-	// if p != sys.EvModificationsEvBin() {
-	// 	t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvModificationsEvBin())
-	// }
-
-	// p = fmt.Sprintf("%s%sev.com.bin", sys.MetaDir(), string(filepath.Separator))
-	// if p != sys.EvCombinedBin() {
-	// 	t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvCombinedBin())
-	// }
-
-	p = fmt.Sprintf("%s%sev.ion.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.EvIonBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.EvIonBin())
-	}
-
 	p = fmt.Sprintf("%s%sdb.bin", sys.MetaDir(), string(filepath.Separator))
 	if p != sys.DBBin() {
 		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.DBBin())
-	}
-
-	p = fmt.Sprintf("%s%smod.bin", sys.MetaDir(), string(filepath.Separator))
-	if p != sys.MODBin() {
-		t.Errorf("Meta path or name is incorrect, got %s, want %s", p, sys.MODBin())
 	}
 }
 

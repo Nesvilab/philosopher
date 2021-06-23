@@ -180,25 +180,23 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	logrus.Info("Saving")
 
 	// create EV PSM
-	rep.SerializeEVPSM(&evi)
+	//rep.SerializeEVPSM(&evi)
+	rep.SerializePSM(&evi.PSM)
 
-	// create EV Ion
-	rep.SerializeEVIon(&evi)
+	// create Ion
+	rep.SerializeIon(&evi.Ions)
 
-	// create EV Peptides
-	rep.SerializeEVPeptides(&evi)
+	// create Peptides
+	rep.SerializePeptides(&evi.Peptides)
 
-	// create EV Ion
-	rep.SerializeEVProteins(&evi)
+	// create Ion
+	rep.SerializeProteins(&evi.Proteins)
 
 	return p
 }
 
 // RunBioQuantification is the top function for functional-based quantification
 func RunBioQuantification(c met.Data) {
-
-	// create clean reference db for clustering
-	//clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")

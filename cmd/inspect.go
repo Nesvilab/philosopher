@@ -47,22 +47,10 @@ var inspectCmd = &cobra.Command{
 			} else {
 				spew.Dump(o)
 			}
-		case "parameters":
-			var o rep.SearchParametersEvidence
-
-			target := fmt.Sprintf(".meta%sev.param.bin", string(filepath.Separator))
-			file, _ := os.Open(target)
-
-			dec := msgpack.NewDecoder(file)
-			e := dec.Decode(&o)
-			if e != nil {
-				msg.DecodeMsgPck(e, "fatal")
-			}
-			spew.Dump(o)
 		case "psm":
 			var o rep.PSMEvidenceList
 
-			target := fmt.Sprintf(".meta%sev.psm.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%spsm.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -95,18 +83,6 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Intensities)
-		case "mod":
-			// var o mod.Modifications
-
-			// target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
-			// file, _ := os.Open(target)
-
-			// dec := msgpack.NewDecoder(file)
-			// e := dec.Decode(&o)
-			// if e != nil {
-			// 	msg.DecodeMsgPck(e, "fatal")
-			// }
-			// spew.Dump(o)
 		case "razor":
 			var o fil.RazorMap
 
@@ -122,7 +98,7 @@ var inspectCmd = &cobra.Command{
 		case "protein":
 			var o rep.ProteinEvidenceList
 
-			target := fmt.Sprintf(".meta%sev.pro.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%spro.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)

@@ -574,9 +574,9 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
-		if _, err := os.Stat(sys.IsoBin()); err == nil {
-			return meta
-		}
+		// if _, err := os.Stat(sys.IsoBin()); err == nil {
+		// 	return meta
+		// }
 
 		logrus.Info("Executing label-based quantification on ", i)
 

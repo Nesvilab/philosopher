@@ -132,14 +132,8 @@ func PepxmlBin() string {
 	return p
 }
 
-// ProtxmlBin file
-func ProtxmlBin() string {
-	p := fmt.Sprintf("%s%sprotxml.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// PsmBin file
-func PsmBin() string {
+// PSMBin file
+func PSMBin() string {
 	p := fmt.Sprintf("%s%spsm.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
@@ -162,66 +156,6 @@ func ProBin() string {
 	return p
 }
 
-// EvBin file
-func EvBin() string {
-	p := fmt.Sprintf("%s%sev.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvParameterBin file
-// func EvParameterBin() string {
-// 	p := fmt.Sprintf("%s%sev.param.bin", MetaDir(), string(filepath.Separator))
-// 	return p
-// }
-
-// EvMetaBin file
-func EvMetaBin() string {
-	p := fmt.Sprintf("%s%sev.meta.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvPSMBin file
-func EvPSMBin() string {
-	p := fmt.Sprintf("%s%sev.psm.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvPeptideBin file
-func EvPeptideBin() string {
-	p := fmt.Sprintf("%s%sev.pep.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvProteinBin file
-func EvProteinBin() string {
-	p := fmt.Sprintf("%s%sev.pro.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvModificationsBin file
-// func EvModificationsBin() string {
-// 	p := fmt.Sprintf("%s%sev.mod.bin", MetaDir(), string(filepath.Separator))
-// 	return p
-// }
-
-// EvModificationsEvBin file
-// func EvModificationsEvBin() string {
-// 	p := fmt.Sprintf("%s%sev.mev.bin", MetaDir(), string(filepath.Separator))
-// 	return p
-// }
-
-// EvCombinedBin file
-// func EvCombinedBin() string {
-// 	p := fmt.Sprintf("%s%sev.com.bin", MetaDir(), string(filepath.Separator))
-// 	return p
-// }
-
-// EvIonBin file
-func EvIonBin() string {
-	p := fmt.Sprintf("%s%sev.ion.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
 // DBBin file
 func DBBin() string {
 	p := fmt.Sprintf("%s%sdb.bin", MetaDir(), string(filepath.Separator))
@@ -231,18 +165,6 @@ func DBBin() string {
 // LFQBin file
 func LFQBin() string {
 	p := fmt.Sprintf("%s%slfq.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// IsoBin file
-func IsoBin() string {
-	p := fmt.Sprintf("%s%siso.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// MODBin file
-func MODBin() string {
-	p := fmt.Sprintf("%s%smod.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
 

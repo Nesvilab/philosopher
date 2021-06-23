@@ -24,19 +24,11 @@ var filterCmd = &cobra.Command{
 		msg.Executing("Filter ", Version)
 
 		// clean, clean, clean
-		os.RemoveAll(sys.EvBin())
-		os.RemoveAll(sys.EvIonBin())
-		//os.RemoveAll(sys.EvModificationsBin())
-		//os.RemoveAll(sys.EvModificationsEvBin())
-		os.RemoveAll(sys.EvPSMBin())
-		os.RemoveAll(sys.EvPeptideBin())
-		os.RemoveAll(sys.EvProteinBin())
-		os.RemoveAll(sys.PsmBin())
-		os.RemoveAll(sys.IonBin())
+		os.RemoveAll(sys.PSMBin())
 		os.RemoveAll(sys.PepBin())
-		os.RemoveAll(sys.PepxmlBin())
+		os.RemoveAll(sys.IonBin())
 		os.RemoveAll(sys.ProBin())
-		os.RemoveAll(sys.ProtxmlBin())
+		os.RemoveAll(sys.PepxmlBin())
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {

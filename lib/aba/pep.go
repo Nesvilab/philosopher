@@ -27,7 +27,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	var names []string
 	//var xmlFiles []string
-	var datasets = make(map[string]rep.Evidence)
+	var datasets = make(map[string]rep.PSMEvidenceList)
 	var labelList []DataSetLabelNames
 
 	// restoring combined file
@@ -45,8 +45,8 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		os.Chdir(i)
 
 		// restoring the PSMs
-		var psm rep.Evidence
-		rep.RestoreEVPSM(&psm)
+		var evi rep.Evidence
+		rep.RestorePSM(&evi.PSM)
 
 		var labels DataSetLabelNames
 		labels.LabelName = make(map[string]string)
@@ -81,7 +81,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
-		datasets[prjName] = psm
+		datasets[prjName] = evi.PSM
 		names = append(names, prjName)
 	}
 
@@ -130,7 +130,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 }
 
 // collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
-func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, decoyTag string) rep.CombinedPeptideEvidenceList {
+func collectPeptideDatafromExperiments(datasets map[string]rep.PSMEvidenceList, decoyTag string) rep.CombinedPeptideEvidenceList {
 
 	var pep id.PepIDList
 	pep.Restore("pep")
@@ -156,7 +156,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, decoyTa
 }
 
 // SummarizeAttributes collects spectral counts and intensities from the individual data sets for the combined peptide report
-func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, local string) rep.CombinedPeptideEvidenceList {
+func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, local string) rep.CombinedPeptideEvidenceList {
 
 	var chargeMap = make(map[string][]uint8)
 	var bestPSM = make(map[string]float64)
@@ -257,7 +257,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 }
 
 // savePeptideAbacusResult creates a single report using 1 or more philosopher result files
-func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_peptide.tsv", session, string(filepath.Separator))

@@ -763,30 +763,6 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 }
 
-// tdclassifier identifies a PSM as target or Decoy based on the
-// presence of the TAG string on <protein> and <alternative_proteins>
-// func tdclassifier(p PeptideIdentification, tag string) bool {
-
-// 	// default for TRUE ( DECOY)
-// 	//var class = true
-// 	var class bool
-
-// 	if strings.HasPrefix(string(p.Protein), tag) {
-// 		class = true
-// 	} else {
-// 		class = false
-// 	}
-
-// 	for i := range p.AlternativeProteins {
-// 		if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
-// 			class = false
-// 			break
-// 		}
-// 	}
-
-// 	return class
-// }
-
 // Serialize converts the whle structure to a gob file
 func (p *PepXML) Serialize() {
 
@@ -823,7 +799,7 @@ func (p *PepIDList) Serialize(level string) {
 	var dest string
 
 	if level == "psm" {
-		dest = sys.PsmBin()
+		dest = sys.PSMBin()
 	} else if level == "pep" {
 		dest = sys.PepBin()
 	} else if level == "ion" {
@@ -850,7 +826,7 @@ func (p *PepIDList) Restore(level string) {
 	var dest string
 
 	if level == "psm" {
-		dest = sys.PsmBin()
+		dest = sys.PSMBin()
 	} else if level == "pep" {
 		dest = sys.PepBin()
 	} else if level == "ion" {

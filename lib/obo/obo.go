@@ -3,7 +3,6 @@ package obo
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,8 +15,6 @@ import (
 	"philosopher/lib/met"
 	unmd "philosopher/lib/obo/unimod"
 	"philosopher/lib/sys"
-
-	"github.com/vmihailenco/msgpack"
 )
 
 // DataFormat defines different data type from PSI
@@ -176,36 +173,6 @@ func (m *Onto) Parse() {
 	if e := scanner.Err(); e != nil {
 		log.Fatal(e)
 	}
-}
-
-// Serialize UniMod data structure
-func (m Onto) Serialize() {
-
-	b, e := msgpack.Marshal(&m)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-
-}
-
-// Restore reads philosopher results files and restore the data sctructure
-func (m *Onto) Restore() {
-
-	b, e := ioutil.ReadFile(sys.MODBin())
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-
-	e = msgpack.Unmarshal(b, &m)
-	if e != nil {
-		msg.DecodeMsgPck(e, "fatal")
-	}
-
 }
 
 func splitAndCollect(s string, target string) string {
