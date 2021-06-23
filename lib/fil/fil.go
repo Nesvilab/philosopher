@@ -3,9 +3,7 @@ package fil
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -59,7 +57,7 @@ func Run(f met.Data) met.Data {
 	} else if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
 
 		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
-		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, f.Filter.Fo, false, f.Filter.Tag)
+		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
 
 	} else {
 
@@ -424,7 +422,7 @@ func ReadProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 // ProcessProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, fo, isCombined bool, decoyTag string) string {
+func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, isCombined bool, decoyTag string) string {
 
 	var pid id.ProtIDList
 
@@ -447,38 +445,6 @@ func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 
 	// run the FDR filter for proteins
 	pid = ProtXMLFilter(p, ptFDR, pepProb, protProb, isPicked, isRazor, decoyTag)
-
-	if fo {
-		output := fmt.Sprintf("%s%spep_pro_mappings.tsv", sys.MetaDir(), string(filepath.Separator))
-
-		file, e := os.Create(output)
-		if e != nil {
-			msg.WriteFile(e, "fatal")
-		}
-		defer file.Close()
-
-		for _, i := range pid {
-			if !strings.HasPrefix(i.ProteinName, decoyTag) {
-
-				var line []string
-
-				line = append(line, i.ProteinName)
-
-				for _, j := range i.PeptideIons {
-					if j.Razor == 1 {
-						line = append(line, j.PeptideSequence)
-					}
-				}
-
-				mapping := strings.Join(line, "\t")
-				_, e = io.WriteString(file, mapping)
-				if e != nil {
-					msg.WriteToFile(e, "fatal")
-				}
-
-			}
-		}
-	}
 
 	// save results on meta folder
 	if isCombined {

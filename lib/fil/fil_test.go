@@ -345,7 +345,7 @@ func Test_readProtXMLInput(t *testing.T) {
 	}
 	for _, tt := range test3 {
 		t.Run(tt.name, func(t *testing.T) {
-			ProcessProteinIdentifications(proXML, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, tt.args.fo, false, tt.args.decoyTag)
+			ProcessProteinIdentifications(proXML, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, false, tt.args.decoyTag)
 		})
 	}
 }

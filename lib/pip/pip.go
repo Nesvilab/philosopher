@@ -506,7 +506,7 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 	p.Abacus.Razor = p.Filter.Razor
 
 	protXML := fil.ReadProtXMLInput("combined.prot.xml", p.DatabaseSearch.DecoyTag, p.Filter.Weight)
-	proBin := fil.ProcessProteinIdentifications(protXML, p.Filter.PtFDR, p.Filter.PepFDR, p.Filter.ProtProb, p.Abacus.Picked, p.Abacus.Razor, p.Filter.Fo, true, p.DatabaseSearch.DecoyTag)
+	proBin := fil.ProcessProteinIdentifications(protXML, p.Filter.PtFDR, p.Filter.PepFDR, p.Filter.ProtProb, p.Abacus.Picked, p.Abacus.Razor, true, p.DatabaseSearch.DecoyTag)
 
 	for _, i := range data {
 		dest := fmt.Sprintf("%s%s.meta%spro.bin", i, string(filepath.Separator), string(filepath.Separator))

@@ -294,13 +294,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			evi.PSM[i].ProteinEnd = reMatch[1]
 
 			if (reMatch[0]) <= 0 {
-				evi.PSM[i].PrevAA = string(sequenceMap[id][0])
+				evi.PSM[i].PrevAA = "-"
 			} else {
 				evi.PSM[i].PrevAA = string(sequenceMap[id][reMatch[0]-1])
 			}
 
 			if (reMatch[1] + 1) >= len(sequenceMap[id]) {
-				evi.PSM[i].NextAA = string(sequenceMap[id][len(sequenceMap[id])-1])
+				evi.PSM[i].NextAA = "-"
 			} else {
 				evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
 			}
@@ -323,13 +323,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.PSM[i].ProteinEnd = reMatch[1]
 
 				if (reMatch[0]) <= 0 {
-					evi.PSM[i].PrevAA = string(sequenceMap[id][0])
+					evi.PSM[i].PrevAA = "-"
 				} else {
 					evi.PSM[i].PrevAA = string(sequenceMap[id][reMatch[0]-1])
 				}
 
 				if (reMatch[1] + 1) >= len(sequenceMap[id]) {
-					evi.PSM[i].NextAA = string(sequenceMap[id][len(sequenceMap[id])-1])
+					evi.PSM[i].NextAA = "-"
 				} else {
 					evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
 				}
