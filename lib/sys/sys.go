@@ -169,10 +169,10 @@ func EvBin() string {
 }
 
 // EvParameterBin file
-func EvParameterBin() string {
-	p := fmt.Sprintf("%s%sev.param.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
+// func EvParameterBin() string {
+// 	p := fmt.Sprintf("%s%sev.param.bin", MetaDir(), string(filepath.Separator))
+// 	return p
+// }
 
 // EvMetaBin file
 func EvMetaBin() string {
@@ -199,22 +199,22 @@ func EvProteinBin() string {
 }
 
 // EvModificationsBin file
-func EvModificationsBin() string {
-	p := fmt.Sprintf("%s%sev.mod.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
+// func EvModificationsBin() string {
+// 	p := fmt.Sprintf("%s%sev.mod.bin", MetaDir(), string(filepath.Separator))
+// 	return p
+// }
 
 // EvModificationsEvBin file
-func EvModificationsEvBin() string {
-	p := fmt.Sprintf("%s%sev.mev.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
+// func EvModificationsEvBin() string {
+// 	p := fmt.Sprintf("%s%sev.mev.bin", MetaDir(), string(filepath.Separator))
+// 	return p
+// }
 
 // EvCombinedBin file
-func EvCombinedBin() string {
-	p := fmt.Sprintf("%s%sev.com.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
+// func EvCombinedBin() string {
+// 	p := fmt.Sprintf("%s%sev.com.bin", MetaDir(), string(filepath.Separator))
+// 	return p
+// }
 
 // EvIonBin file
 func EvIonBin() string {

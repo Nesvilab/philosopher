@@ -10,7 +10,6 @@ import (
 	"philosopher/lib/dat"
 	"philosopher/lib/fil"
 	"philosopher/lib/met"
-	"philosopher/lib/mod"
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
@@ -97,17 +96,17 @@ var inspectCmd = &cobra.Command{
 			}
 			spew.Dump(o.Intensities)
 		case "mod":
-			var o mod.Modifications
+			// var o mod.Modifications
 
-			target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
-			file, _ := os.Open(target)
+			// target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
+			// file, _ := os.Open(target)
 
-			dec := msgpack.NewDecoder(file)
-			e := dec.Decode(&o)
-			if e != nil {
-				msg.DecodeMsgPck(e, "fatal")
-			}
-			spew.Dump(o)
+			// dec := msgpack.NewDecoder(file)
+			// e := dec.Decode(&o)
+			// if e != nil {
+			// 	msg.DecodeMsgPck(e, "fatal")
+			// }
+			// spew.Dump(o)
 		case "razor":
 			var o fil.RazorMap
 

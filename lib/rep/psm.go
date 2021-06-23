@@ -17,7 +17,6 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
-	"philosopher/lib/sys"
 )
 
 // AssemblePSMReport creates the PSM structure for reporting
@@ -131,13 +130,13 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
+func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
 
 	var header string
 	var modMap = make(map[string]string)
 	var modList []string
 
-	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -478,15 +477,12 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			msg.WriteToFile(e, "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
 }
 
 // PSMLocalizationReport report ptm localization based on PTMProphet outputs
-func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMLocalizationReport(workspace, decoyTag string, hasRazor, hasDecoys bool) {
 
-	output := fmt.Sprintf("%s%slocalization.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%slocalization.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -530,7 +526,4 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 			}
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
 }

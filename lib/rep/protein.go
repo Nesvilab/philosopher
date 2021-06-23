@@ -231,10 +231,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
+func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sprotein.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -522,10 +522,6 @@ func (evi Evidence) MetaProteinReport(brand string, channels int, hasDecoys, has
 		}
 
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
 }
 
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
@@ -559,8 +555,4 @@ func (evi *Evidence) ProteinFastaReport(hasDecoys bool) {
 			msg.WriteToFile(e, "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
 }

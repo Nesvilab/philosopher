@@ -10,14 +10,13 @@ import (
 
 	"philosopher/lib/bio"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool) {
+func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -167,8 +166,4 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 			msg.WriteToFile(errors.New("cannot write to MSstats report"), "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
 }

@@ -14,7 +14,6 @@ import (
 	"philosopher/lib/id"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // AssemblePeptideReport reports consist on ion reporting
@@ -128,10 +127,10 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPeptideReport report consist on ion reporting
-func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
@@ -372,7 +371,4 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 			msg.WriteToFile(errors.New("cannot print Peptides to file"), "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
 }

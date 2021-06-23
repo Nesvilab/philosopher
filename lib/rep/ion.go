@@ -15,7 +15,6 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/mod"
-	"philosopher/lib/sys"
 	"philosopher/lib/uti"
 )
 
@@ -108,10 +107,10 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 }
 
 // MetaIonReport reports consist on ion reporting
-func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
@@ -350,8 +349,5 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 			msg.WriteToFile(errors.New("cannot print Ions to file"), "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
 
 }

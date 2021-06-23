@@ -427,36 +427,29 @@ func Run(m met.Data) {
 		hasLabels = true
 	}
 
-	// // get the labels from the annotation file
-	// if len(m.Quantify.Annot) > 0 {
-	// 	annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
-	// 	annotfile, _ = filepath.Abs(annotfile)
-	// 	labels = uti.GetLabelNames(annotfile)
-	// }
-
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
+	repo.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
 
 	// Ion
-	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	repo.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Peptide
-	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	repo.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
-		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repo.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repo.ProteinFastaReport(m.Report.Decoys)
 	}
 
 	// Modifications
 	if len(repo.Modifications.MassBins) > 0 {
-		repo.ModificationReport()
+		repo.ModificationReport(m.Home)
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
-			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
+			repo.PSMLocalizationReport(m.Home, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
 		}
 
 		repo.PlotMassHist()
@@ -464,7 +457,7 @@ func Run(m met.Data) {
 
 	// MSstats
 	if m.Report.MSstats {
-		repo.MetaMSstatsReport(isoBrand, isoChannels, m.Report.Decoys)
+		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys)
 	}
 
 	// MzID

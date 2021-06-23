@@ -24,14 +24,9 @@ func (evi *Evidence) MapMods() {
 
 	o := obo.NewUniModOntology()
 
-	// for _, i := range evi.PSM {
-	// 	modMap[i.Massdiff] = obo.Term{}
-	// }
-
 	for _, i := range evi.PSM {
 		for _, j := range i.Modifications.Index {
 			modMap[j.MassDiff] = obo.Term{}
-			//modMap[i.Massdiff] = obo.Term{}
 		}
 	}
 
@@ -87,7 +82,6 @@ func (evi *Evidence) MapMods() {
 					updatedMod.IsobaricMods[obo.Name] = obo.MonoIsotopicMass
 					evi.PSM[i].Modifications.Index[k] = updatedMod
 				}
-				//break
 			}
 		}
 	}
@@ -197,10 +191,10 @@ func (evi *Evidence) AssembleModificationReport() {
 }
 
 // ModificationReport ...
-func (evi *Evidence) ModificationReport() {
+func (evi *Evidence) ModificationReport(workspace string) {
 
 	// create result file
-	output := fmt.Sprintf("%s%smodifications.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%smodifications.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -231,9 +225,6 @@ func (evi *Evidence) ModificationReport() {
 		}
 
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
 }
 
 // PlotMassHist plots the delta mass histogram

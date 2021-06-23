@@ -30,7 +30,7 @@ func (evi *Evidence) Serialize() {
 func (evi *Evidence) SerializeGranular() {
 
 	// create EV Parameters
-	SerializeEVParameters(evi)
+	//SerializeEVParameters(evi)
 
 	// create EV PSM
 	SerializeEVPSM(evi)
@@ -45,30 +45,30 @@ func (evi *Evidence) SerializeGranular() {
 	SerializeEVProteins(evi)
 
 	// create EV Mods
-	SerializeEVMods(evi)
+	//SerializeEVMods(evi)
 
 	// create EV Modifications
-	SerializeEVModifications(evi)
+	//SerializeEVModifications(evi)
 
 	// create EV Combined
-	SerializeEVCombined(evi)
+	//SerializeEVCombined(evi)
 
 }
 
 // SerializeEVParameters creates an ev serial with Parameter data
-func SerializeEVParameters(evi *Evidence) {
+// func SerializeEVParameters(evi *Evidence) {
 
-	b, e := msgpack.Marshal(&evi.Parameters)
-	if e != nil {
-		logrus.Trace("Cannot marshal Parameters data:", e)
-	}
+// 	b, e := msgpack.Marshal(&evi.Parameters)
+// 	if e != nil {
+// 		logrus.Trace("Cannot marshal Parameters data:", e)
+// 	}
 
-	e = ioutil.WriteFile(sys.EvParameterBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize Parameters data:", e)
-	}
+// 	e = ioutil.WriteFile(sys.EvParameterBin(), b, sys.FilePermission())
+// 	if e != nil {
+// 		logrus.Trace("Cannot serialize Parameters data:", e)
+// 	}
 
-}
+// }
 
 // SerializeEVPSM creates an ev serial with Evidence data
 func SerializeEVPSM(evi *Evidence) {
@@ -130,49 +130,49 @@ func SerializeEVProteins(evi *Evidence) {
 }
 
 // SerializeEVMods creates an ev serial with Evidence data
-func SerializeEVMods(evi *Evidence) {
+// func SerializeEVMods(evi *Evidence) {
 
-	b, e := msgpack.Marshal(&evi.Mods)
-	if e != nil {
-		logrus.Trace("Cannot marshal Modifications data:", e)
-	}
+// 	b, e := msgpack.Marshal(&evi.Mods)
+// 	if e != nil {
+// 		logrus.Trace("Cannot marshal Modifications data:", e)
+// 	}
 
-	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize Modifications data:", e)
-	}
+// 	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
+// 	if e != nil {
+// 		logrus.Trace("Cannot serialize Modifications data:", e)
+// 	}
 
-}
+// }
 
-// SerializeEVModifications creates an ev serial with Evidence data
-func SerializeEVModifications(evi *Evidence) {
+// // SerializeEVModifications creates an ev serial with Evidence data
+// func SerializeEVModifications(evi *Evidence) {
 
-	b, e := msgpack.Marshal(&evi.Modifications)
-	if e != nil {
-		logrus.Trace("Cannot marshal data:", e)
-	}
+// 	b, e := msgpack.Marshal(&evi.Modifications)
+// 	if e != nil {
+// 		logrus.Trace("Cannot marshal data:", e)
+// 	}
 
-	e = ioutil.WriteFile(sys.EvModificationsEvBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize data:", e)
-	}
+// 	e = ioutil.WriteFile(sys.EvModificationsEvBin(), b, sys.FilePermission())
+// 	if e != nil {
+// 		logrus.Trace("Cannot serialize data:", e)
+// 	}
 
-}
+// }
 
 // SerializeEVCombined creates an ev serial with Evidence data
-func SerializeEVCombined(evi *Evidence) {
+// func SerializeEVCombined(evi *Evidence) {
 
-	b, e := msgpack.Marshal(&evi.CombinedProtein)
-	if e != nil {
-		logrus.Trace("Cannot marshal data:", e)
-	}
+// 	b, e := msgpack.Marshal(&evi.CombinedProtein)
+// 	if e != nil {
+// 		logrus.Trace("Cannot marshal data:", e)
+// 	}
 
-	e = ioutil.WriteFile(sys.EvCombinedBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize data:", e)
-	}
+// 	e = ioutil.WriteFile(sys.EvCombinedBin(), b, sys.FilePermission())
+// 	if e != nil {
+// 		logrus.Trace("Cannot serialize data:", e)
+// 	}
 
-}
+// }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (evi *Evidence) Restore() {
@@ -193,7 +193,7 @@ func (evi *Evidence) Restore() {
 func (evi *Evidence) RestoreGranular() {
 
 	// Parameters
-	RestoreEVParameters(evi)
+	//RestoreEVParameters(evi)
 
 	// PSM
 	RestoreEVPSM(evi)
@@ -208,30 +208,30 @@ func (evi *Evidence) RestoreGranular() {
 	RestoreEVProtein(evi)
 
 	// Mods
-	RestoreEVMods(evi)
+	//RestoreEVMods(evi)
 
 	// Modifications
-	RestoreEVModifications(evi)
+	//RestoreEVModifications(evi)
 
 	// Combined
-	RestoreEVCombined(evi)
+	//RestoreEVCombined(evi)
 
 }
 
 // RestoreEVParameters restores Ev PSM data
-func RestoreEVParameters(evi *Evidence) {
+// func RestoreEVParameters(evi *Evidence) {
 
-	b, e := ioutil.ReadFile(sys.EvParameterBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(sys.EvParameterBin())
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Parameters)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Parameters)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
 // RestoreEVPSM restores Ev PSM data
 func RestoreEVPSM(evi *Evidence) {
@@ -294,55 +294,55 @@ func RestoreEVProtein(evi *Evidence) {
 }
 
 // RestoreEVMods restores Ev Mods data
-func RestoreEVMods(evi *Evidence) {
+// func RestoreEVMods(evi *Evidence) {
 
-	b, e := ioutil.ReadFile(sys.EvModificationsBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(sys.EvModificationsBin())
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Mods)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Mods)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
-// RestoreEVModifications restores Ev Mods data
-func RestoreEVModifications(evi *Evidence) {
+// // RestoreEVModifications restores Ev Mods data
+// func RestoreEVModifications(evi *Evidence) {
 
-	b, e := ioutil.ReadFile(sys.EvModificationsEvBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(sys.EvModificationsEvBin())
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Modifications)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Modifications)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
-// RestoreEVCombined restores Ev Mods data
-func RestoreEVCombined(evi *Evidence) {
+// // RestoreEVCombined restores Ev Mods data
+// func RestoreEVCombined(evi *Evidence) {
 
-	b, e := ioutil.ReadFile(sys.EvCombinedBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(sys.EvCombinedBin())
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
 // RestoreGranularWithPath reads philosopher results files and restore the data sctructure
 func (evi *Evidence) RestoreGranularWithPath(p string) {
 
 	// Parameters
-	RestoreEVParametersWithPath(evi, p)
+	//RestoreEVParametersWithPath(evi, p)
 
 	// PSM
 	RestoreEVPSMWithPath(evi, p)
@@ -357,32 +357,32 @@ func (evi *Evidence) RestoreGranularWithPath(p string) {
 	RestoreEVProteinWithPath(evi, p)
 
 	// Mods
-	RestoreEVModsWithPath(evi, p)
+	//RestoreEVModsWithPath(evi, p)
 
 	// Modifications
-	RestoreEVModificationsWithPath(evi, p)
+	//RestoreEVModificationsWithPath(evi, p)
 
 	// Combined
-	RestoreEVCombinedWithPath(evi, p)
+	//WithPath(evi, p)
 
 }
 
 // RestoreEVParametersWithPath restores Ev PSM data
-func RestoreEVParametersWithPath(evi *Evidence, p string) {
+// func RestoreEVParametersWithPath(evi *Evidence, p string) {
 
-	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvParameterBin())
+// 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvParameterBin())
 
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(path)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Parameters)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Parameters)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
 // RestoreEVPSMWithPath restores Ev PSM data
 func RestoreEVPSMWithPath(evi *Evidence, p string) {
@@ -453,51 +453,51 @@ func RestoreEVProteinWithPath(evi *Evidence, p string) {
 }
 
 // RestoreEVModsWithPath restores Ev Mods data
-func RestoreEVModsWithPath(evi *Evidence, p string) {
+// func RestoreEVModsWithPath(evi *Evidence, p string) {
 
-	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
+// 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsBin())
 
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(path)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Mods)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Mods)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
 // RestoreEVModificationsWithPath restores Ev Mods data
-func RestoreEVModificationsWithPath(evi *Evidence, p string) {
+// func RestoreEVModificationsWithPath(evi *Evidence, p string) {
 
-	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
+// 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvModificationsEvBin())
 
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(path)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.Modifications)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
+// 	e = msgpack.Unmarshal(b, &evi.Modifications)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
 
-}
+// }
 
-// RestoreEVCombinedWithPath restores Ev Mods data
-func RestoreEVCombinedWithPath(evi *Evidence, p string) {
+// // RestoreEVCombinedWithPath restores Ev Mods data
+// func RestoreEVCombinedWithPath(evi *Evidence, p string) {
 
-	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
+// 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.EvCombinedBin())
 
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
+// 	b, e := ioutil.ReadFile(path)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot read file:", e)
+// 	}
 
-	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-}
+// 	e = msgpack.Unmarshal(b, &evi.CombinedProtein)
+// 	if e != nil {
+// 		logrus.Fatal("Cannot unmarshal file:", e)
+// 	}
+// }

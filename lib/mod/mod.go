@@ -1,13 +1,5 @@
 package mod
 
-import (
-	"io/ioutil"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
-
-	"github.com/vmihailenco/msgpack"
-)
-
 // Modifications is a collection of modifications
 type Modifications struct {
 	Index map[string]Modification
@@ -32,29 +24,29 @@ type Modification struct {
 }
 
 // Serialize saves to disk a msgpack version of the Isobaric data structure
-func (m *Modifications) Serialize() {
+// func (m *Modifications) Serialize() {
 
-	b, e := msgpack.Marshal(&m)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
+// 	b, e := msgpack.Marshal(&m)
+// 	if e != nil {
+// 		msg.MarshalFile(e, "fatal")
+// 	}
 
-	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.SerializeFile(e, "fatal")
-	}
-}
+// 	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
+// 	if e != nil {
+// 		msg.SerializeFile(e, "fatal")
+// 	}
+// }
 
 // Restore reads philosopher results files and restore the data sctructure
-func (m *Modifications) Restore() {
+// func (m *Modifications) Restore() {
 
-	b, e := ioutil.ReadFile(sys.EvModificationsBin())
-	if e != nil {
-		msg.MarshalFile(e, "warning")
-	}
+// 	b, e := ioutil.ReadFile(sys.EvModificationsBin())
+// 	if e != nil {
+// 		msg.MarshalFile(e, "warning")
+// 	}
 
-	e = msgpack.Unmarshal(b, &m)
-	if e != nil {
-		msg.SerializeFile(e, "warning")
-	}
-}
+// 	e = msgpack.Unmarshal(b, &m)
+// 	if e != nil {
+// 		msg.SerializeFile(e, "warning")
+// 	}
+// }
