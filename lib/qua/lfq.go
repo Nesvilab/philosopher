@@ -167,8 +167,11 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		partName := strings.Split(evi.PSM[i].Spectrum, ".")
 		_, ok := spectra[partName[0]]
 		if ok {
-			evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
-			evi.PSM[i].IntensityCV = instensityCV[evi.PSM[i].Spectrum]
+			if isFaims {
+				evi.PSM[i].Intensity = instensityCV[evi.PSM[i].Spectrum]
+			} else {
+				evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
+			}
 		}
 
 		v, ok := psmMap[evi.PSM[i].Spectrum]

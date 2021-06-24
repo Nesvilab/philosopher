@@ -328,7 +328,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
@@ -340,7 +340,6 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			i.ProteinEnd,
 			i.Intensity,
 			i.IonMobility,
-			i.IntensityCV,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)
