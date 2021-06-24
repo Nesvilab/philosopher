@@ -43,7 +43,7 @@ func RunLabelFreeQuantification(p met.Quantify) {
 	var evi rep.Evidence
 	evi.RestoreGranular()
 
-	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated, p.Raw)
+	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated, p.Raw, p.Faims)
 
 	evi = calculateIntensities(evi)
 

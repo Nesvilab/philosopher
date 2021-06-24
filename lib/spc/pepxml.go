@@ -192,7 +192,7 @@ type SpectrumQuery struct {
 	Index                            uint32       `xml:"index,attr"`
 	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr"`
 	IonMobility                      float64      `xml:"ion_mobility,attr"`
-	CompensationVoltage              float64      `xml:"compensation_voltage,attr"`
+	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
 	SearchResult                     SearchResult `xml:"search_result"`
 }
 

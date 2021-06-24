@@ -31,15 +31,16 @@ type Spectra []Spectrum
 
 // Spectrum tag
 type Spectrum struct {
-	Index         string
-	Scan          string
-	Level         string
-	SpectrumName  string
-	ScanStartTime float64
-	Precursor     Precursor
-	Mz            Mz
-	Intensity     Intensity
-	IonMobility   IonMobility
+	Index               string
+	Scan                string
+	Level               string
+	SpectrumName        string
+	CompensationVoltage string
+	ScanStartTime       float64
+	Precursor           Precursor
+	Mz                  Mz
+	Intensity           Intensity
+	IonMobility         IonMobility
 }
 
 // Precursor struct
@@ -233,6 +234,10 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	for _, j := range mzSpec.CVParam {
 		if string(j.Accession) == "MS:1000511" {
 			spec.Level = j.Value
+		}
+
+		if string(j.Accession) == "MS:1001581" {
+			spec.CompensationVoltage = j.Value
 		}
 	}
 

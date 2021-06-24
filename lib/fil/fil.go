@@ -93,7 +93,7 @@ func Run(f met.Data) met.Data {
 
 		// two-dimensional analysis
 		// complete pep list and filtered mirror-image prot list
-		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag, f.Filter.Razor)
 
 	}
 

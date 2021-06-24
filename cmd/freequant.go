@@ -65,6 +65,7 @@ func init() {
 		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
 		freequant.Flags().Float64VarP(&m.Quantify.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
 		freequant.Flags().BoolVarP(&m.Quantify.Raw, "raw", "", false, "read raw files instead of converted XML")
+		freequant.Flags().BoolVarP(&m.Quantify.Faims, "faims", "", false, "Use FAIMS information for the quantification")
 		freequant.Flags().BoolVarP(&m.Quantify.Isolated, "isolated", "", true, "use the isolated ion instead of the selected ion for quantification")
 		filterCmd.Flags().MarkHidden("isolated")
 	}

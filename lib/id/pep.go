@@ -51,6 +51,7 @@ type PeptideIdentification struct {
 	Peptide                          string
 	Protein                          string
 	ModifiedPeptide                  string
+	CompesationVoltage               string
 	AlternativeProteins              []string
 	AlternativeProteinsIndexed       map[string]int
 	AssumedCharge                    uint8
@@ -87,7 +88,6 @@ type PeptideIdentification struct {
 	Intensity                        float64
 	IonMobility                      float64
 	IsRejected                       uint8
-	CompesationVoltage               float64
 	Modifications                    mod.Modifications
 }
 

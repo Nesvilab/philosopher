@@ -127,6 +127,7 @@ type PSMEvidence struct {
 	EntryName                        string
 	GeneName                         string
 	ModifiedPeptide                  string
+	CompensationVoltage              string
 	MappedProteins                   map[string]int
 	MappedGenes                      map[string]int
 	AssumedCharge                    uint8
@@ -152,9 +153,9 @@ type PSMEvidence struct {
 	Nextscore                        float64
 	DiscriminantValue                float64
 	Intensity                        float64
+	IntensityCV                      float64
 	IonMobility                      float64
 	Purity                           float64
-	CompensationVoltage              float64
 	IsDecoy                          bool
 	IsUnique                         bool
 	IsURazor                         bool

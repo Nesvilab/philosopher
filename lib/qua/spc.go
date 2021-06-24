@@ -7,11 +7,6 @@ import (
 // CalculateSpectralCounts add Spc to ions and proteins
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
-	// if len(e.PSM) < 1 && len(e.Ions) < 1 {
-	// 	fmt.Println("spc")
-	// 	msg.QuantifyingData(errors.New("The PSM list is enpty"), "warning")
-	// }
-
 	var uniqueIonPSM = make(map[string]string)
 	var razorIonPSM = make(map[string]string)
 

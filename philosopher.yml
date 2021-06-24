@@ -223,6 +223,7 @@ Label-Free Quantification:                       # Freequant
   retentionTimeWindow: 3                         # specify the retention time window for xic (minute) (default 3)
   tolerance: 10                                  # m/z tolerance in ppm (default 10)
   raw: false                                     # read raw files instead of converted mzML, or mzXML
+  faims: false                                   # use FAIMS information for the quantification
 
 Isobaric Quantification:                         # Labelquant
   bestPSM: false                                 # select the best PSMs for protein quantification

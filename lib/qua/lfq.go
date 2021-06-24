@@ -33,7 +33,7 @@ func NewLFQ() LFQ {
 	return self
 }
 
-func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso, isRaw bool) rep.Evidence {
+func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float64, isIso, isRaw, isFaims bool) rep.Evidence {
 
 	logrus.Info("Indexing PSM information")
 
@@ -42,10 +42,13 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 	var spectra = make(map[string][]string)
 	var ppmPrecision = make(map[string]float64)
 	var mzMap = make(map[string]float64)
+	var mzCVMap = make(map[string]string)
 	var minRT = make(map[string]float64)
 	var maxRT = make(map[string]float64)
+	var compVoltageMap = make(map[string]string)
 	var retentionTime = make(map[string]float64)
 	var intensity = make(map[string]float64)
+	var instensityCV = make(map[string]float64)
 
 	var charges = make(map[string]int)
 
@@ -60,9 +63,8 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		minRT[i.Spectrum] = (i.RetentionTime / 60) - rTWin
 		maxRT[i.Spectrum] = (i.RetentionTime / 60) + rTWin
 		retentionTime[i.Spectrum] = i.RetentionTime
-
+		compVoltageMap[i.Spectrum] = i.CompensationVoltage
 		charges[i.Spectrum] = int(i.AssumedCharge)
-
 		psmMap[i.Spectrum] = i
 	}
 
@@ -92,24 +94,22 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		}
 
 		for i := range mz.Spectra {
-			if mz.Spectra[i].Level == "1" {
-				if isRaw {
 
-				} else {
+			spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
+
+			if mz.Spectra[i].Level == "1" {
+				if !isRaw {
 					mz.Spectra[i].Decode()
 				}
+
+				if isFaims {
+					mzCVMap[mz.Spectra[i].Scan] = mz.Spectra[i].CompensationVoltage
+				}
+
 			} else if mz.Spectra[i].Level == "2" {
-				spectrum := fmt.Sprintf("%s.%05s.%05s.%d", s, mz.Spectra[i].Scan, mz.Spectra[i].Scan, mz.Spectra[i].Precursor.ChargeState)
 				_, ok := mzMap[spectrum]
 				if ok {
-
 					mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
-					// update the MZ with the desired Precursor value from mzML
-					// if isIso == true {
-					// 	mzMap[spectrum] = mz.Spectra[i].Precursor.TargetIon
-					// } else {
-					// 	mzMap[spectrum] = mz.Spectra[i].Precursor.SelectedIon
-					// }
 				}
 			}
 		}
@@ -129,29 +129,35 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if ok {
 			for _, j := range v {
 
-				measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
+				measuredFaims, measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
 
 				if retrieved {
 
-					// create the list of mz differences for each peak
-					// var mzRatio []float64
-					// for k := 1; k <= 6; k++ {
-					// 	r := float64(k) * (float64(1) / float64(charges[j]))
-					// 	mzRatio = append(mzRatio, uti.ToFixed(r, 2))
-					// }
-
 					var timeW = retentionTime[j] / 60
 					var topI = 0.0
+					var topCVI = 0.0
+					var ms2CompensationVoltage = compVoltageMap[j]
 
 					for k, v := range measured {
+
 						if k > (timeW-pTWin) && k < (timeW+pTWin) {
 							if v > topI {
 								topI = v
 							}
 						}
+
+						if isFaims {
+							v1, ok := measuredFaims[ms2CompensationVoltage]
+							if ok {
+								if v1 > topCVI {
+									topCVI = v1
+								}
+							}
+						}
 					}
 
 					intensity[j] = topI
+					instensityCV[j] = topCVI
 				}
 			}
 		}
@@ -162,6 +168,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		_, ok := spectra[partName[0]]
 		if ok {
 			evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
+			evi.PSM[i].IntensityCV = instensityCV[evi.PSM[i].Spectrum]
 		}
 
 		v, ok := psmMap[evi.PSM[i].Spectrum]
@@ -175,9 +182,10 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 }
 
 // xic extract ion chomatograms
-func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float64]float64, bool) {
+func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[string]float64, map[float64]float64, bool) {
 
 	var list = make(map[float64]float64)
+	var ms1CompensationVoltage = make(map[string]float64)
 
 	for j := range mz {
 		if mz[j].Level == "1" {
@@ -197,6 +205,7 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 
 				if maxI > 0 {
 					list[mz[j].ScanStartTime] = maxI
+					ms1CompensationVoltage[mz[j].CompensationVoltage] = maxI
 				}
 
 			}
@@ -204,10 +213,10 @@ func xic(mz mzn.Spectra, minRT, maxRT, ppmPrecision, mzValue float64) (map[float
 	}
 
 	if len(list) >= 5 {
-		return list, true
+		return ms1CompensationVoltage, list, true
 	}
 
-	return list, false
+	return ms1CompensationVoltage, list, false
 }
 
 func calculateIntensities(e rep.Evidence) rep.Evidence {

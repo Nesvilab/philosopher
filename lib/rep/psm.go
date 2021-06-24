@@ -340,7 +340,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			i.ProteinEnd,
 			i.Intensity,
 			i.IonMobility,
-			i.CompensationVoltage,
+			i.IntensityCV,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)
