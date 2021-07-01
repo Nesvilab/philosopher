@@ -400,15 +400,11 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 		_, ok := ptSupSpec[i.Protein]
 		if !ok {
 			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
-		} else {
-			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
 		}
 
 		if i.IsUnique {
 			_, ok := uniqueSpec[i.IonForm]
 			if !ok {
-				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
-			} else {
 				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
 			}
 		}
@@ -416,8 +412,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 		if i.IsURazor {
 			_, ok := razorSpec[i.IonForm]
 			if !ok {
-				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
-			} else {
 				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
 			}
 		}

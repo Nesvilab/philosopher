@@ -75,23 +75,23 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref := v
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
-				//ref.NumberOfEnzymaticTermini = k.NumberOfEnzymaticTermini
 
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
 				}
+				delete(ref.MappedProteins, i.ProteinName)
 
 				ref.Modifications = k.Modifications
 
-				if len(ref.MappedProteins) == 0 {
+				if len(ref.MappedProteins) == 0 && ref.Weight >= weight {
 					ref.IsUnique = true
 				} else {
 					ref.IsUnique = false
 				}
 
-				if ref.Weight >= weight {
-					ref.IsUnique = true
-				}
+				// if ref.Weight >= weight {
+				// 	ref.IsUnique = true
+				// }
 
 				if k.Razor == 1 {
 					ref.IsURazor = true
@@ -137,18 +137,19 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				for _, l := range k.PeptideParentProtein {
 					ref.MappedProteins[l] = 0
 				}
+				delete(ref.MappedProteins, i.ProteinName)
 
 				ref.Modifications = k.Modifications
 
-				if len(ref.MappedProteins) == 0 {
+				if len(ref.MappedProteins) == 0 && ref.Weight >= weight {
 					ref.IsUnique = true
 				} else {
 					ref.IsUnique = false
 				}
 
-				if ref.Weight >= weight {
-					ref.IsUnique = true
-				}
+				// if ref.Weight >= weight {
+				// 	ref.IsUnique = true
+				// }
 
 				mods, ok := protMods[ion]
 				if ok {

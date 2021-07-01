@@ -279,10 +279,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 		for pt, w := range r[k].MappedProteinsW {
 			if w > 0.5 {
 				razorPair[k] = pt
-			} else if w == 0 {
-				delete(r[k].MappedProteinsGW, pt)
-				delete(r[k].MappedProteinsTNP, pt)
-				delete(r[k].MappedproteinsSID, pt)
 			}
 		}
 	}
@@ -334,7 +330,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					sort.Strings(tnpList)
 
 					for _, pt := range tnpList {
-						if r[k].MappedProteinsTNP[pt] > topTNP {
+						if r[k].MappedProteinsTNP[pt] >= topTNP {
 							topTNP = r[k].MappedProteinsTNP[pt]
 							topPT = pt
 							topTNPMap[topTNP]++
@@ -419,11 +415,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
 				}
-
-				// if p.Groups[i].Proteins[j].PeptideIons[k].PeptideSequence == "GEASRLAHY" {
-				//	fmt.Println(p.Groups[i].Proteins[j].HasRazor, p.Groups[i].Proteins[k].HasRazor, p.Groups[i].Proteins[k].ProteinName, p.Groups[i].Proteins[j].ProteinName)
-				// }
-
 			}
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
