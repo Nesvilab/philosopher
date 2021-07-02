@@ -234,7 +234,7 @@ func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDeco
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			i.PrevAA,
