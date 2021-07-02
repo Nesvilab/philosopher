@@ -58,6 +58,7 @@ func Run(f met.Data) met.Data {
 
 		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
+		pro.Restore()
 
 	} else {
 
@@ -76,10 +77,30 @@ func Run(f met.Data) met.Data {
 			processProteinInferenceIdentifications(pepid, razorMap, coverMap, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
 
+		pro.Restore()
 	}
 
 	pepxml.Restore()
-	pro.Restore()
+
+	if _, err := os.Stat(sys.RazorBin()); err == nil {
+		var psm id.PepIDList
+		psm.Restore("psm")
+		psm = correctRazorAssignment(psm)
+		psm.Serialize("psm")
+		psm = nil
+
+		var pep id.PepIDList
+		pep.Restore("pep")
+		pep = correctRazorAssignment(pep)
+		pep.Serialize("pep")
+		pep = nil
+
+		var ion id.PepIDList
+		ion.Restore("ion")
+		ion = correctRazorAssignment(ion)
+		ion.Serialize("ion")
+		ion = nil
+	}
 
 	if f.Filter.Seq {
 

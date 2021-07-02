@@ -47,7 +47,6 @@ func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
 			evi.PSM[i].NumberOfEnzymaticTermini = int(ntt)
 		}
 	}
-
 }
 
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
@@ -166,7 +165,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		}
 
 	}
-
 }
 
 // UpdateIonModCount counts how many times each ion is observed modified and not modified
@@ -199,7 +197,6 @@ func (evi *Evidence) UpdateIonModCount() {
 
 		}
 	}
-
 }
 
 // SyncPSMToProteins forces the synchronization between the filtered proteins, and the remaining structures.
@@ -239,7 +236,6 @@ func (evi *Evidence) SyncPSMToProteins() {
 		}
 	}
 	evi.Peptides = newPeptides
-
 }
 
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
@@ -385,7 +381,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		evi.Peptides[i].PrevAA = pepPrevAA[evi.Peptides[i].Sequence]
 		evi.Peptides[i].NextAA = pepNextAA[evi.Peptides[i].Sequence]
 	}
-
 }
 
 // UpdateSupportingSpectra pushes back from PSM to Protein the new supporting spectra from razor results
@@ -455,7 +450,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 		}
 
 	}
-
 }
 
 // UpdatePeptideModCount counts how many times each peptide is observed modified and not modified
@@ -501,5 +495,4 @@ func (evi *Evidence) UpdatePeptideModCount() {
 		}
 
 	}
-
 }
