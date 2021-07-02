@@ -282,8 +282,12 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 
 		// map the peptide to the protein
-		re := regexp.MustCompile(evi.PSM[i].Peptide)
+		replacer := strings.NewReplacer("I", "[IL]", "L", "[IL]")
+		peptideIL := replacer.Replace(evi.PSM[i].Peptide)
+
+		re := regexp.MustCompile(peptideIL)
 		reMatch := re.FindStringIndex(sequenceMap[id])
+
 		if len(reMatch) > 0 {
 
 			evi.PSM[i].ProteinStart = reMatch[0]
@@ -301,35 +305,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
 			}
 
-		} else {
-
-			var peptide string
-
-			if strings.Contains(evi.PSM[i].Peptide, "I") {
-				peptide = strings.Replace(evi.PSM[i].Peptide, "I", "L", -1)
-			}
-			if strings.Contains(evi.PSM[i].Peptide, "L") {
-				peptide = strings.Replace(evi.PSM[i].Peptide, "L", "I", -1)
-			}
-
-			re := regexp.MustCompile(peptide)
-			reMatch := re.FindStringIndex(sequenceMap[id])
-			if len(reMatch) > 0 {
-				evi.PSM[i].ProteinStart = reMatch[0]
-				evi.PSM[i].ProteinEnd = reMatch[1]
-
-				if (reMatch[0]) <= 0 {
-					evi.PSM[i].PrevAA = "-"
-				} else {
-					evi.PSM[i].PrevAA = string(sequenceMap[id][reMatch[0]-1])
-				}
-
-				if (reMatch[1] + 1) >= len(sequenceMap[id]) {
-					evi.PSM[i].NextAA = "-"
-				} else {
-					evi.PSM[i].NextAA = string(sequenceMap[id][reMatch[1]])
-				}
-			}
 		}
 
 		pepPrevAA[evi.PSM[i].Peptide] = evi.PSM[i].PrevAA
