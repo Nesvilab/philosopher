@@ -98,7 +98,7 @@ func DeployParameterFile(temp string) string {
 func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build string, data []string) met.Data {
 
 	// Top-level Workspace
-	//wrk.Run(Version, Build, "", false, false, true, true)
+	wrk.Run(Version, Build, "", false, false, true, true)
 
 	for i := range data {
 
