@@ -7,6 +7,9 @@ import (
 
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
+	"philosopher/lib/uti"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 // PeptideMap struct
@@ -365,7 +368,13 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 	var uniqueSpec = make(map[string][]string)
 	var razorSpec = make(map[string][]string)
 
+	var totalPeptides = make(map[string][]string)
+	var uniquePeptides = make(map[string][]string)
+	var razorPeptides = make(map[string][]string)
+
 	for _, i := range evi.PSM {
+
+		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
 
 		_, ok := ptSupSpec[i.Protein]
 		if !ok {
@@ -377,6 +386,8 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			if !ok {
 				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
 			}
+
+			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
 		}
 
 		if i.IsURazor {
@@ -384,8 +395,22 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			if !ok {
 				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
 			}
+
+			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
 		}
 
+	}
+
+	for k, v := range totalPeptides {
+		totalPeptides[k] = uti.RemoveDuplicateStrings(v)
+	}
+
+	for k, v := range uniquePeptides {
+		uniquePeptides[k] = uti.RemoveDuplicateStrings(v)
+	}
+
+	for k, v := range razorPeptides {
+		razorPeptides[k] = uti.RemoveDuplicateStrings(v)
 	}
 
 	for i := range evi.Proteins {
@@ -398,6 +423,12 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 	}
 
 	for i := range evi.Proteins {
+
+		if evi.Proteins[i].PartHeader == "sp|A0A0B4J2D5|GAL3B_HUMAN" {
+			spew.Dump(totalPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+			spew.Dump(uniquePeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+			spew.Dump(razorPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+		}
 
 		v, ok := ptSupSpec[evi.Proteins[i].PartHeader]
 		if ok {
@@ -422,6 +453,21 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 				}
 			}
 
+		}
+
+		vTP, okTP := totalPeptides[evi.Proteins[i].PartHeader]
+		if okTP {
+			evi.Proteins[i].TotalPeptides = len(vTP)
+		}
+
+		vuP, okuP := uniquePeptides[evi.Proteins[i].PartHeader]
+		if okuP {
+			evi.Proteins[i].UniquePeptides = len(vuP)
+		}
+
+		vRP, okRP := razorPeptides[evi.Proteins[i].PartHeader]
+		if okRP {
+			evi.Proteins[i].URazorPeptides = len(vRP)
 		}
 
 	}

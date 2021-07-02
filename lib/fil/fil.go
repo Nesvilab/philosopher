@@ -169,7 +169,7 @@ func Run(f met.Data) met.Data {
 
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
-		//e.UpdateIonStatus(f.Filter.Tag)
+		e.UpdateIonStatus(f.Filter.Tag)
 	}
 
 	logrus.Info("Assigning protein identifications to layers")

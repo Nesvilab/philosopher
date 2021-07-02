@@ -22,6 +22,3 @@ func main() {
 	cmd.Execute()
 
 }
-
-// TODO update PRevAA
-// TODO update protein fdr before filt
