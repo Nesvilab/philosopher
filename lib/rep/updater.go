@@ -8,8 +8,6 @@ import (
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
 	"philosopher/lib/uti"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // PeptideMap struct
@@ -424,11 +422,11 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 
 	for i := range evi.Proteins {
 
-		if evi.Proteins[i].PartHeader == "sp|A0A0B4J2D5|GAL3B_HUMAN" {
-			spew.Dump(totalPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-			spew.Dump(uniquePeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-			spew.Dump(razorPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-		}
+		// if evi.Proteins[i].PartHeader == "sp|A0A0B4J2D5|GAL3B_HUMAN" {
+		// 	spew.Dump(totalPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+		// 	spew.Dump(uniquePeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+		// 	spew.Dump(razorPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
+		// }
 
 		v, ok := ptSupSpec[evi.Proteins[i].PartHeader]
 		if ok {
@@ -457,17 +455,23 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 
 		vTP, okTP := totalPeptides[evi.Proteins[i].PartHeader]
 		if okTP {
-			evi.Proteins[i].TotalPeptides = len(vTP)
+			for _, j := range vTP {
+				evi.Proteins[i].TotalPeptides[j]++
+			}
 		}
 
 		vuP, okuP := uniquePeptides[evi.Proteins[i].PartHeader]
 		if okuP {
-			evi.Proteins[i].UniquePeptides = len(vuP)
+			for _, j := range vuP {
+				evi.Proteins[i].UniquePeptides[j]++
+			}
 		}
 
 		vRP, okRP := razorPeptides[evi.Proteins[i].PartHeader]
 		if okRP {
-			evi.Proteins[i].URazorPeptides = len(vRP)
+			for _, j := range vRP {
+				evi.Proteins[i].URazorPeptides[j]++
+			}
 		}
 
 	}

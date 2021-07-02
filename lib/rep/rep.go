@@ -284,9 +284,9 @@ type ProteinEvidence struct {
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
-	TotalPeptides          int
-	UniquePeptides         int
-	URazorPeptides         int // Unique + razor
+	TotalPeptides          map[string]int
+	UniquePeptides         map[string]int
+	URazorPeptides         map[string]int // Unique + razor
 	TotalIntensity         float64
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor

@@ -51,6 +51,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		rep.Probability = i.Probability
 		rep.TopPepProb = i.TopPepProb
 
+		rep.TotalPeptides = make(map[string]int)
+		rep.UniquePeptides = make(map[string]int)
+		rep.URazorPeptides = make(map[string]int)
+
 		if strings.HasPrefix(i.ProteinName, decoyTag) {
 			rep.IsDecoy = true
 		} else {
@@ -395,25 +399,25 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
 		line := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
-			i.ProteinGroup,          // Group
-			i.ProteinSubGroup,       // SubGroup
-			i.PartHeader,            // Protein
-			i.ProteinID,             // Protein ID
-			i.EntryName,             // Entry Name
-			i.GeneNames,             // Genes
-			i.Length,                // Length
-			i.Coverage,              // Percent Coverage
-			i.Organism,              // Organism
-			i.Description,           // Description
-			i.ProteinExistence,      // Protein Existence
-			i.Probability,           // Protein Probability
-			i.TopPepProb,            // Top Peptide Probability
-			len(i.TotalPeptideIons), // Total Peptide Ions
-			uniqIons,                // Unique Peptide Ions
-			urazorIons,              // Razor Peptide Ions
-			i.TotalPeptides,
-			i.UniquePeptides,
-			i.URazorPeptides,
+			i.ProteinGroup,           // Group
+			i.ProteinSubGroup,        // SubGroup
+			i.PartHeader,             // Protein
+			i.ProteinID,              // Protein ID
+			i.EntryName,              // Entry Name
+			i.GeneNames,              // Genes
+			i.Length,                 // Length
+			i.Coverage,               // Percent Coverage
+			i.Organism,               // Organism
+			i.Description,            // Description
+			i.ProteinExistence,       // Protein Existence
+			i.Probability,            // Protein Probability
+			i.TopPepProb,             // Top Peptide Probability
+			len(i.TotalPeptideIons),  // Total Peptide Ions
+			uniqIons,                 // Unique Peptide Ions
+			urazorIons,               // Razor Peptide Ions
+			len(i.TotalPeptides),     // Total Peptides
+			len(i.UniquePeptides),    // Unique Peptides
+			len(i.URazorPeptides),    // Razor Peptides
 			i.TotalSpC,               // Total Spectral Count
 			i.UniqueSpC,              // Unique Spectral Count
 			i.URazorSpC,              // Razor Spectral Count
