@@ -362,7 +362,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					} else {
 
 						var idList []string
-						for _, id := range r[k].MappedproteinsSID {
+						for protein, id := range r[k].MappedproteinsSID {
+							id = fmt.Sprintf("%s_%s", id, protein)
 							idList = append(idList, id)
 						}
 
