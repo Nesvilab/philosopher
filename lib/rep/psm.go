@@ -135,6 +135,9 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 	var header string
 	var modMap = make(map[string]string)
 	var modList []string
+	var hasCompVolt bool
+	var hasIonMob bool
+	var hasPurity bool
 
 	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
 
@@ -168,6 +171,19 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 				modMap[k] = ""
 			}
 		}
+
+		if len(evi.PSM[i].CompensationVoltage) > 0 {
+			hasCompVolt = true
+		}
+
+		if evi.PSM[i].IonMobility > 0 {
+			hasIonMob = true
+		}
+
+		if evi.PSM[i].Purity > 0 {
+			hasPurity = true
+		}
+
 	}
 
 	for k := range modMap {
@@ -182,7 +198,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tIon Mobility\tCompensation Voltage\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
 
 	if len(modList) > 0 {
 		for _, i := range modList {
@@ -197,27 +213,35 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		header += "\tLocalization Range"
 	}
 
-	header += "\tPurity\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	if hasIonMob {
+		header += "\tIon Mobility"
+	}
+
+	if hasCompVolt {
+		header += "\tCompensation Voltage"
+	}
+
+	header += "\tQuan Usage\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
-			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tIs Used\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		default:
 			header += ""
 		}
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tIs Used\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header += "\tQuan Usage\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
 		case 8:
-			header += "\tIs Used\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header += "\tQuan Usage\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
 		default:
 			header += ""
 		}
@@ -328,7 +352,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
@@ -339,7 +363,6 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			i.ProteinStart,
 			i.ProteinEnd,
 			i.Intensity,
-			i.IonMobility,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)
@@ -366,9 +389,29 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.2f\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		if hasIonMob {
+			line = fmt.Sprintf("%s\t%.4f",
+				line,
+				i.IonMobility,
+			)
+		}
+
+		if hasCompVolt {
+			line = fmt.Sprintf("%s\t%s",
+				line,
+				i.CompensationVoltage,
+			)
+		}
+
+		if hasPurity {
+			line = fmt.Sprintf("%s\t%.2f",
+				line,
+				i.Purity,
+			)
+		}
+
+		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
-			i.Purity,
 			i.IsUnique,
 			i.Protein,
 			i.ProteinID,
