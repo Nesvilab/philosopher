@@ -221,7 +221,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		header += "\tCompensation Voltage"
 	}
 
-	header += "\tQuan Usage\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header += "\tIsUnique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
