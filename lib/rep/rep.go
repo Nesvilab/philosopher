@@ -333,6 +333,9 @@ type CombinedProteinEvidence struct {
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
+	TotalPeptides          map[string]int
+	UniquePeptides         map[string]int
+	UrazorPeptides         map[string]int
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64
@@ -350,7 +353,6 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	//Key                string
 	BestPSM            float64
 	Sequence           string
 	Protein            string

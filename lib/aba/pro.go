@@ -14,6 +14,7 @@ import (
 
 	"philosopher/lib/iso"
 	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"philosopher/lib/dat"
 	"philosopher/lib/fil"
@@ -114,6 +115,9 @@ func proteinLevelAbacus(m met.Data, args []string) {
 	logrus.Info("Processing spectral counts")
 	evidences = getProteinSpectralCounts(evidences, datasets, m.Abacus.Tag)
 
+	logrus.Info("Processing peptide counts")
+	evidences = getProteinToPeptideCounts(evidences, datasets, m.Abacus.Tag)
+
 	logrus.Info("Processing intensities")
 	evidences = sumProteinIntensities(evidences, datasets)
 
@@ -178,6 +182,10 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				ce.UniqueSpc = make(map[string]int)
 				ce.UrazorSpc = make(map[string]int)
 
+				ce.TotalPeptides = make(map[string]int)
+				ce.UniquePeptides = make(map[string]int)
+				ce.UrazorPeptides = make(map[string]int)
+
 				ce.TotalIntensity = make(map[string]float64)
 				ce.UniqueIntensity = make(map[string]float64)
 				ce.UrazorIntensity = make(map[string]float64)
@@ -234,11 +242,67 @@ func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets
 					combined[i].TotalSpc[k] = j.TotalSpC
 					combined[i].UrazorSpc[k] = j.URazorSpC
 
-					combined[i].UniqueStrippedPeptides += j.UniqueSpC
+					//combined[i].UniqueStrippedPeptides += j.UniqueSpC
 
 					break
 				}
 			}
+		}
+
+	}
+
+	return combined
+}
+
+// getProteinToPeptideCounts collects peptide counts from the individual data sets for the combined protein report
+func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
+
+	for k, v := range datasets {
+
+		for i := range combined {
+
+			var total []string
+			var unique []string
+			var razor []string
+
+			for _, j := range v.Proteins {
+				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
+
+					combined[i].UniqueSpc[k] = j.UniqueSpC
+					combined[i].TotalSpc[k] = j.TotalSpC
+					combined[i].UrazorSpc[k] = j.URazorSpC
+
+					for l := range j.TotalPeptides {
+						total = append(total, l)
+					}
+
+					for l := range j.UniquePeptides {
+						unique = append(unique, l)
+					}
+
+					for l := range j.URazorPeptides {
+						razor = append(razor, l)
+					}
+
+					break
+				}
+			}
+
+			total = uti.RemoveDuplicateStrings(total)
+			for _, j := range total {
+				combined[i].TotalPeptides[j]++
+			}
+
+			unique = uti.RemoveDuplicateStrings(unique)
+			for _, j := range unique {
+				combined[i].UniquePeptides[j]++
+			}
+
+			razor = uti.RemoveDuplicateStrings(razor)
+			for _, j := range razor {
+				combined[i].UrazorPeptides[j]++
+			}
+
 		}
 
 	}
@@ -322,7 +386,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tSummarized Spectral Count\tSummarized Unique Spectral Count\tSummarized Total Spectral Count"
+	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Peptides\tCombined Unique Peptides\tCombined Total Peptides\tCombined Spectral Count\tCombined Unique Spectral Count\tCombined Total Spectral Count"
 
 	// Add Unique+Razor SPC
 	for _, i := range namesList {
@@ -422,7 +486,11 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
 
-		//line += fmt.Sprintf("%d\t", i.UniqueStrippedPeptides)
+		line += fmt.Sprintf("%d\t", len(i.UrazorPeptides))
+
+		line += fmt.Sprintf("%d\t", len(i.UniquePeptides))
+
+		line += fmt.Sprintf("%d\t", len(i.TotalPeptides))
 
 		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
 
