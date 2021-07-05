@@ -23,7 +23,6 @@ import (
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -244,10 +243,6 @@ func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets
 					break
 				}
 			}
-		}
-
-		if combined[i].ProteinID == "A6NNZ2" {
-			spew.Dump(combined[i])
 		}
 	}
 

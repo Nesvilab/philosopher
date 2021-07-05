@@ -221,6 +221,10 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		header += "\tCompensation Voltage"
 	}
 
+	if hasPurity {
+		header += "\tPurity"
+	}
+
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {

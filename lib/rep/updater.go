@@ -373,6 +373,9 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 	for _, i := range evi.PSM {
 
 		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
+		for j := range i.MappedProteins {
+			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
+		}
 
 		_, ok := ptSupSpec[i.Protein]
 		if !ok {
@@ -421,12 +424,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 	}
 
 	for i := range evi.Proteins {
-
-		// if evi.Proteins[i].PartHeader == "sp|A0A0B4J2D5|GAL3B_HUMAN" {
-		// 	spew.Dump(totalPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-		// 	spew.Dump(uniquePeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-		// 	spew.Dump(razorPeptides["sp|A0A0B4J2D5|GAL3B_HUMAN"])
-		// }
 
 		v, ok := ptSupSpec[evi.Proteins[i].PartHeader]
 		if ok {
