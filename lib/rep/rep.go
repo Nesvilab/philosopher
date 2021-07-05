@@ -242,6 +242,8 @@ type PeptideEvidence struct {
 	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	IsUnique               bool
+	IsURazor               bool
 	IsDecoy                bool
 	Labels                 iso.Labels
 	PhosphoLabels          iso.Labels

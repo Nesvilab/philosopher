@@ -175,15 +175,15 @@ func Run(f met.Data) met.Data {
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
-		e.SyncPSMToProteins()
-	}
+	// if len(f.Filter.Pox) > 0 || f.Filter.Inference {
+	// 	e.SyncPSMToProteins()
+	// }
 
 	// reorganizes the selected proteins and the alternative proteins list
-	logrus.Info("Updating razor PSM assignment to proteins")
-	if f.Filter.Razor {
-		e.UpdateSupportingSpectra()
-	}
+	// logrus.Info("Updating razor PSM assignment to proteins")
+	// if f.Filter.Razor {
+	// 	e.UpdateSupportingSpectra()
+	// }
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 		e.UpdateNumberOfEnzymaticTermini()
@@ -191,6 +191,7 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Calculating spectral counts")
 	e = qua.CalculateSpectralCounts(e)
+	e = qua.CalculatePeptideCounts(e)
 
 	logrus.Info("Saving")
 	e.SerializeGranular()

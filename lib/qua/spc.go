@@ -1,29 +1,36 @@
 package qua
 
 import (
+	"fmt"
 	"philosopher/lib/rep"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
-	var totalIonPSM = make(map[string][]string)
-	var uniqueIonPSM = make(map[string][]string)
-	var razorIonPSM = make(map[string][]string)
+	var total = make(map[string][]string)
+	var unique = make(map[string][]string)
+	var razor = make(map[string][]string)
 
 	var sequences = make(map[string]int)
+
+	fmt.Println(len(e.PSM))
 
 	for _, i := range e.PSM {
 
 		sequences[i.Peptide]++
 
-		totalIonPSM[i.ProteinID] = append(totalIonPSM[i.ProteinID], i.Spectrum)
+		total[i.Protein] = append(total[i.Protein], i.Spectrum)
+		for j := range i.MappedProteins {
+			total[j] = append(total[j], i.Spectrum)
+		}
 
 		if i.IsUnique {
-			uniqueIonPSM[i.ProteinID] = append(uniqueIonPSM[i.ProteinID], i.Spectrum)
+			unique[i.Protein] = append(unique[i.Protein], i.Spectrum)
 		}
+
 		if i.IsURazor {
-			razorIonPSM[i.ProteinID] = append(razorIonPSM[i.ProteinID], i.Spectrum)
+			razor[i.Protein] = append(razor[i.Protein], i.Spectrum)
 		}
 	}
 
@@ -36,17 +43,17 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 	for i := range e.Proteins {
 
-		vT, okT := totalIonPSM[e.Proteins[i].ProteinID]
+		vT, okT := total[e.Proteins[i].ProteinID]
 		if okT {
 			e.Proteins[i].TotalSpC += len(vT)
 		}
 
-		vU, okU := uniqueIonPSM[e.Proteins[i].ProteinID]
+		vU, okU := unique[e.Proteins[i].ProteinID]
 		if okU {
 			e.Proteins[i].UniqueSpC += len(vU)
 		}
 
-		vUR, okR := razorIonPSM[e.Proteins[i].ProteinID]
+		vUR, okR := razor[e.Proteins[i].ProteinID]
 		if okR {
 			e.Proteins[i].URazorSpC += len(vUR)
 		}

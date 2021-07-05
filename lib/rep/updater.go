@@ -53,24 +53,24 @@ func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
 // UpdateIonStatus pushes back to ion and psm evideces the uniqueness and razorness status of each peptide and ion
 func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 
-	var uniqueMap = make(map[string]bool)
-	var urazorMap = make(map[string]string)
-	var sequenceMap = make(map[string]string)
-	var uniqueSeqMap = make(map[string]string)
+	var uniqueIons = make(map[string]bool)
+	var razorIons = make(map[string]string)
+	var uniquePeptides = make(map[string]string)
+	var razorPeptides = make(map[string]string)
 
 	for _, i := range evi.Proteins {
-
 		for _, j := range i.TotalPeptideIons {
+
 			if j.IsUnique {
-				uniqueMap[j.IonForm] = true
+				uniqueIons[j.IonForm] = true
+				uniquePeptides[j.Sequence] = i.PartHeader
 			}
-		}
 
-		for _, j := range i.TotalPeptideIons {
 			if j.IsURazor {
-				urazorMap[j.IonForm] = i.PartHeader
-				sequenceMap[j.Sequence] = i.PartHeader
+				razorIons[j.IonForm] = i.ProteinID
+				razorPeptides[j.Sequence] = i.PartHeader
 			}
+
 		}
 	}
 
@@ -80,7 +80,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		// wrong classifications. If by any chance the protein gets assigned to
 		// a razor decoy, this mechanism avoids the replacement
 
-		rp, rOK := urazorMap[evi.PSM[i].IonForm]
+		rp, rOK := razorIons[evi.PSM[i].IonForm]
 		if rOK {
 
 			evi.PSM[i].IsURazor = true
@@ -102,7 +102,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 		}
 
 		if !evi.PSM[i].IsURazor {
-			sp, sOK := sequenceMap[evi.PSM[i].Peptide]
+			sp, sOK := razorPeptides[evi.PSM[i].Peptide]
 			if sOK {
 
 				evi.PSM[i].IsURazor = true
@@ -121,17 +121,17 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				}
 			}
 
-			_, uOK := uniqueMap[evi.PSM[i].IonForm]
+			_, uOK := uniqueIons[evi.PSM[i].IonForm]
 			if uOK {
 				evi.PSM[i].IsUnique = true
 			}
 
-			uniqueSeqMap[evi.PSM[i].Peptide] = evi.PSM[i].Protein
+			uniquePeptides[evi.PSM[i].Peptide] = evi.PSM[i].ProteinID
 		}
 	}
 
 	for i := range evi.Ions {
-		rp, rOK := urazorMap[evi.Ions[i].IonForm]
+		rp, rOK := razorIons[evi.Ions[i].IonForm]
 		if rOK {
 
 			evi.Ions[i].IsURazor = true
@@ -145,7 +145,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 
 		}
-		_, uOK := uniqueMap[evi.Ions[i].IonForm]
+		_, uOK := uniqueIons[evi.Ions[i].IonForm]
 		if uOK {
 			evi.Ions[i].IsUnique = true
 		} else {
@@ -154,17 +154,26 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	}
 
 	for i := range evi.Peptides {
-		v, ok := sequenceMap[evi.Peptides[i].Sequence]
-		if ok {
+		rp, rOK := razorPeptides[evi.Peptides[i].Sequence]
+		if rOK {
+
+			evi.Peptides[i].IsURazor = true
+
 			evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein] = 0
-			delete(evi.Peptides[i].MappedProteins, v)
-			evi.Peptides[i].Protein = v
-		}
+			delete(evi.Peptides[i].MappedProteins, rp)
+			evi.Peptides[i].Protein = rp
 
-		if strings.Contains(v, decoyTag) {
-			evi.Peptides[i].IsDecoy = true
-		}
+			if strings.Contains(rp, decoyTag) {
+				evi.Peptides[i].IsDecoy = true
+			}
 
+		}
+		_, uOK := uniquePeptides[evi.Peptides[i].Sequence]
+		if uOK {
+			evi.Peptides[i].IsUnique = true
+		} else {
+			evi.Peptides[i].IsUnique = false
+		}
 	}
 }
 
@@ -372,11 +381,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 
 	for _, i := range evi.PSM {
 
-		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-		for j := range i.MappedProteins {
-			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-		}
-
 		_, ok := ptSupSpec[i.Protein]
 		if !ok {
 			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.Spectrum)
@@ -387,8 +391,6 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			if !ok {
 				uniqueSpec[i.IonForm] = append(uniqueSpec[i.IonForm], i.Spectrum)
 			}
-
-			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
 		}
 
 		if i.IsURazor {
@@ -396,10 +398,23 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 			if !ok {
 				razorSpec[i.IonForm] = append(razorSpec[i.IonForm], i.Spectrum)
 			}
+		}
+	}
 
-			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
+	for _, i := range evi.Peptides {
+
+		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Sequence)
+		for j := range i.MappedProteins {
+			totalPeptides[j] = append(totalPeptides[j], i.Sequence)
 		}
 
+		if i.IsUnique {
+			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Sequence)
+		}
+
+		if i.IsURazor {
+			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Sequence)
+		}
 	}
 
 	for k, v := range totalPeptides {
