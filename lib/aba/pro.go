@@ -23,6 +23,7 @@ import (
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -233,22 +234,21 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 // getProteinSpectralCounts collects protein spectral counts from the individual data sets for the combined protein report
 func getProteinSpectralCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
 
-	for k, v := range datasets {
-
-		for i := range combined {
+	for i := range combined {
+		for k, v := range datasets {
 			for _, j := range v.Proteins {
 				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
 					combined[i].UniqueSpc[k] = j.UniqueSpC
 					combined[i].TotalSpc[k] = j.TotalSpC
 					combined[i].UrazorSpc[k] = j.URazorSpC
-
-					//combined[i].UniqueStrippedPeptides += j.UniqueSpC
-
 					break
 				}
 			}
 		}
 
+		if combined[i].ProteinID == "A6NNZ2" {
+			spew.Dump(combined[i])
+		}
 	}
 
 	return combined
@@ -386,7 +386,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Peptides\tCombined Unique Peptides\tCombined Total Peptides\tCombined Spectral Count\tCombined Unique Spectral Count\tCombined Total Spectral Count"
+	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Spectral Count\tCombined Unique Spectral Count\tCombined Total Spectral Count\tCombined Peptides\tCombined Unique Peptides\tCombined Total Peptides"
 
 	// Add Unique+Razor SPC
 	for _, i := range namesList {
@@ -486,17 +486,17 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
 
-		line += fmt.Sprintf("%d\t", len(i.UrazorPeptides))
-
-		line += fmt.Sprintf("%d\t", len(i.UniquePeptides))
-
-		line += fmt.Sprintf("%d\t", len(i.TotalPeptides))
-
 		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
 
 		line += fmt.Sprintf("%d\t", summUniqueSpC[i.ProteinID])
 
 		line += fmt.Sprintf("%d\t", summTotalSpC[i.ProteinID])
+
+		line += fmt.Sprintf("%d\t", len(i.UrazorPeptides))
+
+		line += fmt.Sprintf("%d\t", len(i.UniquePeptides))
+
+		line += fmt.Sprintf("%d\t", len(i.TotalPeptides))
 
 		// Add Unique+Razor SPC
 		for _, j := range namesList {
