@@ -307,62 +307,6 @@ func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, dataset
 	return combined
 }
 
-// func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
-
-// 	for k, v := range datasets {
-// 		for i := range combined {
-
-// 			var total []string
-// 			var unique []string
-// 			var razor []string
-
-// 			for _, j := range v.Proteins {
-// 				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
-
-// 					combined[i].UniqueSpc[k] = j.UniqueSpC
-// 					combined[i].TotalSpc[k] = j.TotalSpC
-// 					combined[i].UrazorSpc[k] = j.URazorSpC
-
-// 					for l := range j.TotalPeptides {
-// 						total = append(total, l)
-// 					}
-
-// 					for l := range j.UniquePeptides {
-// 						unique = append(unique, l)
-// 					}
-
-// 					for l := range j.URazorPeptides {
-// 						razor = append(razor, l)
-// 					}
-// 					break
-// 				}
-// 			}
-
-// 			total = uti.RemoveDuplicateStrings(total)
-// 			for _, j := range total {
-// 				_, ok := combined[i].TotalPeptides[j]
-// 				if !ok {
-// 					combined[i].TotalPeptides[j]++
-// 				}
-// 			}
-
-// 			unique = uti.RemoveDuplicateStrings(unique)
-// 			for _, j := range unique {
-// 				combined[i].UniquePeptides[j]++
-// 			}
-
-// 			razor = uti.RemoveDuplicateStrings(razor)
-// 			for _, j := range razor {
-// 				combined[i].UrazorPeptides[j]++
-// 			}
-
-// 		}
-
-// 	}
-
-// 	return combined
-// }
-
 // getProteinLabelIntensities collects protein isobaric quantification from the individual data sets for the combined protein report
 func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, decoyTag string) rep.CombinedProteinEvidenceList {
 

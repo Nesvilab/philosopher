@@ -28,6 +28,13 @@ func Run(f met.Data) met.Data {
 	var pepxml id.PepXML
 	var pep id.PepIDList
 	var pro id.ProtIDList
+	var razorBin string
+
+	if len(f.Filter.RazorBin) == 0 {
+		razorBin = sys.RazorBin()
+	} else {
+		razorBin = f.Filter.RazorBin
+	}
 
 	// get the database tag from database command
 	if len(f.Filter.Tag) == 0 {
@@ -82,7 +89,7 @@ func Run(f met.Data) met.Data {
 
 	pepxml.Restore()
 
-	if _, err := os.Stat(sys.RazorBin()); err == nil {
+	if _, err := os.Stat(razorBin); err == nil {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)

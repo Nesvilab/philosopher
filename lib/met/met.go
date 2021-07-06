@@ -331,6 +331,7 @@ type Filter struct {
 	Pox       string  `yaml:"protxml"`
 	Tag       string  `yaml:"tag"`
 	Mods      string  `yaml:"mods"`
+	RazorBin  string  `yaml:"razorbin"`
 	PsmFDR    float64 `yaml:"psmFDR"`
 	PepFDR    float64 `yaml:"peptideFDR"`
 	IonFDR    float64 `yaml:"ionFDR"`
