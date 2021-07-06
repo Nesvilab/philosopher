@@ -70,7 +70,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				razorIons[j.IonForm] = i.PartHeader
 				razorPeptides[j.Sequence] = i.PartHeader
 			}
-
 		}
 	}
 
