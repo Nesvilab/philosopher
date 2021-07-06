@@ -37,15 +37,6 @@ func CalculatePeptideCounts(e rep.Evidence) rep.Evidence {
 		razor[k] = uti.RemoveDuplicateStrings(v)
 	}
 
-	// for i := range e.Proteins {
-	// 	for j := range e.Proteins[i].TotalPeptideIons {
-
-	// 		if len(e.Proteins[i].TotalPeptideIons[j].Spectra) == 0 {
-	// 			delete(e.Proteins[i].TotalPeptideIons, j)
-	// 		}
-	// 	}
-	// }
-
 	for i := range e.Proteins {
 
 		vTP, okTP := total[e.Proteins[i].PartHeader]

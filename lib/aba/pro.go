@@ -23,7 +23,6 @@ import (
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/sirupsen/logrus"
 )
 
@@ -183,9 +182,9 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				ce.UniqueSpc = make(map[string]int)
 				ce.UrazorSpc = make(map[string]int)
 
-				ce.TotalPeptides = make(map[string]int)
-				ce.UniquePeptides = make(map[string]int)
-				ce.UrazorPeptides = make(map[string]int)
+				ce.TotalPeptides = make(map[string]map[string]bool)
+				ce.UniquePeptides = make(map[string]map[string]bool)
+				ce.UrazorPeptides = make(map[string]map[string]bool)
 
 				ce.TotalIntensity = make(map[string]float64)
 				ce.UniqueIntensity = make(map[string]float64)
@@ -262,11 +261,7 @@ func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, dataset
 
 		for k, v := range datasets {
 			for _, j := range v.Proteins {
-				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
-
-					if j.ProteinID == "A0A1B0GUS4" {
-						spew.Dump(j.TotalPeptides, j.UniquePeptides, j.URazorPeptides)
-					}
+				if combined[i].ProteinName == j.PartHeader && !strings.Contains(j.OriginalHeader, decoyTag) {
 
 					for l := range j.TotalPeptides {
 						total = append(total, l)
@@ -279,19 +274,34 @@ func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, dataset
 					for l := range j.URazorPeptides {
 						razor = append(razor, l)
 					}
-					break
 				}
 			}
 
 			total = uti.RemoveDuplicateStrings(total)
-			combined[i].TotalPeptides[k] = len(total)
+			var totalMap = make(map[string]bool)
+			for _, k := range total {
+				totalMap[k] = false
+			}
+			combined[i].TotalPeptides[k] = totalMap
 
 			unique = uti.RemoveDuplicateStrings(unique)
-			combined[i].UniquePeptides[k] = len(unique)
+			var uniqueMap = make(map[string]bool)
+			for _, k := range unique {
+				uniqueMap[k] = false
+			}
+			combined[i].UniquePeptides[k] = uniqueMap
 
 			razor = uti.RemoveDuplicateStrings(razor)
-			combined[i].UrazorPeptides[k] = len(razor)
+			var razorMap = make(map[string]bool)
+			for _, k := range razor {
+				razorMap[k] = false
+			}
+			combined[i].UrazorPeptides[k] = razorMap
 		}
+
+		// if combined[i].ProteinID == "P51809" {
+		// 	spew.Dump(combined[i])
+		// }
 	}
 
 	return combined
@@ -407,6 +417,10 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	var summUniqueSpC = make(map[string]int)
 	var summURazorSpC = make(map[string]int)
 
+	var totalPeptides = make(map[string][]string)
+	var uniquePeptides = make(map[string][]string)
+	var razorPeptides = make(map[string][]string)
+
 	// organize by group number
 	sort.Sort(evidences)
 
@@ -416,7 +430,26 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 			summTotalSpC[i.ProteinID] += i.TotalSpc[j]
 			summUniqueSpC[i.ProteinID] += i.UniqueSpc[j]
 			summURazorSpC[i.ProteinID] += i.UrazorSpc[j]
+
+			totalPeptideMap := i.TotalPeptides[j]
+			for k := range totalPeptideMap {
+				totalPeptides[i.ProteinID] = append(totalPeptides[i.ProteinID], k)
+			}
+
+			uniquePeptideMap := i.UniquePeptides[j]
+			for k := range uniquePeptideMap {
+				uniquePeptides[i.ProteinID] = append(uniquePeptides[i.ProteinID], k)
+			}
+
+			razorPeptideMap := i.UrazorPeptides[j]
+			for k := range razorPeptideMap {
+				razorPeptides[i.ProteinID] = append(razorPeptides[i.ProteinID], k)
+			}
 		}
+
+		totalPeptides[i.ProteinID] = uti.RemoveDuplicateStrings(totalPeptides[i.ProteinID])
+		uniquePeptides[i.ProteinID] = uti.RemoveDuplicateStrings(uniquePeptides[i.ProteinID])
+		razorPeptides[i.ProteinID] = uti.RemoveDuplicateStrings(razorPeptides[i.ProteinID])
 	}
 
 	// create result file
@@ -535,11 +568,11 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 		line += fmt.Sprintf("%d\t", summTotalSpC[i.ProteinID])
 
-		line += fmt.Sprintf("%d\t", len(i.UrazorPeptides))
+		line += fmt.Sprintf("%d\t", len(razorPeptides[i.ProteinID]))
 
-		line += fmt.Sprintf("%d\t", len(i.UniquePeptides))
+		line += fmt.Sprintf("%d\t", len(uniquePeptides[i.ProteinID]))
 
-		line += fmt.Sprintf("%d\t", len(i.TotalPeptides))
+		line += fmt.Sprintf("%d\t", len(totalPeptides[i.ProteinID]))
 
 		// Add Unique+Razor SPC
 		for _, j := range namesList {
@@ -560,18 +593,19 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 			}
 		}
 
+		// Add Unique+Razor Int
 		for _, j := range namesList {
 			line += fmt.Sprintf("%6.f\t", i.UrazorIntensity[j])
 		}
 
-		// Add Unique SPC
+		// Add Unique Int
 		if full {
 			for _, j := range namesList {
 				line += fmt.Sprintf("%6.f\t", i.UniqueIntensity[j])
 			}
 		}
 
-		// Add Total SPC
+		// Add Total Int
 		if full {
 			for _, j := range namesList {
 				line += fmt.Sprintf("%6.f\t", i.TotalIntensity[j])

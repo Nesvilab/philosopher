@@ -67,7 +67,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			}
 
 			if j.IsURazor {
-				razorIons[j.IonForm] = i.ProteinID
+				razorIons[j.IonForm] = i.PartHeader
 				razorPeptides[j.Sequence] = i.PartHeader
 			}
 
@@ -126,7 +126,7 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				evi.PSM[i].IsUnique = true
 			}
 
-			uniquePeptides[evi.PSM[i].Peptide] = evi.PSM[i].ProteinID
+			uniquePeptides[evi.PSM[i].Peptide] = evi.PSM[i].Protein
 		}
 	}
 
@@ -218,9 +218,7 @@ func (evi *Evidence) SyncPSMToProteins() {
 	var newPeptides PeptideEvidenceList
 
 	for _, i := range evi.Proteins {
-		//if !i.IsDecoy {
 		proteinIndex[i.ProteinID] = 0
-		//}
 	}
 
 	for _, i := range evi.PSM {
@@ -267,7 +265,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			proteinIDMap[j.PartHeader] = j.ID
 			entryNameMap[j.PartHeader] = j.EntryName
 			geneMap[j.PartHeader] = j.GeneNames
-			descriptionMap[j.PartHeader] = j.Description
+			descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
 			sequenceMap[j.PartHeader] = j.Sequence
 		}
 	}

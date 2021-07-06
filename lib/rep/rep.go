@@ -335,9 +335,9 @@ type CombinedProteinEvidence struct {
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
-	TotalPeptides          map[string]int
-	UniquePeptides         map[string]int
-	UrazorPeptides         map[string]int
+	TotalPeptides          map[string]map[string]bool
+	UniquePeptides         map[string]map[string]bool
+	UrazorPeptides         map[string]map[string]bool
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64

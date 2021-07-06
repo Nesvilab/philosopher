@@ -154,6 +154,9 @@ func Run(f met.Data) met.Data {
 	e.AssemblePeptideReport(pept, f.Filter.Tag)
 	pept = nil
 
+	logrus.Info("Assigning protein identifications to layers")
+	e.UpdateLayerswithDatabase(f.Filter.Tag)
+
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
 		e.UpdateIonModCount()
@@ -170,20 +173,18 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
+
 	}
 
-	logrus.Info("Assigning protein identifications to layers")
-	e.UpdateLayerswithDatabase(f.Filter.Tag)
-
-	// if len(f.Filter.Pox) > 0 || f.Filter.Inference {
-	// 	e.SyncPSMToProteins()
-	// }
+	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
+		e.SyncPSMToProteins()
+	}
 
 	// reorganizes the selected proteins and the alternative proteins list
 	// logrus.Info("Updating razor PSM assignment to proteins")
-	// if f.Filter.Razor {
-	// 	e.UpdateSupportingSpectra()
-	// }
+	if f.Filter.Razor {
+		e.UpdateSupportingSpectra()
+	}
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 		e.UpdateNumberOfEnzymaticTermini()
