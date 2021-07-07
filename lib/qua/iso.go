@@ -1,11 +1,13 @@
 package qua
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strings"
 
 	"philosopher/lib/iso"
+	"philosopher/lib/msg"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 	"philosopher/lib/tmt"
@@ -373,6 +375,9 @@ func assignUsage(evi rep.Evidence, spectrumMap map[string]iso.Labels) rep.Eviden
 
 func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
+	var counter = 0
+	var rowSum float64
+
 	for i := range evi.PSM {
 
 		var flag = 0
@@ -394,6 +399,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel14.Intensity = 0
 			evi.PSM[i].Labels.Channel15.Intensity = 0
 			evi.PSM[i].Labels.Channel16.Intensity = 0
+
 		} else {
 			for _, j := range evi.PSM[i].Modifications.Index {
 				//if j.MassDiff == 144.1020 || j.MassDiff == 229.1629 || j.MassDiff == 304.2072 {
@@ -421,7 +427,18 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 				evi.PSM[i].Labels.Channel16.Intensity = 0
 			}
 
+			if counter <= 100 {
+				rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity
+				if rowSum > 0 {
+					counter++
+				}
+			}
+
 		}
+	}
+
+	if counter < 100 {
+		msg.QuantifyingData(errors.New("no reporter ions were detected. Review your parameters, and try again"), "fatal")
 	}
 
 	return evi
