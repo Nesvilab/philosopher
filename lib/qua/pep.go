@@ -12,16 +12,19 @@ func CalculatePeptideCounts(e rep.Evidence) rep.Evidence {
 	var unique = make(map[string][]string)
 	var razor = make(map[string][]string)
 
-	for _, i := range e.Peptides {
+	for _, i := range e.PSM {
 
-		total[i.Protein] = append(total[i.Protein], i.Sequence)
+		total[i.Protein] = append(total[i.Protein], i.Peptide)
+		for j := range i.MappedProteins {
+			total[j] = append(total[j], i.Peptide)
+		}
 
 		if i.IsUnique {
-			unique[i.Protein] = append(unique[i.Protein], i.Sequence)
+			unique[i.Protein] = append(unique[i.Protein], i.Peptide)
 		}
 
 		if i.IsURazor {
-			razor[i.Protein] = append(razor[i.Protein], i.Sequence)
+			razor[i.Protein] = append(razor[i.Protein], i.Peptide)
 		}
 	}
 
