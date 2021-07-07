@@ -42,6 +42,10 @@ func CalculatePeptideCounts(e rep.Evidence) rep.Evidence {
 
 	for i := range e.Proteins {
 
+		e.Proteins[i].TotalPeptides = make(map[string]int)
+		e.Proteins[i].UniquePeptides = make(map[string]int)
+		e.Proteins[i].URazorPeptides = make(map[string]int)
+
 		vTP, okTP := total[e.Proteins[i].PartHeader]
 		if okTP {
 			for _, j := range vTP {
@@ -62,7 +66,6 @@ func CalculatePeptideCounts(e rep.Evidence) rep.Evidence {
 				e.Proteins[i].URazorPeptides[j]++
 			}
 		}
-
 	}
 
 	return e
