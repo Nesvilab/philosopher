@@ -676,8 +676,8 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 		if ok {
 			if list[i].Protein != v.MappedProtein {
 
-				list[i].AlternativeProteinsIndexed[list[i].Protein]++
-				delete(list[i].AlternativeProteinsIndexed, v.MappedProtein)
+				list[i].AlternativeProteins[list[i].Protein]++
+				delete(list[i].AlternativeProteins, v.MappedProtein)
 
 				list[i].Protein = v.MappedProtein
 			}

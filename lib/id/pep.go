@@ -44,16 +44,16 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                            uint32
-	Spectrum                         string
-	SpectrumFile                     string
-	Scan                             int
-	Peptide                          string
-	Protein                          string
-	ModifiedPeptide                  string
-	CompesationVoltage               string
-	AlternativeProteins              []string
-	AlternativeProteinsIndexed       map[string]int
+	Index              uint32
+	Spectrum           string
+	SpectrumFile       string
+	Scan               int
+	Peptide            string
+	Protein            string
+	ModifiedPeptide    string
+	CompesationVoltage string
+	//AlternativeProteins              []string
+	AlternativeProteins              map[string]int
 	AssumedCharge                    uint8
 	PrevAA                           string
 	NextAA                           string
@@ -329,7 +329,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 
 	var psm PeptideIdentification
 	psm.Modifications.Index = make(map[string]mod.Modification)
-	psm.AlternativeProteinsIndexed = make(map[string]int)
+	psm.AlternativeProteins = make(map[string]int)
 
 	psm.Index = sq.Index
 	psm.SpectrumFile = FileName
@@ -397,8 +397,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		}
 
 		for _, j := range i.AlternativeProteins {
-			psm.AlternativeProteins = append(psm.AlternativeProteins, string(j.Protein))
-			psm.AlternativeProteinsIndexed[string(j.Protein)]++
+			psm.AlternativeProteins[string(j.Protein)]++
 		}
 
 		for _, j := range i.Score {
@@ -582,12 +581,12 @@ func (p *PepXML) PromoteProteinIDs() {
 
 			for j := range p.PeptideIdentification[i].AlternativeProteins {
 
-				if strings.Contains(p.PeptideIdentification[i].AlternativeProteins[j], "sp|") {
+				if strings.Contains(j, "sp|") {
 					isUniProt = true
 				}
 
-				if !strings.HasPrefix(p.PeptideIdentification[i].AlternativeProteins[j], p.DecoyTag) {
-					list[p.PeptideIdentification[i].AlternativeProteins[j]] = j
+				if !strings.HasPrefix(j, p.DecoyTag) {
+					list[j]++
 				}
 			}
 
@@ -600,7 +599,6 @@ func (p *PepXML) PromoteProteinIDs() {
 				for k := range list {
 					if strings.HasPrefix(k, "sp|") {
 						alt = k
-
 						break
 					} else {
 						alt = k
@@ -609,12 +607,12 @@ func (p *PepXML) PromoteProteinIDs() {
 				p.PeptideIdentification[i].Protein = alt
 
 				// remove the replaces protein from the alternative proteins list
-				p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
-				p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
-				p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				//p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				//p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
+				//p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
 
 				// add the replaces current to the list
-				p.PeptideIdentification[i].AlternativeProteins = append(p.PeptideIdentification[i].AlternativeProteins, current)
+				p.PeptideIdentification[i].AlternativeProteins[current]++
 
 			} else {
 				for k := range list {
@@ -624,12 +622,12 @@ func (p *PepXML) PromoteProteinIDs() {
 				p.PeptideIdentification[i].Protein = alt
 
 				// remove the replaces protein from the alternative proteins list
-				p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
-				p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
-				p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				//p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
+				//p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
+				//p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
 
 				// add the replaces current to the list
-				p.PeptideIdentification[i].AlternativeProteins = append(p.PeptideIdentification[i].AlternativeProteins, current)
+				p.PeptideIdentification[i].AlternativeProteins[current]++
 			}
 
 		}

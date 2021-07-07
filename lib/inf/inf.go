@@ -82,7 +82,7 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 		// total number of peptides per protein
 		proteinTNP[i.Protein]++
 
-		for j := range i.AlternativeProteinsIndexed {
+		for j := range i.AlternativeProteins {
 			if j != i.Protein {
 				proteinTNP[j]++
 			}
@@ -105,13 +105,13 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 			obj.MappedProteins[i.Protein] = proteinTNP[i.Protein]
 			obj.MappedProteinsWithDecoys[i.Protein] = proteinTNP[i.Protein]
 
-			for j := range i.AlternativeProteinsIndexed {
+			for j := range i.AlternativeProteins {
 				obj.MappedProteins[j] = -1
 				obj.MappedProteinsWithDecoys[j] = -1
 			}
 
 			// assign razor for absolute mappings
-			if len(i.AlternativeProteinsIndexed) == 1 {
+			if len(i.AlternativeProteins) == 1 {
 				obj.Protein = i.Protein
 			}
 
@@ -197,22 +197,18 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 
 			if pt != psm[i].Protein {
 
-				psm[i].AlternativeProteins = append(psm[i].AlternativeProteins, psm[i].Protein)
+				psm[i].AlternativeProteins[psm[i].Protein]++
 
-				var toRemove int
+				var toRemove string
 				for j := range psm[i].AlternativeProteins {
-					if psm[i].AlternativeProteins[j] == pt {
+					if j == pt {
 						toRemove = j
 						break
 					}
 				}
 
-				psm[i].AlternativeProteins[toRemove] = psm[i].AlternativeProteins[len(psm[i].AlternativeProteins)-1] // Copy last element to index i.
-				psm[i].AlternativeProteins[len(psm[i].AlternativeProteins)-1] = ""                                   // Erase last element (write zero value).
-				psm[i].AlternativeProteins = psm[i].AlternativeProteins[:len(psm[i].AlternativeProteins)-1]          // Truncate slice.
-
-				psm[i].AlternativeProteinsIndexed[psm[i].Protein]++
-				delete(psm[i].AlternativeProteinsIndexed, pt)
+				psm[i].AlternativeProteins[psm[i].Protein]++
+				delete(psm[i].AlternativeProteins, toRemove)
 
 				psm[i].Protein = pt
 			}

@@ -600,7 +600,10 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				Razor:                1,
 			}
 
-			pep.PeptideParentProtein = i.AlternativeProteins
+			for j := range i.AlternativeProteins {
+				pep.PeptideParentProtein = append(pep.PeptideParentProtein, j)
+				pro.IndistinguishableProtein = append(pro.IndistinguishableProtein, j)
+			}
 
 			pep.NumberOfInstances++
 
@@ -621,7 +624,7 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pep.Modifications.Index[k] = v
 			}
 
-			pro.IndistinguishableProtein = i.AlternativeProteins
+			//pro.IndistinguishableProtein = i.AlternativeProteins
 			pro.HasRazor = true
 			pro.PeptideIons = append(pro.PeptideIons, pep)
 
@@ -647,7 +650,7 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pep.InitialProbability = i.Probability
 			}
 
-			pep.PeptideParentProtein = i.AlternativeProteins
+			//pep.PeptideParentProtein = i.AlternativeProteins
 
 			pep.NumberOfInstances++
 
@@ -664,7 +667,7 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pep.Modifications.Index[k] = v
 			}
 
-			pro.IndistinguishableProtein = i.AlternativeProteins
+			//pro.IndistinguishableProtein = i.AlternativeProteins
 			pro.PeptideIons = append(pro.PeptideIons, pep)
 
 			proteinList[i.Protein] = pro
@@ -733,7 +736,7 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 				filterMap[string(i.Spectrum)] = i
 			} else {
 
-				for _, j := range i.AlternativeProteins {
+				for j := range i.AlternativeProteins {
 					key := fmt.Sprintf("%s#%s", j, i.Peptide)
 					_, ap := protmap[key]
 					if ap {
@@ -757,8 +760,8 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 			if ok {
 				filterMap[string(i.Spectrum)] = i
 			} else {
-				for _, j := range i.AlternativeProteins {
-					_, ap := protmap[string(j)]
+				for j := range i.AlternativeProteins {
+					_, ap := protmap[j]
 					if ap {
 						filterMap[string(i.Spectrum)] = i
 					}

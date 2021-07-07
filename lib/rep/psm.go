@@ -84,7 +84,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.UncalibratedPrecursorNeutralMass = i.PrecursorNeutralMass
 		}
 
-		for _, j := range i.AlternativeProteins {
+		for j := range i.AlternativeProteins {
 			p.MappedProteins[j]++
 		}
 
@@ -110,7 +110,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		if len(i.AlternativeProteins) == 0 {
 			p.IsUnique = true
 		} else {
-			for _, k := range i.AlternativeProteins {
+			for k := range i.AlternativeProteins {
 				if k == i.Protein {
 					redudantMapping++
 				}
