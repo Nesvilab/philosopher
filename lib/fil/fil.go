@@ -82,8 +82,6 @@ func Run(f met.Data) met.Data {
 
 			processProteinInferenceIdentifications(pepid, razorMap, coverMap, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
-
-		pro.Restore()
 	}
 
 	pepxml.Restore()

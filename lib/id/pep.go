@@ -44,51 +44,53 @@ type PepXML struct {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index              uint32
-	Spectrum           string
-	SpectrumFile       string
-	Scan               int
-	Peptide            string
-	Protein            string
-	ModifiedPeptide    string
-	CompesationVoltage string
-	//AlternativeProteins              []string
-	AlternativeProteins              map[string]int
-	AssumedCharge                    uint8
-	PrevAA                           string
-	NextAA                           string
-	HitRank                          uint8
-	MissedCleavages                  uint8
-	NumberTolTerm                    uint8
-	NumberOfEnzymaticTermini         uint8
-	NumberTotalProteins              uint16
-	TotalNumberIons                  uint16
-	NumberMatchedIons                uint16
-	NumberofMissedCleavages          int
-	UncalibratedPrecursorNeutralMass float64
-	PrecursorNeutralMass             float64
-	PrecursorExpMass                 float64
-	RetentionTime                    float64
-	CalcNeutralPepMass               float64
-	Massdiff                         float64
-	LocalizedPTMSites                map[string]int
-	LocalizedPTMMassDiff             map[string]string
-	LocalizationRange                string
-	Probability                      float64
-	IsoMassD                         int
-	Expectation                      float64
-	Xcorr                            float64
-	DeltaCN                          float64
-	DeltaCNStar                      float64
-	SPScore                          float64
-	SPRank                           float64
-	Hyperscore                       float64
-	Nextscore                        float64
-	DiscriminantValue                float64
-	Intensity                        float64
-	IonMobility                      float64
-	IsRejected                       uint8
-	Modifications                    mod.Modifications
+	Index                                uint32
+	Spectrum                             string
+	SpectrumFile                         string
+	Scan                                 int
+	Peptide                              string
+	Protein                              string
+	ModifiedPeptide                      string
+	CompesationVoltage                   string
+	AlternativeProteins                  map[string]int
+	AssumedCharge                        uint8
+	PrevAA                               string
+	NextAA                               string
+	HitRank                              uint8
+	MissedCleavages                      uint8
+	NumberTolTerm                        uint8
+	NumberOfEnzymaticTermini             uint8
+	NumberTotalProteins                  uint16
+	TotalNumberIons                      uint16
+	NumberMatchedIons                    uint16
+	NumberofMissedCleavages              int
+	UncalibratedPrecursorNeutralMass     float64
+	PrecursorNeutralMass                 float64
+	PrecursorExpMass                     float64
+	RetentionTime                        float64
+	CalcNeutralPepMass                   float64
+	Massdiff                             float64
+	LocalizedPTMSites                    map[string]int
+	LocalizedPTMMassDiff                 map[string]string
+	LocalizationRange                    string
+	MSFragerLocalization                 string
+	MSFraggerLocalizationScoreWithPTM    string
+	MSFraggerLocalizationScoreWithoutPTM string
+	Probability                          float64
+	IsoMassD                             int
+	Expectation                          float64
+	Xcorr                                float64
+	DeltaCN                              float64
+	DeltaCNStar                          float64
+	SPScore                              float64
+	SPRank                               float64
+	Hyperscore                           float64
+	Nextscore                            float64
+	DiscriminantValue                    float64
+	Intensity                            float64
+	IonMobility                          float64
+	IsRejected                           uint8
+	Modifications                        mod.Modifications
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -429,6 +431,10 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		}
 
 		psm.LocalizationRange = i.PTMResult.LocalizationPeptide
+
+		psm.MSFragerLocalization = i.PTMResult.LocalizationPeptide
+		psm.MSFraggerLocalizationScoreWithPTM = i.PTMResult.BestScoreWithPTM
+		psm.MSFraggerLocalizationScoreWithoutPTM = i.PTMResult.ScoreWithoutPTM
 
 		// to be able to accept multiple entries with the same spectrum name, we fuse the
 		// file name to the spectrum name. This is going to be used as an identifiable attribute

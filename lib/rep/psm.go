@@ -75,6 +75,9 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.MappedGenes = make(map[string]int)
 		p.MappedProteins = make(map[string]int)
 		p.Modifications = i.Modifications
+		p.MSFragerLocalization = i.MSFragerLocalization
+		p.MSFraggerLocalizationScoreWithPTM = i.MSFraggerLocalizationScoreWithPTM
+		p.MSFraggerLocalizationScoreWithoutPTM = i.MSFraggerLocalizationScoreWithoutPTM
 
 		if i.UncalibratedPrecursorNeutralMass > 0 {
 			p.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -184,6 +187,10 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			hasPurity = true
 		}
 
+		if len(evi.PSM[i].MSFragerLocalization) > 0 {
+			hasLoc = true
+		}
+
 	}
 
 	for k := range modMap {
@@ -210,7 +217,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 	}
 
 	if hasLoc {
-		header += "\tLocalization Range"
+		header += "\tMSFragger Localization\tBest Score with Delta Mass\tBest Score without Delta Mass"
 	}
 
 	if hasIonMob {
@@ -387,9 +394,11 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		}
 
 		if hasLoc {
-			line = fmt.Sprintf("%s\t%s",
+			line = fmt.Sprintf("%s\t%s\t%s\t%s",
 				line,
-				i.LocalizationRange,
+				i.MSFragerLocalization,
+				i.MSFraggerLocalizationScoreWithPTM,
+				i.MSFraggerLocalizationScoreWithoutPTM,
 			)
 		}
 
