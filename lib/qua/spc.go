@@ -40,6 +40,10 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 	for i := range e.Proteins {
 
+		//e.Proteins[i].TotalSpC = 0
+		//e.Proteins[i].UniqueSpC = 0
+		//e.Proteins[i].URazorSpC = 0
+
 		vT, okT := total[e.Proteins[i].PartHeader]
 		if okT {
 			e.Proteins[i].TotalSpC += len(vT)

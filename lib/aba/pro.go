@@ -298,10 +298,6 @@ func getProteinToPeptideCounts(combined rep.CombinedProteinEvidenceList, dataset
 			}
 			combined[i].UrazorPeptides[k] = razorMap
 		}
-
-		// if combined[i].ProteinID == "P51809" {
-		// 	spew.Dump(combined[i])
-		// }
 	}
 
 	return combined

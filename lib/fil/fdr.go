@@ -620,7 +620,7 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 
 // twoDFDRFilter estimates FDR levels by applying a second filter by regenerating
 // a protein list with decoys from protXML and pepXML.
-func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string, isRazor bool) {
+func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) {
 
 	// filter protein list at given FDR level and regenerate protein list by adding pairing decoys
 	//logrus.Info("Creating mirror image from filtered protein list")
@@ -654,12 +654,6 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
 	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
 
-	if isRazor {
-		filteredPSM = correctRazorAssignment(filteredPSM)
-		filteredPeptides = correctRazorAssignment(filteredPeptides)
-		filteredIons = correctRazorAssignment(filteredIons)
-	}
-
 	filteredPSM.Serialize("psm")
 	filteredPeptides.Serialize("pep")
 	filteredIons.Serialize("ion")
@@ -674,6 +668,7 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 	for i := range list {
 		v, ok := rm[list[i].Peptide]
 		if ok {
+
 			if list[i].Protein != v.MappedProtein {
 
 				list[i].AlternativeProteins[list[i].Protein]++

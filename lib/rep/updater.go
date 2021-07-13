@@ -209,7 +209,15 @@ func (evi *Evidence) UpdateIonModCount() {
 }
 
 // SyncPSMToProteins forces the synchronization between the filtered proteins, and the remaining structures.
-func (evi *Evidence) SyncPSMToProteins() {
+func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
+
+	var totalSpc = make(map[string][]string)
+	var uniqueSpc = make(map[string][]string)
+	var razorSpc = make(map[string][]string)
+
+	var totalPeptides = make(map[string][]string)
+	var uniquePeptides = make(map[string][]string)
+	var razorPeptides = make(map[string][]string)
 
 	var proteinIndex = make(map[string]uint8)
 	var newPSM PSMEvidenceList
@@ -243,6 +251,94 @@ func (evi *Evidence) SyncPSMToProteins() {
 		}
 	}
 	evi.Peptides = newPeptides
+
+	for _, i := range evi.PSM {
+
+		if !i.IsDecoy {
+
+			// Total
+			totalSpc[i.Protein] = append(totalSpc[i.Protein], i.Spectrum)
+			totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
+			for j := range i.MappedProteins {
+				totalSpc[j] = append(totalSpc[j], i.Spectrum)
+				totalPeptides[j] = append(totalPeptides[j], i.Peptide)
+			}
+
+			if i.IsUnique {
+				uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.Spectrum)
+				uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
+			}
+
+			if i.IsURazor {
+				razorSpc[i.Protein] = append(razorSpc[i.Protein], i.Spectrum)
+				razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
+			}
+		}
+	}
+
+	for k, v := range totalPeptides {
+		totalPeptides[k] = uti.RemoveDuplicateStrings(v)
+	}
+
+	for k, v := range uniquePeptides {
+		uniquePeptides[k] = uti.RemoveDuplicateStrings(v)
+	}
+
+	for k, v := range razorPeptides {
+		razorPeptides[k] = uti.RemoveDuplicateStrings(v)
+	}
+
+	for i := range evi.Proteins {
+
+		evi.Proteins[i].SupportingSpectra = make(map[string]int)
+		evi.Proteins[i].TotalSpC = 0
+		evi.Proteins[i].UniqueSpC = 0
+		evi.Proteins[i].URazorSpC = 0
+		evi.Proteins[i].TotalPeptides = make(map[string]int)
+		evi.Proteins[i].UniquePeptides = make(map[string]int)
+		evi.Proteins[i].URazorPeptides = make(map[string]int)
+
+		v, ok := totalSpc[evi.Proteins[i].PartHeader]
+		if ok {
+			evi.Proteins[i].TotalSpC += len(v)
+			for _, j := range v {
+				evi.Proteins[i].SupportingSpectra[j]++
+			}
+		}
+
+		v, ok = totalPeptides[evi.Proteins[i].PartHeader]
+		if ok {
+			for _, j := range v {
+				evi.Proteins[i].TotalPeptides[j]++
+			}
+		}
+
+		v, ok = uniqueSpc[evi.Proteins[i].PartHeader]
+		if ok {
+			evi.Proteins[i].UniqueSpC += len(v)
+		}
+
+		v, ok = uniquePeptides[evi.Proteins[i].PartHeader]
+		if ok {
+			for _, j := range v {
+				evi.Proteins[i].UniquePeptides[j]++
+			}
+		}
+
+		v, ok = razorSpc[evi.Proteins[i].PartHeader]
+		if ok {
+			evi.Proteins[i].URazorSpC += len(v)
+		}
+
+		v, ok = razorPeptides[evi.Proteins[i].PartHeader]
+		if ok {
+			for _, j := range v {
+				evi.Proteins[i].URazorPeptides[j]++
+			}
+		}
+	}
+
+	return evi
 }
 
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data

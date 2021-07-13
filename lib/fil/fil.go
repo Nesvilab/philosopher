@@ -14,7 +14,6 @@ import (
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
-	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
@@ -89,7 +88,29 @@ func Run(f met.Data) met.Data {
 
 	pepxml.Restore()
 
-	if _, err := os.Stat(razorBin); err == nil {
+	if f.Filter.Seq {
+
+		// sequential analysis
+		// filtered psm list and filtered prot list
+		pep.Restore("psm")
+		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+		pep = nil
+
+	} else if f.Filter.TwoD {
+
+		// two-dimensional analysis
+		// complete pep list and filtered mirror-image prot list
+		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+
+	}
+
+	var dtb dat.Base
+	dtb.Restore()
+	if len(dtb.Records) < 1 {
+		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
+	}
+
+	if _, err := os.Stat(razorBin); err == nil || f.Filter.TwoD {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)
@@ -107,28 +128,6 @@ func Run(f met.Data) met.Data {
 		ion = correctRazorAssignment(ion)
 		ion.Serialize("ion")
 		ion = nil
-	}
-
-	if f.Filter.Seq {
-
-		// sequential analysis
-		// filtered psm list and filtered prot list
-		pep.Restore("psm")
-		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
-		pep = nil
-
-	} else if f.Filter.TwoD {
-
-		// two-dimensional analysis
-		// complete pep list and filtered mirror-image prot list
-		twoDFDRFilter(pepxml.PeptideIdentification, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag, f.Filter.Razor)
-
-	}
-
-	var dtb dat.Base
-	dtb.Restore()
-	if len(dtb.Records) < 1 {
-		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	}
 
 	logrus.Info("Post processing identifications")
@@ -170,6 +169,48 @@ func Run(f met.Data) met.Data {
 		e.UpdatePeptideModCount()
 	}
 
+	if f.Filter.Razor {
+		var razor RazorMap = make(map[string]RazorCandidate)
+		razor.Restore()
+		for i := range e.PSM {
+
+			for j := range e.PSM[i].MappedProteins {
+				if strings.Contains(j, f.Filter.Tag) {
+					delete(e.PSM[i].MappedProteins, j)
+				}
+			}
+
+			v, ok := razor[e.PSM[i].Peptide]
+
+			if ok {
+				if len(v.MappedProtein) > 0 {
+					if e.PSM[i].Protein != v.MappedProtein {
+						e.PSM[i].MappedProteins[e.PSM[i].Protein]++
+						delete(e.PSM[i].MappedProteins, v.MappedProtein)
+						e.PSM[i].Protein = v.MappedProtein
+					}
+					delete(e.PSM[i].MappedProteins, v.MappedProtein)
+				}
+
+				e.PSM[i].IsURazor = true
+			}
+
+			if e.PSM[i].IsUnique {
+				e.PSM[i].IsURazor = true
+			}
+
+			if len(e.PSM[i].MappedProteins) == 0 {
+				e.PSM[i].IsURazor = true
+				e.PSM[i].IsUnique = true
+
+				e.PSM[i].MappedGenes = make(map[string]int)
+			}
+
+		}
+
+		razor = nil
+	}
+
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
 		logrus.Info("Processing protein inference")
@@ -180,25 +221,22 @@ func Run(f met.Data) met.Data {
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
 		e.UpdateIonStatus(f.Filter.Tag)
-	}
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
-		e.SyncPSMToProteins()
+		logrus.Info("Synchronizing PSMs and proteins")
+
+		e = e.SyncPSMToProteins(f.Filter.Tag)
+
+		e.UpdateNumberOfEnzymaticTermini()
 	}
 
 	// reorganizes the selected proteins and the alternative proteins list
 	// logrus.Info("Updating razor PSM assignment to proteins")
-	if f.Filter.Razor {
-		e.UpdateSupportingSpectra()
-	}
+	// if f.Filter.Razor {
+	// 	e.UpdateSupportingSpectra()
+	// }
 
-	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
-		e.UpdateNumberOfEnzymaticTermini()
-	}
-
-	logrus.Info("Calculating spectral counts")
-	e = qua.CalculateSpectralCounts(e)
-	e = qua.CalculatePeptideCounts(e)
+	//e = qua.CalculateSpectralCounts(e)
+	//e = qua.CalculatePeptideCounts(e)
 
 	logrus.Info("Saving")
 	e.SerializeGranular()
