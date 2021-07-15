@@ -29,9 +29,7 @@ func Run(f met.Data) met.Data {
 	var pro id.ProtIDList
 	var razorBin string
 
-	if len(f.Filter.RazorBin) == 0 {
-		razorBin = sys.RazorBin()
-	} else {
+	if len(f.Filter.RazorBin) > 0 {
 		razorBin = f.Filter.RazorBin
 	}
 
@@ -168,8 +166,10 @@ func Run(f met.Data) met.Data {
 	}
 
 	if f.Filter.Razor {
+
 		var razor RazorMap = make(map[string]RazorCandidate)
 		razor.Restore()
+
 		for i := range e.PSM {
 
 			for j := range e.PSM[i].MappedProteins {
