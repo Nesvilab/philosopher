@@ -679,6 +679,8 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 		}
 	}
 
+	rm.Serialize()
+
 	return list
 }
 
