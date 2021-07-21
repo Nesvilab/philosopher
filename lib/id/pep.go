@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"path"
 	"path/filepath"
 	"sort"
@@ -217,13 +216,13 @@ func (p *PepXML) Read(f string) {
 
 		}
 
-		massDeviation := getMassDeviation(mpa.MsmsRunSummary.SpectrumQuery)
+		//massDeviation := getMassDeviation(mpa.MsmsRunSummary.SpectrumQuery)
 
 		// start processing spectra queries
 		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		for _, i := range sq {
-			psm := processSpectrumQuery(i, massDeviation, p.Modifications, p.DecoyTag, p.FileName)
+			psm := processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
 			psmlist = append(psmlist, psm)
 		}
 
@@ -327,7 +326,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 	return pepIdent, searchEngine
 }
 
-func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
 	psm.Modifications.Index = make(map[string]mod.Modification)
@@ -365,7 +364,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, massDeviation float64, mods mod.
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
-		psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
+
+		//psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
+		psm.Massdiff = uti.ToFixed(i.Massdiff, 4)
 
 		psm.NumberofMissedCleavages = int(i.MissedCleavages)
 		psm.NumberOfEnzymaticTermini = i.TotalTerm
@@ -549,25 +550,25 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 }
 
 // getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
-func getMassDeviation(sq []spc.SpectrumQuery) float64 {
+// func getMassDeviation(sq []spc.SpectrumQuery) float64 {
 
-	var countZero int
-	var massZero float64
-	var adjustedMass float64
+// 	var countZero int
+// 	var massZero float64
+// 	var adjustedMass float64
 
-	for _, i := range sq {
-		for _, j := range i.SearchResult.SearchHit {
-			if math.Abs(j.Massdiff) >= -0.1 && math.Abs(j.Massdiff) <= 0.1 {
-				countZero++
-				massZero += j.Massdiff
-			}
-		}
-	}
+// 	for _, i := range sq {
+// 		for _, j := range i.SearchResult.SearchHit {
+// 			if math.Abs(j.Massdiff) >= -0.1 && math.Abs(j.Massdiff) <= 0.1 {
+// 				countZero++
+// 				massZero += j.Massdiff
+// 			}
+// 		}
+// 	}
 
-	adjustedMass = massZero / float64(countZero)
+// 	adjustedMass = massZero / float64(countZero)
 
-	return adjustedMass
-}
+// 	return adjustedMass
+// }
 
 // PromoteProteinIDs changes the identification in cases where the reference protein is a decoy and
 // the alternative proteins contains target proteins.
