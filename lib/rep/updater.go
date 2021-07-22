@@ -369,7 +369,6 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 			evi.Peptides[i].Spc = len(v)
 		}
 
-		fmt.Println(evi.Peptides[i].Spc, evi.Peptides[i].Spectra)
 	}
 
 	return evi
