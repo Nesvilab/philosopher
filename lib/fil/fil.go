@@ -227,6 +227,8 @@ func Run(f met.Data) met.Data {
 		e.UpdateNumberOfEnzymaticTermini()
 	}
 
+	e = e.SyncPSMToPeptides(f.Filter.Tag)
+
 	// reorganizes the selected proteins and the alternative proteins list
 	// logrus.Info("Updating razor PSM assignment to proteins")
 	// if f.Filter.Razor {
