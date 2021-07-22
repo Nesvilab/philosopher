@@ -23,28 +23,20 @@ var filterCmd = &cobra.Command{
 
 		msg.Executing("Filter ", Version)
 
-		// clean, clean clean
-		os.RemoveAll(sys.EvBin())
-		os.RemoveAll(sys.EvIonBin())
-		os.RemoveAll(sys.EvModificationsBin())
-		os.RemoveAll(sys.EvModificationsEvBin())
-		os.RemoveAll(sys.EvPSMBin())
-		os.RemoveAll(sys.EvPeptideBin())
-		os.RemoveAll(sys.EvProteinBin())
-		os.RemoveAll(sys.PsmBin())
-		os.RemoveAll(sys.IonBin())
+		// clean, clean, clean
+		os.RemoveAll(sys.PSMBin())
 		os.RemoveAll(sys.PepBin())
-		os.RemoveAll(sys.PepxmlBin())
+		os.RemoveAll(sys.IonBin())
 		os.RemoveAll(sys.ProBin())
-		os.RemoveAll(sys.ProtxmlBin())
+		os.RemoveAll(sys.PepxmlBin())
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {
-			msg.InputNotFound(errors.New("You must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
+			msg.InputNotFound(errors.New("you must provide a pepXML file or a folder with one or more files, Run 'philosopher filter --help' for more information"), "fatal")
 		}
 
-		if len(m.Filter.Pox) == 0 && m.Filter.Razor == true {
-			msg.Custom(errors.New("Razor option will be ignored because there is no protein inference data"), "warning")
+		if len(m.Filter.Pox) == 0 && m.Filter.Razor {
+			msg.Custom(errors.New("razor option will be ignored because there is no protein inference data"), "warning")
 			m.Filter.Razor = false
 		}
 
@@ -56,7 +48,6 @@ var filterCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 
@@ -70,6 +61,7 @@ func init() {
 		filterCmd.Flags().StringVarP(&m.Filter.Pox, "protxml", "", "", "protXML file path")
 		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "rev_", "decoy tag")
 		filterCmd.Flags().StringVarP(&m.Filter.Mods, "mods", "", "", "list of modifications for a stratified FDR filtering")
+		filterCmd.Flags().StringVarP(&m.Filter.RazorBin, "razorbin", "", "", "use a custom razor assignment for the filtering")
 		filterCmd.Flags().Float64VarP(&m.Filter.IonFDR, "ion", "", 0.01, "peptide ion FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PepFDR, "pep", "", 0.01, "peptide FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PsmFDR, "psm", "", 0.01, "psm FDR level")
@@ -84,10 +76,8 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Mapmods, "mapmods", "", false, "map modifications")
 		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
-		filterCmd.Flags().BoolVarP(&m.Filter.Fo, "fo", "", false, "")
-		filterCmd.Flags().MarkHidden("fo")
 		filterCmd.Flags().MarkHidden("mods")
-		//filterCmd.Flags().MarkHidden("inference")
+		filterCmd.Flags().MarkHidden("razorbin")
 	}
 
 	RootCmd.AddCommand(filterCmd)

@@ -1,8 +1,18 @@
 ### Added
-- Added support to compensation Voltage. 
+- Native support for Thermo raw files (Windows, and Linux).
+- Option to tag contaminant sequences with a prefix tag.
+- New parameters added to MSFragger.
+- Support for FAIMS data.
+- New parameters for MSFragger.
 
 ### Changed
-- Tabular spaces in FASTA headers will be replaced by a simple space character.
+- Improvements in overall performance.
+- Improvements to the pipeline processing speed.
+- Major code cleaning and refactoring.
+- The pipeline protein inference is now calculated once for all data sets.
+- Updated razor assingment classification.
+- Upgated Go compiler to v1.16.5.
 
 ### Fixed
-- Fix a bug that would miscalculate the number of peptides to be reported.
+- Label positioning in the reprint output.
+- Minor bugs and fixes.

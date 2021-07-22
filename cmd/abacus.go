@@ -22,7 +22,7 @@ var abacusCmd = &cobra.Command{
 		m.FunctionInitCheckUp()
 
 		if len(args) < 2 {
-			msg.InputNotFound(errors.New("The combined analysis needs at least 2 result files to work"), "fatal")
+			msg.InputNotFound(errors.New("the combined analysis needs at least 2 result files to work"), "fatal")
 		}
 
 		msg.Executing("Abacus", Version)
@@ -35,7 +35,6 @@ var abacusCmd = &cobra.Command{
 		met.CleanTemp(m.Temp)
 
 		msg.Done()
-		return
 	},
 }
 
@@ -55,6 +54,7 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Reprint, "reprint", "", false, "create abacus reports using the Reprint format")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Full, "full", "", true, "generates combined tables with extra information")
 	}
 
 	RootCmd.AddCommand(abacusCmd)

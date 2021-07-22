@@ -4,6 +4,7 @@ package uti
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -94,7 +95,7 @@ func GetLabelNames(annot string) map[string]string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		// does the line has at least an iso tag?
-		if len(scanner.Text()) > 0 {
+		if len(scanner.Text()) > 3 {
 
 			// replace tabs and multiple spaces by single space
 			// space := regexp.MustCompile(`\s+`)
@@ -126,7 +127,7 @@ func FindFile(targetDir string, pattern string) string {
 	return match[0]
 }
 
-// WalkMatch looks for files with a certain extension in a specofoc folder
+// WalkMatch recursively looks for files with a certain extension in a specific folder
 func WalkMatch(root, pattern string) ([]string, error) {
 	var matches []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -147,4 +148,57 @@ func WalkMatch(root, pattern string) ([]string, error) {
 		return nil, err
 	}
 	return matches, nil
+}
+
+// IOReadDir looks for files with a certain extension in a specific folder
+func IOReadDir(root, ext string) []string {
+
+	var files []string
+
+	fileInfo, err := ioutil.ReadDir(root)
+	if err != nil {
+		return files
+	}
+	for _, file := range fileInfo {
+		if strings.Contains(file.Name(), ext) {
+			files = append(files, file.Name())
+		}
+	}
+
+	return files
+}
+
+// GetMaxNumber returns the highest (string) number from an array in string format
+func GetMaxNumber(list []string) string {
+
+	var max = -1.0
+
+	for _, i := range list {
+		f, _ := strconv.ParseFloat(i, 64)
+		if f > max {
+			max = f
+		}
+	}
+
+	s := fmt.Sprintf("%f", max)
+
+	if s == "-1.000000" {
+		return ""
+	}
+
+	return s
+}
+
+// RemoveDuplicateStrings removes duplicates from a slice
+func RemoveDuplicateStrings(slice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+
+	for _, entry := range slice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }

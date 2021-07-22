@@ -2,13 +2,14 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"philosopher/lib/dat"
+	"philosopher/lib/fil"
 	"philosopher/lib/met"
-	"philosopher/lib/mod"
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
@@ -28,8 +29,8 @@ var inspectCmd = &cobra.Command{
 	Hidden: true,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if object == "meta" {
-
+		switch object {
+		case "meta":
 			var o met.Data
 
 			target := fmt.Sprintf(".meta%smeta.bin", string(filepath.Separator))
@@ -46,26 +47,10 @@ var inspectCmd = &cobra.Command{
 			} else {
 				spew.Dump(o)
 			}
-
-		} else if object == "parameters" {
-
-			var o rep.SearchParametersEvidence
-
-			target := fmt.Sprintf(".meta%sev.param.bin", string(filepath.Separator))
-			file, _ := os.Open(target)
-
-			dec := msgpack.NewDecoder(file)
-			e := dec.Decode(&o)
-			if e != nil {
-				msg.DecodeMsgPck(e, "fatal")
-			}
-			spew.Dump(o)
-
-		} else if object == "psm" {
-
+		case "psm":
 			var o rep.PSMEvidenceList
 
-			target := fmt.Sprintf(".meta%sev.psm.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%spsm.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -74,9 +59,7 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
-
-		} else if object == "db" {
-
+		case "db":
 			var o dat.Base
 
 			target := fmt.Sprintf(".meta%sdb.bin", string(filepath.Separator))
@@ -88,9 +71,7 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Records)
-
-		} else if object == "lfq" {
-
+		case "lfq":
 			var o qua.LFQ
 
 			target := fmt.Sprintf(".meta%slfq.bin", string(filepath.Separator))
@@ -102,26 +83,10 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o.Intensities)
+		case "razor":
+			var o fil.RazorMap
 
-		} else if object == "lfq" {
-
-			var o qua.LFQ
-
-			target := fmt.Sprintf(".meta%slfq.bin", string(filepath.Separator))
-			file, _ := os.Open(target)
-
-			dec := msgpack.NewDecoder(file)
-			e := dec.Decode(&o)
-			if e != nil {
-				msg.DecodeMsgPck(e, "fatal")
-			}
-			spew.Dump(o.Intensities)
-
-		} else if object == "mod" {
-
-			var o mod.Modifications
-
-			target := fmt.Sprintf(".meta%sev.mod.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%srazor.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -130,12 +95,10 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
-
-		} else if object == "protein" {
-
+		case "protein":
 			var o rep.ProteinEvidenceList
 
-			target := fmt.Sprintf(".meta%sev.pro.bin", string(filepath.Separator))
+			target := fmt.Sprintf(".meta%spro.bin", string(filepath.Separator))
 			file, _ := os.Open(target)
 
 			dec := msgpack.NewDecoder(file)
@@ -155,10 +118,10 @@ var inspectCmd = &cobra.Command{
 			} else {
 				spew.Dump(o)
 			}
-
+		default:
+			msg.Custom(errors.New("the option is not available"), "fatal")
 		}
 
-		return
 	},
 }
 

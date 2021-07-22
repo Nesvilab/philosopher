@@ -33,7 +33,7 @@ func Run(m met.Data) met.Data {
 func writeDatabase(d met.Database, text string) string {
 
 	var dbFlavor string
-	if d.Rev == true {
+	if d.Rev {
 		dbFlavor = "Swiss-Prot"
 	} else {
 		dbFlavor = "TrEMBL"
@@ -41,7 +41,7 @@ func writeDatabase(d met.Database, text string) string {
 
 	text = fmt.Sprintf("A protein database file was downloaded from UniProt %s (PMID:30395287) using the proteome ID %s on %s.", dbFlavor, d.ID, d.TimeStamp)
 
-	if d.Crap == true {
+	if d.Crap {
 		text = fmt.Sprintf("%s A list of 153 common contaminants was also added to the database.", text)
 	}
 
@@ -63,30 +63,7 @@ func writeMSFragger(d met.MSFragger, text string) string {
 	phosphorylation (+79.9663) of serine, threonine, and tyrosine residues
 	*/
 
-	var searchText string
-
-	// var precursorUnits string
-	// var fragmentUnits string
-
-	// if d.PrecursorMassMode == "1" {
-	// 	precursorUnits = "ppm"
-	// } else if d.PrecursorMassMode == "0" {
-	// 	precursorUnits = "Da"
-	// }
-
-	// if d.FragmentMassUnits == 1 {
-	// 	fragmentUnits = "ppm"
-	// } else if d.FragmentMassUnits == 0 {
-	// 	fragmentUnits = "Da"
-	// }
-
-	// if d.PrecursorMassUpper > 75 {
-	// 	searchText = fmt.Sprintf("An open database search on %s files was performed with MSFragger [CITATION] using precursor tolerance set from %d to %d Da and fragment tolerance of %d %s", d.RawExtension, d.PrecursorMassLower, d.PrecursorMassUpper, d.FragmentMassTolerance, fragmentUnits)
-	// } else {
-	// 	searchText = fmt.Sprintf("Database searching was performed on %s files with MSFragger [CITATION] using a precursor tolerance of %s %s, fragment tolerance of %s %s", d.RawExtension, d.PrecursorMassLower, precursorUnits, d.FragmentMassTolerance, fragmentUnits)
-	// }
-
-	searchText = fmt.Sprintf("Database searching was performed on %s files with MSFragger [CITATION] using a precursor tolerance of", d.RawExtension)
+	searchText := fmt.Sprintf("Database searching was performed on %s files with MSFragger [CITATION] using a precursor tolerance of", d.Extension)
 
 	text = text + searchText
 

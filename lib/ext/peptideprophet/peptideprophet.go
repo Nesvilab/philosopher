@@ -54,9 +54,9 @@ func Run(m met.Data, args []string) met.Data {
 
 	var pep = New(m.Temp)
 
-	if len(m.PeptideProphet.Database) < 1 {
-		msg.Custom(errors.New("You need to provide a protein database"), "fatal")
-	}
+	// if len(m.PeptideProphet.Database) < 1 {
+	// 	msg.Custom(errors.New("You need to provide a protein database"), "fatal")
+	// }
 
 	// get the database tag from database command
 	if len(m.PeptideProphet.Decoy) == 0 {
@@ -106,8 +106,6 @@ func (p *PeptideProphet) Deploy(os, distro string) {
 			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
-
-	return
 }
 
 // Execute PeptideProphet
@@ -143,7 +141,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 
 	var files []string
 
-	if params.Combine == false {
+	if !params.Combine {
 
 		for i := range args {
 
@@ -271,7 +269,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 		_ = cmd.Wait()
 
 		if cmd.ProcessState.ExitCode() != 0 {
-			msg.ExecutingBinary(errors.New("There was an error with PeptideProphet, please check your parameters and input files"), "fatal")
+			msg.ExecutingBinary(errors.New("there was an error with PeptideProphet, please check your parameters and input files"), "fatal")
 		}
 
 	}
@@ -291,7 +289,7 @@ func refreshParser(p PeptideProphet, file, database, output, temp string) {
 	// append the database
 	if len(database) > 0 {
 		db, _ := filepath.Abs(database)
-		v := fmt.Sprintf("%s", db)
+		v := db
 		cmd.Args = append(cmd.Args, v)
 	}
 
@@ -315,8 +313,6 @@ func refreshParser(p PeptideProphet, file, database, output, temp string) {
 		msg.ExecutingBinary(e, "fatal")
 	}
 	_ = cmd.Wait()
-
-	return
 }
 
 // peptideProphet executes peptideprophet
@@ -327,95 +323,95 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 	// string of arguments to be passed as a command
 	cmd.Args = append(cmd.Args, file)
 
-	if params.Exclude == true {
+	if params.Exclude {
 		cmd.Args = append(cmd.Args, "EXCLUDE")
 	}
 
-	if params.Leave == true {
+	if params.Leave {
 		cmd.Args = append(cmd.Args, "LEAVE")
 	}
 
-	if params.Perfectlib == true {
+	if params.Perfectlib {
 		cmd.Args = append(cmd.Args, "PERFECTLIB")
 	}
 
-	if params.Icat == true {
+	if params.Icat {
 		cmd.Args = append(cmd.Args, "ICAT")
 	}
 
-	if params.Noicat == true {
+	if params.Noicat {
 		cmd.Args = append(cmd.Args, "NOICAT")
 	}
 
-	if params.Zero == true {
+	if params.Zero {
 		cmd.Args = append(cmd.Args, "ZERO")
 	}
 
-	if params.Accmass == true {
+	if params.Accmass {
 		cmd.Args = append(cmd.Args, "ACCMASS")
 	}
 
-	if params.Ppm == true {
+	if params.Ppm {
 		cmd.Args = append(cmd.Args, "PPM")
 	}
 
-	if params.Nomass == true {
+	if params.Nomass {
 		cmd.Args = append(cmd.Args, "NOMASS")
 	}
 
-	if params.Pi == true {
+	if params.Pi {
 		cmd.Args = append(cmd.Args, "PI")
 	}
 
-	if params.Rt == true {
+	if params.Rt {
 		cmd.Args = append(cmd.Args, "RT")
 	}
 
-	if params.Glyc == true {
+	if params.Glyc {
 		cmd.Args = append(cmd.Args, "GLYC")
 	}
 
-	if params.Phospho == true {
+	if params.Phospho {
 		cmd.Args = append(cmd.Args, "PHOSPHO")
 	}
 
-	if params.Maldi == true {
+	if params.Maldi {
 		cmd.Args = append(cmd.Args, "MALDI")
 	}
 
-	if params.Instrwarn == true {
+	if params.Instrwarn {
 		cmd.Args = append(cmd.Args, "INSTRWARN")
 	}
 
-	if params.Decoyprobs == true {
+	if params.Decoyprobs {
 		cmd.Args = append(cmd.Args, "DECOYPROBS")
 	}
 
-	if params.Nontt == true {
+	if params.Nontt {
 		cmd.Args = append(cmd.Args, "NONTT")
 	}
 
-	if params.Nonmc == true {
+	if params.Nonmc {
 		cmd.Args = append(cmd.Args, "NONMC")
 	}
 
-	if params.Expectscore == true {
+	if params.Expectscore {
 		cmd.Args = append(cmd.Args, "EXPECTSCORE")
 	}
 
-	if params.Nonparam == true {
+	if params.Nonparam {
 		cmd.Args = append(cmd.Args, "NONPARAM")
 	}
 
-	if params.Neggamma == true {
+	if params.Neggamma {
 		cmd.Args = append(cmd.Args, "NEGGAMMA")
 	}
 
-	if params.Forcedistr == true {
+	if params.Forcedistr {
 		cmd.Args = append(cmd.Args, "FORCEDISTR")
 	}
 
-	if params.Nonparam == true {
+	if params.Nonparam {
 		cmd.Args = append(cmd.Args, "NONPARAM")
 	}
 

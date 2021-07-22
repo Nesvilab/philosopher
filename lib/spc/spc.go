@@ -72,7 +72,6 @@ func (p *PepXML) Parse(f string) {
 	p.MsmsPipelineAnalysis = mpa
 	p.Name = filepath.Base(f)
 
-	return
 }
 
 // Parse is the main function for parsing pepxml data
@@ -98,5 +97,4 @@ func (p *ProtXML) Parse(f string) {
 	p.ProteinSummary = ps
 	p.Name = filepath.Base(f)
 
-	return
 }

@@ -99,8 +99,6 @@ func (p *ProteinProphet) Deploy(os, distro string) {
 			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
-
-	return
 }
 
 // Execute ProteinProphet executes peptideprophet
@@ -144,7 +142,7 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	_ = cmd.Wait()
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		msg.ExecutingBinary(errors.New("There was an error with ProteinProphet, please check your parameters and input files"), "fatal")
+		msg.ExecutingBinary(errors.New("there was an error with ProteinProphet, please check your parameters and input files"), "fatal")
 	}
 
 	// copy to work directory
@@ -164,95 +162,95 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 
 func (p ProteinProphet) appendParams(params met.ProteinProphet, cmd *exec.Cmd) *exec.Cmd {
 
-	if params.ExcludeZ == true {
+	if params.ExcludeZ {
 		cmd.Args = append(cmd.Args, "EXCLUDE_ZEROS")
 	}
 
-	if params.Noplot == true {
+	if params.Noplot {
 		cmd.Args = append(cmd.Args, "NOPLOT")
 	}
 
-	if params.Nooccam == true {
+	if params.Nooccam {
 		cmd.Args = append(cmd.Args, "NOOCCAM")
 	}
 
-	if params.Softoccam == true {
+	if params.Softoccam {
 		cmd.Args = append(cmd.Args, "SOFTOCCAM")
 	}
 
-	if params.Icat == true {
+	if params.Icat {
 		cmd.Args = append(cmd.Args, "ICAT")
 	}
 
-	if params.Glyc == true {
+	if params.Glyc {
 		cmd.Args = append(cmd.Args, "GLYC")
 	}
 
-	if params.Nogroupwts == true {
+	if params.Nogroupwts {
 		cmd.Args = append(cmd.Args, "NOGROUPWTS")
 	}
 
-	if params.NonSP == true {
+	if params.NonSP {
 		cmd.Args = append(cmd.Args, "NONSP")
 	}
 
-	if params.Accuracy == true {
+	if params.Accuracy {
 		cmd.Args = append(cmd.Args, "ACCURACY")
 	}
 
-	if params.Asap == true {
+	if params.Asap {
 		cmd.Args = append(cmd.Args, "ASAP")
 	}
 
-	if params.Refresh == true {
+	if params.Refresh {
 		cmd.Args = append(cmd.Args, "REFRESH")
 	}
 
-	if params.Normprotlen == true {
+	if params.Normprotlen {
 		cmd.Args = append(cmd.Args, "NORMPROTLEN")
 	}
 
-	if params.Logprobs == true {
+	if params.Logprobs {
 		cmd.Args = append(cmd.Args, "LOGPROBS")
 	}
 
-	if params.Confem == true {
+	if params.Confem {
 		cmd.Args = append(cmd.Args, "CONFEM")
 	}
 
-	if params.Allpeps == true {
+	if params.Allpeps {
 		cmd.Args = append(cmd.Args, "ALLPEPS")
 	}
 
-	if params.Unmapped == true {
+	if params.Unmapped {
 		cmd.Args = append(cmd.Args, "UNMAPPED")
 	}
 
-	if params.Noprotlen == true {
+	if params.Noprotlen {
 		cmd.Args = append(cmd.Args, "NOPROTLEN")
 	}
 
-	if params.Instances == true {
+	if params.Instances {
 		cmd.Args = append(cmd.Args, "INSTANCES")
 	}
 
-	if params.Fpkm == true {
+	if params.Fpkm {
 		cmd.Args = append(cmd.Args, "FPKM")
 	}
 
-	if params.Protmw == true {
+	if params.Protmw {
 		cmd.Args = append(cmd.Args, "PROTMW")
 	}
 
-	if params.Iprophet == true {
+	if params.Iprophet {
 		cmd.Args = append(cmd.Args, "IPROPHET")
 	}
 
-	if params.Asapprophet == true {
+	if params.Asapprophet {
 		cmd.Args = append(cmd.Args, "ASAP_PROPHET")
 	}
 
-	if params.Delude == true {
+	if params.Delude {
 		cmd.Args = append(cmd.Args, "DELUDE")
 	}
 

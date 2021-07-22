@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"philosopher/lib/sys"
 
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack"
 )
 
@@ -77,6 +79,7 @@ type Database struct {
 	Custom    string `yaml:"custom"`
 	TimeStamp string `yaml:"timestamp"`
 	Crap      bool   `yaml:"contam"`
+	CrapTag   bool   `yaml:"contaminant_tag"`
 	Rev       bool   `yaml:"reviewed"`
 	Iso       bool   `yaml:"isoform"`
 	NoD       bool   `yaml:"nodecoys"`
@@ -97,7 +100,8 @@ type MSFragger struct {
 	JarPath                            string  `yaml:"path"`
 	Memory                             int     `yaml:"memory"`
 	Threads                            int     `yaml:"num_threads"`
-	RawExtension                       string  `yaml:"raw"`
+	Extension                          string  `yaml:"extension"`
+	DataType                           int     `yaml:"data_type"`
 	DatabaseName                       string  `yaml:"database_name"`
 	PrecursorMassLower                 int     `yaml:"precursor_mass_lower"`
 	PrecursorMassUpper                 int     `yaml:"precursor_mass_upper"`
@@ -111,12 +115,14 @@ type MSFragger struct {
 	DecoyPrefix                        string  `yaml:"decoy_prefix"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
 	Deisotope                          int     `yaml:"deisotope"`
+	Deneutralloss                      int     `yaml:"deneutralloss"`
 	IsotopeError                       string  `yaml:"isotope_error"`
-	MassOffsets                        int     `yaml:"mass_offsets"`
+	MassOffsets                        string  `yaml:"mass_offsets"`
 	PrecursorMassMode                  string  `yaml:"precursor_mass_mode"`
 	LocalizeDeltaMass                  int     `yaml:"localize_delta_mass"`
 	DeltaMassExcludeRanges             string  `yaml:"delta_mass_exclude_ranges"`
 	FragmentIonSeries                  string  `yaml:"fragment_ion_series"`
+	IonSeriesDefinitions               string  `yaml:"ion_series_definitions"`
 	SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
 	SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`
 	SearchEnzymeButNotAfter            string  `yaml:"search_enzyme_butnotafter"`
@@ -325,6 +331,7 @@ type Filter struct {
 	Pox       string  `yaml:"protxml"`
 	Tag       string  `yaml:"tag"`
 	Mods      string  `yaml:"mods"`
+	RazorBin  string  `yaml:"razorbin"`
 	PsmFDR    float64 `yaml:"psmFDR"`
 	PepFDR    float64 `yaml:"peptideFDR"`
 	IonFDR    float64 `yaml:"ionFDR"`
@@ -338,7 +345,6 @@ type Filter struct {
 	Seq       bool    `yaml:"sequential"`
 	TwoD      bool    `yaml:"two-dimensional"`
 	Mapmods   bool    `yaml:"mapMods"`
-	Fo        bool
 	Inference bool
 }
 
@@ -363,6 +369,8 @@ type Quantify struct {
 	IntNorm    bool    `yaml:"intNorm"`
 	Unique     bool    `yaml:"uniqueOnly"`
 	BestPSM    bool    `yaml:"bestPSM"`
+	Raw        bool    `yaml:"raw"`
+	Faims      bool    `yaml:"faims"`
 	LabelNames map[string]string
 }
 
@@ -378,6 +386,7 @@ type Abacus struct {
 	Labels   bool    `yaml:"labels"`
 	Unique   bool    `yaml:"uniqueOnly"`
 	Reprint  bool    `yaml:"reprint"`
+	Full     bool    `yaml:"full"`
 }
 
 // BioQuant options and parameters
@@ -411,6 +420,7 @@ type Index struct {
 type Pipeline struct {
 	Directives string
 	Print      bool
+	Verbose    bool
 }
 
 // New initializes the structure with the system information needed
@@ -420,7 +430,7 @@ func New(h string) Data {
 	var d Data
 
 	var fmtuuid = uuid.NewV4()
-	var uuid = fmt.Sprintf("%s", fmtuuid)
+	var uuid = fmtuuid.String()
 	d.UUID = uuid
 
 	d.OS = runtime.GOOS
@@ -455,8 +465,6 @@ func CleanTemp(dir string) {
 	if e != nil {
 		msg.Custom(e, "error")
 	}
-
-	return
 }
 
 // Serialize converts the whole structure to a gob file
@@ -472,7 +480,6 @@ func (d *Data) Serialize() {
 		msg.WriteFile(e, "fatal")
 	}
 
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -483,9 +490,9 @@ func (d *Data) Restore(f string) {
 	e2 := msgpack.Unmarshal(b, &d)
 
 	if e1 != nil && e2 != nil {
-		msg.Custom(errors.New("Workspace not detected"), "warning")
+		msg.Custom(errors.New("workspace not detected"), "warning")
 	} else if len(d.UUID) < 1 {
-		msg.Custom(errors.New("The current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
+		msg.Custom(errors.New("the current Workspace is corrupted or was created with an older version. Please remove it and create a new one"), "warning")
 	}
 
 	// checks if the temp is still there, if not recreate it
@@ -493,7 +500,6 @@ func (d *Data) Restore(f string) {
 		os.Mkdir(d.Temp, sys.FilePermission())
 	}
 
-	return
 }
 
 // FunctionInitCheckUp does initilization checkup and verification if meta and temp folders are up.
@@ -501,7 +507,7 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		msg.WorkspaceNotFound(errors.New("Failed to checkup the initialization"), "fatal")
+		msg.WorkspaceNotFound(errors.New("failed to checkup the initialization"), "fatal")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {
@@ -509,5 +515,41 @@ func (d Data) FunctionInitCheckUp() {
 		msg.LocatingTemDirecotry(e, "warning")
 	}
 
-	return
+}
+
+// ToCmdString converts the MSFragger struct into a CMD string
+func (d MSFragger) ToCmdString() {
+
+	var cmd = "CMD string: philosopher msfragger"
+
+	v := reflect.ValueOf(d)
+	typeOfS := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+
+		if typeOfS.Field(i).Name == "Param" || typeOfS.Field(i).Name == "RawFiles" || typeOfS.Field(i).Name == "ParamFile" {
+			continue
+		}
+
+		cmd = fmt.Sprintf("%s --%s %v", cmd, typeOfS.Field(i).Name, v.Field(i).Interface())
+	}
+
+	logrus.Info(cmd)
+
+}
+
+// ToCmdString converts the PeptideProphet struct into a CMD string
+func (d PeptideProphet) ToCmdString() {
+
+	var cmd = "CMD string: philosopher peptideprophet"
+
+	v := reflect.ValueOf(d)
+	typeOfS := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		cmd = fmt.Sprintf("%s --%s %v", cmd, typeOfS.Field(i).Name, v.Field(i).Interface())
+	}
+
+	logrus.Info(cmd)
+
 }

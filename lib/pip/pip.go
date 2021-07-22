@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 
+	"philosopher/lib/dat"
 	"philosopher/lib/msg"
 
 	"philosopher/lib/ext/interprophet"
@@ -21,7 +23,6 @@ import (
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
 
-	"philosopher/lib/dat"
 	"philosopher/lib/ext/comet"
 	"philosopher/lib/ext/msfragger"
 	"philosopher/lib/met"
@@ -99,12 +100,12 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 	// Top-level Workspace
 	wrk.Run(Version, Build, "", false, false, true, true)
 
-	for _, i := range data {
+	for i := range data {
 
-		logrus.Info("Initiating the workspace on ", i)
+		logrus.Info("Initiating the workspace on ", data[i])
 
 		// getting inside de the dataset folder
-		dsAbs, _ := filepath.Abs(i)
+		dsAbs, _ := filepath.Abs(data[i])
 		os.Chdir(dsAbs)
 
 		// Workspace
@@ -112,14 +113,6 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 
 		// reload the meta data to avoid being overwritten with black home
 		meta.Restore(sys.Meta())
-
-		// Database
-		//if p.Commands.Database == "yes" {
-		meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
-		meta.Database.Tag = p.DatabaseSearch.DecoyTag
-		dat.Run(meta)
-		meta.Serialize()
-		//}
 
 		met.CleanTemp(meta.Temp)
 
@@ -130,10 +123,58 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 	return meta
 }
 
+// AnnotateDatabase annotates the database on the first ds, and copy the bin data to the other folders
+func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) met.Data {
+
+	var source string
+
+	// getting inside de the dataset folder
+	dsAbs, _ := filepath.Abs(data[0])
+	os.Chdir(dsAbs)
+
+	// reload the meta data to avoid being overwritten with black home
+	meta.Restore(sys.Meta())
+
+	meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
+	meta.Database.Tag = p.DatabaseSearch.DecoyTag
+	dat.Run(meta)
+	meta.Serialize()
+	source = fmt.Sprintf("%s%s.meta%sdb.bin", dsAbs, string(filepath.Separator), string(filepath.Separator))
+
+	// return to the top level directory
+	os.Chdir(dir)
+
+	for i := 1; i < len(data); i++ {
+		//source := fmt.Sprintf("%s%s.meta%sdb.bin", data[0], string(filepath.Separator), string(filepath.Separator))
+		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
+
+		// Read all content of src to data
+		data, e := ioutil.ReadFile(source)
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		e = ioutil.WriteFile(destination, data, 0644)
+		if e != nil {
+			log.Fatal(e)
+		}
+
+		//meta.Serialize()
+	}
+
+	met.CleanTemp(meta.Temp)
+
+	return meta
+}
+
 // DBSearch executes the search engines if requested
 func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	logrus.Info("Running the Database Search on all data")
+	logrus.Info("Running the Database Search")
+
+	// if meta.Pipeline.Verbose == true {
+	// 	p.DatabaseSearch.MSFragger.ToCmdString()
+	// }
 
 	// reload the meta data
 	meta.Restore(sys.Meta())
@@ -182,7 +223,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 			meta.MSFragger.DatabaseName = p.DatabaseSearch.ProteinDatabase
 			meta.MSFragger.DecoyPrefix = p.DatabaseSearch.DecoyTag
 
-			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.RawExtension)
+			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.Extension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
 				msg.Custom(e, "fatal")
@@ -214,7 +255,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 // PeptideProphet executes PeptideProphet in Parallel mode
 func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	if p.PeptideProphet.Concurrent == false {
+	if !p.PeptideProphet.Concurrent {
 		for _, i := range data {
 
 			logrus.Info("Running the validation and inference on ", i)
@@ -239,6 +280,7 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 				if e != nil {
 					msg.Custom(e, "fatal")
 				}
+
 				peptideprophet.Run(meta, files)
 				meta.Serialize()
 			}
@@ -296,54 +338,6 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 			worker.Start(interface{}(ds))
 		}
 		worker.Wait()
-
-		// var wg sync.WaitGroup
-		// wg.Add(len(data))
-
-		// meta.Restore(sys.Meta())
-		// meta.Database.Annot = p.DatabaseSearch.ProteinDatabase
-		// meta.Database.Tag = p.DatabaseSearch.DecoyTag
-
-		// for _, ds := range data {
-
-		// 	db := p.DatabaseSearch.ProteinDatabase
-
-		// 	go func(ds, db string) {
-		// 		defer wg.Done()
-
-		// 		logrus.Info("Running the validation and inference on ", ds)
-
-		// 		// getting inside de the dataset folder
-		// 		dsAbs, _ := filepath.Abs(ds)
-		// 		absMeta := fmt.Sprintf("%s%s%s", dsAbs, string(filepath.Separator), sys.Meta())
-
-		// 		// reload the meta data
-		// 		meta.Restore(absMeta)
-
-		// 		// PeptideProphet
-		// 		logrus.Info("Executing PeptideProphet on ", ds)
-		// 		meta.PeptideProphet = p.PeptideProphet
-		// 		meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
-		// 		meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
-		// 		meta.PeptideProphet.Output = "interact"
-		// 		meta.PeptideProphet.Combine = true
-
-		// 		gobExt := fmt.Sprintf("%s%s*.%s", dsAbs, string(filepath.Separator), p.PeptideProphet.FileExtension)
-
-		// 		files, e := filepath.Glob(gobExt)
-		// 		if e != nil {
-		// 			msg.Custom(e, "fatal")
-		// 		}
-
-		// 		peptideprophet.Run(meta, files)
-
-		// 		// give a chance to the execution to untangle the output
-		// 		time.Sleep(time.Second * 1)
-
-		// 	}(ds, db)
-		// }
-
-		// wg.Wait()
 	}
 
 	os.Chdir(dir)
@@ -426,7 +420,7 @@ func CombinedPeptideList(meta met.Data, p Directives, dir string, data []string)
 
 	var combinedPepXML string
 
-	if p.Steps.IntegratedReports == "yes" && p.Abacus.Peptide == true && len(p.Filter.Pex) == 0 {
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Peptide && len(p.Filter.Pex) == 0 {
 
 		logrus.Info("Integrating peptide validation")
 
@@ -469,9 +463,9 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 	var combinedProtXML string
 
-	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein == true && len(p.Filter.Pox) == 0 {
+	logrus.Info("Creating combined protein inference")
 
-		logrus.Info("Creating combined protein inference")
+	if p.Steps.IntegratedReports == "yes" && p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 
 		// return to the top level directory
 		os.Chdir(dir)
@@ -502,6 +496,29 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 		// copy to work directory
 		sys.CopyFile(combinedProtXML, filepath.Base(combinedProtXML))
+	}
+
+	// when running the pipeline, we want to run the inference only once
+	// and them copy the meta data to all data folders.
+	os.Chdir(dir)
+
+	p.Abacus.Picked = p.Filter.Picked
+	p.Abacus.Razor = p.Filter.Razor
+
+	protXML := fil.ReadProtXMLInput("combined.prot.xml", p.DatabaseSearch.DecoyTag, p.Filter.Weight)
+	proBin := fil.ProcessProteinIdentifications(protXML, p.Filter.PtFDR, p.Filter.PepFDR, p.Filter.ProtProb, p.Abacus.Picked, p.Abacus.Razor, true, p.DatabaseSearch.DecoyTag)
+
+	for _, i := range data {
+		dest := fmt.Sprintf("%s%s.meta%spro.bin", i, string(filepath.Separator), string(filepath.Separator))
+		sys.CopyFile(proBin, dest)
+
+		rdest := fmt.Sprintf("%s%s.meta%srazor.bin", i, string(filepath.Separator), string(filepath.Separator))
+		sys.CopyFile(sys.RazorBin(), rdest)
+	}
+
+	e := os.RemoveAll(path.Dir(proBin))
+	if e != nil {
+		log.Fatal(e)
 	}
 
 	return meta
@@ -560,9 +577,9 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		// reload the meta data
 		meta.Restore(sys.Meta())
 
-		if _, err := os.Stat(sys.IsoBin()); err == nil {
-			return meta
-		}
+		// if _, err := os.Stat(sys.IsoBin()); err == nil {
+		// 	return meta
+		// }
 
 		logrus.Info("Executing label-based quantification on ", i)
 
@@ -653,8 +670,8 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 			}
 
 			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
-				meta.Filter.Pox = fmt.Sprintf("..%scombined.prot.xml", string(filepath.Separator))
-			} else if p.Steps.IntegratedReports == "no" && p.Abacus.Protein == false && len(p.Filter.Pox) == 0 {
+				meta.Filter.Pox = "combined"
+			} else if p.Steps.IntegratedReports == "no" && !p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false
@@ -710,11 +727,8 @@ func Abacus(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 		logrus.Info("Executing abacus")
 
-		// // return to the top level directory
+		// return to the top level directory
 		os.Chdir(dir)
-
-		// // reload the meta data
-		//meta.Restore(sys.Meta())
 
 		meta.Abacus = p.Abacus
 		meta.Abacus.Tag = p.DatabaseSearch.DecoyTag
@@ -753,70 +767,3 @@ func TMTIntegrator(meta met.Data, p Directives, dir string, data []string) met.D
 
 	return meta
 }
-
-// Prophets execute the TPP Prophets
-// func Prophets(meta met.Data, p Directives, dir string, data []string) met.Data {
-
-// 	if p.Steps.PeptideValidation == "yes" || p.Steps.ProteinInference == "yes" || p.Steps.PTMLocalization == "yes" {
-// 		for _, i := range data {
-
-// 			logrus.Info("Running the validation and inference on ", i)
-
-// 			// getting inside de the dataset folder
-// 			dsAbs, _ := filepath.Abs(i)
-// 			os.Chdir(dsAbs)
-
-// 			// reload the meta data
-// 			meta.Restore(sys.Meta())
-
-// 			// PeptideProphet
-// 			if p.Steps.PeptideValidation == "yes" {
-// 				logrus.Info("Executing PeptideProphet on ", i)
-// 				meta.PeptideProphet = p.PeptideProphet
-// 				meta.PeptideProphet.Database = p.DatabaseSearch.ProteinDatabase
-// 				meta.PeptideProphet.Decoy = p.DatabaseSearch.DecoyTag
-// 				meta.PeptideProphet.Output = "interact"
-// 				meta.PeptideProphet.Combine = true
-// 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
-// 				files, e := filepath.Glob(gobExt)
-// 				if e != nil {
-// 					msg.Custom(e, "fatal")
-// 				}
-// 				peptideprophet.Run(meta, files)
-// 				meta.Serialize()
-// 			}
-
-// 			// PTMProphet
-// 			if p.Steps.PTMLocalization == "yes" {
-// 				logrus.Info("Executing PTMProphet on ", i)
-// 				meta.PTMProphet = p.PTMProphet
-// 				var files []string
-// 				files = append(files, "interact.pep.xml")
-// 				meta.PTMProphet.InputFiles = files
-// 				ptmprophet.Run(meta, files)
-// 				meta.Serialize()
-// 			}
-
-// 			// ProteinProphet
-// 			if p.Steps.ProteinInference == "yes" {
-// 				logrus.Info("Executing ProteinProphet on ", i)
-// 				meta.ProteinProphet = p.ProteinProphet
-// 				meta.ProteinProphet.Output = "interact"
-// 				var files []string
-// 				if p.Steps.PTMLocalization == "yes" {
-// 					files = append(files, "interact.mod.pep.xml")
-// 				} else {
-// 					files = append(files, "interact.pep.xml")
-// 				}
-// 				proteinprophet.Run(meta, files)
-// 				meta.Serialize()
-// 				met.CleanTemp(meta.Temp)
-// 			}
-
-// 			// return to the top level directory
-// 			os.Chdir(dir)
-// 		}
-// 	}
-
-// 	return meta
-// }

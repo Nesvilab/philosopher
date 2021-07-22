@@ -26,7 +26,7 @@ func IsDecoyPSM(p id.PeptideIdentification, tag string) bool {
 	// only one evidence is enough to promote the PSM as a "no-decoy"
 	if len(p.AlternativeProteins) > 1 {
 		for i := range p.AlternativeProteins {
-			if !strings.HasPrefix(p.AlternativeProteins[i], tag) {
+			if !strings.HasPrefix(i, tag) {
 				class = false
 				break
 			}

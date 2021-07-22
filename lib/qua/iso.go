@@ -1,143 +1,22 @@
 package qua
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strings"
 
 	"philosopher/lib/iso"
+	"philosopher/lib/msg"
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
 	"philosopher/lib/tmt"
 	"philosopher/lib/trq"
-	"philosopher/lib/uti"
 )
 
 const (
 	mzDeltaWindow float64 = 0.5
 )
-
-// calculateIonPurity verifies how much interference there is on the precursor scans for each fragment
-func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep.PSMEvidence {
-
-	// index MS1 and MS2 spectra in a dictionary
-	var indexedMS1 = make(map[string]mzn.Spectrum)
-	var indexedMS2 = make(map[string]mzn.Spectrum)
-
-	var MS1Peaks = make(map[string][]float64)
-	var MS1Int = make(map[string][]float64)
-
-	for i := range mz.Spectra {
-
-		if mz.Spectra[i].Level == "1" {
-
-			// left-pad the spectrum index
-			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
-
-			// left-pad the spectrum scan
-			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
-
-			mz.Spectra[i].Index = paddedIndex
-			mz.Spectra[i].Scan = paddedScan
-
-			indexedMS1[paddedScan] = mz.Spectra[i]
-
-			MS1Peaks[paddedScan] = mz.Spectra[i].Mz.DecodedStream
-			MS1Int[paddedScan] = mz.Spectra[i].Intensity.DecodedStream
-
-		} else if mz.Spectra[i].Level == "2" {
-
-			if mz.Spectra[i].Precursor.IsolationWindowLowerOffset == 0 && mz.Spectra[i].Precursor.IsolationWindowUpperOffset == 0 {
-				mz.Spectra[i].Precursor.IsolationWindowLowerOffset = mzDeltaWindow
-				mz.Spectra[i].Precursor.IsolationWindowUpperOffset = mzDeltaWindow
-			}
-
-			// left-pad the spectrum index
-			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
-
-			// left-pad the spectrum scan
-			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
-
-			// left-pad the precursor spectrum index
-			paddedPI := fmt.Sprintf("%05s", mz.Spectra[i].Precursor.ParentIndex)
-
-			// left-pad the precursor spectrum scan
-			paddedPS := fmt.Sprintf("%05s", mz.Spectra[i].Precursor.ParentScan)
-
-			mz.Spectra[i].Index = paddedIndex
-			mz.Spectra[i].Scan = paddedScan
-			mz.Spectra[i].Precursor.ParentIndex = paddedPI
-			mz.Spectra[i].Precursor.ParentScan = paddedPS
-
-			stream := MS1Peaks[paddedPS]
-
-			for j := range stream {
-				if stream[j] >= (mz.Spectra[i].Precursor.TargetIon-mz.Spectra[i].Precursor.IsolationWindowLowerOffset) && stream[j] <= (mz.Spectra[i].Precursor.TargetIon+mz.Spectra[i].Precursor.IsolationWindowUpperOffset) {
-					if MS1Int[mz.Spectra[i].Precursor.ParentScan][j] > mz.Spectra[i].Precursor.TargetIonIntensity {
-						mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
-					}
-				}
-			}
-
-			indexedMS2[paddedScan] = mz.Spectra[i]
-		}
-	}
-
-	for i := range evi {
-
-		// get spectrum index
-		split := strings.Split(evi[i].Spectrum, ".")
-
-		v2, ok := indexedMS2[split[1]]
-		if ok {
-
-			v1 := indexedMS1[v2.Precursor.ParentScan]
-
-			var ions = make(map[float64]float64)
-			var isolationWindowSummedInt float64
-
-			for k := range v1.Mz.DecodedStream {
-				if v1.Mz.DecodedStream[k] >= (v2.Precursor.TargetIon-v2.Precursor.IsolationWindowUpperOffset) && v1.Mz.DecodedStream[k] <= (v2.Precursor.TargetIon+v2.Precursor.IsolationWindowUpperOffset) {
-					ions[v1.Mz.DecodedStream[k]] = v1.Intensity.DecodedStream[k]
-					isolationWindowSummedInt += v1.Intensity.DecodedStream[k]
-				}
-			}
-
-			// create the list of mz differences for each peak
-			var mzRatio []float64
-			for k := 1; k <= 6; k++ {
-				r := float64(k) * (float64(1) / float64(v2.Precursor.ChargeState))
-				mzRatio = append(mzRatio, uti.ToFixed(r, 2))
-			}
-
-			var isotopePackage = make(map[float64]float64)
-
-			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.TargetIonIntensity
-			isotopesInt := v2.Precursor.TargetIonIntensity
-
-			for k, v := range ions {
-				for _, m := range mzRatio {
-					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.02) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.02) {
-						if v != v2.Precursor.TargetIonIntensity {
-							isotopePackage[k] = v
-							isotopesInt += v
-						}
-						break
-					}
-				}
-			}
-
-			if isotopesInt == 0 {
-				evi[i].Purity = 0
-			} else {
-				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
-			}
-
-		}
-	}
-
-	return evi
-}
 
 // prepareLabelStructureWithMS2 instantiates the Label objects and maps them against the fragment scans in order to get the channel intensities
 func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, mz mzn.MsData) map[string]iso.Labels {
@@ -496,6 +375,9 @@ func assignUsage(evi rep.Evidence, spectrumMap map[string]iso.Labels) rep.Eviden
 
 func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
+	var counter = 0
+	var rowSum float64
+
 	for i := range evi.PSM {
 
 		var flag = 0
@@ -517,6 +399,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel14.Intensity = 0
 			evi.PSM[i].Labels.Channel15.Intensity = 0
 			evi.PSM[i].Labels.Channel16.Intensity = 0
+
 		} else {
 			for _, j := range evi.PSM[i].Modifications.Index {
 				//if j.MassDiff == 144.1020 || j.MassDiff == 229.1629 || j.MassDiff == 304.2072 {
@@ -544,7 +427,18 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 				evi.PSM[i].Labels.Channel16.Intensity = 0
 			}
 
+			if counter <= 100 {
+				rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity
+				if rowSum > 0 {
+					counter++
+				}
+			}
+
 		}
+	}
+
+	if counter < 100 {
+		msg.QuantifyingData(errors.New("no reporter ions were detected. Review your parameters, and try again"), "fatal")
 	}
 
 	return evi
@@ -1477,36 +1371,6 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		i.URazorLabels.Channel14.Intensity *= normFactors[13]
 		i.URazorLabels.Channel15.Intensity *= normFactors[14]
 		i.URazorLabels.Channel16.Intensity *= normFactors[15]
-	}
-
-	return evi
-}
-
-func calculateRatios(evi rep.Evidence) rep.Evidence {
-
-	var psmSum = make(map[string]float64)
-	var psmLog2 = make(map[string]float64)
-
-	// calculate the sum of all intensities for each PSM and then the log2 from the intensities
-	for i := range evi.PSM {
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel1.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel2.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel3.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel4.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel5.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel6.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel7.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel8.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel9.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel10.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel11.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel12.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel13.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel14.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel15.Intensity
-		psmSum[evi.PSM[i].Spectrum] += evi.PSM[i].Labels.Channel16.Intensity
-
-		psmLog2[evi.PSM[i].Spectrum] = math.Log2(psmSum[evi.PSM[i].Spectrum])
 	}
 
 	return evi

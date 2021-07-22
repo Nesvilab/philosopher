@@ -67,8 +67,8 @@ type InstrumentConfigurationList struct {
 // InstrumentConfiguration tag
 type InstrumentConfiguration struct {
 	XMLName                    xml.Name                     `xml:"instrumentConfiguration"`
-	ID                         string                       `xml:"id,att,omitempty"`
-	ScanSettingsRef            string                       `xml:"scanSettingsRef,att,omitempty"`
+	ID                         string                       `xml:"id,attr,omitempty"`
+	ScanSettingsRef            string                       `xml:"scanSettingsRef,attr,omitempty"`
 	ReferenceableParamGroupRef []ReferenceableParamGroupRef `xml:"referenceableParamGroupRef"`
 	CVParam                    []CVParam                    `xml:"cvParam"`
 	UserParam                  []UserParam                  `xml:"userParam"`
@@ -169,7 +169,7 @@ type RefParamGroupList struct {
 // ReferenceableParamGroupRef is a reference to a previously defined ParamGroup, which is a reusable container of one or more cvParams
 type ReferenceableParamGroupRef struct {
 	XMLName xml.Name `xml:"referenceableParamGroupRef"`
-	Ref     string   `xml:"id,ref"`
+	Ref     string   `xml:"ref"`
 }
 
 // ReferenceableParamGroup is a collection of CVParam and UserParam elements that can be referenced from elsewhere in this mzML
@@ -248,11 +248,11 @@ type SoftwareRef struct {
 // Run tag
 type Run struct {
 	XMLName                           xml.Name                     `xml:"run"`
-	DefaultInstrumentConfigurationRef string                       `xml:"defaultInstrumentConfigurationRef,attr,omitempy"`
-	DefaultSourceFileRef              string                       `xml:"defaultSourceFileRef,attr,omitempy"`
-	ID                                string                       `xml:"id,attr,omitempy"`
-	SampleRef                         string                       `xml:"sampleRef,attr,omitempy"`
-	StartTimeStamp                    string                       `xml:"startTimeStamp,att,omitempty"`
+	DefaultInstrumentConfigurationRef string                       `xml:"defaultInstrumentConfigurationRef,attr,omitempty"`
+	DefaultSourceFileRef              string                       `xml:"defaultSourceFileRef,attr,omitempty"`
+	ID                                string                       `xml:"id,attr,omitempty"`
+	SampleRef                         string                       `xml:"sampleRef,attr,omitempty"`
+	StartTimeStamp                    string                       `xml:"startTimeStamp,attr,omitempty"`
 	ReferenceableParamGroupRef        []ReferenceableParamGroupRef `xml:"referenceableParamGroupRef"`
 	CVParam                           []CVParam                    `xml:"cvParam"`
 	UserParam                         []UserParam                  `xml:"userParam"`
@@ -271,7 +271,7 @@ type SpectrumList struct {
 // Spectrum tag
 type Spectrum struct {
 	XMLName             xml.Name            `xml:"spectrum"`
-	DataProcessingRef   string              `xml:"dataProcessingRef,att"`
+	DataProcessingRef   string              `xml:"dataProcessingRef,attr"`
 	DefaultArrayLength  float64             `xml:"defaultArrayLength,attr"`
 	ID                  string              `xml:"id,attr"`
 	Index               string              `xml:"index,attr"`

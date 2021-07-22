@@ -156,7 +156,7 @@ type SearchDatabase struct {
 type EnzymaticSearchConstraint struct {
 	XMLName                 xml.Name `xml:"enzymatic_search_constraint"`
 	Enzyme                  []byte   `xml:"enzyme,attr"`
-	MaxNumInternalCleavages uint32   `xml:"max_num_internal_cleavages,attr"`
+	MaxNumInternalCleavages int8     `xml:"max_num_internal_cleavages,attr"`
 	MinNumTermini           uint8    `xml:"min_number_termini,attr"`
 }
 
@@ -192,7 +192,7 @@ type SpectrumQuery struct {
 	Index                            uint32       `xml:"index,attr"`
 	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr"`
 	IonMobility                      float64      `xml:"ion_mobility,attr"`
-	CompensationVoltage              float64      `xml:"compensation_voltage,attr"`
+	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
 	SearchResult                     SearchResult `xml:"search_result"`
 }
 
@@ -224,6 +224,7 @@ type SearchHit struct {
 	ModificationInfo    ModificationInfo     `xml:"modification_info"`
 	AnalysisResult      []AnalysisResult     `xml:"analysis_result"`
 	AlternativeProteins []AlternativeProtein `xml:"alternative_protein"`
+	PTMResult           PTMResult            `xml:"ptm_result"`
 }
 
 // AlternativeProtein tag
@@ -290,8 +291,18 @@ type SearchScore struct {
 	Value   string   `xml:"value,attr"`
 }
 
-// ProphetModel struct
+// ProphetModel tag
 type ProphetModel struct {
 	Charge uint8
 	Points map[string]uint8
+}
+
+// PTMResult tag
+type PTMResult struct {
+	Localization           string `xml:"localization,attr"`
+	BestScoreWithPTM       string `xml:"best_score_with_ptm,attr"`
+	ScoreWithoutPTM        string `xml:"score_without_ptm,attr"`
+	LocalizationPeptide    string `xml:"localization_peptide,attr"`
+	SecondBestScoreWithPTM string `xml:"second_best_score_with_ptm,attr"`
+	PTMMass                string `xml:"ptm_mass,attr"`
 }

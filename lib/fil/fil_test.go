@@ -273,7 +273,7 @@ func Test_readProtXMLInput(t *testing.T) {
 	var proXML id.ProtXML
 
 	type args1 struct {
-		meta     string
+		//meta     string
 		xmlFile  string
 		decoyTag string
 		weight   float64
@@ -293,7 +293,7 @@ func Test_readProtXMLInput(t *testing.T) {
 	for _, tt := range test1 {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got := readProtXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
+			got := ReadProtXMLInput(tt.args.xmlFile, tt.args.decoyTag, tt.args.weight)
 			proXML = got
 
 			if len(got.Groups) != tt.want {
@@ -345,7 +345,7 @@ func Test_readProtXMLInput(t *testing.T) {
 	}
 	for _, tt := range test3 {
 		t.Run(tt.name, func(t *testing.T) {
-			processProteinIdentifications(proXML, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, tt.args.fo, tt.args.decoyTag)
+			ProcessProteinIdentifications(proXML, tt.args.ptFDR, tt.args.pepProb, tt.args.protProb, tt.args.isPicked, tt.args.isRazor, false, tt.args.decoyTag)
 		})
 	}
 }

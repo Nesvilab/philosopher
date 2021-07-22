@@ -3,10 +3,12 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"math"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"philosopher/lib/ext/rawfilereader"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
@@ -41,13 +43,12 @@ func RunLabelFreeQuantification(p met.Quantify) {
 	var evi rep.Evidence
 	evi.RestoreGranular()
 
-	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated)
+	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated, p.Raw, p.Faims)
 
 	evi = calculateIntensities(evi)
 
 	evi.SerializeGranular()
 
-	return
 }
 
 // RunIsobaricLabelQuantification is the top function for label quantification
@@ -58,7 +59,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	var sourceList []string
 
 	if p.Brand == "" {
-		msg.NoParametersFound(errors.New("You need to specify a brand type (tmt or itraq)"), "fatal")
+		msg.NoParametersFound(errors.New("you need to specify a brand type (tmt or itraq)"), "fatal")
 	}
 
 	var evi rep.Evidence
@@ -93,14 +94,24 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	for i := range sourceList {
 
 		var mz mzn.MsData
+		var fileName string
 
 		logrus.Info("Processing ", sourceList[i])
-		fileName := fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
 
-		mz.Read(fileName)
+		if p.Raw {
 
-		for i := range mz.Spectra {
-			mz.Spectra[i].Decode()
+			fileName = fmt.Sprintf("%s%s%s.raw", p.Dir, string(filepath.Separator), sourceList[i])
+			stream := rawfilereader.Run(fileName, "")
+			mz.ReadRaw(fileName, stream)
+
+		} else {
+
+			fileName = fmt.Sprintf("%s%s%s.mzML", p.Dir, string(filepath.Separator), sourceList[i])
+			mz.Read(fileName)
+
+			for i := range mz.Spectra {
+				mz.Spectra[i].Decode()
+			}
 		}
 
 		mappedPurity := calculateIonPurity(p.Dir, p.Format, mz, sourceMap[sourceList[i]])
@@ -169,25 +180,23 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	logrus.Info("Saving")
 
 	// create EV PSM
-	rep.SerializeEVPSM(&evi)
+	//rep.SerializeEVPSM(&evi)
+	rep.SerializePSM(&evi.PSM)
 
-	// create EV Ion
-	rep.SerializeEVIon(&evi)
+	// create Ion
+	rep.SerializeIon(&evi.Ions)
 
-	// create EV Peptides
-	rep.SerializeEVPeptides(&evi)
+	// create Peptides
+	rep.SerializePeptides(&evi.Peptides)
 
-	// create EV Ion
-	rep.SerializeEVProteins(&evi)
+	// create Ion
+	rep.SerializeProteins(&evi.Proteins)
 
 	return p
 }
 
 // RunBioQuantification is the top function for functional-based quantification
 func RunBioQuantification(c met.Data) {
-
-	// create clean reference db for clustering
-	//clusterFasta := createCleanDataBaseReference(c.UUID, c.Temp)
 
 	// run cdhit, create cluster file
 	logrus.Info("Clustering")
@@ -207,7 +216,6 @@ func RunBioQuantification(c met.Data) {
 	// mapping to functional annotation and save to disk
 	savetoDisk(mappedClust, c.Temp, c.BioQuant.UID)
 
-	return
 }
 
 // cleanPreviousData cleans previous label quantifications
@@ -435,10 +443,9 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 	var spectrumMap = make(map[string]iso.Labels)
 	var phosphoSpectrumMap = make(map[string]iso.Labels)
-
 	var bestMap = make(map[string]uint8)
-
 	var psmLabelSumList PairList
+	var quantCheckUp bool
 
 	// 1st check: Purity the score and the Probability levels
 	for _, i := range evi.PSM {
@@ -447,7 +454,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 			spectrumMap[i.Spectrum] = i.Labels
 			bestMap[i.Spectrum] = 0
 
-			if mods == true {
+			if mods {
 				_, ok1 := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
 				_, ok2 := i.LocalizedPTMSites["PTMProphet_STY79.96633"]
 				_, ok3 := i.LocalizedPTMSites["PTMProphet_STY79.966331"]
@@ -476,13 +483,21 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel15.Intensity +
 				i.Labels.Channel16.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
+
+			if sum > 0 {
+				quantCheckUp = true
+			}
 		}
+	}
+
+	if remove != 0 && !quantCheckUp {
+		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "fatal")
 	}
 
 	// 2nd check: best PSM
 	// collect all ion-related spectra from the each fraction/file
 	// var bestMap = make(map[string]uint8)
-	if best == true {
+	if best {
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
 			specName := strings.Split(i.Spectrum, ".")
@@ -568,4 +583,125 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	}
 
 	return spectrumMap, phosphoSpectrumMap
+}
+
+// calculateIonPurity verifies how much interference there is on the precursor scans for each fragment
+func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep.PSMEvidence {
+
+	// index MS1 and MS2 spectra in a dictionary
+	var indexedMS1 = make(map[string]mzn.Spectrum)
+	var indexedMS2 = make(map[string]mzn.Spectrum)
+
+	var MS1Peaks = make(map[string][]float64)
+	var MS1Int = make(map[string][]float64)
+
+	for i := range mz.Spectra {
+
+		if mz.Spectra[i].Level == "1" {
+
+			// left-pad the spectrum index
+			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
+
+			// left-pad the spectrum scan
+			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
+
+			mz.Spectra[i].Index = paddedIndex
+			mz.Spectra[i].Scan = paddedScan
+
+			indexedMS1[paddedScan] = mz.Spectra[i]
+
+			MS1Peaks[paddedScan] = mz.Spectra[i].Mz.DecodedStream
+			MS1Int[paddedScan] = mz.Spectra[i].Intensity.DecodedStream
+
+		} else if mz.Spectra[i].Level == "2" {
+
+			if mz.Spectra[i].Precursor.IsolationWindowLowerOffset == 0 && mz.Spectra[i].Precursor.IsolationWindowUpperOffset == 0 {
+				mz.Spectra[i].Precursor.IsolationWindowLowerOffset = mzDeltaWindow
+				mz.Spectra[i].Precursor.IsolationWindowUpperOffset = mzDeltaWindow
+			}
+
+			// left-pad the spectrum index
+			paddedIndex := fmt.Sprintf("%05s", mz.Spectra[i].Index)
+
+			// left-pad the spectrum scan
+			paddedScan := fmt.Sprintf("%05s", mz.Spectra[i].Scan)
+
+			// left-pad the precursor spectrum index
+			paddedPI := fmt.Sprintf("%05s", mz.Spectra[i].Precursor.ParentIndex)
+
+			// left-pad the precursor spectrum scan
+			paddedPS := fmt.Sprintf("%05s", mz.Spectra[i].Precursor.ParentScan)
+
+			mz.Spectra[i].Index = paddedIndex
+			mz.Spectra[i].Scan = paddedScan
+			mz.Spectra[i].Precursor.ParentIndex = paddedPI
+			mz.Spectra[i].Precursor.ParentScan = paddedPS
+
+			stream := MS1Peaks[paddedPS]
+
+			for j := range stream {
+				if stream[j] >= (mz.Spectra[i].Precursor.TargetIon-mz.Spectra[i].Precursor.IsolationWindowLowerOffset) && stream[j] <= (mz.Spectra[i].Precursor.TargetIon+mz.Spectra[i].Precursor.IsolationWindowUpperOffset) {
+					if MS1Int[mz.Spectra[i].Precursor.ParentScan][j] > mz.Spectra[i].Precursor.TargetIonIntensity {
+						mz.Spectra[i].Precursor.TargetIonIntensity = MS1Int[mz.Spectra[i].Precursor.ParentScan][j]
+					}
+				}
+			}
+
+			indexedMS2[paddedScan] = mz.Spectra[i]
+		}
+	}
+
+	for i := range evi {
+
+		// get spectrum index
+		split := strings.Split(evi[i].Spectrum, ".")
+
+		v2, ok := indexedMS2[split[1]]
+		if ok {
+
+			v1 := indexedMS1[v2.Precursor.ParentScan]
+
+			var ions = make(map[float64]float64)
+			var isolationWindowSummedInt float64
+
+			for k := range v1.Mz.DecodedStream {
+				if v1.Mz.DecodedStream[k] >= (v2.Precursor.TargetIon-v2.Precursor.IsolationWindowUpperOffset) && v1.Mz.DecodedStream[k] <= (v2.Precursor.TargetIon+v2.Precursor.IsolationWindowUpperOffset) {
+					ions[v1.Mz.DecodedStream[k]] = v1.Intensity.DecodedStream[k]
+					isolationWindowSummedInt += v1.Intensity.DecodedStream[k]
+				}
+			}
+
+			// create the list of mz differences for each peak
+			var mzRatio []float64
+			for k := 1; k <= 6; k++ {
+				r := float64(k) * (float64(1) / float64(v2.Precursor.ChargeState))
+				mzRatio = append(mzRatio, uti.ToFixed(r, 2))
+			}
+
+			var isotopePackage = make(map[float64]float64)
+			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.TargetIonIntensity
+			isotopesInt := v2.Precursor.TargetIonIntensity
+
+			for k, v := range ions {
+				for _, m := range mzRatio {
+					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.025) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.025) {
+						if v != v2.Precursor.TargetIonIntensity {
+							isotopePackage[k] = v
+							isotopesInt += v
+						}
+						break
+					}
+				}
+			}
+
+			if isotopesInt == 0 {
+				evi[i].Purity = 0
+			} else {
+				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
+			}
+
+		}
+	}
+
+	return evi
 }

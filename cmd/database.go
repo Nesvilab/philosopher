@@ -26,7 +26,6 @@ var databaseCmd = &cobra.Command{
 		m.Serialize()
 
 		msg.Done()
-		return
 	},
 }
 
@@ -43,6 +42,7 @@ func init() {
 		databaseCmd.Flags().StringVarP(&m.Database.Add, "add", "", "", "add custom sequences (UniProt FASTA format only)")
 		databaseCmd.Flags().StringVarP(&m.Database.Custom, "custom", "", "", "use a pre-formatted custom database")
 		databaseCmd.Flags().BoolVarP(&m.Database.Crap, "contam", "", false, "add common contaminants")
+		databaseCmd.Flags().BoolVarP(&m.Database.CrapTag, "contamprefix", "", false, "mark the contaminant sequences with a prefix tag")
 		databaseCmd.Flags().BoolVarP(&m.Database.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
 		databaseCmd.Flags().BoolVarP(&m.Database.Iso, "isoform", "", false, "add isoform sequences")
 		databaseCmd.Flags().BoolVarP(&m.Database.NoD, "nodecoys", "", false, "don't add decoys to the database")

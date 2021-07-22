@@ -6,16 +6,17 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
 	"philosopher/lib/bio"
 	"philosopher/lib/cla"
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
-	"philosopher/lib/sys"
 )
 
 // AssemblePSMReport creates the PSM structure for reporting
@@ -44,8 +45,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Spectrum = i.Spectrum
 		p.SpectrumFile = i.SpectrumFile
 		p.Scan = i.Scan
-		p.PrevAA = i.PrevAA
-		p.NextAA = i.NextAA
+		p.PrevAA = ""
+		p.NextAA = ""
 		p.NumberOfEnzymaticTermini = int(i.NumberOfEnzymaticTermini)
 		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
@@ -74,6 +75,9 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.MappedGenes = make(map[string]int)
 		p.MappedProteins = make(map[string]int)
 		p.Modifications = i.Modifications
+		p.MSFragerLocalization = i.MSFragerLocalization
+		p.MSFraggerLocalizationScoreWithPTM = i.MSFraggerLocalizationScoreWithPTM
+		p.MSFraggerLocalizationScoreWithoutPTM = i.MSFraggerLocalizationScoreWithoutPTM
 
 		if i.UncalibratedPrecursorNeutralMass > 0 {
 			p.PrecursorNeutralMass = i.PrecursorNeutralMass
@@ -83,7 +87,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.UncalibratedPrecursorNeutralMass = i.PrecursorNeutralMass
 		}
 
-		for _, j := range i.AlternativeProteins {
+		for j := range i.AlternativeProteins {
 			p.MappedProteins[j]++
 		}
 
@@ -102,10 +106,23 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.IsDecoy = true
 		}
 
+		// the redudnancy check was introduced because of inconsistencies with
+		// PeptideProphet. The Windows version is printing the same protein
+		// as alternative when the peptide maps to the same protein multiple times
+		var redudantMapping = 0
 		if len(i.AlternativeProteins) == 0 {
 			p.IsUnique = true
 		} else {
+			for k := range i.AlternativeProteins {
+				if k == i.Protein {
+					redudantMapping++
+				}
+			}
 			p.IsUnique = false
+		}
+
+		if redudantMapping == len(i.AlternativeProteins) {
+			p.IsUnique = true
 		}
 
 		list = append(list, p)
@@ -113,20 +130,24 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
 	sort.Sort(list)
 	evi.PSM = list
-
-	return
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
+func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%spsm.tsv", sys.MetaDir(), string(filepath.Separator))
+	var modMap = make(map[string]string)
+	var modList []string
+	var hasCompVolt bool
+	var hasIonMob bool
+	var hasPurity bool
+
+	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create report file"), "fatal")
+		msg.WriteFile(errors.New("cannot create report file"), "fatal")
 	}
 	defer file.Close()
 
@@ -137,25 +158,78 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		compositeName := strings.Split(evi.PSM[i].Spectrum, "#")
 		evi.PSM[i].Spectrum = compositeName[0]
 
-		if hasDecoys == false {
-			if evi.PSM[i].IsDecoy == false {
+		if !hasDecoys {
+			if !evi.PSM[i].IsDecoy {
 				printSet = append(printSet, evi.PSM[i])
 			}
 		} else {
 			printSet = append(printSet, evi.PSM[i])
 		}
+
+		for k := range evi.PSM[i].LocalizedPTMMassDiff {
+			_, ok := modMap[k]
+			if !ok {
+				modMap[k] = ""
+			} else {
+				modMap[k] = ""
+			}
+		}
+
+		if len(evi.PSM[i].CompensationVoltage) > 0 {
+			hasCompVolt = true
+		}
+
+		if evi.PSM[i].IonMobility > 0 {
+			hasIonMob = true
+		}
+
+		if evi.PSM[i].Purity > 0 {
+			hasPurity = true
+		}
+
+		if len(evi.PSM[i].MSFragerLocalization) > 0 {
+			hasLoc = true
+		}
+
 	}
 
-	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
+	for k := range modMap {
+		modList = append(modList, k)
+	}
 
-	if isComet == true {
+	sort.Strings(modList)
+
+	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPrev AA\tNext AA\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
+
+	if isComet {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tIntensity\tIon Mobility\tCompensation Voltage\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
 
-	if hasLoc == true {
-		header += "\tNumber of Phospho Sites\tPhospho Site Localization"
+	if len(modList) > 0 {
+		for _, i := range modList {
+			if strings.Contains(i, "STY:79.966331") {
+				i = "STY:79.9663"
+			}
+			header += "\t" + i + "\t" + i + " Best Localization"
+		}
+	}
+
+	if hasLoc {
+		header += "\tMSFragger Localization\tBest Score with Delta Mass\tBest Score without Delta Mass"
+	}
+
+	if hasIonMob {
+		header += "\tIon Mobility"
+	}
+
+	if hasCompVolt {
+		header += "\tCompensation Voltage"
+	}
+
+	if hasPurity {
+		header += "\tPurity"
 	}
 
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
@@ -163,22 +237,22 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tIs Used\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		default:
 			header += ""
 		}
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tIs Used\tPurity\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header += "\tQuan Usage\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
 		case 8:
-			header += "\tIs Used\tPurity\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header += "\tQuan Usage\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
 		default:
 			header += ""
 		}
@@ -187,7 +261,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels == true {
+	if hasLabels {
 
 		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
 
@@ -233,7 +307,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -259,11 +333,13 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.SpectrumFile,
 			i.Peptide,
 			i.ModifiedPeptide,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Peptide),
 			i.AssumedCharge,
 			i.RetentionTime,
@@ -276,7 +352,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			i.Massdiff,
 		)
 
-		if isComet == true {
+		if isComet {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Xcorr,
@@ -287,7 +363,7 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%.4f\t%.4f\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
@@ -295,30 +371,55 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			i.Probability,
 			i.NumberOfEnzymaticTermini,
 			i.NumberOfMissedCleavages,
+			i.ProteinStart,
+			i.ProteinEnd,
 			i.Intensity,
-			i.IonMobility,
-			i.CompensationVoltage,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)
 
-		if hasLoc == true {
+		if len(modList) > 0 {
+			for _, j := range modList {
 
-			var sites int
-			var md string
+				r := regexp.MustCompile(`\d\.\d{3}`)
+				matches := r.FindAllString(i.LocalizedPTMMassDiff[j], -1)
+				max := uti.GetMaxNumber(matches)
 
-			sites += i.LocalizedPTMSites["STY:79.9663"]
-			sites += i.LocalizedPTMSites["STY:79.96633"]
-			sites += i.LocalizedPTMSites["STY:79.966331"]
+				line = fmt.Sprintf("%s\t%s\t%s",
+					line,
+					i.LocalizedPTMMassDiff[j],
+					max,
+				)
+			}
+		}
 
-			md += i.LocalizedPTMMassDiff["STY:79.9663"]
-			md += i.LocalizedPTMMassDiff["STY:79.96633"]
-			md += i.LocalizedPTMMassDiff["STY:79.966331"]
-
-			line = fmt.Sprintf("%s\t%d\t%s",
+		if hasLoc {
+			line = fmt.Sprintf("%s\t%s\t%s\t%s",
 				line,
-				sites,
-				md,
+				i.MSFragerLocalization,
+				i.MSFraggerLocalizationScoreWithPTM,
+				i.MSFraggerLocalizationScoreWithoutPTM,
+			)
+		}
+
+		if hasIonMob {
+			line = fmt.Sprintf("%s\t%.4f",
+				line,
+				i.IonMobility,
+			)
+		}
+
+		if hasCompVolt {
+			line = fmt.Sprintf("%s\t%s",
+				line,
+				i.CompensationVoltage,
+			)
+		}
+
+		if hasPurity {
+			line = fmt.Sprintf("%s\t%.2f",
+				line,
+				i.Purity,
 			)
 		}
 
@@ -336,20 +437,18 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 
 		switch channels {
 		case 4:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
 				i.Labels.Channel4.Intensity,
 			)
 		case 6:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -358,10 +457,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel6.Intensity,
 			)
 		case 8:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -372,10 +470,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel8.Intensity,
 			)
 		case 10:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -388,10 +485,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel10.Intensity,
 			)
 		case 11:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -405,10 +501,9 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 				i.Labels.Channel11.Intensity,
 			)
 		case 16:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
-				i.Purity,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
@@ -437,17 +532,12 @@ func (evi Evidence) MetaPSMReport(brand string, channels int, hasDecoys, isComet
 			msg.WriteToFile(e, "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }
 
 // PSMLocalizationReport report ptm localization based on PTMProphet outputs
-func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys bool) {
+func (evi *Evidence) PSMLocalizationReport(workspace, decoyTag string, hasRazor, hasDecoys bool) {
 
-	output := fmt.Sprintf("%s%slocalization.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%slocalization.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
@@ -464,8 +554,8 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range evi.PSM {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -491,100 +581,4 @@ func (evi *Evidence) PSMLocalizationReport(decoyTag string, hasRazor, hasDecoys 
 			}
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }
-
-// PepXMLReport report PSMs in pep.xml format
-// func (evi *Evidence) PepXMLReport() {
-
-// 	// collect database information
-// 	var dtb dat.Base
-// 	dtb.Restore()
-
-// 	var proteinDescription = make(map[string]string)
-// 	for _, j := range dtb.Records {
-// 		proteinDescription[j.PartHeader] = j.Description
-// 	}
-
-// 	t := time.Now()
-
-// 	// collect source file names
-// 	var sourceMap = make(map[string]uint8)
-// 	var sources []string
-// 	for _, i := range evi.PSM {
-// 		s := strings.Split(i.Spectrum, ".")
-// 		sourceMap[s[0]]++
-// 	}
-
-// 	for i := range sourceMap {
-// 		sources = append(sources, i)
-// 	}
-
-// 	sort.Strings(sources)
-
-// 	var p spc.PepXML
-
-// 	p.MsmsPipelineAnalysis.Date = t.Format(time.ANSIC)
-
-// 	as := &spc.AnalysisSummary{
-// 		Analysis: "philosopher",
-// 		Time:     t.Format(time.ANSIC),
-// 	}
-// 	p.MsmsPipelineAnalysis.AnalysisSummary = append(p.MsmsPipelineAnalysis.AnalysisSummary, *as)
-
-// 	for _, i := range evi.PSM {
-
-// 		spectrumName := strings.Split(i.Spectrum, "#")
-
-// 		sq := &spc.SpectrumQuery{
-// 			StartScan:            i.Scan,
-// 			EndScan:              i.Scan,
-// 			AssumedCharge:        i.AssumedCharge,
-// 			Spectrum:             spectrumName[0],
-// 			Index:                i.Index,
-// 			PrecursorNeutralMass: i.PrecursorNeutralMass,
-// 			RetentionTimeSec:     i.RetentionTime,
-// 			PrecursorIntensity:   i.Intensity,
-// 			SearchResult: spc.SearchResult{
-// 				SearchHit: []spc.SearchHit{
-// 					{
-// 						Peptide:            i.Peptide,
-// 						Massdiff:           i.Massdiff,
-// 						CalcNeutralPepMass: i.CalcNeutralPepMass,
-// 						NextAA:             i.NextAA,
-// 						PrevAA:             i.PrevAA,
-// 						IsRejected:         0,
-// 						ProteinDescr:       i.ProteinDescription,
-// 						HitRank:            i.HitRank,
-// 						Protein:            i.Protein,
-// 						AnalysisResult: []spc.AnalysisResult{
-// 							{
-// 								Analysis: "peptideprophet",
-// 								PeptideProphetResult: spc.PeptideProphetResult{
-// 									Probability: i.Probability,
-// 								},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		}
-
-// 		for j := range i.MappedProteins {
-// 			ap := &spc.AlternativeProtein{
-// 				Protein:     j,
-// 				Description: proteinDescription[j],
-// 			}
-// 			sq.SearchResult.SearchHit[0].AlternativeProteins = append(sq.SearchResult.SearchHit[0].AlternativeProteins, *ap)
-// 		}
-
-// 		p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery = append(p.MsmsPipelineAnalysis.MsmsRunSummary.SpectrumQuery, *sq)
-// 	}
-
-// 	p.Write()
-
-// }

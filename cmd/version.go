@@ -2,8 +2,6 @@
 package cmd
 
 import (
-	"os"
-
 	"philosopher/lib/gth"
 
 	"github.com/sirupsen/logrus"
@@ -22,15 +20,10 @@ var versionCmd = &cobra.Command{
 		}).Info("Current Philosopher build and version")
 
 		gth.UpdateChecker(Version, Build)
-
-		return
 	},
 }
 
 func init() {
-
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-	}
 
 	RootCmd.AddCommand(versionCmd)
 }

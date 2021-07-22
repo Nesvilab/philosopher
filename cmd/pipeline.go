@@ -37,12 +37,12 @@ var pipelineCmd = &cobra.Command{
 
 		os.Mkdir(meta.Temp, sys.FilePermission())
 		if _, e = os.Stat(meta.Temp); os.IsNotExist(e) {
-			msg.Custom(errors.New("Can't find temporary directory; check folder permissions"), "info")
+			msg.Custom(errors.New("can't find temporary directory; check folder permissions"), "info")
 		}
 
-		if m.Pipeline.Print == true {
+		if m.Pipeline.Print {
 			param := pip.DeployParameterFile(meta.Temp)
-			msg.Custom(errors.New("Printing parameter file"), "info")
+			msg.Custom(errors.New("printing parameter file"), "info")
 			sys.CopyFile(param, filepath.Base(param))
 			return
 		}
@@ -61,15 +61,19 @@ var pipelineCmd = &cobra.Command{
 		}
 
 		if len(args) < 1 {
-			msg.NoParametersFound(errors.New("You need to provide at least one dataset for the analysis"), "fatal")
+			msg.NoParametersFound(errors.New("you need to provide at least one dataset for the analysis"), "fatal")
 		} else if p.Steps.IntegratedReports == "true" && len(args) < 2 {
-			msg.NoParametersFound(errors.New("You need to provide at least two datasets for the abacus integrative analysis"), "fatal")
+			msg.NoParametersFound(errors.New("you need to provide at least two datasets for the abacus integrative analysis"), "fatal")
 		}
 
 		// Workspace - Database
-		//if p.Steps.Workspace == "yes" {
 		meta = pip.InitializeWorkspaces(meta, p, dir, Version, Build, args)
-		//}
+
+		meta = pip.AnnotateDatabase(meta, p, dir, args)
+
+		// if m.Pipeline.Verbose == true {
+		// 	meta.Pipeline.Verbose = true
+		// }
 
 		// Comet - MSFragger
 		if p.Steps.DatabaseSearch == "yes" {
@@ -140,7 +144,6 @@ var pipelineCmd = &cobra.Command{
 		met.CleanTemp(meta.Temp)
 
 		msg.Done()
-		return
 	},
 }
 
@@ -148,10 +151,10 @@ func init() {
 
 	if len(os.Args) > 1 && os.Args[1] == "pipeline" {
 
-		//m.Restore(sys.Meta())
-
 		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Print, "print", "", false, "print the pipeline configuration file")
+		pipelineCmd.Flags().BoolVarP(&m.Pipeline.Verbose, "verbose", "", false, "show the parameters for each command that is executed")
 		pipelineCmd.Flags().StringVarP(&m.Pipeline.Directives, "config", "", "", "configuration file for the pipeline execution")
+		pipelineCmd.Flags().MarkHidden("verbose")
 
 	}
 

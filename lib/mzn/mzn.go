@@ -10,6 +10,7 @@ import (
 	"math"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"philosopher/lib/msg"
 
@@ -30,15 +31,16 @@ type Spectra []Spectrum
 
 // Spectrum tag
 type Spectrum struct {
-	Index         string
-	Scan          string
-	Level         string
-	SpectrumName  string
-	ScanStartTime float64
-	Precursor     Precursor
-	Mz            Mz
-	Intensity     Intensity
-	IonMobility   IonMobility
+	Index               string
+	Scan                string
+	Level               string
+	SpectrumName        string
+	CompensationVoltage string
+	ScanStartTime       float64
+	Precursor           Precursor
+	Mz                  Mz
+	Intensity           Intensity
+	IonMobility         IonMobility
 }
 
 // Precursor struct
@@ -82,11 +84,121 @@ func (a Spectra) Len() int           { return len(a) }
 func (a Spectra) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Spectra) Less(i, j int) bool { return a[i].Index < a[j].Index }
 
+// ReadRaw is the main function for parsing Thermo Raw data
+func (p *MsData) ReadRaw(fileName, f string) {
+
+	p.FileName = fileName
+	var spectra Spectra
+
+	lines := strings.Split(f, "%")
+
+	for _, i := range lines {
+		parts := strings.Split(i, "#")
+
+		if len(parts) >= 8 {
+
+			var spec Spectrum
+
+			if strings.Contains(parts[0], "ms3") {
+				spec.Level = "3"
+			} else if strings.Contains(parts[0], "ms2") {
+				spec.Level = "2"
+			} else {
+				spec.Level = "1"
+			}
+
+			spec.Scan = parts[1]
+			indexInt, _ := strconv.Atoi(parts[1])
+			indexInt--
+			spec.Index = string(strconv.Itoa(indexInt))
+
+			parts2, _ := strconv.Atoi(parts[2])
+			spec.Precursor.ChargeState = parts2
+
+			spec.Precursor.ParentScan = parts[3]
+			parentIndexInt, _ := strconv.Atoi(parts[3])
+			parentIndexInt--
+			spec.Precursor.ParentIndex = string(strconv.Itoa(parentIndexInt))
+
+			spec.Precursor.IsolationWindowLowerOffset = 0.6
+			spec.Precursor.IsolationWindowUpperOffset = 0.6
+
+			siVal1, e := strconv.ParseFloat(parts[5], 64)
+			if e != nil {
+				msg.CastFloatToString(e, "fatal")
+			} else {
+				spec.Precursor.SelectedIon = siVal1
+				spec.Precursor.TargetIon = siVal1
+			}
+
+			siVal2, e := strconv.ParseFloat(parts[6], 64)
+			if e != nil {
+				msg.CastFloatToString(e, "fatal")
+			} else {
+				//spec.Precursor.SelectedIonIntensity = siVal2
+				spec.Precursor.TargetIonIntensity = siVal2
+			}
+
+			if spec.Level == "1" {
+				spec.Precursor.ParentScan = ""
+				spec.Precursor.ParentIndex = ""
+				spec.Precursor.ChargeState = 0
+				spec.Precursor.SelectedIon = 0
+				spec.Precursor.SelectedIonIntensity = 0
+				spec.Precursor.TargetIon = 0
+				spec.Precursor.TargetIonIntensity = 0
+				spec.Precursor.IsolationWindowLowerOffset = 0.6
+				spec.Precursor.IsolationWindowUpperOffset = 0.6
+			}
+
+			rtVal, _ := strconv.ParseFloat(parts[4], 64)
+			spec.ScanStartTime = rtVal
+
+			//spec.Mz.Stream = []byte(parts[7])
+			spec.Mz.Precision = "64"
+			spec.Mz.Compression = "1"
+
+			//spec.Intensity.Stream = []byte(parts[8])
+			spec.Intensity.Precision = "64"
+			spec.Intensity.Compression = "1"
+
+			peaks := strings.Split(parts[8], " ")
+			for _, arg := range peaks {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Mz.DecodedStream = append(spec.Mz.DecodedStream, n)
+				}
+			}
+
+			intensities := strings.Split(parts[9], " ")
+			for _, arg := range intensities {
+				if n, e := strconv.ParseFloat(string(arg), 64); e == nil {
+					spec.Intensity.DecodedStream = append(spec.Intensity.DecodedStream, n)
+				}
+			}
+
+			spectra = append(spectra, spec)
+		}
+	}
+
+	if len(spectra) == 0 {
+		msg.NoSpectraFound(errors.New(""), "fatal")
+	}
+
+	p.Spectra = spectra
+}
+
 // Read is the main function for parsing mzML data
 func (p *MsData) Read(f string) {
 
 	var xml psi.IndexedMzML
 	xml.Parse(f)
+
+	if xml.MzML.SoftwareList.Software[0].ID == "pwiz" {
+		version, _ := strconv.Atoi(strings.Replace(xml.MzML.SoftwareList.Software[0].Version, ".", "", -1))
+		if version <= 3019127 {
+			msg.Custom(errors.New("the pwiz version used to convert this file is not supported, or deprecated. Please update your pwiz and convert the raw files again"), "warning")
+		}
+	}
 
 	p.FileName = f
 
@@ -106,7 +218,6 @@ func (p *MsData) Read(f string) {
 
 	p.Spectra = spectra
 
-	return
 }
 
 func processSpectrum(mzSpec psi.Spectrum) Spectrum {
@@ -124,6 +235,10 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 		if string(j.Accession) == "MS:1000511" {
 			spec.Level = j.Value
 		}
+
+		if string(j.Accession) == "MS:1001581" {
+			spec.CompensationVoltage = j.Value
+		}
 	}
 
 	for _, j := range mzSpec.ScanList.Scan[0].CVParam {
@@ -139,10 +254,6 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 	spec.Precursor = Precursor{}
 	if len(mzSpec.PrecursorList.Precursor) > 0 {
 
-		// parent index and parent scan
-		//var ref []string
-		//var precRef []string
-
 		if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) > 0 {
 
 			scanRG := regexp.MustCompile(`scan=(.+)`)
@@ -153,41 +264,6 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			pi = (pi - 1)
 			spec.Precursor.ParentIndex = strconv.Itoa(pi)
 		}
-
-		// if len(mzSpec.PrecursorList.Precursor[0].SpectrumRef) == 0 {
-
-		// 	precRef = append(precRef, "-1")
-		// 	precRef = append(precRef, "-1")
-
-		// } else {
-
-		// 	scanRG := regexp.MustCompile(`scan=(.+)`)
-		// 	match := scanRG.FindStringSubmatch(mzSpec.PrecursorList.Precursor[0].SpectrumRef)
-
-		// 	spec.Precursor.ParentScan = match[1]
-		// 	pi, _ := strconv.Atoi(match[1])
-		// 	pi = (pi - 1)
-		// 	spec.Precursor.ParentIndex = strconv.Itoa(pi)
-
-		// ref = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, " ")
-		// precRef = strings.Split(ref[2], "=")
-
-		// // ABSCIEX has a different way of reporting the prcursor reference spectrum
-		// if len(ref) < 1 || len(precRef) < 1 {
-		// 	precRef = strings.Split(mzSpec.PrecursorList.Precursor[0].SpectrumRef, "=")
-		// }
-
-		//}
-
-		// if spec.Scan == "34280" {
-		// 	fmt.Println(spec.Scan, mzSpec.PrecursorList.Precursor[0].SpectrumRef, spec.Precursor.ParentScan, spec.Precursor.ParentIndex)
-		// 	os.Exit(1)
-		// }
-
-		// spec.Precursor.ParentScan = strings.TrimSpace(precRef[1])
-		// pi, _ := strconv.Atoi(precRef[1])
-		// pi = (pi - 1)
-		// spec.Precursor.ParentIndex = strconv.Itoa(pi)
 
 		for _, j := range mzSpec.PrecursorList.Precursor[0].IsolationWindow.CVParam {
 
@@ -310,7 +386,6 @@ func (s *Spectrum) Decode() {
 		s.IonMobility.Stream = nil
 	}
 
-	return
 }
 
 // readEncoded transforms the binary data into float64 values

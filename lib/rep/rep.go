@@ -108,55 +108,61 @@ type SearchParametersEvidence struct {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Source                           string
-	Index                            uint32
-	Spectrum                         string
-	SpectrumFile                     string
-	Scan                             int
-	NumberOfEnzymaticTermini         int
-	NumberOfMissedCleavages          int
-	PrevAA                           string
-	NextAA                           string
-	Peptide                          string
-	IonForm                          string
-	Protein                          string
-	ProteinDescription               string
-	ProteinID                        string
-	EntryName                        string
-	GeneName                         string
-	ModifiedPeptide                  string
-	MappedProteins                   map[string]int
-	MappedGenes                      map[string]int
-	AssumedCharge                    uint8
-	HitRank                          uint8
-	UncalibratedPrecursorNeutralMass float64
-	PrecursorNeutralMass             float64
-	PrecursorExpMass                 float64
-	RetentionTime                    float64
-	CalcNeutralPepMass               float64
-	RawMassdiff                      float64
-	Massdiff                         float64
-	LocalizedPTMSites                map[string]int
-	LocalizedPTMMassDiff             map[string]string
-	Probability                      float64
-	Expectation                      float64
-	Xcorr                            float64
-	DeltaCN                          float64
-	DeltaCNStar                      float64
-	SPScore                          float64
-	SPRank                           float64
-	Hyperscore                       float64
-	Nextscore                        float64
-	DiscriminantValue                float64
-	Intensity                        float64
-	IonMobility                      float64
-	Purity                           float64
-	CompensationVoltage              float64
-	IsDecoy                          bool
-	IsUnique                         bool
-	IsURazor                         bool
-	Labels                           iso.Labels
-	Modifications                    mod.Modifications
+	Source                               string
+	Index                                uint32
+	Spectrum                             string
+	SpectrumFile                         string
+	Scan                                 int
+	NumberOfEnzymaticTermini             int
+	NumberOfMissedCleavages              int
+	ProteinStart                         int
+	ProteinEnd                           int
+	PrevAA                               string
+	NextAA                               string
+	Peptide                              string
+	IonForm                              string
+	Protein                              string
+	ProteinDescription                   string
+	ProteinID                            string
+	EntryName                            string
+	GeneName                             string
+	ModifiedPeptide                      string
+	CompensationVoltage                  string
+	MappedProteins                       map[string]int
+	MappedGenes                          map[string]int
+	AssumedCharge                        uint8
+	HitRank                              uint8
+	UncalibratedPrecursorNeutralMass     float64
+	PrecursorNeutralMass                 float64
+	PrecursorExpMass                     float64
+	RetentionTime                        float64
+	CalcNeutralPepMass                   float64
+	RawMassdiff                          float64
+	Massdiff                             float64
+	LocalizedPTMSites                    map[string]int
+	LocalizedPTMMassDiff                 map[string]string
+	LocalizationRange                    string
+	MSFragerLocalization                 string
+	MSFraggerLocalizationScoreWithPTM    string
+	MSFraggerLocalizationScoreWithoutPTM string
+	Probability                          float64
+	Expectation                          float64
+	Xcorr                                float64
+	DeltaCN                              float64
+	DeltaCNStar                          float64
+	SPScore                              float64
+	SPRank                               float64
+	Hyperscore                           float64
+	Nextscore                            float64
+	DiscriminantValue                    float64
+	Intensity                            float64
+	IonMobility                          float64
+	Purity                               float64
+	IsDecoy                              bool
+	IsUnique                             bool
+	IsURazor                             bool
+	Labels                               iso.Labels
+	Modifications                        mod.Modifications
 }
 
 // PSMEvidenceList ...
@@ -180,6 +186,8 @@ type IonEvidence struct {
 	RetentionTime            string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
+	PrevAA                   string
+	NextAA                   string
 	Spectra                  map[string]int
 	MappedProteins           map[string]int
 	MappedGenes              map[string]int
@@ -223,6 +231,8 @@ type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
 	Spectra                map[string]uint8
+	PrevAA                 string
+	NextAA                 string
 	Protein                string
 	ProteinID              string
 	GeneName               string
@@ -235,6 +245,8 @@ type PeptideEvidence struct {
 	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	IsUnique               bool
+	IsURazor               bool
 	IsDecoy                bool
 	Labels                 iso.Labels
 	PhosphoLabels          iso.Labels
@@ -277,6 +289,9 @@ type ProteinEvidence struct {
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
+	TotalPeptides          map[string]int
+	UniquePeptides         map[string]int
+	URazorPeptides         map[string]int // Unique + razor
 	TotalIntensity         float64
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
@@ -323,6 +338,9 @@ type CombinedProteinEvidence struct {
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
+	TotalPeptides          map[string]map[string]bool
+	UniquePeptides         map[string]map[string]bool
+	UrazorPeptides         map[string]map[string]bool
 	TotalIntensity         map[string]float64
 	UniqueIntensity        map[string]float64
 	UrazorIntensity        map[string]float64
@@ -340,7 +358,6 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	//Key                string
 	BestPSM            float64
 	Sequence           string
 	Protein            string
@@ -402,7 +419,7 @@ func Run(m met.Data) {
 		isComet = true
 	}
 
-	if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
+	if m.MSFragger.LocalizeDeltaMass == 1 {
 		hasLoc = true
 	}
 
@@ -420,52 +437,44 @@ func Run(m met.Data) {
 		hasLabels = true
 	}
 
-	// // get the labels from the annotation file
-	// if len(m.Quantify.Annot) > 0 {
-	// 	annotfile := fmt.Sprintf(".%sannotation.txt", string(filepath.Separator))
-	// 	annotfile, _ = filepath.Abs(annotfile)
-	// 	labels = uti.GetLabelNames(annotfile)
-	// }
-
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
+	repo.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
 
 	// Ion
-	repo.MetaIonReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	repo.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Peptide
-	repo.MetaPeptideReport(isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	repo.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
 
 	// Protein
-	if len(m.Filter.Pox) > 0 || m.Filter.Inference == true {
-		repo.MetaProteinReport(isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
-		repo.ProteinFastaReport(m.Report.Decoys)
+	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
+		repo.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repo.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 
 	// Modifications
 	if len(repo.Modifications.MassBins) > 0 {
-		repo.ModificationReport()
+		repo.ModificationReport(m.Home)
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
-			repo.PSMLocalizationReport(m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
+			repo.PSMLocalizationReport(m.Home, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
 		}
 
 		repo.PlotMassHist()
 	}
 
 	// MSstats
-	if m.Report.MSstats == true {
-		repo.MetaMSstatsReport(isoBrand, isoChannels, m.Report.Decoys)
+	if m.Report.MSstats {
+		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys)
 	}
 
 	// MzID
-	if m.Report.MZID == true {
+	if m.Report.MZID {
 		repo.MzIdentMLReport(m.Version, m.Database.Annot)
 	}
 
-	return
 }
 
 // prepares the list of modifications to be printed by the report functions

@@ -26,7 +26,7 @@ func GetHome() string {
 	} else if runtime.GOOS == Linux() {
 		home = os.Getenv("HOME")
 	} else {
-		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "fatal")
 	}
 
 	return home
@@ -41,7 +41,7 @@ func GetTemp() string {
 	} else if runtime.GOOS == Linux() {
 		tmp = "/tmp"
 	} else {
-		msg.Custom(errors.New("Cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "fatal")
 	}
 
 	return tmp
@@ -51,10 +51,9 @@ func GetTemp() string {
 func VerifyTemp(f string) {
 
 	if _, err := os.Stat(f); os.IsNotExist(err) {
-		msg.Custom(errors.New("Cannot find the custom temporary folder"), "fatal")
+		msg.Custom(errors.New("cannot find the custom temporary folder"), "fatal")
 	}
 
-	return
 }
 
 // GetLinuxFlavor returns the Linux flavor by looking into the lsb_release
@@ -113,7 +112,6 @@ func CopyFile(from, to string) {
 		msg.Custom(e, "fatal")
 	}
 
-	return
 }
 
 // Meta file
@@ -134,14 +132,8 @@ func PepxmlBin() string {
 	return p
 }
 
-// ProtxmlBin file
-func ProtxmlBin() string {
-	p := fmt.Sprintf("%s%sprotxml.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// PsmBin file
-func PsmBin() string {
+// PSMBin file
+func PSMBin() string {
 	p := fmt.Sprintf("%s%spsm.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
@@ -164,66 +156,6 @@ func ProBin() string {
 	return p
 }
 
-// EvBin file
-func EvBin() string {
-	p := fmt.Sprintf("%s%sev.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvParameterBin file
-func EvParameterBin() string {
-	p := fmt.Sprintf("%s%sev.param.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvMetaBin file
-func EvMetaBin() string {
-	p := fmt.Sprintf("%s%sev.meta.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvPSMBin file
-func EvPSMBin() string {
-	p := fmt.Sprintf("%s%sev.psm.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvPeptideBin file
-func EvPeptideBin() string {
-	p := fmt.Sprintf("%s%sev.pep.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvProteinBin file
-func EvProteinBin() string {
-	p := fmt.Sprintf("%s%sev.pro.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvModificationsBin file
-func EvModificationsBin() string {
-	p := fmt.Sprintf("%s%sev.mod.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvModificationsEvBin file
-func EvModificationsEvBin() string {
-	p := fmt.Sprintf("%s%sev.mev.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvCombinedBin file
-func EvCombinedBin() string {
-	p := fmt.Sprintf("%s%sev.com.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// EvIonBin file
-func EvIonBin() string {
-	p := fmt.Sprintf("%s%sev.ion.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
 // DBBin file
 func DBBin() string {
 	p := fmt.Sprintf("%s%sdb.bin", MetaDir(), string(filepath.Separator))
@@ -236,15 +168,9 @@ func LFQBin() string {
 	return p
 }
 
-// IsoBin file
-func IsoBin() string {
-	p := fmt.Sprintf("%s%siso.bin", MetaDir(), string(filepath.Separator))
-	return p
-}
-
-// MODBin file
-func MODBin() string {
-	p := fmt.Sprintf("%s%smod.bin", MetaDir(), string(filepath.Separator))
+// RazorBin file
+func RazorBin() string {
+	p := fmt.Sprintf("%s%srazor.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
 

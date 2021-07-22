@@ -33,7 +33,6 @@ var iprophCmd = &cobra.Command{
 
 		msg.Done()
 
-		return
 	},
 }
 

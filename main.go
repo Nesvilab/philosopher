@@ -10,8 +10,8 @@ var (
 
 	version = "dev"
 	build   = "build"
-	commit  = "none"
-	date    = "unknown"
+	//commit  = "none"
+	//date    = "unknown"
 )
 
 func main() {

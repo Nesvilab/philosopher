@@ -68,8 +68,6 @@ func (p *PTMProphet) Deploy(os, distro string) {
 			msg.UnsupportedDistribution(errors.New(""), "fatal")
 		}
 	}
-
-	return
 }
 
 // Execute PTMProphet
@@ -90,7 +88,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	// append output file
 	var output string
-	if params.KeepOld == true {
+	if params.KeepOld {
 
 		//if len(params.Output) > 0 {
 		if args[0] == "interact.pep.xml" {
@@ -113,12 +111,12 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	_ = cmd.Wait()
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		msg.ExecutingBinary(errors.New("There was an error with PTMProphet, please check your parameters and input files"), "fatal")
+		msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "fatal")
 	}
 
 	// collect all resulting files
 	var customOutput []string
-	if params.KeepOld == true {
+	if params.KeepOld {
 		for _, i := range cmd.Args {
 			if strings.Contains(i, output) || i == params.Output {
 				customOutput = append(customOutput, i)
@@ -126,7 +124,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 		}
 	}
 
-	if params.KeepOld == true {
+	if params.KeepOld {
 		return customOutput
 	}
 	return args
@@ -134,39 +132,39 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 func (p PTMProphet) appendParams(params met.PTMProphet, cmd *exec.Cmd) *exec.Cmd {
 
-	if params.NoUpdate == true {
+	if params.NoUpdate {
 		cmd.Args = append(cmd.Args, "NOUPDATE")
 	}
 
-	if params.KeepOld == true {
+	if params.KeepOld {
 		cmd.Args = append(cmd.Args, "KEEPOLD")
 	}
 
-	if params.Verbose == true {
+	if params.Verbose {
 		cmd.Args = append(cmd.Args, "VERBOSE")
 	}
 
-	if params.Lability == true {
+	if params.Lability {
 		cmd.Args = append(cmd.Args, "LABILITY")
 	}
 
-	if params.Ifrags == true {
+	if params.Ifrags {
 		cmd.Args = append(cmd.Args, "IFRAGS")
 	}
 
-	if params.Autodirect == true {
+	if params.Autodirect {
 		cmd.Args = append(cmd.Args, "AUTORIDECT")
 	}
 
-	if params.MassDiffMode == true {
+	if params.MassDiffMode {
 		cmd.Args = append(cmd.Args, "MASSDIFFMODE")
 	}
 
-	if params.NoMinoFactor == true {
+	if params.NoMinoFactor {
 		cmd.Args = append(cmd.Args, "NOMINOFACTOR")
 	}
 
-	if params.Static == true {
+	if params.Static {
 		cmd.Args = append(cmd.Args, "STATIC")
 	}
 

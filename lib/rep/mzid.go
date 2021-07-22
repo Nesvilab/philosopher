@@ -1110,5 +1110,4 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	// Burn!
 	mzid.Write()
 
-	return
 }

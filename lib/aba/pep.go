@@ -26,8 +26,8 @@ import (
 func peptideLevelAbacus(m met.Data, args []string) {
 
 	var names []string
-	var xmlFiles []string
-	var datasets = make(map[string]rep.Evidence)
+	//var xmlFiles []string
+	var datasets = make(map[string]rep.PSMEvidenceList)
 	var labelList []DataSetLabelNames
 
 	// restoring combined file
@@ -45,8 +45,8 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		os.Chdir(i)
 
 		// restoring the PSMs
-		var psm rep.Evidence
-		rep.RestoreEVPSM(&psm)
+		var evi rep.Evidence
+		rep.RestorePSM(&evi.PSM)
 
 		var labels DataSetLabelNames
 		labels.LabelName = make(map[string]string)
@@ -55,11 +55,11 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 		// collect interact full file names
 		for _, f := range files {
-			if strings.Contains(f.Name(), "pep.xml") {
-				interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-				absPath, _ := filepath.Abs(interactFile)
-				xmlFiles = append(xmlFiles, absPath)
-			}
+			//if strings.Contains(f.Name(), "pep.xml") {
+			//interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
+			//absPath, _ := filepath.Abs(interactFile)
+			//xmlFiles = append(xmlFiles, absPath)
+			//}
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				labels.Name = annot
@@ -81,7 +81,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
-		datasets[prjName] = psm
+		datasets[prjName] = evi.PSM
 		names = append(names, prjName)
 	}
 
@@ -89,17 +89,16 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	sort.Strings(names)
 
-	logrus.Info("Collecting data from individual experiments")
+	logrus.Info("collecting data from individual experiments")
 	evidences := collectPeptideDatafromExperiments(datasets, m.Abacus.Tag)
 
-	logrus.Info("Summarizing the quantification")
+	logrus.Info("summarizing the quantification")
 	evidences = SummarizeAttributes(evidences, datasets, local)
 
 	os.Chdir(local)
 
 	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
 
-	return
 }
 
 // processPeptideCombinedFile reads and filter the combined peptide report
@@ -110,7 +109,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		msg.NoParametersFound(errors.New("Cannot find the combined.pep.xml file"), "fatal")
+		msg.NoParametersFound(errors.New("cannot find the combined.pep.xml file"), "fatal")
 
 	} else {
 
@@ -128,11 +127,10 @@ func processPeptideCombinedFile(a met.Abacus) {
 
 	}
 
-	return
 }
 
 // collectPeptideDatafromExperiments reads each individual data set peptide output and collects the quantification data to the combined report
-func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, decoyTag string) rep.CombinedPeptideEvidenceList {
+func collectPeptideDatafromExperiments(datasets map[string]rep.PSMEvidenceList, decoyTag string) rep.CombinedPeptideEvidenceList {
 
 	var pep id.PepIDList
 	pep.Restore("pep")
@@ -158,7 +156,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.Evidence, decoyTa
 }
 
 // SummarizeAttributes collects spectral counts and intensities from the individual data sets for the combined peptide report
-func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, local string) rep.CombinedPeptideEvidenceList {
+func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, local string) rep.CombinedPeptideEvidenceList {
 
 	var chargeMap = make(map[string][]uint8)
 	var bestPSM = make(map[string]float64)
@@ -175,6 +173,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 		ModsMap := make(map[string][]string)
 
 		protIDMap := make(map[string]string)
+		protMap := make(map[string]string)
 		protDescMap := make(map[string]string)
 		GeneMap := make(map[string]string)
 
@@ -191,6 +190,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 			IntMap[j.Sequence] = j.Intensity
 
 			protIDMap[j.Sequence] = j.ProteinID
+			protMap[j.Sequence] = j.Protein
 			protDescMap[j.Sequence] = j.ProteinDescription
 			GeneMap[j.Sequence] = j.GeneName
 
@@ -230,6 +230,10 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 			if ok {
 				evidences[i].ProteinID = id
 			}
+			pro, ok := protMap[evidences[i].Sequence]
+			if ok {
+				evidences[i].Protein = pro
+			}
 			desc, ok := protDescMap[evidences[i].Sequence]
 			if ok {
 				evidences[i].ProteinDescription = desc
@@ -253,7 +257,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 }
 
 // savePeptideAbacusResult creates a single report using 1 or more philosopher result files
-func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_peptide.tsv", session, string(filepath.Separator))
@@ -325,5 +329,4 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	// copy to work directory
 	sys.CopyFile(output, filepath.Base(output))
 
-	return
 }

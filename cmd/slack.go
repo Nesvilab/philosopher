@@ -32,12 +32,10 @@ var slackCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if len(token) < 1 {
-			msg.InputNotFound(errors.New("You need to specify your token in order to push a notification"), "error")
+			msg.InputNotFound(errors.New("you need to specify your token in order to push a notification"), "error")
 		}
 
 		sla.Run(name, direct, token, message, channel)
-
-		return
 	},
 }
 

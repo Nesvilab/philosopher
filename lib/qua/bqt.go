@@ -44,37 +44,6 @@ type Cluster struct {
 // List list
 type List []Cluster
 
-// CreateCleanDataBaseReference removes decoys and contaminants from struct
-func createCleanDataBaseReference(uid, temp string) string {
-
-	var u dat.Base
-	u.Restore()
-
-	clstrFasta := temp + string(filepath.Separator) + uid + ".fasta"
-
-	file, e := os.Create(clstrFasta)
-	if e != nil {
-		msg.Custom(errors.New("Could not create output for binning"), "fatal")
-	}
-	defer file.Close()
-
-	for _, i := range u.Records {
-
-		if i.IsDecoy == false && i.IsContaminant == false {
-
-			line := fmt.Sprintf(">%s\n%s\n", i.OriginalHeader, i.Sequence)
-			_, e = io.WriteString(file, line)
-
-			if e != nil {
-				msg.Custom(errors.New("Could not create output for binning"), "fatal")
-			}
-
-		}
-	}
-
-	return clstrFasta
-}
-
 // Execute is top function for Comet
 func execute(level float64) (string, string) {
 
@@ -103,18 +72,18 @@ func parseClusterFile(cls, database string) List {
 
 	f, e := os.Open(cls)
 	if e != nil {
-		msg.Custom(errors.New("Cannot open cluster file"), "fatal")
+		msg.Custom(errors.New("cannot open cluster file"), "fatal")
 	}
 	defer f.Close()
 
 	reheader, e1 := regexp.Compile(`^>Cluster\s+(.*)`)
 	if e1 != nil {
-		msg.Custom(errors.New("Cannot compile Cluster header regex"), "fatal")
+		msg.Custom(errors.New("cannot compile Cluster header regex"), "fatal")
 	}
 
 	reseq, e2 := regexp.Compile(`\|(.*)\|.*`)
 	if e2 != nil {
-		msg.Custom(errors.New("Cannot compile Cluster description regex"), "fatal")
+		msg.Custom(errors.New("cannot compile Cluster description regex"), "fatal")
 	}
 
 	scanner := bufio.NewScanner(f)
@@ -127,7 +96,7 @@ func parseClusterFile(cls, database string) List {
 			num := cluster[1]
 			i, e := strconv.Atoi(num)
 			if e != nil {
-				msg.Custom(errors.New("FAST header not found"), "fatal")
+				msg.Custom(errors.New("FASTA header not found"), "fatal")
 			}
 			clusterNumber = i
 
@@ -136,19 +105,19 @@ func parseClusterFile(cls, database string) List {
 
 		} else {
 
-			if strings.Contains(scanner.Text(), "*") {
+			if strings.Contains(scanner.Text(), "*") && !strings.Contains(scanner.Text(), "rev_") {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
 				if len(centroid) < 2 {
 					msg.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "fatal")
 				}
 				centroidmap[clusterNumber] = centroid[1]
-			}
 
-			seq := reseq.FindStringSubmatch(scanner.Text())
-			seqsName = clustermap[clusterNumber]
-			seqsName = append(seqsName, seq[1])
-			clustermap[clusterNumber] = seqsName
+				seq := reseq.FindStringSubmatch(scanner.Text())
+				seqsName = clustermap[clusterNumber]
+				seqsName = append(seqsName, seq[1])
+				clustermap[clusterNumber] = seqsName
+			}
 		}
 	}
 
@@ -180,7 +149,7 @@ func mapProtXML2Clusters(clusters List) List {
 	e.RestoreGranular()
 
 	for _, i := range e.Proteins {
-		if i.IsDecoy == false && i.IsContaminant == false {
+		if !i.IsDecoy && !i.IsContaminant {
 			for j := range clusters {
 
 				_, ok := clusters[j].Members[i.ProteinID]
@@ -194,7 +163,8 @@ func mapProtXML2Clusters(clusters List) List {
 					}
 
 					for _, k := range i.TotalPeptideIons {
-						clusters[j].Peptides = append(clusters[j].Peptides, k.Sequence)
+						ion := fmt.Sprintf("%s_%d", k.Sequence, k.ChargeState)
+						clusters[j].Peptides = append(clusters[j].Peptides, ion)
 					}
 
 					for _, k := range i.TotalPeptideIons {
@@ -214,11 +184,14 @@ func mapProtXML2Clusters(clusters List) List {
 	pepMap := make(map[string]uint8)
 	for _, i := range e.Proteins {
 		for _, j := range i.TotalPeptideIons {
-			_, ok := pepMap[j.Sequence]
+
+			ion := fmt.Sprintf("%s_%d", j.Sequence, j.ChargeState)
+
+			_, ok := pepMap[ion]
 			if ok {
-				pepMap[j.Sequence]++
+				pepMap[ion]++
 			} else {
-				pepMap[j.Sequence] = 1
+				pepMap[ion] = 1
 			}
 		}
 	}
@@ -246,26 +219,6 @@ func mapProtXML2Clusters(clusters List) List {
 	return clusters
 }
 
-func retrieveInfoFromUniProtDB(clusters List) List {
-
-	// collect database information
-	var dtb dat.Base
-	dtb.Restore()
-
-	for i := range clusters {
-		for _, j := range dtb.Records {
-			if strings.EqualFold(clusters[i].Centroid, j.ID) && j.IsDecoy == false && j.IsContaminant == false {
-				clusters[i].Description = j.ProteinName
-				clusters[i].GeneNames = j.GeneNames
-				break
-			}
-
-		}
-	}
-
-	return clusters
-}
-
 // GetFile is the miun function from annot package. It's responsible for connecting Uniprot
 // using ans Organism ID and retrieving functional information.
 func getFile(getAll bool, resultDir string, organism string) (faMap map[string][]string) {
@@ -273,7 +226,7 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	var query string
 	query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=organism:", organism, "&columns=id,protein%20names&format=tab")
 
-	if getAll == true {
+	if getAll {
 		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=organism:", organism, "&columns=id,reviewed,existence,genes,feature(DOMAIN%20EXTENT),comment(PATHWAY),go-id&format=tab")
 	}
 
@@ -289,21 +242,21 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		msg.Custom(errors.New("Could not find the annotation file"), "fatal")
+		msg.Custom(errors.New("could not find the annotation file"), "fatal")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		msg.Custom(errors.New("Cannot download the annotation file"), "fatal")
+		msg.Custom(errors.New("cannot download the annotation file"), "fatal")
 	}
 
 	faMap = make(map[string][]string)
 
 	f, e := os.Open(outfile)
 	if outfile == "" || e != nil {
-		msg.Custom(errors.New("Emty or inexisting file"), "fatal")
+		msg.Custom(errors.New("emty or inexisting file"), "fatal")
 	}
 	defer f.Close()
 
@@ -315,18 +268,6 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	}
 
 	return
-}
-
-func parseFastaFile(db dat.Base) map[string]string {
-
-	var fastaMap = make(map[string]string)
-
-	// get protein ID and description and add them to fastaMap
-	for _, k := range db.Records {
-		fastaMap[k.ID] = k.ProteinName
-	}
-
-	return fastaMap
 }
 
 // SavetoDisk saves functional inference result to disk
@@ -342,11 +283,11 @@ func savetoDisk(list List, temp, uid string) {
 	defer file.Close()
 
 	var line string
-	line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n")
+	line = "cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n"
 
 	if len(uid) > 0 {
 		logrus.Info("Retrieving annotation from UniProt")
-		line = fmt.Sprintf("Cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n")
+		line = "cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n"
 	}
 
 	_, e = io.WriteString(file, line)
@@ -357,8 +298,6 @@ func savetoDisk(list List, temp, uid string) {
 	var faMap = make(map[string][]string)
 	if len(uid) > 0 {
 		faMap = getFile(true, temp, uid)
-	} else {
-		//faMap, _ = fasta.ParseFastaDescription(rep.DB)
 	}
 
 	for i := range list {
@@ -407,6 +346,4 @@ func savetoDisk(list List, temp, uid string) {
 	}
 
 	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }

@@ -15,7 +15,6 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/mod"
-	"philosopher/lib/sys"
 	"philosopher/lib/uti"
 )
 
@@ -105,14 +104,13 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	sort.Sort(list)
 	evi.Ions = list
 
-	return
 }
 
 // MetaIonReport reports consist on ion reporting
-func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sion.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
@@ -125,8 +123,8 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 	for _, i := range evi.Ions {
 		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
 		if i.Probability > 0 {
-			if hasDecoys == false {
-				if i.IsDecoy == false {
+			if !hasDecoys {
+				if !i.IsDecoy {
 					printSet = append(printSet, i)
 				}
 			} else {
@@ -135,7 +133,7 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -164,7 +162,7 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels == true {
+	if hasLabels {
 
 		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
 
@@ -210,7 +208,7 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print Ion to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print Ion to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -236,9 +234,11 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 		sort.Strings(assL)
 		sort.Strings(obs)
 
-		line := fmt.Sprintf("%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.4f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Sequence),
 			i.MZ,
 			i.ChargeState,
@@ -346,12 +346,8 @@ func (evi Evidence) MetaIonReport(brand string, channels int, hasDecoys, hasLabe
 
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("Cannot print Ions to file"), "fatal")
+			msg.WriteToFile(errors.New("cannot print Ions to file"), "fatal")
 		}
 	}
 
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }

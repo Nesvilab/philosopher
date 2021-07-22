@@ -3,7 +3,6 @@ package obo
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -11,8 +10,8 @@ import (
 	"strings"
 
 	"philosopher/lib/msg"
+	"philosopher/lib/uti"
 
-	"github.com/vmihailenco/msgpack"
 	"philosopher/lib/met"
 	unmd "philosopher/lib/obo/unimod"
 	"philosopher/lib/sys"
@@ -87,7 +86,6 @@ func (m *Onto) Deploy() {
 
 	unmd.Deploy(m.OboFile)
 
-	return
 }
 
 // Parse reads the unimod.obo file and creates the data structure
@@ -143,7 +141,7 @@ func (m *Onto) Parse() {
 			term.RecordID = i
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_mono_mass") && flag == 1 {
 			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
-			term.MonoIsotopicMass = i
+			term.MonoIsotopicMass = uti.ToFixed(i, 4)
 		} else if strings.HasPrefix(scanner.Text(), "xref: delta_avge_mass") && flag == 1 {
 			i, _ := strconv.ParseFloat(splitAndCollect(scanner.Text(), "xref"), 64)
 			term.AverageMass = i
@@ -175,40 +173,6 @@ func (m *Onto) Parse() {
 	if e := scanner.Err(); e != nil {
 		log.Fatal(e)
 	}
-
-	return
-}
-
-// Serialize UniMod data structure
-func (m Onto) Serialize() {
-
-	b, e := msgpack.Marshal(&m)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.MODBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-
-	return
-}
-
-// Restore reads philosopher results files and restore the data sctructure
-func (m *Onto) Restore() {
-
-	b, e := ioutil.ReadFile(sys.MODBin())
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-
-	e = msgpack.Unmarshal(b, &m)
-	if e != nil {
-		msg.DecodeMsgPck(e, "fatal")
-	}
-
-	return
 }
 
 func splitAndCollect(s string, target string) string {

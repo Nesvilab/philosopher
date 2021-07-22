@@ -14,7 +14,6 @@ import (
 	"philosopher/lib/id"
 	"philosopher/lib/mod"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // AssemblePeptideReport reports consist on ion reporting
@@ -116,9 +115,6 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 			}
 		}
 
-		pep.Spc = len(spectra[k])
-		pep.Intensity = pepInt[k]
-
 		// is this a decoy ?
 		pep.IsDecoy = v
 
@@ -128,14 +124,13 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 	sort.Sort(list)
 	evi.Peptides = list
 
-	return
 }
 
 // MetaPeptideReport report consist on ion reporting
-func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%speptide.tsv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%speptide.tsv", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
 	if e != nil {
@@ -148,8 +143,8 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 	for _, i := range evi.Peptides {
 		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
 		if i.Probability > 0 {
-			if hasDecoys == false {
-				if i.IsDecoy == false {
+			if !hasDecoys {
+				if !i.IsDecoy {
 					printSet = append(printSet, i)
 				}
 			} else {
@@ -158,7 +153,7 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 		}
 	}
 
-	header = "Peptide\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -187,7 +182,7 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels == true {
+	if hasLabels {
 
 		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
 
@@ -233,7 +228,7 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -265,8 +260,10 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 		sort.Strings(obs)
 		sort.Strings(cs)
 
-		line := fmt.Sprintf("%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
+			i.PrevAA,
+			i.NextAA,
 			len(i.Sequence),
 			strings.Join(cs, ", "),
 			i.Probability,
@@ -371,12 +368,7 @@ func (evi Evidence) MetaPeptideReport(brand string, channels int, hasDecoys, has
 
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("Cannot print Peptides to file"), "fatal")
+			msg.WriteToFile(errors.New("cannot print Peptides to file"), "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }

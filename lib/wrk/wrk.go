@@ -22,31 +22,30 @@ import (
 // Run is the workspace main entry point
 func Run(Version, Build, temp string, backup, clean, initialize, nocheck bool) {
 
-	if nocheck == false {
+	if !nocheck {
 		gth.UpdateChecker(Version, Build)
 	}
 
-	if (initialize == true && backup == true && clean == true) || (initialize == true && backup == true) || (initialize == true && clean == true) || (clean == true && backup == true) {
+	if (initialize && backup && clean) || (initialize && backup) || (initialize && clean) || (clean && backup) {
 		msg.Custom(errors.New("this command accepts only one parameter"), "fatal")
 	}
 
-	if initialize == true {
+	if initialize {
 
 		logrus.Info("Creating workspace")
 		Init(Version, Build, temp)
 
-	} else if backup == true {
+	} else if backup {
 
 		logrus.Info("Creating backup")
 		Backup()
 
-	} else if clean == true {
+	} else if clean {
 
 		logrus.Info("Removing workspace")
 		Clean()
 	}
 
-	return
 }
 
 // Init creates a new workspace
@@ -92,13 +91,9 @@ func Init(version, build, temp string) {
 			msg.LocatingTemDirecotry(e, "fatal")
 		}
 
-		da.Home = fmt.Sprintf("%s", da.Home)
-		da.MetaDir = fmt.Sprintf("%s", da.MetaDir)
-
 		da.Serialize()
 	}
 
-	return
 }
 
 // Backup collects all binary files from the workspace and zips them
@@ -133,7 +128,6 @@ func Backup() {
 		msg.ArchivingMetaDirecotry(e, "error")
 	}
 
-	return
 }
 
 // Clean deletes all meta data and the workspace directory
@@ -158,5 +152,4 @@ func Clean() {
 		}
 	}
 
-	return
 }

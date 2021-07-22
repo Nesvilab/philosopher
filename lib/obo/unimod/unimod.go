@@ -21,5 +21,4 @@ func Deploy(f string) {
 		msg.DeployAsset(errors.New("Unimod"), "Cannot deploy Unimod obo")
 	}
 
-	return
 }

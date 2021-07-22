@@ -10,27 +10,26 @@ import (
 
 	"philosopher/lib/bio"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool) {
+func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%smsstats.csv", sys.MetaDir(), string(filepath.Separator))
+	output := fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("Cannot create MSstats report"), "error")
+		msg.WriteFile(errors.New("cannot create MSstats report"), "error")
 	}
 	defer file.Close()
 
 	// building the printing set tat may or not contain decoys
 	var printSet PSMEvidenceList
 	for _, i := range evi.PSM {
-		if hasDecoys == false {
-			if i.IsDecoy == false {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
 		} else {
@@ -56,28 +55,28 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 	header += "\n"
 
 	// verify if the structure has labels, if so, replace the original channel names by them.
-	if len(printSet[0].Labels.Channel1.CustomName) > 3 {
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel16.Name, printSet[0].Labels.Channel16.CustomName, -1)
-	}
+	// if len(printSet[0].Labels.Channel1.CustomName) > 3 {
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
+	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel16.Name, printSet[0].Labels.Channel16.CustomName, -1)
+	// }
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("Cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
 	}
 
 	for _, i := range printSet {
@@ -135,7 +134,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 					i.Labels.Channel11.Intensity,
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
 					i.Purity,
 					i.Labels.Channel1.Intensity,
@@ -149,11 +148,11 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 					i.Labels.Channel9.Intensity,
 					i.Labels.Channel10.Intensity,
 					i.Labels.Channel11.Intensity,
-					//i.Labels.Channel12.Intensity,
-					//i.Labels.Channel13.Intensity,
-					//i.Labels.Channel14.Intensity,
-					//i.Labels.Channel15.Intensity,
-					//i.Labels.Channel16.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
 				)
 			default:
 				header += ""
@@ -164,12 +163,7 @@ func (evi Evidence) MetaMSstatsReport(brand string, channels int, hasDecoys bool
 
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("Cannot write to MSstats report"), "fatal")
+			msg.WriteToFile(errors.New("cannot write to MSstats report"), "fatal")
 		}
 	}
-
-	// copy to work directory
-	sys.CopyFile(output, filepath.Base(output))
-
-	return
 }

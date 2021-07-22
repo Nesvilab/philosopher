@@ -16,7 +16,6 @@ func SetupTestEnv() {
 		}
 	}
 
-	return
 }
 
 // ShutDowTestEnv pre-sets environment directory and meta folder
@@ -24,5 +23,4 @@ func ShutDowTestEnv() {
 
 	wrk.Clean()
 
-	return
 }
