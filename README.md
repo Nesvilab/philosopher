@@ -3,7 +3,7 @@
 </p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/Nesvilab/philosopher/releases/latest)
-![Golang](https://img.shields.io/badge/Go-1.16.4-blue.svg?style=for-the-badge)
+![Golang](https://img.shields.io/badge/Go-1.16.12-blue.svg?style=for-the-badge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Nesvilab/philosopher?style=for-the-badge&color=red&logo=appveyor)](https://goreportcard.com/report/github.com/Nesvilab/philosopher)
 ![GitHub](https://img.shields.io/github/license/Nesvilab/philosopher?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
@@ -73,7 +73,7 @@ da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacher
 
 
 ## Questions, requests and bug reports
-If you have any questions, remarks, requests or if you found a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
+If you have any questions or remarks please use the [Discussion board](https://github.com/Nesvilab/philosopher/discussions). If you want to report a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
 
 
 ## License
