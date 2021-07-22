@@ -229,14 +229,7 @@ func Run(f met.Data) met.Data {
 
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 
-	// reorganizes the selected proteins and the alternative proteins list
-	// logrus.Info("Updating razor PSM assignment to proteins")
-	// if f.Filter.Razor {
-	// 	e.UpdateSupportingSpectra()
-	// }
-
-	//e = qua.CalculateSpectralCounts(e)
-	//e = qua.CalculatePeptideCounts(e)
+	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
 	logrus.Info("Saving")
 	e.SerializeGranular()

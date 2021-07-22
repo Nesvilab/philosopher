@@ -374,6 +374,36 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 	return evi
 }
 
+// SyncPSMToPeptideIons forces the synchronization between the filtered ions, and the remaining structures.
+func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
+
+	var ion = make(map[string]int)
+	var spectra = make(map[string][]string)
+
+	for _, i := range evi.PSM {
+
+		if !i.IsDecoy {
+			ion[i.IonForm]++
+			spectra[i.IonForm] = append(spectra[i.IonForm], i.Spectrum)
+		}
+	}
+
+	for i := range evi.Ions {
+
+		evi.Ions[i].Spectra = make(map[string]int)
+
+		v, ok := spectra[evi.Ions[i].IonForm]
+		if ok {
+			for _, j := range v {
+				evi.Ions[i].Spectra[j]++
+			}
+		}
+
+	}
+
+	return evi
+}
+
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
 func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
