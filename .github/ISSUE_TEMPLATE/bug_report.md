@@ -36,5 +36,3 @@ If applicable, add screenshots to help explain your problem.
  - Version: [e.g. v2.0.0]
 
 **Additional context**
-
-Add any other context about the problem here.
