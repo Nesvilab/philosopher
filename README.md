@@ -55,9 +55,8 @@ Download the latest version [here](https://github.com/nesvilab/philosopher/relea
 ## Documentation
 See the [documentation](https://github.com/Nesvilab/philosopher/wiki/Home) for more details about the available commands.
 
-
-## Questions, requests, and bug reports
-If you have any questions, remarks, or requests, or if you found a bug, please use the [issue tracker](https://github.com/nesvilab/philosopher/issues).
+## Questions, requests and bug reports
+If you have any questions or remarks please use the [Discussion board](https://github.com/Nesvilab/philosopher/discussions). If you want to report a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
 
 
 ## How to cite
@@ -70,11 +69,6 @@ da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacher
 [Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
 
 [Alexey Nesvizhskii's research group](http://www.nesvilab.org/)
-
-
-## Questions, requests and bug reports
-If you have any questions or remarks please use the [Discussion board](https://github.com/Nesvilab/philosopher/discussions). If you want to report a bug, please use the [Issue tracker](https://github.com/nesvilab/philosopher/issues).
-
 
 ## License
 GPL 3
