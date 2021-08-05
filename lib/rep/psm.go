@@ -237,7 +237,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
+			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131N"
 		case 10:
 			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
@@ -435,94 +435,101 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			strings.Join(mappedProteins, ", "),
 		)
 
-		switch channels {
-		case 4:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-			)
-		case 6:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-			)
-		case 8:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-			)
-		case 10:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-			)
-		case 11:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-				i.Labels.Channel11.Intensity,
-			)
-		case 16:
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-				i.Labels.Channel11.Intensity,
-				i.Labels.Channel12.Intensity,
-				i.Labels.Channel13.Intensity,
-				i.Labels.Channel14.Intensity,
-				i.Labels.Channel15.Intensity,
-				i.Labels.Channel16.Intensity,
-			)
-		default:
-			header += ""
+		if brand == "tmt" {
+			switch channels {
+			case 6:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+			case 10:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "itraq" {
+			switch channels {
+			case 4:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+				)
+			case 8:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+				)
+			default:
+				header += ""
+			}
 		}
 
 		line += "\n"
