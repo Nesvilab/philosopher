@@ -1,19 +1,5 @@
 ### Added
-- Native support for Thermo raw files (Windows, and Linux).
-- Option to tag contaminant sequences with a prefix tag.
-- New parameters added to MSFragger.
-- Support for FAIMS data.
-- New parameters for MSFragger.
 
 ### Changed
-- Improvements in overall performance.
-- Improvements to the pipeline processing speed.
-- Major code cleaning and refactoring.
-- The pipeline protein inference is now calculated once for all data sets.
-- Updated razor assingment classification.
-- Upgated Go compiler to v1.16.5.
 
 ### Fixed
-- Label positioning in the reprint output.
-- Minor bugs and fixes.
-- Fixed problems with Spectral Counting.
