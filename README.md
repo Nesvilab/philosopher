@@ -64,7 +64,7 @@ da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacher
 
 
 ## About the developers
-[Felipe da Veiga leprevost](http://www.leprevost.com.br)
+[Felipe da Veiga Leprevost](http://prvst.github.io)
 
 [Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
 
