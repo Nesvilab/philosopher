@@ -454,10 +454,6 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 							Value: e.Parameters.MaxVariableModsCombinations,
 						},
 						{
-							Name:  "output_file_extension",
-							Value: e.Parameters.OutputFileExtension,
-						},
-						{
 							Name:  "output_format",
 							Value: e.Parameters.OutputFormat,
 						},

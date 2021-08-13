@@ -111,6 +111,7 @@ type MSFragger struct {
 	FragmentMassTolerance              float64 `yaml:"fragment_mass_tolerance"`
 	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
 	CalibrateMass                      int     `yaml:"calibrate_mass"`
+	UseAllModsInFirstSearch            int     `yaml:"use_all_mods_in_first_search"`
 	WriteCalibratedMGF                 int     `yaml:"write_calibrated_mgf"`
 	DecoyPrefix                        string  `yaml:"decoy_prefix"`
 	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
@@ -132,7 +133,6 @@ type MSFragger struct {
 	AllowMultipleVariableModsOnResidue int     `yaml:"allow_multiple_variable_mods_on_residue"`
 	MaxVariableModsPerPeptide          int     `yaml:"max_variable_mods_per_peptide"`
 	MaxVariableModsCombinations        int     `yaml:"max_variable_mods_combinations"`
-	OutputFileExtension                string  `yaml:"output_file_extension"`
 	OutputFormat                       string  `yaml:"output_format"`
 	OutputReportTopN                   int     `yaml:"output_report_topN"`
 	OutputMaxExpect                    int     `yaml:"output_max_expect"`
@@ -147,6 +147,7 @@ type MSFragger struct {
 	ZeroBinAcceptExpect                int     `yaml:"zero_bin_accept_expect"`
 	ZeroBinMultExpect                  int     `yaml:"zero_bin_mult_expect"`
 	AddTopNComplementary               int     `yaml:"add_topN_complementary"`
+	CheckSpectralFiles                 int     `yaml:"check_spectral_files"`
 	MinimumPeaks                       int     `yaml:"minimum_peaks"`
 	UseTopNPeaks                       int     `yaml:"use_topN_peaks"`
 	MinFragmentsModelling              int     `yaml:"min_fragments_modelling"`

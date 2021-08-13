@@ -1,5 +1,5 @@
 # Philosopher pipeline configuration file
-# Version 3.6.0
+# Version 4.0.1
 #
 # The pipeline mode automates the processing done by Philosopher and other tools. First, check
 # the steps you want to execute in the commands section and change them to
@@ -31,44 +31,45 @@ Steps:
   Integrated Reports: no                         # combined analysis of LC-MS/MS results inspired by Abacus
   Integrated Isobaric Quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-Database Search:                                 # MSFragger 3.2 & Comet
+Database Search:                                 # MSFragger 3.3 & Comet v2019011
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
   contaminant_tag: false                         # prefix tag used added to decoy sequences
-  search_engine: comet                           # search engine options include "comet" and "msfragger"
+  search_engine: msfragger                       # search engine options include "comet" and "msfragger"
   comet:                                         # Comet v2019011
     noindex: true                                # skip mzML file indexing
     param:                                       # comet parameter file (default "comet.params.txt")
     extension: mzML                              # format of the spectra file
-  msfragger:                                     # MSFragger v3.0
+  msfragger:                                     # MSFragger v3.3
     path:                                        # path to MSFragger jar
     memory: 8                                    # how much memory in GB to use
     param:                                       # MSFragger parameter file
     extension: mzML                              # spectra format
-    data_type: 0                                 # 0 for DDA, 1 for DIA, 2 for DIA-narrow-window
-    num_threads: 0                               # 0=poll CPU to set num threads; else specify num threads directly (max 64)
-    precursor_mass_lower: -50                    # lower bound of the precursor mass window
-    precursor_mass_upper: 50                     # upper bound of the precursor mass window
+    num_threads: 0                               # number of CPU threads to use. 0=poll CPU to set num threads
+    precursor_mass_lower: -20                    # lower bound of the precursor mass window
+    precursor_mass_upper: 20                     # upper bound of the precursor mass window
     precursor_mass_units: 1                      # 0=Daltons, 1=ppm
+    data_type: 0                                 # 0 for DDA, 1 for DIA, 2 for DIA-narrow-window
     precursor_true_tolerance: 20                 # true precursor mass tolerance (window is +/- this value)
     precursor_true_units: 1                      # 0=Daltons, 1=ppm
     fragment_mass_tolerance: 20                  # fragment mass tolerance (window is +/- this value)
     fragment_mass_units: 1                       # fragment mass tolerance units (0 for Da, 1 for ppm)
     calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
-    deneutralloss: 0                             # Perform deneutrallossing or not (0=no, 1=yes)
-    deisotope: 1                                 # activates deisotoping.
+    use_all_mods_in_first_search: 0              # use all variable modifications in first search (0 for No, 1 for Yes).
+    write_calibrated_mgf: 0                      # write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)
     isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
     mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
-    precursor_mass_mode: selected                # selected or isolated
+    restrict_deltamass_to: all                   # specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
+    precursor_mass_mode: selected                # one of isolated/selected/corrected.
     localize_delta_mass: 0                       # this allows shifted fragment ions - fragment ions with mass increased by the calculated mass difference, to be included in scoring
     delta_mass_exclude_ranges: (-1.5,3.5)        # exclude mass range for shifted ions searching
     fragment_ion_series: b,y                     # ion series used in search
-    ion_series_definitions:                      # User defined ion series. (Example: b* N -17.026548;b0 N -18.010565)
+    ion_series_definitions:                      # user defined ion series. (Example: b* N -17.026548;b0 N -18.010565)
     search_enzyme_name: Trypsin                  # name of enzyme to be written to the pepXML file
     search_enzyme_cutafter: KR                   # residues after which the enzyme cuts
     search_enzyme_butnotafter: P                 # residues that the enzyme will not cut before
     num_enzyme_termini: 2                        # 2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion
-    allowed_missed_cleavage: 1                   # maximum value is 5
+    allowed_missed_cleavage: 2                   # maximum value is 5
     clip_nTerm_M: 1                              # specifies the trimming of a protein N-terminal methionine as a variable modification (0 or 1)
     variable_mod_01: 15.99490 M 3                # variable modification
     variable_mod_02: 42.01060 [^ 1               # variable modification
@@ -80,9 +81,9 @@ Database Search:                                 # MSFragger 3.2 & Comet
     allow_multiple_variable_mods_on_residue: 0   # static mods are not considered
     max_variable_mods_per_peptide: 3             # maximum of 5
     max_variable_mods_combinations: 5000         # maximum of 65534, limits number of modified peptides generated from sequence
+    mass_diff_to_variable_mod: 0			           # put mass diff as a variable modification. 0 for no; 1 for yes and change the original mass diff and the calculated mass accordingly; 2 for yes but do not change the original mass diff.
     output_file_extension: pepXML                # file extension of output files
     output_format: pepXML                        # file format of output files (pepXML or tsv)
-    write_calibrated_mgf: 0                      # Write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)
     output_report_topN: 1                        # reports top N PSMs per input spectrum
     output_max_expect: 50                        # suppresses reporting of PSM if top hit has expectation greater than this threshold
     report_alternative_proteins: 0               # 0=no, 1=yes
@@ -96,8 +97,11 @@ Database Search:                                 # MSFragger 3.2 & Comet
     zero_bin_accept_expect: 0                    # boost top zero bin entry to top if it has expect under 0.01 - set to 0 to disable
     zero_bin_mult_expect: 1                      # disabled if above passes - multiply expect of zero bin for ordering purposes (does not affect reported expect)
     add_topN_complementary: 0                    # inserts complementary ions corresponding to the top N most intense fragments in each experimental spectra
+    check_spectral_files: 1                      # check the spectral files before searching.
     minimum_peaks: 15                            # required minimum number of peaks in spectrum to search (default 10)
-    use_topN_peaks: 100                          # pre-process experimental spectrum to only use top N peaks
+    use_topN_peaks: 150                          # pre-process experimental spectrum to only use top N peaks
+    deisotope: 1                                 # activates deisotoping.
+    deneutralloss: 1                             # performs deneutrallossing or not (0=no, 1=yes)
     min_fragments_modelling: 2                   # minimum number of matched peaks in PSM for inclusion in statistical modeling
     min_matched_fragments: 4                     # minimum number of matched peaks for PSM to be reported
     minimum_ratio: 0.01                          # filters out all peaks in experimental spectrum less intense than this multiple of the base peak intensity
@@ -105,9 +109,7 @@ Database Search:                                 # MSFragger 3.2 & Comet
     remove_precursor_peak: 0                     # remove precursor peaks from tandem mass spectra. 0=not remove; 1=remove the peak with precursor charge; 2=remove the peaks with all charge states.
     remove_precursor_range: -1.5,1.5             # m/z range in removing precursor peaks. Unit: Da.
     intensity_transform: 0                       # transform peaks intensities with sqrt root. 0=not transform; 1=transform using sqrt root.
-    mass_diff_to_variable_mod: 0			           # Put mass diff as a variable modification. 0 for no; 1 for yes and change the original mass diff and the calculated mass accordingly; 2 for yes but do not change the original mass diff.
     labile_search_mode: off                      # type of search (nglycan, labile, or off). Off means non-labile/typical search.
-    restrict_deltamass_to: all                   # Specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
     diagnostic_intensity_filter: 0			         # [nglycan/labile search_mode only]. Minimum relative intensity for SUM of all detected oxonium ions to achieve for spectrum to contain diagnostic fragment evidence. Calculated relative to spectrum base peak. 0 <= value.
     Y_type_masses:                               # [nglycan/labile search_mode only]. Specify fragments of labile mods that are commonly retained on intact peptides (e.g. Y ions for glycans). Only used if 'Y' is included in fragment_ion_series.
     diagnostic_fragments:                        # [nglycan/labile search_mode only]. Specify diagnostic fragments of labile mods that appear in the low m/z region. Only used if diagnostic_intensity_filter > 0.
@@ -268,7 +270,7 @@ Integrated Reports:                              # Abacus
   uniqueOnly: false                              # report TMT quantification based on only unique peptides
   reprint: false                                 # create abacus reports using the Reprint format
 
-Integrated Isobaric Quantification:              # TMT-Integrator v1.1.10
+Integrated Isobaric Quantification:              # TMT-Integrator v3.1.0
   path:                                          # path to TMT-Integrator jar
   memory: 6                                      # memory allocation, in Gb
   output:                                        # the location of output files
@@ -295,3 +297,4 @@ Integrated Isobaric Quantification:              # TMT-Integrator v1.1.10
   add_Ref: -1                                    # add an artificial reference channel if there is no reference channel (-1: don't add the reference; 0: use summation as the reference; 1: use average as the reference; 2: use median as the reference)
   max_pep_prob_thres: 0                          # the threshold for maximum peptide probability
   min_ntt: 0                                     # minimum allowed number of enzymatic termini
+  aggregation_method: 0                          # the aggregation method from the PSM level to the specified level (0: median, 1: weighted-ratio)
