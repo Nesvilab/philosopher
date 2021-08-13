@@ -453,7 +453,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		if len(reMatch) > 0 {
 
-			evi.PSM[i].ProteinStart = reMatch[0]
+			evi.PSM[i].ProteinStart = reMatch[0] + 1
 			evi.PSM[i].ProteinEnd = reMatch[1]
 
 			if (reMatch[0]) <= 0 {
