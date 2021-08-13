@@ -419,21 +419,18 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var pepNextAA = make(map[string]string)
 
 	for _, j := range dtb.Records {
-		if !j.IsDecoy {
-			proteinIDMap[j.PartHeader] = j.ID
-			entryNameMap[j.PartHeader] = j.EntryName
-			geneMap[j.PartHeader] = j.GeneNames
-			descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
-			sequenceMap[j.PartHeader] = j.Sequence
-		}
+		//if !j.IsDecoy {
+		proteinIDMap[j.PartHeader] = j.ID
+		entryNameMap[j.PartHeader] = j.EntryName
+		geneMap[j.PartHeader] = j.GeneNames
+		descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
+		sequenceMap[j.PartHeader] = j.Sequence
+		//}
 	}
 
 	for i := range evi.PSM {
 
 		id := evi.PSM[i].Protein
-		if evi.PSM[i].IsDecoy {
-			id = strings.Replace(id, decoyTag, "", 1)
-		}
 
 		evi.PSM[i].ProteinID = proteinIDMap[id]
 		evi.PSM[i].EntryName = entryNameMap[id]
