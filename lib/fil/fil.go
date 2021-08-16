@@ -106,7 +106,7 @@ func Run(f met.Data) met.Data {
 		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	}
 
-	if _, err := os.Stat(razorBin); err == nil || f.Filter.TwoD {
+	if _, err := os.Stat(razorBin); err == nil || (f.Filter.TwoD && f.Filter.Razor) {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)

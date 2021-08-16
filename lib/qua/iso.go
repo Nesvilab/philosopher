@@ -382,6 +382,11 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 		var flag = 0
 
+		rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity
+		if rowSum > 0 {
+			counter++
+		}
+
 		if len(evi.PSM[i].Modifications.Index) < 1 {
 			evi.PSM[i].Labels.Channel1.Intensity = 0
 			evi.PSM[i].Labels.Channel2.Intensity = 0
@@ -426,19 +431,11 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 				evi.PSM[i].Labels.Channel15.Intensity = 0
 				evi.PSM[i].Labels.Channel16.Intensity = 0
 			}
-
-			if counter <= 100 {
-				rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity
-				if rowSum > 0 {
-					counter++
-				}
-			}
-
 		}
 	}
 
-	if counter < 100 {
-		msg.QuantifyingData(errors.New("no reporter ions were detected. Review your parameters, and try again"), "fatal")
+	if counter < 10 {
+		msg.QuantifyingData(errors.New("no reporter ions were detected. Review your parameters, and try again"), "warning")
 	}
 
 	return evi
