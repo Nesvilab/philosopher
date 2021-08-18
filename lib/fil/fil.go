@@ -231,6 +231,13 @@ func Run(f met.Data) met.Data {
 
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
+	logrus.WithFields(logrus.Fields{
+		"psms":     len(e.PSM),
+		"peptides": len(e.Peptides),
+		"ions":     len(e.Ions),
+		"proteins": len(e.Proteins),
+	}).Info("Total report numbers after FDR filtering, and post-processing")
+
 	logrus.Info("Saving")
 	e.SerializeGranular()
 

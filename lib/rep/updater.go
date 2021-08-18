@@ -8,6 +8,8 @@ import (
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
 	"philosopher/lib/uti"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 // PeptideMap struct
@@ -225,19 +227,21 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 	var newPeptides PeptideEvidenceList
 
 	for _, i := range evi.Proteins {
-		proteinIndex[i.ProteinID] = 0
+		proteinIndex[i.PartHeader] = 0
 	}
 
 	for _, i := range evi.PSM {
-		_, ok := proteinIndex[i.ProteinID]
+		_, ok := proteinIndex[i.Protein]
 		if ok {
 			newPSM = append(newPSM, i)
+		} else {
+			spew.Dump(i)
 		}
 	}
 	evi.PSM = newPSM
 
 	for _, i := range evi.Ions {
-		_, ok := proteinIndex[i.ProteinID]
+		_, ok := proteinIndex[i.Protein]
 		if ok {
 			newIons = append(newIons, i)
 		}
@@ -245,7 +249,7 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 	evi.Ions = newIons
 
 	for _, i := range evi.Peptides {
-		_, ok := proteinIndex[i.ProteinID]
+		_, ok := proteinIndex[i.Protein]
 		if ok {
 			newPeptides = append(newPeptides, i)
 		}
@@ -348,7 +352,6 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 	var spectra = make(map[string][]string)
 
 	for _, i := range evi.PSM {
-
 		if !i.IsDecoy {
 			spc[i.Peptide]++
 			spectra[i.Peptide] = append(spectra[i.Peptide], i.Spectrum)
@@ -362,11 +365,16 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 
 		v, ok := spectra[evi.Peptides[i].Sequence]
 		if ok {
+
+			//evi.Peptides[i].IsDecoy = false
+
 			for _, j := range v {
 				evi.Peptides[i].Spectra[j]++
 			}
-
 			evi.Peptides[i].Spc = len(v)
+
+		} else {
+			//evi.Peptides[i].IsDecoy = true
 		}
 
 	}
@@ -381,7 +389,6 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 	var spectra = make(map[string][]string)
 
 	for _, i := range evi.PSM {
-
 		if !i.IsDecoy {
 			ion[i.IonForm]++
 			spectra[i.IonForm] = append(spectra[i.IonForm], i.Spectrum)
@@ -394,9 +401,14 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 
 		v, ok := spectra[evi.Ions[i].IonForm]
 		if ok {
+
+			//evi.Ions[i].IsDecoy = false
+
 			for _, j := range v {
 				evi.Ions[i].Spectra[j]++
 			}
+		} else {
+			//evi.Ions[i].IsDecoy = true
 		}
 
 	}
@@ -419,13 +431,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var pepNextAA = make(map[string]string)
 
 	for _, j := range dtb.Records {
-		//if !j.IsDecoy {
 		proteinIDMap[j.PartHeader] = j.ID
 		entryNameMap[j.PartHeader] = j.EntryName
 		geneMap[j.PartHeader] = j.GeneNames
 		descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
 		sequenceMap[j.PartHeader] = j.Sequence
-		//}
 	}
 
 	for i := range evi.PSM {
