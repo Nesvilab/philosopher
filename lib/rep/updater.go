@@ -8,8 +8,6 @@ import (
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
 	"philosopher/lib/uti"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 // PeptideMap struct
@@ -234,8 +232,6 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 		_, ok := proteinIndex[i.Protein]
 		if ok {
 			newPSM = append(newPSM, i)
-		} else {
-			spew.Dump(i)
 		}
 	}
 	evi.PSM = newPSM

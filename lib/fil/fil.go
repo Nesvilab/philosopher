@@ -29,8 +29,30 @@ func Run(f met.Data) met.Data {
 	var pro id.ProtIDList
 	var razorBin string
 
-	if len(f.Filter.RazorBin) > 0 {
-		razorBin = f.Filter.RazorBin
+	// if len(f.Filter.RazorBin) > 0 {
+
+	// 	if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
+	// 		// path/to/whatever does not exist
+	// 	}
+
+	// 	razorBin = f.Filter.RazorBin
+	// }
+
+	if len(f.Filter.RazorBin) > 0 && !f.Filter.Razor {
+		if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
+			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Skipping razor assignment")
+			f.Filter.RazorBin = ""
+			razorBin = ""
+			f.Filter.Razor = false
+		} else {
+			razorBin = f.Filter.RazorBin
+			f.Filter.Razor = false
+		}
+	} else if len(f.Filter.RazorBin) > 0 && f.Filter.Razor {
+		logrus.Warn("Ignoring the razorbin flag, and forcing a new razor assignment")
+		f.Filter.RazorBin = ""
+		razorBin = ""
+		f.Filter.Razor = true
 	}
 
 	// get the database tag from database command
@@ -231,11 +253,36 @@ func Run(f met.Data) met.Data {
 
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
+	var countPSM, countPep, countIon, coutProtein int
+	for _, i := range e.PSM {
+		if !i.IsDecoy {
+			countPSM++
+		}
+	}
+
+	for _, i := range e.Peptides {
+		if !i.IsDecoy {
+			countPep++
+		}
+	}
+
+	for _, i := range e.Ions {
+		if !i.IsDecoy {
+			countIon++
+		}
+	}
+
+	for _, i := range e.Proteins {
+		if !i.IsDecoy {
+			coutProtein++
+		}
+	}
+
 	logrus.WithFields(logrus.Fields{
-		"psms":     len(e.PSM),
-		"peptides": len(e.Peptides),
-		"ions":     len(e.Ions),
-		"proteins": len(e.Proteins),
+		"psms":     countPSM,
+		"peptides": countPep,
+		"ions":     countIon,
+		"proteins": coutProtein,
 	}).Info("Total report numbers after FDR filtering, and post-processing")
 
 	logrus.Info("Saving")
