@@ -38,7 +38,6 @@ func Run(f met.Data) met.Data {
 			f.Filter.RazorBin = ""
 		} else {
 			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
-			fmt.Println(rdest)
 			sys.CopyFile(f.Filter.RazorBin, rdest)
 		}
 	}
