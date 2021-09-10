@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -27,32 +28,19 @@ func Run(f met.Data) met.Data {
 	var pepxml id.PepXML
 	var pep id.PepIDList
 	var pro id.ProtIDList
-	var razorBin string
 
-	// if len(f.Filter.RazorBin) > 0 {
+	if len(f.Filter.RazorBin) > 0 {
 
-	// 	if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
-	// 		// path/to/whatever does not exist
-	// 	}
+		f.Filter.Razor = true
 
-	// 	razorBin = f.Filter.RazorBin
-	// }
-
-	if len(f.Filter.RazorBin) > 0 && !f.Filter.Razor {
 		if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
 			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Skipping razor assignment")
 			f.Filter.RazorBin = ""
-			razorBin = ""
-			f.Filter.Razor = false
 		} else {
-			razorBin = f.Filter.RazorBin
-			f.Filter.Razor = false
+			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
+			fmt.Println(rdest)
+			sys.CopyFile(f.Filter.RazorBin, rdest)
 		}
-	} else if len(f.Filter.RazorBin) > 0 && f.Filter.Razor {
-		logrus.Warn("Ignoring the razorbin flag, and forcing a new razor assignment")
-		f.Filter.RazorBin = ""
-		razorBin = ""
-		f.Filter.Razor = true
 	}
 
 	// get the database tag from database command
@@ -128,7 +116,7 @@ func Run(f met.Data) met.Data {
 		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	}
 
-	if _, err := os.Stat(razorBin); err == nil || (f.Filter.TwoD && f.Filter.Razor) {
+	if f.Filter.TwoD || f.Filter.Razor {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)
