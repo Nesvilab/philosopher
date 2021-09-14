@@ -185,7 +185,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	// fix the name sand headers and pull database information into protein report
 	for i := range list {
 		for _, j := range dtb.Records {
-			if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
+			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
+			if strings.HasPrefix(j.OriginalHeader, list[i].ProteinName) {
 
 				//fmt.Println("A:", j.OriginalHeader, "\t", "B:", list[i].ProteinName)
 
