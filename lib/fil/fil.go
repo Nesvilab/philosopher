@@ -213,6 +213,9 @@ func Run(f met.Data) met.Data {
 				e.PSM[i].MappedGenes = make(map[string]int)
 			}
 
+			if strings.Contains(e.PSM[i].Protein, f.Filter.Tag) {
+				e.PSM[i].IsDecoy = true
+			}
 		}
 
 		razor = nil
@@ -227,7 +230,7 @@ func Run(f met.Data) met.Data {
 
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
-		e.UpdateIonStatus(f.Filter.Tag)
+		//e.UpdateIonStatus(f.Filter.Tag)
 
 		logrus.Info("Synchronizing PSMs and proteins")
 

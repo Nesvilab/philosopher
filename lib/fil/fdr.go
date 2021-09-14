@@ -369,12 +369,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 
 						sort.Strings(idList)
 
-						for key, val := range r[k].MappedproteinsSID {
-							if val == idList[0] {
-								razorPair[k] = key
-							}
-						}
-
+						id := strings.Split(idList[0], "_")
+						razorPair[k] = id[1]
 					}
 
 				}

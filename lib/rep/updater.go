@@ -223,37 +223,37 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 	var newPSM PSMEvidenceList
 	var newIons IonEvidenceList
 	var newPeptides PeptideEvidenceList
+	var newProteins ProteinEvidenceList
 
 	for _, i := range evi.Proteins {
 		proteinIndex[i.PartHeader] = 0
 	}
 
+	// for _, i := range evi.PSM {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newPSM = append(newPSM, i)
+	// 	}
+	// }
+	// evi.PSM = newPSM
+
+	// for _, i := range evi.Ions {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newIons = append(newIons, i)
+	// 	}
+	// }
+	// evi.Ions = newIons
+
+	// for _, i := range evi.Peptides {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newPeptides = append(newPeptides, i)
+	// 	}
+	// }
+	// evi.Peptides = newPeptides
+
 	for _, i := range evi.PSM {
-		_, ok := proteinIndex[i.Protein]
-		if ok {
-			newPSM = append(newPSM, i)
-		}
-	}
-	evi.PSM = newPSM
-
-	for _, i := range evi.Ions {
-		_, ok := proteinIndex[i.Protein]
-		if ok {
-			newIons = append(newIons, i)
-		}
-	}
-	evi.Ions = newIons
-
-	for _, i := range evi.Peptides {
-		_, ok := proteinIndex[i.Protein]
-		if ok {
-			newPeptides = append(newPeptides, i)
-		}
-	}
-	evi.Peptides = newPeptides
-
-	for _, i := range evi.PSM {
-
 		if !i.IsDecoy {
 
 			// Total
@@ -337,6 +337,39 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 			}
 		}
 	}
+
+	proteinIndex = make(map[string]uint8)
+	for _, i := range evi.Proteins {
+		if len(i.SupportingSpectra) > 0 {
+			proteinIndex[i.PartHeader] = 0
+			newProteins = append(newProteins, i)
+		}
+	}
+	evi.Proteins = newProteins
+
+	for _, i := range evi.PSM {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newPSM = append(newPSM, i)
+		}
+	}
+	evi.PSM = newPSM
+
+	for _, i := range evi.Ions {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newIons = append(newIons, i)
+		}
+	}
+	evi.Ions = newIons
+
+	for _, i := range evi.Peptides {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newPeptides = append(newPeptides, i)
+		}
+	}
+	evi.Peptides = newPeptides
 
 	return evi
 }

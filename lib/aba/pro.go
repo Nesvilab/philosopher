@@ -478,121 +478,125 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 	for _, i := range evidences {
 
-		var line string
+		if len(i.TotalSpc) > 0 {
 
-		line += fmt.Sprintf("%s\t", i.ProteinName)
+			var line string
 
-		line += fmt.Sprintf("%s\t", i.ProteinID)
+			line += fmt.Sprintf("%s\t", i.ProteinName)
 
-		line += fmt.Sprintf("%s\t", i.EntryName)
+			line += fmt.Sprintf("%s\t", i.ProteinID)
 
-		line += fmt.Sprintf("%s\t", i.GeneNames)
+			line += fmt.Sprintf("%s\t", i.EntryName)
 
-		line += fmt.Sprintf("%d\t", i.Length)
+			line += fmt.Sprintf("%s\t", i.GeneNames)
 
-		line += fmt.Sprintf("%.2f\t", i.Coverage)
+			line += fmt.Sprintf("%d\t", i.Length)
 
-		line += fmt.Sprintf("%s\t", i.Organism)
+			line += fmt.Sprintf("%.2f\t", i.Coverage)
 
-		line += fmt.Sprintf("%s\t", i.ProteinExistence)
+			line += fmt.Sprintf("%s\t", i.Organism)
 
-		line += fmt.Sprintf("%s\t", i.Description)
+			line += fmt.Sprintf("%s\t", i.ProteinExistence)
 
-		line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
+			line += fmt.Sprintf("%s\t", i.Description)
 
-		line += fmt.Sprintf("%.4f\t", i.TopPepProb)
+			line += fmt.Sprintf("%.4f\t", i.ProteinProbability)
 
-		line += fmt.Sprintf("%d\t", len(totalPeptides[i.ProteinID]))
+			line += fmt.Sprintf("%.4f\t", i.TopPepProb)
 
-		line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
+			line += fmt.Sprintf("%d\t", len(totalPeptides[i.ProteinID]))
 
-		line += fmt.Sprintf("%d\t", summUniqueSpC[i.ProteinID])
+			line += fmt.Sprintf("%d\t", summURazorSpC[i.ProteinID])
 
-		line += fmt.Sprintf("%d\t", summTotalSpC[i.ProteinID])
+			line += fmt.Sprintf("%d\t", summUniqueSpC[i.ProteinID])
 
-		//line += fmt.Sprintf("%d\t", len(razorPeptides[i.ProteinID]))
+			line += fmt.Sprintf("%d\t", summTotalSpC[i.ProteinID])
 
-		//line += fmt.Sprintf("%d\t", len(uniquePeptides[i.ProteinID]))
+			//line += fmt.Sprintf("%d\t", len(razorPeptides[i.ProteinID]))
 
-		// Add Unique+Razor SPC
-		for _, j := range namesList {
-			line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
-		}
+			//line += fmt.Sprintf("%d\t", len(uniquePeptides[i.ProteinID]))
 
-		// Add Unique SPC
-		if full {
+			// Add Unique+Razor SPC
 			for _, j := range namesList {
-				line += fmt.Sprintf("%d\t", i.UniqueSpc[j])
+				line += fmt.Sprintf("%d\t", i.UrazorSpc[j])
 			}
-		}
 
-		// Add Total SPC
-		if full {
-			for _, j := range namesList {
-				line += fmt.Sprintf("%d\t", i.TotalSpc[j])
-			}
-		}
-
-		// Add Unique+Razor Int
-		for _, j := range namesList {
-			line += fmt.Sprintf("%6.f\t", i.UrazorIntensity[j])
-		}
-
-		// Add Unique Int
-		if full {
-			for _, j := range namesList {
-				line += fmt.Sprintf("%6.f\t", i.UniqueIntensity[j])
-			}
-		}
-
-		// Add Total Int
-		if full {
-			for _, j := range namesList {
-				line += fmt.Sprintf("%6.f\t", i.TotalIntensity[j])
-			}
-		}
-
-		if hasTMT {
-			if uniqueOnly {
+			// Add Unique SPC
+			if full {
 				for _, j := range namesList {
-					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
-						i.UniqueLabels[j].Channel1.Intensity,
-						i.UniqueLabels[j].Channel2.Intensity,
-						i.UniqueLabels[j].Channel3.Intensity,
-						i.UniqueLabels[j].Channel4.Intensity,
-						i.UniqueLabels[j].Channel5.Intensity,
-						i.UniqueLabels[j].Channel6.Intensity,
-						i.UniqueLabels[j].Channel7.Intensity,
-						i.UniqueLabels[j].Channel8.Intensity,
-						i.UniqueLabels[j].Channel9.Intensity,
-						i.UniqueLabels[j].Channel10.Intensity,
-					)
-				}
-			} else {
-				for _, j := range namesList {
-					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
-						i.URazorLabels[j].Channel1.Intensity,
-						i.URazorLabels[j].Channel2.Intensity,
-						i.URazorLabels[j].Channel3.Intensity,
-						i.URazorLabels[j].Channel4.Intensity,
-						i.URazorLabels[j].Channel5.Intensity,
-						i.URazorLabels[j].Channel6.Intensity,
-						i.URazorLabels[j].Channel7.Intensity,
-						i.URazorLabels[j].Channel8.Intensity,
-						i.URazorLabels[j].Channel9.Intensity,
-						i.URazorLabels[j].Channel10.Intensity,
-					)
+					line += fmt.Sprintf("%d\t", i.UniqueSpc[j])
 				}
 			}
-		}
 
-		ip := strings.Join(i.IndiProtein, ", ")
-		line += fmt.Sprintf("%s\t", ip)
+			// Add Total SPC
+			if full {
+				for _, j := range namesList {
+					line += fmt.Sprintf("%d\t", i.TotalSpc[j])
+				}
+			}
 
-		line += "\n"
-		_, e := io.WriteString(file, line)
-		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			// Add Unique+Razor Int
+			for _, j := range namesList {
+				line += fmt.Sprintf("%6.f\t", i.UrazorIntensity[j])
+			}
+
+			// Add Unique Int
+			if full {
+				for _, j := range namesList {
+					line += fmt.Sprintf("%6.f\t", i.UniqueIntensity[j])
+				}
+			}
+
+			// Add Total Int
+			if full {
+				for _, j := range namesList {
+					line += fmt.Sprintf("%6.f\t", i.TotalIntensity[j])
+				}
+			}
+
+			if hasTMT {
+				if uniqueOnly {
+					for _, j := range namesList {
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+							i.UniqueLabels[j].Channel1.Intensity,
+							i.UniqueLabels[j].Channel2.Intensity,
+							i.UniqueLabels[j].Channel3.Intensity,
+							i.UniqueLabels[j].Channel4.Intensity,
+							i.UniqueLabels[j].Channel5.Intensity,
+							i.UniqueLabels[j].Channel6.Intensity,
+							i.UniqueLabels[j].Channel7.Intensity,
+							i.UniqueLabels[j].Channel8.Intensity,
+							i.UniqueLabels[j].Channel9.Intensity,
+							i.UniqueLabels[j].Channel10.Intensity,
+						)
+					}
+				} else {
+					for _, j := range namesList {
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+							i.URazorLabels[j].Channel1.Intensity,
+							i.URazorLabels[j].Channel2.Intensity,
+							i.URazorLabels[j].Channel3.Intensity,
+							i.URazorLabels[j].Channel4.Intensity,
+							i.URazorLabels[j].Channel5.Intensity,
+							i.URazorLabels[j].Channel6.Intensity,
+							i.URazorLabels[j].Channel7.Intensity,
+							i.URazorLabels[j].Channel8.Intensity,
+							i.URazorLabels[j].Channel9.Intensity,
+							i.URazorLabels[j].Channel10.Intensity,
+						)
+					}
+				}
+			}
+
+			ip := strings.Join(i.IndiProtein, ", ")
+			line += fmt.Sprintf("%s\t", ip)
+
+			line += "\n"
+			_, e := io.WriteString(file, line)
+			if e != nil {
+				msg.WriteToFile(e, "fatal")
+			}
+
 		}
 	}
 
