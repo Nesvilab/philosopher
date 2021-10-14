@@ -254,26 +254,26 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 	// evi.Peptides = newPeptides
 
 	for _, i := range evi.PSM {
-		if !i.IsDecoy {
+		//if !i.IsDecoy {
 
-			// Total
-			totalSpc[i.Protein] = append(totalSpc[i.Protein], i.Spectrum)
-			totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-			for j := range i.MappedProteins {
-				totalSpc[j] = append(totalSpc[j], i.Spectrum)
-				totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-			}
-
-			if i.IsUnique {
-				uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.Spectrum)
-				uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
-			}
-
-			if i.IsURazor {
-				razorSpc[i.Protein] = append(razorSpc[i.Protein], i.Spectrum)
-				razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
-			}
+		// Total
+		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.Spectrum)
+		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
+		for j := range i.MappedProteins {
+			totalSpc[j] = append(totalSpc[j], i.Spectrum)
+			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
 		}
+
+		if i.IsUnique {
+			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.Spectrum)
+			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
+		}
+
+		if i.IsURazor {
+			razorSpc[i.Protein] = append(razorSpc[i.Protein], i.Spectrum)
+			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
+		}
+		//}
 	}
 
 	for k, v := range totalPeptides {
@@ -402,10 +402,7 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 			}
 			evi.Peptides[i].Spc = len(v)
 
-		} else {
-			//evi.Peptides[i].IsDecoy = true
 		}
-
 	}
 
 	return evi
@@ -436,10 +433,7 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 			for _, j := range v {
 				evi.Ions[i].Spectra[j]++
 			}
-		} else {
-			//evi.Ions[i].IsDecoy = true
 		}
-
 	}
 
 	return evi
