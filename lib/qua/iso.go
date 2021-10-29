@@ -140,7 +140,19 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if i.Mz.DecodedStream[j] > 135 {
+				if i.Mz.DecodedStream[j] <= (labelData.Channel17.Mz+(ppmPrecision*labelData.Channel17.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel17.Mz-(ppmPrecision*labelData.Channel17.Mz)) {
+					if i.Intensity.DecodedStream[j] > labelData.Channel17.Intensity {
+						labelData.Channel17.Intensity = i.Intensity.DecodedStream[j]
+					}
+				}
+
+				if i.Mz.DecodedStream[j] <= (labelData.Channel18.Mz+(ppmPrecision*labelData.Channel18.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel18.Mz-(ppmPrecision*labelData.Channel18.Mz)) {
+					if i.Intensity.DecodedStream[j] > labelData.Channel18.Intensity {
+						labelData.Channel18.Intensity = i.Intensity.DecodedStream[j]
+					}
+				}
+
+				if i.Mz.DecodedStream[j] > 137 {
 					break
 				}
 
@@ -277,7 +289,19 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if i.Mz.DecodedStream[j] > 135 {
+				if i.Mz.DecodedStream[j] <= (labelData.Channel17.Mz+(ppmPrecision*labelData.Channel17.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel17.Mz-(ppmPrecision*labelData.Channel17.Mz)) {
+					if i.Intensity.DecodedStream[j] > labelData.Channel17.Intensity {
+						labelData.Channel17.Intensity = i.Intensity.DecodedStream[j]
+					}
+				}
+
+				if i.Mz.DecodedStream[j] <= (labelData.Channel18.Mz+(ppmPrecision*labelData.Channel18.Mz)) && i.Mz.DecodedStream[j] >= (labelData.Channel18.Mz-(ppmPrecision*labelData.Channel18.Mz)) {
+					if i.Intensity.DecodedStream[j] > labelData.Channel18.Intensity {
+						labelData.Channel18.Intensity = i.Intensity.DecodedStream[j]
+					}
+				}
+
+				if i.Mz.DecodedStream[j] > 137 {
 					break
 				}
 
@@ -354,6 +378,12 @@ func mapLabeledSpectra(labels map[string]iso.Labels, purity float64, evi []rep.P
 			evi[i].Labels.Channel16.Intensity = v.Channel16.Intensity
 			evi[i].Labels.Channel16.CustomName = v.Channel16.CustomName
 
+			evi[i].Labels.Channel17.Intensity = v.Channel17.Intensity
+			evi[i].Labels.Channel17.CustomName = v.Channel17.CustomName
+
+			evi[i].Labels.Channel18.Intensity = v.Channel18.Intensity
+			evi[i].Labels.Channel18.CustomName = v.Channel18.CustomName
+
 		}
 	}
 
@@ -382,7 +412,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 
 		var flag = 0
 
-		rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity
+		rowSum = evi.PSM[i].Labels.Channel1.Intensity + evi.PSM[i].Labels.Channel2.Intensity + evi.PSM[i].Labels.Channel3.Intensity + evi.PSM[i].Labels.Channel4.Intensity + evi.PSM[i].Labels.Channel5.Intensity + evi.PSM[i].Labels.Channel6.Intensity + evi.PSM[i].Labels.Channel7.Intensity + evi.PSM[i].Labels.Channel8.Intensity + evi.PSM[i].Labels.Channel9.Intensity + evi.PSM[i].Labels.Channel10.Intensity + evi.PSM[i].Labels.Channel11.Intensity + evi.PSM[i].Labels.Channel12.Intensity + evi.PSM[i].Labels.Channel13.Intensity + evi.PSM[i].Labels.Channel14.Intensity + evi.PSM[i].Labels.Channel15.Intensity + evi.PSM[i].Labels.Channel16.Intensity + evi.PSM[i].Labels.Channel17.Intensity + evi.PSM[i].Labels.Channel18.Intensity
 		if rowSum > 0 {
 			counter++
 		}
@@ -404,6 +434,8 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel14.Intensity = 0
 			evi.PSM[i].Labels.Channel15.Intensity = 0
 			evi.PSM[i].Labels.Channel16.Intensity = 0
+			evi.PSM[i].Labels.Channel17.Intensity = 0
+			evi.PSM[i].Labels.Channel18.Intensity = 0
 
 		} else {
 			for _, j := range evi.PSM[i].Modifications.Index {
@@ -430,6 +462,8 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 				evi.PSM[i].Labels.Channel14.Intensity = 0
 				evi.PSM[i].Labels.Channel15.Intensity = 0
 				evi.PSM[i].Labels.Channel16.Intensity = 0
+				evi.PSM[i].Labels.Channel17.Intensity = 0
+				evi.PSM[i].Labels.Channel18.Intensity = 0
 			}
 		}
 	}
@@ -529,6 +563,21 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 				evi.Peptides[j].Labels.Channel16.CustomName = i.Channel16.CustomName
 				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
 				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
+
+				evi.Peptides[j].Labels.Channel16.Name = i.Channel16.Name
+				evi.Peptides[j].Labels.Channel16.CustomName = i.Channel16.CustomName
+				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
+				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
+
+				evi.Peptides[j].Labels.Channel17.Name = i.Channel17.Name
+				evi.Peptides[j].Labels.Channel17.CustomName = i.Channel17.CustomName
+				evi.Peptides[j].Labels.Channel17.Mz = i.Channel17.Mz
+				evi.Peptides[j].Labels.Channel17.Intensity += i.Channel17.Intensity
+
+				evi.Peptides[j].Labels.Channel18.Name = i.Channel18.Name
+				evi.Peptides[j].Labels.Channel18.CustomName = i.Channel18.CustomName
+				evi.Peptides[j].Labels.Channel18.Mz = i.Channel18.Mz
+				evi.Peptides[j].Labels.Channel18.Intensity += i.Channel18.Intensity
 			}
 
 			i, ok = phosphoSpectrumMap[k]
@@ -613,6 +662,16 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 				evi.Peptides[j].PhosphoLabels.Channel16.CustomName = i.Channel16.CustomName
 				evi.Peptides[j].PhosphoLabels.Channel16.Mz = i.Channel16.Mz
 				evi.Peptides[j].PhosphoLabels.Channel16.Intensity += i.Channel16.Intensity
+
+				evi.Peptides[j].PhosphoLabels.Channel17.Name = i.Channel17.Name
+				evi.Peptides[j].PhosphoLabels.Channel17.CustomName = i.Channel17.CustomName
+				evi.Peptides[j].PhosphoLabels.Channel17.Mz = i.Channel17.Mz
+				evi.Peptides[j].PhosphoLabels.Channel17.Intensity += i.Channel17.Intensity
+
+				evi.Peptides[j].PhosphoLabels.Channel18.Name = i.Channel18.Name
+				evi.Peptides[j].PhosphoLabels.Channel18.CustomName = i.Channel18.CustomName
+				evi.Peptides[j].PhosphoLabels.Channel18.Mz = i.Channel18.Mz
+				evi.Peptides[j].PhosphoLabels.Channel18.Intensity += i.Channel18.Intensity
 			}
 
 		}
@@ -709,90 +768,110 @@ func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[string]iso.Labels, phos
 				evi.Ions[j].Labels.Channel16.CustomName = i.Channel16.CustomName
 				evi.Ions[j].Labels.Channel16.Mz = i.Channel16.Mz
 				evi.Ions[j].Labels.Channel16.Intensity += i.Channel16.Intensity
+
+				evi.Ions[j].Labels.Channel17.Name = i.Channel17.Name
+				evi.Ions[j].Labels.Channel17.CustomName = i.Channel17.CustomName
+				evi.Ions[j].Labels.Channel17.Mz = i.Channel17.Mz
+				evi.Ions[j].Labels.Channel17.Intensity += i.Channel17.Intensity
+
+				evi.Ions[j].Labels.Channel18.Name = i.Channel18.Name
+				evi.Ions[j].Labels.Channel18.CustomName = i.Channel18.CustomName
+				evi.Ions[j].Labels.Channel18.Mz = i.Channel18.Mz
+				evi.Ions[j].Labels.Channel18.Intensity += i.Channel18.Intensity
 			}
 
 			i, ok = phosphoSpectrumMap[k]
 			if ok {
 
 				evi.Ions[j].PhosphoLabels.Channel1.Name = i.Channel1.Name
-				evi.Ions[j].Labels.Channel1.CustomName = i.Channel1.CustomName
+				evi.Ions[j].PhosphoLabels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Ions[j].PhosphoLabels.Channel1.Mz = i.Channel1.Mz
 				evi.Ions[j].PhosphoLabels.Channel1.Intensity += i.Channel1.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel2.Name = i.Channel2.Name
-				evi.Ions[j].Labels.Channel2.CustomName = i.Channel2.CustomName
+				evi.Ions[j].PhosphoLabels.Channel2.CustomName = i.Channel2.CustomName
 				evi.Ions[j].PhosphoLabels.Channel2.Mz = i.Channel2.Mz
 				evi.Ions[j].PhosphoLabels.Channel2.Intensity += i.Channel2.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel3.Name = i.Channel3.Name
-				evi.Ions[j].Labels.Channel3.CustomName = i.Channel3.CustomName
+				evi.Ions[j].PhosphoLabels.Channel3.CustomName = i.Channel3.CustomName
 				evi.Ions[j].PhosphoLabels.Channel3.Mz = i.Channel3.Mz
 				evi.Ions[j].PhosphoLabels.Channel3.Intensity += i.Channel3.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel4.Name = i.Channel4.Name
-				evi.Ions[j].Labels.Channel4.CustomName = i.Channel4.CustomName
+				evi.Ions[j].PhosphoLabels.Channel4.CustomName = i.Channel4.CustomName
 				evi.Ions[j].PhosphoLabels.Channel4.Mz = i.Channel4.Mz
 				evi.Ions[j].PhosphoLabels.Channel4.Intensity += i.Channel4.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel5.Name = i.Channel5.Name
-				evi.Ions[j].Labels.Channel5.CustomName = i.Channel5.CustomName
+				evi.Ions[j].PhosphoLabels.Channel5.CustomName = i.Channel5.CustomName
 				evi.Ions[j].PhosphoLabels.Channel5.Mz = i.Channel5.Mz
 				evi.Ions[j].PhosphoLabels.Channel5.Intensity += i.Channel5.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel6.Name = i.Channel6.Name
-				evi.Ions[j].Labels.Channel6.CustomName = i.Channel6.CustomName
+				evi.Ions[j].PhosphoLabels.Channel6.CustomName = i.Channel6.CustomName
 				evi.Ions[j].PhosphoLabels.Channel6.Mz = i.Channel6.Mz
 				evi.Ions[j].PhosphoLabels.Channel6.Intensity += i.Channel6.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel7.Name = i.Channel7.Name
-				evi.Ions[j].Labels.Channel7.CustomName = i.Channel7.CustomName
+				evi.Ions[j].PhosphoLabels.Channel7.CustomName = i.Channel7.CustomName
 				evi.Ions[j].PhosphoLabels.Channel7.Mz = i.Channel7.Mz
 				evi.Ions[j].PhosphoLabels.Channel7.Intensity += i.Channel7.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel8.Name = i.Channel8.Name
-				evi.Ions[j].Labels.Channel8.CustomName = i.Channel8.CustomName
+				evi.Ions[j].PhosphoLabels.Channel8.CustomName = i.Channel8.CustomName
 				evi.Ions[j].PhosphoLabels.Channel8.Mz = i.Channel8.Mz
 				evi.Ions[j].PhosphoLabels.Channel8.Intensity += i.Channel8.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel9.Name = i.Channel9.Name
-				evi.Ions[j].Labels.Channel9.CustomName = i.Channel9.CustomName
+				evi.Ions[j].PhosphoLabels.Channel9.CustomName = i.Channel9.CustomName
 				evi.Ions[j].PhosphoLabels.Channel9.Mz = i.Channel9.Mz
 				evi.Ions[j].PhosphoLabels.Channel9.Intensity += i.Channel9.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel10.Name = i.Channel10.Name
-				evi.Ions[j].Labels.Channel10.CustomName = i.Channel10.CustomName
+				evi.Ions[j].PhosphoLabels.Channel10.CustomName = i.Channel10.CustomName
 				evi.Ions[j].PhosphoLabels.Channel10.Mz = i.Channel10.Mz
 				evi.Ions[j].PhosphoLabels.Channel10.Intensity += i.Channel10.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel11.Name = i.Channel11.Name
-				evi.Ions[j].Labels.Channel11.CustomName = i.Channel11.CustomName
+				evi.Ions[j].PhosphoLabels.Channel11.CustomName = i.Channel11.CustomName
 				evi.Ions[j].PhosphoLabels.Channel11.Mz = i.Channel11.Mz
 				evi.Ions[j].PhosphoLabels.Channel11.Intensity += i.Channel11.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel12.Name = i.Channel12.Name
-				evi.Ions[j].Labels.Channel12.CustomName = i.Channel12.CustomName
+				evi.Ions[j].PhosphoLabels.Channel12.CustomName = i.Channel12.CustomName
 				evi.Ions[j].PhosphoLabels.Channel12.Mz = i.Channel12.Mz
 				evi.Ions[j].PhosphoLabels.Channel12.Intensity += i.Channel12.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel13.Name = i.Channel13.Name
-				evi.Ions[j].Labels.Channel13.CustomName = i.Channel13.CustomName
+				evi.Ions[j].PhosphoLabels.Channel13.CustomName = i.Channel13.CustomName
 				evi.Ions[j].PhosphoLabels.Channel13.Mz = i.Channel13.Mz
 				evi.Ions[j].PhosphoLabels.Channel13.Intensity += i.Channel13.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel14.Name = i.Channel14.Name
-				evi.Ions[j].Labels.Channel14.CustomName = i.Channel14.CustomName
+				evi.Ions[j].PhosphoLabels.Channel14.CustomName = i.Channel14.CustomName
 				evi.Ions[j].PhosphoLabels.Channel14.Mz = i.Channel14.Mz
 				evi.Ions[j].PhosphoLabels.Channel14.Intensity += i.Channel14.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel15.Name = i.Channel15.Name
-				evi.Ions[j].Labels.Channel15.CustomName = i.Channel15.CustomName
+				evi.Ions[j].PhosphoLabels.Channel15.CustomName = i.Channel15.CustomName
 				evi.Ions[j].PhosphoLabels.Channel15.Mz = i.Channel15.Mz
 				evi.Ions[j].PhosphoLabels.Channel15.Intensity += i.Channel15.Intensity
 
 				evi.Ions[j].PhosphoLabels.Channel16.Name = i.Channel16.Name
-				evi.Ions[j].Labels.Channel16.CustomName = i.Channel16.CustomName
+				evi.Ions[j].PhosphoLabels.Channel16.CustomName = i.Channel16.CustomName
 				evi.Ions[j].PhosphoLabels.Channel16.Mz = i.Channel16.Mz
 				evi.Ions[j].PhosphoLabels.Channel16.Intensity += i.Channel16.Intensity
+
+				evi.Ions[j].PhosphoLabels.Channel17.Name = i.Channel17.Name
+				evi.Ions[j].PhosphoLabels.Channel17.CustomName = i.Channel17.CustomName
+				evi.Ions[j].PhosphoLabels.Channel17.Mz = i.Channel17.Mz
+				evi.Ions[j].PhosphoLabels.Channel17.Intensity += i.Channel17.Intensity
+
+				evi.Ions[j].PhosphoLabels.Channel18.Name = i.Channel18.Name
+				evi.Ions[j].PhosphoLabels.Channel18.CustomName = i.Channel18.CustomName
+				evi.Ions[j].PhosphoLabels.Channel18.Mz = i.Channel18.Mz
+				evi.Ions[j].PhosphoLabels.Channel18.Intensity += i.Channel18.Intensity
 			}
 
 		}
@@ -890,6 +969,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 					evi.Proteins[j].TotalLabels.Channel16.Mz = i.Channel16.Mz
 					evi.Proteins[j].TotalLabels.Channel16.Intensity += i.Channel16.Intensity
 
+					evi.Proteins[j].TotalLabels.Channel17.Name = i.Channel17.Name
+					evi.Proteins[j].TotalLabels.Channel17.CustomName = i.Channel17.CustomName
+					evi.Proteins[j].TotalLabels.Channel17.Mz = i.Channel17.Mz
+					evi.Proteins[j].TotalLabels.Channel17.Intensity += i.Channel17.Intensity
+
+					evi.Proteins[j].TotalLabels.Channel18.Name = i.Channel18.Name
+					evi.Proteins[j].TotalLabels.Channel18.CustomName = i.Channel18.CustomName
+					evi.Proteins[j].TotalLabels.Channel18.Mz = i.Channel18.Mz
+					evi.Proteins[j].TotalLabels.Channel18.Intensity += i.Channel18.Intensity
+
 					//if k.IsNondegenerateEvidence {
 					if k.IsUnique {
 						evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
@@ -971,6 +1060,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 						evi.Proteins[j].UniqueLabels.Channel16.CustomName = i.Channel16.CustomName
 						evi.Proteins[j].UniqueLabels.Channel16.Mz = i.Channel16.Mz
 						evi.Proteins[j].UniqueLabels.Channel16.Intensity += i.Channel16.Intensity
+
+						evi.Proteins[j].UniqueLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].UniqueLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].UniqueLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].UniqueLabels.Channel17.Intensity += i.Channel17.Intensity
+
+						evi.Proteins[j].UniqueLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].UniqueLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].UniqueLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].UniqueLabels.Channel18.Intensity += i.Channel18.Intensity
 					}
 
 					if k.IsURazor {
@@ -1053,6 +1152,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 						evi.Proteins[j].URazorLabels.Channel16.CustomName = i.Channel16.CustomName
 						evi.Proteins[j].URazorLabels.Channel16.Mz = i.Channel16.Mz
 						evi.Proteins[j].URazorLabels.Channel16.Intensity += i.Channel16.Intensity
+
+						evi.Proteins[j].URazorLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].URazorLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].URazorLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].URazorLabels.Channel17.Intensity += i.Channel17.Intensity
+
+						evi.Proteins[j].URazorLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].URazorLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].URazorLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].URazorLabels.Channel18.Intensity += i.Channel18.Intensity
 					}
 				}
 
@@ -1138,6 +1247,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 					evi.Proteins[j].PhosphoTotalLabels.Channel16.Mz = i.Channel16.Mz
 					evi.Proteins[j].PhosphoTotalLabels.Channel16.Intensity += i.Channel16.Intensity
 
+					evi.Proteins[j].PhosphoTotalLabels.Channel17.Name = i.Channel17.Name
+					evi.Proteins[j].PhosphoTotalLabels.Channel17.CustomName = i.Channel17.CustomName
+					evi.Proteins[j].PhosphoTotalLabels.Channel17.Mz = i.Channel17.Mz
+					evi.Proteins[j].PhosphoTotalLabels.Channel17.Intensity += i.Channel17.Intensity
+
+					evi.Proteins[j].PhosphoTotalLabels.Channel18.Name = i.Channel18.Name
+					evi.Proteins[j].PhosphoTotalLabels.Channel18.CustomName = i.Channel18.CustomName
+					evi.Proteins[j].PhosphoTotalLabels.Channel18.Mz = i.Channel18.Mz
+					evi.Proteins[j].PhosphoTotalLabels.Channel18.Intensity += i.Channel18.Intensity
+
 					//if k.IsNondegenerateEvidence {
 					if k.IsUnique {
 						evi.Proteins[j].PhosphoUniqueLabels.Channel1.Name = i.Channel1.Name
@@ -1219,6 +1338,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 						evi.Proteins[j].PhosphoUniqueLabels.Channel16.CustomName = i.Channel16.CustomName
 						evi.Proteins[j].PhosphoUniqueLabels.Channel16.Mz = i.Channel16.Mz
 						evi.Proteins[j].PhosphoUniqueLabels.Channel16.Intensity += i.Channel16.Intensity
+
+						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].PhosphoUniqueLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Intensity += i.Channel17.Intensity
+
+						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].PhosphoUniqueLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Intensity += i.Channel18.Intensity
 					}
 
 					if k.IsURazor {
@@ -1301,6 +1430,16 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 						evi.Proteins[j].PhosphoURazorLabels.Channel16.CustomName = i.Channel16.CustomName
 						evi.Proteins[j].PhosphoURazorLabels.Channel16.Mz = i.Channel16.Mz
 						evi.Proteins[j].PhosphoURazorLabels.Channel16.Intensity += i.Channel16.Intensity
+
+						evi.Proteins[j].PhosphoURazorLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].PhosphoURazorLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].PhosphoURazorLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].PhosphoURazorLabels.Channel17.Intensity += i.Channel17.Intensity
+
+						evi.Proteins[j].PhosphoURazorLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].PhosphoURazorLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].PhosphoURazorLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].PhosphoURazorLabels.Channel18.Intensity += i.Channel18.Intensity
 					}
 				}
 
@@ -1315,8 +1454,8 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 
 	var topValue float64
-	var channelSum = [16]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	var normFactors = [16]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	var channelSum = [18]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	var normFactors = [18]float64{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 	// sum TMT singal for each column
 	for _, i := range evi.Proteins {
@@ -1336,6 +1475,8 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		channelSum[13] += i.URazorLabels.Channel14.Intensity
 		channelSum[14] += i.URazorLabels.Channel15.Intensity
 		channelSum[15] += i.URazorLabels.Channel16.Intensity
+		channelSum[16] += i.URazorLabels.Channel17.Intensity
+		channelSum[17] += i.URazorLabels.Channel18.Intensity
 	}
 
 	// find the highest value amongst channels
@@ -1368,6 +1509,8 @@ func NormToTotalProteins(evi rep.Evidence) rep.Evidence {
 		i.URazorLabels.Channel14.Intensity *= normFactors[13]
 		i.URazorLabels.Channel15.Intensity *= normFactors[14]
 		i.URazorLabels.Channel16.Intensity *= normFactors[15]
+		i.URazorLabels.Channel17.Intensity *= normFactors[16]
+		i.URazorLabels.Channel18.Intensity *= normFactors[17]
 	}
 
 	return evi

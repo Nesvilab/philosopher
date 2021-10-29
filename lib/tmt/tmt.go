@@ -25,6 +25,8 @@ func New(plex string) iso.Labels {
 	o.Channel14.Name = "133N"
 	o.Channel15.Name = "133C"
 	o.Channel16.Name = "134N"
+	o.Channel17.Name = "134C"
+	o.Channel18.Name = "135N"
 
 	o.Channel1.Mz = 126.127726
 	o.Channel2.Mz = 127.124761
@@ -36,12 +38,14 @@ func New(plex string) iso.Labels {
 	o.Channel8.Mz = 130.134825
 	o.Channel9.Mz = 130.141145
 	o.Channel10.Mz = 131.138180
-	o.Channel11.Mz = 131.144499
+	o.Channel11.Mz = 131.144500
 	o.Channel12.Mz = 132.141535
 	o.Channel13.Mz = 132.147855
 	o.Channel14.Mz = 133.144890
 	o.Channel15.Mz = 133.151210
 	o.Channel16.Mz = 134.148245
+	o.Channel17.Mz = 134.154565
+	o.Channel18.Mz = 135.151600
 
 	return o
 }

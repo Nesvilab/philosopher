@@ -356,6 +356,18 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel16.CustomName = labelNames["134N"]
 			}
 
+			if len(labelNames["134C"]) < 1 {
+				v2.Channel17.CustomName = "134C"
+			} else {
+				v2.Channel17.CustomName = labelNames["134C"]
+			}
+
+			if len(labelNames["135N"]) < 1 {
+				v2.Channel18.CustomName = "135N"
+			} else {
+				v2.Channel18.CustomName = labelNames["135N"]
+			}
+
 		} else if brand == "itraq" && plex == "4" {
 
 			if len(labelNames["114"]) < 1 {
@@ -481,7 +493,9 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel13.Intensity +
 				i.Labels.Channel14.Intensity +
 				i.Labels.Channel15.Intensity +
-				i.Labels.Channel16.Intensity
+				i.Labels.Channel16.Intensity +
+				i.Labels.Channel17.Intensity +
+				i.Labels.Channel18.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
 
 			if sum > 0 {
@@ -528,7 +542,9 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel13.Intensity +
 						i.Labels.Channel14.Intensity +
 						i.Labels.Channel15.Intensity +
-						i.Labels.Channel16.Intensity
+						i.Labels.Channel16.Intensity +
+						i.Labels.Channel17.Intensity +
+						i.Labels.Channel18.Intensity
 
 					if tmtSum > bestPSMInt {
 						bestPSM = i.Spectrum

@@ -264,6 +264,8 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+		case 18:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
 		default:
 			header += ""
 		}
@@ -283,7 +285,7 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 	// verify if the structure has labels, if so, replace the original channel names by them.
 	if hasLabels {
 
-		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
+		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
 
 		for _, i := range printSet {
 			if len(i.UniqueLabels.Channel1.CustomName) >= 1 {
@@ -303,6 +305,8 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 				c14 = i.UniqueLabels.Channel14.CustomName
 				c15 = i.UniqueLabels.Channel15.CustomName
 				c16 = i.UniqueLabels.Channel16.CustomName
+				c17 = i.UniqueLabels.Channel17.CustomName
+				c18 = i.UniqueLabels.Channel18.CustomName
 				break
 			}
 		}
@@ -323,6 +327,8 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel14.Name, c14, -1)
 		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel15.Name, c15, -1)
 		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel16.Name, c16, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel17.Name, c17, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel18.Name, c18, -1)
 	}
 
 	_, e = io.WriteString(file, header)
@@ -358,7 +364,7 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 		sort.Strings(ip)
 
 		// change between Unique+Razor and Unique only based on parameter defined on labelquant
-		var reportIntensities [16]float64
+		var reportIntensities [18]float64
 		if uniqueOnly || !hasRazor {
 			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
 			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
@@ -376,6 +382,8 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 			reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
 			reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
 			reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
+			reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
+			reportIntensities[17] = i.UniqueLabels.Channel18.Intensity
 
 		} else {
 			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
@@ -394,7 +402,8 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 			reportIntensities[13] = i.URazorLabels.Channel14.Intensity
 			reportIntensities[14] = i.URazorLabels.Channel15.Intensity
 			reportIntensities[15] = i.URazorLabels.Channel16.Intensity
-
+			reportIntensities[16] = i.URazorLabels.Channel17.Intensity
+			reportIntensities[17] = i.URazorLabels.Channel18.Intensity
 		}
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
@@ -509,6 +518,28 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 				reportIntensities[13],
 				reportIntensities[14],
 				reportIntensities[15],
+			)
+		case 18:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				reportIntensities[10],
+				reportIntensities[11],
+				reportIntensities[12],
+				reportIntensities[13],
+				reportIntensities[14],
+				reportIntensities[15],
+				reportIntensities[16],
+				reportIntensities[17],
 			)
 		default:
 			header += ""

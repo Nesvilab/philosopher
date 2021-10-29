@@ -24,6 +24,8 @@ type Labels struct {
 	Channel14     Channel14
 	Channel15     Channel15
 	Channel16     Channel16
+	Channel17     Channel17
+	Channel18     Channel18
 }
 
 // LabeledSpectra is a list of spectra lables
@@ -151,6 +153,22 @@ type Channel15 struct {
 
 // Channel16 TMT
 type Channel16 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+// Channel17 TMT
+type Channel17 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+// Channel18 TMT
+type Channel18 struct {
 	Name       string
 	CustomName string
 	Mz         float64

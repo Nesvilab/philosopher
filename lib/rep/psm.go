@@ -244,6 +244,8 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
 			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+		case 18:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
 		default:
 			header += ""
 		}
@@ -263,7 +265,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 	// verify if the structure has labels, if so, replace the original channel names by them.
 	if hasLabels {
 
-		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
+		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
 
 		for _, i := range printSet {
 			if len(i.Labels.Channel1.CustomName) >= 1 {
@@ -283,6 +285,8 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 				c14 = i.Labels.Channel14.CustomName
 				c15 = i.Labels.Channel15.CustomName
 				c16 = i.Labels.Channel16.CustomName
+				c17 = i.Labels.Channel17.CustomName
+				c18 = i.Labels.Channel18.CustomName
 				break
 			}
 		}
@@ -303,6 +307,8 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel14.Name, c14, -1)
 		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel15.Name, c15, -1)
 		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel16.Name, c16, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel17.Name, c17, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel18.Name, c18, -1)
 	}
 
 	_, e = io.WriteString(file, header)
@@ -499,6 +505,29 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 					i.Labels.Channel14.Intensity,
 					i.Labels.Channel15.Intensity,
 					i.Labels.Channel16.Intensity,
+				)
+			case 18:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
+					i.Labels.Channel17.Intensity,
+					i.Labels.Channel18.Intensity,
 				)
 			default:
 				header += ""

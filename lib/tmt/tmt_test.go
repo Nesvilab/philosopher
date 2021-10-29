@@ -62,7 +62,7 @@ func TestNew(t *testing.T) {
 
 				Channel11: iso.Channel11{
 					Name: "131C",
-					Mz:   131.144499,
+					Mz:   131.144500,
 				},
 
 				Channel12: iso.Channel12{
@@ -88,6 +88,16 @@ func TestNew(t *testing.T) {
 				Channel16: iso.Channel16{
 					Name: "134N",
 					Mz:   134.148245,
+				},
+
+				Channel17: iso.Channel17{
+					Name: "134C",
+					Mz:   134.154565,
+				},
+
+				Channel18: iso.Channel18{
+					Name: "135N",
+					Mz:   135.151600,
 				},
 			},
 		},
