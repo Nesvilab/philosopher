@@ -1,5 +1,5 @@
 ### Added
--Support for TMTPro (18-plex)
+- Support for TMTPro (18-plex)
 
 ### Changed
 - Decoys have NextAA and PrevAA

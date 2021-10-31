@@ -91,27 +91,27 @@ release:
   name_template: "Philosopher {{ .Version }}"
 
 
-dockers:
-  - image_templates:
-    - "prvst/philosopher:{{ .Version }}"
-    - "prvst/philosopher:latest"
+    #dockers:
+    #  - image_templates:
+    #    - "prvst/philosopher:{{ .Version }}"
+    #    - "prvst/philosopher:latest"
 
-    goos: linux
+    #    goos: linux
 
-    goarch: amd64
+    #    goarch: amd64
 
-    goarm: ''
+    #    goarm: ''
 
-    binaries:
-    - philosopher
+    #    binaries:
+    #    - philosopher
     
-    dockerfile: Dockerfile
+    #    dockerfile: Dockerfile
 
     # Skips the docker push. Could be useful if you also do draft releases.
     # If set to auto, the release will not be pushed to the docker repository
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Defaults to false.
-    skip_push: true
+    #    skip_push: true
 
 
 snapcrafts:
