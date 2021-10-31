@@ -16,102 +16,6 @@ func TestNew(t *testing.T) {
 		want iso.Labels
 	}{
 		{
-			name: "Testting 10 plex",
-			args: args{plex: "10"},
-			want: iso.Labels{
-				Channel1: iso.Channel1{
-					Name: "126",
-					Mz:   126.127726,
-				},
-				Channel2: iso.Channel2{
-					Name: "127N",
-					Mz:   127.124761,
-				},
-				Channel3: iso.Channel3{
-					Name: "127C",
-					Mz:   127.131081,
-				},
-				Channel4: iso.Channel4{
-					Name: "128N",
-					Mz:   128.128116,
-				},
-				Channel5: iso.Channel5{
-					Name: "128C",
-					Mz:   128.134436,
-				},
-				Channel6: iso.Channel6{
-					Name: "129N",
-					Mz:   129.131471,
-				},
-				Channel7: iso.Channel7{
-					Name: "129C",
-					Mz:   129.137790,
-				},
-				Channel8: iso.Channel8{
-					Name: "130N",
-					Mz:   130.134825,
-				},
-				Channel9: iso.Channel9{
-					Name: "130C",
-					Mz:   130.141145,
-				},
-				Channel10: iso.Channel10{
-					Name: "131N",
-					Mz:   131.138180,
-				},
-			},
-		},
-		{
-			name: "Testting 11 plex",
-			args: args{plex: "11"},
-			want: iso.Labels{
-				Channel1: iso.Channel1{
-					Name: "126",
-					Mz:   126.127726,
-				},
-				Channel2: iso.Channel2{
-					Name: "127N",
-					Mz:   127.124761,
-				},
-				Channel3: iso.Channel3{
-					Name: "127C",
-					Mz:   127.131081,
-				},
-				Channel4: iso.Channel4{
-					Name: "128N",
-					Mz:   128.128116,
-				},
-				Channel5: iso.Channel5{
-					Name: "128C",
-					Mz:   128.134436,
-				},
-				Channel6: iso.Channel6{
-					Name: "129N",
-					Mz:   129.131471,
-				},
-				Channel7: iso.Channel7{
-					Name: "129C",
-					Mz:   129.137790,
-				},
-				Channel8: iso.Channel8{
-					Name: "130N",
-					Mz:   130.134825,
-				},
-				Channel9: iso.Channel9{
-					Name: "130C",
-					Mz:   130.141145,
-				},
-				Channel10: iso.Channel10{
-					Name: "131N",
-					Mz:   131.138180,
-				},
-				Channel11: iso.Channel11{
-					Name: "131C",
-					Mz:   131.144499,
-				},
-			},
-		},
-		{
 			name: "Testting 16 plex",
 			args: args{plex: "16"},
 			want: iso.Labels{
@@ -158,7 +62,7 @@ func TestNew(t *testing.T) {
 
 				Channel11: iso.Channel11{
 					Name: "131C",
-					Mz:   131.144499,
+					Mz:   131.144500,
 				},
 
 				Channel12: iso.Channel12{
@@ -184,6 +88,16 @@ func TestNew(t *testing.T) {
 				Channel16: iso.Channel16{
 					Name: "134N",
 					Mz:   134.148245,
+				},
+
+				Channel17: iso.Channel17{
+					Name: "134C",
+					Mz:   134.154565,
+				},
+
+				Channel18: iso.Channel18{
+					Name: "135N",
+					Mz:   135.151600,
 				},
 			},
 		},

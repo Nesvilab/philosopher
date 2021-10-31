@@ -59,6 +59,18 @@ var inspectCmd = &cobra.Command{
 				msg.DecodeMsgPck(e, "fatal")
 			}
 			spew.Dump(o)
+		case "peptide":
+			var o rep.PeptideEvidenceList
+
+			target := fmt.Sprintf(".meta%spep.bin", string(filepath.Separator))
+			file, _ := os.Open(target)
+
+			dec := msgpack.NewDecoder(file)
+			e := dec.Decode(&o)
+			if e != nil {
+				msg.DecodeMsgPck(e, "fatal")
+			}
+			spew.Dump(o)
 		case "db":
 			var o dat.Base
 

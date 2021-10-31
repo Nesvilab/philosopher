@@ -223,57 +223,57 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 	var newPSM PSMEvidenceList
 	var newIons IonEvidenceList
 	var newPeptides PeptideEvidenceList
+	var newProteins ProteinEvidenceList
 
 	for _, i := range evi.Proteins {
-		proteinIndex[i.ProteinID] = 0
+		proteinIndex[i.PartHeader] = 0
 	}
+
+	// for _, i := range evi.PSM {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newPSM = append(newPSM, i)
+	// 	}
+	// }
+	// evi.PSM = newPSM
+
+	// for _, i := range evi.Ions {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newIons = append(newIons, i)
+	// 	}
+	// }
+	// evi.Ions = newIons
+
+	// for _, i := range evi.Peptides {
+	// 	_, ok := proteinIndex[i.Protein]
+	// 	if ok {
+	// 		newPeptides = append(newPeptides, i)
+	// 	}
+	// }
+	// evi.Peptides = newPeptides
 
 	for _, i := range evi.PSM {
-		_, ok := proteinIndex[i.ProteinID]
-		if ok {
-			newPSM = append(newPSM, i)
+		//if !i.IsDecoy {
+
+		// Total
+		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.Spectrum)
+		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
+		for j := range i.MappedProteins {
+			totalSpc[j] = append(totalSpc[j], i.Spectrum)
+			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
 		}
-	}
-	evi.PSM = newPSM
 
-	for _, i := range evi.Ions {
-		_, ok := proteinIndex[i.ProteinID]
-		if ok {
-			newIons = append(newIons, i)
+		if i.IsUnique {
+			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.Spectrum)
+			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
 		}
-	}
-	evi.Ions = newIons
 
-	for _, i := range evi.Peptides {
-		_, ok := proteinIndex[i.ProteinID]
-		if ok {
-			newPeptides = append(newPeptides, i)
+		if i.IsURazor {
+			razorSpc[i.Protein] = append(razorSpc[i.Protein], i.Spectrum)
+			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
 		}
-	}
-	evi.Peptides = newPeptides
-
-	for _, i := range evi.PSM {
-
-		if !i.IsDecoy {
-
-			// Total
-			totalSpc[i.Protein] = append(totalSpc[i.Protein], i.Spectrum)
-			totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-			for j := range i.MappedProteins {
-				totalSpc[j] = append(totalSpc[j], i.Spectrum)
-				totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-			}
-
-			if i.IsUnique {
-				uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.Spectrum)
-				uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
-			}
-
-			if i.IsURazor {
-				razorSpc[i.Protein] = append(razorSpc[i.Protein], i.Spectrum)
-				razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
-			}
-		}
+		//}
 	}
 
 	for k, v := range totalPeptides {
@@ -338,6 +338,39 @@ func (evi Evidence) SyncPSMToProteins(decoy string) Evidence {
 		}
 	}
 
+	proteinIndex = make(map[string]uint8)
+	for _, i := range evi.Proteins {
+		if len(i.SupportingSpectra) > 0 {
+			proteinIndex[i.PartHeader] = 0
+			newProteins = append(newProteins, i)
+		}
+	}
+	evi.Proteins = newProteins
+
+	for _, i := range evi.PSM {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newPSM = append(newPSM, i)
+		}
+	}
+	evi.PSM = newPSM
+
+	for _, i := range evi.Ions {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newIons = append(newIons, i)
+		}
+	}
+	evi.Ions = newIons
+
+	for _, i := range evi.Peptides {
+		_, ok := proteinIndex[i.Protein]
+		if ok {
+			newPeptides = append(newPeptides, i)
+		}
+	}
+	evi.Peptides = newPeptides
+
 	return evi
 }
 
@@ -348,7 +381,6 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 	var spectra = make(map[string][]string)
 
 	for _, i := range evi.PSM {
-
 		if !i.IsDecoy {
 			spc[i.Peptide]++
 			spectra[i.Peptide] = append(spectra[i.Peptide], i.Spectrum)
@@ -362,13 +394,15 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 
 		v, ok := spectra[evi.Peptides[i].Sequence]
 		if ok {
+
+			//evi.Peptides[i].IsDecoy = false
+
 			for _, j := range v {
 				evi.Peptides[i].Spectra[j]++
 			}
-
 			evi.Peptides[i].Spc = len(v)
-		}
 
+		}
 	}
 
 	return evi
@@ -381,7 +415,6 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 	var spectra = make(map[string][]string)
 
 	for _, i := range evi.PSM {
-
 		if !i.IsDecoy {
 			ion[i.IonForm]++
 			spectra[i.IonForm] = append(spectra[i.IonForm], i.Spectrum)
@@ -394,11 +427,13 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 
 		v, ok := spectra[evi.Ions[i].IonForm]
 		if ok {
+
+			//evi.Ions[i].IsDecoy = false
+
 			for _, j := range v {
 				evi.Ions[i].Spectra[j]++
 			}
 		}
-
 	}
 
 	return evi
@@ -419,21 +454,16 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var pepNextAA = make(map[string]string)
 
 	for _, j := range dtb.Records {
-		if !j.IsDecoy {
-			proteinIDMap[j.PartHeader] = j.ID
-			entryNameMap[j.PartHeader] = j.EntryName
-			geneMap[j.PartHeader] = j.GeneNames
-			descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
-			sequenceMap[j.PartHeader] = j.Sequence
-		}
+		proteinIDMap[j.PartHeader] = j.ID
+		entryNameMap[j.PartHeader] = j.EntryName
+		geneMap[j.PartHeader] = j.GeneNames
+		descriptionMap[j.PartHeader] = strings.TrimSpace(j.Description)
+		sequenceMap[j.PartHeader] = j.Sequence
 	}
 
 	for i := range evi.PSM {
 
 		id := evi.PSM[i].Protein
-		if evi.PSM[i].IsDecoy {
-			id = strings.Replace(id, decoyTag, "", 1)
-		}
 
 		evi.PSM[i].ProteinID = proteinIDMap[id]
 		evi.PSM[i].EntryName = entryNameMap[id]
@@ -456,7 +486,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		if len(reMatch) > 0 {
 
-			evi.PSM[i].ProteinStart = reMatch[0]
+			evi.PSM[i].ProteinStart = reMatch[0] + 1
 			evi.PSM[i].ProteinEnd = reMatch[1]
 
 			if (reMatch[0]) <= 0 {

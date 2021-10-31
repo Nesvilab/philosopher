@@ -30,6 +30,8 @@ func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) {
 			e.Parameters.FragmentMassUnits = i.Value
 		} else if i.Name == "calibrate_mass" {
 			e.Parameters.CalibrateMass = i.Value
+		} else if i.Name == "use_all_mods_in first_search" {
+			e.Parameters.UseAllModsInFirstSearch = i.Value
 		} else if i.Name == "ms1_tolerance_mad" {
 			e.Parameters.Ms1ToleranceMad = i.Value
 		} else if i.Name == "ms2_tolerance_mad" {
@@ -66,8 +68,6 @@ func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) {
 			e.Parameters.MaxVariableModsPerMod = i.Value
 		} else if i.Name == "max_variable_mods_combinations" {
 			e.Parameters.MaxVariableModsCombinations = i.Value
-		} else if i.Name == "output_file_extension" {
-			e.Parameters.OutputFileExtension = i.Value
 		} else if i.Name == "output_format" {
 			e.Parameters.OutputFormat = i.Value
 		} else if i.Name == "output_report_topN" {
@@ -96,6 +96,8 @@ func (e *Evidence) AssembleSearchParameters(params []spc.Parameter) {
 			e.Parameters.ZeroBinMultExpect = i.Value
 		} else if i.Name == "add_topN_complementary" {
 			e.Parameters.AddTopNComplementary = i.Value
+		} else if i.Name == "check_spectral_files" {
+			e.Parameters.CheckSpectralFiles = i.Value
 		} else if i.Name == "minimum_peaks" {
 			e.Parameters.MinimumPeaks = i.Value
 		} else if i.Name == "use_topN_peaks" {

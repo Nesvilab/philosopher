@@ -39,6 +39,7 @@ type SearchParametersEvidence struct {
 	FragmentMassTolerance              string
 	FragmentMassUnits                  string
 	CalibrateMass                      string
+	UseAllModsInFirstSearch            string
 	Ms1ToleranceMad                    string
 	Ms2ToleranceMad                    string
 	EvaluateMassCalibration            string
@@ -57,7 +58,6 @@ type SearchParametersEvidence struct {
 	AllowMultipleVariableModsOnResidue string
 	MaxVariableModsPerMod              string
 	MaxVariableModsCombinations        string
-	OutputFileExtension                string
 	OutputFormat                       string
 	OutputReportTopN                   string
 	OutputMaxExpect                    string
@@ -72,6 +72,7 @@ type SearchParametersEvidence struct {
 	ZeroBinAcceptExpect                string
 	ZeroBinMultExpect                  string
 	AddTopNComplementary               string
+	CheckSpectralFiles                 string
 	MinimumPeaks                       string
 	UseTopNPeaks                       string
 	MinFragmentsModelling              string

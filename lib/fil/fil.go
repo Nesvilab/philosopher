@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -27,10 +28,18 @@ func Run(f met.Data) met.Data {
 	var pepxml id.PepXML
 	var pep id.PepIDList
 	var pro id.ProtIDList
-	var razorBin string
 
 	if len(f.Filter.RazorBin) > 0 {
-		razorBin = f.Filter.RazorBin
+
+		f.Filter.Razor = true
+
+		if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
+			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Skipping razor assignment")
+			f.Filter.RazorBin = ""
+		} else {
+			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
+			sys.CopyFile(f.Filter.RazorBin, rdest)
+		}
 	}
 
 	// get the database tag from database command
@@ -106,7 +115,7 @@ func Run(f met.Data) met.Data {
 		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	}
 
-	if _, err := os.Stat(razorBin); err == nil || f.Filter.TwoD {
+	if f.Filter.TwoD || f.Filter.Razor {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)
@@ -204,6 +213,9 @@ func Run(f met.Data) met.Data {
 				e.PSM[i].MappedGenes = make(map[string]int)
 			}
 
+			if strings.Contains(e.PSM[i].Protein, f.Filter.Tag) {
+				e.PSM[i].IsDecoy = true
+			}
 		}
 
 		razor = nil
@@ -218,7 +230,7 @@ func Run(f met.Data) met.Data {
 
 		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
 		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
-		e.UpdateIonStatus(f.Filter.Tag)
+		//e.UpdateIonStatus(f.Filter.Tag)
 
 		logrus.Info("Synchronizing PSMs and proteins")
 
@@ -230,6 +242,38 @@ func Run(f met.Data) met.Data {
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
+
+	var countPSM, countPep, countIon, coutProtein int
+	for _, i := range e.PSM {
+		if !i.IsDecoy {
+			countPSM++
+		}
+	}
+
+	for _, i := range e.Peptides {
+		if !i.IsDecoy {
+			countPep++
+		}
+	}
+
+	for _, i := range e.Ions {
+		if !i.IsDecoy {
+			countIon++
+		}
+	}
+
+	for _, i := range e.Proteins {
+		if !i.IsDecoy {
+			coutProtein++
+		}
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"psms":     countPSM,
+		"peptides": countPep,
+		"ions":     countIon,
+		"proteins": coutProtein,
+	}).Info("Total report numbers after FDR filtering, and post-processing")
 
 	logrus.Info("Saving")
 	e.SerializeGranular()

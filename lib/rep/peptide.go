@@ -141,15 +141,12 @@ func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, has
 	// building the printing set tat may or not contain decoys
 	var printSet PeptideEvidenceList
 	for _, i := range evi.Peptides {
-		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
-		if i.Probability > 0 {
-			if !hasDecoys {
-				if !i.IsDecoy {
-					printSet = append(printSet, i)
-				}
-			} else {
+		if !hasDecoys {
+			if !i.IsDecoy {
 				printSet = append(printSet, i)
 			}
+		} else {
+			printSet = append(printSet, i)
 		}
 	}
 
@@ -165,6 +162,8 @@ func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, has
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+		case 18:
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
 		default:
 			header += ""
 		}
@@ -184,7 +183,7 @@ func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, has
 	// verify if the structure has labels, if so, replace the original channel names by them.
 	if hasLabels {
 
-		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16 string
+		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
 
 		for _, i := range printSet {
 			if len(i.Labels.Channel1.CustomName) >= 1 {
@@ -204,26 +203,30 @@ func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, has
 				c14 = i.Labels.Channel14.CustomName
 				c15 = i.Labels.Channel15.CustomName
 				c16 = i.Labels.Channel16.CustomName
+				c17 = i.Labels.Channel17.CustomName
+				c18 = i.Labels.Channel18.CustomName
 				break
 			}
 		}
 
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, c1, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, c2, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, c3, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, c4, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, c5, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, c6, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, c7, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, c8, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, c9, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, c10, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, c11, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, c12, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, c13, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, c14, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, c15, -1)
-		header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel16.Name, c16, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel1.Name, c1, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel2.Name, c2, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel3.Name, c3, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel4.Name, c4, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel5.Name, c5, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel6.Name, c6, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel7.Name, c7, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel8.Name, c8, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel9.Name, c9, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel10.Name, c10, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel11.Name, c11, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel12.Name, c12, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel13.Name, c13, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel14.Name, c14, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel15.Name, c15, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel16.Name, c16, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel17.Name, c17, -1)
+		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel18.Name, c18, -1)
 	}
 
 	_, e = io.WriteString(file, header)
@@ -359,6 +362,28 @@ func (evi Evidence) MetaPeptideReport(workspace, brand string, channels int, has
 				i.Labels.Channel14.Intensity,
 				i.Labels.Channel15.Intensity,
 				i.Labels.Channel16.Intensity,
+			)
+		case 18:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+				i.Labels.Channel3.Intensity,
+				i.Labels.Channel4.Intensity,
+				i.Labels.Channel5.Intensity,
+				i.Labels.Channel6.Intensity,
+				i.Labels.Channel7.Intensity,
+				i.Labels.Channel8.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
+				i.Labels.Channel11.Intensity,
+				i.Labels.Channel12.Intensity,
+				i.Labels.Channel13.Intensity,
+				i.Labels.Channel14.Intensity,
+				i.Labels.Channel15.Intensity,
+				i.Labels.Channel16.Intensity,
+				i.Labels.Channel17.Intensity,
+				i.Labels.Channel18.Intensity,
 			)
 		default:
 			header += ""
