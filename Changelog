@@ -2,6 +2,8 @@
 -Support for TMTPro (18-plex)
 
 ### Changed
+- Decoys have NextAA and PrevAA
+- Improved the filtering process
 
 ### Fixed
 - Fixed an issue with the labelling of the TMT-6 channels.
