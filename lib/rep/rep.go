@@ -441,7 +441,7 @@ func Run(m met.Data) {
 	logrus.Info("Creating reports")
 
 	// PSM
-	repo.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, hasLabels)
+	repo.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
 
 	// Ion
 	repo.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
