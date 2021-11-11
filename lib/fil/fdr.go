@@ -363,13 +363,13 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 
 						var idList []string
 						for protein, id := range r[k].MappedproteinsSID {
-							id = fmt.Sprintf("%s_%s", id, protein)
+							id = fmt.Sprintf("%s#%s", id, protein)
 							idList = append(idList, id)
 						}
 
 						sort.Strings(idList)
 
-						id := strings.Split(idList[0], "_")
+						id := strings.Split(idList[0], "#")
 						razorPair[k] = id[1]
 					}
 
