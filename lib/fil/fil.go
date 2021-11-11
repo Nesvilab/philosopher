@@ -33,13 +33,23 @@ func Run(f met.Data) met.Data {
 
 		f.Filter.Razor = true
 
-		if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
-			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Skipping razor assignment")
-			f.Filter.RazorBin = ""
-		} else {
+		if _, err := os.Stat(f.Filter.RazorBin); err == nil {
+
 			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
 			sys.CopyFile(f.Filter.RazorBin, rdest)
+
+			var rm RazorMap = make(map[string]RazorCandidate)
+			rm.Restore()
+			logrus.Info("Fetching razor assignment from: ", f.Filter.RazorBin, ": ", len(rm), " razor groups imported.")
+			_ = rm
+
+		} else if errors.Is(err, os.ErrNotExist) {
+
+			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Calculating a new assignment")
+			f.Filter.RazorBin = ""
+
 		}
+
 	}
 
 	// get the database tag from database command

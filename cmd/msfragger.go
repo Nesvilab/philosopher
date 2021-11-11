@@ -73,7 +73,7 @@ func init() {
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeCut2, "search_enzyme_cut_2", "", "", "Second enzyme's cutting amino acid.")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeNocut2, "search_enzyme_nocut_2", "", "", "Second enzyme's protecting amino acid.")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.AllowedMissedCleavage2, "allowed_missed_cleavage_2", "", 2, "Second enzyme's allowed number of missed cleavages per peptide. Maximum value is 5.")
-		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeSense2, "search_enzyme_sense_2", "", "", "Second enzyme's cutting terminal.")
+		msfraggerCmd.Flags().StringVarP(&m.MSFragger.SearchEnzymeSense2, "search_enzyme_sense_2", "", "C", "Second enzyme's cutting terminal.")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.NumEnzymeTermini, "num_enzyme_termini", "", 2, "2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion")
 		msfraggerCmd.Flags().IntVarP(&m.MSFragger.ClipNTermM, "clip_nTerm_M", "", 1, "")
 		msfraggerCmd.Flags().StringVarP(&m.MSFragger.VariableMod01, "variable_mod_01", "", "", "")
