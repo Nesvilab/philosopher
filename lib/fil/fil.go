@@ -39,7 +39,7 @@ func Run(f met.Data) met.Data {
 			sys.CopyFile(f.Filter.RazorBin, rdest)
 
 			var rm RazorMap = make(map[string]RazorCandidate)
-			rm.Restore()
+			rm.Restore(false)
 			logrus.Info("Fetching razor assignment from: ", f.Filter.RazorBin, ": ", len(rm), " razor groups imported.")
 			_ = rm
 
@@ -187,7 +187,7 @@ func Run(f met.Data) met.Data {
 	if f.Filter.Razor {
 
 		var razor RazorMap = make(map[string]RazorCandidate)
-		razor.Restore()
+		razor.Restore(false)
 
 		for i := range e.PSM {
 

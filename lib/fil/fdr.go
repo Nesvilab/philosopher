@@ -213,178 +213,185 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 	var r RazorMap = make(map[string]RazorCandidate)
 	var rList []string
 
-	// for each peptide sequence, collapse all parent protein peptides from ions originated from the same sequence
-	for _, i := range p.Groups {
-		for _, j := range i.Proteins {
-			for _, k := range j.PeptideIons {
+	// perform a test load of the razor assingment, if there's a file, then the assignment is skipped, and the current file used.
+	r.Restore(true)
+	if len(r) == 0 {
 
-				v, ok := r[k.PeptideSequence]
-				if !ok {
+		// for each peptide sequence, collapse all parent protein peptides from ions originated from the same sequence
+		for _, i := range p.Groups {
+			for _, j := range i.Proteins {
+				for _, k := range j.PeptideIons {
 
-					var rc RazorCandidate
-					rc.Sequence = k.PeptideSequence
-					rc.MappedProteinsW = make(map[string]float64)
-					rc.MappedProteinsGW = make(map[string]float64)
-					rc.MappedProteinsTNP = make(map[string]int)
-					rc.MappedproteinsSID = make(map[string]string)
+					v, ok := r[k.PeptideSequence]
+					if !ok {
 
-					rc.MappedProteinsW[j.ProteinName] = k.Weight
-					rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-					rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-					rc.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
+						var rc RazorCandidate
+						rc.Sequence = k.PeptideSequence
+						rc.MappedProteinsW = make(map[string]float64)
+						rc.MappedProteinsGW = make(map[string]float64)
+						rc.MappedProteinsTNP = make(map[string]int)
+						rc.MappedproteinsSID = make(map[string]string)
 
-					for _, i := range j.IndistinguishableProtein {
-						rc.MappedProteinsW[i] = -1
-						rc.MappedProteinsGW[i] = -1
-						rc.MappedProteinsTNP[i] = -1
-						rc.MappedproteinsSID[i] = "zzz"
+						rc.MappedProteinsW[j.ProteinName] = k.Weight
+						rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+						rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+						rc.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
+
+						for _, i := range j.IndistinguishableProtein {
+							rc.MappedProteinsW[i] = -1
+							rc.MappedProteinsGW[i] = -1
+							rc.MappedProteinsTNP[i] = -1
+							rc.MappedproteinsSID[i] = "zzz"
+						}
+
+						for _, i := range k.PeptideParentProtein {
+							rc.MappedProteinsW[i] = -1
+							rc.MappedProteinsGW[i] = -1
+							rc.MappedProteinsTNP[i] = -1
+							rc.MappedproteinsSID[i] = "zzz"
+						}
+
+						r[k.PeptideSequence] = rc
+
+					} else {
+						var c = v
+
+						// doing like this will allow proteins that map to shared peptidesto be considered
+						c.MappedProteinsW[j.ProteinName] = k.Weight
+						c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
+						c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
+						c.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
+						r[k.PeptideSequence] = c
+
 					}
-
-					for _, i := range k.PeptideParentProtein {
-						rc.MappedProteinsW[i] = -1
-						rc.MappedProteinsGW[i] = -1
-						rc.MappedProteinsTNP[i] = -1
-						rc.MappedproteinsSID[i] = "zzz"
-					}
-
-					r[k.PeptideSequence] = rc
-
-				} else {
-					var c = v
-
-					// doing like this will allow proteins that map to shared peptidesto be considered
-					c.MappedProteinsW[j.ProteinName] = k.Weight
-					c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-					c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-					c.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
-					r[k.PeptideSequence] = c
 
 				}
-
 			}
 		}
-	}
 
-	// this will make the assignment more deterministic
-	for k := range r {
-		rList = append(rList, k)
-	}
-	sort.Strings(rList)
-
-	var razorPair = make(map[string]string)
-
-	// get the best protein candidate for each peptide sequence and make the razor pair
-	for _, k := range rList {
-		// 1st pass: mark all cases with weight > 0.5
-		for pt, w := range r[k].MappedProteinsW {
-			if w > 0.5 {
-				razorPair[k] = pt
-			}
+		// this will make the assignment more deterministic
+		for k := range r {
+			rList = append(rList, k)
 		}
-	}
+		sort.Strings(rList)
 
-	// 2nd pass: mark all cases with highest group weight in the list
-	for _, k := range rList {
+		var razorPair = make(map[string]string)
 
-		_, ok := razorPair[k]
-		if !ok {
-
-			var topPT string
-			var topCount int
-			var topGW float64
-			var topTNP int
-			var topGWMap = make(map[float64]uint8)
-			var topTNPMap = make(map[int]uint8)
-
-			if len(r[k].MappedProteinsGW) == 1 {
-
-				for pt := range r[k].MappedProteinsGW {
+		// get the best protein candidate for each peptide sequence and make the razor pair
+		for _, k := range rList {
+			// 1st pass: mark all cases with weight > 0.5
+			for pt, w := range r[k].MappedProteinsW {
+				if w > 0.5 {
 					razorPair[k] = pt
 				}
+			}
+		}
 
-			} else if len(r[k].MappedProteinsGW) > 1 {
+		// 2nd pass: mark all cases with highest group weight in the list
+		for _, k := range rList {
 
-				for pt, tnp := range r[k].MappedProteinsGW {
-					if tnp >= topGW {
-						topGW = tnp
-						topPT = pt
-						topGWMap[topGW]++
-					}
-				}
+			_, ok := razorPair[k]
+			if !ok {
 
-				var tie bool
-				if topGWMap[topGW] >= 2 {
-					tie = true
-				}
+				var topPT string
+				var topCount int
+				var topGW float64
+				var topTNP int
+				var topGWMap = make(map[float64]uint8)
+				var topTNPMap = make(map[int]uint8)
 
-				if !tie {
-					razorPair[k] = topPT
+				if len(r[k].MappedProteinsGW) == 1 {
 
-				} else {
-
-					var tnpList []string
-					for pt := range r[k].MappedProteinsTNP {
-						tnpList = append(tnpList, pt)
+					for pt := range r[k].MappedProteinsGW {
+						razorPair[k] = pt
 					}
 
-					sort.Strings(tnpList)
+				} else if len(r[k].MappedProteinsGW) > 1 {
 
-					for _, pt := range tnpList {
-						if r[k].MappedProteinsTNP[pt] >= topTNP {
-							topTNP = r[k].MappedProteinsTNP[pt]
+					for pt, tnp := range r[k].MappedProteinsGW {
+						if tnp >= topGW {
+							topGW = tnp
 							topPT = pt
-							topTNPMap[topTNP]++
+							topGWMap[topGW]++
 						}
 					}
 
 					var tie bool
-					if topTNPMap[topTNP] >= 2 {
+					if topGWMap[topGW] >= 2 {
 						tie = true
 					}
 
 					if !tie {
-
-						var mplist []string
-						for pt := range r[k].MappedProteinsTNP {
-							mplist = append(mplist, pt)
-						}
-						sort.Strings(mplist)
-
-						for _, pt := range mplist {
-							if r[k].MappedProteinsTNP[pt] >= topCount {
-								topCount = r[k].MappedProteinsTNP[pt]
-								topPT = pt
-							}
-						}
-
 						razorPair[k] = topPT
 
 					} else {
 
-						var idList []string
-						for protein, id := range r[k].MappedproteinsSID {
-							id = fmt.Sprintf("%s#%s", id, protein)
-							idList = append(idList, id)
+						var tnpList []string
+						for pt := range r[k].MappedProteinsTNP {
+							tnpList = append(tnpList, pt)
 						}
 
-						sort.Strings(idList)
+						sort.Strings(tnpList)
 
-						id := strings.Split(idList[0], "#")
-						razorPair[k] = id[1]
+						for _, pt := range tnpList {
+							if r[k].MappedProteinsTNP[pt] >= topTNP {
+								topTNP = r[k].MappedProteinsTNP[pt]
+								topPT = pt
+								topTNPMap[topTNP]++
+							}
+						}
+
+						var tie bool
+						if topTNPMap[topTNP] >= 2 {
+							tie = true
+						}
+
+						if !tie {
+
+							var mplist []string
+							for pt := range r[k].MappedProteinsTNP {
+								mplist = append(mplist, pt)
+							}
+							sort.Strings(mplist)
+
+							for _, pt := range mplist {
+								if r[k].MappedProteinsTNP[pt] >= topCount {
+									topCount = r[k].MappedProteinsTNP[pt]
+									topPT = pt
+								}
+							}
+
+							razorPair[k] = topPT
+
+						} else {
+
+							var idList []string
+							for protein, id := range r[k].MappedproteinsSID {
+								id = fmt.Sprintf("%s#%s", id, protein)
+								idList = append(idList, id)
+							}
+
+							sort.Strings(idList)
+
+							id := strings.Split(idList[0], "#")
+							razorPair[k] = id[1]
+						}
+
 					}
-
 				}
 			}
 		}
-	}
 
-	for _, k := range rList {
-		pt, ok := razorPair[k]
-		if ok {
-			razor := r[k]
-			razor.MappedProtein = pt
-			r[k] = razor
+		for _, k := range rList {
+			pt, ok := razorPair[k]
+			if ok {
+				razor := r[k]
+				razor.MappedProtein = pt
+				r[k] = razor
+			}
 		}
+
+		r.Serialize()
 	}
 
 	for i := range p.Groups {
@@ -416,8 +423,6 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 			p.Groups[i].Proteins[j].TopPepProb = r
 		}
 	}
-
-	r.Serialize()
 
 	return p
 }
@@ -659,7 +664,7 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 
 	var rm RazorMap = make(map[string]RazorCandidate)
-	rm.Restore()
+	rm.Restore(false)
 
 	for i := range list {
 		v, ok := rm[list[i].Peptide]
@@ -675,7 +680,7 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 		}
 	}
 
-	rm.Serialize()
+	//rm.Serialize()
 
 	return list
 }

@@ -37,15 +37,15 @@ func (p *RazorMap) Serialize() {
 }
 
 // Restore reads razor bin files and restore the data sctructure
-func (p *RazorMap) Restore() {
+func (p *RazorMap) Restore(silent bool) {
 
 	b, e := ioutil.ReadFile(sys.RazorBin())
-	if e != nil {
+	if e != nil && !silent {
 		msg.ReadFile(e, "warning")
 	}
 
 	e = msgpack.Unmarshal(b, &p)
-	if e != nil {
+	if e != nil && !silent {
 		msg.DecodeMsgPck(e, "warning")
 	}
 
