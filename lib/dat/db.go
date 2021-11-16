@@ -395,8 +395,15 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 	idm := idReg.FindStringSubmatch(k)
 	e.ID = idm[1]
 
-	e.Description = ""
-	e.EntryName = ""
+	part := strings.Split(k, " ")
+
+	if len(part) > 1 {
+		e.Description = part[1]
+	} else {
+		e.Description = k
+	}
+
+	e.EntryName = k
 	e.GeneNames = ""
 	e.Organism = ""
 	e.SequenceVersion = ""
@@ -405,7 +412,6 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 	e.Length = len(v)
 	e.OriginalHeader = k
 
-	part := strings.Split(k, " ")
 	e.PartHeader = part[0]
 
 	if strings.HasPrefix(k, decoyTag) {

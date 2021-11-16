@@ -214,7 +214,8 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	for i := range list {
 		for _, j := range database.Records {
-			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && !strings.Contains(j.OriginalHeader, a.Tag) {
+			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.HasPrefix(j.OriginalHeader, list[i].ProteinID) && !strings.Contains(j.OriginalHeader, a.Tag) {
+				//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && !strings.Contains(j.OriginalHeader, a.Tag) {
 				list[i].ProteinName = j.PartHeader
 				list[i].ProteinID = j.ID
 				list[i].EntryName = j.EntryName
