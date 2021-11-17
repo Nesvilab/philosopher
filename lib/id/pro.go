@@ -41,6 +41,7 @@ type ProteinIdentification struct {
 	GroupNumber              uint32
 	GroupSiblingID           string
 	ProteinName              string
+	Description              string
 	UniqueStrippedPeptides   []string
 	Length                   string
 	PercentCoverage          float32
@@ -130,6 +131,7 @@ func (p *ProtXML) Read(f string) {
 			ptid.GroupProbability = i.Probability
 			ptid.Probability = i.Probability
 			ptid.ProteinName = string(j.ProteinName)
+			ptid.Description = string(j.Annotation.ProteinDescription)
 			ptid.Probability = j.Probability
 			ptid.PercentCoverage = j.PercentCoverage
 			ptid.PctSpectrumIDs = j.PctSpectrumIDs
