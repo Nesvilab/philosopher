@@ -1,5 +1,5 @@
 # Philosopher pipeline configuration file
-# Version 4.0.1
+# Version 4.1.1
 #
 # The pipeline mode automates the processing done by Philosopher and other tools. First, check
 # the steps you want to execute in the commands section and change them to
@@ -74,7 +74,7 @@ Database Search:                                 # MSFragger-3.4 & Comet v201901
     search_enzyme_cut_2:                         # Second enzyme's cutting amino acid.
     search_enzyme_nocut_2:                       # Second enzyme's protecting amino acid.
     allowed_missed_cleavage_2:                   # Second enzyme's allowed number of missed cleavages per peptide. Maximum value is 5.
-    search_enzyme_sense_2:                       # Second enzyme's cutting terminal.
+    search_enzyme_sense_2: C                     # Second enzyme's cutting terminal.
     num_enzyme_termini: 2                        # 2 for enzymatic, 1 for semi-enzymatic, 0 for nonspecific digestion
     clip_nTerm_M: 1                              # specifies the trimming of a protein N-terminal methionine as a variable modification (0 or 1)
     variable_mod_01: 15.99490 M 3                # variable modification

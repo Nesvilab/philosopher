@@ -415,6 +415,7 @@ type Report struct {
 	Decoys  bool `yaml:"withDecoys"`
 	MSstats bool `yaml:"msstats"`
 	MZID    bool `yaml:"mzID"`
+	IonMob  bool `yaml:"ionmobility"`
 }
 
 // TMTIntegrator options and parameters

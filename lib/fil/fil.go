@@ -9,12 +9,10 @@ import (
 	"strings"
 
 	"philosopher/lib/cla"
-	"philosopher/lib/dat"
 	"philosopher/lib/id"
 	"philosopher/lib/inf"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
-	"philosopher/lib/msg"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
@@ -33,13 +31,23 @@ func Run(f met.Data) met.Data {
 
 		f.Filter.Razor = true
 
-		if _, err := os.Stat(f.Filter.RazorBin); os.IsNotExist(err) {
-			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Skipping razor assignment")
-			f.Filter.RazorBin = ""
-		} else {
+		if _, err := os.Stat(f.Filter.RazorBin); err == nil {
+
 			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
 			sys.CopyFile(f.Filter.RazorBin, rdest)
+
+			var rm RazorMap = make(map[string]RazorCandidate)
+			rm.Restore(false)
+			logrus.Info("Fetching razor assignment from: ", f.Filter.RazorBin, ": ", len(rm), " razor groups imported.")
+			_ = rm
+
+		} else if errors.Is(err, os.ErrNotExist) {
+
+			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Calculating a new assignment")
+			f.Filter.RazorBin = ""
+
 		}
+
 	}
 
 	// get the database tag from database command
@@ -70,6 +78,7 @@ func Run(f met.Data) met.Data {
 	} else if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
 
 		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+
 		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
 		pro.Restore()
 
@@ -109,13 +118,13 @@ func Run(f met.Data) met.Data {
 
 	}
 
-	var dtb dat.Base
-	dtb.Restore()
-	if len(dtb.Records) < 1 {
-		msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
-	}
+	// var dtb dat.Base
+	// dtb.Restore()
+	// if len(dtb.Records) < 1 {
+	// 	msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
+	// }
 
-	if f.Filter.TwoD || f.Filter.Razor {
+	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
 		var psm id.PepIDList
 		psm.Restore("psm")
 		psm = correctRazorAssignment(psm)
@@ -174,10 +183,10 @@ func Run(f met.Data) met.Data {
 		e.UpdatePeptideModCount()
 	}
 
-	if f.Filter.Razor {
+	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
 
 		var razor RazorMap = make(map[string]RazorCandidate)
-		razor.Restore()
+		razor.Restore(false)
 
 		for i := range e.PSM {
 
@@ -225,6 +234,7 @@ func Run(f met.Data) met.Data {
 
 		logrus.Info("Processing protein inference")
 		pro.Restore()
+
 		e.AssembleProteinReport(pro, f.Filter.Weight, f.Filter.Tag)
 		pro = nil
 

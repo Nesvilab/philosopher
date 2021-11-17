@@ -133,13 +133,12 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasLabels bool) {
+func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
 
 	var header string
 	var modMap = make(map[string]string)
 	var modList []string
 	var hasCompVolt bool
-	var hasIonMob bool
 	var hasPurity bool
 
 	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
@@ -179,7 +178,7 @@ func (evi Evidence) MetaPSMReport(workspace, brand string, channels int, hasDeco
 			hasCompVolt = true
 		}
 
-		if evi.PSM[i].IonMobility > 0 {
+		if !hasIonMob && evi.PSM[i].IonMobility > 0 {
 			hasIonMob = true
 		}
 

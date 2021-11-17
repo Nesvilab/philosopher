@@ -43,6 +43,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		rep.Modifications.Index = make(map[string]mod.Modification)
 
 		rep.ProteinName = i.ProteinName
+		rep.Description = i.Description
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
 		rep.Length, _ = strconv.Atoi(i.Length)
@@ -185,10 +186,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	// fix the name sand headers and pull database information into protein report
 	for i := range list {
 		for _, j := range dtb.Records {
-			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) {
-			if strings.HasPrefix(j.OriginalHeader, list[i].ProteinName) {
 
-				//fmt.Println("A:", j.OriginalHeader, "\t", "B:", list[i].ProteinName)
+			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.Contains(j.OriginalHeader, list[i].Description) {
 
 				if (j.IsDecoy && list[i].IsDecoy) || (!j.IsDecoy && !list[i].IsDecoy) {
 
