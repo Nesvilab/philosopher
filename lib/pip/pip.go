@@ -512,8 +512,10 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 		dest := fmt.Sprintf("%s%s.meta%spro.bin", i, string(filepath.Separator), string(filepath.Separator))
 		sys.CopyFile(proBin, dest)
 
-		rdest := fmt.Sprintf("%s%s.meta%srazor.bin", i, string(filepath.Separator), string(filepath.Separator))
-		sys.CopyFile(sys.RazorBin(), rdest)
+		if p.Abacus.Razor {
+			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", i, string(filepath.Separator), string(filepath.Separator))
+			sys.CopyFile(sys.RazorBin(), rdest)
+		}
 	}
 
 	e := os.RemoveAll(path.Dir(proBin))
