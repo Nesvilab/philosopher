@@ -2,8 +2,7 @@
 
 
 ### Changed
-
+- Added the parsing rules from the Prophets to the protein description.
 
 ### Fixed
-- Fixed an issue with the ion mobility column not showing in empty PSM tables.
-- Fixed an issue where high-scoring peptides mapping to complicated razor cases where not showing in the reports.
+
