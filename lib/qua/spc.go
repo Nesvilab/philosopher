@@ -1,15 +1,16 @@
 package qua
 
 import (
+	"philosopher/lib/id"
 	"philosopher/lib/rep"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins
 func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
-	var total = make(map[string][]string)
-	var unique = make(map[string][]string)
-	var razor = make(map[string][]string)
+	var total = make(map[string][]id.SpectrumType)
+	var unique = make(map[string][]id.SpectrumType)
+	var razor = make(map[string][]id.SpectrumType)
 
 	var sequences = make(map[string]int)
 
@@ -17,17 +18,17 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 
 		sequences[i.Peptide]++
 
-		total[i.Protein] = append(total[i.Protein], i.Spectrum)
+		total[i.Protein] = append(total[i.Protein], i.SpectrumFileName())
 		for j := range i.MappedProteins {
-			total[j] = append(total[j], i.Spectrum)
+			total[j] = append(total[j], i.SpectrumFileName())
 		}
 
 		if i.IsUnique {
-			unique[i.Protein] = append(unique[i.Protein], i.Spectrum)
+			unique[i.Protein] = append(unique[i.Protein], i.SpectrumFileName())
 		}
 
 		if i.IsURazor {
-			razor[i.Protein] = append(razor[i.Protein], i.Spectrum)
+			razor[i.Protein] = append(razor[i.Protein], i.SpectrumFileName())
 		}
 	}
 
@@ -76,10 +77,10 @@ func CalculateSpectralCounts(e rep.Evidence) rep.Evidence {
 // 		sequences[i.Peptide]++
 
 // 		if i.IsUnique {
-// 			uniqueIonPSM[i.Spectrum] = i.ProteinID
+// 			uniqueIonPSM[i.SpectrumFileName()] = i.ProteinID
 // 		}
 // 		if i.IsURazor {
-// 			razorIonPSM[i.Spectrum] = i.ProteinID
+// 			razorIonPSM[i.SpectrumFileName()] = i.ProteinID
 // 		}
 // 	}
 

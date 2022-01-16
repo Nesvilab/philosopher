@@ -3,12 +3,12 @@ package id
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"philosopher/lib/uti"
@@ -20,7 +20,6 @@ import (
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
@@ -41,8 +40,21 @@ type PepXML struct {
 	PeptideIdentification PepIDList
 }
 
-// PeptideIdentification struct
-type PeptideIdentification struct {
+type PepXML4Serialiazation struct {
+	FileName              string
+	SpectraFile           string
+	SearchEngine          string
+	DecoyTag              string
+	SearchParameters      []spc.Parameter
+	Database              string
+	Prophet               string
+	Modifications         mod.Modifications
+	Models                []spc.DistributionPoint
+	PeptideIdentification PepIDListPtrs
+}
+
+// PeptideIdentificationOld struct
+type PeptideIdentificationOld struct {
 	Index                                uint32
 	Spectrum                             string
 	SpectrumFile                         string
@@ -50,7 +62,7 @@ type PeptideIdentification struct {
 	Peptide                              string
 	Protein                              string
 	ModifiedPeptide                      string
-	CompesationVoltage                   string
+	CompensationVoltage                  string
 	AlternativeProteins                  map[string]int
 	AssumedCharge                        uint8
 	PrevAA                               string
@@ -92,8 +104,71 @@ type PeptideIdentification struct {
 	Modifications                        mod.Modifications
 }
 
+type SpectrumType struct{ Spectrum, FileName string }
+
+func (s SpectrumType) Str() string { return fmt.Sprintf("%s#%s", s.Spectrum, s.FileName) }
+func (p PeptideIdentification) SpectrumFileName() SpectrumType {
+	return SpectrumType{p.Spectrum, p.SpectrumFile}
+}
+
+// PeptideIdentification struct
+type PeptideIdentification struct {
+	Index                            uint32
+	AssumedCharge                    uint8
+	HitRank                          uint8
+	NumberOfEnzymaticTermini         uint8
+	NumberofMissedCleavages          uint8
+	UncalibratedPrecursorNeutralMass float64
+	PrecursorNeutralMass             float64
+	RetentionTime                    float64
+	CalcNeutralPepMass               float64
+	Massdiff                         float64
+	Probability                      float64
+	Expectation                      float64
+	Xcorr                            float64
+	DeltaCN                          float64
+	SPRank                           float64
+	Hyperscore                       float64
+	Nextscore                        float64
+	IonMobility                      float64
+	Intensity                        float64
+
+	Spectrum        string
+	SpectrumFile    string
+	Peptide         string
+	Protein         string
+	ModifiedPeptide string
+
+	CompensationVoltage string
+
+	AlternativeProteins map[string]int
+	MSFragerLoc         *MSFraggerLoc
+	PTM                 *PTM
+	Modifications       mod.ModificationsSlice
+}
+
+type PTM struct {
+	LocalizedPTMSites    map[string]int
+	LocalizedPTMMassDiff map[string]string
+}
+
+type MSFraggerLoc struct {
+	MSFragerLocalization                 string
+	MSFraggerLocalizationScoreWithPTM    string
+	MSFraggerLocalizationScoreWithoutPTM string
+}
+
 // PepIDList is a list of PeptideSpectrumMatch
 type PepIDList []PeptideIdentification
+type PepIDListPtrs []*PeptideIdentification
+
+func ToPepIDListPtrs(p PepIDList) PepIDListPtrs {
+	pptrs := make(PepIDListPtrs, len(p), len(p))
+	for i := range p {
+		pptrs[i] = &p[i]
+	}
+	return pptrs
+}
 
 // Len function for Sort
 func (p PepIDList) Len() int {
@@ -110,10 +185,26 @@ func (p PepIDList) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
+// Len function for Sort
+func (p PepIDListPtrs) Len() int {
+	return len(p)
+}
+
+// Less function for Sort
+func (p PepIDListPtrs) Less(i, j int) bool {
+	return p[i].Probability > p[j].Probability
+}
+
+// Swap function for Sort
+func (p PepIDListPtrs) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
 // Read is the main function for parsing pepxml data
 func (p *PepXML) Read(f string) {
 
 	var xml spc.PepXML
+	logrus.Info("Parsing ", f)
 	xml.Parse(f)
 
 	var mpa = xml.MsmsPipelineAnalysis
@@ -165,18 +256,21 @@ func (p *PepXML) Read(f string) {
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.AminoAcidModifications {
 
 			key := fmt.Sprintf("%s#%.4f", i.AminoAcid, i.Mass)
-
+			variableStr := string(i.Variable)
+			if variableStr != "Y" && variableStr != "N" {
+				panic(nil)
+			}
+			variable := variableStr == "Y"
 			_, ok := p.Modifications.Index[key]
 			if !ok {
-
 				m := mod.Modification{
-					Index:            key,
-					Type:             "Assigned",
-					MonoIsotopicMass: i.Mass,
-					MassDiff:         uti.ToFixed(i.MassDiff, 4),
-					Variable:         string(i.Variable),
-					AminoAcid:        string(i.AminoAcid),
-					IsobaricMods:     make(map[string]float64),
+					Index: key,
+					Type:  mod.Assigned,
+					//MonoIsotopicMass: i.Mass,
+					MassDiff:  uti.ToFixed(i.MassDiff, 4),
+					Variable:  variable,
+					AminoAcid: string(i.AminoAcid),
+					//IsobaricMods: make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -187,20 +281,24 @@ func (p *PepXML) Read(f string) {
 		for _, i := range mpa.MsmsRunSummary.SearchSummary.TerminalModifications {
 
 			key := fmt.Sprintf("%s-term#%.4f", strings.ToUpper(string(i.Terminus)), i.Mass)
-
+			variableStr := string(i.Variable)
+			if variableStr != "Y" && variableStr != "N" {
+				panic(nil)
+			}
+			variable := variableStr == "Y"
 			_, ok := p.Modifications.Index[key]
 			if !ok {
 
 				m := mod.Modification{
-					Index:             key,
-					Type:              "Assigned",
-					MonoIsotopicMass:  i.Mass,
-					MassDiff:          uti.ToFixed(i.MassDiff, 4),
-					Variable:          string(i.Variable),
-					AminoAcid:         fmt.Sprintf("%s-term", i.Terminus),
-					IsProteinTerminus: string(i.ProteinTerminus),
-					Terminus:          strings.ToLower(string(i.Terminus)),
-					IsobaricMods:      make(map[string]float64),
+					Index: key,
+					Type:  mod.Assigned,
+					//MonoIsotopicMass:  i.Mass,
+					MassDiff:  uti.ToFixed(i.MassDiff, 4),
+					Variable:  variable,
+					AminoAcid: fmt.Sprintf("%s-term", i.Terminus),
+					//IsProteinTerminus: string(i.ProteinTerminus),
+					//Terminus:          strings.ToLower(string(i.Terminus)),
+					//IsobaricMods: make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -219,20 +317,18 @@ func (p *PepXML) Read(f string) {
 		//massDeviation := getMassDeviation(mpa.MsmsRunSummary.SpectrumQuery)
 
 		// start processing spectra queries
-		var psmlist PepIDList
 		sq := mpa.MsmsRunSummary.SpectrumQuery
-		for _, i := range sq {
-			psm := processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
-			psmlist = append(psmlist, psm)
+		p.PeptideIdentification = make(PepIDList, len(sq), len(sq))
+		for idx, i := range sq {
+			p.PeptideIdentification[idx] = processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
 		}
 
-		p.PeptideIdentification = psmlist
 		p.Prophet = string(mpa.AnalysisSummary[0].Analysis)
 		p.Models = models
 
 		// p.adjustMassDeviation()
 
-		if len(psmlist) == 0 {
+		if len(p.PeptideIdentification) == 0 {
 			msg.NoPSMFound(errors.New(f), "warning")
 		}
 
@@ -240,16 +336,15 @@ func (p *PepXML) Read(f string) {
 }
 
 // ReadPepXMLInput reads one or more fies and organize the data into PSM list
-func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, string) {
+func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs, string) {
 
-	var files = make(map[string]uint8)
-	var pepIdent PepIDList
+	var files = make(map[string]struct{})
 	var params []spc.Parameter
 	var modsIndex = make(map[string]mod.Modification)
 	var searchEngine string
 
 	if strings.Contains(xmlFile, "pep.xml") || strings.Contains(xmlFile, "pepXML") {
-		files[xmlFile] = 0
+		files[xmlFile] = struct{}{}
 	} else {
 
 		list := uti.IOReadDir(xmlFile, "pep.xml")
@@ -263,7 +358,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 		for _, i := range list {
 			base := filepath.Base(i)
 			if strings.Contains(base, ".mod.") {
-				files[i] = 0
+				files[i] = struct{}{}
 			}
 		}
 
@@ -272,19 +367,27 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 			for _, i := range list {
 				base := filepath.Base(i)
 				if !strings.Contains(base, ".mod.") {
-					files[i] = 0
+					files[i] = struct{}{}
 				}
 			}
 		}
 
 	}
 
+	pepIdentList := make([]PepIDList, len(files))
+	sortedFiles := make([]string, 0, len(files))
 	for i := range files {
+		sortedFiles = append(sortedFiles, i)
+	}
+	sort.Strings(sortedFiles)
+	mu := sync.Mutex{}
+	processSinglePepXML := func(idx int, i string) {
 		var p PepXML
 		p.DecoyTag = decoyTag
 		p.Read(i)
-
-		params = p.SearchParameters
+		if idx == 0 {
+			params = p.SearchParameters
+		}
 
 		// print models
 		if models {
@@ -297,23 +400,41 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 			}
 		}
 
-		pepIdent = append(pepIdent, p.PeptideIdentification...)
-
+		pepIdentList[idx] = p.PeptideIdentification
+		mu.Lock()
 		for _, k := range p.Modifications.Index {
-			_, ok := modsIndex[k.Index]
-			if !ok {
+			if _, ok := modsIndex[k.Index]; !ok {
 				modsIndex[k.Index] = k
 			}
 		}
-
-		searchEngine = p.SearchEngine
+		mu.Unlock()
+		if idx == 0 {
+			searchEngine = p.SearchEngine
+		}
 	}
-
+	wg := sync.WaitGroup{}
+	parallelism := 6
+	parallelismTokens := make(chan struct{}, parallelism)
+	wg.Add(len(sortedFiles))
+	for idx, i := range sortedFiles {
+		go func(idx int, i string) {
+			defer wg.Done()
+			parallelismTokens <- struct{}{}
+			processSinglePepXML(idx, i)
+			<-parallelismTokens
+		}(idx, i)
+	}
+	wg.Wait()
 	// create a "fake" global pepXML comprising all data
-	var pepXML PepXML
+	var pepXML PepXML4Serialiazation
 	pepXML.DecoyTag = decoyTag
 	pepXML.SearchParameters = params
-	pepXML.PeptideIdentification = pepIdent
+	pepXML.PeptideIdentification = make(PepIDListPtrs, 0)
+	for _, pepIdent := range pepIdentList {
+		for idx := range pepIdent {
+			pepXML.PeptideIdentification = append(pepXML.PeptideIdentification, &pepIdent[idx])
+		}
+	}
 	pepXML.Modifications.Index = modsIndex
 
 	// promoting Spectra that matches to both decoys and targets to TRUE hits
@@ -323,23 +444,22 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDList, st
 	sort.Sort(pepXML.PeptideIdentification)
 	pepXML.Serialize()
 
-	return pepIdent, searchEngine
+	return pepXML.PeptideIdentification, searchEngine
 }
 
 func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
-	psm.Modifications.Index = make(map[string]mod.Modification)
+	//psm.Modifications.Index = make(map[string]mod.Modification)
 	psm.AlternativeProteins = make(map[string]int)
 
 	psm.Index = sq.Index
 	psm.SpectrumFile = FileName
-	psm.Spectrum = string(sq.Spectrum)
-	psm.Scan = sq.StartScan
+	//psm.Scan = sq.StartScan
 	psm.AssumedCharge = sq.AssumedCharge
 	psm.RetentionTime = sq.RetentionTimeSec
 	psm.IonMobility = sq.IonMobility
-	psm.CompesationVoltage = sq.CompensationVoltage
+	psm.CompensationVoltage = sq.CompensationVoltage
 
 	if sq.UncalibratedPrecursorNeutralMass > 0 {
 		psm.PrecursorNeutralMass = sq.PrecursorNeutralMass
@@ -352,14 +472,14 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 	for _, i := range sq.SearchResult.SearchHit {
 
 		psm.HitRank = i.HitRank
-		psm.PrevAA = string(i.PrevAA)
-		psm.NextAA = string(i.NextAA)
-		psm.MissedCleavages = i.MissedCleavages
-		psm.NumberTolTerm = i.TotalTerm
-		psm.NumberTotalProteins = i.TotalProteins
-		psm.TotalNumberIons = i.TotalIons
-		psm.NumberMatchedIons = i.MatchedIons
-		psm.IsRejected = i.IsRejected
+		//psm.PrevAA = string(i.PrevAA)
+		//psm.NextAA = string(i.NextAA)
+		//psm.MissedCleavages = i.MissedCleavages
+		//psm.NumberTolTerm = i.TotalTerm
+		//psm.NumberTotalProteins = i.TotalProteins
+		//psm.TotalNumberIons = i.TotalIons
+		//psm.NumberMatchedIons = i.MatchedIons
+		//psm.IsRejected = i.IsRejected
 
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
@@ -368,7 +488,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		//psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
 		psm.Massdiff = uti.ToFixed(i.Massdiff, 4)
 
-		psm.NumberofMissedCleavages = int(i.MissedCleavages)
+		psm.NumberofMissedCleavages = i.MissedCleavages
 		psm.NumberOfEnzymaticTermini = i.TotalTerm
 
 		for _, j := range i.AnalysisResult {
@@ -380,7 +500,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 				for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
 
 					if k.Name == "massd" {
-						psm.IsoMassD, _ = strconv.Atoi(k.Value)
+						//psm.IsoMassD, _ = strconv.Atoi(k.Value)
 					}
 				}
 			}
@@ -390,11 +510,16 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 
 			if string(j.Analysis) == "ptmprophet" {
-				psm.LocalizedPTMSites = make(map[string]int)
-				psm.LocalizedPTMMassDiff = make(map[string]string)
+				psm.PTM = &PTM{LocalizedPTMSites: make(map[string]int), LocalizedPTMMassDiff: make(map[string]string)}
+				LocalizedPTMSites := make(map[string]int)
+				LocalizedPTMMassDiff := make(map[string]string)
 				for _, k := range j.PTMProphetResult {
-					psm.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
-					psm.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
+					psm.PTM.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
+					psm.PTM.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
+				}
+				if len(j.PTMProphetResult) != 0 {
+					psm.PTM.LocalizedPTMSites = LocalizedPTMSites
+					psm.PTM.LocalizedPTMMassDiff = LocalizedPTMMassDiff
 				}
 			}
 		}
@@ -414,11 +539,11 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.DeltaCN = value
 			} else if string(j.Name) == "deltacnstar" {
-				value, _ := strconv.ParseFloat(j.Value, 64)
-				psm.DeltaCNStar = value
+				//value, _ := strconv.ParseFloat(j.Value, 64)
+				//psm.DeltaCNStar = value
 			} else if string(j.Name) == "spscore" {
-				value, _ := strconv.ParseFloat(j.Value, 64)
-				psm.SPScore = value
+				//value, _ := strconv.ParseFloat(j.Value, 64)
+				//psm.SPScore = value
 			} else if string(j.Name) == "sprank" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SPRank = value
@@ -431,16 +556,19 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 		}
 
-		psm.LocalizationRange = i.PTMResult.LocalizationPeptide
-
-		psm.MSFragerLocalization = i.PTMResult.LocalizationPeptide
-		psm.MSFraggerLocalizationScoreWithPTM = i.PTMResult.BestScoreWithPTM
-		psm.MSFraggerLocalizationScoreWithoutPTM = i.PTMResult.ScoreWithoutPTM
+		//psm.LocalizationRange = i.PTMResult.LocalizationPeptide
+		if len(i.PTMResult.LocalizationPeptide+i.PTMResult.BestScoreWithPTM+i.PTMResult.ScoreWithoutPTM) != 0 {
+			psm.MSFragerLoc = &MSFraggerLoc{
+				MSFragerLocalization:                 i.PTMResult.LocalizationPeptide,
+				MSFraggerLocalizationScoreWithPTM:    i.PTMResult.BestScoreWithPTM,
+				MSFraggerLocalizationScoreWithoutPTM: i.PTMResult.ScoreWithoutPTM}
+		}
 
 		// to be able to accept multiple entries with the same spectrum name, we fuse the
 		// file name to the spectrum name. This is going to be used as an identifiable attribute
 		// Before reporting the filtered PSMs, the file name is removed from the spectrum name.
-		psm.Spectrum = fmt.Sprintf("%s#%s", psm.Spectrum, FileName)
+		//psm.Spectrum = fmt.Sprintf("%s#%s", psm.Spectrum, FileName)
+		psm.Spectrum = string(sq.Spectrum)
 
 		psm.mapModsFromPepXML(i.ModificationInfo, mods)
 	}
@@ -452,7 +580,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods mod.Modifications) {
 
 	p.ModifiedPeptide = string(m.ModifiedPeptide)
-
+	pModificationsIndex := make(map[string]mod.Modification)
 	for _, i := range m.ModAminoacidMass {
 
 		aa := strings.Split(p.Peptide, "")
@@ -468,9 +596,9 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			m := v
 			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 			m.Index = newKey
-			m.Position = strconv.Itoa(i.Position)
-			m.IsobaricMods = make(map[string]float64)
-			p.Modifications.Index[newKey] = m
+			m.Position = i.Position
+			//m.IsobaricMods = make(map[string]float64)
+			pModificationsIndex[newKey] = m
 		} else {
 
 			v, ok = mods.Index[keyPlus]
@@ -478,9 +606,9 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 				m := v
 				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 				m.Index = newKey
-				m.Position = strconv.Itoa(i.Position)
-				m.IsobaricMods = make(map[string]float64)
-				p.Modifications.Index[newKey] = m
+				m.Position = i.Position
+				//m.IsobaricMods = make(map[string]float64)
+				pModificationsIndex[newKey] = m
 			}
 
 			v, ok = mods.Index[keyMinus]
@@ -488,9 +616,9 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 				m := v
 				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 				m.Index = newKey
-				m.Position = strconv.Itoa(i.Position)
-				m.IsobaricMods = make(map[string]float64)
-				p.Modifications.Index[newKey] = m
+				m.Position = i.Position
+				//m.IsobaricMods = make(map[string]float64)
+				pModificationsIndex[newKey] = m
 			}
 		}
 	}
@@ -502,8 +630,8 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "N-term"
-			m.IsobaricMods = make(map[string]float64)
-			p.Modifications.Index[key] = m
+			//m.IsobaricMods = make(map[string]float64)
+			pModificationsIndex[key] = m
 		}
 
 		// this rule was added because PTMProphet is changing the mod_nterm_mass
@@ -514,8 +642,8 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			if ok {
 				m := v
 				m.AminoAcid = "N-term"
-				m.IsobaricMods = make(map[string]float64)
-				p.Modifications.Index[key] = m
+				//m.IsobaricMods = make(map[string]float64)
+				pModificationsIndex[key] = m
 			}
 		}
 
@@ -528,25 +656,27 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "C-term"
-			m.IsobaricMods = make(map[string]float64)
-			p.Modifications.Index[key] = m
+			//m.IsobaricMods = make(map[string]float64)
+			pModificationsIndex[key] = m
 		}
 	}
 
 	// if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
 	key := fmt.Sprintf("%.4f", p.Massdiff)
-	_, ok := p.Modifications.Index[key]
+	_, ok := pModificationsIndex[key]
 	if !ok {
 		m := mod.Modification{
-			Index:        key,
-			Name:         "Unknown",
-			Type:         "Observed",
-			MassDiff:     p.Massdiff,
-			IsobaricMods: make(map[string]float64),
+			Index:    key,
+			Name:     "Unknown",
+			Type:     mod.Observed,
+			MassDiff: p.Massdiff,
+			//IsobaricMods: make(map[string]float64),
 		}
-		p.Modifications.Index[key] = m
+		pModificationsIndex[key] = m
 	}
-
+	if len(pModificationsIndex) != 0 {
+		p.Modifications = mod.Modifications{Index: pModificationsIndex}.ToSlice()
+	}
 }
 
 // getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
@@ -572,7 +702,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 
 // PromoteProteinIDs changes the identification in cases where the reference protein is a decoy and
 // the alternative proteins contains target proteins.
-func (p *PepXML) PromoteProteinIDs() {
+func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 
 	for i := range p.PeptideIdentification {
 
@@ -768,34 +898,14 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 }
 
-// Serialize converts the whle structure to a gob file
-func (p *PepXML) Serialize() {
-
-	b, e := msgpack.Marshal(&p)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.PepxmlBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-
+// Serialize converts the whole structure to a msgpack file
+func (p *PepXML4Serialiazation) Serialize() {
+	sys.Serialize(p, sys.PepxmlBin())
 }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (p *PepXML) Restore() {
-
-	b, e := ioutil.ReadFile(sys.PepxmlBin())
-	if e != nil {
-		msg.ReadFile(e, "warning")
-	}
-
-	e = msgpack.Unmarshal(b, &p)
-	if e != nil {
-		msg.DecodeMsgPck(e, "warning")
-	}
-
+	sys.Restore(p, sys.PepxmlBin(), false)
 }
 
 // Serialize converts the whle structure to a gob file
@@ -812,17 +922,24 @@ func (p *PepIDList) Serialize(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
 	}
+	sys.Serialize(p, dest)
+}
 
-	b, e := msgpack.Marshal(&p)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
+// Serialize converts the whle structure to a gob file
+func (p *PepIDListPtrs) Serialize(level string) {
+
+	var dest string
+
+	if level == "psm" {
+		dest = sys.PSMBin()
+	} else if level == "pep" {
+		dest = sys.PepBin()
+	} else if level == "ion" {
+		dest = sys.IonBin()
+	} else {
+		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
 	}
-
-	e = ioutil.WriteFile(dest, b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-
+	sys.Serialize(p, dest)
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -839,15 +956,5 @@ func (p *PepIDList) Restore(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
 	}
-
-	b, e := ioutil.ReadFile(dest)
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-
-	e = msgpack.Unmarshal(b, &p)
-	if e != nil {
-		msg.DecodeMsgPck(e, "fatal")
-	}
-
+	sys.Restore(p, dest, false)
 }

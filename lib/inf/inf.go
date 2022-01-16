@@ -20,7 +20,7 @@ type Peptide struct {
 	CalcNeutralPepMass       float64
 	Probability              float64
 	Weight                   float64
-	Spectra                  map[string]int
+	Spectra                  map[id.SpectrumType]int
 	MappedProteins           map[string]int
 	MappedProteinsWithDecoys map[string]int
 }
@@ -49,7 +49,7 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 			var p Peptide
 
 			p.IonForm = ionForm
-			p.Spectra = make(map[string]int)
+			p.Spectra = make(map[id.SpectrumType]int)
 			p.MappedProteins = make(map[string]int)
 			p.MappedProteinsWithDecoys = make(map[string]int)
 
@@ -100,7 +100,7 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 			obj := v
 
 			obj.Sequence = i.Peptide
-			obj.Spectra[i.Spectrum]++
+			obj.Spectra[i.SpectrumFileName()]++
 
 			obj.MappedProteins[i.Protein] = proteinTNP[i.Protein]
 			obj.MappedProteinsWithDecoys[i.Protein] = proteinTNP[i.Protein]

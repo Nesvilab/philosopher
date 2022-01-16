@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -21,44 +22,44 @@ import (
 // AssembleIonReport reports consist on ion reporting
 func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 
-	var list IonEvidenceList
-	var psmPtMap = make(map[string][]string)
-	var psmIonMap = make(map[string][]string)
-	var bestProb = make(map[string]float64)
+	var psmPtMap = make(map[id.IonFormType][]string)
+	var psmIonMap = make(map[id.IonFormType][]id.SpectrumType)
+	var bestProb = make(map[id.IonFormType]float64)
 
-	var ionMods = make(map[string][]mod.Modification)
+	var ionMods = make(map[id.IonFormType][]mod.Modification)
 
 	// collapse all psm to protein based on Peptide-level identifications
 	for _, i := range evi.PSM {
 
-		psmIonMap[i.IonForm] = append(psmIonMap[i.IonForm], i.Spectrum)
-		psmPtMap[i.Spectrum] = append(psmPtMap[i.Spectrum], i.Protein)
+		psmIonMap[i.IonForm()] = append(psmIonMap[i.IonForm()], i.SpectrumFileName())
+		//psmPtMap[i.SpectrumFileName()] = append(psmPtMap[i.SpectrumFileName()], i.Protein)
 
-		if i.Probability > bestProb[i.IonForm] {
-			bestProb[i.IonForm] = i.Probability
+		if i.Probability > bestProb[i.IonForm()] {
+			bestProb[i.IonForm()] = i.Probability
 		}
 
 		for j := range i.MappedProteins {
-			psmPtMap[i.IonForm] = append(psmPtMap[i.IonForm], j)
+			psmPtMap[i.IonForm()] = append(psmPtMap[i.IonForm()], j)
 		}
 
-		for _, j := range i.Modifications.Index {
-			ionMods[i.IonForm] = append(ionMods[i.IonForm], j)
+		for _, j := range i.Modifications.IndexSlice {
+			ionMods[i.IonForm()] = append(ionMods[i.IonForm()], j)
 		}
 
 	}
 
-	for _, i := range ion {
-		var pr IonEvidence
+	evi.Ions = make(IonEvidenceList, len(ion))
+	for idx, i := range ion {
+		pr := &evi.Ions[idx]
 
-		pr.IonForm = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
+		//pr.IonForm() = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 
-		pr.Spectra = make(map[string]int)
-		pr.MappedGenes = make(map[string]int)
+		pr.Spectra = make(map[id.SpectrumType]int)
+		pr.MappedGenes = make(map[string]struct{})
 		pr.MappedProteins = make(map[string]int)
-		pr.Modifications.Index = make(map[string]mod.Modification)
+		//pr.Modifications.Index = make(map[string]mod.Modification)
 
-		v, ok := psmIonMap[pr.IonForm]
+		v, ok := psmIonMap[pr.IonForm()]
 		if ok {
 			for _, j := range v {
 				pr.Spectra[j]++
@@ -76,59 +77,57 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.Protein = i.Protein
 		pr.MappedProteins[i.Protein] = 0
 		pr.Modifications = i.Modifications
-		pr.Probability = bestProb[pr.IonForm]
+		pr.Probability = bestProb[pr.IonForm()]
 
 		// get the mapped proteins
-		for _, j := range psmPtMap[pr.IonForm] {
+		for _, j := range psmPtMap[pr.IonForm()] {
 			pr.MappedProteins[j] = 0
 		}
-
-		mods, ok := ionMods[pr.IonForm]
-		if ok {
+		prModifications := pr.Modifications.ToMap()
+		if mods, ok := ionMods[pr.IonForm()]; ok {
 			for _, j := range mods {
-				_, okMod := pr.Modifications.Index[j.Index]
+				_, okMod := prModifications.Index[j.Index]
 				if !okMod {
-					pr.Modifications.Index[j.Index] = j
+					prModifications.Index[j.Index] = j
 				}
 			}
 		}
-
+		pr.Modifications = prModifications.ToSlice()
 		// is this bservation a decoy ?
 		if cla.IsDecoyPSM(i, decoyTag) {
 			pr.IsDecoy = true
 		}
 
-		list = append(list, pr)
 	}
 
-	sort.Sort(list)
-	evi.Ions = list
-
+	sort.Sort(evi.Ions)
 }
 
 // MetaIonReport reports consist on ion reporting
-func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi IonEvidenceList) MetaIonReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
+	bw := bufio.NewWriter(file)
 	if e != nil {
 		msg.WriteFile(errors.New("peptide ion output file"), "fatal")
 	}
 	defer file.Close()
+	defer bw.Flush()
 
 	// building the printing set tat may or not contain decoys
-	var printSet IonEvidenceList
-	for _, i := range evi.Ions {
+	var printSet []*IonEvidence
+	for idx, i := range evi {
 		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
 		if i.Probability > 0 {
 			if !hasDecoys {
 				if !i.IsDecoy {
-					printSet = append(printSet, i)
+					printSet = append(printSet, &evi[idx])
 				}
 			} else {
-				printSet = append(printSet, i)
+				printSet = append(printSet, &evi[idx])
 			}
 		}
 	}
@@ -212,14 +211,14 @@ func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDeco
 		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel18.Name, c18, -1)
 	}
 
-	_, e = io.WriteString(file, header)
+	_, e = io.WriteString(bw, header)
 	if e != nil {
 		msg.WriteToFile(errors.New("cannot print Ion to file"), "fatal")
 	}
 
 	for _, i := range printSet {
 
-		assL, obs := getModsList(i.Modifications.Index)
+		assL, obs := getModsList(i.Modifications.ToMap().Index)
 
 		var mappedProteins []string
 		for j := range i.MappedProteins {
@@ -243,8 +242,8 @@ func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDeco
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
-			i.PrevAA,
-			i.NextAA,
+			string(i.PrevAA),
+			string(i.NextAA),
 			len(i.Sequence),
 			i.MZ,
 			i.ChargeState,
@@ -372,7 +371,7 @@ func (evi Evidence) MetaIonReport(workspace, brand string, channels int, hasDeco
 
 		line += "\n"
 
-		_, e = io.WriteString(file, line)
+		_, e = io.WriteString(bw, line)
 		if e != nil {
 			msg.WriteToFile(errors.New("cannot print Ions to file"), "fatal")
 		}

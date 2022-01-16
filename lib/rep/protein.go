@@ -1,13 +1,13 @@
 package rep
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	"philosopher/lib/dat"
@@ -19,34 +19,30 @@ import (
 // AssembleProteinReport creates the post processed protein strcuture
 func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, decoyTag string) {
 
-	var list ProteinEvidenceList
-	var protMods = make(map[string][]mod.Modification)
-	var evidenceIons = make(map[string]IonEvidence)
-
-	for _, i := range evi.Ions {
-		evidenceIons[i.IonForm] = i
+	var protMods = make(map[id.IonFormType][]mod.Modification)
+	var evidenceIons = make(map[id.IonFormType]*IonEvidence)
+	for idx, i := range evi.Ions {
+		evidenceIons[i.IonForm()] = &evi.Ions[idx]
 	}
 
 	for _, i := range evi.PSM {
-		for _, j := range i.Modifications.Index {
-			protMods[i.IonForm] = append(protMods[i.IonForm], j)
+		for _, j := range i.Modifications.IndexSlice {
+			protMods[i.IonForm()] = append(protMods[i.IonForm()], j)
 		}
 	}
-
-	for _, i := range pro {
-
-		var rep ProteinEvidence
-
-		rep.SupportingSpectra = make(map[string]int)
-		rep.TotalPeptideIons = make(map[string]IonEvidence)
-		rep.IndiProtein = make(map[string]uint8)
-		rep.Modifications.Index = make(map[string]mod.Modification)
+	evi.Proteins = make(ProteinEvidenceList, len(pro))
+	for idx, i := range pro {
+		rep := &evi.Proteins[idx]
+		rep.SupportingSpectra = make(map[id.SpectrumType]int)
+		rep.TotalPeptideIons = make(map[id.IonFormType]IonEvidence)
+		rep.IndiProtein = make(map[string]struct{})
+		repModificationsIndex := make(map[string]mod.Modification)
 
 		rep.ProteinName = i.ProteinName
 		rep.Description = i.Description
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
-		rep.Length, _ = strconv.Atoi(i.Length)
+		rep.Length = i.Length
 		rep.Coverage = i.PercentCoverage
 		rep.UniqueStrippedPeptides = len(i.UniqueStrippedPeptides)
 		rep.Probability = i.Probability
@@ -63,21 +59,21 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		}
 
 		for j := range i.IndistinguishableProtein {
-			rep.IndiProtein[i.IndistinguishableProtein[j]] = 0
+			rep.IndiProtein[i.IndistinguishableProtein[j]] = struct{}{}
 		}
 
 		for _, k := range i.PeptideIons {
 
-			ion := fmt.Sprintf("%s#%d#%.4f", k.PeptideSequence, k.Charge, k.CalcNeutralPepMass)
+			//ion := fmt.Sprintf("%s#%d#%.4f", k.PeptideSequence, k.Charge, k.CalcNeutralPepMass)
+			ion := k.IonForm()
 
-			v, ok := evidenceIons[ion]
-			if ok {
+			if v, ok := evidenceIons[ion]; ok {
 
 				for spec := range v.Spectra {
 					rep.SupportingSpectra[spec]++
 				}
 
-				ref := v
+				ref := *v
 				ref.Weight = k.Weight
 				ref.GroupWeight = k.GroupWeight
 
@@ -86,7 +82,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				}
 				delete(ref.MappedProteins, i.ProteinName)
 
-				ref.Modifications = k.Modifications
+				ref.Modifications = k.Modifications.ToSlice()
 
 				if len(ref.MappedProteins) == 0 && ref.Weight >= weight {
 					ref.IsUnique = true
@@ -97,35 +93,34 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				if k.Razor == 1 {
 					ref.IsURazor = true
 				}
-
-				mods, ok := protMods[ion]
-				if ok {
+				refModifications := ref.Modifications.ToMap()
+				if mods, ok := protMods[ion]; ok {
 					for _, j := range mods {
-						_, okMod := ref.Modifications.Index[j.Index]
+						_, okMod := refModifications.Index[j.Index]
 						if !okMod && k.IsUnique {
-							ref.Modifications.Index[j.Index] = j
-							rep.Modifications.Index[j.Index] = j
+							refModifications.Index[j.Index] = j
+							repModificationsIndex[j.Index] = j
 						}
 
 						if !okMod && k.Razor == 1 {
-							ref.Modifications.Index[j.Index] = j
-							rep.Modifications.Index[j.Index] = j
+							refModifications.Index[j.Index] = j
+							repModificationsIndex[j.Index] = j
 						}
 					}
 				}
-
+				ref.Modifications = refModifications.ToSlice()
 				rep.TotalPeptideIons[ion] = ref
 
 			} else {
 
 				var ref IonEvidence
 				ref.MappedProteins = make(map[string]int)
-				ref.Spectra = make(map[string]int)
+				ref.Spectra = make(map[id.SpectrumType]int)
 
 				ref.Protein = i.ProteinName
 
 				ref.Sequence = k.PeptideSequence
-				ref.IonForm = ion
+				//ref.IonForm() = ion
 				ref.ModifiedSequence = k.ModifiedPeptide
 				ref.ChargeState = k.Charge
 				ref.Probability = k.InitialProbability
@@ -140,40 +135,40 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				}
 				delete(ref.MappedProteins, i.ProteinName)
 
-				ref.Modifications = k.Modifications
+				ref.Modifications = k.Modifications.ToSlice()
 
 				if len(ref.MappedProteins) == 0 && ref.Weight >= weight {
 					ref.IsUnique = true
 				} else {
 					ref.IsUnique = false
 				}
-
-				mods, ok := protMods[ion]
-				if ok {
+				refModifications := ref.Modifications.ToMap()
+				if mods, ok := protMods[ion]; ok {
 					for _, j := range mods {
-						_, okMod := ref.Modifications.Index[j.Index]
+						_, okMod := refModifications.Index[j.Index]
 						if !okMod && k.IsUnique {
-							ref.Modifications.Index[j.Index] = j
-							rep.Modifications.Index[j.Index] = j
+							refModifications.Index[j.Index] = j
+							repModificationsIndex[j.Index] = j
 						}
 
 						if !okMod && k.Razor == 1 {
-							ref.Modifications.Index[j.Index] = j
-							rep.Modifications.Index[j.Index] = j
+							refModifications.Index[j.Index] = j
+							repModificationsIndex[j.Index] = j
 						}
 					}
 				}
-
+				ref.Modifications = refModifications.ToSlice()
 				rep.TotalPeptideIons[ion] = ref
 			}
 
 		}
-
+		if len(repModificationsIndex) != 0 {
+			rep.Modifications = mod.Modifications{Index: repModificationsIndex}.ToSlice()
+		}
 		// if strings.Contains(rep.ProteinName, "Q8WXG9") {
 		// 	spew.Dump(rep)
 		// }
 
-		list = append(list, rep)
 	}
 
 	var dtb dat.Base
@@ -184,35 +179,36 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 
 	// fix the name sand headers and pull database information into protein report
-	for i := range list {
+	for i := range evi.Proteins {
+		pe := &evi.Proteins[i]
 		for _, j := range dtb.Records {
 
 			desc := strings.Replace(j.Description, "|", " ", -1)
 
 			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.Contains(j.OriginalHeader, desc) {
+			if strings.Contains(j.OriginalHeader, pe.ProteinName) && strings.Contains(j.OriginalHeader, desc) {
 
-				if (j.IsDecoy && list[i].IsDecoy) || (!j.IsDecoy && !list[i].IsDecoy) {
+				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
-					list[i].OriginalHeader = j.OriginalHeader
-					list[i].PartHeader = j.PartHeader
-					list[i].ProteinID = j.ID
-					list[i].EntryName = j.EntryName
-					list[i].ProteinExistence = j.ProteinExistence
-					list[i].GeneNames = j.GeneNames
-					list[i].Sequence = j.Sequence
-					list[i].ProteinName = j.ProteinName
-					list[i].Organism = j.Organism
+					pe.OriginalHeader = j.OriginalHeader
+					pe.PartHeader = j.PartHeader
+					pe.ProteinID = j.ID
+					pe.EntryName = j.EntryName
+					pe.ProteinExistence = j.ProteinExistence
+					pe.GeneNames = j.GeneNames
+					pe.Sequence = j.Sequence
+					pe.ProteinName = j.ProteinName
+					pe.Organism = j.Organism
 
 					// uniprot entries have the description on ProteinName
 					if len(j.Description) < 1 {
-						list[i].Description = j.ProteinName
+						pe.Description = j.ProteinName
 					} else {
-						list[i].Description = j.Description
+						pe.Description = j.Description
 					}
 
 					// updating the protein ions
-					for _, k := range list[i].TotalPeptideIons {
+					for _, k := range pe.TotalPeptideIons {
 						k.Protein = j.PartHeader
 						k.ProteinID = j.ID
 						k.GeneName = j.GeneNames
@@ -224,33 +220,33 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		}
 	}
 
-	sort.Sort(list)
-	evi.Proteins = list
+	sort.Sort(evi.Proteins)
 
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
+func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
 
 	// create result file
 	file, e := os.Create(output)
+	bw := bufio.NewWriter(file)
 	if e != nil {
 		msg.WriteFile(errors.New("cannot create protein report"), "error")
 	}
 	defer file.Close()
-
+	defer bw.Flush()
 	// building the printing set tat may or not contain decoys
-	var printSet ProteinEvidenceList
-	for _, i := range evi.Proteins {
+	var printSet []*ProteinEvidence
+	for idx, i := range eviProteins {
 		if !hasDecoys {
 			if !i.IsDecoy {
-				printSet = append(printSet, i)
+				printSet = append(printSet, &eviProteins[idx])
 			}
 		} else {
-			printSet = append(printSet, i)
+			printSet = append(printSet, &eviProteins[idx])
 		}
 	}
 
@@ -333,7 +329,7 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel18.Name, c18, -1)
 	}
 
-	_, e = io.WriteString(file, header)
+	_, e = io.WriteString(bw, header)
 	if e != nil {
 		msg.WriteToFile(e, "fatal")
 	}
@@ -345,7 +341,7 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 			ip = append(ip, k)
 		}
 
-		assL, obs := getModsList(i.Modifications.Index)
+		assL, obs := getModsList(i.Modifications.ToMap().Index)
 
 		// var uniqIons int
 		// for _, j := range i.TotalPeptideIons {
@@ -368,44 +364,47 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 		// change between Unique+Razor and Unique only based on parameter defined on labelquant
 		var reportIntensities [18]float64
 		if uniqueOnly || !hasRazor {
-			reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
-			reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
-			reportIntensities[2] = i.UniqueLabels.Channel3.Intensity
-			reportIntensities[3] = i.UniqueLabels.Channel4.Intensity
-			reportIntensities[4] = i.UniqueLabels.Channel5.Intensity
-			reportIntensities[5] = i.UniqueLabels.Channel6.Intensity
-			reportIntensities[6] = i.UniqueLabels.Channel7.Intensity
-			reportIntensities[7] = i.UniqueLabels.Channel8.Intensity
-			reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
-			reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
-			reportIntensities[10] = i.UniqueLabels.Channel11.Intensity
-			reportIntensities[11] = i.UniqueLabels.Channel12.Intensity
-			reportIntensities[12] = i.UniqueLabels.Channel13.Intensity
-			reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
-			reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
-			reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
-			reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
-			reportIntensities[17] = i.UniqueLabels.Channel18.Intensity
-
+			if i.UniqueLabels != nil {
+				reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
+				reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
+				reportIntensities[2] = i.UniqueLabels.Channel3.Intensity
+				reportIntensities[3] = i.UniqueLabels.Channel4.Intensity
+				reportIntensities[4] = i.UniqueLabels.Channel5.Intensity
+				reportIntensities[5] = i.UniqueLabels.Channel6.Intensity
+				reportIntensities[6] = i.UniqueLabels.Channel7.Intensity
+				reportIntensities[7] = i.UniqueLabels.Channel8.Intensity
+				reportIntensities[8] = i.UniqueLabels.Channel9.Intensity
+				reportIntensities[9] = i.UniqueLabels.Channel10.Intensity
+				reportIntensities[10] = i.UniqueLabels.Channel11.Intensity
+				reportIntensities[11] = i.UniqueLabels.Channel12.Intensity
+				reportIntensities[12] = i.UniqueLabels.Channel13.Intensity
+				reportIntensities[13] = i.UniqueLabels.Channel14.Intensity
+				reportIntensities[14] = i.UniqueLabels.Channel15.Intensity
+				reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
+				reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
+				reportIntensities[17] = i.UniqueLabels.Channel18.Intensity
+			}
 		} else {
-			reportIntensities[0] = i.URazorLabels.Channel1.Intensity
-			reportIntensities[1] = i.URazorLabels.Channel2.Intensity
-			reportIntensities[2] = i.URazorLabels.Channel3.Intensity
-			reportIntensities[3] = i.URazorLabels.Channel4.Intensity
-			reportIntensities[4] = i.URazorLabels.Channel5.Intensity
-			reportIntensities[5] = i.URazorLabels.Channel6.Intensity
-			reportIntensities[6] = i.URazorLabels.Channel7.Intensity
-			reportIntensities[7] = i.URazorLabels.Channel8.Intensity
-			reportIntensities[8] = i.URazorLabels.Channel9.Intensity
-			reportIntensities[9] = i.URazorLabels.Channel10.Intensity
-			reportIntensities[10] = i.URazorLabels.Channel11.Intensity
-			reportIntensities[11] = i.URazorLabels.Channel12.Intensity
-			reportIntensities[12] = i.URazorLabels.Channel13.Intensity
-			reportIntensities[13] = i.URazorLabels.Channel14.Intensity
-			reportIntensities[14] = i.URazorLabels.Channel15.Intensity
-			reportIntensities[15] = i.URazorLabels.Channel16.Intensity
-			reportIntensities[16] = i.URazorLabels.Channel17.Intensity
-			reportIntensities[17] = i.URazorLabels.Channel18.Intensity
+			if i.URazorLabels != nil {
+				reportIntensities[0] = i.URazorLabels.Channel1.Intensity
+				reportIntensities[1] = i.URazorLabels.Channel2.Intensity
+				reportIntensities[2] = i.URazorLabels.Channel3.Intensity
+				reportIntensities[3] = i.URazorLabels.Channel4.Intensity
+				reportIntensities[4] = i.URazorLabels.Channel5.Intensity
+				reportIntensities[5] = i.URazorLabels.Channel6.Intensity
+				reportIntensities[6] = i.URazorLabels.Channel7.Intensity
+				reportIntensities[7] = i.URazorLabels.Channel8.Intensity
+				reportIntensities[8] = i.URazorLabels.Channel9.Intensity
+				reportIntensities[9] = i.URazorLabels.Channel10.Intensity
+				reportIntensities[10] = i.URazorLabels.Channel11.Intensity
+				reportIntensities[11] = i.URazorLabels.Channel12.Intensity
+				reportIntensities[12] = i.URazorLabels.Channel13.Intensity
+				reportIntensities[13] = i.URazorLabels.Channel14.Intensity
+				reportIntensities[14] = i.URazorLabels.Channel15.Intensity
+				reportIntensities[15] = i.URazorLabels.Channel16.Intensity
+				reportIntensities[16] = i.URazorLabels.Channel17.Intensity
+				reportIntensities[17] = i.URazorLabels.Channel18.Intensity
+			}
 		}
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
@@ -549,7 +548,7 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 
 		line += "\n"
 
-		_, e = io.WriteString(file, line)
+		_, e = io.WriteString(bw, line)
 		if e != nil {
 			msg.WriteToFile(e, "fatal")
 		}
@@ -558,32 +557,33 @@ func (evi Evidence) MetaProteinReport(workspace, brand string, channels int, has
 }
 
 // ProteinFastaReport saves to disk a filtered FASTA file with FDR aproved proteins
-func (evi *Evidence) ProteinFastaReport(workspace string, hasDecoys bool) {
+func (eviProteins ProteinEvidenceList) ProteinFastaReport(workspace string, hasDecoys bool) {
 
 	output := fmt.Sprintf("%s%sprotein.fas", workspace, string(filepath.Separator))
 
 	file, e := os.Create(output)
+	bw := bufio.NewWriter(file)
 	if e != nil {
 		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
-
+	defer bw.Flush()
 	// building the printing set tat may or not contain decoys
-	var printSet ProteinEvidenceList
-	for _, i := range evi.Proteins {
+	var printSet []*ProteinEvidence
+	for idx, i := range eviProteins {
 		if !hasDecoys {
 			if !i.IsDecoy {
-				printSet = append(printSet, i)
+				printSet = append(printSet, &eviProteins[idx])
 			}
 		} else {
-			printSet = append(printSet, i)
+			printSet = append(printSet, &eviProteins[idx])
 		}
 	}
 
 	for _, i := range printSet {
 		header := i.OriginalHeader
 		line := ">" + header + "\n" + i.Sequence + "\n"
-		_, e = io.WriteString(file, line)
+		_, e = io.WriteString(bw, line)
 		if e != nil {
 			msg.WriteToFile(e, "fatal")
 		}

@@ -1,12 +1,10 @@
 package spc
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/xml"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-
 	"philosopher/lib/msg"
 
 	"github.com/rogpeppe/go-charset/charset"
@@ -56,17 +54,17 @@ func (p *PepXML) Parse(f string) {
 	if e != nil {
 		msg.ReadFile(e, "fatal")
 	}
-	defer xmlFile.Close()
-	b, _ := ioutil.ReadAll(xmlFile)
-
-	var mpa MsmsPipelineAnalysis
-
-	reader := bytes.NewReader(b)
+	reader := bufio.NewReader(xmlFile)
 	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = charset.NewReader
 
+	var mpa MsmsPipelineAnalysis
 	if e = decoder.Decode(&mpa); e != nil {
 		msg.DecodeMsgPck(e, "fatal")
+	}
+	err := xmlFile.Close()
+	if err != nil {
+		panic(err)
 	}
 
 	p.MsmsPipelineAnalysis = mpa
@@ -82,11 +80,10 @@ func (p *ProtXML) Parse(f string) {
 		msg.ReadFile(e, "fatal")
 	}
 	defer xmlFile.Close()
-	b, _ := ioutil.ReadAll(xmlFile)
 
 	var ps ProteinSummary
 
-	reader := bytes.NewReader(b)
+	reader := bufio.NewReader(xmlFile)
 	decoder := xml.NewDecoder(reader)
 	decoder.CharsetReader = charset.NewReader
 

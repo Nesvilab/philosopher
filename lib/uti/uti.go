@@ -191,14 +191,15 @@ func GetMaxNumber(list []string) string {
 
 // RemoveDuplicateStrings removes duplicates from a slice
 func RemoveDuplicateStrings(slice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-
+	keys := make(map[string]struct{}, len(slice))
+	list := make([]string, 0, len(slice))
 	for _, entry := range slice {
 		if _, value := keys[entry]; !value {
-			keys[entry] = true
+			keys[entry] = struct{}{}
 			list = append(list, entry)
 		}
 	}
-	return list
+	list2 := make([]string, len(list))
+	copy(list2, list)
+	return list2
 }

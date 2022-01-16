@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"philosopher/lib/mod"
 
 	"philosopher/lib/msg"
 	"philosopher/lib/obo"
@@ -25,7 +26,7 @@ func (evi *Evidence) MapMods() {
 	o := obo.NewUniModOntology()
 
 	for _, i := range evi.PSM {
-		for _, j := range i.Modifications.Index {
+		for _, j := range i.Modifications.IndexSlice {
 			modMap[j.MassDiff] = obo.Term{}
 		}
 	}
@@ -58,8 +59,8 @@ func (evi *Evidence) MapMods() {
 
 	for i := range evi.PSM {
 		// for fixed and variable modifications
-
-		for k, v := range evi.PSM[i].Modifications.Index {
+		mods := evi.PSM[i].Modifications.ToMap()
+		for k, v := range mods.Index {
 
 			obo, ok := modMap[v.MassDiff]
 			if ok {
@@ -70,20 +71,27 @@ func (evi *Evidence) MapMods() {
 					updatedMod.Name = obo.Name
 					updatedMod.Definition = obo.Definition
 					updatedMod.ID = obo.ID
-					updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					//updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					if updatedMod.IsobaricMods == nil {
+						updatedMod.IsobaricMods = make(map[string]float64)
+					}
 					updatedMod.IsobaricMods[obo.Name]++
-					evi.PSM[i].Modifications.Index[k] = updatedMod
+					mods.Index[k] = updatedMod
 				}
-				if updatedMod.Type == "Observed" {
+				if updatedMod.Type == mod.Observed {
 					updatedMod.Name = obo.Name
 					updatedMod.Definition = obo.Definition
 					updatedMod.ID = obo.ID
-					updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					//updatedMod.MonoIsotopicMass = obo.MonoIsotopicMass
+					if updatedMod.IsobaricMods == nil {
+						updatedMod.IsobaricMods = make(map[string]float64)
+					}
 					updatedMod.IsobaricMods[obo.Name] = obo.MonoIsotopicMass
-					evi.PSM[i].Modifications.Index[k] = updatedMod
+					mods.Index[k] = updatedMod
 				}
 			}
 		}
+		evi.PSM[i].Modifications = mods.ToSlice()
 	}
 }
 
@@ -127,12 +135,12 @@ func (evi *Evidence) AssembleModificationReport() {
 			// for assigned mods
 			// 0 here means something that doest not map to the pepXML header
 			// like multiple mods on n-term
-			for _, l := range evi.PSM[i].Modifications.Index {
+			for _, l := range evi.PSM[i].Modifications.IndexSlice {
 
 				if l.MassDiff > bins[j].LowerMass && l.MassDiff <= bins[j].HigherRight && l.MassDiff != 0 {
 					_, ok := assignChecklist[l.MassDiff]
 					if !ok {
-						if l.Type == "Assigned" {
+						if l.Type == mod.Assigned {
 							bins[j].AssignedMods = append(bins[j].AssignedMods, evi.PSM[i])
 							assignChecklist[l.MassDiff] = 0
 						}

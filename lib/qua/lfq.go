@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
+	"philosopher/lib/id"
 	"sort"
 	"strings"
 
@@ -37,35 +38,35 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 
 	logrus.Info("Indexing PSM information")
 
-	var psmMap = make(map[string]rep.PSMEvidence)
+	var psmMap = make(map[id.SpectrumType]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
-	var spectra = make(map[string][]string)
-	var ppmPrecision = make(map[string]float64)
+	var spectra = make(map[string][]id.SpectrumType)
+	var ppmPrecision = make(map[id.SpectrumType]float64)
 	var mzMap = make(map[string]float64)
 	var mzCVMap = make(map[string]string)
-	var minRT = make(map[string]float64)
-	var maxRT = make(map[string]float64)
-	var compVoltageMap = make(map[string]string)
-	var retentionTime = make(map[string]float64)
-	var intensity = make(map[string]float64)
-	var instensityCV = make(map[string]float64)
+	var minRT = make(map[id.SpectrumType]float64)
+	var maxRT = make(map[id.SpectrumType]float64)
+	var compVoltageMap = make(map[id.SpectrumType]string)
+	var retentionTime = make(map[id.SpectrumType]float64)
+	var intensity = make(map[id.SpectrumType]float64)
+	var instensityCV = make(map[id.SpectrumType]float64)
 
-	var charges = make(map[string]int)
+	var charges = make(map[id.SpectrumType]int)
 
 	// collect attributes from PSM
 	for _, i := range evi.PSM {
 		partName := strings.Split(i.Spectrum, ".")
 		sourceMap[partName[0]] = append(sourceMap[partName[0]], i)
-		spectra[partName[0]] = append(spectra[partName[0]], i.Spectrum)
+		spectra[partName[0]] = append(spectra[partName[0]], i.SpectrumFileName())
 
-		ppmPrecision[i.Spectrum] = tol / math.Pow(10, 6)
-		mzMap[i.Spectrum] = ((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge))
-		minRT[i.Spectrum] = (i.RetentionTime / 60) - rTWin
-		maxRT[i.Spectrum] = (i.RetentionTime / 60) + rTWin
-		retentionTime[i.Spectrum] = i.RetentionTime
-		compVoltageMap[i.Spectrum] = i.CompensationVoltage
-		charges[i.Spectrum] = int(i.AssumedCharge)
-		psmMap[i.Spectrum] = i
+		ppmPrecision[i.SpectrumFileName()] = tol / math.Pow(10, 6)
+		mzMap[i.SpectrumFileName().Str()] = ((i.PrecursorNeutralMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge))
+		minRT[i.SpectrumFileName()] = (i.RetentionTime / 60) - rTWin
+		maxRT[i.SpectrumFileName()] = (i.RetentionTime / 60) + rTWin
+		retentionTime[i.SpectrumFileName()] = i.RetentionTime
+		compVoltageMap[i.SpectrumFileName()] = i.CompensationVoltage
+		charges[i.SpectrumFileName()] = int(i.AssumedCharge)
+		psmMap[i.SpectrumFileName()] = i
 	}
 
 	// get a sorted list of spectrum names
@@ -117,11 +118,11 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		mappedPurity := calculateIonPurity(dir, format, mz, sourceMap[s])
 
 		for _, j := range mappedPurity {
-			v, ok := psmMap[j.Spectrum]
+			v, ok := psmMap[j.SpectrumFileName()]
 			if ok {
 				psm := v
 				psm.Purity = j.Purity
-				psmMap[j.Spectrum] = psm
+				psmMap[j.SpectrumFileName()] = psm
 			}
 		}
 
@@ -129,7 +130,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		if ok {
 			for _, j := range v {
 
-				measuredFaims, measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j])
+				measuredFaims, measured, retrieved := xic(mz.Spectra, minRT[j], maxRT[j], ppmPrecision[j], mzMap[j.Str()])
 
 				if retrieved {
 
@@ -168,13 +169,13 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		_, ok := spectra[partName[0]]
 		if ok {
 			if isFaims {
-				evi.PSM[i].Intensity = instensityCV[evi.PSM[i].Spectrum]
+				evi.PSM[i].Intensity = instensityCV[evi.PSM[i].SpectrumFileName()]
 			} else {
-				evi.PSM[i].Intensity = intensity[evi.PSM[i].Spectrum]
+				evi.PSM[i].Intensity = intensity[evi.PSM[i].SpectrumFileName()]
 			}
 		}
 
-		v, ok := psmMap[evi.PSM[i].Spectrum]
+		v, ok := psmMap[evi.PSM[i].SpectrumFileName()]
 		if ok {
 			evi.PSM[i].Purity = v.Purity
 		}
@@ -231,7 +232,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	}
 
 	var peptideIntMap = make(map[string]float64)
-	var ionIntMap = make(map[string]float64)
+	var ionIntMap = make(map[id.IonFormType]float64)
 
 	for _, i := range e.PSM {
 
@@ -244,13 +245,13 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 		}
 
 		// ion intensity : most intense ion
-		ionV, ok := ionIntMap[i.IonForm]
+		ionV, ok := ionIntMap[i.IonForm()]
 		if ok {
 			if i.Intensity > ionV {
-				ionIntMap[i.IonForm] = i.Intensity
+				ionIntMap[i.IonForm()] = i.Intensity
 			}
 		} else {
-			ionIntMap[i.IonForm] = i.Intensity
+			ionIntMap[i.IonForm()] = i.Intensity
 		}
 
 	}
@@ -263,7 +264,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	}
 
 	for i := range e.Ions {
-		v, ok := ionIntMap[e.Ions[i].IonForm]
+		v, ok := ionIntMap[e.Ions[i].IonForm()]
 		if ok {
 			e.Ions[i].Intensity = v
 		}
@@ -277,7 +278,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 		var razorInt []float64
 
 		for _, k := range e.Proteins[i].TotalPeptideIons {
-			v, ok := ionIntMap[k.IonForm]
+			v, ok := ionIntMap[k.IonForm()]
 			if ok {
 
 				totalInt = append(totalInt, v)

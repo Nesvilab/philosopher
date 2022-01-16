@@ -21,7 +21,7 @@ import (
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // Base main structure
@@ -361,17 +361,7 @@ func (d *Base) Serialize() {
 
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Base) Restore() {
-
-	b, e := ioutil.ReadFile(sys.DBBin())
-	if e != nil {
-		msg.MarshalFile(e, "warning")
-	}
-
-	e = msgpack.Unmarshal(b, &d)
-	if e != nil {
-		msg.SerializeFile(e, "warning")
-	}
-
+	sys.Restore(d, sys.DBBin(), false)
 }
 
 // RestoreWithPath reads philosopher results files and restore the data sctructure
@@ -379,15 +369,7 @@ func (d *Base) RestoreWithPath(p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
 	path, _ = filepath.Abs(path)
-
-	file, _ := os.Open(path)
-
-	dec := msgpack.NewDecoder(file)
-	e := dec.Decode(&d)
-	if e != nil {
-		msg.DecodeMsgPck(e, "fatal")
-	}
-
+	sys.Restore(d, path, false)
 }
 
 // reverseSeq returns its argument string reversed rune-wise left to right.

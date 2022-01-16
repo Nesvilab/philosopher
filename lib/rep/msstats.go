@@ -14,6 +14,9 @@ import (
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter
 func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys bool) {
+	if evi.PSM == nil {
+		RestorePSM(&evi.PSM)
+	}
 
 	var header string
 	output := fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
@@ -88,7 +91,7 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		fileName = fmt.Sprintf("%s.raw", parts[0])
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s",
-			i.Spectrum,
+			i.SpectrumFileName().Str(),
 			fileName,
 			i.Peptide,
 			i.ModifiedPeptide,
