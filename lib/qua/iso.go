@@ -564,11 +564,6 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
 				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
 
-				evi.Peptides[j].Labels.Channel16.Name = i.Channel16.Name
-				evi.Peptides[j].Labels.Channel16.CustomName = i.Channel16.CustomName
-				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
-				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
-
 				evi.Peptides[j].Labels.Channel17.Name = i.Channel17.Name
 				evi.Peptides[j].Labels.Channel17.CustomName = i.Channel17.CustomName
 				evi.Peptides[j].Labels.Channel17.Mz = i.Channel17.Mz
