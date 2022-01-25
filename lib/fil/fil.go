@@ -179,7 +179,7 @@ func Run(f met.Data) met.Data {
 
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
-		e.UpdateIonModCount()
+		//e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
 
