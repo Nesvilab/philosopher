@@ -189,8 +189,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 			desc := strings.Replace(j.Description, "|", " ", -1)
 
-			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-				//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.Contains(j.OriginalHeader, list[i].Description) {
+			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
+			if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.Contains(j.OriginalHeader, desc) {
 
 				if (j.IsDecoy && list[i].IsDecoy) || (!j.IsDecoy && !list[i].IsDecoy) {
 
