@@ -246,7 +246,7 @@ func Run(f met.Data) met.Data {
 
 		e = e.SyncPSMToProteins(f.Filter.Tag)
 
-		e.UpdateNumberOfEnzymaticTermini()
+		e.UpdateNumberOfEnzymaticTermini(f.Filter.Tag)
 	}
 
 	e = e.SyncPSMToPeptides(f.Filter.Tag)

@@ -22,7 +22,7 @@ type PeptideMap struct {
 
 // UpdateNumberOfEnzymaticTermini collects the NTT from ProteinProphet
 // and passes along to the final Protein structure.
-func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
+func (evi *Evidence) UpdateNumberOfEnzymaticTermini(decoyTag string) {
 
 	// restore the original prot.xml output
 	var p id.ProtIDList
@@ -33,7 +33,7 @@ func (evi *Evidence) UpdateNumberOfEnzymaticTermini() {
 
 	for _, i := range p {
 		for _, j := range i.PeptideIons {
-			if !strings.Contains(i.ProteinName, "rev_") {
+			if !strings.Contains(i.ProteinName, decoyTag) {
 				key := fmt.Sprintf("%s#%s", j.PeptideSequence, i.ProteinName)
 				nttPeptidetoProptein[key] = j.NumberOfEnzymaticTermini
 			}
