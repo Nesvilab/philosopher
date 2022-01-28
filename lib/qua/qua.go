@@ -526,7 +526,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
 			specName := strings.Split(i.Spectrum, ".")
-			fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm())
+			fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm().Str())
 			groupedPSMMap[fqn] = append(groupedPSMMap[fqn], i)
 		}
 

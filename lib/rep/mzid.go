@@ -219,7 +219,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 					//AvgMassDelta:          j.AverageMass,
 					//MonoIsotopicMassDelta: j.MonoIsotopicMass,
 					Residues: j.AminoAcid,
-					Location: string(j.Position),
+					Location: strconv.Itoa(j.Position),
 					CVParam: []psi.CVParam{
 						{
 							CVRef:     "UNIMOD",
