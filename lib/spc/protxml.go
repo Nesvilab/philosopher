@@ -22,16 +22,16 @@ type ProteinSummaryHeader struct {
 	XMLName                     xml.Name       `xml:"protein_summary_header"`
 	ReferenceDatabase           []byte         `xml:"reference_database,attr"`
 	ResidueSubstitutionList     []byte         `xml:"residue_substitution_list,attr"`
-	MinPeptideProbability       float32        `xml:"min_peptide_probability,attr"`
-	MinPeptideWeight            float32        `xml:"min_peptide_weight,attr"`
-	NumPredictedCorrectProteins float32        `xml:"num_predicted_correct_prots,attr"`
+	SampleEnzyme                []byte         `xml:"sample_enzyme,attr"`
 	NumInput1Spectra            uint32         `xml:"num_input_1_spectra,attr"`
 	NumInput2Spectra            uint32         `xml:"num_input_2_spectra,attr"`
 	NumInput3Spectra            uint32         `xml:"num_input_3_spectra,attr"`
 	NumInput4Spectra            uint32         `xml:"num_input_4_spectra,attr"`
 	NumInput5Spectra            uint32         `xml:"num_input_5_spectra,attr"`
 	TotalNumberSpectrumIDs      float32        `xml:"total_no_spectrum_ids,attr"`
-	SampleEnzyme                []byte         `xml:"sample_enzyme,attr"`
+	MinPeptideProbability       float32        `xml:"min_peptide_probability,attr"`
+	MinPeptideWeight            float32        `xml:"min_peptide_weight,attr"`
+	NumPredictedCorrectProteins float32        `xml:"num_predicted_correct_prots,attr"`
 	ProgramDetails              ProgramDetails `xml:"program_details"`
 }
 
@@ -68,21 +68,21 @@ type ProteinGroup struct {
 
 // Protein tag
 type Protein struct {
-	XMLName                         xml.Name                   `xml:"protein"`
-	ProteinName                     []byte                     `xml:"protein_name,attr"`
-	NumberIndistinguishableProteins int16                      `xml:"n_indistinguishable_proteins,attr"`
-	Probability                     float64                    `xml:"probability,attr"`
-	PercentCoverage                 float32                    `xml:"percent_coverage,attr"`
-	UniqueStrippedPeptides          []byte                     `xml:"unique_stripped_peptides,attr"`
-	GroupSiblingID                  []byte                     `xml:"group_sibling_id,attr"`
-	TotalNumberPeptides             int                        `xml:"total_number_peptides,attr"`
-	TotalNumberIndPeptides          int                        `xml:"total_number_distinct_peptides,attr"`
-	PctSpectrumIDs                  float32                    `xml:"pct_spectrum_ids,attr"`
+	XMLName                         xml.Name `xml:"protein"`
+	ProteinName                     []byte   `xml:"protein_name,attr"`
+	UniqueStrippedPeptides          []byte   `xml:"unique_stripped_peptides,attr"`
+	GroupSiblingID                  []byte   `xml:"group_sibling_id,attr"`
+	NumberIndistinguishableProteins int16    `xml:"n_indistinguishable_proteins,attr"`
+	TotalNumberPeptides             int      `xml:"total_number_peptides,attr"`
+	TotalNumberIndPeptides          int      `xml:"total_number_distinct_peptides,attr"`
+	PercentCoverage                 float32  `xml:"percent_coverage,attr"`
+	PctSpectrumIDs                  float32  `xml:"pct_spectrum_ids,attr"`
+	Probability                     float64  `xml:"probability,attr"`
+	TopPepProb                      float64
 	Parameter                       Parameter                  `xml:"parameter"`
 	Annotation                      Annotation                 `xml:"annotation"`
 	IndistinguishableProtein        []IndistinguishableProtein `xml:"indistinguishable_protein"`
 	Peptide                         []Peptide                  `xml:"peptide"`
-	TopPepProb                      float64
 	//Confidence                      float64                    `xml:"confidence,attr"`
 }
 
@@ -97,19 +97,19 @@ type IndistinguishableProtein struct {
 type Peptide struct {
 	XMLName                  xml.Name                   `xml:"peptide"`
 	PeptideSequence          []byte                     `xml:"peptide_sequence,attr"`
+	IsNondegenerateEvidence  []byte                     `xml:"is_nondegenerate_evidence,attr"`
+	IsContributingEvidence   []byte                     `xml:"is_contributing_evidence,attr"`
+	NEnzymaticTermini        uint8                      `xml:"n_enzymatic_termini,attr"`
 	Charge                   uint8                      `xml:"charge,attr"`
-	InitialProbability       float64                    `xml:"initial_probability,attr"`
+	NIstances                int                        `xml:"n_instances,attr"`
 	NSPAdjustedPprobability  float32                    `xml:"nsp_adjusted_probability,attr"`
 	FPKMAdjustedProbability  float32                    `xml:"fpkm_adjusted_probability,attr"`
-	Weight                   float64                    `xml:"weight,attr"`
-	GroupWeight              float64                    `xml:"group_weight,attr"`
-	IsNondegenerateEvidence  []byte                     `xml:"is_nondegenerate_evidence,attr"`
-	NEnzymaticTermini        uint8                      `xml:"n_enzymatic_termini,attr"`
 	NSiblingPeptides         float32                    `xml:"n_sibling_peptides,attr"`
 	NSiblingPeptidesBin      float32                    `xml:"n_sibling_peptides_bin,attr"`
-	NIstances                int                        `xml:"n_instances,attr"`
 	ExpTotInstances          float32                    `xml:"exp_tot_instances,attr"`
-	IsContributingEvidence   []byte                     `xml:"is_contributing_evidence,attr"`
+	Weight                   float64                    `xml:"weight,attr"`
+	GroupWeight              float64                    `xml:"group_weight,attr"`
+	InitialProbability       float64                    `xml:"initial_probability,attr"`
 	CalcNeutralPepMass       float64                    `xml:"calc_neutral_pep_mass,attr"`
 	ModificationInfo         ModificationInfo           `xml:"modification_info"`
 	PeptideParentProtein     []PeptideParentProtein     `xml:"peptide_parent_protein"`

@@ -164,19 +164,19 @@ type EnzymaticSearchConstraint struct {
 type AminoacidModification struct {
 	XMLName   xml.Name `xml:"aminoacid_modification"`
 	AminoAcid []byte   `xml:"aminoacid,attr"`
+	Variable  []byte   `xml:"variable,attr"`
 	MassDiff  float64  `xml:"massdiff,attr"`
 	Mass      float64  `xml:"mass,attr"`
-	Variable  []byte   `xml:"variable,attr"`
 }
 
 // TerminalModification tag
 type TerminalModification struct {
 	XMLName         xml.Name `xml:"terminal_modification"`
-	MassDiff        float64  `xml:"massdiff,attr"`
 	ProteinTerminus []byte   `xml:"protein_terminus,attr"`
-	Mass            float64  `xml:"mass,attr"`
 	Terminus        []byte   `xml:"terminus,attr"`
 	Variable        []byte   `xml:"variable,attr"`
+	Mass            float64  `xml:"mass,attr"`
+	MassDiff        float64  `xml:"massdiff,attr"`
 }
 
 // SpectrumQuery tag
@@ -184,15 +184,15 @@ type SpectrumQuery struct {
 	XMLName                          xml.Name     `xml:"spectrum_query"`
 	Spectrum                         []byte       `xml:"spectrum,attr"`
 	SpectrumNativeID                 []byte       `xml:"spectrumNativeID,attr"`
+	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
+	AssumedCharge                    uint8        `xml:"assumed_charge,attr"`
+	Index                            uint32       `xml:"index,attr"`
 	StartScan                        int          `xml:"start_scan,attr"`
 	EndScan                          int          `xml:"end_scan,attr"`
 	UncalibratedPrecursorNeutralMass float64      `xml:"uncalibrated_precursor_neutral_mass,attr"`
 	PrecursorNeutralMass             float64      `xml:"precursor_neutral_mass,attr"`
-	AssumedCharge                    uint8        `xml:"assumed_charge,attr"`
-	Index                            uint32       `xml:"index,attr"`
 	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr"`
 	IonMobility                      float64      `xml:"ion_mobility,attr"`
-	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
 	SearchResult                     SearchResult `xml:"search_result"`
 }
 
@@ -205,26 +205,26 @@ type SearchResult struct {
 // SearchHit tag
 type SearchHit struct {
 	XMLName             xml.Name             `xml:"search_hit"`
-	HitRank             uint8                `xml:"hit_rank,attr"`
 	Peptide             []byte               `xml:"peptide,attr"`
 	PrevAA              []byte               `xml:"peptide_prev_aa,attr"`
 	NextAA              []byte               `xml:"peptide_next_aa,attr"`
 	Protein             []byte               `xml:"protein,attr"`
 	ProteinDescr        []byte               `xml:"protein_descr,attr"`
+	TotalTerm           uint8                `xml:"num_tol_term,attr"`
+	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
+	HitRank             uint8                `xml:"hit_rank,attr"`
+	IsRejected          uint8                `xml:"is_rejected,attr"`
 	TotalProteins       uint16               `xml:"num_tot_proteins,attr"`
 	MatchedIons         uint16               `xml:"num_matched_ions,attr"`
 	TotalIons           uint16               `xml:"tot_num_ions,attr"`
+	MatchedPeptides     uint32               `xml:"num_matched_peptides,attr"`
 	CalcNeutralPepMass  float64              `xml:"calc_neutral_pep_mass,attr"`
 	Massdiff            float64              `xml:"massdiff,attr"`
-	TotalTerm           uint8                `xml:"num_tol_term,attr"`
-	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
-	MatchedPeptides     uint32               `xml:"num_matched_peptides,attr"`
-	IsRejected          uint8                `xml:"is_rejected,attr"`
-	Score               []SearchScore        `xml:"search_score"`
 	ModificationInfo    ModificationInfo     `xml:"modification_info"`
+	PTMResult           PTMResult            `xml:"ptm_result"`
+	Score               []SearchScore        `xml:"search_score"`
 	AnalysisResult      []AnalysisResult     `xml:"analysis_result"`
 	AlternativeProteins []AlternativeProtein `xml:"alternative_protein"`
-	PTMResult           PTMResult            `xml:"ptm_result"`
 }
 
 // AlternativeProtein tag
@@ -232,9 +232,9 @@ type AlternativeProtein struct {
 	XMLName     xml.Name `xml:"alternative_protein"`
 	Protein     []byte   `xml:"protein,attr"`
 	Description []byte   `xml:"protein_descr,attr"`
-	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
 	PepPrevAA   []byte   `xml:"peptide_prev_aa,attr"`
 	PepNextAA   []byte   `xml:"peptide_next_aa,attr"`
+	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
 }
 
 // AnalysisResult tag

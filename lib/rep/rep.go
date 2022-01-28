@@ -110,14 +110,8 @@ type SearchParametersEvidence struct {
 // PSMEvidence struct
 type PSMEvidence struct {
 	Source                               string
-	Index                                uint32
 	Spectrum                             string
 	SpectrumFile                         string
-	Scan                                 int
-	NumberOfEnzymaticTermini             int
-	NumberOfMissedCleavages              int
-	ProteinStart                         int
-	ProteinEnd                           int
 	PrevAA                               string
 	NextAA                               string
 	Peptide                              string
@@ -129,10 +123,18 @@ type PSMEvidence struct {
 	GeneName                             string
 	ModifiedPeptide                      string
 	CompensationVoltage                  string
-	MappedProteins                       map[string]int
-	MappedGenes                          map[string]int
+	LocalizationRange                    string
+	MSFragerLocalization                 string
+	MSFraggerLocalizationScoreWithPTM    string
+	MSFraggerLocalizationScoreWithoutPTM string
 	AssumedCharge                        uint8
 	HitRank                              uint8
+	Index                                uint32
+	Scan                                 int
+	NumberOfEnzymaticTermini             int
+	NumberOfMissedCleavages              int
+	ProteinStart                         int
+	ProteinEnd                           int
 	UncalibratedPrecursorNeutralMass     float64
 	PrecursorNeutralMass                 float64
 	PrecursorExpMass                     float64
@@ -140,12 +142,6 @@ type PSMEvidence struct {
 	CalcNeutralPepMass                   float64
 	RawMassdiff                          float64
 	Massdiff                             float64
-	LocalizedPTMSites                    map[string]int
-	LocalizedPTMMassDiff                 map[string]string
-	LocalizationRange                    string
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
 	Probability                          float64
 	Expectation                          float64
 	Xcorr                                float64
@@ -159,6 +155,10 @@ type PSMEvidence struct {
 	Intensity                            float64
 	IonMobility                          float64
 	Purity                               float64
+	MappedProteins                       map[string]int
+	MappedGenes                          map[string]int
+	LocalizedPTMSites                    map[string]int
+	LocalizedPTMMassDiff                 map[string]string
 	IsDecoy                              bool
 	IsUnique                             bool
 	IsURazor                             bool
@@ -185,13 +185,15 @@ type IonEvidence struct {
 	IonForm                  string
 	ModifiedSequence         string
 	RetentionTime            string
-	ChargeState              uint8
-	NumberOfEnzymaticTermini uint8
 	PrevAA                   string
 	NextAA                   string
-	Spectra                  map[string]int
-	MappedProteins           map[string]int
-	MappedGenes              map[string]int
+	Protein                  string
+	ProteinID                string
+	GeneName                 string
+	EntryName                string
+	ProteinDescription       string
+	ChargeState              uint8
+	NumberOfEnzymaticTermini uint8
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -204,11 +206,9 @@ type IonEvidence struct {
 	IsUnique                 bool
 	IsURazor                 bool
 	IsDecoy                  bool
-	Protein                  string
-	ProteinID                string
-	GeneName                 string
-	EntryName                string
-	ProteinDescription       string
+	Spectra                  map[string]int
+	MappedProteins           map[string]int
+	MappedGenes              map[string]int
 	Labels                   iso.Labels
 	PhosphoLabels            iso.Labels
 	Modifications            mod.Modifications
@@ -230,8 +230,6 @@ func RemoveIonsByIndex(s []IonEvidence, i int) []IonEvidence {
 // PeptideEvidence groups all valid info about peptide ions for reports
 type PeptideEvidence struct {
 	Sequence               string
-	ChargeState            map[uint8]uint8
-	Spectra                map[string]uint8
 	PrevAA                 string
 	NextAA                 string
 	Protein                string
@@ -239,16 +237,18 @@ type PeptideEvidence struct {
 	GeneName               string
 	EntryName              string
 	ProteinDescription     string
-	MappedProteins         map[string]int
-	MappedGenes            map[string]int
 	Spc                    int
-	Intensity              float64
-	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	Intensity              float64
+	Probability            float64
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
+	ChargeState            map[uint8]uint8
+	Spectra                map[string]uint8
+	MappedProteins         map[string]int
+	MappedGenes            map[string]int
 	Labels                 iso.Labels
 	PhosphoLabels          iso.Labels
 	Modifications          mod.Modifications
@@ -272,27 +272,21 @@ type ProteinEvidence struct {
 	OriginalHeader         string
 	PartHeader             string
 	ProteinName            string
-	ProteinGroup           uint32
 	ProteinSubGroup        string
 	ProteinID              string
 	EntryName              string
 	Description            string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Sequence               string
-	SupportingSpectra      map[string]int
-	IndiProtein            map[string]uint8
+	ProteinGroup           uint32
+	Length                 int
 	UniqueStrippedPeptides int
-	TotalPeptideIons       map[string]IonEvidence
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
-	TotalPeptides          map[string]int
-	UniquePeptides         map[string]int
-	URazorPeptides         map[string]int // Unique + razor
+	Coverage               float32
 	TotalIntensity         float64
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
@@ -300,6 +294,12 @@ type ProteinEvidence struct {
 	TopPepProb             float64
 	IsDecoy                bool
 	IsContaminant          bool
+	IndiProtein            map[string]uint8
+	SupportingSpectra      map[string]int
+	TotalPeptides          map[string]int
+	UniquePeptides         map[string]int
+	URazorPeptides         map[string]int // Unique + razor
+	TotalPeptideIons       map[string]IonEvidence
 	TotalLabels            iso.Labels
 	UniqueLabels           iso.Labels
 	URazorLabels           iso.Labels // Unique + razor
@@ -318,24 +318,23 @@ func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[
 
 // CombinedProteinEvidence represents all combined proteins detected
 type CombinedProteinEvidence struct {
-	GroupNumber            uint32
 	SiblingID              string
 	ProteinName            string
 	ProteinID              string
-	IndiProtein            []string
 	EntryName              string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Description            string
+	IndiProtein            []string
 	Names                  []string
+	GroupNumber            uint32
+	Length                 int
 	UniqueStrippedPeptides int
-	SupportingSpectra      map[string]string
+	Coverage               float32
 	ProteinProbability     float64
 	TopPepProb             float64
-	PeptideIons            []id.PeptideIonIdentification
+	SupportingSpectra      map[string]string
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
@@ -348,6 +347,7 @@ type CombinedProteinEvidence struct {
 	TotalLabels            map[string]iso.Labels
 	UniqueLabels           map[string]iso.Labels
 	URazorLabels           map[string]iso.Labels // Unique + razor
+	PeptideIons            []id.PeptideIonIdentification
 }
 
 // CombinedProteinEvidenceList is a list of Combined Protein Evidences
@@ -359,13 +359,13 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	BestPSM            float64
 	Sequence           string
 	Protein            string
 	ProteinID          string
 	EntryName          string
 	Gene               string
 	ProteinDescription string
+	BestPSM            float64
 	ChargeStates       map[uint8]uint8
 	AssignedMassDiffs  map[string]uint8
 	Spc                map[string]int

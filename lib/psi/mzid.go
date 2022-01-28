@@ -223,11 +223,11 @@ type Modification struct {
 // by another (amino acid change)
 type SubstitutionModification struct {
 	XMLName               xml.Name `xml:"SubstitutionModification"`
-	AvgMassDelta          float64  `xml:"avgMassDelta,attr,omitempty"`
-	Location              int      `xml:"location,attr,omitempty"`
-	MonoisotopicMassDelta float64  `xml:"monoisotopicMassDelta,attr,omitempty"`
 	OriginalResidue       string   `xml:"originalResidue,attr,omitempty"`
 	ReplacementResidue    string   `xml:"replacementResidue,attr,omitempty"`
+	AvgMassDelta          float64  `xml:"avgMassDelta,attr,omitempty"`
+	MonoisotopicMassDelta float64  `xml:"monoisotopicMassDelta,attr,omitempty"`
+	Location              int      `xml:"location,attr,omitempty"`
 }
 
 // PeptideEvidence  links a specific Peptide element to a specific position in a
@@ -236,7 +236,6 @@ type SubstitutionModification struct {
 type PeptideEvidence struct {
 	XMLName             xml.Name    `xml:"PeptideEvidence"`
 	DBSequenceRef       string      `xml:"dBSequence_ref,attr,omitempty"`
-	End                 int         `xml:"end,attr,omitempty"`
 	Frame               string      `xml:"frame,attr,omitempty"`
 	ID                  string      `xml:"id,attr,omitempty"`
 	IsDecoy             string      `xml:"isDecoy,attr,omitempty"`
@@ -246,6 +245,7 @@ type PeptideEvidence struct {
 	Pre                 string      `xml:"pre,attr,omitempty"`
 	Start               string      `xml:"start,attr,omitempty"`
 	TranslationTableRef string      `xml:"translationTable_ref,attr,omitempty"`
+	End                 int         `xml:"end,attr,omitempty"`
 	CVParam             []CVParam   `xml:"cvParam"`
 	UserParam           []UserParam `xml:"userParam"`
 }
