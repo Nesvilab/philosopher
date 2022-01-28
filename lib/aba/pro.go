@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	"philosopher/lib/iso"
@@ -196,7 +195,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 				ce.SupportingSpectra = make(map[string]string)
 				ce.ProteinName = j.ProteinName
-				ce.Length, _ = strconv.Atoi(j.Length)
+				ce.Length = j.Length
 				ce.Coverage = j.PercentCoverage
 				ce.GroupNumber = j.GroupNumber
 				ce.SiblingID = j.GroupSiblingID
@@ -312,9 +311,9 @@ func getProteinLabelIntensities(combined rep.CombinedProteinEvidenceList, datase
 		for i := range combined {
 			for _, j := range v.Proteins {
 				if combined[i].ProteinID == j.ProteinID && !strings.Contains(j.OriginalHeader, decoyTag) {
-					combined[i].TotalLabels[k] = j.TotalLabels
-					combined[i].UniqueLabels[k] = j.UniqueLabels
-					combined[i].URazorLabels[k] = j.URazorLabels
+					combined[i].TotalLabels[k] = *j.TotalLabels
+					combined[i].UniqueLabels[k] = *j.UniqueLabels
+					combined[i].URazorLabels[k] = *j.URazorLabels
 					break
 				}
 			}
@@ -330,9 +329,9 @@ func sumProteinIntensities(combined rep.CombinedProteinEvidenceList, datasets ma
 
 	for k, v := range datasets {
 
-		var ions = make(map[string]float64)
+		var ions = make(map[id.IonFormType]float64)
 		for _, i := range v.Ions {
-			ions[i.IonForm] = i.Intensity
+			ions[i.IonForm()] = i.Intensity
 		}
 
 		for _, i := range combined {

@@ -3,10 +3,10 @@ package id
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"philosopher/lib/iso"
@@ -18,7 +18,6 @@ import (
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
 )
 
 // ProtXML struct
@@ -38,43 +37,56 @@ type GroupIdentification struct {
 
 // ProteinIdentification struct
 type ProteinIdentification struct {
-	GroupNumber              uint32
-	GroupSiblingID           string
-	ProteinName              string
-	Description              string
-	UniqueStrippedPeptides   []string
-	Length                   string
-	PercentCoverage          float32
-	PctSpectrumIDs           float32
-	GroupProbability         float64
-	Probability              float64
-	Confidence               float64
+	GroupNumber            uint32
+	GroupSiblingID         string
+	ProteinName            string
+	Description            string
+	UniqueStrippedPeptides []string
+	Length                 int
+	PercentCoverage        float32
+	//PctSpectrumIDs         float32
+	//GroupProbability         float64
+	Probability float64
+	//Confidence               float64
 	TopPepProb               float64
 	IndistinguishableProtein []string
 	TotalNumberPeptides      int
 	PeptideIons              []PeptideIonIdentification
-	HasRazor                 bool
 	Picked                   int
+	HasRazor                 bool
 }
 
 // PeptideIonIdentification struct
 type PeptideIonIdentification struct {
-	PeptideSequence          string
-	ModifiedPeptide          string
-	Charge                   uint8
-	InitialProbability       float64
-	Weight                   float64
-	GroupWeight              float64
-	CalcNeutralPepMass       float64
-	NumberOfEnzymaticTermini uint8
-	NumberOfInstances        int
-	SharedParentProteins     int
-	Razor                    int
-	IsNondegenerateEvidence  bool
-	IsUnique                 bool
+	PeptideSequence    string
+	ModifiedPeptide    string
+	InitialProbability float64
+	Weight             float64
+	GroupWeight        float64
+	CalcNeutralPepMass float64
+	//NumberOfInstances        int
+	//SharedParentProteins    int
+	//IsNondegenerateEvidence bool
 	PeptideParentProtein     []string
-	Labels                   iso.Labels
+	Labels                   *iso.Labels
 	Modifications            mod.Modifications
+	Razor                    int
+	NumberOfEnzymaticTermini uint8
+	Charge                   uint8
+	IsUnique                 bool
+}
+type IonFormType struct {
+	Peptide            string
+	CalcNeutralPepMass float32
+	AssumedCharge      uint8
+}
+
+func (e PeptideIonIdentification) IonForm() IonFormType {
+	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.CalcNeutralPepMass), 32)
+	if err != nil {
+		panic(err)
+	}
+	return IonFormType{e.PeptideSequence, float32(t), e.Charge}
 }
 
 // GroupList represents a protein group list
@@ -120,7 +132,7 @@ func (p *ProtXML) Read(f string) {
 			// correcting group probabilities
 			if jindex == 0 {
 				if i.Probability == 1 && j.Probability == 0 {
-					j.Probability = float64(i.Probability)
+					j.Probability = i.Probability
 					break
 				}
 			}
@@ -128,19 +140,23 @@ func (p *ProtXML) Read(f string) {
 			var ptid ProteinIdentification
 
 			ptid.GroupNumber = i.GroupNumber
-			ptid.GroupProbability = i.Probability
+			//ptid.GroupProbability = i.Probability
 			ptid.Probability = i.Probability
 			ptid.ProteinName = string(j.ProteinName)
 			ptid.Description = string(j.Annotation.ProteinDescription)
 			ptid.Probability = j.Probability
 			ptid.PercentCoverage = j.PercentCoverage
-			ptid.PctSpectrumIDs = j.PctSpectrumIDs
+			//ptid.PctSpectrumIDs = j.PctSpectrumIDs
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 			ptid.TopPepProb = 0
 
 			if strings.EqualFold(j.Parameter.Name, "prot_length") {
-				ptid.Length = j.Parameter.Value
+				l, e := strconv.Atoi(j.Parameter.Value)
+				if e != nil {
+					panic(e)
+				}
+				ptid.Length = l
 			}
 
 			// collect indistinguishable proteins (Protein to Protein equivalency)
@@ -161,17 +177,17 @@ func (p *ProtXML) Read(f string) {
 				pepid.Weight = k.Weight
 				pepid.GroupWeight = k.GroupWeight
 				pepid.CalcNeutralPepMass = k.CalcNeutralPepMass
-				pepid.SharedParentProteins = len(k.PeptideParentProtein)
+				//pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Modifications.Index = make(map[string]mod.Modification)
-				pepid.NumberOfInstances = k.NIstances
+				//pepid.NumberOfInstances = k.NIstances
 				pepid.NumberOfEnzymaticTermini = k.NEnzymaticTermini
 				pepid.Razor = -1
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
-					pepid.IsNondegenerateEvidence = true
+					//pepid.IsNondegenerateEvidence = true
 					pepid.IsUnique = true
 				} else {
-					pepid.IsNondegenerateEvidence = false
+					//pepid.IsNondegenerateEvidence = false
 					pepid.IsUnique = false
 				}
 
@@ -260,16 +276,7 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 
 // Serialize converts the whle structure to a gob file
 func (p *ProtIDList) Serialize() {
-
-	b, e := msgpack.Marshal(&p)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
-	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
+	sys.Serialize(p, sys.ProBin())
 }
 
 // SerializeToTemp converts the whle structure to a gob file and puts in a specific data set folder
@@ -291,32 +298,12 @@ func (p *ProtIDList) SerializeToTemp() string {
 		log.Fatal(e)
 	}
 
-	b, e := msgpack.Marshal(&p)
-	if e != nil {
-		msg.MarshalFile(e, "fatal")
-	}
-
 	dest := fmt.Sprintf("%s%spro.bin", m.Temp, string(filepath.Separator))
-
-	e = ioutil.WriteFile(dest, b, sys.FilePermission())
-	if e != nil {
-		msg.WriteFile(e, "fatal")
-	}
-
+	sys.Serialize(p, dest)
 	return dest
 }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (p *ProtIDList) Restore() {
-
-	b, e := ioutil.ReadFile(sys.ProBin())
-	if e != nil {
-		msg.ReadFile(e, "fatal")
-	}
-
-	e = msgpack.Unmarshal(b, &p)
-	if e != nil {
-		msg.DecodeMsgPck(e, "fatal")
-	}
-
+	sys.Restore(p, sys.ProBin(), false)
 }

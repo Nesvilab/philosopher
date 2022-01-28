@@ -1,8 +1,10 @@
 package sys
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"github.com/vmihailenco/msgpack/v5"
 	"io"
 	"os"
 	"os/exec"
@@ -228,4 +230,49 @@ func Arch386() string {
 func FilePermission() os.FileMode {
 	//return 0644
 	return 0755
+}
+
+func Serialize(v interface{}, filename string) {
+	output, e := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, FilePermission())
+	if e != nil {
+		msg.WriteFile(e, "fatal")
+		panic(e)
+	}
+	bo := bufio.NewWriter(output)
+	enc := msgpack.NewEncoder(bo)
+	enc.UseInternedStrings(true)
+	err := enc.Encode(&v)
+	errFlush := bo.Flush()
+	if errFlush != nil {
+		msg.MarshalFile(errFlush, "fatal")
+		panic(errFlush)
+	}
+	_ = output.Close()
+	if err != nil {
+		msg.MarshalFile(err, "fatal")
+		panic(err)
+	}
+}
+
+func Restore(v interface{}, filename string, silent bool) {
+	input, e := os.Open(filename)
+	if e != nil && silent {
+		return
+	}
+	if e != nil {
+		msg.ReadFile(e, "fatal")
+		panic(e)
+	}
+	bi := bufio.NewReader(input)
+	dec := msgpack.NewDecoder(bi)
+	dec.UseInternedStrings(true)
+	err := dec.Decode(&v)
+	errClose := input.Close()
+	if errClose != nil {
+		panic(errClose)
+	}
+	if err != nil && !silent {
+		msg.DecodeMsgPck(e, "fatal")
+		panic(e)
+	}
 }

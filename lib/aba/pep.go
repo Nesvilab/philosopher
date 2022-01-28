@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"philosopher/lib/mod"
 	"sort"
 	"strconv"
 	"strings"
@@ -104,9 +105,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 // processPeptideCombinedFile reads and filter the combined peptide report
 func processPeptideCombinedFile(a met.Abacus) {
 
-	var pepID id.PepIDList
-	var filteredPeptides id.PepIDList
-
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
 		msg.NoParametersFound(errors.New("cannot find the combined.pep.xml file"), "fatal")
@@ -116,13 +114,12 @@ func processPeptideCombinedFile(a met.Abacus) {
 		var pep id.PepXML
 		pep.DecoyTag = a.Tag
 
-		pepID, _ = id.ReadPepXMLInput("combined.pep.xml", a.Tag, sys.GetTemp(), false)
-
+		pepID, _ := id.ReadPepXMLInput("combined.pep.xml", a.Tag, sys.GetTemp(), false)
 		//uniqPsms := fil.GetUniquePSMs(pepID)
 		uniqPeps := fil.GetUniquePeptides(pepID)
 
 		//filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ = fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
 		filteredPeptides.Serialize("pep")
 
 	}
@@ -179,8 +176,8 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 
 		for _, j := range evi.Peptides {
 
-			for _, k := range j.Modifications.Index {
-				if k.Type == "Assigned" {
+			for _, k := range j.Modifications.IndexSlice {
+				if k.Type == mod.Assigned {
 					mass := strconv.FormatFloat(k.MassDiff, 'f', 6, 64)
 					ModsMap[j.Sequence] = append(ModsMap[j.Sequence], mass)
 				}

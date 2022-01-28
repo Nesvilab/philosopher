@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
@@ -23,7 +24,6 @@ import (
 func Run(f met.Data) met.Data {
 
 	e := rep.New()
-	var pepxml id.PepXML
 	var pep id.PepIDList
 	var pro id.ProtIDList
 
@@ -99,11 +99,13 @@ func Run(f met.Data) met.Data {
 			processProteinInferenceIdentifications(pepid, razorMap, coverMap, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
 	}
-
+	var pepxml id.PepXML
 	pepxml.Restore()
+	// restoring for the modifications
+	e.Mods = pepxml.Modifications
+	e.AssembleSearchParameters(pepxml.SearchParameters)
 
 	if f.Filter.Seq {
-
 		// sequential analysis
 		// filtered psm list and filtered prot list
 		pep.Restore("psm")
@@ -123,6 +125,8 @@ func Run(f met.Data) met.Data {
 	// if len(dtb.Records) < 1 {
 	// 	msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
 	// }
+
+	os.RemoveAll(sys.PepxmlBin())
 
 	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
 		var psm id.PepIDList
@@ -145,12 +149,6 @@ func Run(f met.Data) met.Data {
 	}
 
 	logrus.Info("Post processing identifications")
-
-	// restoring for the modifications
-	e.Mods = pepxml.Modifications
-	e.AssembleSearchParameters(pepxml.SearchParameters)
-	pepxml = id.PepXML{}
-	os.RemoveAll(sys.PepxmlBin())
 
 	var psm id.PepIDList
 	psm.Restore("psm")
@@ -176,7 +174,6 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
-
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
 		//e.UpdateIonModCount()
@@ -219,7 +216,7 @@ func Run(f met.Data) met.Data {
 				e.PSM[i].IsURazor = true
 				e.PSM[i].IsUnique = true
 
-				e.PSM[i].MappedGenes = make(map[string]int)
+				e.PSM[i].MappedGenes = make(map[string]struct{})
 			}
 
 			if strings.Contains(e.PSM[i].Protein, f.Filter.Tag) {
@@ -229,7 +226,6 @@ func Run(f met.Data) met.Data {
 
 		razor = nil
 	}
-
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
 		logrus.Info("Processing protein inference")
@@ -244,13 +240,11 @@ func Run(f met.Data) met.Data {
 
 		logrus.Info("Synchronizing PSMs and proteins")
 
-		e = e.SyncPSMToProteins(f.Filter.Tag)
+		e.SyncPSMToProteins(f.Filter.Tag)
 
 		e.UpdateNumberOfEnzymaticTermini(f.Filter.Tag)
 	}
-
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
-
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
 	var countPSM, countPep, countIon, coutProtein int
@@ -284,7 +278,6 @@ func Run(f met.Data) met.Data {
 		"ions":     countIon,
 		"proteins": coutProtein,
 	}).Info("Total report numbers after FDR filtering, and post-processing")
-
 	logrus.Info("Saving")
 	e.SerializeGranular()
 
@@ -292,7 +285,7 @@ func Run(f met.Data) met.Data {
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, peptide, ion float64) (float64, float64, float64) {
+func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
@@ -344,13 +337,16 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, p
 	}).Info("Database search results")
 
 	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
-	filteredPSM.Serialize("psm")
+	wg := sync.WaitGroup{}
+	wg.Add(3)
+	go func() { defer wg.Done(); filteredPSM.Serialize("psm") }()
 
 	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
-	filteredPeptides.Serialize("pep")
+	go func() { defer wg.Done(); filteredPeptides.Serialize("pep") }()
 
 	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
-	filteredIons.Serialize("ion")
+	go func() { defer wg.Done(); filteredIons.Serialize("ion") }()
+	wg.Wait()
 
 	// sug-group FDR filtering
 	if len(mods) > 0 {
@@ -360,7 +356,7 @@ func processPeptideIdentifications(p id.PepIDList, decoyTag, mods string, psm, p
 	return psmThreshold, peptideThreshold, ionThreshold
 }
 
-func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, decoyTag, mods string) {
+func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag, mods string) {
 
 	// unmodified = no ptms
 	// defined = only the ptms defined, nothing else
@@ -368,9 +364,9 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 
 	logrus.Info("Separating PSMs based on the modification profile")
 
-	unModPSMs := make(map[string]id.PepIDList)
-	definedModPSMs := make(map[string]id.PepIDList)
-	restModPSMs := make(map[string]id.PepIDList)
+	unModPSMs := make(map[string]id.PepIDListPtrs)
+	definedModPSMs := make(map[string]id.PepIDListPtrs)
+	restModPSMs := make(map[string]id.PepIDListPtrs)
 
 	modsMap := make(map[string]string)
 
@@ -380,45 +376,45 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 		modsMap[i] = m[0]
 	}
 
-	exclusionList := make(map[string]uint8)
-	psmsWithOtherPTMs := make(map[string]id.PepIDList)
+	exclusionList := make(map[id.SpectrumType]uint8)
+	psmsWithOtherPTMs := make(map[id.SpectrumType]id.PepIDListPtrs)
 
 	for k, v := range uniqPsms {
 
 		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
 
 			unModPSMs[k] = v
-			exclusionList[v[0].Spectrum] = 0
+			exclusionList[v[0].SpectrumFileName()] = 0
 
 		} else {
 
 			// if PSM contains other mods than the ones defined by the flag, mark them to be ignored
-			for _, i := range v[0].Modifications.Index {
-				if i.Variable == "Y" {
+			for _, i := range v[0].Modifications.IndexSlice {
+				if i.Variable {
 					m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
 					_, ok := modsMap[m]
 					if !ok {
-						psmsWithOtherPTMs[v[0].Spectrum] = v
+						psmsWithOtherPTMs[v[0].SpectrumFileName()] = v
 					}
 				}
 			}
 
 			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
 			// and mark it for being excluded from rest
-			for _, i := range v[0].Modifications.Index {
+			for _, i := range v[0].Modifications.IndexSlice {
 				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
 				aa, ok1 := modsMap[m]
-				_, ok2 := psmsWithOtherPTMs[v[0].Spectrum]
+				_, ok2 := psmsWithOtherPTMs[v[0].SpectrumFileName()]
 
 				if ok1 && !ok2 && aa == i.AminoAcid {
 					definedModPSMs[k] = v
-					exclusionList[v[0].Spectrum] = 0
+					exclusionList[v[0].SpectrumFileName()] = 0
 				}
 			}
 
 		}
 
-		_, ok := exclusionList[v[0].Spectrum]
+		_, ok := exclusionList[v[0].SpectrumFileName()]
 		if !ok {
 			restModPSMs[k] = v
 		}
@@ -433,7 +429,7 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 	logrus.Info("Filtering all modified PSMs")
 	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
 
-	var combinedFiltered id.PepIDList
+	var combinedFiltered id.PepIDListPtrs
 
 	combinedFiltered = append(combinedFiltered, filteredUnmodPSM...)
 
@@ -446,7 +442,7 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDList, targetFDR float64, d
 }
 
 // chargeProfile ...
-func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
+func chargeProfile(p id.PepIDListPtrs, charge uint8, decoyTag string) (t, d int) {
 
 	for _, i := range p {
 		if i.AssumedCharge == charge {
@@ -462,19 +458,17 @@ func chargeProfile(p id.PepIDList, charge uint8, decoyTag string) (t, d int) {
 }
 
 //GetUniquePSMs selects only unique pepetide ions for the given data structure
-func GetUniquePSMs(p id.PepIDList) map[string]id.PepIDList {
-
-	uniqMap := make(map[string]id.PepIDList)
+func GetUniquePSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
+	uniqMap := make(map[string]id.PepIDListPtrs)
 
 	for _, i := range p {
-		uniqMap[i.Spectrum] = append(uniqMap[i.Spectrum], i)
+		uniqMap[i.SpectrumFileName().Str()] = append(uniqMap[i.SpectrumFileName().Str()], i)
 	}
-
 	return uniqMap
 }
 
 //getUniquePeptideIons selects only unique pepetide ions for the given data structure
-func getUniquePeptideIons(p id.PepIDList) map[string]id.PepIDList {
+func getUniquePeptideIons(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 
 	uniqMap := ExtractIonsFromPSMs(p)
 
@@ -482,9 +476,9 @@ func getUniquePeptideIons(p id.PepIDList) map[string]id.PepIDList {
 }
 
 // ExtractIonsFromPSMs takes a pepidlist and transforms into an ion map
-func ExtractIonsFromPSMs(p id.PepIDList) map[string]id.PepIDList {
+func ExtractIonsFromPSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 
-	uniqMap := make(map[string]id.PepIDList)
+	uniqMap := make(map[string]id.PepIDListPtrs)
 
 	for _, i := range p {
 		ion := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
@@ -500,12 +494,12 @@ func ExtractIonsFromPSMs(p id.PepIDList) map[string]id.PepIDList {
 }
 
 // GetUniquePeptides selects only unique pepetide for the given data structure
-func GetUniquePeptides(p id.PepIDList) map[string]id.PepIDList {
+func GetUniquePeptides(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 
-	uniqMap := make(map[string]id.PepIDList)
+	uniqMap := make(map[string]id.PepIDListPtrs)
 
 	for _, i := range p {
-		uniqMap[string(i.Peptide)] = append(uniqMap[string(i.Peptide)], i)
+		uniqMap[i.Peptide] = append(uniqMap[i.Peptide], i)
 	}
 
 	// organize id list by score
@@ -625,11 +619,11 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 
 		if ok && pro.ProteinName == razorProtein {
 
-			pro.Length = "0"
+			pro.Length = 0
 			pro.PercentCoverage = float32(coverMap[pro.ProteinName])
-			pro.PctSpectrumIDs = 0.0
-			pro.GroupProbability = 1.00
-			pro.Confidence = 1.00
+			//pro.PctSpectrumIDs = 0.0
+			//pro.GroupProbability = 1.00
+			//pro.Confidence = 1.00
 			pro.HasRazor = true
 
 			if i.Probability > pro.Probability {
@@ -643,11 +637,11 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 
 			_, ok := razorMarked[pro.ProteinName]
 			if !ok {
-				pro.Length = "0"
+				pro.Length = 0
 				pro.PercentCoverage = float32(coverMap[pro.ProteinName])
-				pro.PctSpectrumIDs = 0.0
-				pro.GroupProbability = 1.00
-				pro.Confidence = 1.00
+				//pro.PctSpectrumIDs = 0.0
+				//pro.GroupProbability = 1.00
+				//pro.Confidence = 1.00
 				pro.HasRazor = false
 
 				if i.Probability > pro.Probability {
@@ -675,14 +669,14 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 			pro.TotalNumberPeptides++
 
 			pep := id.PeptideIonIdentification{
-				PeptideSequence:      i.Peptide,
-				ModifiedPeptide:      i.ModifiedPeptide,
-				Charge:               i.AssumedCharge,
-				Weight:               1,
-				GroupWeight:          0,
-				CalcNeutralPepMass:   i.CalcNeutralPepMass,
-				SharedParentProteins: len(i.AlternativeProteins),
-				Razor:                1,
+				PeptideSequence:    i.Peptide,
+				ModifiedPeptide:    i.ModifiedPeptide,
+				Charge:             i.AssumedCharge,
+				Weight:             1,
+				GroupWeight:        0,
+				CalcNeutralPepMass: i.CalcNeutralPepMass,
+				//SharedParentProteins: len(i.AlternativeProteins),
+				Razor: 1,
 			}
 
 			for j := range i.AlternativeProteins {
@@ -690,22 +684,22 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pro.IndistinguishableProtein = append(pro.IndistinguishableProtein, j)
 			}
 
-			pep.NumberOfInstances++
+			//pep.NumberOfInstances++
 
 			if i.Probability > pep.InitialProbability {
 				pep.InitialProbability = i.Probability
 			}
 
 			if len(i.AlternativeProteins) < 2 {
-				pep.IsNondegenerateEvidence = true
+				//pep.IsNondegenerateEvidence = true
 				pep.IsUnique = true
 			} else {
-				pep.IsNondegenerateEvidence = false
+				//pep.IsNondegenerateEvidence = false
 				pep.IsUnique = false
 			}
 
 			pep.Modifications.Index = make(map[string]mod.Modification)
-			for k, v := range i.Modifications.Index {
+			for k, v := range i.Modifications.ToMap().Index {
 				pep.Modifications.Index[k] = v
 			}
 
@@ -721,14 +715,14 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 			pro.TotalNumberPeptides++
 
 			pep := id.PeptideIonIdentification{
-				PeptideSequence:      i.Peptide,
-				ModifiedPeptide:      i.ModifiedPeptide,
-				Charge:               i.AssumedCharge,
-				Weight:               0,
-				GroupWeight:          0,
-				CalcNeutralPepMass:   i.CalcNeutralPepMass,
-				SharedParentProteins: len(i.AlternativeProteins),
-				Razor:                0,
+				PeptideSequence:    i.Peptide,
+				ModifiedPeptide:    i.ModifiedPeptide,
+				Charge:             i.AssumedCharge,
+				Weight:             0,
+				GroupWeight:        0,
+				CalcNeutralPepMass: i.CalcNeutralPepMass,
+				//SharedParentProteins: len(i.AlternativeProteins),
+				Razor: 0,
 			}
 
 			if i.Probability > pep.InitialProbability {
@@ -737,18 +731,18 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 
 			//pep.PeptideParentProtein = i.AlternativeProteins
 
-			pep.NumberOfInstances++
+			//pep.NumberOfInstances++
 
 			if len(i.AlternativeProteins) < 2 {
-				pep.IsNondegenerateEvidence = true
+				//pep.IsNondegenerateEvidence = true
 				pep.IsUnique = true
 			} else {
-				pep.IsNondegenerateEvidence = false
+				//pep.IsNondegenerateEvidence = false
 				pep.IsUnique = false
 			}
 
 			pep.Modifications.Index = make(map[string]mod.Modification)
-			for k, v := range i.Modifications.Index {
+			for k, v := range i.Modifications.ToMap().Index {
 				pep.Modifications.Index[k] = v
 			}
 
@@ -796,11 +790,11 @@ func proteinProfile(p id.ProtXML) (t, d int) {
 
 // extractPSMfromPepXML retrieves all psm from protxml that maps into pepxml files
 // using protein names from <protein> and <alternative_proteins> tags
-func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList) id.PepIDList {
+func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList) id.PepIDListPtrs {
 
-	var protmap = make(map[string]uint16)
-	var filterMap = make(map[string]id.PeptideIdentification)
-	var output id.PepIDList
+	var protmap = make(map[string]struct{})
+	var filterMap = make(map[id.SpectrumType]*id.PeptideIdentification)
+	var output id.PepIDListPtrs
 
 	if filter == "sequential" {
 
@@ -808,24 +802,24 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 		for _, i := range pro {
 			for _, j := range i.UniqueStrippedPeptides {
 				key := fmt.Sprintf("%s#%s", i.ProteinName, j)
-				protmap[string(key)] = 0
+				protmap[key] = struct{}{}
 			}
 		}
 
-		for _, i := range peplist {
+		for idx, i := range peplist {
 
 			key := fmt.Sprintf("%s#%s", i.Protein, i.Peptide)
 
 			_, ok := protmap[key]
 			if ok {
-				filterMap[string(i.Spectrum)] = i
+				filterMap[i.SpectrumFileName()] = &peplist[idx]
 			} else {
 
 				for j := range i.AlternativeProteins {
 					key := fmt.Sprintf("%s#%s", j, i.Peptide)
 					_, ap := protmap[key]
 					if ap {
-						filterMap[string(i.Spectrum)] = i
+						filterMap[i.SpectrumFileName()] = &peplist[idx]
 					}
 				}
 
@@ -837,18 +831,18 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 
 		// get all protein names from protxml
 		for _, i := range pro {
-			protmap[string(i.ProteinName)] = 0
+			protmap[string(i.ProteinName)] = struct{}{}
 		}
 
-		for _, i := range peplist {
+		for idx, i := range peplist {
 			_, ok := protmap[string(i.Protein)]
 			if ok {
-				filterMap[string(i.Spectrum)] = i
+				filterMap[i.SpectrumFileName()] = &peplist[idx]
 			} else {
 				for j := range i.AlternativeProteins {
 					_, ap := protmap[j]
 					if ap {
-						filterMap[string(i.Spectrum)] = i
+						filterMap[i.SpectrumFileName()] = &peplist[idx]
 					}
 				}
 			}

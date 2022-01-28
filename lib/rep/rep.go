@@ -107,71 +107,91 @@ type SearchParametersEvidence struct {
 	Tyrosine                           string
 }
 
+func (p PSMEvidence) SpectrumFileName() id.SpectrumType {
+	return id.SpectrumType{Spectrum: p.Spectrum, FileName: p.SpectrumFile}
+}
+
 // PSMEvidence struct
 type PSMEvidence struct {
-	Source                               string
-	Index                                uint32
-	Spectrum                             string
-	SpectrumFile                         string
-	Scan                                 int
-	NumberOfEnzymaticTermini             int
-	NumberOfMissedCleavages              int
-	ProteinStart                         int
-	ProteinEnd                           int
-	PrevAA                               string
-	NextAA                               string
-	Peptide                              string
-	IonForm                              string
-	Protein                              string
-	ProteinDescription                   string
-	ProteinID                            string
-	EntryName                            string
-	GeneName                             string
-	ModifiedPeptide                      string
-	CompensationVoltage                  string
-	MappedProteins                       map[string]int
-	MappedGenes                          map[string]int
-	AssumedCharge                        uint8
-	HitRank                              uint8
-	UncalibratedPrecursorNeutralMass     float64
-	PrecursorNeutralMass                 float64
-	PrecursorExpMass                     float64
-	RetentionTime                        float64
-	CalcNeutralPepMass                   float64
-	RawMassdiff                          float64
-	Massdiff                             float64
-	LocalizedPTMSites                    map[string]int
-	LocalizedPTMMassDiff                 map[string]string
-	LocalizationRange                    string
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
-	Probability                          float64
-	Expectation                          float64
-	Xcorr                                float64
-	DeltaCN                              float64
-	DeltaCNStar                          float64
-	SPScore                              float64
-	SPRank                               float64
-	Hyperscore                           float64
-	Nextscore                            float64
-	DiscriminantValue                    float64
-	Intensity                            float64
-	IonMobility                          float64
-	Purity                               float64
-	IsDecoy                              bool
-	IsUnique                             bool
-	IsURazor                             bool
-	Labels                               iso.Labels
-	Modifications                        mod.Modifications
+	Source       string
+	Index        uint32
+	Spectrum     string
+	SpectrumFile string
+	//Scan                                 int
+
+	ProteinStart int
+	ProteinEnd   int
+	Peptide      string
+	//IonForm()                     string
+	Protein                          string
+	ProteinDescription               string
+	ProteinID                        string
+	EntryName                        string
+	GeneName                         string
+	ModifiedPeptide                  string
+	CompensationVoltage              string
+	MappedProteins                   map[string]int
+	MappedGenes                      map[string]struct{}
+	NumberOfEnzymaticTermini         uint8
+	NumberOfMissedCleavages          uint8
+	AssumedCharge                    uint8
+	HitRank                          uint8
+	UncalibratedPrecursorNeutralMass float64
+	PrecursorNeutralMass             float64
+	//PrecursorExpMass                     float64
+	RetentionTime      float64
+	CalcNeutralPepMass float64
+	RawMassdiff        float64
+	Massdiff           float64
+	PTM                *id.PTM
+	//LocalizationRange                    string
+	MSFraggerLoc *id.MSFraggerLoc
+	Probability  float64
+	Expectation  float64
+	Xcorr        float64
+	DeltaCN      float64
+	DeltaCNStar  float64
+	SPScore      float64
+	SPRank       float64
+	Hyperscore   float64
+	Nextscore    float64
+	//DiscriminantValue                    float64
+	Intensity     float64
+	IonMobility   float64
+	Purity        float64
+	PrevAA        byte
+	NextAA        byte
+	IsDecoy       bool
+	IsUnique      bool
+	IsURazor      bool
+	Labels        *iso.Labels
+	Modifications mod.ModificationsSlice
+}
+
+func (e PSMEvidence) IonForm() id.IonFormType {
+	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.CalcNeutralPepMass), 32)
+	if err != nil {
+		panic(err)
+	}
+	return id.IonFormType{e.Peptide, float32(t), e.AssumedCharge}
+}
+
+func (e IonEvidence) IonForm() id.IonFormType {
+	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.PeptideMass), 32)
+	if err != nil {
+		panic(err)
+	}
+	return id.IonFormType{e.Sequence, float32(t), e.ChargeState}
 }
 
 // PSMEvidenceList ...
 type PSMEvidenceList []PSMEvidence
 
-func (a PSMEvidenceList) Len() int           { return len(a) }
-func (a PSMEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a PSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spectrum }
+func (a PSMEvidenceList) Len() int      { return len(a) }
+func (a PSMEvidenceList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a PSMEvidenceList) Less(i, j int) bool {
+	return a[i].SpectrumFileName().Str() < a[j].SpectrumFileName().Str()
+}
 
 // RemovePSMByIndex perfomrs a re-slicing by removing an element from a list
 func RemovePSMByIndex(s []PSMEvidence, i int) []PSMEvidence {
@@ -181,17 +201,17 @@ func RemovePSMByIndex(s []PSMEvidence, i int) []PSMEvidence {
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence                 string
-	IonForm                  string
-	ModifiedSequence         string
-	RetentionTime            string
+	Sequence string
+	//IonForm() string
+	ModifiedSequence string
+	//RetentionTime            string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
-	PrevAA                   string
-	NextAA                   string
-	Spectra                  map[string]int
+	PrevAA                   byte
+	NextAA                   byte
+	Spectra                  map[id.SpectrumType]int
 	MappedProteins           map[string]int
-	MappedGenes              map[string]int
+	MappedGenes              map[string]struct{}
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -209,9 +229,9 @@ type IonEvidence struct {
 	GeneName                 string
 	EntryName                string
 	ProteinDescription       string
-	Labels                   iso.Labels
-	PhosphoLabels            iso.Labels
-	Modifications            mod.Modifications
+	Labels                   *iso.Labels
+	PhosphoLabels            *iso.Labels
+	Modifications            mod.ModificationsSlice
 }
 
 // IonEvidenceList ...
@@ -231,27 +251,27 @@ func RemoveIonsByIndex(s []IonEvidence, i int) []IonEvidence {
 type PeptideEvidence struct {
 	Sequence               string
 	ChargeState            map[uint8]uint8
-	Spectra                map[string]uint8
-	PrevAA                 string
-	NextAA                 string
+	Spectra                map[id.SpectrumType]uint8
 	Protein                string
 	ProteinID              string
 	GeneName               string
 	EntryName              string
 	ProteinDescription     string
 	MappedProteins         map[string]int
-	MappedGenes            map[string]int
+	MappedGenes            map[string]struct{}
 	Spc                    int
 	Intensity              float64
 	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	PrevAA                 byte
+	NextAA                 byte
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
-	Labels                 iso.Labels
-	PhosphoLabels          iso.Labels
-	Modifications          mod.Modifications
+	Labels                 *iso.Labels
+	PhosphoLabels          *iso.Labels
+	Modifications          mod.ModificationsSlice
 }
 
 // PeptideEvidenceList ...
@@ -283,10 +303,10 @@ type ProteinEvidence struct {
 	GeneNames              string
 	ProteinExistence       string
 	Sequence               string
-	SupportingSpectra      map[string]int
-	IndiProtein            map[string]uint8
+	SupportingSpectra      map[id.SpectrumType]int
+	IndiProtein            map[string]struct{}
 	UniqueStrippedPeptides int
-	TotalPeptideIons       map[string]IonEvidence
+	TotalPeptideIons       map[id.IonFormType]IonEvidence
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
@@ -300,13 +320,13 @@ type ProteinEvidence struct {
 	TopPepProb             float64
 	IsDecoy                bool
 	IsContaminant          bool
-	TotalLabels            iso.Labels
-	UniqueLabels           iso.Labels
-	URazorLabels           iso.Labels // Unique + razor
-	PhosphoTotalLabels     iso.Labels
-	PhosphoUniqueLabels    iso.Labels
-	PhosphoURazorLabels    iso.Labels // Unique + razor
-	Modifications          mod.Modifications
+	TotalLabels            *iso.Labels
+	UniqueLabels           *iso.Labels
+	URazorLabels           *iso.Labels // Unique + razor
+	PhosphoTotalLabels     *iso.Labels
+	PhosphoUniqueLabels    *iso.Labels
+	PhosphoURazorLabels    *iso.Labels // Unique + razor
+	Modifications          mod.ModificationsSlice
 }
 
 // ProteinEvidenceList list
@@ -407,9 +427,6 @@ func New() Evidence {
 // Run is the main entry poit for Report
 func Run(m met.Data) {
 
-	var repo = New()
-	repo.RestoreGranular()
-
 	var isComet bool
 	var hasLoc bool
 	var hasLabels bool
@@ -439,24 +456,38 @@ func Run(m met.Data) {
 	}
 
 	logrus.Info("Creating reports")
-
-	// PSM
-	repo.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
-
-	// Ion
-	repo.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
-
-	// Peptide
-	repo.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
-
+	{
+		var repoPSM PSMEvidenceList
+		RestorePSM(&repoPSM)
+		// PSM
+		repoPSM.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
+	}
+	{
+		var repoIons IonEvidenceList
+		RestoreIon(&repoIons)
+		// Ion
+		repoIons.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	}
+	{
+		// Peptide
+		var repoPeptides PeptideEvidenceList
+		RestorePeptide(&repoPeptides)
+		repoPeptides.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+	}
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
-		repo.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
-		repo.ProteinFastaReport(m.Home, m.Report.Decoys)
+		var repoProteins ProteinEvidenceList
+		RestoreProtein(&repoProteins)
+		repoProteins.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 
 	// Modifications
+	repo := New()
 	if len(repo.Modifications.MassBins) > 0 {
+		if repo.PSM == nil {
+			RestorePSM(&repo.PSM)
+		}
 		repo.ModificationReport(m.Home)
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
@@ -473,6 +504,7 @@ func Run(m met.Data) {
 
 	// MzID
 	if m.Report.MZID {
+		repo.RestoreGranular()
 		repo.MzIdentMLReport(m.Version, m.Database.Annot)
 	}
 
@@ -485,10 +517,14 @@ func getModsList(m map[string]mod.Modification) ([]string, []string) {
 	var o []string
 
 	for _, i := range m {
-		if i.Type == "Assigned" && i.Name != "Unknown" {
-			a = append(a, fmt.Sprintf("%s%s(%.4f)", i.Position, i.AminoAcid, i.MassDiff))
+		if i.Type == mod.Assigned && i.Name != "Unknown" {
+			pos := ""
+			if len(i.AminoAcid) == 1 {
+				pos = strconv.Itoa(i.Position)
+			}
+			a = append(a, fmt.Sprintf("%s%s(%.4f)", pos, i.AminoAcid, i.MassDiff))
 		}
-		if i.Type == "Observed" && i.Name != "Unknown" {
+		if i.Type == mod.Observed && i.Name != "Unknown" {
 			for k, v := range i.IsobaricMods {
 				o = append(o, fmt.Sprintf("%s(%f)", k, v))
 			}

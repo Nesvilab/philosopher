@@ -1,6 +1,9 @@
 package main
 
-import "philosopher/cmd"
+import (
+	"philosopher/cmd"
+	"runtime/debug"
+)
 
 var (
 	// Version code
@@ -15,7 +18,7 @@ var (
 )
 
 func main() {
-
+	debug.SetGCPercent(20)
 	cmd.Version = version
 	cmd.Build = build
 

@@ -4,86 +4,47 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sync"
 
 	"philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // SerializeGranular converts the whole structure into sevral small gob files
 func (evi *Evidence) SerializeGranular() {
-
+	wg := sync.WaitGroup{}
+	wg.Add(4)
 	// create PSM Bin
-	SerializePSM(&evi.PSM)
-
+	go func() { defer wg.Done(); SerializePSM(&evi.PSM) }()
 	// create Ion Bin
-	SerializeIon(&evi.Ions)
-
+	go func() { defer wg.Done(); SerializeIon(&evi.Ions) }()
 	// create Peptides Bin
-	SerializePeptides(&evi.Peptides)
-
+	go func() { defer wg.Done(); SerializePeptides(&evi.Peptides) }()
 	// create Protein Bin
-	SerializeProteins(&evi.Proteins)
+	go func() { defer wg.Done(); SerializeProteins(&evi.Proteins) }()
+	wg.Wait()
 }
 
 // SerializePSM creates an ev serial with Evidence data
 func SerializePSM(evi *PSMEvidenceList) {
-
-	b, e := msgpack.Marshal(&evi)
-	if e != nil {
-		logrus.Trace("Cannot marshal PSM data:", e)
-	}
-
-	e = ioutil.WriteFile(sys.PSMBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize PSM data:", e)
-	}
-
+	sys.Serialize(evi, sys.PSMBin())
 }
 
 // SerializeIon creates an ev serial with Evidence data
 func SerializeIon(evi *IonEvidenceList) {
-
-	b, e := msgpack.Marshal(&evi)
-	if e != nil {
-		logrus.Trace("Cannot marshal Ions data:", e)
-	}
-
-	e = ioutil.WriteFile(sys.IonBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize Ions data:", e)
-	}
+	sys.Serialize(evi, sys.IonBin())
 }
 
 // SerializePeptides creates an ev serial with Evidence data
 func SerializePeptides(evi *PeptideEvidenceList) {
-
-	b, e := msgpack.Marshal(&evi)
-	if e != nil {
-		logrus.Trace("Cannot marshal Peptides data:", e)
-	}
-
-	e = ioutil.WriteFile(sys.PepBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize Peptides data:", e)
-	}
-
+	sys.Serialize(evi, sys.PepBin())
 }
 
 // SerializeProteins creates an ev serial with Evidence data
 func SerializeProteins(evi *ProteinEvidenceList) {
-
-	b, e := msgpack.Marshal(&evi)
-	if e != nil {
-		logrus.Trace("Cannot marshal Proteins data:", e)
-	}
-
-	e = ioutil.WriteFile(sys.ProBin(), b, sys.FilePermission())
-	if e != nil {
-		logrus.Trace("Cannot serialize Proteins data:", e)
-	}
-
+	sys.Serialize(evi, sys.ProBin())
 }
 
 // RestoreGranular reads philosopher results files and restore the data sctructure
@@ -104,62 +65,22 @@ func (evi *Evidence) RestoreGranular() {
 
 // RestorePSM restores PSM data
 func RestorePSM(evi *PSMEvidenceList) {
-
-	b, e := ioutil.ReadFile(sys.PSMBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, sys.PSMBin(), false)
 }
 
 // RestoreIon restores Ion data
 func RestoreIon(evi *IonEvidenceList) {
-
-	b, e := ioutil.ReadFile(sys.IonBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, sys.IonBin(), false)
 }
 
 // RestorePeptide restores Peptide data
 func RestorePeptide(evi *PeptideEvidenceList) {
-
-	b, e := ioutil.ReadFile(sys.PepBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, sys.PepBin(), false)
 }
 
 // RestoreProtein restores Protein data
 func RestoreProtein(evi *ProteinEvidenceList) {
-
-	b, e := ioutil.ReadFile(sys.ProBin())
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, sys.ProBin(), false)
 }
 
 // RestoreGranularWithPath reads philosopher results files and restore the data sctructure
