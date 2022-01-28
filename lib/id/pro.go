@@ -81,6 +81,10 @@ type IonFormType struct {
 	AssumedCharge      uint8
 }
 
+func (e IonFormType) Str() string {
+	return fmt.Sprintf("%s#%d#%.4f", e.Peptide, e.AssumedCharge, e.CalcNeutralPepMass)
+}
+
 func (e PeptideIonIdentification) IonForm() IonFormType {
 	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.CalcNeutralPepMass), 32)
 	if err != nil {
