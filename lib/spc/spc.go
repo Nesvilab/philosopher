@@ -36,9 +36,9 @@ type Annotation struct {
 // ModificationInfo tag
 type ModificationInfo struct {
 	XMLName          xml.Name           `xml:"modification_info"`
+	ModifiedPeptide  []byte             `xml:"modified_peptide,attr"`
 	ModNTermMass     float64            `xml:"mod_nterm_mass,attr"`
 	ModCTermMass     float64            `xml:"mod_cterm_mass,attr"`
-	ModifiedPeptide  []byte             `xml:"modified_peptide,attr"`
 	ModAminoacidMass []ModAminoacidMass `xml:"mod_aminoacid_mass"`
 }
 

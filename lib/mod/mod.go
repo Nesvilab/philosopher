@@ -14,12 +14,12 @@ type Modification struct {
 	Variable          string
 	Position          string
 	Type              string
-	MonoIsotopicMass  float64
-	AverageMass       float64
-	MassDiff          float64
 	AminoAcid         string
 	IsProteinTerminus string
 	Terminus          string
+	MonoIsotopicMass  float64
+	AverageMass       float64
+	MassDiff          float64
 	IsobaricMods      map[string]float64
 }
 

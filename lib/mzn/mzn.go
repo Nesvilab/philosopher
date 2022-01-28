@@ -58,26 +58,26 @@ type Precursor struct {
 
 // Mz struct
 type Mz struct {
-	Stream        []byte
-	DecodedStream []float64
 	Precision     string
 	Compression   string
+	Stream        []byte
+	DecodedStream []float64
 }
 
 // Intensity struct
 type Intensity struct {
-	Stream        []byte
-	DecodedStream []float64
 	Precision     string
 	Compression   string
+	Stream        []byte
+	DecodedStream []float64
 }
 
 // IonMobility struct
 type IonMobility struct {
-	Stream        []byte
-	DecodedStream []float64
 	Precision     string
 	Compression   string
+	Stream        []byte
+	DecodedStream []float64
 }
 
 func (a Spectra) Len() int           { return len(a) }
