@@ -24,8 +24,8 @@ import (
 type ProtXML struct {
 	FileName   string
 	DecoyTag   string
-	Groups     GroupList
 	RunOptions string
+	Groups     GroupList
 }
 
 // GroupIdentification tag

@@ -260,8 +260,6 @@ type PeptideEvidence struct {
 	MappedProteins         map[string]int
 	MappedGenes            map[string]struct{}
 	Spc                    int
-	Intensity              float64
-	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
 	PrevAA                 byte
@@ -292,14 +290,11 @@ type ProteinEvidence struct {
 	OriginalHeader         string
 	PartHeader             string
 	ProteinName            string
-	ProteinGroup           uint32
 	ProteinSubGroup        string
 	ProteinID              string
 	EntryName              string
 	Description            string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Sequence               string
@@ -310,9 +305,7 @@ type ProteinEvidence struct {
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
-	TotalPeptides          map[string]int
-	UniquePeptides         map[string]int
-	URazorPeptides         map[string]int // Unique + razor
+	Coverage               float32
 	TotalIntensity         float64
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
@@ -338,24 +331,23 @@ func (a ProteinEvidenceList) Less(i, j int) bool { return a[i].ProteinGroup < a[
 
 // CombinedProteinEvidence represents all combined proteins detected
 type CombinedProteinEvidence struct {
-	GroupNumber            uint32
 	SiblingID              string
 	ProteinName            string
 	ProteinID              string
-	IndiProtein            []string
 	EntryName              string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Description            string
+	IndiProtein            []string
 	Names                  []string
+	GroupNumber            uint32
+	Length                 int
 	UniqueStrippedPeptides int
-	SupportingSpectra      map[string]string
+	Coverage               float32
 	ProteinProbability     float64
 	TopPepProb             float64
-	PeptideIons            []id.PeptideIonIdentification
+	SupportingSpectra      map[string]string
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
@@ -368,6 +360,7 @@ type CombinedProteinEvidence struct {
 	TotalLabels            map[string]iso.Labels
 	UniqueLabels           map[string]iso.Labels
 	URazorLabels           map[string]iso.Labels // Unique + razor
+	PeptideIons            []id.PeptideIonIdentification
 }
 
 // CombinedProteinEvidenceList is a list of Combined Protein Evidences
@@ -379,13 +372,13 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	BestPSM            float64
 	Sequence           string
 	Protein            string
 	ProteinID          string
 	EntryName          string
 	Gene               string
 	ProteinDescription string
+	BestPSM            float64
 	ChargeStates       map[uint8]uint8
 	AssignedMassDiffs  map[string]uint8
 	Spc                map[string]int

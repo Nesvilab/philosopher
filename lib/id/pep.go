@@ -32,12 +32,12 @@ type PepXML struct {
 	SpectraFile           string
 	SearchEngine          string
 	DecoyTag              string
-	SearchParameters      []spc.Parameter
 	Database              string
 	Prophet               string
 	Modifications         mod.Modifications
-	Models                []spc.DistributionPoint
 	PeptideIdentification PepIDList
+	SearchParameters      []spc.Parameter
+	Models                []spc.DistributionPoint
 }
 
 type PepXML4Serialiazation struct {
@@ -67,28 +67,26 @@ type PeptideIdentificationOld struct {
 	AssumedCharge                        uint8
 	PrevAA                               string
 	NextAA                               string
+	AssumedCharge                        uint8
 	HitRank                              uint8
 	MissedCleavages                      uint8
 	NumberTolTerm                        uint8
 	NumberOfEnzymaticTermini             uint8
+	IsRejected                           uint8
 	NumberTotalProteins                  uint16
 	TotalNumberIons                      uint16
 	NumberMatchedIons                    uint16
+	Index                                uint32
+	Scan                                 int
 	NumberofMissedCleavages              int
+	IsoMassD                             int
 	UncalibratedPrecursorNeutralMass     float64
 	PrecursorNeutralMass                 float64
 	PrecursorExpMass                     float64
 	RetentionTime                        float64
 	CalcNeutralPepMass                   float64
 	Massdiff                             float64
-	LocalizedPTMSites                    map[string]int
-	LocalizedPTMMassDiff                 map[string]string
-	LocalizationRange                    string
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
 	Probability                          float64
-	IsoMassD                             int
 	Expectation                          float64
 	Xcorr                                float64
 	DeltaCN                              float64
@@ -100,7 +98,9 @@ type PeptideIdentificationOld struct {
 	DiscriminantValue                    float64
 	Intensity                            float64
 	IonMobility                          float64
-	IsRejected                           uint8
+	LocalizedPTMMassDiff                 map[string]string
+	LocalizedPTMSites                    map[string]int
+	AlternativeProteins                  map[string]int
 	Modifications                        mod.Modifications
 }
 

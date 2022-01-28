@@ -51,6 +51,7 @@ func (m ModificationsSlice) ToMap() Modifications {
 		Index[e.Index] = e
 	}
 	return Modifications{Index: Index}
+
 }
 
 // Serialize saves to disk a msgpack version of the Isobaric data structure
