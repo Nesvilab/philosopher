@@ -480,12 +480,15 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 func rollUpPeptides(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Peptides {
+
+		evi.Peptides[j].Labels = &iso.Labels{}
+
 		for k := range evi.Peptides[j].Spectra {
 
 			i, ok := spectrumMap[k]
 			if ok {
 
-				evi.Peptides[j].Labels = &iso.Labels{}
+				//evi.Peptides[j].Labels = &iso.Labels{}
 				evi.Peptides[j].Labels.Channel1.Name = i.Channel1.Name
 				evi.Peptides[j].Labels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Peptides[j].Labels.Channel1.Mz = i.Channel1.Mz
@@ -681,11 +684,14 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels
 func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Ions {
+
+		evi.Ions[j].Labels = &iso.Labels{}
+
 		for k := range evi.Ions[j].Spectra {
 
 			i, ok := spectrumMap[k]
 			if ok {
-				evi.Ions[j].Labels = &iso.Labels{}
+				//evi.Ions[j].Labels = &iso.Labels{}
 				evi.Ions[j].Labels.Channel1.Name = i.Channel1.Name
 				evi.Ions[j].Labels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Ions[j].Labels.Channel1.Mz = i.Channel1.Mz
@@ -881,12 +887,17 @@ func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Lab
 func rollUpProteins(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Proteins {
+
+		evi.Proteins[j].TotalLabels = &iso.Labels{}
+		evi.Proteins[j].UniqueLabels = &iso.Labels{}
+		evi.Proteins[j].URazorLabels = &iso.Labels{}
+
 		for _, k := range evi.Proteins[j].TotalPeptideIons {
 			for l := range k.Spectra {
 
 				i, ok := spectrumMap[l]
 				if ok {
-					evi.Proteins[j].TotalLabels = &iso.Labels{}
+					//evi.Proteins[j].TotalLabels = &iso.Labels{}
 					evi.Proteins[j].TotalLabels.Channel1.Name = i.Channel1.Name
 					evi.Proteins[j].TotalLabels.Channel1.CustomName = i.Channel1.CustomName
 					evi.Proteins[j].TotalLabels.Channel1.Mz = i.Channel1.Mz
@@ -979,7 +990,7 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels
 
 					//if k.IsNondegenerateEvidence {
 					if k.IsUnique {
-						evi.Proteins[j].UniqueLabels = &iso.Labels{}
+						//evi.Proteins[j].UniqueLabels = &iso.Labels{}
 						evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
 						evi.Proteins[j].UniqueLabels.Channel1.CustomName = i.Channel1.CustomName
 						evi.Proteins[j].UniqueLabels.Channel1.Mz = i.Channel1.Mz
@@ -1072,7 +1083,7 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels
 					}
 
 					if k.IsURazor {
-						evi.Proteins[j].URazorLabels = &iso.Labels{}
+						//evi.Proteins[j].URazorLabels = &iso.Labels{}
 						evi.Proteins[j].URazorLabels.Channel1.Name = i.Channel1.Name
 						evi.Proteins[j].URazorLabels.Channel1.CustomName = i.Channel1.CustomName
 						evi.Proteins[j].URazorLabels.Channel1.Mz = i.Channel1.Mz
