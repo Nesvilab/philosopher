@@ -32,7 +32,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	for _, i := range evi.PSM {
 
 		psmIonMap[i.IonForm()] = append(psmIonMap[i.IonForm()], i.SpectrumFileName())
-		//psmPtMap[i.SpectrumFileName()] = append(psmPtMap[i.SpectrumFileName()], i.Protein)
+		psmPtMap[i.IonForm()] = append(psmPtMap[i.IonForm()], i.Protein)
 
 		if i.Probability > bestProb[i.IonForm()] {
 			bestProb[i.IonForm()] = i.Probability
