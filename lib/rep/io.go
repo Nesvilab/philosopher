@@ -2,14 +2,10 @@ package rep
 
 import (
 	"fmt"
-	"io/ioutil"
 	"path/filepath"
 	"sync"
 
 	"philosopher/lib/sys"
-
-	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack/v5"
 )
 
 // SerializeGranular converts the whole structure into sevral small gob files
@@ -101,68 +97,24 @@ func (evi *Evidence) RestoreGranularWithPath(p string) {
 
 // RestorePSMWithPath restores PSM data
 func RestorePSMWithPath(evi *PSMEvidenceList, p string) {
-
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.PSMBin())
-
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, path, false)
 }
 
 // RestoreIonWithPath restores Ion data
 func RestoreIonWithPath(evi *IonEvidenceList, p string) {
-
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.IonBin())
-
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, path, false)
 }
 
 // RestorePeptideWithPath restores Ion data
 func RestorePeptideWithPath(evi *PeptideEvidenceList, p string) {
-
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.PepBin())
-
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, path, false)
 }
 
 // RestoreProteinWithPath restores Protein data
 func RestoreProteinWithPath(evi *ProteinEvidenceList, p string) {
-
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.ProBin())
-
-	b, e := ioutil.ReadFile(path)
-	if e != nil {
-		logrus.Fatal("Cannot read file:", e)
-	}
-
-	e = msgpack.Unmarshal(b, &evi)
-	if e != nil {
-		logrus.Fatal("Cannot unmarshal file:", e)
-	}
-
+	sys.Restore(evi, path, false)
 }
