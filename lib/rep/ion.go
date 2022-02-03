@@ -59,18 +59,16 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.MappedProteins = make(map[string]int)
 		//pr.Modifications.Index = make(map[string]mod.Modification)
 
-		v, ok := psmIonMap[pr.IonForm()]
-		if ok {
-			for _, j := range v {
-				pr.Spectra[j]++
-			}
-		}
-
 		pr.Sequence = i.Peptide
 		pr.ModifiedSequence = i.ModifiedPeptide
 		pr.MZ = uti.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
 		pr.ChargeState = i.AssumedCharge
 		pr.PeptideMass = i.CalcNeutralPepMass
+		if v, ok := psmIonMap[pr.IonForm()]; ok {
+			for _, j := range v {
+				pr.Spectra[j]++
+			}
+		}
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
 		pr.Expectation = i.Expectation
 		pr.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
