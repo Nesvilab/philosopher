@@ -273,6 +273,6 @@ func Restore(v interface{}, filename string, silent bool) {
 	}
 	if err != nil && !silent {
 		msg.DecodeMsgPck(e, "fatal")
-		panic(e)
+		panic(err)
 	}
 }
