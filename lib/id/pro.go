@@ -24,8 +24,8 @@ import (
 type ProtXML struct {
 	FileName   string
 	DecoyTag   string
-	Groups     GroupList
 	RunOptions string
+	Groups     GroupList
 }
 
 // GroupIdentification tag
@@ -37,43 +37,43 @@ type GroupIdentification struct {
 
 // ProteinIdentification struct
 type ProteinIdentification struct {
-	GroupNumber            uint32
-	GroupSiblingID         string
-	ProteinName            string
-	Description            string
-	UniqueStrippedPeptides []string
-	Length                 int
-	PercentCoverage        float32
-	//PctSpectrumIDs         float32
-	//GroupProbability         float64
-	Probability float64
-	//Confidence               float64
-	TopPepProb               float64
+	ProteinName              string
+	Description              string
+	GroupSiblingID           string
+	UniqueStrippedPeptides   []string
 	IndistinguishableProtein []string
-	TotalNumberPeptides      int
-	PeptideIons              []PeptideIonIdentification
+	GroupNumber              uint32
+	Length                   int
 	Picked                   int
+	TotalNumberPeptides      int
+	PercentCoverage          float32
+	Probability              float64
+	TopPepProb               float64
+	PeptideIons              []PeptideIonIdentification
 	HasRazor                 bool
+	//Confidence             float64
+	//PctSpectrumIDs         float32
+	//GroupProbability       float64
 }
 
 // PeptideIonIdentification struct
 type PeptideIonIdentification struct {
-	PeptideSequence    string
-	ModifiedPeptide    string
-	InitialProbability float64
-	Weight             float64
-	GroupWeight        float64
-	CalcNeutralPepMass float64
-	//NumberOfInstances        int
-	//SharedParentProteins    int
-	//IsNondegenerateEvidence bool
+	PeptideSequence          string
+	ModifiedPeptide          string
 	PeptideParentProtein     []string
-	Labels                   *iso.Labels
-	Modifications            mod.Modifications
 	Razor                    int
 	NumberOfEnzymaticTermini uint8
 	Charge                   uint8
+	InitialProbability       float64
+	Weight                   float64
+	GroupWeight              float64
+	CalcNeutralPepMass       float64
 	IsUnique                 bool
+	Labels                   *iso.Labels
+	Modifications            mod.Modifications
+	//NumberOfInstances       int
+	//SharedParentProteins    int
+	//IsNondegenerateEvidence bool
 }
 type IonFormType struct {
 	Peptide            string

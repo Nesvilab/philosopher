@@ -113,16 +113,10 @@ func (p PSMEvidence) SpectrumFileName() id.SpectrumType {
 
 // PSMEvidence struct
 type PSMEvidence struct {
-	Source       string
-	Index        uint32
-	Spectrum     string
-	SpectrumFile string
-	//Scan                                 int
-
-	ProteinStart int
-	ProteinEnd   int
-	Peptide      string
-	//IonForm()                     string
+	Source                           string
+	Spectrum                         string
+	SpectrumFile                     string
+	Peptide                          string
 	Protein                          string
 	ProteinDescription               string
 	ProteinID                        string
@@ -130,42 +124,47 @@ type PSMEvidence struct {
 	GeneName                         string
 	ModifiedPeptide                  string
 	CompensationVoltage              string
-	MappedProteins                   map[string]int
-	MappedGenes                      map[string]struct{}
+	ProteinStart                     int
+	ProteinEnd                       int
 	NumberOfEnzymaticTermini         uint8
 	NumberOfMissedCleavages          uint8
 	AssumedCharge                    uint8
 	HitRank                          uint8
+	Index                            uint32
 	UncalibratedPrecursorNeutralMass float64
 	PrecursorNeutralMass             float64
-	//PrecursorExpMass                     float64
-	RetentionTime      float64
-	CalcNeutralPepMass float64
-	RawMassdiff        float64
-	Massdiff           float64
-	PTM                *id.PTM
-	//LocalizationRange                    string
-	MSFraggerLoc *id.MSFraggerLoc
-	Probability  float64
-	Expectation  float64
-	Xcorr        float64
-	DeltaCN      float64
-	DeltaCNStar  float64
-	SPScore      float64
-	SPRank       float64
-	Hyperscore   float64
-	Nextscore    float64
-	//DiscriminantValue                    float64
-	Intensity     float64
-	IonMobility   float64
-	Purity        float64
-	PrevAA        byte
-	NextAA        byte
-	IsDecoy       bool
-	IsUnique      bool
-	IsURazor      bool
-	Labels        *iso.Labels
-	Modifications mod.ModificationsSlice
+	RetentionTime                    float64
+	CalcNeutralPepMass               float64
+	RawMassdiff                      float64
+	Massdiff                         float64
+	Probability                      float64
+	Expectation                      float64
+	Xcorr                            float64
+	DeltaCN                          float64
+	DeltaCNStar                      float64
+	SPScore                          float64
+	SPRank                           float64
+	Hyperscore                       float64
+	Nextscore                        float64
+	Intensity                        float64
+	IonMobility                      float64
+	Purity                           float64
+	PrevAA                           byte
+	NextAA                           byte
+	IsDecoy                          bool
+	IsUnique                         bool
+	IsURazor                         bool
+	PTM                              *id.PTM
+	MSFraggerLoc                     *id.MSFraggerLoc
+	Labels                           *iso.Labels
+	Modifications                    mod.ModificationsSlice
+	MappedProteins                   map[string]int
+	MappedGenes                      map[string]struct{}
+	//Scan                           int
+	//PrecursorExpMass               float64
+	//LocalizationRange              string
+	//DiscriminantValue              float64
+	//IonForm()                      string
 }
 
 func (e PSMEvidence) IonForm() id.IonFormType {
@@ -201,17 +200,17 @@ func RemovePSMByIndex(s []PSMEvidence, i int) []PSMEvidence {
 
 // IonEvidence groups all valid info about peptide ions for reports
 type IonEvidence struct {
-	Sequence string
-	//IonForm() string
-	ModifiedSequence string
-	//RetentionTime            string
+	Sequence                 string
+	ModifiedSequence         string
+	Protein                  string
+	ProteinID                string
+	GeneName                 string
+	EntryName                string
+	ProteinDescription       string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
 	PrevAA                   byte
 	NextAA                   byte
-	Spectra                  map[id.SpectrumType]int
-	MappedProteins           map[string]int
-	MappedGenes              map[string]struct{}
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -224,14 +223,15 @@ type IonEvidence struct {
 	IsUnique                 bool
 	IsURazor                 bool
 	IsDecoy                  bool
-	Protein                  string
-	ProteinID                string
-	GeneName                 string
-	EntryName                string
-	ProteinDescription       string
 	Labels                   *iso.Labels
 	PhosphoLabels            *iso.Labels
 	Modifications            mod.ModificationsSlice
+	Spectra                  map[id.SpectrumType]int
+	MappedProteins           map[string]int
+	MappedGenes              map[string]struct{}
+	//IonForm()              string
+	//RetentionTime          string
+
 }
 
 // IonEvidenceList ...
@@ -250,25 +250,25 @@ func RemoveIonsByIndex(s []IonEvidence, i int) []IonEvidence {
 // PeptideEvidence groups all valid info about peptide ions for reports
 type PeptideEvidence struct {
 	Sequence               string
-	ChargeState            map[uint8]uint8
-	Spectra                map[id.SpectrumType]uint8
 	Protein                string
 	ProteinID              string
 	GeneName               string
 	EntryName              string
 	ProteinDescription     string
-	MappedProteins         map[string]int
-	MappedGenes            map[string]struct{}
 	Spc                    int
-	Intensity              float64
-	Probability            float64
 	ModifiedObservations   int
 	UnModifiedObservations int
+	Intensity              float64
+	Probability            float64
 	PrevAA                 byte
 	NextAA                 byte
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
+	ChargeState            map[uint8]uint8
+	Spectra                map[id.SpectrumType]uint8
+	MappedProteins         map[string]int
+	MappedGenes            map[string]struct{}
 	Labels                 *iso.Labels
 	PhosphoLabels          *iso.Labels
 	Modifications          mod.ModificationsSlice
@@ -292,27 +292,21 @@ type ProteinEvidence struct {
 	OriginalHeader         string
 	PartHeader             string
 	ProteinName            string
-	ProteinGroup           uint32
 	ProteinSubGroup        string
 	ProteinID              string
 	EntryName              string
 	Description            string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Sequence               string
-	SupportingSpectra      map[id.SpectrumType]int
-	IndiProtein            map[string]struct{}
-	UniqueStrippedPeptides int
-	TotalPeptideIons       map[id.IonFormType]IonEvidence
+	Length                 int
 	TotalSpC               int
 	UniqueSpC              int
 	URazorSpC              int // Unique + razor
-	TotalPeptides          map[string]int
-	UniquePeptides         map[string]int
-	URazorPeptides         map[string]int // Unique + razor
+	UniqueStrippedPeptides int
+	ProteinGroup           uint32
+	Coverage               float32
 	TotalIntensity         float64
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
@@ -320,6 +314,12 @@ type ProteinEvidence struct {
 	TopPepProb             float64
 	IsDecoy                bool
 	IsContaminant          bool
+	SupportingSpectra      map[id.SpectrumType]int
+	IndiProtein            map[string]struct{}
+	TotalPeptideIons       map[id.IonFormType]IonEvidence
+	TotalPeptides          map[string]int
+	UniquePeptides         map[string]int
+	URazorPeptides         map[string]int // Unique + razor
 	TotalLabels            *iso.Labels
 	UniqueLabels           *iso.Labels
 	URazorLabels           *iso.Labels // Unique + razor
@@ -342,20 +342,19 @@ type CombinedProteinEvidence struct {
 	SiblingID              string
 	ProteinName            string
 	ProteinID              string
-	IndiProtein            []string
 	EntryName              string
 	Organism               string
-	Length                 int
-	Coverage               float32
 	GeneNames              string
 	ProteinExistence       string
 	Description            string
+	IndiProtein            []string
 	Names                  []string
+	Length                 int
 	UniqueStrippedPeptides int
-	SupportingSpectra      map[string]string
+	Coverage               float32
 	ProteinProbability     float64
 	TopPepProb             float64
-	PeptideIons            []id.PeptideIonIdentification
+	SupportingSpectra      map[string]string
 	TotalSpc               map[string]int
 	UniqueSpc              map[string]int
 	UrazorSpc              map[string]int
@@ -368,6 +367,7 @@ type CombinedProteinEvidence struct {
 	TotalLabels            map[string]iso.Labels
 	UniqueLabels           map[string]iso.Labels
 	URazorLabels           map[string]iso.Labels // Unique + razor
+	PeptideIons            []id.PeptideIonIdentification
 }
 
 // CombinedProteinEvidenceList is a list of Combined Protein Evidences
@@ -379,13 +379,13 @@ func (a CombinedProteinEvidenceList) Less(i, j int) bool { return a[i].GroupNumb
 
 // CombinedPeptideEvidence represents all combined peptides detected
 type CombinedPeptideEvidence struct {
-	BestPSM            float64
 	Sequence           string
 	Protein            string
 	ProteinID          string
 	EntryName          string
 	Gene               string
 	ProteinDescription string
+	BestPSM            float64
 	ChargeStates       map[uint8]uint8
 	AssignedMassDiffs  map[string]uint8
 	Spc                map[string]int

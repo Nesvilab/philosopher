@@ -7,11 +7,11 @@ import (
 // RazorCandidate is a peptide sequence to be evaluated as a razor
 type RazorCandidate struct {
 	Sequence          string
+	MappedProtein     string
+	MappedproteinsSID map[string]string
 	MappedProteinsW   map[string]float64
 	MappedProteinsGW  map[string]float64
 	MappedProteinsTNP map[string]int
-	MappedproteinsSID map[string]string
-	MappedProtein     string
 }
 
 // a Map fo Razor candidates

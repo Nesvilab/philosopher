@@ -29,15 +29,15 @@ type Cluster struct {
 	Status                  string
 	Existence               string
 	GeneNames               string
+	Peptides                []string
+	PeptideIons             []string
+	UniqueClusterPeptides   []string
 	Number                  int
 	TotalPeptideNumber      int
 	SharedPeptides          int
 	Coverage                float32
 	UniqueClusterTopPepProb float64
 	TopPepProb              float64
-	Peptides                []string
-	PeptideIons             []string
-	UniqueClusterPeptides   []string
 	Members                 map[string]uint8
 }
 

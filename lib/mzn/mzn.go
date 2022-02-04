@@ -22,8 +22,8 @@ import (
 // MsData top struct
 type MsData struct {
 	FileName string
+	Spectra  Spectra
 	//	RefSpectra sync.Map
-	Spectra Spectra
 }
 
 // Spectra struct

@@ -14,20 +14,20 @@ const (
 
 // Modification is the basic attribute for each modification
 type Modification struct {
-	Index      string
-	ID         string
-	Name       string
-	Definition string
-	//MonoIsotopicMass  float64
-	//AverageMass       float64
-	AminoAcid string
-	//IsProteinTerminus string
-	//Terminus          string
+	Index        string
+	ID           string
+	Name         string
+	Definition   string
+	AminoAcid    string
 	IsobaricMods map[string]float64
 	MassDiff     float64
 	Position     int
 	Type         ModTypeType
 	Variable     bool
+	//IsProteinTerminus string
+	//Terminus          string
+	//MonoIsotopicMass  float64
+	//AverageMass       float64
 }
 
 // Modifications is a collection of modifications

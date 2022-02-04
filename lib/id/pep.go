@@ -32,11 +32,11 @@ type PepXML struct {
 	SpectraFile           string
 	SearchEngine          string
 	DecoyTag              string
-	SearchParameters      []spc.Parameter
 	Database              string
 	Prophet               string
-	Modifications         mod.Modifications
+	SearchParameters      []spc.Parameter
 	Models                []spc.DistributionPoint
+	Modifications         mod.Modifications
 	PeptideIdentification PepIDList
 }
 
@@ -45,50 +45,48 @@ type PepXML4Serialiazation struct {
 	SpectraFile           string
 	SearchEngine          string
 	DecoyTag              string
-	SearchParameters      []spc.Parameter
 	Database              string
 	Prophet               string
-	Modifications         mod.Modifications
+	SearchParameters      []spc.Parameter
 	Models                []spc.DistributionPoint
+	Modifications         mod.Modifications
 	PeptideIdentification PepIDListPtrs
 }
 
 // PeptideIdentificationOld struct
 type PeptideIdentificationOld struct {
-	Index                                uint32
 	Spectrum                             string
 	SpectrumFile                         string
-	Scan                                 int
 	Peptide                              string
 	Protein                              string
 	ModifiedPeptide                      string
 	CompensationVoltage                  string
-	AlternativeProteins                  map[string]int
-	AssumedCharge                        uint8
 	PrevAA                               string
 	NextAA                               string
+	LocalizationRange                    string
+	MSFragerLocalization                 string
+	MSFraggerLocalizationScoreWithPTM    string
+	MSFraggerLocalizationScoreWithoutPTM string
+	Scan                                 int
+	NumberofMissedCleavages              int
+	IsoMassD                             int
+	AssumedCharge                        uint8
 	HitRank                              uint8
 	MissedCleavages                      uint8
 	NumberTolTerm                        uint8
 	NumberOfEnzymaticTermini             uint8
+	IsRejected                           uint8
 	NumberTotalProteins                  uint16
 	TotalNumberIons                      uint16
 	NumberMatchedIons                    uint16
-	NumberofMissedCleavages              int
+	Index                                uint32
 	UncalibratedPrecursorNeutralMass     float64
 	PrecursorNeutralMass                 float64
 	PrecursorExpMass                     float64
 	RetentionTime                        float64
 	CalcNeutralPepMass                   float64
 	Massdiff                             float64
-	LocalizedPTMSites                    map[string]int
-	LocalizedPTMMassDiff                 map[string]string
-	LocalizationRange                    string
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
 	Probability                          float64
-	IsoMassD                             int
 	Expectation                          float64
 	Xcorr                                float64
 	DeltaCN                              float64
@@ -100,7 +98,9 @@ type PeptideIdentificationOld struct {
 	DiscriminantValue                    float64
 	Intensity                            float64
 	IonMobility                          float64
-	IsRejected                           uint8
+	AlternativeProteins                  map[string]int
+	LocalizedPTMSites                    map[string]int
+	LocalizedPTMMassDiff                 map[string]string
 	Modifications                        mod.Modifications
 }
 
@@ -113,11 +113,17 @@ func (p PeptideIdentification) SpectrumFileName() SpectrumType {
 
 // PeptideIdentification struct
 type PeptideIdentification struct {
-	Index                            uint32
+	Spectrum                         string
+	SpectrumFile                     string
+	Peptide                          string
+	Protein                          string
+	ModifiedPeptide                  string
+	CompensationVoltage              string
 	AssumedCharge                    uint8
 	HitRank                          uint8
 	NumberOfEnzymaticTermini         uint8
 	NumberofMissedCleavages          uint8
+	Index                            uint32
 	UncalibratedPrecursorNeutralMass float64
 	PrecursorNeutralMass             float64
 	RetentionTime                    float64
@@ -132,19 +138,10 @@ type PeptideIdentification struct {
 	Nextscore                        float64
 	IonMobility                      float64
 	Intensity                        float64
-
-	Spectrum        string
-	SpectrumFile    string
-	Peptide         string
-	Protein         string
-	ModifiedPeptide string
-
-	CompensationVoltage string
-
-	AlternativeProteins map[string]int
-	MSFragerLoc         *MSFraggerLoc
-	PTM                 *PTM
-	Modifications       mod.ModificationsSlice
+	AlternativeProteins              map[string]int
+	MSFragerLoc                      *MSFraggerLoc
+	PTM                              *PTM
+	Modifications                    mod.ModificationsSlice
 }
 
 type PTM struct {
