@@ -398,12 +398,15 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 		}
 
 		if hasLoc {
+			MSFraggerLoc := i.MSFraggerLoc
+			if MSFraggerLoc == nil {
+				MSFraggerLoc = &id.MSFraggerLoc{}
+			}
 			line = fmt.Sprintf("%s\t%s\t%s\t%s",
 				line,
-				i.MSFraggerLoc.MSFragerLocalization,
-				i.MSFraggerLoc.MSFraggerLocalizationScoreWithPTM,
-				i.MSFraggerLoc.MSFraggerLocalizationScoreWithoutPTM,
-			)
+				MSFraggerLoc.MSFragerLocalization,
+				MSFraggerLoc.MSFraggerLocalizationScoreWithPTM,
+				MSFraggerLoc.MSFraggerLocalizationScoreWithoutPTM)
 		}
 
 		if hasIonMob {
