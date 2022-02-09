@@ -13,6 +13,7 @@ import (
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
 	"philosopher/lib/rep"
+	"philosopher/lib/sys"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/cobra"
@@ -51,14 +52,11 @@ var inspectCmd = &cobra.Command{
 			var o rep.PSMEvidenceList
 
 			target := fmt.Sprintf(".meta%spsm.bin", string(filepath.Separator))
-			file, _ := os.Open(target)
 
-			dec := msgpack.NewDecoder(file)
-			e := dec.Decode(&o)
-			if e != nil {
-				msg.DecodeMsgPck(e, "fatal")
-			}
+			sys.Restore(&o, target, false)
+
 			spew.Dump(o)
+
 		case "peptide":
 			var o rep.PeptideEvidenceList
 

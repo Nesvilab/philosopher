@@ -358,14 +358,15 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 
 func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag, mods string) {
 
-	// unmodified = no ptms
-	// defined = only the ptms defined, nothing else
-	// remaining or all = one or more ptms that might include the combination of the defined + something else
-
 	logrus.Info("Separating PSMs based on the modification profile")
 
+	// unmodified: no ptms
 	unModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// defined: only the ptms defined, nothing else
 	definedModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// other: one or more ptms that might include the combination of the defined + something else
 	restModPSMs := make(map[string]id.PepIDListPtrs)
 
 	modsMap := make(map[string]string)
@@ -376,48 +377,36 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 		modsMap[i] = m[0]
 	}
 
-	exclusionList := make(map[id.SpectrumType]uint8)
-	psmsWithOtherPTMs := make(map[id.SpectrumType]id.PepIDListPtrs)
-
 	for k, v := range uniqPsms {
 
-		if !strings.Contains(v[0].ModifiedPeptide, "[") || len(v[0].ModifiedPeptide) == 0 {
+		var other, defined bool
 
-			unModPSMs[k] = v
-			exclusionList[v[0].SpectrumFileName()] = 0
+		for _, i := range v[0].Modifications.IndexSlice {
 
-		} else {
+			if i.Variable {
 
-			// if PSM contains other mods than the ones defined by the flag, mark them to be ignored
-			for _, i := range v[0].Modifications.IndexSlice {
-				if i.Variable {
-					m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
-					_, ok := modsMap[m]
-					if !ok {
-						psmsWithOtherPTMs[v[0].SpectrumFileName()] = v
-					}
-				}
-			}
-
-			// if PSM contains only the defined mod and the correct amino acid, teh add to defined category
-			// and mark it for being excluded from rest
-			for _, i := range v[0].Modifications.IndexSlice {
 				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
-				aa, ok1 := modsMap[m]
-				_, ok2 := psmsWithOtherPTMs[v[0].SpectrumFileName()]
 
-				if ok1 && !ok2 && aa == i.AminoAcid {
-					definedModPSMs[k] = v
-					exclusionList[v[0].SpectrumFileName()] = 0
+				_, ok := modsMap[m]
+				if ok {
+					defined = true
+				} else {
+					other = true
 				}
+
 			}
-
 		}
 
-		_, ok := exclusionList[v[0].SpectrumFileName()]
-		if !ok {
+		if other && defined {
 			restModPSMs[k] = v
+		} else if other && !defined {
+			restModPSMs[k] = v
+		} else if !other && defined {
+			definedModPSMs[k] = v
+		} else {
+			unModPSMs[k] = v
 		}
+
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
