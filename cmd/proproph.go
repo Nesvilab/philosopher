@@ -48,6 +48,7 @@ func init() {
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Glyc, "glyc", "", false, "highlight peptide N-glycosylation motif")
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Fpkm, "fpkm", "", false, "model protein FPKM values")
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.NonSP, "nonsp", "", false, "do not use NSP model")
+		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Nogroups, "nogroups", "", false, "NOGROUPS")
 		proprophCmd.Flags().IntVarP(&m.ProteinProphet.Minindep, "minindep", "", 0, "minimum percentage of independent peptides required for a protein")
 		proprophCmd.Flags().Float64VarP(&m.ProteinProphet.Minprob, "minprob", "", 0.05, "PeptideProphet probability threshold")
 		proprophCmd.Flags().IntVarP(&m.ProteinProphet.Maxppmdiff, "maxppmdiff", "", 2000000, "maximum peptide mass difference in ppm")
