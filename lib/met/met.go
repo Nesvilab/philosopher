@@ -289,7 +289,7 @@ type ProteinProphet struct {
 	Glyc        bool    `yaml:"glyc"`
 	Nogroupwts  bool    `yaml:"nogroupwts"`
 	NonSP       bool    `yaml:"nonsp"`
-	Nogroups    bool    `yaml:"nogroups"`
+	Subgroups   bool    `yaml:"subgroups"`
 	Accuracy    bool    `yaml:"accuracy"`
 	Asap        bool    `yaml:"asap"`
 	Refresh     bool    `yaml:"refresh"`
