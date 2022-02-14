@@ -386,12 +386,16 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 			for _, j := range modList {
 
 				r := regexp.MustCompile(`\d\.\d{3}`)
-				matches := r.FindAllString(i.PTM.LocalizedPTMMassDiff[j], -1)
+				PTM := i.PTM
+				if PTM == nil {
+					PTM = &id.PTM{LocalizedPTMSites: map[string]int{}, LocalizedPTMMassDiff: map[string]string{}}
+				}
+				matches := r.FindAllString(PTM.LocalizedPTMMassDiff[j], -1)
 				max := uti.GetMaxNumber(matches)
 
 				line = fmt.Sprintf("%s\t%s\t%s",
 					line,
-					i.PTM.LocalizedPTMMassDiff[j],
+					PTM.LocalizedPTMMassDiff[j],
 					max,
 				)
 			}
