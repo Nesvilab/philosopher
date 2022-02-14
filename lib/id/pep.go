@@ -507,16 +507,12 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 
 			if string(j.Analysis) == "ptmprophet" {
-				psm.PTM = &PTM{LocalizedPTMSites: make(map[string]int), LocalizedPTMMassDiff: make(map[string]string)}
-				LocalizedPTMSites := make(map[string]int)
-				LocalizedPTMMassDiff := make(map[string]string)
-				for _, k := range j.PTMProphetResult {
-					psm.PTM.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
-					psm.PTM.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
-				}
 				if len(j.PTMProphetResult) != 0 {
-					psm.PTM.LocalizedPTMSites = LocalizedPTMSites
-					psm.PTM.LocalizedPTMMassDiff = LocalizedPTMMassDiff
+					psm.PTM = &PTM{LocalizedPTMSites: make(map[string]int), LocalizedPTMMassDiff: make(map[string]string)}
+					for _, k := range j.PTMProphetResult {
+						psm.PTM.LocalizedPTMSites[string(k.PTM)] = len(k.ModAminoAcidProbability)
+						psm.PTM.LocalizedPTMMassDiff[string(k.PTM)] = string(k.PTMPeptide)
+					}
 				}
 			}
 		}
