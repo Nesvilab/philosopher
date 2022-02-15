@@ -194,6 +194,10 @@ func (p ProteinProphet) appendParams(params met.ProteinProphet, cmd *exec.Cmd) *
 		cmd.Args = append(cmd.Args, "NONSP")
 	}
 
+	if !params.Subgroups {
+		cmd.Args = append(cmd.Args, "NOGROUPS")
+	}
+
 	if params.Accuracy {
 		cmd.Args = append(cmd.Args, "ACCURACY")
 	}
