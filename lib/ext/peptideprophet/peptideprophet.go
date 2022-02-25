@@ -8,11 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "philosopher/lib/ext/peptideprophet/unix"
-	wPeP "philosopher/lib/ext/peptideprophet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // PeptideProphet is the main tool data configuration structure
@@ -72,40 +69,6 @@ func Run(m met.Data, args []string) met.Data {
 	m.PeptideProphet.InputFiles = args
 
 	return m
-}
-
-// Deploy PeptideProphet binaries on binary directory
-func (p *PeptideProphet) Deploy(os, distro string) {
-
-	if os == sys.Windows() {
-		wPeP.WinInteractParser(p.WinInteractParser)
-		p.DefaultInteractParser = p.WinInteractParser
-		wPeP.WinRefreshParser(p.WinRefreshParser)
-		p.DefaultRefreshParser = p.WinRefreshParser
-		wPeP.WinPeptideProphetParser(p.WinPeptideProphetParser)
-		p.DefaultPeptideProphetParser = p.WinPeptideProphetParser
-		wPeP.LibgccDLL(p.LibgccDLL)
-		wPeP.Zlib1DLL(p.Zlib1DLL)
-		wPeP.Mv(p.Mv)
-	} else {
-		if strings.EqualFold(distro, sys.Debian()) {
-			unix.UnixInteractParser(p.UnixInteractParser)
-			p.DefaultInteractParser = p.UnixInteractParser
-			unix.UnixRefreshParser(p.UnixRefreshParser)
-			p.DefaultRefreshParser = p.UnixRefreshParser
-			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
-			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
-		} else if strings.EqualFold(distro, sys.Redhat()) {
-			unix.UnixInteractParser(p.UnixInteractParser)
-			p.DefaultInteractParser = p.UnixInteractParser
-			unix.UnixRefreshParser(p.UnixRefreshParser)
-			p.DefaultRefreshParser = p.UnixRefreshParser
-			unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
-			p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
-		} else {
-			msg.UnsupportedDistribution(errors.New(""), "fatal")
-		}
-	}
 }
 
 // Execute PeptideProphet

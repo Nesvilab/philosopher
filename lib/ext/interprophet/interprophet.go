@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "philosopher/lib/ext/interprophet/unix"
-	wiPr "philosopher/lib/ext/interprophet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
@@ -56,27 +54,6 @@ func Run(m met.Data, args []string) met.Data {
 	m.InterProphet.InputFiles = args
 
 	return m
-}
-
-// Deploy generates comet binary on workdir bin directory
-func (i *InterProphet) Deploy(os, distro string) {
-
-	if os == sys.Windows() {
-		wiPr.WinInterProphetParser(i.WinInterProphetParser)
-		i.DefaultInterProphetParser = i.WinInterProphetParser
-		wiPr.LibgccDLL(i.LibgccDLL)
-		wiPr.Zlib1DLL(i.Zlib1DLL)
-	} else {
-		if strings.EqualFold(distro, sys.Debian()) {
-			unix.UnixInterProphetParser(i.UnixInterProphetParser)
-			i.DefaultInterProphetParser = i.UnixInterProphetParser
-		} else if strings.EqualFold(distro, sys.Redhat()) {
-			unix.UnixInterProphetParser(i.UnixInterProphetParser)
-			i.DefaultInterProphetParser = i.UnixInterProphetParser
-		} else {
-			msg.UnsupportedDistribution(errors.New(""), "fatal")
-		}
-	}
 }
 
 // Execute IProphet
