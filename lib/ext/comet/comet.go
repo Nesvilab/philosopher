@@ -53,7 +53,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	cmt.Deploy(m.OS, m.Arch)
+	cmt.Deploy(m.Arch)
 
 	if m.Comet.Print {
 		logrus.Info("Printing parameter file")

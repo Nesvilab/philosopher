@@ -8,7 +8,7 @@ import (
 )
 
 // Deploy PeptideProphet binaries on binary directory
-func (p *PeptideProphet) Deploy(os, distro string) {
+func (p *PeptideProphet) Deploy(distro string) {
 	wPeP.WinInteractParser(p.WinInteractParser)
 	p.DefaultInteractParser = p.WinInteractParser
 	wPeP.WinRefreshParser(p.WinRefreshParser)

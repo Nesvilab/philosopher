@@ -8,7 +8,7 @@ import (
 )
 
 // Deploy generates comet binary on workdir bin directory
-func (i *InterProphet) Deploy(os, distro string) {
+func (i *InterProphet) Deploy(distro string) {
 
 	wiPr.WinInterProphetParser(i.WinInterProphetParser)
 	i.DefaultInterProphetParser = i.WinInterProphetParser

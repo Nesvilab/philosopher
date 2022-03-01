@@ -13,7 +13,7 @@ import (
 )
 
 // Deploy generates comet binary on workdir bin directory
-func (i *InterProphet) Deploy(os, distro string) {
+func (i *InterProphet) Deploy(distro string) {
 
 	if strings.EqualFold(distro, sys.Debian()) {
 		unix.UnixInterProphetParser(i.UnixInterProphetParser)

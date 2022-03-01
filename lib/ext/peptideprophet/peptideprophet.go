@@ -61,7 +61,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	pep.Deploy(m.OS, m.Distro)
+	pep.Deploy(m.Distro)
 
 	// run
 	pep.Execute(m.PeptideProphet, m.Home, m.Temp, args)

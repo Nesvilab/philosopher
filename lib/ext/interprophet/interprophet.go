@@ -46,7 +46,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	itp.Deploy(m.OS, m.Distro)
+	itp.Deploy(m.Distro)
 
 	// run InterProphet
 	itp.Execute(m.InterProphet, m.Home, m.Temp, args)

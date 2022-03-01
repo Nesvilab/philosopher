@@ -9,7 +9,7 @@ import (
 )
 
 // Deploy generates comet binary on workdir bin directory
-func (c *Comet) Deploy(os, arch string) {
+func (c *Comet) Deploy(arch string) {
 	// deploy comet param file
 	wcomet.WinParameterFile(c.WinParam)
 	c.DefaultParam = c.WinParam

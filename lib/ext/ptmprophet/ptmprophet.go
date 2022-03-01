@@ -38,7 +38,7 @@ func Run(m met.Data, args []string) met.Data {
 	var ptm = New(m.Temp)
 
 	// deploy the binaries
-	ptm.Deploy(m.OS, m.Distro)
+	ptm.Deploy(m.Distro)
 
 	// run
 	ptm.Execute(m.PTMProphet, args)

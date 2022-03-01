@@ -8,7 +8,7 @@ import (
 )
 
 // Deploy PTMProphet binaries on binary directory
-func (p *PTMProphet) Deploy(os, distro string) {
+func (p *PTMProphet) Deploy(distro string) {
 	wPeP.WinPTMProphetParser(p.WinPTMProphetParser)
 	p.DefaultPTMProphetParser = p.WinPTMProphetParser
 }

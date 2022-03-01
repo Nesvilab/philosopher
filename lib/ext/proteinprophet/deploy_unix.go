@@ -12,7 +12,7 @@ import (
 )
 
 // Deploy generates comet binary on workdir bin directory
-func (p *ProteinProphet) Deploy(os, distro string) {
+func (p *ProteinProphet) Deploy(distro string) {
 
 	if strings.EqualFold(distro, sys.Debian()) {
 		unix.UnixBatchCoverage(p.UnixBatchCoverage)

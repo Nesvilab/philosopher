@@ -13,7 +13,7 @@ import (
 )
 
 // Deploy PTMProphet binaries on binary directory
-func (p *PTMProphet) Deploy(os, distro string) {
+func (p *PTMProphet) Deploy(distro string) {
 	if strings.EqualFold(distro, sys.Debian()) {
 		unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
 		p.DefaultPTMProphetParser = p.UnixPTMProphetParser

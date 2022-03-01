@@ -13,7 +13,7 @@ import (
 )
 
 // Deploy PeptideProphet binaries on binary directory
-func (p *PeptideProphet) Deploy(os, distro string) {
+func (p *PeptideProphet) Deploy(distro string) {
 
 	if strings.EqualFold(distro, sys.Debian()) {
 		unix.UnixInteractParser(p.UnixInteractParser)

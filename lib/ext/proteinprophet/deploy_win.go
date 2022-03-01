@@ -8,7 +8,7 @@ import (
 )
 
 // Deploy generates comet binary on workdir bin directory
-func (p *ProteinProphet) Deploy(os, distro string) {
+func (p *ProteinProphet) Deploy(distro string) {
 
 	wPoP.WinBatchCoverage(p.WinBatchCoverage)
 	p.DefaultBatchCoverage = p.WinBatchCoverage

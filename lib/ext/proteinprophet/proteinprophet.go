@@ -56,7 +56,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	pop.Deploy(m.OS, m.Distro)
+	pop.Deploy(m.Distro)
 
 	// run ProteinProphet
 	pop.Execute(m.ProteinProphet, m.Home, m.Temp, args)
