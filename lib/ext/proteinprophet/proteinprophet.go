@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "philosopher/lib/ext/proteinprophet/unix"
-	wPoP "philosopher/lib/ext/proteinprophet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
@@ -58,7 +56,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	pop.Deploy(m.OS, m.Distro)
+	pop.Deploy(m.Distro)
 
 	// run ProteinProphet
 	pop.Execute(m.ProteinProphet, m.Home, m.Temp, args)
@@ -66,39 +64,6 @@ func Run(m met.Data, args []string) met.Data {
 	m.ProteinProphet.InputFiles = args
 
 	return m
-}
-
-// Deploy generates comet binary on workdir bin directory
-func (p *ProteinProphet) Deploy(os, distro string) {
-
-	if os == sys.Windows() {
-		wPoP.WinBatchCoverage(p.WinBatchCoverage)
-		p.DefaultBatchCoverage = p.WinBatchCoverage
-		wPoP.WinDatabaseParser(p.WinDatabaseParser)
-		p.DefaultDatabaseParser = p.WinDatabaseParser
-		wPoP.WinProteinProphet(p.WinProteinProphet)
-		p.DefaultProteinProphet = p.WinProteinProphet
-		wPoP.LibgccDLL(p.LibgccDLL)
-		wPoP.Zlib1DLL(p.Zlib1DLL)
-	} else {
-		if strings.EqualFold(distro, sys.Debian()) {
-			unix.UnixBatchCoverage(p.UnixBatchCoverage)
-			p.DefaultBatchCoverage = p.UnixBatchCoverage
-			unix.UnixDatabaseParser(p.UnixDatabaseParser)
-			p.DefaultDatabaseParser = p.UnixDatabaseParser
-			unix.UnixProteinProphet(p.UnixProteinProphet)
-			p.DefaultProteinProphet = p.UnixProteinProphet
-		} else if strings.EqualFold(distro, sys.Redhat()) {
-			unix.UnixBatchCoverage(p.UnixBatchCoverage)
-			p.DefaultBatchCoverage = p.UnixBatchCoverage
-			unix.UnixDatabaseParser(p.UnixDatabaseParser)
-			p.DefaultDatabaseParser = p.UnixDatabaseParser
-			unix.UnixProteinProphet(p.UnixProteinProphet)
-			p.DefaultProteinProphet = p.UnixProteinProphet
-		} else {
-			msg.UnsupportedDistribution(errors.New(""), "fatal")
-		}
-	}
 }
 
 // Execute ProteinProphet executes peptideprophet

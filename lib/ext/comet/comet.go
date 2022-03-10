@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	ucomet "philosopher/lib/ext/comet/unix"
-	wcomet "philosopher/lib/ext/comet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/sys"
@@ -55,7 +53,7 @@ func Run(m met.Data, args []string) met.Data {
 	}
 
 	// deploy the binaries
-	cmt.Deploy(m.OS, m.Arch)
+	cmt.Deploy(m.Arch)
 
 	if m.Comet.Print {
 		logrus.Info("Printing parameter file")
@@ -98,38 +96,6 @@ func Run(m met.Data, args []string) met.Data {
 	cmt.Execute(args, m.Comet.Param)
 
 	return m
-}
-
-// Deploy generates comet binary on workdir bin directory
-func (c *Comet) Deploy(os, arch string) {
-
-	if os == sys.Windows() {
-
-		// deploy comet param file
-		wcomet.WinParameterFile(c.WinParam)
-		c.DefaultParam = c.WinParam
-
-		if arch == sys.Arch386() {
-			wcomet.Win32(c.Win32)
-			c.DefaultBin = c.Win32
-
-		} else {
-			wcomet.Win64(c.Win64)
-			c.DefaultBin = c.Win64
-		}
-
-	} else {
-
-		// deploy comet param file
-		ucomet.UnixParameterFile(c.UnixParam)
-		c.DefaultParam = c.UnixParam
-
-		// deploy comet
-		ucomet.Unix64(c.Unix64)
-		c.DefaultBin = c.Unix64
-
-	}
-
 }
 
 // Execute is the main function to execute Comet
