@@ -298,10 +298,10 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand string, channe
 				line,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
 				i.Labels.Channel5.Intensity,
 				i.Labels.Channel6.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
 			)
 		case 8:
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",

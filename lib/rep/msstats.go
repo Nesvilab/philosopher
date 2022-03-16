@@ -107,6 +107,17 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 		if brand == "tmt" {
 			switch channels {
+			case 6:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Purity,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
 			case 10:
 				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,

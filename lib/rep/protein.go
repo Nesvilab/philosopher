@@ -454,10 +454,10 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 				line,
 				reportIntensities[0],
 				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
 				reportIntensities[4],
 				reportIntensities[5],
+				reportIntensities[8],
+				reportIntensities[9],
 			)
 		case 8:
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
