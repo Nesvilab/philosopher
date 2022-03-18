@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"philosopher/lib/id"
+	"philosopher/lib/k2s"
 	"strings"
 
 	"philosopher/lib/iso"
@@ -34,6 +35,8 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 				labelData = tmt.New(plex)
 			} else if brand == "itraq" {
 				labelData = trq.New(plex)
+			} else if brand == "k2" {
+				labelData = k2s.New(plex)
 			}
 
 			// left-pad the spectrum scan
@@ -153,7 +156,9 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if i.Mz.DecodedStream[j] > 137 {
+				if brand != "k2s" && i.Mz.DecodedStream[j] > 137 {
+					break
+				} else if i.Mz.DecodedStream[j] > 300 {
 					break
 				}
 
@@ -182,6 +187,8 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 				labelData = tmt.New(plex)
 			} else if brand == "itraq" {
 				labelData = trq.New(plex)
+			} else if brand == "k2" {
+				labelData = k2s.New(plex)
 			}
 
 			// left-pad the spectrum scan
@@ -302,7 +309,9 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if i.Mz.DecodedStream[j] > 137 {
+				if brand != "k2s" && i.Mz.DecodedStream[j] > 137 {
+					break
+				} else if i.Mz.DecodedStream[j] > 300 {
 					break
 				}
 

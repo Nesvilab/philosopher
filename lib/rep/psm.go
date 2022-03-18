@@ -256,6 +256,8 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 		default:
 			header += ""
 		}
+	} else if brand == "k2s" {
+		header += "\tChannel 284\tChannel 290"
 	}
 
 	header += "\n"
@@ -564,8 +566,14 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 			default:
 				header += ""
 			}
+		} else if brand == "k2s" {
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
+				line,
+				i.Labels.IsUsed,
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+			)
 		}
-
 		line += "\n"
 
 		_, e = io.WriteString(bw, line)

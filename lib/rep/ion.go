@@ -156,6 +156,8 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand string, channels int, 
 		default:
 			header += ""
 		}
+	} else if brand == "k2s" {
+		header += "\tChannel 284\tChannel 290"
 	}
 
 	header += "\n"

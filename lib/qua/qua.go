@@ -6,6 +6,7 @@ import (
 	"math"
 	"path/filepath"
 	"philosopher/lib/id"
+	"philosopher/lib/k2s"
 	"sort"
 	"strings"
 
@@ -229,6 +230,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = trq.New(plex)
+		} else if brand == "k2" {
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = k2s.New(plex)
 		}
 	}
 
@@ -239,6 +243,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = trq.New(plex)
+		} else if brand == "k2" {
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = k2s.New(plex)
 		}
 	}
 
@@ -257,6 +264,13 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 			*evi.Proteins[i].TotalLabels = trq.New(plex)
 			*evi.Proteins[i].UniqueLabels = trq.New(plex)
 			*evi.Proteins[i].URazorLabels = trq.New(plex)
+		} else if brand == "k2" {
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = k2s.New(plex)
+			*evi.Proteins[i].UniqueLabels = k2s.New(plex)
+			*evi.Proteins[i].URazorLabels = k2s.New(plex)
 		}
 	}
 
@@ -454,6 +468,18 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel8.CustomName = labelNames["121"]
 			}
 
+		} else if brand == "k2s" {
+			if len(labelNames["284"]) < 1 {
+				v2.Channel1.CustomName = "284"
+			} else {
+				v2.Channel1.CustomName = labelNames["284"]
+			}
+
+			if len(labelNames["290"]) < 1 {
+				v2.Channel2.CustomName = "290"
+			} else {
+				v2.Channel2.CustomName = labelNames["290"]
+			}
 		}
 
 		labels[k] = v2
