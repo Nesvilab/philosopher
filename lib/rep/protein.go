@@ -443,6 +443,12 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 		)
 
 		switch channels {
+		case 2:
+			line = fmt.Sprintf("%s\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+			)
 		case 4:
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
