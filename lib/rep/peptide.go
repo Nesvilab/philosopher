@@ -176,7 +176,7 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand string, channe
 		default:
 			header += ""
 		}
-	} else if brand == "k2s" {
+	} else if brand == "k2" {
 		header += "\tChannel 284\tChannel 290"
 	}
 

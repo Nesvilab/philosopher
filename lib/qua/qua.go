@@ -468,7 +468,7 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel8.CustomName = labelNames["121"]
 			}
 
-		} else if brand == "k2s" {
+		} else if brand == "k2" {
 			if len(labelNames["284"]) < 1 {
 				v2.Channel1.CustomName = "284"
 			} else {

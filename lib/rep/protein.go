@@ -276,7 +276,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 		default:
 			header += ""
 		}
-	} else if brand == "k2s" {
+	} else if brand == "k2" {
 		header += "\tChannel 284\tChannel 290"
 	}
 
