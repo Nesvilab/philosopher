@@ -427,8 +427,8 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 func Classify(s, decoyTag string) string {
 
 	// remove the decoy and contamintant tags so we can see better the seq header
-	seq := strings.Replace(s, decoyTag, "", -1)
-	seq = strings.Replace(seq, "con_", "", -1)
+	seq := strings.Replace(s, decoyTag, "", 1)
+	seq = strings.Replace(seq, "contam_", "", 1)
 
 	if strings.HasPrefix(seq, "sp|") || strings.HasPrefix(seq, "tr|") || strings.HasPrefix(seq, "db|") {
 		return "uniprot"
