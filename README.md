@@ -68,6 +68,8 @@ da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacher
 
 [Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
 
+[Guo Ci Teo](https://github.com/guoci)
+
 [Alexey Nesvizhskii's research group](http://www.nesvilab.org/)
 
 ## License
