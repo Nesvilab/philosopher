@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"philosopher/lib/id"
 	"strings"
 
 	"philosopher/lib/iso"
@@ -391,10 +392,10 @@ func mapLabeledSpectra(labels map[string]iso.Labels, purity float64, evi []rep.P
 }
 
 // the assignment of usage is only done for general PSM, not for phosphoPSMs
-func assignUsage(evi rep.Evidence, spectrumMap map[string]iso.Labels) rep.Evidence {
+func assignUsage(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for i := range evi.PSM {
-		_, ok := spectrumMap[evi.PSM[i].Spectrum]
+		_, ok := spectrumMap[evi.PSM[i].SpectrumFileName()]
 		if ok {
 			evi.PSM[i].Labels.IsUsed = true
 		}
@@ -417,7 +418,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			counter++
 		}
 
-		if len(evi.PSM[i].Modifications.Index) < 1 {
+		if len(evi.PSM[i].Modifications.IndexSlice) < 1 {
 			evi.PSM[i].Labels.Channel1.Intensity = 0
 			evi.PSM[i].Labels.Channel2.Intensity = 0
 			evi.PSM[i].Labels.Channel3.Intensity = 0
@@ -438,7 +439,7 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 			evi.PSM[i].Labels.Channel18.Intensity = 0
 
 		} else {
-			for _, j := range evi.PSM[i].Modifications.Index {
+			for _, j := range evi.PSM[i].Modifications.IndexSlice {
 				//if j.MassDiff == 144.1020 || j.MassDiff == 229.1629 || j.MassDiff == 304.2072 {
 				if j.MassDiff > 144 {
 					flag++
@@ -476,14 +477,18 @@ func correctUnlabelledSpectra(evi rep.Evidence) rep.Evidence {
 }
 
 // rollUpPeptides gathers PSM info and filters them before summing the instensities to the peptide level
-func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phosphoSpectrumMap map[string]iso.Labels) rep.Evidence {
+func rollUpPeptides(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Peptides {
+
+		evi.Peptides[j].Labels = &iso.Labels{}
+
 		for k := range evi.Peptides[j].Spectra {
 
 			i, ok := spectrumMap[k]
 			if ok {
 
+				//evi.Peptides[j].Labels = &iso.Labels{}
 				evi.Peptides[j].Labels.Channel1.Name = i.Channel1.Name
 				evi.Peptides[j].Labels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Peptides[j].Labels.Channel1.Mz = i.Channel1.Mz
@@ -564,11 +569,6 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
 				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
 
-				evi.Peptides[j].Labels.Channel16.Name = i.Channel16.Name
-				evi.Peptides[j].Labels.Channel16.CustomName = i.Channel16.CustomName
-				evi.Peptides[j].Labels.Channel16.Mz = i.Channel16.Mz
-				evi.Peptides[j].Labels.Channel16.Intensity += i.Channel16.Intensity
-
 				evi.Peptides[j].Labels.Channel17.Name = i.Channel17.Name
 				evi.Peptides[j].Labels.Channel17.CustomName = i.Channel17.CustomName
 				evi.Peptides[j].Labels.Channel17.Mz = i.Channel17.Mz
@@ -582,7 +582,7 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 
 			i, ok = phosphoSpectrumMap[k]
 			if ok {
-
+				evi.Peptides[j].PhosphoLabels = &iso.Labels{}
 				evi.Peptides[j].PhosphoLabels.Channel1.Name = i.Channel1.Name
 				evi.Peptides[j].PhosphoLabels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Peptides[j].PhosphoLabels.Channel1.Mz = i.Channel1.Mz
@@ -681,14 +681,17 @@ func rollUpPeptides(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 }
 
 // rollUpPeptideIons gathers PSM info and filters them before summing the instensities to the peptide ION level
-func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[string]iso.Labels, phosphoSpectrumMap map[string]iso.Labels) rep.Evidence {
+func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Ions {
+
+		evi.Ions[j].Labels = &iso.Labels{}
+
 		for k := range evi.Ions[j].Spectra {
 
 			i, ok := spectrumMap[k]
 			if ok {
-
+				//evi.Ions[j].Labels = &iso.Labels{}
 				evi.Ions[j].Labels.Channel1.Name = i.Channel1.Name
 				evi.Ions[j].Labels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Ions[j].Labels.Channel1.Mz = i.Channel1.Mz
@@ -782,7 +785,7 @@ func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[string]iso.Labels, phos
 
 			i, ok = phosphoSpectrumMap[k]
 			if ok {
-
+				evi.Ions[j].PhosphoLabels = &iso.Labels{}
 				evi.Ions[j].PhosphoLabels.Channel1.Name = i.Channel1.Name
 				evi.Ions[j].PhosphoLabels.Channel1.CustomName = i.Channel1.CustomName
 				evi.Ions[j].PhosphoLabels.Channel1.Mz = i.Channel1.Mz
@@ -881,14 +884,20 @@ func rollUpPeptideIons(evi rep.Evidence, spectrumMap map[string]iso.Labels, phos
 }
 
 // rollUpProteins gathers PSM info and filters them before summing the instensities to the peptide ION level
-func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phosphoSpectrumMap map[string]iso.Labels) rep.Evidence {
+func rollUpProteins(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels, phosphoSpectrumMap map[id.SpectrumType]iso.Labels) rep.Evidence {
 
 	for j := range evi.Proteins {
+
+		evi.Proteins[j].TotalLabels = &iso.Labels{}
+		evi.Proteins[j].UniqueLabels = &iso.Labels{}
+		evi.Proteins[j].URazorLabels = &iso.Labels{}
+
 		for _, k := range evi.Proteins[j].TotalPeptideIons {
 			for l := range k.Spectra {
 
 				i, ok := spectrumMap[l]
 				if ok {
+					//evi.Proteins[j].TotalLabels = &iso.Labels{}
 					evi.Proteins[j].TotalLabels.Channel1.Name = i.Channel1.Name
 					evi.Proteins[j].TotalLabels.Channel1.CustomName = i.Channel1.CustomName
 					evi.Proteins[j].TotalLabels.Channel1.Mz = i.Channel1.Mz
@@ -981,6 +990,7 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 
 					//if k.IsNondegenerateEvidence {
 					if k.IsUnique {
+						//evi.Proteins[j].UniqueLabels = &iso.Labels{}
 						evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
 						evi.Proteins[j].UniqueLabels.Channel1.CustomName = i.Channel1.CustomName
 						evi.Proteins[j].UniqueLabels.Channel1.Mz = i.Channel1.Mz
@@ -1073,6 +1083,7 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[string]iso.Labels, phospho
 					}
 
 					if k.IsURazor {
+						//evi.Proteins[j].URazorLabels = &iso.Labels{}
 						evi.Proteins[j].URazorLabels.Channel1.Name = i.Channel1.Name
 						evi.Proteins[j].URazorLabels.Channel1.CustomName = i.Channel1.CustomName
 						evi.Proteins[j].URazorLabels.Channel1.Mz = i.Channel1.Mz

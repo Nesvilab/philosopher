@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
+	"philosopher/lib/id"
 	"sort"
 	"strings"
 
@@ -23,7 +24,7 @@ import (
 
 // Pair ...
 type Pair struct {
-	Key   string
+	Key   id.SpectrumType
 	Value float64
 }
 
@@ -54,7 +55,7 @@ func RunLabelFreeQuantification(p met.Quantify) {
 // RunIsobaricLabelQuantification is the top function for label quantification
 func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
-	var psmMap = make(map[string]rep.PSMEvidence)
+	var psmMap = make(map[id.SpectrumType]rep.PSMEvidence)
 	var sourceMap = make(map[string][]rep.PSMEvidence)
 	var sourceList []string
 
@@ -72,7 +73,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	for _, i := range evi.PSM {
 		specName := strings.Split(i.Spectrum, ".")
 		sourceMap[specName[0]] = append(sourceMap[specName[0]], i)
-		psmMap[i.Spectrum] = i
+		psmMap[i.SpectrumFileName()] = i
 	}
 
 	for i := range sourceMap {
@@ -129,27 +130,27 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		mappedPSM := mapLabeledSpectra(labels, p.Purity, sourceMap[sourceList[i]])
 
 		for _, j := range mappedPurity {
-			v, ok := psmMap[j.Spectrum]
+			v, ok := psmMap[j.SpectrumFileName()]
 			if ok {
 				psm := v
 				psm.Purity = j.Purity
-				psmMap[j.Spectrum] = psm
+				psmMap[j.SpectrumFileName()] = psm
 			}
 		}
 
 		for _, j := range mappedPSM {
-			v, ok := psmMap[j.Spectrum]
+			v, ok := psmMap[j.SpectrumFileName()]
 			if ok {
 				psm := v
 				psm.Labels = j.Labels
-				psmMap[j.Spectrum] = psm
+				psmMap[j.SpectrumFileName()] = psm
 			}
 		}
 
 	}
 
 	for i := range evi.PSM {
-		v, ok := psmMap[evi.PSM[i].Spectrum]
+		v, ok := psmMap[evi.PSM[i].SpectrumFileName()]
 		if ok {
 			evi.PSM[i].Purity = v.Purity
 			evi.PSM[i].Labels = v.Labels
@@ -223,29 +224,39 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 
 	for i := range evi.PSM {
 		if brand == "tmt" {
-			evi.PSM[i].Labels = tmt.New(plex)
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = tmt.New(plex)
 		} else if brand == "itraq" {
-			evi.PSM[i].Labels = trq.New(plex)
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = trq.New(plex)
 		}
 	}
 
 	for i := range evi.Ions {
 		if brand == "tmt" {
-			evi.Ions[i].Labels = tmt.New(plex)
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = tmt.New(plex)
 		} else if brand == "itraq" {
-			evi.Ions[i].Labels = trq.New(plex)
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = trq.New(plex)
 		}
 	}
 
 	for i := range evi.Proteins {
 		if brand == "tmt" {
-			evi.Proteins[i].TotalLabels = tmt.New(plex)
-			evi.Proteins[i].UniqueLabels = tmt.New(plex)
-			evi.Proteins[i].URazorLabels = tmt.New(plex)
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = tmt.New(plex)
+			*evi.Proteins[i].UniqueLabels = tmt.New(plex)
+			*evi.Proteins[i].URazorLabels = tmt.New(plex)
 		} else if brand == "itraq" {
-			evi.Proteins[i].TotalLabels = trq.New(plex)
-			evi.Proteins[i].UniqueLabels = trq.New(plex)
-			evi.Proteins[i].URazorLabels = trq.New(plex)
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = trq.New(plex)
+			*evi.Proteins[i].UniqueLabels = trq.New(plex)
+			*evi.Proteins[i].URazorLabels = trq.New(plex)
 		}
 	}
 
@@ -451,11 +462,11 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 	return labels
 }
 
-func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[string]iso.Labels, map[string]iso.Labels) {
+func classification(evi rep.Evidence, mods, best bool, remove, purity, probability float64) (map[id.SpectrumType]iso.Labels, map[id.SpectrumType]iso.Labels) {
 
-	var spectrumMap = make(map[string]iso.Labels)
-	var phosphoSpectrumMap = make(map[string]iso.Labels)
-	var bestMap = make(map[string]uint8)
+	var spectrumMap = make(map[id.SpectrumType]iso.Labels)
+	var phosphoSpectrumMap = make(map[id.SpectrumType]iso.Labels)
+	var bestMap = make(map[id.SpectrumType]uint8)
 	var psmLabelSumList PairList
 	var quantCheckUp bool
 
@@ -463,15 +474,15 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	for _, i := range evi.PSM {
 		if i.Probability >= probability && i.Purity >= purity {
 
-			spectrumMap[i.Spectrum] = i.Labels
-			bestMap[i.Spectrum] = 0
+			spectrumMap[i.SpectrumFileName()] = *i.Labels
+			bestMap[i.SpectrumFileName()] = 0
 
-			if mods {
-				_, ok1 := i.LocalizedPTMSites["PTMProphet_STY79.9663"]
-				_, ok2 := i.LocalizedPTMSites["PTMProphet_STY79.96633"]
-				_, ok3 := i.LocalizedPTMSites["PTMProphet_STY79.966331"]
+			if mods && i.PTM != nil {
+				_, ok1 := i.PTM.LocalizedPTMSites["PTMProphet_STY79.9663"]
+				_, ok2 := i.PTM.LocalizedPTMSites["PTMProphet_STY79.96633"]
+				_, ok3 := i.PTM.LocalizedPTMSites["PTMProphet_STY79.966331"]
 				if ok1 || ok2 || ok3 {
-					phosphoSpectrumMap[i.Spectrum] = i.Labels
+					phosphoSpectrumMap[i.SpectrumFileName()] = *i.Labels
 				}
 			}
 
@@ -496,7 +507,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel16.Intensity +
 				i.Labels.Channel17.Intensity +
 				i.Labels.Channel18.Intensity
-			psmLabelSumList = append(psmLabelSumList, Pair{i.Spectrum, sum})
+			psmLabelSumList = append(psmLabelSumList, Pair{i.SpectrumFileName(), sum})
 
 			if sum > 0 {
 				quantCheckUp = true
@@ -515,16 +526,16 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 		var groupedPSMMap = make(map[string][]rep.PSMEvidence)
 		for _, i := range evi.PSM {
 			specName := strings.Split(i.Spectrum, ".")
-			fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm)
+			fqn := fmt.Sprintf("%s#%s", specName[0], i.IonForm().Str())
 			groupedPSMMap[fqn] = append(groupedPSMMap[fqn], i)
 		}
 
 		for _, v := range groupedPSMMap {
 			if len(v) == 1 {
-				bestMap[v[0].Spectrum] = 0
+				bestMap[v[0].SpectrumFileName()] = 0
 			} else {
 
-				var bestPSM string
+				var bestPSM id.SpectrumType
 				var bestPSMInt float64
 				for _, i := range v {
 					tmtSum := i.Labels.Channel1.Intensity +
@@ -547,7 +558,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel18.Intensity
 
 					if tmtSum > bestPSMInt {
-						bestPSM = i.Spectrum
+						bestPSM = i.SpectrumFileName()
 						bestPSMInt = tmtSum
 					}
 
@@ -559,8 +570,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 		}
 	}
 
-	var toDelete = make(map[string]uint8)
-	var toDeletePhospho = make(map[string]uint8)
+	var toDelete = make(map[id.SpectrumType]uint8)
+	var toDeletePhospho = make(map[id.SpectrumType]uint8)
 
 	// 3rd check: remove the lower 3%
 	// Ignore all PSMs that fall under the lower 3% based on their summed TMT labels

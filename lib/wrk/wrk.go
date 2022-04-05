@@ -16,7 +16,7 @@ import (
 
 	"github.com/pierrre/archivefile/zip"
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // Run is the workspace main entry point

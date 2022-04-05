@@ -36,7 +36,6 @@ type Onto struct {
 // Term refers to an atomic ontology definition
 type Term struct {
 	ID               string
-	RecordID         int
 	Name             string
 	Definition       string
 	DateTimePosted   string
@@ -44,9 +43,10 @@ type Term struct {
 	Comments         string
 	Synonyms         string
 	IsA              string
+	Composition      string
+	RecordID         int
 	MonoIsotopicMass float64
 	AverageMass      float64
-	Composition      string
 	Sites            map[string]uint8
 }
 

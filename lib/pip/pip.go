@@ -518,9 +518,11 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 		}
 	}
 
-	e := os.RemoveAll(path.Dir(proBin))
-	if e != nil {
-		log.Fatal(e)
+	if _, err := os.Stat(path.Dir(proBin)); err == nil {
+		e := os.RemoveAll(path.Dir(proBin))
+		if e != nil {
+			log.Fatal(e)
+		}
 	}
 
 	return meta

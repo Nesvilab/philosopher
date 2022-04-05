@@ -8,11 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	unix "philosopher/lib/ext/ptmprophet/unix"
-	wPeP "philosopher/lib/ext/ptmprophet/win"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 )
 
 // PTMProphet is the main tool data configuration structure
@@ -41,7 +38,7 @@ func Run(m met.Data, args []string) met.Data {
 	var ptm = New(m.Temp)
 
 	// deploy the binaries
-	ptm.Deploy(m.OS, m.Distro)
+	ptm.Deploy(m.Distro)
 
 	// run
 	ptm.Execute(m.PTMProphet, args)
@@ -49,25 +46,6 @@ func Run(m met.Data, args []string) met.Data {
 	m.PTMProphet.InputFiles = args
 
 	return m
-}
-
-// Deploy PTMProphet binaries on binary directory
-func (p *PTMProphet) Deploy(os, distro string) {
-
-	if os == sys.Windows() {
-		wPeP.WinPTMProphetParser(p.WinPTMProphetParser)
-		p.DefaultPTMProphetParser = p.WinPTMProphetParser
-	} else {
-		if strings.EqualFold(distro, sys.Debian()) {
-			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
-			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
-		} else if strings.EqualFold(distro, sys.Redhat()) {
-			unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
-			p.DefaultPTMProphetParser = p.UnixPTMProphetParser
-		} else {
-			msg.UnsupportedDistribution(errors.New(""), "fatal")
-		}
-	}
 }
 
 // Execute PTMProphet

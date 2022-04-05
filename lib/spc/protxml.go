@@ -22,16 +22,16 @@ type ProteinSummaryHeader struct {
 	XMLName                     xml.Name       `xml:"protein_summary_header"`
 	ReferenceDatabase           []byte         `xml:"reference_database,attr"`
 	ResidueSubstitutionList     []byte         `xml:"residue_substitution_list,attr"`
+	SampleEnzyme                []byte         `xml:"sample_enzyme,attr"`
 	MinPeptideProbability       float32        `xml:"min_peptide_probability,attr"`
 	MinPeptideWeight            float32        `xml:"min_peptide_weight,attr"`
 	NumPredictedCorrectProteins float32        `xml:"num_predicted_correct_prots,attr"`
+	TotalNumberSpectrumIDs      float32        `xml:"total_no_spectrum_ids,attr"`
 	NumInput1Spectra            uint32         `xml:"num_input_1_spectra,attr"`
 	NumInput2Spectra            uint32         `xml:"num_input_2_spectra,attr"`
 	NumInput3Spectra            uint32         `xml:"num_input_3_spectra,attr"`
 	NumInput4Spectra            uint32         `xml:"num_input_4_spectra,attr"`
 	NumInput5Spectra            uint32         `xml:"num_input_5_spectra,attr"`
-	TotalNumberSpectrumIDs      float32        `xml:"total_no_spectrum_ids,attr"`
-	SampleEnzyme                []byte         `xml:"sample_enzyme,attr"`
 	ProgramDetails              ProgramDetails `xml:"program_details"`
 }
 
@@ -70,19 +70,18 @@ type ProteinGroup struct {
 type Protein struct {
 	XMLName                         xml.Name                   `xml:"protein"`
 	ProteinName                     []byte                     `xml:"protein_name,attr"`
-	NumberIndistinguishableProteins int16                      `xml:"n_indistinguishable_proteins,attr"`
-	Probability                     float64                    `xml:"probability,attr"`
-	PercentCoverage                 float32                    `xml:"percent_coverage,attr"`
 	UniqueStrippedPeptides          []byte                     `xml:"unique_stripped_peptides,attr"`
 	GroupSiblingID                  []byte                     `xml:"group_sibling_id,attr"`
+	NumberIndistinguishableProteins int16                      `xml:"n_indistinguishable_proteins,attr"`
 	TotalNumberPeptides             int                        `xml:"total_number_peptides,attr"`
 	TotalNumberIndPeptides          int                        `xml:"total_number_distinct_peptides,attr"`
+	PercentCoverage                 float32                    `xml:"percent_coverage,attr"`
 	PctSpectrumIDs                  float32                    `xml:"pct_spectrum_ids,attr"`
+	Probability                     float64                    `xml:"probability,attr"`
 	Parameter                       Parameter                  `xml:"parameter"`
 	Annotation                      Annotation                 `xml:"annotation"`
 	IndistinguishableProtein        []IndistinguishableProtein `xml:"indistinguishable_protein"`
 	Peptide                         []Peptide                  `xml:"peptide"`
-	TopPepProb                      float64
 	//Confidence                      float64                    `xml:"confidence,attr"`
 }
 

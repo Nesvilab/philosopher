@@ -16,7 +16,7 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
-	"github.com/vmihailenco/msgpack"
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 // Data is the global parameter container
@@ -88,74 +88,79 @@ type Database struct {
 // Comet options and parameters
 type Comet struct {
 	Param        string `yaml:"param"`
-	ParamFile    []byte
 	RawExtension string `yaml:"raw"`
 	RawFiles     []string
+	ParamFile    []byte
 	Print        bool
 	NoIndex      bool `yaml:"noindex"`
 }
 
 // MSFragger options and parameters
 type MSFragger struct {
-	JarPath                 string  `yaml:"path"`
-	Memory                  int     `yaml:"memory"`
-	Threads                 int     `yaml:"num_threads"`
-	Extension               string  `yaml:"extension"`
-	DataType                int     `yaml:"data_type"`
-	DatabaseName            string  `yaml:"database_name"`
-	PrecursorMassLower      int     `yaml:"precursor_mass_lower"`
-	PrecursorMassUpper      int     `yaml:"precursor_mass_upper"`
-	PrecursorMassUnits      int     `yaml:"precursor_mass_units"`
-	PrecursorTrueTolerance  int     `yaml:"precursor_true_tolerance"`
-	PrecursorTrueUnits      int     `yaml:"precursor_true_units"`
-	FragmentMassTolerance   float64 `yaml:"fragment_mass_tolerance"`
-	FragmentMassUnits       int     `yaml:"fragment_mass_units"`
-	CalibrateMass           int     `yaml:"calibrate_mass"`
-	UseAllModsInFirstSearch int     `yaml:"use_all_mods_in_first_search"`
-	WriteCalibratedMGF      int     `yaml:"write_calibrated_mgf"`
-	DecoyPrefix             string  `yaml:"decoy_prefix"`
-	EvaluateMassCalibration int     `yaml:"evaluate_mass_calibration"`
-	Deisotope               int     `yaml:"deisotope"`
-	Deneutralloss           int     `yaml:"deneutralloss"`
-	IsotopeError            string  `yaml:"isotope_error"`
-	MassOffsets             string  `yaml:"mass_offsets"`
-	PrecursorMassMode       string  `yaml:"precursor_mass_mode"`
-	LocalizeDeltaMass       int     `yaml:"localize_delta_mass"`
-	DeltaMassExcludeRanges  string  `yaml:"delta_mass_exclude_ranges"`
-	FragmentIonSeries       string  `yaml:"fragment_ion_series"`
-	IonSeriesDefinitions    string  `yaml:"ion_series_definitions"`
-
-	SearchEnzymeName1      string `yaml:"search_enzyme_name_1"`
-	SearchEnzymeCut1       string `yaml:"search_enzyme_cut_1"`
-	SearchEnzymeNocut1     string `yaml:"search_enzyme_nocut_1"`
-	AllowedMissedCleavage1 int    `yaml:"allowed_missed_cleavage_1"`
-	SearchEnzymeSense1     string `yaml:"search_enzyme_sense_1"`
-
-	SearchEnzymeName2      string `yaml:"search_enzyme_name_2"`
-	SearchEnzymeCut2       string `yaml:"search_enzyme_cut_2"`
-	SearchEnzymeNocut2     string `yaml:"search_enzyme_nocut_2"`
-	AllowedMissedCleavage2 int    `yaml:"allowed_missed_cleavage_2"`
-	SearchEnzymeSense2     string `yaml:"search_enzyme_sense_2"`
-
-	//SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
-	//SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`
-	//SearchEnzymeButNotAfter            string  `yaml:"search_enzyme_butnotafter"`
-	//AllowedMissedCleavage              int     `yaml:"allowed_missed_cleavage"`
-
+	JarPath                            string `yaml:"path"`
+	Extension                          string `yaml:"extension"`
+	DatabaseName                       string `yaml:"database_name"`
+	DecoyPrefix                        string `yaml:"decoy_prefix"`
+	IsotopeError                       string `yaml:"isotope_error"`
+	MassOffsets                        string `yaml:"mass_offsets"`
+	PrecursorMassMode                  string `yaml:"precursor_mass_mode"`
+	DeltaMassExcludeRanges             string `yaml:"delta_mass_exclude_ranges"`
+	FragmentIonSeries                  string `yaml:"fragment_ion_series"`
+	IonSeriesDefinitions               string `yaml:"ion_series_definitions"`
+	SearchEnzymeName1                  string `yaml:"search_enzyme_name_1"`
+	SearchEnzymeCut1                   string `yaml:"search_enzyme_cut_1"`
+	SearchEnzymeNocut1                 string `yaml:"search_enzyme_nocut_1"`
+	SearchEnzymeSense1                 string `yaml:"search_enzyme_sense_1"`
+	SearchEnzymeName2                  string `yaml:"search_enzyme_name_2"`
+	SearchEnzymeCut2                   string `yaml:"search_enzyme_cut_2"`
+	SearchEnzymeNocut2                 string `yaml:"search_enzyme_nocut_2"`
+	SearchEnzymeSense2                 string `yaml:"search_enzyme_sense_2"`
+	OutputFormat                       string `yaml:"output_format"`
+	PrecursorCharge                    string `yaml:"precursor_charge"`
+	DigestMassRange                    string `yaml:"digest_mass_range"`
+	ClearMzRange                       string `yaml:"clear_mz_range"`
+	RemovePrecursorRange               string `yaml:"remove_precursor_range"`
+	LabileSearchMode                   string `yaml:"labile_search_mode"`
+	RestrictDeltaMassTo                string `yaml:"restrict_deltamass_to"`
+	DiagnosticFragments                string `yaml:"diagnostic_fragments"`
+	YTypeMasses                        string `yaml:"Y_type_masses"`
+	VariableMod01                      string `yaml:"variable_mod_01"`
+	VariableMod02                      string `yaml:"variable_mod_02"`
+	VariableMod03                      string `yaml:"variable_mod_03"`
+	VariableMod04                      string `yaml:"variable_mod_04"`
+	VariableMod05                      string `yaml:"variable_mod_05"`
+	VariableMod06                      string `yaml:"variable_mod_06"`
+	VariableMod07                      string `yaml:"variable_mod_07"`
+	RawFiles                           []string
+	Memory                             int     `yaml:"memory"`
+	Threads                            int     `yaml:"num_threads"`
+	DataType                           int     `yaml:"data_type"`
+	PrecursorMassLower                 int     `yaml:"precursor_mass_lower"`
+	PrecursorMassUpper                 int     `yaml:"precursor_mass_upper"`
+	PrecursorMassUnits                 int     `yaml:"precursor_mass_units"`
+	PrecursorTrueTolerance             int     `yaml:"precursor_true_tolerance"`
+	PrecursorTrueUnits                 int     `yaml:"precursor_true_units"`
+	FragmentMassUnits                  int     `yaml:"fragment_mass_units"`
+	CalibrateMass                      int     `yaml:"calibrate_mass"`
+	UseAllModsInFirstSearch            int     `yaml:"use_all_mods_in_first_search"`
+	WriteCalibratedMGF                 int     `yaml:"write_calibrated_mgf"`
+	EvaluateMassCalibration            int     `yaml:"evaluate_mass_calibration"`
+	Deisotope                          int     `yaml:"deisotope"`
+	Deneutralloss                      int     `yaml:"deneutralloss"`
+	LocalizeDeltaMass                  int     `yaml:"localize_delta_mass"`
+	AllowedMissedCleavage1             int     `yaml:"allowed_missed_cleavage_1"`
+	AllowedMissedCleavage2             int     `yaml:"allowed_missed_cleavage_2"`
 	NumEnzymeTermini                   int     `yaml:"num_enzyme_termini"`
 	ClipNTermM                         int     `yaml:"clip_nTerm_M"`
 	AllowMultipleVariableModsOnResidue int     `yaml:"allow_multiple_variable_mods_on_residue"`
 	MaxVariableModsPerPeptide          int     `yaml:"max_variable_mods_per_peptide"`
 	MaxVariableModsCombinations        int     `yaml:"max_variable_mods_combinations"`
-	OutputFormat                       string  `yaml:"output_format"`
 	OutputReportTopN                   int     `yaml:"output_report_topN"`
 	OutputMaxExpect                    int     `yaml:"output_max_expect"`
 	ReportAlternativeProteins          int     `yaml:"report_alternative_proteins"`
 	OverrideCharge                     int     `yaml:"override_charge"`
-	PrecursorCharge                    string  `yaml:"precursor_charge"`
 	DigestMinLength                    int     `yaml:"digest_min_length"`
 	DigestMaxLength                    int     `yaml:"digest_max_length"`
-	DigestMassRange                    string  `yaml:"digest_mass_range"`
 	MaxFragmentCharge                  int     `yaml:"max_fragment_charge"`
 	TrackZeroTopN                      int     `yaml:"track_zero_topN"`
 	ZeroBinAcceptExpect                int     `yaml:"zero_bin_accept_expect"`
@@ -166,24 +171,12 @@ type MSFragger struct {
 	UseTopNPeaks                       int     `yaml:"use_topN_peaks"`
 	MinFragmentsModelling              int     `yaml:"min_fragments_modelling"`
 	MinMatchedFragments                int     `yaml:"min_matched_fragments"`
-	MinimumRatio                       float64 `yaml:"minimum_ratio"`
-	ClearMzRange                       string  `yaml:"clear_mz_range"`
 	RemovePrecursorPeak                int     `yaml:"remove_precursor_peak"`
-	RemovePrecursorRange               string  `yaml:"remove_precursor_range"`
 	IntensityTransform                 int     `yaml:"intensity_transform"`
 	MassDiffToVariableMod              int     `yaml:"mass_diff_to_variable_mod"`
-	LabileSearchMode                   string  `yaml:"labile_search_mode"`
-	RestrictDeltaMassTo                string  `yaml:"restrict_deltamass_to"`
 	DiagnosticIntensityFilter          int     `yaml:"diagnostic_intensity_filter"`
-	DiagnosticFragments                string  `yaml:"diagnostic_fragments"`
-	YTypeMasses                        string  `yaml:"Y_type_masses"`
-	VariableMod01                      string  `yaml:"variable_mod_01"`
-	VariableMod02                      string  `yaml:"variable_mod_02"`
-	VariableMod03                      string  `yaml:"variable_mod_03"`
-	VariableMod04                      string  `yaml:"variable_mod_04"`
-	VariableMod05                      string  `yaml:"variable_mod_05"`
-	VariableMod06                      string  `yaml:"variable_mod_06"`
-	VariableMod07                      string  `yaml:"variable_mod_07"`
+	MinimumRatio                       float64 `yaml:"minimum_ratio"`
+	FragmentMassTolerance              float64 `yaml:"fragment_mass_tolerance"`
 	AddCtermPeptide                    float64 `yaml:"add_Cterm_peptide"`
 	AddCtermProtein                    float64 `yaml:"add_Cterm_protein"`
 	AddNTermPeptide                    float64 `yaml:"add_Nterm_peptide"`
@@ -209,20 +202,23 @@ type MSFragger struct {
 	AddTryptophan                      float64 `yaml:"add_W_tryptophan"`
 	AddTyrosine                        float64 `yaml:"add_Y_tyrosine"`
 	Param                              string  `yaml:"param"`
-	RawFiles                           []string
 	ParamFile                          []byte
+	//SearchEnzymeName                   string  `yaml:"search_enzyme_name"`
+	//SearchEnzymeCutafter               string  `yaml:"search_enzyme_cutafter"`
+	//SearchEnzymeButNotAfter            string  `yaml:"search_enzyme_butnotafter"`
+	//AllowedMissedCleavage              int     `yaml:"allowed_missed_cleavage"`
 }
 
 // PeptideProphet options and parameters
 type PeptideProphet struct {
+	FileExtension string `yaml:"extension"`
+	Output        string `yaml:"output"`
+	Database      string `yaml:"database"`
+	Rtcat         string `yaml:"rtcat"`
+	Decoy         string `yaml:"decoy"`
+	Enzyme        string `yaml:"enzyme"`
+	Ignorechg     string `yaml:"ignorechg"`
 	InputFiles    []string
-	FileExtension string  `yaml:"extension"`
-	Output        string  `yaml:"output"`
-	Database      string  `yaml:"database"`
-	Rtcat         string  `yaml:"rtcat"`
-	Decoy         string  `yaml:"decoy"`
-	Enzyme        string  `yaml:"enzyme"`
-	Ignorechg     string  `yaml:"ignorechg"`
 	Minpiprob     float64 `yaml:"minpiprob"`
 	Minrtprob     float64 `yaml:"minrtprob"`
 	Minprob       float64 `yaml:"minprob"`
@@ -293,6 +289,7 @@ type ProteinProphet struct {
 	Glyc        bool    `yaml:"glyc"`
 	Nogroupwts  bool    `yaml:"nogroupwts"`
 	NonSP       bool    `yaml:"nonsp"`
+	Subgroups   bool    `yaml:"subgroups"`
 	Accuracy    bool    `yaml:"accuracy"`
 	Asap        bool    `yaml:"asap"`
 	Refresh     bool    `yaml:"refresh"`

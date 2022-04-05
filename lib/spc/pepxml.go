@@ -182,17 +182,17 @@ type TerminalModification struct {
 // SpectrumQuery tag
 type SpectrumQuery struct {
 	XMLName                          xml.Name     `xml:"spectrum_query"`
+	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
 	Spectrum                         []byte       `xml:"spectrum,attr"`
 	SpectrumNativeID                 []byte       `xml:"spectrumNativeID,attr"`
 	StartScan                        int          `xml:"start_scan,attr"`
 	EndScan                          int          `xml:"end_scan,attr"`
-	UncalibratedPrecursorNeutralMass float64      `xml:"uncalibrated_precursor_neutral_mass,attr"`
-	PrecursorNeutralMass             float64      `xml:"precursor_neutral_mass,attr"`
 	AssumedCharge                    uint8        `xml:"assumed_charge,attr"`
 	Index                            uint32       `xml:"index,attr"`
 	RetentionTimeSec                 float64      `xml:"retention_time_sec,attr"`
 	IonMobility                      float64      `xml:"ion_mobility,attr"`
-	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
+	UncalibratedPrecursorNeutralMass float64      `xml:"uncalibrated_precursor_neutral_mass,attr"`
+	PrecursorNeutralMass             float64      `xml:"precursor_neutral_mass,attr"`
 	SearchResult                     SearchResult `xml:"search_result"`
 }
 
@@ -211,17 +211,17 @@ type SearchHit struct {
 	NextAA              []byte               `xml:"peptide_next_aa,attr"`
 	Protein             []byte               `xml:"protein,attr"`
 	ProteinDescr        []byte               `xml:"protein_descr,attr"`
+	TotalTerm           uint8                `xml:"num_tol_term,attr"`
+	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
+	IsRejected          uint8                `xml:"is_rejected,attr"`
 	TotalProteins       uint16               `xml:"num_tot_proteins,attr"`
 	MatchedIons         uint16               `xml:"num_matched_ions,attr"`
 	TotalIons           uint16               `xml:"tot_num_ions,attr"`
+	MatchedPeptides     uint32               `xml:"num_matched_peptides,attr"`
 	CalcNeutralPepMass  float64              `xml:"calc_neutral_pep_mass,attr"`
 	Massdiff            float64              `xml:"massdiff,attr"`
-	TotalTerm           uint8                `xml:"num_tol_term,attr"`
-	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
-	MatchedPeptides     uint32               `xml:"num_matched_peptides,attr"`
-	IsRejected          uint8                `xml:"is_rejected,attr"`
-	Score               []SearchScore        `xml:"search_score"`
 	ModificationInfo    ModificationInfo     `xml:"modification_info"`
+	Score               []SearchScore        `xml:"search_score"`
 	AnalysisResult      []AnalysisResult     `xml:"analysis_result"`
 	AlternativeProteins []AlternativeProtein `xml:"alternative_protein"`
 	PTMResult           PTMResult            `xml:"ptm_result"`
@@ -230,9 +230,9 @@ type SearchHit struct {
 // AlternativeProtein tag
 type AlternativeProtein struct {
 	XMLName     xml.Name `xml:"alternative_protein"`
+	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
 	Protein     []byte   `xml:"protein,attr"`
 	Description []byte   `xml:"protein_descr,attr"`
-	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
 	PepPrevAA   []byte   `xml:"peptide_prev_aa,attr"`
 	PepNextAA   []byte   `xml:"peptide_next_aa,attr"`
 }

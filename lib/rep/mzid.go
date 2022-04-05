@@ -2,6 +2,7 @@ package rep
 
 import (
 	"fmt"
+	"philosopher/lib/id"
 	"sort"
 	"strconv"
 	"strings"
@@ -38,7 +39,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 	dtb.Restore()
 
 	// spectra evidence reference map
-	var specRef = make(map[string]string)
+	var specRef = make(map[id.SpectrumType]string)
 
 	// peptide evidence reference map
 	var pepRef = make(map[string]string)
@@ -212,13 +213,13 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 			},
 		}
 
-		for _, j := range i.Modifications.Index {
+		for _, j := range i.Modifications.IndexSlice {
 			if j.Name != "Unknown" {
 				mod := psi.Modification{
-					AvgMassDelta:          j.AverageMass,
-					MonoIsotopicMassDelta: j.MonoIsotopicMass,
-					Residues:              j.AminoAcid,
-					Location:              j.Position,
+					//AvgMassDelta:          j.AverageMass,
+					//MonoIsotopicMassDelta: j.MonoIsotopicMass,
+					Residues: j.AminoAcid,
+					Location: strconv.Itoa(j.Position),
 					CVParam: []psi.CVParam{
 						{
 							CVRef:     "UNIMOD",
@@ -252,8 +253,8 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 			ID:            fmt.Sprintf("PepEv_%d", idCounter),
 			IsDecoy:       strconv.FormatBool(i.IsDecoy),
 			PeptideRef:    i.Peptide,
-			Pre:           i.PrevAA,
-			Post:          i.NextAA,
+			Pre:           string(i.PrevAA),
+			Post:          string(i.NextAA),
 		}
 
 		pepRef[i.Peptide] = fmt.Sprintf("PepEv_%d", idCounter)
@@ -791,7 +792,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 									CVRef:     "PSI-MS",
 									Accession: "MS:1000796",
 									Name:      "spectrum title",
-									Value:     j.Spectrum,
+									Value:     j.SpectrumFileName().Str(),
 								},
 								{
 									CVRef:     "PSI-MS",
@@ -1012,7 +1013,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 					},
 				}
 
-				specRef[j.Spectrum] = fmt.Sprintf("Spectrum_%d", idCounter)
+				specRef[j.SpectrumFileName()] = fmt.Sprintf("Spectrum_%d", idCounter)
 				ad.SpectrumIdentificationList[0].SpectrumIdentificationResult = append(ad.SpectrumIdentificationList[0].SpectrumIdentificationResult, *sir)
 			}
 		}

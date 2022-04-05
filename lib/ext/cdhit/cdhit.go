@@ -8,8 +8,6 @@ import (
 
 	"philosopher/lib/msg"
 
-	ucdhit "philosopher/lib/ext/cdhit/unix"
-	wcdhit "philosopher/lib/ext/cdhit/win"
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
 )
@@ -54,25 +52,6 @@ func New() CDhit {
 	o.FileName = m.Temp + string(filepath.Separator) + "cdhit"
 
 	return o
-}
-
-// Deploy generates binaries on workdir
-func (c *CDhit) Deploy() {
-
-	if c.OS == sys.Windows() {
-
-		// deploy cd-hit binary
-		wcdhit.Win64(c.WinBin)
-		c.DefaultBin = c.WinBin
-
-	} else {
-
-		// deploy cd-hit binary
-		ucdhit.Unix64(c.UnixBin)
-		c.DefaultBin = c.UnixBin
-
-	}
-
 }
 
 // Run runs the cdhit binary with user's information
