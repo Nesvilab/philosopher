@@ -1,13 +1,5 @@
 ### Added
-- Added support for TMT 18
-- Added option for contaminant tags in the database.
 
 ### Changed
-- Added the parsing rules from the Prophets to the protein description.
-- Removed RawReader because of licensing issues.
-- Improved processing speed and resource usage.
-- Reduced binariy size.
 
 ### Fixed
-- Several bugs and code fizes added.
-- Fixed issue with TMT 6 plex quantification.
