@@ -4,7 +4,6 @@ package uti
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -155,13 +154,13 @@ func IOReadDir(root, ext string) []string {
 
 	var files []string
 
-	fileInfo, err := ioutil.ReadDir(root)
+	fileInfo, err := os.ReadDir(root)
 	if err != nil {
 		return files
 	}
 	for _, file := range fileInfo {
 		if strings.Contains(file.Name(), ext) {
-			files = append(files, file.Name())
+			files = append(files, filepath.Join(root, file.Name()))
 		}
 	}
 
