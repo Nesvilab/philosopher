@@ -460,25 +460,25 @@ func Run(m met.Data) {
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
-		repoPSM.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
+		repoPSM.MetaPSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
 	}
 	{
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
-		repoIons.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+		repoIons.MetaIonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
 	}
 	{
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
-		repoPeptides.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+		repoPeptides.MetaPeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
 	}
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
 		var repoProteins ProteinEvidenceList
 		RestoreProtein(&repoProteins)
-		repoProteins.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repoProteins.MetaProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 

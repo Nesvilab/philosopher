@@ -128,7 +128,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
+func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
 	var header string
 	var modMap = make(map[string]string)
 	var modList []string
@@ -336,6 +336,12 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 		sort.Strings(mappedProteins)
 		sort.Strings(assL)
 		sort.Strings(obs)
+
+		// append decoy tags on the gene and proteinID names
+		if i.IsDecoy {
+			i.ProteinID = decoyTag + i.ProteinID
+			i.GeneName = decoyTag + i.GeneName
+		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,

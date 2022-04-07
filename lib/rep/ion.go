@@ -102,7 +102,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 }
 
 // MetaIonReport reports consist on ion reporting
-func (evi IonEvidenceList) MetaIonReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
@@ -236,6 +236,12 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand string, channels int, 
 		sort.Strings(mappedProteins)
 		sort.Strings(assL)
 		sort.Strings(obs)
+
+		// append decoy tags on the gene and proteinID names
+		if i.IsDecoy {
+			i.ProteinID = decoyTag + i.ProteinID
+			i.GeneName = decoyTag + i.GeneName
+		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
