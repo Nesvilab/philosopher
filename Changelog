@@ -1,4 +1,6 @@
 ### Added
+- Decoys tag now appear inthe Gene and ProteinID
+- Support for TAIR database
 
 ### Changed
 
