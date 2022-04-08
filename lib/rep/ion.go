@@ -241,6 +241,7 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, chan
 		if i.IsDecoy {
 			i.ProteinID = decoyTag + i.ProteinID
 			i.GeneName = decoyTag + i.GeneName
+			i.EntryName = decoyTag + i.EntryName
 		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",

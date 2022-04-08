@@ -341,6 +341,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 		if i.IsDecoy {
 			i.ProteinID = decoyTag + i.ProteinID
 			i.GeneName = decoyTag + i.GeneName
+			i.EntryName = decoyTag + i.EntryName
 		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",

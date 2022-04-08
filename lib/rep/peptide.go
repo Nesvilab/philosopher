@@ -268,6 +268,7 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 		if i.IsDecoy {
 			i.ProteinID = decoyTag + i.ProteinID
 			i.GeneName = decoyTag + i.GeneName
+			i.EntryName = decoyTag + i.EntryName
 		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",

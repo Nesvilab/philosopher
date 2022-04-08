@@ -397,6 +397,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 		if i.IsDecoy {
 			i.ProteinID = decoyTag + i.ProteinID
 			i.GeneNames = decoyTag + i.GeneNames
+			i.EntryName = decoyTag + i.EntryName
 		}
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
