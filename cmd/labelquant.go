@@ -43,6 +43,10 @@ var labelquantCmd = &cobra.Command{
 			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
+		if m.Quantify.Raw {
+			msg.Custom(errors.New("support for Thermo raw files was temporarily removed, please convert your files to mzML"), "fatal")
+		}
+
 		m.Quantify = qua.RunIsobaricLabelQuantification(m.Quantify, m.Filter.Mapmods)
 
 		// store parameters on meta data

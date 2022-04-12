@@ -38,6 +38,10 @@ var freequant = &cobra.Command{
 			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
+		if m.Quantify.Raw {
+			msg.Custom(errors.New("support for Thermo raw files was temporarily removed, please convert your files to mzML"), "fatal")
+		}
+
 		//forcing the larger time window to be the same as the smaller one
 		//m.Quantify.RTWin = 3
 		m.Quantify.RTWin = m.Quantify.PTWin

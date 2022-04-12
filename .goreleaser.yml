@@ -2,6 +2,9 @@
 # Make sure to check the documentation at http://goreleaser.com
 project_name: philosopher
 
+env_files:
+  github_token: /home/prvst/bin/github_token
+
 before:
   hooks:
     #- ginkgo -r
@@ -14,7 +17,6 @@ builds:
     - -w -s -X main.version=v{{ .Version }} -X main.build={{ .Timestamp }}
 
   goos:
-    - freebsd
     - windows
     - linux
 

@@ -383,7 +383,7 @@ func ProcessUniRef(k, v, decoyTag string) Record {
 	return e
 }
 
-// ProcessGeneric parses generci and uknown database headers
+// ProcessGeneric parses generic and uknown database headers
 func ProcessGeneric(k, v, decoyTag string) Record {
 
 	var e Record
@@ -423,6 +423,54 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 	return e
 }
 
+// ProcessTair parses Arabidopsis DB database headers
+func ProcessTair(k, v, decoyTag string) Record {
+
+	var e Record
+
+	parts := strings.Split(k, "|")
+
+	// ID
+	e.ID = parts[0]
+	e.ID = strings.TrimLeft(e.ID, " ")
+	e.ID = strings.TrimRight(e.ID, " ")
+
+	// Gene
+	if strings.Contains(parts[1], "no symbol available") {
+		e.GeneNames = ""
+	} else {
+		//Symbols\:\s(.+?)\s\|
+		geneReg := regexp.MustCompile(`Symbols\:\s(.+)\s`)
+		gm := geneReg.FindStringSubmatch(parts[1])
+		e.GeneNames = gm[1]
+	}
+
+	// Descripion
+	e.Description = parts[2]
+	e.Description = strings.TrimLeft(e.Description, " ")
+	e.Description = strings.TrimRight(e.Description, " ")
+
+	part := strings.Split(k, " ")
+
+	e.EntryName = k
+	e.Organism = ""
+	e.SequenceVersion = ""
+
+	e.Sequence = v
+	e.Length = len(v)
+	e.OriginalHeader = k
+
+	e.PartHeader = part[0]
+
+	if strings.HasPrefix(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	return e
+}
+
 // Classify determines what kind of database originated the given sequence
 func Classify(s, decoyTag string) string {
 
@@ -438,6 +486,8 @@ func Classify(s, decoyTag string) string {
 		return "ensembl"
 	} else if strings.HasPrefix(seq, "UniRef") {
 		return "uniref"
+	} else if strings.HasPrefix(seq, "AT") {
+		return "tair"
 	}
 
 	return "generic"

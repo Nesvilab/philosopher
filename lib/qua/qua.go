@@ -10,7 +10,6 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/ext/rawfilereader"
 	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
@@ -101,10 +100,9 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 		logrus.Info("Processing ", sourceList[i])
 
 		if p.Raw {
-
-			fileName = fmt.Sprintf("%s%s%s.raw", p.Dir, string(filepath.Separator), sourceList[i])
-			stream := rawfilereader.Run(fileName, "")
-			mz.ReadRaw(fileName, stream)
+			//fileName = fmt.Sprintf("%s%s%s.raw", p.Dir, string(filepath.Separator), sourceList[i])
+			//stream := rawfilereader.Run(fileName, "")
+			//mz.ReadRaw(fileName, stream)
 
 		} else {
 

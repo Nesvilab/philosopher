@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
+	"philosopher/lib/bio"
 	"philosopher/lib/id"
+	"philosopher/lib/msg"
 	"sort"
 	"strings"
-
-	"philosopher/lib/bio"
-	"philosopher/lib/ext/rawfilereader"
-	"philosopher/lib/msg"
 
 	"philosopher/lib/mzn"
 	"philosopher/lib/rep"
@@ -86,9 +84,9 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		var fileName string
 
 		if isRaw {
-			fileName = fmt.Sprintf("%s%s%s.raw", dir, string(filepath.Separator), s)
-			stream := rawfilereader.Run(fileName, "")
-			mz.ReadRaw(s, stream)
+			//fileName = fmt.Sprintf("%s%s%s.raw", dir, string(filepath.Separator), s)
+			//stream := rawfilereader.Run(fileName, "")
+			//mz.ReadRaw(s, stream)
 		} else {
 			fileName = fmt.Sprintf("%s%s%s.mzML", dir, string(filepath.Separator), s)
 			mz.Read(fileName)
