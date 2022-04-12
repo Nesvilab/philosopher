@@ -19,7 +19,13 @@ func (evi *Evidence) SerializeGranular() {
 	// create Peptides Bin
 	go func() { defer wg.Done(); SerializePeptides(&evi.Peptides) }()
 	// create Protein Bin
-	go func() { defer wg.Done(); SerializeProteins(&evi.Proteins) }()
+	go func() {
+		defer wg.Done()
+		if evi.Proteins == nil {
+			evi.Proteins = make(ProteinEvidenceList, 0)
+		}
+		SerializeProteins(&evi.Proteins)
+	}()
 	wg.Wait()
 }
 
