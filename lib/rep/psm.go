@@ -574,13 +574,30 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				header += ""
 			}
 		} else if brand == "k2" {
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
-				line,
-				i.Labels.IsUsed,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-			)
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+				)
+			case 6:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+				)
+			default:
+				header += ""
+			}
 		}
+
 		line += "\n"
 
 		_, e = io.WriteString(bw, line)
