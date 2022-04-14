@@ -177,7 +177,14 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 			header += ""
 		}
 	} else if brand == "k2" {
-		header += "\tChannel 284\tChannel 290"
+		switch channels {
+		case 2:
+			header += "\tChannel 284\tChannel 290"
+		case 6:
+			header += "\tChannel 284\tChannel 290\tChannel 301\tChannel 307\tChannel 327\tChannel 333"
+		default:
+			header += ""
+		}
 	}
 
 	header += "\n"
