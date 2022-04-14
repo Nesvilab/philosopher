@@ -478,6 +478,30 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 			} else {
 				v2.Channel2.CustomName = labelNames["290"]
 			}
+
+			if len(labelNames["301"]) < 1 {
+				v2.Channel3.CustomName = "301"
+			} else {
+				v2.Channel3.CustomName = labelNames["301"]
+			}
+
+			if len(labelNames["307"]) < 1 {
+				v2.Channel4.CustomName = "307"
+			} else {
+				v2.Channel4.CustomName = labelNames["307"]
+			}
+
+			if len(labelNames["327"]) < 1 {
+				v2.Channel5.CustomName = "327"
+			} else {
+				v2.Channel5.CustomName = labelNames["327"]
+			}
+
+			if len(labelNames["333"]) < 1 {
+				v2.Channel6.CustomName = "333"
+			} else {
+				v2.Channel6.CustomName = labelNames["333"]
+			}
 		}
 
 		labels[k] = v2

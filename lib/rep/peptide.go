@@ -414,16 +414,14 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 		} else if brand == "k2" {
 			switch channels {
 			case 2:
-				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f",
 					line,
-					i.Labels.IsUsed,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 				)
 			case 6:
-				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Labels.IsUsed,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
