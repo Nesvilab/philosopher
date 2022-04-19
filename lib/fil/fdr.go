@@ -111,7 +111,7 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 	}
 
-	var cleanlist id.PepIDListPtrs
+	cleanlist := make(id.PepIDListPtrs, 0)
 	decoys = 0
 	targets = 0
 
