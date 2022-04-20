@@ -146,6 +146,8 @@ type PSMEvidence struct {
 	SPRank                           float64
 	Hyperscore                       float64
 	Nextscore                        float64
+	SpectralSim                      float64
+	Rtscore                          float64
 	Intensity                        float64
 	IonMobility                      float64
 	Purity                           float64
@@ -160,11 +162,6 @@ type PSMEvidence struct {
 	Modifications                    mod.ModificationsSlice
 	MappedProteins                   map[string]int
 	MappedGenes                      map[string]struct{}
-	//Scan                           int
-	//PrecursorExpMass               float64
-	//LocalizationRange              string
-	//DiscriminantValue              float64
-	//IonForm()                      string
 }
 
 func (e PSMEvidence) IonForm() id.IonFormType {
