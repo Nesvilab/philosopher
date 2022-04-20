@@ -1,6 +1,7 @@
 ### Added
 - Decoys tag now appear inthe Gene and ProteinID
 - Support for TAIR database
+- Support for MSBooster scores which nowappear in the PSM table
 
 ### Changed
 
