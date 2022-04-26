@@ -1,4 +1,4 @@
-package k2s
+package ktag1
 
 import (
 	"philosopher/lib/iso"

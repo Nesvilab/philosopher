@@ -285,6 +285,13 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 		default:
 			header += ""
 		}
+	} else if brand == "sclip2" {
+		switch channels {
+		case 2:
+			header += "\tChannel 286\tChannel 290"
+		default:
+			header += ""
+		}
 	}
 
 	header += "\n"
@@ -568,6 +575,17 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 					reportIntensities[3],
 					reportIntensities[4],
 					reportIntensities[5],
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "sclip2" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
 				)
 			default:
 				header += ""

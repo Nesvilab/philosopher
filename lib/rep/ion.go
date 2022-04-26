@@ -165,6 +165,13 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, chan
 		default:
 			header += ""
 		}
+	} else if brand == "sclip2" {
+		switch channels {
+		case 2:
+			header += "\tChannel 286\tChannel 290"
+		default:
+			header += ""
+		}
 	}
 
 	header += "\n"
@@ -405,6 +412,17 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, chan
 					i.Labels.Channel4.Intensity,
 					i.Labels.Channel5.Intensity,
 					i.Labels.Channel6.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "sclip2" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
 				)
 			default:
 				header += ""
