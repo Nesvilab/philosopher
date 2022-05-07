@@ -139,7 +139,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create report file"), "fatal")
+		msg.WriteFile(errors.New("cannot create report file, "+e.Error()), "fatal")
 	}
 	defer file.Close()
 	defer bw.Flush()
