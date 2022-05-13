@@ -59,26 +59,6 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 	header += "\n"
 
-	// verify if the structure has labels, if so, replace the original channel names by them.
-	// if len(printSet[0].Labels.Channel1.CustomName) > 3 {
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, -1)
-	// 	header = strings.Replace(header, "Channel "+printSet[0].Labels.Channel16.Name, printSet[0].Labels.Channel16.CustomName, -1)
-	// }
-
 	_, e = io.WriteString(file, header)
 	if e != nil {
 		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
@@ -91,7 +71,7 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		fileName = fmt.Sprintf("%s.raw", parts[0])
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%.4f\t%.4f\t%t\t%s\t%s\t%s",
-			i.SpectrumFileName().Str(),
+			parts[0],
 			fileName,
 			i.Peptide,
 			i.ModifiedPeptide,
