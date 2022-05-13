@@ -178,7 +178,7 @@ Peptide Validation:                              # PeptideProphet v5.2
   ppm: true                                      # use PPM mass error instead of Dalton for mass modeling
   zero: false                                    # report results with minimum probability 0
 
-PTM Localization:                                # PTMProphet v6.0
+PTM Localization:                                # PTMProphet v6.1
   autodirect: false                              # use direct evidence when the lability is high, use in combination with LABILITY
   cions:                                         # use specified C-term ions, separate multiple ions by commas (default: y for CID, z for ETD)
   direct: false                                  # use only direct evidence for evaluating PTM site probabilities
