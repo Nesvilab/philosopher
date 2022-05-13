@@ -303,7 +303,7 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 			e.ProteinExistence = "5:Protein uncertain"
 		}
 	} else {
-		e.ProteinExistence = ""
+		e.ProteinExistence = pem[1]
 	}
 
 	var svm []string
