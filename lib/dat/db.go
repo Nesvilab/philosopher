@@ -32,11 +32,6 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 
 	var e Record
 
-	// idReg1 := regexp.MustCompile(`(ENSP\w+)`)
-	// idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
-	// desReg := regexp.MustCompile(`ENSP\w+(.*)`)
-	// geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
-
 	// this version accepts ENSEMBL headers from other souces like transcript and gene
 	idReg1 := regexp.MustCompile(`(ENS\w+\.?\d{1,})`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
@@ -226,7 +221,6 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 			e.EntryName = smEnm[1]
 		}
 
-		//e.EntryName = smEnm[1]
 	} else {
 		e.EntryName = enm[1]
 	}
@@ -236,12 +230,10 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	if pnm == nil {
 		e.ProteinName = ""
 		e.ProteinName = ""
-		//Description
 		e.Description = ""
 	} else {
 		e.ProteinName = pnm[1]
 		e.ProteinName = pnm[1]
-		//Description
 		e.Description = pnm[1]
 	}
 
@@ -327,6 +319,12 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	e.OriginalHeader = k
 
 	return e
@@ -388,7 +386,6 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 
 	var e Record
 
-	//idReg := regexp.MustCompile(`\w+\|(.+?)\|`)
 	idReg := regexp.MustCompile(`(.*)`)
 
 	// ID
@@ -439,7 +436,6 @@ func ProcessTair(k, v, decoyTag string) Record {
 	if strings.Contains(parts[1], "no symbol available") {
 		e.GeneNames = ""
 	} else {
-		//Symbols\:\s(.+?)\s\|
 		geneReg := regexp.MustCompile(`Symbols\:\s(.+)\s`)
 		gm := geneReg.FindStringSubmatch(parts[1])
 		e.GeneNames = gm[1]
@@ -476,7 +472,7 @@ func Classify(s, decoyTag string) string {
 
 	// remove the decoy and contamintant tags so we can see better the seq header
 	seq := strings.Replace(s, decoyTag, "", -1)
-	seq = strings.Replace(seq, "con_", "", -1)
+	seq = strings.Replace(seq, "contam_", "", -1)
 
 	if strings.HasPrefix(seq, "sp|") || strings.HasPrefix(seq, "tr|") || strings.HasPrefix(seq, "db|") {
 		return "uniprot"
