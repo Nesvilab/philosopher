@@ -1,8 +1,10 @@
 ### Added
 - Decoys tag now appear inthe Gene and ProteinID
 - Support for TAIR database
-- Support for MSBooster scores which nowappear in the PSM table
+- Support for MSBooster scores which now appear in the PSM table
 
 ### Changed
+- Updated PTMProphet to v6.1
 
 ### Fixed
+- Minor bugs andd issues were fixed
