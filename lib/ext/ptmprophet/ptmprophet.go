@@ -90,6 +90,7 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	if cmd.ProcessState.ExitCode() != 0 {
 		msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "fatal")
+		fmt.Println(cmd.Stderr)
 	}
 
 	// collect all resulting files
