@@ -120,7 +120,6 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref.Protein = i.ProteinName
 
 				ref.Sequence = k.PeptideSequence
-				//ref.IonForm() = ion
 				ref.ModifiedSequence = k.ModifiedPeptide
 				ref.ChargeState = k.Charge
 				ref.Probability = k.InitialProbability
@@ -165,7 +164,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		if len(repModificationsIndex) != 0 {
 			rep.Modifications = mod.Modifications{Index: repModificationsIndex}.ToSlice()
 		}
-		// if strings.Contains(rep.ProteinName, "Q8WXG9") {
+
+		// if strings.Contains(rep.ProteinName, "Biognosys") {
 		// 	spew.Dump(rep)
 		// }
 
@@ -181,12 +181,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	// fix the name sand headers and pull database information into protein report
 	for i := range evi.Proteins {
 		pe := &evi.Proteins[i]
+
 		for _, j := range dtb.Records {
 
 			desc := strings.Replace(j.Description, "|", " ", -1)
 
 			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, pe.ProteinName) && strings.Contains(j.OriginalHeader, desc) {
+			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (strings.Contains(j.OriginalHeader, j.Description) || strings.Contains(j.OriginalHeader, desc)) {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
@@ -199,6 +200,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 					pe.Sequence = j.Sequence
 					pe.ProteinName = j.ProteinName
 					pe.Organism = j.Organism
+
+					// some simple headers might not have a full partheader, so we force them to be
+					// the same as the EntryName
+					if len(pe.PartHeader) == 0 {
+						pe.PartHeader = pe.ProteinName
+						pe.EntryName = pe.ProteinName
+					}
 
 					// uniprot entries have the description on ProteinName
 					if len(j.Description) < 1 {

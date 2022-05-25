@@ -421,6 +421,20 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	// iRT Biognosis formatting
+	if strings.Contains(k, "Biognosys") {
+
+		if len(e.PartHeader) == 0 {
+			e.PartHeader = "Biognosys|iRT-Kit_WR_fusion"
+		}
+		if len(e.GeneNames) == 0 {
+			e.GeneNames = "iRTKit"
+		}
+		if len(e.ProteinName) == 0 {
+			e.ProteinName = "Biognosys|iRT-Kit_WR_fusion"
+		}
+	}
+
 	return e
 }
 
