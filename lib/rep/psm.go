@@ -80,6 +80,11 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.UncalibratedPrecursorNeutralMass = float64(i.PrecursorNeutralMass)
 		}
 
+		// Forcing the modified peptide string to be empty in case no mods are present
+		if len(p.Modifications.IndexSlice) == 0 {
+			p.ModifiedPeptide = ""
+		}
+
 		for j := range i.AlternativeProteins {
 			p.MappedProteins[j]++
 		}
