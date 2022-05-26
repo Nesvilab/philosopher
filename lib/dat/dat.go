@@ -157,6 +157,11 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 			db := ProcessTair(k, v, decoyTag)
 			d.Records = append(d.Records, db)
 
+		} else if class == "nextprot" {
+
+			db := ProcessNextProt(k, v, decoyTag)
+			d.Records = append(d.Records, db)
+
 		} else {
 			msg.ParsingFASTA(errors.New(""), "fatal")
 		}

@@ -94,6 +94,12 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	return e
 }
 
@@ -186,6 +192,12 @@ func ProcessNCBI(k, v, decoyTag string) Record {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
 	}
 
 	return e
@@ -380,6 +392,12 @@ func ProcessUniRef(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	e.OriginalHeader = k
 
 	return e
@@ -446,6 +464,49 @@ func ProcessTair(k, v, decoyTag string) Record {
 	parts := strings.Split(k, "|")
 
 	// ID
+	e.ID = parts[1]
+	e.ID = strings.TrimLeft(e.ID, " ")
+	e.ID = strings.TrimRight(e.ID, " ")
+
+	// Gene
+	e.GeneNames = parts[2]
+
+	// Descripion
+	e.Description = parts[3]
+
+	e.EntryName = k
+	e.Organism = "Homo sapiens"
+	e.SequenceVersion = parts[4]
+
+	e.Sequence = v
+	e.Length = len(v)
+	e.OriginalHeader = k
+
+	e.PartHeader = parts[1]
+
+	if strings.HasPrefix(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
+	return e
+}
+
+// ProcessNextProt parses NeXtProt headers
+func ProcessNextProt(k, v, decoyTag string) Record {
+
+	var e Record
+
+	parts := strings.Split(k, "|")
+
+	// ID
 	e.ID = parts[0]
 	e.ID = strings.TrimLeft(e.ID, " ")
 	e.ID = strings.TrimRight(e.ID, " ")
@@ -482,6 +543,12 @@ func ProcessTair(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	return e
 }
 
@@ -502,6 +569,8 @@ func Classify(s, decoyTag string) string {
 		return "uniref"
 	} else if strings.HasPrefix(seq, "AT") {
 		return "tair"
+	} else if strings.HasPrefix(seq, "nxp") {
+		return "nextprot"
 	}
 
 	return "generic"
