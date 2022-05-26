@@ -3,7 +3,6 @@
 *.a
 *.so
 
-Makefile
 philosopher
 
 # Folders
