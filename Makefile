@@ -57,14 +57,14 @@ all:
 	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
 	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
 
-.PHONY: draft
-draft:
-	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
-
 .PHONY: push
 push:
 	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
+	
+.PHONY: draft
+draft:
+	goreleaser --skip-publish --snapshot --release-notes=Changelog --rm-dist
 
 .PHONY: release
 release:
