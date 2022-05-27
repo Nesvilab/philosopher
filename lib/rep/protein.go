@@ -120,7 +120,6 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 				ref.Protein = i.ProteinName
 
 				ref.Sequence = k.PeptideSequence
-				//ref.IonForm() = ion
 				ref.ModifiedSequence = k.ModifiedPeptide
 				ref.ChargeState = k.Charge
 				ref.Probability = k.InitialProbability
@@ -165,7 +164,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		if len(repModificationsIndex) != 0 {
 			rep.Modifications = mod.Modifications{Index: repModificationsIndex}.ToSlice()
 		}
-		// if strings.Contains(rep.ProteinName, "Q8WXG9") {
+
+		// if strings.Contains(rep.ProteinName, "Biognosys") {
 		// 	spew.Dump(rep)
 		// }
 
@@ -181,12 +181,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	// fix the name sand headers and pull database information into protein report
 	for i := range evi.Proteins {
 		pe := &evi.Proteins[i]
+
 		for _, j := range dtb.Records {
 
 			desc := strings.Replace(j.Description, "|", " ", -1)
 
 			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, pe.ProteinName) && strings.Contains(j.OriginalHeader, desc) {
+			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (strings.Contains(j.OriginalHeader, j.Description) || strings.Contains(j.OriginalHeader, desc)) {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
@@ -199,6 +200,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 					pe.Sequence = j.Sequence
 					pe.ProteinName = j.ProteinName
 					pe.Organism = j.Organism
+
+					// some simple headers might not have a full partheader, so we force them to be
+					// the same as the EntryName
+					if len(pe.PartHeader) == 0 {
+						pe.PartHeader = pe.ProteinName
+						pe.EntryName = pe.ProteinName
+					}
 
 					// uniprot entries have the description on ProteinName
 					if len(j.Description) < 1 {
@@ -225,7 +233,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
+func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
@@ -250,7 +258,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 		}
 	}
 
-	header = "Group\tSubGroup\tProtein\tProtein ID\tEntry Name\tGene\tLength\tPercent Coverage\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
 
 	if brand == "tmt" {
 		switch channels {
@@ -343,20 +351,6 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 
 		assL, obs := getModsList(i.Modifications.ToMap().Index)
 
-		// var uniqIons int
-		// for _, j := range i.TotalPeptideIons {
-		// 	if j.IsUnique {
-		// 		uniqIons++
-		// 	}
-		// }
-
-		// var urazorIons int
-		// for _, j := range i.TotalPeptideIons {
-		// 	if j.IsURazor {
-		// 		urazorIons++
-		// 	}
-		// }
-
 		sort.Strings(assL)
 		sort.Strings(obs)
 		sort.Strings(ip)
@@ -407,25 +401,26 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand string
 			}
 		}
 
+		// append decoy tags on the gene and proteinID names
+		if i.IsDecoy {
+			i.ProteinID = decoyTag + i.ProteinID
+			i.GeneNames = decoyTag + i.GeneNames
+			i.EntryName = decoyTag + i.EntryName
+		}
+
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%.2f\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
-			i.ProteinGroup,     // Group
-			i.ProteinSubGroup,  // SubGroup
-			i.PartHeader,       // Protein
-			i.ProteinID,        // Protein ID
-			i.EntryName,        // Entry Name
-			i.GeneNames,        // Genes
-			i.Length,           // Length
-			i.Coverage,         // Percent Coverage
-			i.Organism,         // Organism
-			i.Description,      // Description
-			i.ProteinExistence, // Protein Existence
-			i.Probability,      // Protein Probability
-			i.TopPepProb,       // Top Peptide Probability
-			//len(i.TotalPeptideIons),  // Total Peptide Ions
-			//uniqIons,                 // Unique Peptide Ions
-			//urazorIons,               // Razor Peptide Ions
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+			i.PartHeader,             // Protein
+			i.ProteinID,              // Protein ID
+			i.EntryName,              // Entry Name
+			i.GeneNames,              // Genes
+			i.Length,                 // Length
+			i.Organism,               // Organism
+			i.Description,            // Description
+			i.ProteinExistence,       // Protein Existence
+			i.Probability,            // Protein Probability
+			i.TopPepProb,             // Top Peptide Probability
 			len(i.TotalPeptides),     // Total Peptides
 			len(i.UniquePeptides),    // Unique Peptides
 			len(i.URazorPeptides),    // Razor Peptides

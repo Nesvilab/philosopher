@@ -32,11 +32,6 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 
 	var e Record
 
-	// idReg1 := regexp.MustCompile(`(ENSP\w+)`)
-	// idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
-	// desReg := regexp.MustCompile(`ENSP\w+(.*)`)
-	// geneReg := regexp.MustCompile(`ENSP\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
-
 	// this version accepts ENSEMBL headers from other souces like transcript and gene
 	idReg1 := regexp.MustCompile(`(ENS\w+\.?\d{1,})`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
@@ -97,6 +92,12 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
 	}
 
 	return e
@@ -193,6 +194,12 @@ func ProcessNCBI(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	return e
 }
 
@@ -226,7 +233,6 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 			e.EntryName = smEnm[1]
 		}
 
-		//e.EntryName = smEnm[1]
 	} else {
 		e.EntryName = enm[1]
 	}
@@ -236,12 +242,10 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	if pnm == nil {
 		e.ProteinName = ""
 		e.ProteinName = ""
-		//Description
 		e.Description = ""
 	} else {
 		e.ProteinName = pnm[1]
 		e.ProteinName = pnm[1]
-		//Description
 		e.Description = pnm[1]
 	}
 
@@ -303,7 +307,11 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 			e.ProteinExistence = "5:Protein uncertain"
 		}
 	} else {
-		e.ProteinExistence = ""
+		if len(pem) > 0 {
+			e.ProteinExistence = pem[0]
+		} else {
+			e.ProteinExistence = ""
+		}
 	}
 
 	var svm []string
@@ -325,6 +333,12 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 		e.IsDecoy = true
 	} else {
 		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
 	}
 
 	e.OriginalHeader = k
@@ -378,17 +392,22 @@ func ProcessUniRef(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	e.OriginalHeader = k
 
 	return e
 }
 
-// ProcessGeneric parses generci and uknown database headers
+// ProcessGeneric parses generic and uknown database headers
 func ProcessGeneric(k, v, decoyTag string) Record {
 
 	var e Record
 
-	//idReg := regexp.MustCompile(`\w+\|(.+?)\|`)
 	idReg := regexp.MustCompile(`(.*)`)
 
 	// ID
@@ -420,6 +439,116 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 		e.IsDecoy = false
 	}
 
+	// iRT Biognosis formatting
+	if strings.Contains(k, "Biognosys") {
+
+		if len(e.PartHeader) == 0 {
+			e.PartHeader = "Biognosys|iRT-Kit_WR_fusion"
+		}
+		if len(e.GeneNames) == 0 {
+			e.GeneNames = "iRTKit"
+		}
+		if len(e.ProteinName) == 0 {
+			e.ProteinName = "Biognosys|iRT-Kit_WR_fusion"
+		}
+	}
+
+	return e
+}
+
+// ProcessTair parses Arabidopsis DB database headers
+func ProcessTair(k, v, decoyTag string) Record {
+
+	var e Record
+
+	parts := strings.Split(k, "|")
+
+	// ID
+	e.ID = parts[0]
+	e.ID = strings.TrimLeft(e.ID, " ")
+	e.ID = strings.TrimRight(e.ID, " ")
+
+	// Gene
+	if strings.Contains(parts[1], "no symbol available") {
+		e.GeneNames = ""
+	} else {
+		geneReg := regexp.MustCompile(`Symbols\:\s(.+)\s`)
+		gm := geneReg.FindStringSubmatch(parts[1])
+		e.GeneNames = gm[1]
+	}
+
+	// Descripion
+	e.Description = parts[2]
+	e.Description = strings.TrimLeft(e.Description, " ")
+	e.Description = strings.TrimRight(e.Description, " ")
+
+	part := strings.Split(k, " ")
+
+	e.EntryName = k
+	e.Organism = ""
+	e.SequenceVersion = ""
+
+	e.Sequence = v
+	e.Length = len(v)
+	e.OriginalHeader = k
+
+	e.PartHeader = part[0]
+
+	if strings.HasPrefix(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
+	return e
+}
+
+// ProcessNextProt parses NeXtProt headers
+func ProcessNextProt(k, v, decoyTag string) Record {
+
+	var e Record
+
+	parts := strings.Split(k, "|")
+
+	// ID
+	e.ID = parts[1]
+	e.ID = strings.TrimLeft(e.ID, " ")
+	e.ID = strings.TrimRight(e.ID, " ")
+
+	// Gene
+	e.GeneNames = parts[2]
+
+	// Descripion
+	e.Description = parts[3]
+
+	e.EntryName = k
+	e.Organism = "Homo sapiens"
+	e.SequenceVersion = parts[4]
+
+	e.Sequence = v
+	e.Length = len(v)
+	e.OriginalHeader = k
+
+	e.PartHeader = parts[1]
+
+	if strings.HasPrefix(k, decoyTag) {
+		e.IsDecoy = true
+	} else {
+		e.IsDecoy = false
+	}
+
+	if strings.Contains(k, "contam_") {
+		e.IsContaminant = true
+	} else {
+		e.IsContaminant = false
+	}
+
 	return e
 }
 
@@ -428,7 +557,7 @@ func Classify(s, decoyTag string) string {
 
 	// remove the decoy and contamintant tags so we can see better the seq header
 	seq := strings.Replace(s, decoyTag, "", -1)
-	seq = strings.Replace(seq, "con_", "", -1)
+	seq = strings.Replace(seq, "contam_", "", -1)
 
 	if strings.HasPrefix(seq, "sp|") || strings.HasPrefix(seq, "tr|") || strings.HasPrefix(seq, "db|") {
 		return "uniprot"
@@ -438,6 +567,10 @@ func Classify(s, decoyTag string) string {
 		return "ensembl"
 	} else if strings.HasPrefix(seq, "UniRef") {
 		return "uniref"
+	} else if strings.HasPrefix(seq, "AT") {
+		return "tair"
+	} else if strings.HasPrefix(seq, "nxp") {
+		return "nextprot"
 	}
 
 	return "generic"

@@ -38,6 +38,10 @@ var freequant = &cobra.Command{
 			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
+		if m.Quantify.Raw {
+			msg.Custom(errors.New("support for Thermo raw files was temporarily removed, please convert your files to mzML"), "fatal")
+		}
+
 		//forcing the larger time window to be the same as the smaller one
 		//m.Quantify.RTWin = 3
 		m.Quantify.RTWin = m.Quantify.PTWin
@@ -64,7 +68,7 @@ func init() {
 		freequant.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
 		freequant.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 10, "m/z tolerance in ppm")
 		freequant.Flags().Float64VarP(&m.Quantify.PTWin, "ptw", "", 0.4, "specify the time windows for the peak (minute)")
-		//freequant.Flags().BoolVarP(&m.Quantify.Raw, "raw", "", false, "read raw files instead of converted XML")
+		freequant.Flags().BoolVarP(&m.Quantify.Raw, "raw", "", false, "read raw files instead of converted XML")
 		freequant.Flags().BoolVarP(&m.Quantify.Faims, "faims", "", false, "Use FAIMS information for the quantification")
 	}
 

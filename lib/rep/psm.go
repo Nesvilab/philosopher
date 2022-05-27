@@ -45,18 +45,13 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Index = i.Index
 		p.Spectrum = i.Spectrum
 		p.SpectrumFile = i.SpectrumFile
-		//p.Scan = i.Scan
-		//p.PrevAA = ""
-		//p.NextAA = ""
 		p.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
 		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
-		//p.IonForm() = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		p.Protein = i.Protein
 		p.ModifiedPeptide = i.ModifiedPeptide
 		p.AssumedCharge = i.AssumedCharge
 		p.HitRank = i.HitRank
-		//p.PrecursorExpMass = i.PrecursorExpMass
 		p.RetentionTime = i.RetentionTime
 		p.CalcNeutralPepMass = i.CalcNeutralPepMass
 		p.Massdiff = i.Massdiff
@@ -68,7 +63,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.SPRank = i.SPRank
 		p.Hyperscore = i.Hyperscore
 		p.Nextscore = i.Nextscore
-		//p.DiscriminantValue = i.DiscriminantValue
+		p.SpectralSim = i.SpectralSim
+		p.Rtscore = i.Rtscore
 		p.Intensity = i.Intensity
 		p.IonMobility = i.IonMobility
 		p.CompensationVoltage = i.CompensationVoltage
@@ -82,6 +78,11 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		} else {
 			p.PrecursorNeutralMass = float64(i.PrecursorNeutralMass)
 			p.UncalibratedPrecursorNeutralMass = float64(i.PrecursorNeutralMass)
+		}
+
+		// Forcing the modified peptide string to be empty in case no mods are present
+		if len(p.Modifications.IndexSlice) == 0 {
+			p.ModifiedPeptide = ""
 		}
 
 		for j := range i.AlternativeProteins {
@@ -128,12 +129,14 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
+func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
 	var header string
 	var modMap = make(map[string]string)
 	var modList []string
 	var hasCompVolt bool
 	var hasPurity bool
+	var hasSpectralSim bool
+	var hasRtScore bool
 
 	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
 
@@ -141,7 +144,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create report file"), "fatal")
+		msg.WriteFile(errors.New("cannot create report file, "+e.Error()), "fatal")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -150,9 +153,6 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 	//var printSet PSMEvidenceList
 	var printSet []*PSMEvidence
 	for i := range evi {
-
-		//compositeName := strings.Split(evi[i].Spectrum, "#")
-		//evi[i].Spectrum = compositeName[0]
 
 		if !hasDecoys {
 			if !evi[i].IsDecoy {
@@ -189,6 +189,14 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 			hasLoc = true
 		}
 
+		if evi[i].SpectralSim != 0 {
+			hasSpectralSim = true
+		}
+
+		if evi[i].Rtscore != 0 {
+			hasRtScore = true
+		}
+
 	}
 
 	for k := range modMap {
@@ -201,6 +209,14 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 
 	if isComet {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
+	}
+
+	if hasSpectralSim {
+		header += "\tSpectralSim"
+	}
+
+	if hasRtScore {
+		header += "\tRTScore"
 	}
 
 	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
@@ -337,6 +353,13 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 		sort.Strings(assL)
 		sort.Strings(obs)
 
+		// append decoy tags on the gene and proteinID names
+		if i.IsDecoy {
+			i.ProteinID = decoyTag + i.ProteinID
+			i.GeneName = decoyTag + i.GeneName
+			i.EntryName = decoyTag + i.EntryName
+		}
+
 		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.SpectrumFile,
@@ -364,6 +387,20 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand string, channels int, 
 				i.DeltaCNStar,
 				i.SPScore,
 				i.SPRank,
+			)
+		}
+
+		if hasSpectralSim {
+			line = fmt.Sprintf("%s\t%.4f",
+				line,
+				i.SpectralSim,
+			)
+		}
+
+		if hasRtScore {
+			line = fmt.Sprintf("%s\t%.4f",
+				line,
+				i.Rtscore,
 			)
 		}
 

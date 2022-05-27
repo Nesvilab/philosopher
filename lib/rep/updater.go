@@ -223,40 +223,15 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 		proteinIndex[i.PartHeader] = struct{}{}
 	}
 
-	// for _, i := range evi.PSM {
-	// 	_, ok := proteinIndex[i.Protein]
-	// 	if ok {
-	// 		newPSM = append(newPSM, i)
-	// 	}
-	// }
-	// evi.PSM = newPSM
-
-	// for _, i := range evi.Ions {
-	// 	_, ok := proteinIndex[i.Protein]
-	// 	if ok {
-	// 		newIons = append(newIons, i)
-	// 	}
-	// }
-	// evi.Ions = newIons
-
-	// for _, i := range evi.Peptides {
-	// 	_, ok := proteinIndex[i.Protein]
-	// 	if ok {
-	// 		newPeptides = append(newPeptides, i)
-	// 	}
-	// }
-	// evi.Peptides = newPeptides
-
 	for _, i := range evi.PSM {
-		//if !i.IsDecoy {
 
 		// Total
 		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.SpectrumFileName())
 		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-		for j := range i.MappedProteins {
-			totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
-			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-		}
+		// for j := range i.MappedProteins {
+		// 	totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
+		// 	totalPeptides[j] = append(totalPeptides[j], i.Peptide)
+		// }
 
 		if i.IsUnique {
 			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.SpectrumFileName())
@@ -267,7 +242,6 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 			razorSpc[i.Protein] = append(razorSpc[i.Protein], i.SpectrumFileName())
 			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
 		}
-		//}
 	}
 
 	for k, v := range totalPeptides {

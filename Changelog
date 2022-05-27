@@ -1,13 +1,8 @@
 ### Added
-- Added support for TMT 18
-- Added option for contaminant tags in the database.
-
-### Changed
-- Added the parsing rules from the Prophets to the protein description.
-- Removed RawReader because of licensing issues.
-- Improved processing speed and resource usage.
-- Reduced binariy size.
+- Decoys tag now appear inthe Gene and ProteinID
+- Support for TAIR database
+- Support for neXtProt database
+- Support for MSBooster scores which now appear in the PSM table
 
 ### Fixed
-- Several bugs and code fizes added.
-- Fixed issue with TMT 6 plex quantification.
+- Minor bugs andd issues were fixed

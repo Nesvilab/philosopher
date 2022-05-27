@@ -146,6 +146,8 @@ type PSMEvidence struct {
 	SPRank                           float64
 	Hyperscore                       float64
 	Nextscore                        float64
+	SpectralSim                      float64
+	Rtscore                          float64
 	Intensity                        float64
 	IonMobility                      float64
 	Purity                           float64
@@ -160,11 +162,6 @@ type PSMEvidence struct {
 	Modifications                    mod.ModificationsSlice
 	MappedProteins                   map[string]int
 	MappedGenes                      map[string]struct{}
-	//Scan                           int
-	//PrecursorExpMass               float64
-	//LocalizationRange              string
-	//DiscriminantValue              float64
-	//IonForm()                      string
 }
 
 func (e PSMEvidence) IonForm() id.IonFormType {
@@ -460,25 +457,25 @@ func Run(m met.Data) {
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
-		repoPSM.MetaPSMReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
+		repoPSM.MetaPSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
 	}
 	{
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
-		repoIons.MetaIonReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+		repoIons.MetaIonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
 	}
 	{
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
-		repoPeptides.MetaPeptideReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, hasLabels)
+		repoPeptides.MetaPeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
 	}
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
 		var repoProteins ProteinEvidenceList
 		RestoreProtein(&repoProteins)
-		repoProteins.MetaProteinReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repoProteins.MetaProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
 		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 

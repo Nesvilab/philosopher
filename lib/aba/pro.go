@@ -402,7 +402,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 	}
 	defer file.Close()
 
-	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tCoverage\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Total Peptides\tCombined Spectral Count\tCombined Unique Spectral Count\tCombined Total Spectral Count"
+	header := "Protein\tProtein ID\tEntry Name\tGene\tProtein Length\tOrganism\tProtein Existence\tDescription\tProtein Probability\tTop Peptide Probability\tCombined Total Peptides\tCombined Spectral Count\tCombined Unique Spectral Count\tCombined Total Spectral Count"
 
 	// Add Unique+Razor SPC
 	for _, i := range namesList {
@@ -492,8 +492,6 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 
 			line += fmt.Sprintf("%d\t", i.Length)
 
-			line += fmt.Sprintf("%.2f\t", i.Coverage)
-
 			line += fmt.Sprintf("%s\t", i.Organism)
 
 			line += fmt.Sprintf("%s\t", i.ProteinExistence)
@@ -511,10 +509,6 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 			line += fmt.Sprintf("%d\t", summUniqueSpC[i.ProteinID])
 
 			line += fmt.Sprintf("%d\t", summTotalSpC[i.ProteinID])
-
-			//line += fmt.Sprintf("%d\t", len(razorPeptides[i.ProteinID]))
-
-			//line += fmt.Sprintf("%d\t", len(uniquePeptides[i.ProteinID]))
 
 			// Add Unique+Razor SPC
 			for _, j := range namesList {

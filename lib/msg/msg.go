@@ -315,7 +315,8 @@ func callLogrus(m, t string) {
 	case "error":
 		logrus.Error(m)
 	case "fatal":
-		logrus.Fatal(m)
+		logrus.Error(m)
+		panic(m)
 	default:
 		logrus.Error(m)
 	}

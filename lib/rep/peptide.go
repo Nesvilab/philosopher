@@ -125,7 +125,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPeptideReport report consist on ion reporting
-func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand string, channels int, hasDecoys, hasLabels bool) {
+func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels bool) {
 
 	var header string
 	output := fmt.Sprintf("%s%speptide.tsv", workspace, string(filepath.Separator))
@@ -263,6 +263,13 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand string, channe
 		sort.Strings(assL)
 		sort.Strings(obs)
 		sort.Strings(cs)
+
+		// append decoy tags on the gene and proteinID names
+		if i.IsDecoy {
+			i.ProteinID = decoyTag + i.ProteinID
+			i.GeneName = decoyTag + i.GeneName
+			i.EntryName = decoyTag + i.EntryName
+		}
 
 		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,

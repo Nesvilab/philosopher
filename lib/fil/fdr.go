@@ -111,7 +111,7 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 	}
 
-	var cleanlist id.PepIDListPtrs
+	cleanlist := make(id.PepIDListPtrs, 0)
 	decoys = 0
 	targets = 0
 
@@ -548,6 +548,12 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		for i := 0; i <= len(probArray); i++ {
 
 			if probArray[i] == curProb {
+
+				if i+1 > len(probArray) {
+					msg.Custom(errors.New("the protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "warning")
+					break
+				}
+
 				probList[probArray[i+1]] = 0
 				minProb = probArray[i+1]
 				calcFDR = scoreMap[probArray[i+1]]

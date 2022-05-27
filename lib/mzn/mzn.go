@@ -195,8 +195,8 @@ func (p *MsData) Read(f string) {
 
 	if xml.MzML.SoftwareList.Software[0].ID == "pwiz" {
 		version, _ := strconv.Atoi(strings.Replace(xml.MzML.SoftwareList.Software[0].Version, ".", "", -1))
-		if version <= 3019127 {
-			msg.Custom(errors.New("the pwiz version used to convert this file is not supported, or deprecated. Please update your pwiz and convert the raw files again"), "warning")
+		if version <= 3020232 {
+			msg.Custom(errors.New("the msconvert version used to convert this file is not supported, or is deprecated. Please update your ProteoWizard and convert the raw files again"), "warning")
 		}
 	}
 

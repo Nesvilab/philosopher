@@ -54,55 +54,55 @@ type PepXML4Serialiazation struct {
 }
 
 // PeptideIdentificationOld struct
-type PeptideIdentificationOld struct {
-	Spectrum                             string
-	SpectrumFile                         string
-	Peptide                              string
-	Protein                              string
-	ModifiedPeptide                      string
-	CompensationVoltage                  string
-	PrevAA                               string
-	NextAA                               string
-	LocalizationRange                    string
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
-	Scan                                 int
-	NumberofMissedCleavages              int
-	IsoMassD                             int
-	AssumedCharge                        uint8
-	HitRank                              uint8
-	MissedCleavages                      uint8
-	NumberTolTerm                        uint8
-	NumberOfEnzymaticTermini             uint8
-	IsRejected                           uint8
-	NumberTotalProteins                  uint16
-	TotalNumberIons                      uint16
-	NumberMatchedIons                    uint16
-	Index                                uint32
-	UncalibratedPrecursorNeutralMass     float64
-	PrecursorNeutralMass                 float64
-	PrecursorExpMass                     float64
-	RetentionTime                        float64
-	CalcNeutralPepMass                   float64
-	Massdiff                             float64
-	Probability                          float64
-	Expectation                          float64
-	Xcorr                                float64
-	DeltaCN                              float64
-	DeltaCNStar                          float64
-	SPScore                              float64
-	SPRank                               float64
-	Hyperscore                           float64
-	Nextscore                            float64
-	DiscriminantValue                    float64
-	Intensity                            float64
-	IonMobility                          float64
-	AlternativeProteins                  map[string]int
-	LocalizedPTMSites                    map[string]int
-	LocalizedPTMMassDiff                 map[string]string
-	Modifications                        mod.Modifications
-}
+// type PeptideIdentificationOld struct {
+// 	Spectrum                             string
+// 	SpectrumFile                         string
+// 	Peptide                              string
+// 	Protein                              string
+// 	ModifiedPeptide                      string
+// 	CompensationVoltage                  string
+// 	PrevAA                               string
+// 	NextAA                               string
+// 	LocalizationRange                    string
+// 	MSFragerLocalization                 string
+// 	MSFraggerLocalizationScoreWithPTM    string
+// 	MSFraggerLocalizationScoreWithoutPTM string
+// 	Scan                                 int
+// 	NumberofMissedCleavages              int
+// 	IsoMassD                             int
+// 	AssumedCharge                        uint8
+// 	HitRank                              uint8
+// 	MissedCleavages                      uint8
+// 	NumberTolTerm                        uint8
+// 	NumberOfEnzymaticTermini             uint8
+// 	IsRejected                           uint8
+// 	NumberTotalProteins                  uint16
+// 	TotalNumberIons                      uint16
+// 	NumberMatchedIons                    uint16
+// 	Index                                uint32
+// 	UncalibratedPrecursorNeutralMass     float64
+// 	PrecursorNeutralMass                 float64
+// 	PrecursorExpMass                     float64
+// 	RetentionTime                        float64
+// 	CalcNeutralPepMass                   float64
+// 	Massdiff                             float64
+// 	Probability                          float64
+// 	Expectation                          float64
+// 	Xcorr                                float64
+// 	DeltaCN                              float64
+// 	DeltaCNStar                          float64
+// 	SPScore                              float64
+// 	SPRank                               float64
+// 	Hyperscore                           float64
+// 	Nextscore                            float64
+// 	DiscriminantValue                    float64
+// 	Intensity                            float64
+// 	IonMobility                          float64
+// 	AlternativeProteins                  map[string]int
+// 	LocalizedPTMSites                    map[string]int
+// 	LocalizedPTMMassDiff                 map[string]string
+// 	Modifications                        mod.Modifications
+// }
 
 type SpectrumType struct{ Spectrum, FileName string }
 
@@ -136,6 +136,8 @@ type PeptideIdentification struct {
 	SPRank                           float64
 	Hyperscore                       float64
 	Nextscore                        float64
+	SpectralSim                      float64
+	Rtscore                          float64
 	IonMobility                      float64
 	Intensity                        float64
 	AlternativeProteins              map[string]int
@@ -546,6 +548,12 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			} else if string(j.Name) == "nextscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Nextscore = value
+			} else if string(j.Name) == "spectralsim" {
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.SpectralSim = value
+			} else if string(j.Name) == "rtscore" {
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.Rtscore = value
 			}
 		}
 

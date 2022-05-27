@@ -43,6 +43,10 @@ var labelquantCmd = &cobra.Command{
 			msg.InputNotFound(errors.New("unknown file format"), "fatal")
 		}
 
+		if m.Quantify.Raw {
+			msg.Custom(errors.New("support for Thermo raw files was temporarily removed, please convert your files to mzML"), "fatal")
+		}
+
 		m.Quantify = qua.RunIsobaricLabelQuantification(m.Quantify, m.Filter.Mapmods)
 
 		// store parameters on meta data
@@ -72,7 +76,7 @@ func init() {
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.RemoveLow, "removelow", "", 0.0, "ignore the lower % of PSMs based on their summed abundances. 0 means no removal, entry value must be a decimal")
 		labelquantCmd.Flags().BoolVarP(&m.Quantify.Unique, "uniqueonly", "", false, "report quantification based only on unique peptides")
 		labelquantCmd.Flags().BoolVarP(&m.Quantify.BestPSM, "bestpsm", "", false, "select the best PSMs for protein quantification")
-		//labelquantCmd.Flags().BoolVarP(&m.Quantify.Raw, "raw", "", false, "read raw files instead of converted XML")
+		labelquantCmd.Flags().BoolVarP(&m.Quantify.Raw, "raw", "", false, "read raw files instead of converted XML")
 
 	}
 

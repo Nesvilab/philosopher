@@ -152,6 +152,16 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 			db := ProcessUniRef(k, v, decoyTag)
 			d.Records = append(d.Records, db)
 
+		} else if class == "tair" {
+
+			db := ProcessTair(k, v, decoyTag)
+			d.Records = append(d.Records, db)
+
+		} else if class == "nextprot" {
+
+			db := ProcessNextProt(k, v, decoyTag)
+			d.Records = append(d.Records, db)
+
 		} else {
 			msg.ParsingFASTA(errors.New(""), "fatal")
 		}
