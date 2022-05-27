@@ -154,11 +154,14 @@ func IOReadDir(root, ext string) []string {
 
 	var files []string
 
-	fileInfo, err := os.ReadDir(root)
+	fileInfo, err := os.Open(root)
 	if err != nil {
 		return files
 	}
-	for _, file := range fileInfo {
+
+	fileList, _ := fileInfo.Readdir(0)
+
+	for _, file := range fileList {
 		if strings.Contains(file.Name(), ext) {
 			files = append(files, filepath.Join(root, file.Name()))
 		}
