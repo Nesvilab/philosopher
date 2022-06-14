@@ -472,9 +472,15 @@ func ProcessTair(k, v, decoyTag string) Record {
 	if strings.Contains(parts[1], "no symbol available") {
 		e.GeneNames = ""
 	} else {
+
 		geneReg := regexp.MustCompile(`Symbols\:\s(.+)\s`)
 		gm := geneReg.FindStringSubmatch(parts[1])
-		e.GeneNames = gm[1]
+
+		if len(gm) == 0 {
+			e.GeneNames = ""
+		} else {
+			e.GeneNames = gm[1]
+		}
 	}
 
 	// Descripion
