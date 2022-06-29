@@ -1,7 +1,6 @@
 package ptmprophet
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -88,10 +87,10 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	}
 	_ = cmd.Wait()
 
-	if cmd.ProcessState.ExitCode() != 0 {
-		fmt.Println(cmd.Stdout, cmd.Stderr)
-		msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "fatal")
-	}
+	// if cmd.ProcessState.ExitCode() != 0 {
+	// 	fmt.Println(cmd.Stdout, cmd.Stderr)
+	// 	msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "fatal")
+	// }
 
 	// collect all resulting files
 	var customOutput []string
