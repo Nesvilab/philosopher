@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/ajstarks/svgo v0.0.0-20200204031535-0cbcf57ea1d8 // indirect
 	github.com/davecgh/go-spew v1.1.1
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/jpillora/go-ogle-analytics v0.0.0-20161213085824-14b04e0594ef
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
@@ -24,7 +25,6 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/exp v0.0.0-20200228211341-fcea875c7e85 // indirect
 	golang.org/x/image v0.0.0-20200119044424-58c23975cae1 // indirect
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	gonum.org/v1/netlib v0.0.0-20200229103305-d71f404090bf // indirect
 	gonum.org/v1/plot v0.7.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect

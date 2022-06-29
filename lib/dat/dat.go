@@ -2,11 +2,12 @@
 package dat
 
 import (
+	"compress/gzip"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -20,6 +21,7 @@ import (
 	"philosopher/lib/met"
 	"philosopher/lib/sys"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/vmihailenco/msgpack/v5"
 )
@@ -172,21 +174,59 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 // Fetch downloads a database file from UniProt
 func (d *Base) Fetch(id, temp string, iso, rev bool) {
 
-	var query string
-
 	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
 
-	if rev {
-		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=reviewed:yes+AND+proteome:", id, "&format=fasta")
+	base := "https://rest.uniprot.org/uniprotkb/"
+
+	// add the parameters
+	query := base + "stream?compressed=false&format=fasta&"
+
+	// add isoforms?
+	if iso {
+		query = query + "includeIsoform=true&"
 	} else {
-		query = fmt.Sprintf("%s%s%s", "http://www.uniprot.org/uniprot/?query=proteome:", id, "&format=fasta")
+		query = query + "includeIsoform=false&"
 	}
 
-	if iso {
-		query = fmt.Sprintf("%s&include=yes", query)
+	// add the proteome parameter
+	query = query + "query=proteome:UP000005640"
+
+	// is reviewed?
+	if rev {
+		query = query + "+AND+reviewed:true"
 	} else {
-		query = fmt.Sprintf("%s&include=no", query)
+		query = query + "+AND+reviewed:false"
 	}
+
+	client := resty.New()
+
+	// HTTP response gets saved into file, similar to curl -o flag
+	f := d.UniProtDB + ".gz"
+	_, e := client.R().
+		SetOutput(f).
+		SetHeader("Accept-Encoding", "gzip,deflate").
+		SetHeader("Content-Encoding", "gzip,deflate").
+		SetHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36").
+		Get(query)
+
+	if e != nil {
+		panic(e)
+	}
+
+	file, err := os.Open(f)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gz, err := gzip.NewReader(file)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+	defer gz.Close()
 
 	// tries to create an output file
 	output, e := os.Create(d.UniProtDB)
@@ -195,25 +235,13 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	}
 	defer output.Close()
 
-	// Tries to query data from Uniprot
-	response, e := http.Get(query)
-	if e != nil {
-		msg.Custom(errors.New("uniProt query failed, please check your connection"), "fatal")
-	}
-
-	if response.ContentLength != -1 {
-		msg.Custom(errors.New("no sequences downloaded, check your proteome ID and parameters"), "fatal")
-	}
-	defer response.Body.Close()
-
-	// Tries to download data from Uniprot
-	_, e = io.Copy(output, response.Body)
+	// tries to download data from Uniprot
+	_, e = io.Copy(output, gz)
 	if e != nil {
 		msg.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
 	}
 
 	d.DownloadedFiles = append(d.DownloadedFiles, d.UniProtDB)
-
 }
 
 // Create processes the given fasta file and add decoy sequences
