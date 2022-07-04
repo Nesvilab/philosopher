@@ -189,7 +189,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	}
 
 	// add the proteome parameter
-	query = query + "query=proteome:UP000005640"
+	query = fmt.Sprintf("%squery=proteome:%s", query, id)
 
 	// is reviewed?
 	if rev {
@@ -197,7 +197,6 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	} else {
 		query = query + "+AND+reviewed:false"
 	}
-
 	client := resty.New()
 
 	// HTTP response gets saved into file, similar to curl -o flag
