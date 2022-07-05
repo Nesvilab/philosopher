@@ -1,2 +1,2 @@
 ### Fixed
-- Updated the Endpoint from UniProt, fixing the database fetching issue.
+- Issue with the database command only fetching the human FASTA.

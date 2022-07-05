@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/ajstarks/svgo v0.0.0-20200204031535-0cbcf57ea1d8 // indirect
 	github.com/davecgh/go-spew v1.1.1
-	github.com/go-resty/resty/v2 v2.7.0 // indirect
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gorilla/websocket v1.4.1 // indirect
 	github.com/jpillora/go-ogle-analytics v0.0.0-20161213085824-14b04e0594ef
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
