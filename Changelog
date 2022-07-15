@@ -2,6 +2,7 @@
 
 ### Changed
 - Updated the TMT-Integrator to match with the version v4.0.0
+- Replaced the cRAP contaminant database with the Universal Protein Contaminants from Frankenfield et al. (10.1021/acs.jproteome.2c00145)
 
 ### Fixed
 - Contaminant tags are now added to Human sequences as well
