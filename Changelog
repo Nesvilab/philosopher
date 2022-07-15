@@ -1,2 +1,7 @@
+### Added
+
+### Changed
+- Updated the TMT-Integrator to match with the version v4.0.0
+
 ### Fixed
-- Issue with the database command only fetching the human FASTA.
+- Contaminant tags are now added to Human sequences as well

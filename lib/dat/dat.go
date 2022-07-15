@@ -271,7 +271,11 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 
 			for k, v := range crapMap {
 
-				if cTag && !strings.Contains(k, "_HUMAN") && !strings.Contains(k, "OX=9606") {
+				// if cTag && !strings.Contains(k, "_HUMAN") && !strings.Contains(k, "OX=9606") {
+				// 	k = "contam_" + k
+				// }
+
+				if cTag {
 					k = "contam_" + k
 				}
 
