@@ -56,12 +56,12 @@ func UpdateChecker(v, b string) {
 			remote := strings.Split(rel[0].TagName, ".")
 			remote[0] = strings.Replace(remote[0], "v", "", 1)
 
-			if remote[0] > local[0] {
-				logrus.Warning("There is a new version of Philosopher available for download: https://philosopher/releases")
-			}
+			outdatedMajorVersion := remote[0] > local[0]
+			outdatedMinorVersion := (remote[0] == local[0]) && (remote[1] > local[1])
+			outdated := outdatedMajorVersion || outdatedMinorVersion
 
-			if (remote[0] == local[0]) && (remote[1] > local[1]) {
-				logrus.Warning("There is a new version of Philosopher available for download: https://philosopher/releases")
+			if outdated {
+				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/Nesvilab/philosopher/releases")
 			}
 
 		}
