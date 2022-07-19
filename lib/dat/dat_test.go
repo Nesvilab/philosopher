@@ -37,7 +37,7 @@ func TestBase_Fetch(t *testing.T) {
 				TaDeDB:    tt.fields.TaDeDB,
 				Records:   tt.fields.Records,
 			}
-			d.Fetch(tt.args.id, tt.args.temp, tt.args.iso, tt.args.rev)
+			d.Fetch(tt.args.id, "9606", tt.args.temp, tt.args.iso, tt.args.rev)
 		})
 	}
 }

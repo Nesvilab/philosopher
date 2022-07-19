@@ -2,6 +2,7 @@
 package dat
 
 import (
+	"bufio"
 	"compress/gzip"
 	"errors"
 	"fmt"
@@ -32,9 +33,10 @@ type Base struct {
 	UniProtDB       string
 	CrapDB          string
 	Prefix          string
+	Proteomes       string
 	DownloadedFiles []string
-	TaDeDB          map[string]string
 	Records         []Record
+	TaDeDB          map[string]string
 }
 
 // New constructor
@@ -84,12 +86,15 @@ func Run(m met.Data) met.Data {
 
 		dbs := strings.Split(m.Database.ID, ",")
 		for _, i := range dbs {
-			logrus.Info("Fetching database ", i)
+
+			organism, proteomeID := GetOrganismID(sys.GetTemp(), i)
+
+			logrus.Info("Fetching ", organism, " database ", i)
 
 			currentTime := time.Now()
 			m.Database.TimeStamp = currentTime.Format("2006.01.02 15:04:05")
 
-			db.Fetch(i, m.Temp, m.Database.Iso, m.Database.Rev)
+			db.Fetch(i, proteomeID, m.Temp, m.Database.Iso, m.Database.Rev)
 		}
 
 	} else {
@@ -172,9 +177,9 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 }
 
 // Fetch downloads a database file from UniProt
-func (d *Base) Fetch(id, temp string, iso, rev bool) {
+func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 
-	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
+	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), uniprotID)
 
 	base := "https://rest.uniprot.org/uniprotkb/"
 
@@ -189,14 +194,15 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	}
 
 	// add the proteome parameter
-	query = fmt.Sprintf("%squery=proteome:%s", query, id)
+	query = fmt.Sprintf("%squery=proteome:%s", query, uniprotID)
 
 	// is reviewed?
 	if rev {
 		query = query + "+AND+reviewed:true"
-	} else {
-		query = query + "+AND+reviewed:false"
 	}
+
+	query = fmt.Sprintf("%s+AND+model_organism:%s", query, proteomeID)
+
 	client := resty.New()
 
 	// HTTP response gets saved into file, similar to curl -o flag
@@ -321,6 +327,39 @@ func (d *Base) Deploy(temp string) {
 		msg.WriteFile(e2, "fatal")
 	}
 
+}
+
+// GetOrganismID maps the UniprotID to organismID
+func GetOrganismID(temp string, uniprotID string) (string, string) {
+
+	var proteomes = make(map[string]string)
+	var organisms = make(map[string]string)
+	proteomeFile := fmt.Sprintf("%s%sproteomes.csv", temp, string(filepath.Separator))
+
+	param, e1 := Asset("proteomes.csv")
+	if e1 != nil {
+		msg.WriteFile(e1, "fatal")
+	}
+
+	e2 := ioutil.WriteFile(proteomeFile, param, sys.FilePermission())
+	if e2 != nil {
+		msg.WriteFile(e2, "fatal")
+	}
+
+	f, e := os.Open(proteomeFile)
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		parts := strings.Split(scanner.Text(), ",")
+		organisms[parts[0]] = parts[1]
+		proteomes[parts[0]] = parts[2]
+	}
+
+	return organisms[uniprotID], proteomes[uniprotID]
 }
 
 // Save fasta file to disk

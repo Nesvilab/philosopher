@@ -57,8 +57,10 @@ func UpdateChecker(v, b string) {
 			remote[0] = strings.Replace(remote[0], "v", "", 1)
 
 			outdatedMajorVersion := remote[0] > local[0]
-			outdatedMinorVersion := (remote[0] == local[0]) && (remote[1] > local[1])
-			outdated := outdatedMajorVersion || outdatedMinorVersion
+			//outdatedMinorVersion := (remote[0] == local[0]) && (remote[1] > local[1])
+			//outdated := outdatedMajorVersion || outdatedMinorVersion
+
+			outdated := outdatedMajorVersion
 
 			if outdated {
 				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/Nesvilab/philosopher/releases")
