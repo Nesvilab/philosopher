@@ -323,9 +323,9 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[
 // Deploy crap file to session folder
 func (d *Base) Deploy(temp string) {
 
-	d.CrapDB = fmt.Sprintf("%s%scrap.fas", temp, string(filepath.Separator))
+	d.CrapDB = fmt.Sprintf("%s%scrap-gpmdb.fas", temp, string(filepath.Separator))
 
-	param, e1 := Asset("crap.fas")
+	param, e1 := Asset("crap-gpmdb.fas")
 	if e1 != nil {
 		msg.WriteFile(e1, "fatal")
 	}
