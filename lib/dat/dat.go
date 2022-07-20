@@ -80,9 +80,8 @@ func Run(m met.Data) met.Data {
 		msg.Custom(errors.New("contaminants are not going to be added to database"), "warning")
 	}
 
-	// bool variable will control the adition fo contaminant tags to human proteins
-	// when using a human protein database from Unprot.
-	var hasHuman bool
+	// bool variable will control the adition fo contaminant tags to contam proteins from the same organism.
+	var ids = make(map[string]string)
 
 	if len(m.Database.Custom) < 1 {
 
@@ -100,9 +99,7 @@ func Run(m met.Data) met.Data {
 
 			db.Fetch(i, proteomeID, m.Temp, m.Database.Iso, m.Database.Rev)
 
-			if i == "UP000005640" {
-				hasHuman = true
-			}
+			ids[proteomeID] = organism
 		}
 
 	} else {
@@ -112,7 +109,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	logrus.Info("Generating the target-decoy database")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, hasHuman)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
 
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -120,7 +117,7 @@ func Run(m met.Data) met.Data {
 	db.ProcessDB(customDB, m.Database.Tag)
 
 	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, hasHuman)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -258,7 +255,7 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag, hasHuman bool) {
+func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[string]string) {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -284,13 +281,16 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag, hasHuman bool
 			crapMap := fas.ParseFile(d.CrapDB)
 
 			for k, v := range crapMap {
+				for key := range ids {
 
-				if cTag {
-					if (strings.Contains(k, "_HUMAN") || strings.Contains(k, "OX=9606")) && hasHuman {
-						// Do not add contaminant tags to human proteins when using a human FASTA
-					} else {
-						k = "contam_" + k
+					if cTag {
+						if strings.Contains(k, key) {
+							// Do not add contaminant tags to contam. proteins from the same organism
+						} else {
+							k = "contam_" + k
+						}
 					}
+
 				}
 
 				split := strings.Split(k, "|")
