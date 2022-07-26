@@ -562,6 +562,7 @@ func ProcessNextProt(k, v, decoyTag string) Record {
 func Classify(s, decoyTag string) string {
 
 	// remove the decoy and contamintant tags so we can see better the seq header
+
 	seq := strings.Replace(s, decoyTag, "", -1)
 	seq = strings.Replace(seq, "contam_", "", -1)
 

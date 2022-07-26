@@ -272,6 +272,22 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 		default:
 			header += ""
 		}
+	} else if brand == "k2" {
+		switch channels {
+		case 2:
+			header += "\tQuan Usage\tChannel 284\tChannel 290"
+		case 6:
+			header += "\tQuan Usage\tChannel 284\tChannel 290\tChannel 301\tChannel 307\tChannel 327\tChannel 333"
+		default:
+			header += ""
+		}
+	} else if brand == "sclip2" {
+		switch channels {
+		case 2:
+			header += "\tQuan Usage\tChannel 286\tChannel 290"
+		default:
+			header += ""
+		}
 	}
 
 	header += "\n"
@@ -597,6 +613,41 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 					i.Labels.Channel6.Intensity,
 					i.Labels.Channel7.Intensity,
 					i.Labels.Channel8.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "k2" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+				)
+			case 6:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "sclip2" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f",
+					line,
+					i.Labels.IsUsed,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
 				)
 			default:
 				header += ""
