@@ -6,8 +6,6 @@ import (
 	"math"
 	"path/filepath"
 	"philosopher/lib/id"
-	"philosopher/lib/ktag1"
-	"philosopher/lib/ktag2"
 	"sort"
 	"strings"
 
@@ -229,12 +227,6 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = trq.New(plex)
-		} else if brand == "k2" {
-			evi.PSM[i].Labels = &iso.Labels{}
-			*evi.PSM[i].Labels = ktag1.New(plex)
-		} else if brand == "sclip2" {
-			evi.PSM[i].Labels = &iso.Labels{}
-			*evi.PSM[i].Labels = ktag2.New(plex)
 		}
 	}
 
@@ -245,12 +237,6 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = trq.New(plex)
-		} else if brand == "k2" {
-			evi.Ions[i].Labels = &iso.Labels{}
-			*evi.Ions[i].Labels = ktag1.New(plex)
-		} else if brand == "sclip2" {
-			evi.Ions[i].Labels = &iso.Labels{}
-			*evi.Ions[i].Labels = ktag2.New(plex)
 		}
 	}
 
@@ -269,20 +255,6 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 			*evi.Proteins[i].TotalLabels = trq.New(plex)
 			*evi.Proteins[i].UniqueLabels = trq.New(plex)
 			*evi.Proteins[i].URazorLabels = trq.New(plex)
-		} else if brand == "k2" {
-			evi.Proteins[i].TotalLabels = &iso.Labels{}
-			evi.Proteins[i].UniqueLabels = &iso.Labels{}
-			evi.Proteins[i].URazorLabels = &iso.Labels{}
-			*evi.Proteins[i].TotalLabels = ktag1.New(plex)
-			*evi.Proteins[i].UniqueLabels = ktag1.New(plex)
-			*evi.Proteins[i].URazorLabels = ktag1.New(plex)
-		} else if brand == "sclip2" {
-			evi.Proteins[i].TotalLabels = &iso.Labels{}
-			evi.Proteins[i].UniqueLabels = &iso.Labels{}
-			evi.Proteins[i].URazorLabels = &iso.Labels{}
-			*evi.Proteins[i].TotalLabels = ktag2.New(plex)
-			*evi.Proteins[i].UniqueLabels = ktag2.New(plex)
-			*evi.Proteins[i].URazorLabels = ktag2.New(plex)
 		}
 	}
 
@@ -480,54 +452,6 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel8.CustomName = labelNames["121"]
 			}
 
-		} else if brand == "k2" {
-			if len(labelNames["284"]) < 1 {
-				v2.Channel1.CustomName = "284"
-			} else {
-				v2.Channel1.CustomName = labelNames["284"]
-			}
-
-			if len(labelNames["290"]) < 1 {
-				v2.Channel2.CustomName = "290"
-			} else {
-				v2.Channel2.CustomName = labelNames["290"]
-			}
-
-			if len(labelNames["301"]) < 1 {
-				v2.Channel3.CustomName = "301"
-			} else {
-				v2.Channel3.CustomName = labelNames["301"]
-			}
-
-			if len(labelNames["307"]) < 1 {
-				v2.Channel4.CustomName = "307"
-			} else {
-				v2.Channel4.CustomName = labelNames["307"]
-			}
-
-			if len(labelNames["327"]) < 1 {
-				v2.Channel5.CustomName = "327"
-			} else {
-				v2.Channel5.CustomName = labelNames["327"]
-			}
-
-			if len(labelNames["333"]) < 1 {
-				v2.Channel6.CustomName = "333"
-			} else {
-				v2.Channel6.CustomName = labelNames["333"]
-			}
-		} else if brand == "sclip2" {
-			if len(labelNames["286"]) < 1 {
-				v2.Channel1.CustomName = "286"
-			} else {
-				v2.Channel1.CustomName = labelNames["286"]
-			}
-
-			if len(labelNames["290"]) < 1 {
-				v2.Channel2.CustomName = "290"
-			} else {
-				v2.Channel2.CustomName = labelNames["290"]
-			}
 		}
 
 		labels[k] = v2
