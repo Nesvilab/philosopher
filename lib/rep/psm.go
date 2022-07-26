@@ -251,27 +251,29 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131N"
+			header += "\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		case 18:
-			header += "\tQuan Usage\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
 		default:
 			header += ""
 		}
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tQuan Usage\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header += "\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
 		case 8:
-			header += "\tQuan Usage\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header += "\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
 		default:
 			header += ""
 		}
+	} else if brand == "xtag" {
+		header += "\txTag1\txTag2\txTag3\txTag4\txTag5\txTag6\txTag7\txTag8\txTag9\txTag10\txTag11\txTag12\txTag13\txTag14\txTag15\txTag16\txTag17\txTag18"
 	}
 
 	header += "\n"
@@ -601,8 +603,29 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 			default:
 				header += ""
 			}
+		} else if brand == "xtag" {
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+				i.Labels.Channel3.Intensity,
+				i.Labels.Channel4.Intensity,
+				i.Labels.Channel5.Intensity,
+				i.Labels.Channel6.Intensity,
+				i.Labels.Channel7.Intensity,
+				i.Labels.Channel8.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
+				i.Labels.Channel11.Intensity,
+				i.Labels.Channel12.Intensity,
+				i.Labels.Channel13.Intensity,
+				i.Labels.Channel14.Intensity,
+				i.Labels.Channel15.Intensity,
+				i.Labels.Channel16.Intensity,
+				i.Labels.Channel17.Intensity,
+				i.Labels.Channel18.Intensity,
+			)
 		}
-
 		line += "\n"
 
 		_, e = io.WriteString(bw, line)

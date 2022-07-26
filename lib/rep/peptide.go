@@ -176,6 +176,8 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 		default:
 			header += ""
 		}
+	} else if brand == "xtag" {
+		header += "\txTag1\txTag2\txTag3\txTag4\txTag5\txTag6\txTag7\txTag8\txTag9\txTag10\txTag11\txTag12\txTag13\txTag14\txTag15\txTag16\txTag17\txTag18"
 	}
 
 	header += "\n"
@@ -291,87 +293,118 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 			strings.Join(mappedProteins, ", "),
 		)
 
-		switch channels {
-		case 4:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-			)
-		case 6:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-			)
-		case 8:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-			)
-		case 10:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-			)
-		case 11:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-				i.Labels.Channel11.Intensity,
-			)
-		case 16:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				i.Labels.Channel1.Intensity,
-				i.Labels.Channel2.Intensity,
-				i.Labels.Channel3.Intensity,
-				i.Labels.Channel4.Intensity,
-				i.Labels.Channel5.Intensity,
-				i.Labels.Channel6.Intensity,
-				i.Labels.Channel7.Intensity,
-				i.Labels.Channel8.Intensity,
-				i.Labels.Channel9.Intensity,
-				i.Labels.Channel10.Intensity,
-				i.Labels.Channel11.Intensity,
-				i.Labels.Channel12.Intensity,
-				i.Labels.Channel13.Intensity,
-				i.Labels.Channel14.Intensity,
-				i.Labels.Channel15.Intensity,
-				i.Labels.Channel16.Intensity,
-			)
-		case 18:
+		if brand == "tmt" {
+			switch channels {
+			case 6:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+			case 10:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
+				)
+			case 18:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+					i.Labels.Channel9.Intensity,
+					i.Labels.Channel10.Intensity,
+					i.Labels.Channel11.Intensity,
+					i.Labels.Channel12.Intensity,
+					i.Labels.Channel13.Intensity,
+					i.Labels.Channel14.Intensity,
+					i.Labels.Channel15.Intensity,
+					i.Labels.Channel16.Intensity,
+					i.Labels.Channel17.Intensity,
+					i.Labels.Channel18.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "itraq" {
+			switch channels {
+			case 4:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+				)
+			case 8:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "xtag" {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.Channel1.Intensity,
@@ -393,10 +426,7 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 				i.Labels.Channel17.Intensity,
 				i.Labels.Channel18.Intensity,
 			)
-		default:
-			header += ""
 		}
-
 		line += "\n"
 
 		_, e = io.WriteString(bw, line)

@@ -284,6 +284,8 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 		default:
 			header += ""
 		}
+	} else if brand == "xtag" {
+		header += "\txTag1\txTag2\txTag3\txTag4\txTag5\txTag6\txTag7\txTag8\txTag9\txTag10\txTag11\txTag12\txTag13\txTag14\txTag15\txTag16\txTag17\txTag18"
 	}
 
 	header += "\n"
@@ -435,87 +437,119 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			strings.Join(ip, ", "),   // Indistinguishable Proteins
 		)
 
-		switch channels {
-		case 4:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-			)
-		case 6:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[8],
-				reportIntensities[9],
-			)
-		case 8:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-			)
-		case 10:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-			)
-		case 11:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-				reportIntensities[10],
-			)
-		case 16:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-				reportIntensities[10],
-				reportIntensities[11],
-				reportIntensities[12],
-				reportIntensities[13],
-				reportIntensities[14],
-				reportIntensities[15],
-			)
-		case 18:
+		if brand == "tmt" || brand == "itraq" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+				)
+			case 4:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+				)
+			case 6:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[8],
+					reportIntensities[9],
+				)
+			case 8:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+				)
+			case 10:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+					reportIntensities[11],
+					reportIntensities[12],
+					reportIntensities[13],
+					reportIntensities[14],
+					reportIntensities[15],
+				)
+			case 18:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[0],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+					reportIntensities[11],
+					reportIntensities[12],
+					reportIntensities[13],
+					reportIntensities[14],
+					reportIntensities[15],
+					reportIntensities[16],
+					reportIntensities[17],
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "xtag" {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				reportIntensities[0],
@@ -537,8 +571,6 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				reportIntensities[16],
 				reportIntensities[17],
 			)
-		default:
-			header += ""
 		}
 
 		line += "\n"

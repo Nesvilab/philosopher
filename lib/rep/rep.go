@@ -442,6 +442,8 @@ func Run(m met.Data) {
 		isoBrand = "tmt"
 	} else if m.Quantify.Brand == "itraq" {
 		isoBrand = "itraq"
+	} else if m.Quantify.Brand == "xtag" {
+		isoBrand = "xtag"
 	}
 
 	if len(m.Quantify.Plex) > 0 {
