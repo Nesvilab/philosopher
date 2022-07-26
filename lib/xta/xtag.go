@@ -28,13 +28,13 @@ func New(plex string) iso.Labels {
 	o.Channel17.Name = "xTag17"
 	o.Channel18.Name = "xTag18"
 
-	o.Channel1.Mz = 0
-	o.Channel2.Mz = 0
-	o.Channel3.Mz = 0
-	o.Channel4.Mz = 0
-	o.Channel5.Mz = 0
-	o.Channel6.Mz = 0
-	o.Channel7.Mz = 0
+	o.Channel1.Mz = 173.1284
+	o.Channel2.Mz = 184.1076
+	o.Channel3.Mz = 229.1910
+	o.Channel4.Mz = 272.1612
+	o.Channel5.Mz = 328.2231
+	o.Channel6.Mz = 384.2612
+	o.Channel7.Mz = 412.2674
 	o.Channel8.Mz = 0
 	o.Channel9.Mz = 0
 	o.Channel10.Mz = 0

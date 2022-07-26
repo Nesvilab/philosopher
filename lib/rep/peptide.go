@@ -177,7 +177,7 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 			header += ""
 		}
 	} else if brand == "xtag" {
-		header += "\txTag1\txTag2\txTag3\txTag4\txTag5\txTag6\txTag7\txTag8\txTag9\txTag10\txTag11\txTag12\txTag13\txTag14\txTag15\txTag16\txTag17\txTag18"
+		header += "\tChannel xTag1\tChannel xTag2\tChannel xTag3\tChannel xTag4\tChannel xTag5\tChannel xTag6\tChannel xTag7\tChannel xTag8\tChannel xTag9\tChannel xTag10\tChannel xTag11\tChannel xTag12\tChannel xTag13\tChannel xTag14\tChannel xTag15\tChannel xTag16\tChannel xTag17\tChannel xTag18"
 	}
 
 	header += "\n"

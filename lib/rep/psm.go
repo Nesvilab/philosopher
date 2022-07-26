@@ -273,7 +273,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 			header += ""
 		}
 	} else if brand == "xtag" {
-		header += "\txTag1\txTag2\txTag3\txTag4\txTag5\txTag6\txTag7\txTag8\txTag9\txTag10\txTag11\txTag12\txTag13\txTag14\txTag15\txTag16\txTag17\txTag18"
+		header += "\tChannel xTag1\tChannel xTag2\tChannel xTag3\tChannel xTag4\tChannel xTag5\tChannel xTag6\tChannel xTag7\tChannel xTag8\tChannel xTag9\tChannel xTag10\tChannel xTag11\tChannel xTag12\tChannel xTag13\tChannel xTag14\tChannel xTag15\tChannel xTag16\tChannel xTag17\tChannel xTag18"
 	}
 
 	header += "\n"
@@ -281,50 +281,52 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	// verify if the structure has labels, if so, replace the original channel names by them.
 	if hasLabels {
 
-		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
+		// var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
 
-		for _, i := range printSet {
-			if len(i.Labels.Channel1.CustomName) >= 1 {
-				c1 = i.Labels.Channel1.CustomName
-				c2 = i.Labels.Channel2.CustomName
-				c3 = i.Labels.Channel3.CustomName
-				c4 = i.Labels.Channel4.CustomName
-				c5 = i.Labels.Channel5.CustomName
-				c6 = i.Labels.Channel6.CustomName
-				c7 = i.Labels.Channel7.CustomName
-				c8 = i.Labels.Channel8.CustomName
-				c9 = i.Labels.Channel9.CustomName
-				c10 = i.Labels.Channel10.CustomName
-				c11 = i.Labels.Channel11.CustomName
-				c12 = i.Labels.Channel12.CustomName
-				c13 = i.Labels.Channel13.CustomName
-				c14 = i.Labels.Channel14.CustomName
-				c15 = i.Labels.Channel15.CustomName
-				c16 = i.Labels.Channel16.CustomName
-				c17 = i.Labels.Channel17.CustomName
-				c18 = i.Labels.Channel18.CustomName
-				break
-			}
-		}
+		// for _, i := range printSet {
+		// 	if len(i.Labels.Channel1.CustomName) >= 1 {
+		// 		c1 = i.Labels.Channel1.CustomName
+		// 		c2 = i.Labels.Channel2.CustomName
+		// 		c3 = i.Labels.Channel3.CustomName
+		// 		c4 = i.Labels.Channel4.CustomName
+		// 		c5 = i.Labels.Channel5.CustomName
+		// 		c6 = i.Labels.Channel6.CustomName
+		// 		c7 = i.Labels.Channel7.CustomName
+		// 		c8 = i.Labels.Channel8.CustomName
+		// 		c9 = i.Labels.Channel9.CustomName
+		// 		c10 = i.Labels.Channel10.CustomName
+		// 		c11 = i.Labels.Channel11.CustomName
+		// 		c12 = i.Labels.Channel12.CustomName
+		// 		c13 = i.Labels.Channel13.CustomName
+		// 		c14 = i.Labels.Channel14.CustomName
+		// 		c15 = i.Labels.Channel15.CustomName
+		// 		c16 = i.Labels.Channel16.CustomName
+		// 		c17 = i.Labels.Channel17.CustomName
+		// 		c18 = i.Labels.Channel18.CustomName
+		// 		break
+		// 	}
+		// }
 
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel1.Name, c1, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel2.Name, c2, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel3.Name, c3, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel4.Name, c4, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel5.Name, c5, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel6.Name, c6, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel7.Name, c7, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel8.Name, c8, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel9.Name, c9, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel10.Name, c10, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel11.Name, c11, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel12.Name, c12, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel13.Name, c13, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel14.Name, c14, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel15.Name, c15, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel16.Name, c16, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel17.Name, c17, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].Labels.Channel18.Name, c18, -1)
+		header = strings.Replace(header, printSet[0].Labels.Channel1.Name, printSet[0].Labels.Channel1.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel2.Name, printSet[0].Labels.Channel2.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel3.Name, printSet[0].Labels.Channel3.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel4.Name, printSet[0].Labels.Channel4.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel5.Name, printSet[0].Labels.Channel5.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel6.Name, printSet[0].Labels.Channel6.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel7.Name, printSet[0].Labels.Channel7.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel8.Name, printSet[0].Labels.Channel8.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel9.Name, printSet[0].Labels.Channel9.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel10.Name, printSet[0].Labels.Channel10.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel11.Name, printSet[0].Labels.Channel11.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel12.Name, printSet[0].Labels.Channel12.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel13.Name, printSet[0].Labels.Channel13.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel14.Name, printSet[0].Labels.Channel14.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel15.Name, printSet[0].Labels.Channel15.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel16.Name, printSet[0].Labels.Channel16.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel17.Name, printSet[0].Labels.Channel17.CustomName, 1)
+		header = strings.Replace(header, printSet[0].Labels.Channel18.Name, printSet[0].Labels.Channel18.CustomName, 1)
+
+		header = strings.Replace(header, "Channel ", "", -1)
 	}
 
 	_, e = io.WriteString(bw, header)

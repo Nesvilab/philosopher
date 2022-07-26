@@ -156,7 +156,7 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if brand != "xta" && i.Mz.DecodedStream[j] > 137 {
+				if brand != "xtag" && i.Mz.DecodedStream[j] > 137 {
 					break
 				} else if i.Mz.DecodedStream[j] > 450 {
 					break
@@ -187,7 +187,7 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 				labelData = tmt.New(plex)
 			} else if brand == "itraq" {
 				labelData = trq.New(plex)
-			} else if brand == "xta" {
+			} else if brand == "xtag" {
 				labelData = xta.New(plex)
 			}
 
