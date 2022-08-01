@@ -459,25 +459,25 @@ func Run(m met.Data) {
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
-		repoPSM.MetaPSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
+		repoPSM.MetaPSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels, m.Report.Prefix)
 	}
 	{
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
-		repoIons.MetaIonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
+		repoIons.MetaIonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix)
 	}
 	{
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
-		repoPeptides.MetaPeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
+		repoPeptides.MetaPeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix)
 	}
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
 		var repoProteins ProteinEvidenceList
 		RestoreProtein(&repoProteins)
-		repoProteins.MetaProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repoProteins.MetaProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix)
 		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 
@@ -487,7 +487,7 @@ func Run(m met.Data) {
 		if repo.PSM == nil {
 			RestorePSM(&repo.PSM)
 		}
-		repo.ModificationReport(m.Home)
+		repo.ModificationReport(m.Home, m.Report.Prefix)
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
 			repo.PSMLocalizationReport(m.Home, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
@@ -498,7 +498,7 @@ func Run(m met.Data) {
 
 	// MSstats
 	if m.Report.MSstats {
-		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys)
+		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Report.Prefix)
 	}
 
 	// MzID

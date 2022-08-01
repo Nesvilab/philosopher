@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -233,10 +234,16 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 }
 
 // MetaProteinReport creates the TSV Protein report
-func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
+func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels, hasPrefix bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_protein.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)

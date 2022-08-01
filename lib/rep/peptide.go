@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -125,10 +126,16 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPeptideReport report consist on ion reporting
-func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels bool) {
+func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%speptide.tsv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_peptide.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%speptide.tsv", workspace, string(filepath.Separator))
+	}
 
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)

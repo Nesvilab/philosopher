@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -129,8 +130,10 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 }
 
 // MetaPSMReport report all psms from study that passed the FDR filter
-func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels bool) {
+func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels, hasPrefix bool) {
+
 	var header string
+	var output string
 	var modMap = make(map[string]string)
 	var modList []string
 	var hasCompVolt bool
@@ -138,7 +141,11 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	var hasSpectralSim bool
 	var hasRtScore bool
 
-	output := fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_psm.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%spsm.tsv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)

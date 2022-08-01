@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -13,13 +14,20 @@ import (
 )
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys bool) {
+func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys, hasPrefix bool) {
+
 	if evi.PSM == nil {
 		RestorePSM(&evi.PSM)
 	}
 
 	var header string
-	output := fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_msstats.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)

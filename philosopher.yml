@@ -267,6 +267,7 @@ Individual Reports:                              # Report
   msstats: false                                 # create an output compatible to MSstats
   withDecoys: false                              # add decoy observations to reports
   mzID: false                                    # create a mzID output
+  prefix: false                                  # add the project (folder) name as a prefix to the output files
             
 Integrated Reports:                              # Abacus
   protein: true                                  # global level protein report

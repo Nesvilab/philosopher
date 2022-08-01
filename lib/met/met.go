@@ -413,6 +413,7 @@ type Report struct {
 	MSstats bool `yaml:"msstats"`
 	MZID    bool `yaml:"mzID"`
 	IonMob  bool `yaml:"ionmobility"`
+	Prefix  bool `yaml:"prefix"`
 }
 
 // TMTIntegrator options and parameters

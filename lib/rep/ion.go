@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -102,10 +103,16 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 }
 
 // MetaIonReport reports consist on ion reporting
-func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels bool) {
+func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_ion.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%sion.tsv", workspace, string(filepath.Separator))
+	}
 
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
