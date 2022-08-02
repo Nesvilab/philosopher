@@ -270,7 +270,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -280,7 +280,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				printSet[0].UniqueLabels.Channel10.CustomName,
 			)
 		case 10:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -294,7 +294,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				printSet[0].UniqueLabels.Channel10.CustomName,
 			)
 		case 11:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -309,7 +309,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				printSet[0].UniqueLabels.Channel11.CustomName,
 			)
 		case 16:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -329,7 +329,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				printSet[0].UniqueLabels.Channel16.CustomName,
 			)
 		case 18:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -356,7 +356,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -364,7 +364,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				printSet[0].UniqueLabels.Channel4.CustomName,
 			)
 		case 8:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].UniqueLabels.Channel1.CustomName,
 				printSet[0].UniqueLabels.Channel2.CustomName,
@@ -379,7 +379,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			header += ""
 		}
 	} else if brand == "xtag" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
 			printSet[0].UniqueLabels.Channel1.CustomName,
 			printSet[0].UniqueLabels.Channel2.CustomName,
@@ -401,6 +401,8 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			printSet[0].UniqueLabels.Channel18.CustomName,
 		)
 	}
+
+	header += "\n"
 
 	_, e = io.WriteString(bw, header)
 	if e != nil {
