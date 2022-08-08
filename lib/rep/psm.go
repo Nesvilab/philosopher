@@ -258,7 +258,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -268,7 +268,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel10.CustomName,
 			)
 		case 10:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -282,7 +282,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel10.CustomName,
 			)
 		case 11:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -297,7 +297,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel11.CustomName,
 			)
 		case 16:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -317,7 +317,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel16.CustomName,
 			)
 		case 18:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -344,7 +344,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -352,7 +352,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel4.CustomName,
 			)
 		case 8:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -367,7 +367,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 			header += ""
 		}
 	} else if brand == "xtag" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
 			printSet[0].Labels.Channel1.CustomName,
 			printSet[0].Labels.Channel2.CustomName,
