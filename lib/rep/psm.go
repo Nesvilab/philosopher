@@ -256,9 +256,12 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	if brand == "tmt" {
+
+		header += "\tQuan Usage"
+
 		switch channels {
 		case 6:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -268,7 +271,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel10.CustomName,
 			)
 		case 10:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -282,7 +285,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel10.CustomName,
 			)
 		case 11:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -297,7 +300,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel11.CustomName,
 			)
 		case 16:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -317,7 +320,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel16.CustomName,
 			)
 		case 18:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -342,9 +345,12 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 			header += ""
 		}
 	} else if brand == "itraq" {
+
+		header += "\tQuan Usage"
+
 		switch channels {
 		case 4:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -352,7 +358,7 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				printSet[0].Labels.Channel4.CustomName,
 			)
 		case 8:
-			header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				header,
 				printSet[0].Labels.Channel1.CustomName,
 				printSet[0].Labels.Channel2.CustomName,
@@ -367,7 +373,10 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 			header += ""
 		}
 	} else if brand == "xtag" {
-		header = fmt.Sprintf("%s\tQuan Usage\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+
+		header += "\tQuan Usage"
+
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
 			printSet[0].Labels.Channel1.CustomName,
 			printSet[0].Labels.Channel2.CustomName,
@@ -669,8 +678,9 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 				header += ""
 			}
 		} else if brand == "xtag" {
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
+				i.Labels.IsUsed,
 				i.Labels.Channel1.Intensity,
 				i.Labels.Channel2.Intensity,
 				i.Labels.Channel3.Intensity,
