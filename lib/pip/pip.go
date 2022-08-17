@@ -573,10 +573,10 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		dsAbs, _ := filepath.Abs(i)
 		os.Chdir(dsAbs)
 
-		//annotation, _ := filepath.Glob("annotation*.txt")
-		//fullAnnotation, _ := filepath.Abs(annotation[0])
+		annotation, _ := filepath.Glob("*_annotation.txt")
+		fullAnnotation, _ := filepath.Abs(annotation[0])
 
-		fullAnnotation := "annotation.txt"
+		//fullAnnotation := "annotation.txt"
 
 		// reload the meta data
 		meta.Restore(sys.Meta())
