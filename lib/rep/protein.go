@@ -269,7 +269,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 
 	var headerIndex int
 	for i := range printSet {
-		if len(printSet[i].UniqueLabels.Channel1.Name) > 0 {
+		if printSet[i].UniqueLabels != nil && len(printSet[i].UniqueLabels.Channel1.Name) > 0 {
 			headerIndex = i
 			break
 		}

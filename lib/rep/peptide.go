@@ -161,7 +161,7 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 
 	var headerIndex int
 	for i := range printSet {
-		if len(printSet[i].Labels.Channel1.Name) > 0 {
+		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.Name) > 0 {
 			headerIndex = i
 			break
 		}
