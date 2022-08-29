@@ -69,6 +69,7 @@ func init() {
 		filterCmd.Flags().Float64VarP(&m.Filter.PepProb, "pepProb", "", 0.7, "top peptide probability threshold for the FDR filtering")
 		filterCmd.Flags().Float64VarP(&m.Filter.ProtProb, "protProb", "", 0.5, "protein probability threshold for the FDR filtering (not used with the razor algorithm)")
 		filterCmd.Flags().Float64VarP(&m.Filter.Weight, "weight", "", 1, "threshold for defining peptide uniqueness")
+		filterCmd.Flags().BoolVarP(&m.Filter.Delta, "delta", "", false, "applies a stratification to PSMs based on Delta mass profile")
 		filterCmd.Flags().BoolVarP(&m.Filter.Seq, "sequential", "", false, "alternative algorithm that estimates FDR using both filtered PSM and protein lists")
 		filterCmd.Flags().BoolVarP(&m.Filter.TwoD, "2d", "", false, "two-dimensional FDR filtering")
 		filterCmd.Flags().BoolVarP(&m.Filter.Model, "models", "", false, "print model distribution")
@@ -77,6 +78,7 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Mapmods, "mapmods", "", false, "map modifications")
 		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
 		filterCmd.Flags().MarkHidden("mods")
+		filterCmd.Flags().MarkHidden("delta")
 		filterCmd.Flags().MarkHidden("razorbin")
 	}
 
