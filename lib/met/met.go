@@ -357,6 +357,7 @@ type Filter struct {
 	Seq       bool    `yaml:"sequential"`
 	TwoD      bool    `yaml:"two-dimensional"`
 	Mapmods   bool    `yaml:"mapMods"`
+	Delta     bool    `yaml:"delta"`
 	Inference bool
 }
 

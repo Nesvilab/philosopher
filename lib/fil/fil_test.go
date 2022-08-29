@@ -125,7 +125,7 @@ func Test_readPepXMLInput(t *testing.T) {
 	for _, tt := range test2 {
 
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, got2 := processPeptideIdentifications(pepIDList, tt.args.decoyTag, "", tt.args.psm, tt.args.peptide, tt.args.ion)
+			got, got1, got2 := processPeptideIdentifications(pepIDList, tt.args.decoyTag, "", tt.args.psm, tt.args.peptide, tt.args.ion, false)
 			if got != tt.want {
 				t.Errorf("processPeptideIdentifications(psm) got = %v, want %v", got, tt.want)
 			}

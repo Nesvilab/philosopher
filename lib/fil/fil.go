@@ -66,7 +66,7 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta)
 	_ = psmT
 	_ = pepT
 	_ = ionT
@@ -285,7 +285,7 @@ func Run(f met.Data) met.Data {
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64) (float64, float64, float64) {
+func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64, delta bool) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
@@ -353,7 +353,65 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 		ptmBasedPSMFiltering(uniqPsms, psm, decoyTag, mods)
 	}
 
+	if delta {
+		deltaMassBasedPSMFiltering(uniqPsms, psm, decoyTag)
+	}
+
 	return psmThreshold, peptideThreshold, ionThreshold
+}
+
+func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
+
+	logrus.Info("Separating PSMs based on the delta mass profile")
+
+	// unmodified: delta mass < 1000
+	unModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// common: only the most common PTMs; > 1000 & < 100000
+	commonModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// glyco: all the remaining PTMs including glyco
+	glycoModPSMs := make(map[string]id.PepIDListPtrs)
+
+	for k, v := range uniqPsms {
+
+		var glyco, common bool
+
+		if v[0].Massdiff >= 146 {
+			glyco = true
+		} else if v[0].Massdiff >= 3.5 && v[0].Massdiff <= 145 {
+			common = true
+		}
+
+		if glyco && !common {
+			glycoModPSMs[k] = v
+		} else if !glyco && common {
+			commonModPSMs[k] = v
+		} else {
+			unModPSMs[k] = v
+		}
+
+	}
+
+	logrus.Info("Filtering unmodified PSMs")
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+
+	logrus.Info("Filtering commonly modified PSMs")
+	filteredDefinedPSM, _ := PepXMLFDRFilter(commonModPSMs, targetFDR, "PSM", decoyTag)
+
+	logrus.Info("Filtering glyco-modified PSMs")
+	filteredAllPSM, _ := PepXMLFDRFilter(glycoModPSMs, targetFDR, "PSM", decoyTag)
+
+	var combinedFiltered id.PepIDListPtrs
+
+	combinedFiltered = append(combinedFiltered, filteredUnmodPSM...)
+
+	combinedFiltered = append(combinedFiltered, filteredDefinedPSM...)
+
+	combinedFiltered = append(combinedFiltered, filteredAllPSM...)
+
+	combinedFiltered.Serialize("psm")
+
 }
 
 func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag, mods string) {
