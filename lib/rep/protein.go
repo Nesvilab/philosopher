@@ -22,6 +22,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 	var protMods = make(map[id.IonFormType][]mod.Modification)
 	var evidenceIons = make(map[id.IonFormType]*IonEvidence)
+
 	for idx, i := range evi.Ions {
 		evidenceIons[i.IonForm()] = &evi.Ions[idx]
 	}
@@ -33,6 +34,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 	evi.Proteins = make(ProteinEvidenceList, len(pro))
 	for idx, i := range pro {
+
 		rep := &evi.Proteins[idx]
 		rep.SupportingSpectra = make(map[id.SpectrumType]int)
 		rep.TotalPeptideIons = make(map[id.IonFormType]IonEvidence)
@@ -185,10 +187,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 		for _, j := range dtb.Records {
 
-			desc := strings.Replace(j.Description, "|", " ", -1)
+			desc := strings.Replace(pe.Description, "|", " ", -1)
 
 			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (strings.Contains(j.OriginalHeader, j.Description) || strings.Contains(j.OriginalHeader, desc)) {
+			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (j.Length == pe.Length) && (strings.Contains(j.OriginalHeader, pe.Description) || strings.Contains(j.OriginalHeader, desc)) {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
