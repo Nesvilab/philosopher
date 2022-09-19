@@ -243,6 +243,8 @@ func Run(f met.Data) met.Data {
 		e.SyncPSMToProteins(f.Filter.Tag)
 
 		e.UpdateNumberOfEnzymaticTermini(f.Filter.Tag)
+
+		e.CalculateProteinCoverage()
 	}
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)

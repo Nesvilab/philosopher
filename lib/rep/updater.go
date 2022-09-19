@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"sort"
 	"strings"
 
 	"philosopher/lib/dat"
@@ -690,5 +691,35 @@ func (evi *Evidence) UpdatePeptideModCount() {
 			evi.Peptides[i].ModifiedObservations = v2
 		}
 
+	}
+}
+
+// CalculateProteinCoverage calcualtes the peptide coverage for each protein
+func (evi *Evidence) CalculateProteinCoverage() {
+
+	replacerIL := strings.NewReplacer("L", "I")
+
+	for p := range evi.Proteins {
+
+		var pep []string
+		evi.Proteins[p].Coverage = -1
+
+		seq := replacerIL.Replace(evi.Proteins[p].Sequence)
+
+		for i := range evi.Proteins[p].TotalPeptides {
+			pep = append(pep, i)
+		}
+
+		sort.Sort(sort.Reverse(sort.StringSlice(pep)))
+
+		for _, i := range pep {
+			seq = strings.Replace(seq, replacerIL.Replace(i), strings.Repeat("x", len(i)), -1)
+		}
+
+		count := strings.Count(seq, "x")
+
+		cent := uti.Round((float64(count)/float64(evi.Proteins[p].Length))*100, float64(5), 2)
+
+		evi.Proteins[p].Coverage = float32(cent)
 	}
 }
