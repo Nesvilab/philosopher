@@ -21,9 +21,11 @@ type DataSetLabelNames struct {
 // TODO update error methos on the abacus function
 func Run(m met.Data, args []string) {
 
-	if !m.Abacus.Peptide && !m.Abacus.Protein {
-		msg.Custom(errors.New("you need to specify a peptide or protein combined file for the Abacus analysis"), "fatal")
-	}
+	// if !m.Abacus.Peptide && !m.Abacus.Protein {
+	// 	msg.Custom(errors.New("you need to specify a peptide or protein combined file for the Abacus analysis"), "fatal")
+	// }
+
+	psmLevelAbacus(m, args)
 
 	if m.Abacus.Peptide {
 		peptideLevelAbacus(m, args)

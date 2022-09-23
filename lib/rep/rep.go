@@ -396,6 +396,30 @@ func (a CombinedPeptideEvidenceList) Len() int           { return len(a) }
 func (a CombinedPeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a CombinedPeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
+// CombinedPSMEvidence represents all combined PSMs detected
+type CombinedPSMEvidence struct {
+	DataSet            string
+	Source             string
+	Spectrum           string
+	SpectrumFile       string
+	Peptide            string
+	ModifiedPeptide    string
+	Protein            string
+	ProteinDescription string
+	ProteinID          string
+	EntryName          string
+	GeneName           string
+	AssumedCharge      uint8
+	Intensity          float64
+}
+
+// CombinedPSMEvidenceList is a list of Combined PSM Evidences
+type CombinedPSMEvidenceList []CombinedPSMEvidence
+
+func (a CombinedPSMEvidenceList) Len() int           { return len(a) }
+func (a CombinedPSMEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedPSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spectrum }
+
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
 	MassBins []MassBin
