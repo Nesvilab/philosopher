@@ -410,6 +410,7 @@ type CombinedPSMEvidence struct {
 	EntryName          string
 	GeneName           string
 	AssumedCharge      uint8
+	Purity             float64
 	IsUnique           bool
 	IsUsed             bool
 	Intensity          map[string]float64

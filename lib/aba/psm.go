@@ -81,6 +81,7 @@ func psmLevelAbacus(m met.Data, args []string) {
 			psm.GeneName = j.GeneName
 			psm.AssumedCharge = j.AssumedCharge
 			psm.IsUnique = j.IsUnique
+			psm.Purity = j.Purity
 
 			psm.Intensity[prjName] = j.Intensity
 
@@ -116,7 +117,7 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 	}
 	defer file.Close()
 
-	header := "Source\tSpectrum\tSpectrumFile\tPeptide\tModified Peptide\tCharge\tProtein\tProtein ID\tEntry Name\tProtein Description\tGene\tIs Unique\tQuan Usage"
+	header := "Source\tSpectrum\tSpectrumFile\tPeptide\tModified Peptide\tCharge\tProtein\tProtein ID\tEntry Name\tProtein Description\tGene\tIs Unique\tQuan Usage\tPurity"
 
 	// Add Unique+Razor Intensity
 	for _, i := range namesList {
@@ -180,6 +181,8 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 		line += fmt.Sprintf("%t\t", i.IsUnique)
 
 		line += fmt.Sprintf("%t\t", i.IsUsed)
+
+		line += fmt.Sprintf("%.2f\t", i.Purity)
 
 		for _, j := range namesList {
 			line += fmt.Sprintf("%6.f\t", i.Intensity[j])
