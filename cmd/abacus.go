@@ -54,7 +54,7 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Reprint, "reprint", "", false, "create abacus reports using the Reprint format")
-		abacusCmd.Flags().BoolVarP(&m.Abacus.Full, "full", "", true, "generates combined tables with extra information")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Full, "full", "", false, "generates combined tables with extra information")
 	}
 
 	RootCmd.AddCommand(abacusCmd)

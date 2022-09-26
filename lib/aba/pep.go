@@ -66,7 +66,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 				labels.Name = annot
 
 				if len(m.Quantify.Annot) > 0 {
-					labels.LabelName = getLabelNames(annot)
+					labels.LabelName = getLabelNames(i, annot)
 				}
 			}
 

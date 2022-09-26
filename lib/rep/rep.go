@@ -410,7 +410,10 @@ type CombinedPSMEvidence struct {
 	EntryName          string
 	GeneName           string
 	AssumedCharge      uint8
-	Intensity          float64
+	IsUnique           bool
+	IsUsed             bool
+	Intensity          map[string]float64
+	Labels             map[string]iso.Labels
 }
 
 // CombinedPSMEvidenceList is a list of Combined PSM Evidences

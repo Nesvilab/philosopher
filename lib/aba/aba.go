@@ -37,7 +37,7 @@ func Run(m met.Data, args []string) {
 }
 
 // addCustomNames adds to the label structures user-defined names to be used on the TMT labels
-func getLabelNames(annot string) map[string]string {
+func getLabelNames(dataSet, annot string) map[string]string {
 
 	var labels = make(map[string]string)
 
@@ -50,7 +50,10 @@ func getLabelNames(annot string) map[string]string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		names := strings.Split(scanner.Text(), " ")
-		labels[names[0]] = names[1]
+
+		name := dataSet + " " + names[0]
+
+		labels[name] = names[1]
 	}
 
 	if e = scanner.Err(); e != nil {

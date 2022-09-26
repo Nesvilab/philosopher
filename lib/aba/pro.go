@@ -62,8 +62,8 @@ func proteinLevelAbacus(m met.Data, args []string) {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				labels.Name = annot
 
-				if len(m.Quantify.Annot) > 0 {
-					labels.LabelName = getLabelNames(annot)
+				if len(labels.Name) > 0 {
+					labels.LabelName = getLabelNames(i, annot)
 				}
 			}
 		}
@@ -80,6 +80,8 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		datasets[prjName] = e
 		names = append(names, prjName)
 	}
+
+	sort.Strings(names)
 
 	// If the name starts with CONTROL  or control then we put CONTROL (regardless of what follows after first '_')
 	// If the name starts with something else, then we first determine, for each experiment, if the annotation
@@ -351,7 +353,7 @@ func sumProteinIntensities(combined rep.CombinedProteinEvidenceList, datasets ma
 }
 
 // saveProteinAbacusResult creates a single report using 1 or more philosopher result files
-func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasTMT, full bool, labelsList []DataSetLabelNames) {
+func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasLabels, full bool, labelsList []DataSetLabelNames) {
 
 	var summTotalSpC = make(map[string]int)
 	var summUniqueSpC = make(map[string]int)
@@ -442,30 +444,28 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		}
 	}
 
-	if hasTMT {
+	if hasLabels {
 		for _, i := range namesList {
-			header += fmt.Sprintf("\t%s 126 Abundance", i)
-			header += fmt.Sprintf("\t%s 127N Abundance", i)
-			header += fmt.Sprintf("\t%s 127C Abundance", i)
-			header += fmt.Sprintf("\t%s 128N Abundance", i)
-			header += fmt.Sprintf("\t%s 128C Abundance", i)
-			header += fmt.Sprintf("\t%s 129N Abundance", i)
-			header += fmt.Sprintf("\t%s 129C Abundance", i)
-			header += fmt.Sprintf("\t%s 130N Abundance", i)
-			header += fmt.Sprintf("\t%s 130C Abundance", i)
-			header += fmt.Sprintf("\t%s 131N Abundance", i)
+			header += fmt.Sprintf("\t%s 126", i)
+			header += fmt.Sprintf("\t%s 127N", i)
+			header += fmt.Sprintf("\t%s 127C", i)
+			header += fmt.Sprintf("\t%s 128N", i)
+			header += fmt.Sprintf("\t%s 128C", i)
+			header += fmt.Sprintf("\t%s 129N", i)
+			header += fmt.Sprintf("\t%s 129C", i)
+			header += fmt.Sprintf("\t%s 130N", i)
+			header += fmt.Sprintf("\t%s 130C", i)
+			header += fmt.Sprintf("\t%s 131N", i)
 
 			for _, j := range labelsList {
-				if j.Name == i {
+				if strings.Contains(j.Name, i) {
 					for k, v := range j.LabelName {
-						before := fmt.Sprintf("%s %s Abundance", i, k)
-						after := fmt.Sprintf("%s Abundance", v)
-						header = strings.Replace(header, before, after, -1)
+
+						header = strings.Replace(header, k, v, 1)
 					}
 				}
 			}
 		}
-
 	}
 
 	header += "\tIndistinguishable Proteins"
@@ -548,10 +548,10 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 				}
 			}
 
-			if hasTMT {
+			if hasLabels {
 				if uniqueOnly {
 					for _, j := range namesList {
-						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 							i.UniqueLabels[j].Channel1.Intensity,
 							i.UniqueLabels[j].Channel2.Intensity,
 							i.UniqueLabels[j].Channel3.Intensity,
@@ -566,7 +566,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 					}
 				} else {
 					for _, j := range namesList {
-						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 							i.URazorLabels[j].Channel1.Intensity,
 							i.URazorLabels[j].Channel2.Intensity,
 							i.URazorLabels[j].Channel3.Intensity,

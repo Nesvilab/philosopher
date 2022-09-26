@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"philosopher/lib/iso"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/rep"
@@ -43,8 +44,8 @@ func psmLevelAbacus(m met.Data, args []string) {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 				labels.Name = annot
 
-				if len(m.Quantify.Annot) > 0 {
-					labels.LabelName = getLabelNames(annot)
+				if len(labels.Name) > 0 {
+					labels.LabelName = getLabelNames(i, annot)
 				}
 			}
 		}
@@ -64,6 +65,8 @@ func psmLevelAbacus(m met.Data, args []string) {
 		for _, j := range e.PSM {
 
 			var psm rep.CombinedPSMEvidence
+			psm.Intensity = make(map[string]float64)
+			psm.Labels = make(map[string]iso.Labels)
 
 			psm.DataSet = prjName
 			psm.Source = j.Source
@@ -77,6 +80,16 @@ func psmLevelAbacus(m met.Data, args []string) {
 			psm.EntryName = j.EntryName
 			psm.GeneName = j.GeneName
 			psm.AssumedCharge = j.AssumedCharge
+			psm.IsUnique = j.IsUnique
+
+			psm.Intensity[prjName] = j.Intensity
+
+			if j.Labels != nil {
+				psm.Labels[prjName] = *j.Labels
+				if j.Labels.IsUsed {
+					psm.IsUsed = true
+				}
+			}
 
 			evidences = append(evidences, psm)
 		}
@@ -91,7 +104,7 @@ func psmLevelAbacus(m met.Data, args []string) {
 }
 
 // savePSMAbacusResult creates a single report using 1 or more philosopher result files
-func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasTMT, full bool, labelsList []DataSetLabelNames) {
+func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList []DataSetLabelNames) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_psm.tsv", session, string(filepath.Separator))
@@ -103,32 +116,30 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 	}
 	defer file.Close()
 
-	header := "Source\tSpectrum\tSpectrumFile\tPeptide\tModified Peptide\tCharge\tProtein\tProtein ID\tEntry Name\tProtein Description\tGene"
+	header := "Source\tSpectrum\tSpectrumFile\tPeptide\tModified Peptide\tCharge\tProtein\tProtein ID\tEntry Name\tProtein Description\tGene\tIs Unique\tQuan Usage"
 
 	// Add Unique+Razor Intensity
 	for _, i := range namesList {
-		header += fmt.Sprintf("\t%s Intensity", i)
+		header += fmt.Sprintf("\t%s", i)
 	}
 
-	if hasTMT {
+	if hasLabels {
 		for _, i := range namesList {
-			header += fmt.Sprintf("\t%s 126 Abundance", i)
-			header += fmt.Sprintf("\t%s 127N Abundance", i)
-			header += fmt.Sprintf("\t%s 127C Abundance", i)
-			header += fmt.Sprintf("\t%s 128N Abundance", i)
-			header += fmt.Sprintf("\t%s 128C Abundance", i)
-			header += fmt.Sprintf("\t%s 129N Abundance", i)
-			header += fmt.Sprintf("\t%s 129C Abundance", i)
-			header += fmt.Sprintf("\t%s 130N Abundance", i)
-			header += fmt.Sprintf("\t%s 130C Abundance", i)
-			header += fmt.Sprintf("\t%s 131N Abundance", i)
+			header += fmt.Sprintf("\t%s 126", i)
+			header += fmt.Sprintf("\t%s 127N", i)
+			header += fmt.Sprintf("\t%s 127C", i)
+			header += fmt.Sprintf("\t%s 128N", i)
+			header += fmt.Sprintf("\t%s 128C", i)
+			header += fmt.Sprintf("\t%s 129N", i)
+			header += fmt.Sprintf("\t%s 129C", i)
+			header += fmt.Sprintf("\t%s 130N", i)
+			header += fmt.Sprintf("\t%s 130C", i)
+			header += fmt.Sprintf("\t%s 131N", i)
 
 			for _, j := range labelsList {
-				if j.Name == i {
+				if strings.Contains(j.Name, i) {
 					for k, v := range j.LabelName {
-						before := fmt.Sprintf("%s %s Abundance", i, k)
-						after := fmt.Sprintf("%s Abundance", v)
-						header = strings.Replace(header, before, after, -1)
+						header = strings.Replace(header, k, v, 1)
 					}
 				}
 			}
@@ -165,6 +176,31 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 		line += fmt.Sprintf("%s\t", i.ProteinDescription)
 
 		line += fmt.Sprintf("%s\t", i.GeneName)
+
+		line += fmt.Sprintf("%t\t", i.IsUnique)
+
+		line += fmt.Sprintf("%t\t", i.IsUsed)
+
+		for _, j := range namesList {
+			line += fmt.Sprintf("%6.f\t", i.Intensity[j])
+		}
+
+		if hasLabels {
+			for _, j := range namesList {
+				line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					i.Labels[j].Channel1.Intensity,
+					i.Labels[j].Channel2.Intensity,
+					i.Labels[j].Channel3.Intensity,
+					i.Labels[j].Channel4.Intensity,
+					i.Labels[j].Channel5.Intensity,
+					i.Labels[j].Channel6.Intensity,
+					i.Labels[j].Channel7.Intensity,
+					i.Labels[j].Channel8.Intensity,
+					i.Labels[j].Channel9.Intensity,
+					i.Labels[j].Channel10.Intensity,
+				)
+			}
+		}
 
 		line += "\n"
 		_, e := io.WriteString(file, line)
