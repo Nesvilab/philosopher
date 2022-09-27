@@ -71,7 +71,6 @@ func psmLevelAbacus(m met.Data, args []string) {
 			psm.DataSet = prjName
 			psm.Source = j.Source
 			psm.Spectrum = j.Spectrum
-			psm.SpectrumFile = j.SpectrumFile
 			psm.Peptide = j.Peptide
 			psm.ModifiedPeptide = j.ModifiedPeptide
 			psm.Protein = j.Protein
@@ -117,7 +116,7 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 	}
 	defer file.Close()
 
-	header := "Source\tSpectrum\tSpectrumFile\tPeptide\tModified Peptide\tCharge\tProtein\tProtein ID\tEntry Name\tProtein Description\tGene\tIs Unique\tQuan Usage\tPurity"
+	header := "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tCharge\tGene\tProtein\tProtein ID\tEntry Name\tProtein Description\tIs Unique\tQuan Usage\tPurity"
 
 	// Add Unique+Razor Intensity
 	for _, i := range namesList {
@@ -156,17 +155,17 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 	for _, i := range evidences {
 		var line string
 
-		line += fmt.Sprintf("%s\t", i.Source)
-
 		line += fmt.Sprintf("%s\t", i.Spectrum)
 
-		line += fmt.Sprintf("%s\t", i.SpectrumFile)
+		line += fmt.Sprintf("%s.raw\t", i.Source)
 
 		line += fmt.Sprintf("%s\t", i.Peptide)
 
 		line += fmt.Sprintf("%s\t", i.ModifiedPeptide)
 
 		line += fmt.Sprintf("%d\t", i.AssumedCharge)
+
+		line += fmt.Sprintf("%s\t", i.GeneName)
 
 		line += fmt.Sprintf("%s\t", i.Protein)
 
@@ -175,8 +174,6 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 		line += fmt.Sprintf("%s\t", i.EntryName)
 
 		line += fmt.Sprintf("%s\t", i.ProteinDescription)
-
-		line += fmt.Sprintf("%s\t", i.GeneName)
 
 		line += fmt.Sprintf("%t\t", i.IsUnique)
 

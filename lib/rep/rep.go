@@ -401,7 +401,6 @@ type CombinedPSMEvidence struct {
 	DataSet            string
 	Source             string
 	Spectrum           string
-	SpectrumFile       string
 	Peptide            string
 	ModifiedPeptide    string
 	Protein            string
