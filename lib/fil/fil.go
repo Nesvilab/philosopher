@@ -379,7 +379,7 @@ func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR 
 
 		var glyco, common bool
 
-		if v[0].Massdiff >= 146 {
+		if v[0].Massdiff > 145 {
 			glyco = true
 		} else if v[0].Massdiff >= 3.5 && v[0].Massdiff <= 145 {
 			common = true
@@ -445,7 +445,12 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 
 			if i.Variable {
 
-				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+				var m string
+				if i.AminoAcid == "N-term" {
+					m = fmt.Sprintf("%s:%.4f", "n", i.MassDiff)
+				} else {
+					m = fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+				}
 
 				_, ok := modsMap[m]
 				if ok {
@@ -475,7 +480,7 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 	logrus.Info("Filtering defined modified PSMs")
 	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
 
-	logrus.Info("Filtering all modified PSMs")
+	logrus.Info("Filtering all other PSMs")
 	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
 
 	var combinedFiltered id.PepIDListPtrs
