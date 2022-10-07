@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"philosopher/lib/iso"
 	"philosopher/lib/msg"
 
 	"philosopher/lib/dat"
@@ -29,8 +30,6 @@ type Cluster struct {
 	Status                  string
 	Existence               string
 	GeneNames               string
-	Peptides                []string
-	PeptideIons             []string
 	UniqueClusterPeptides   []string
 	Number                  int
 	TotalPeptideNumber      int
@@ -38,7 +37,10 @@ type Cluster struct {
 	Coverage                float32
 	UniqueClusterTopPepProb float64
 	TopPepProb              float64
+	Intensity               float64
+	Peptides                map[string]uint8
 	Members                 map[string]uint8
+	Labels                  iso.Labels
 }
 
 // List list
@@ -135,7 +137,8 @@ func parseClusterFile(cls, database string) List {
 		for j := range arr {
 			memberMap[arr[j]] = 0
 		}
-		c := Cluster{Number: i, Centroid: centroidmap[i], Description: fastaMap[centroidmap[i]], Members: memberMap}
+
+		c := Cluster{Number: i, Centroid: centroidmap[i], Description: fastaMap[centroidmap[i]], Members: memberMap, Peptides: make(map[string]uint8)}
 		list = append(list, c)
 	}
 
@@ -148,64 +151,88 @@ func mapProtXML2Clusters(clusters List) List {
 	var e rep.Evidence
 	e.RestoreGranular()
 
+	var peptideProbabilities = make(map[string]float64)
+	var proteinIntensities = make(map[string]float64)
+	var proteinLabels = make(map[string]iso.Labels)
+
+	for _, i := range e.Peptides {
+
+		if i.Probability >= 0.7 {
+
+			_, ok := peptideProbabilities[i.Sequence]
+			if ok {
+				if i.Probability > peptideProbabilities[i.Sequence] {
+					peptideProbabilities[i.Sequence] = i.Probability
+				}
+			} else {
+				peptideProbabilities[i.Sequence] = i.Probability
+			}
+		}
+	}
+
 	for _, i := range e.Proteins {
-		if !i.IsDecoy && !i.IsContaminant {
+		if !i.IsDecoy {
+
+			proteinIntensities[i.ProteinID] = i.URazorIntensity
+			proteinLabels[i.ProteinID] = *i.URazorLabels
+
 			for j := range clusters {
 
 				_, ok := clusters[j].Members[i.ProteinID]
 				if ok {
 
-					clusters[j].Members[i.ProteinID]++
-					clusters[j].TotalPeptideNumber += len(i.TotalPeptideIons)
+					clusters[j].Members[i.ProteinID] = 0
+					clusters[j].TotalPeptideNumber = len(i.TotalPeptides)
 
 					if i.Coverage > clusters[j].Coverage {
 						clusters[j].Coverage = i.Coverage
 					}
 
-					for _, k := range i.TotalPeptideIons {
-						ion := fmt.Sprintf("%s_%d", k.Sequence, k.ChargeState)
-						clusters[j].Peptides = append(clusters[j].Peptides, ion)
+					for k := range i.TotalPeptides {
+						clusters[j].Peptides[k] = 0
 					}
 
-					for _, k := range i.TotalPeptideIons {
-						if clusters[j].TopPepProb < k.Probability {
-							clusters[j].TopPepProb = k.Probability
+					for k := range i.TotalPeptides {
+						if clusters[j].TopPepProb < peptideProbabilities[k] {
+							clusters[j].TopPepProb = peptideProbabilities[k]
 						}
 					}
-
 				}
-
 			}
 		}
-
 	}
 
 	// creates a global peptide map
 	pepMap := make(map[string]uint8)
+
 	for _, i := range e.Proteins {
-		for _, j := range i.TotalPeptideIons {
+		for j := range i.TotalPeptides {
 
-			ion := fmt.Sprintf("%s_%d", j.Sequence, j.ChargeState)
-
-			_, ok := pepMap[ion]
+			_, ok := pepMap[j]
 			if ok {
-				pepMap[ion]++
+				pepMap[j]++
 			} else {
-				pepMap[ion] = 1
+				pepMap[j] = 1
 			}
 		}
 	}
 
 	// now runs for each cluster and checks if the peptides appear in other clusters
 	for i := range clusters {
+
+		clusters[i].Intensity = proteinIntensities[clusters[i].Centroid]
+		clusters[i].Labels = proteinLabels[clusters[i].Centroid]
+
 		for j := range clusters[i].Peptides {
-			v, ok := pepMap[clusters[i].Peptides[j]]
+
+			v, ok := pepMap[j]
+
 			if ok {
 				if v > 1 {
 					clusters[i].SharedPeptides++
 					clusters[i].UniqueClusterTopPepProb = clusters[i].TopPepProb
 				} else {
-					clusters[i].UniqueClusterPeptides = append(clusters[i].UniqueClusterPeptides, clusters[i].Peptides[j])
+					clusters[i].UniqueClusterPeptides = append(clusters[i].UniqueClusterPeptides, j)
 
 					if clusters[i].UniqueClusterTopPepProb < clusters[i].TopPepProb {
 						clusters[i].UniqueClusterTopPepProb = clusters[i].TopPepProb
@@ -282,15 +309,47 @@ func savetoDisk(list List, temp, uid string) {
 	}
 	defer file.Close()
 
-	var line string
-	line = "cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\n"
+	var header string
+	header = "Cluster Number\tRepresentative\tDescription\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tIntensity"
 
 	if len(uid) > 0 {
 		logrus.Info("Retrieving annotation from UniProt")
-		line = "cluster Number\tRepresentative\tTotal Members\tMembers\tPercentage Coverage\tTotal Peptides\tIntra Cluster Peptides\tInter Cluster Peptides\tDescription\tStatus\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology\n"
+		header = header + "\t" + "Status\tExistence\tGenes\tProtein Domains\tPathways\tGene Ontology"
 	}
 
-	_, e = io.WriteString(file, line)
+	var headerIndex int
+	for i := range list {
+		if len(list[i].Labels.Channel1.Name) > 0 {
+			headerIndex = i
+			break
+		}
+	}
+
+	header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header,
+		list[headerIndex].Labels.Channel1.CustomName,
+		list[headerIndex].Labels.Channel2.CustomName,
+		list[headerIndex].Labels.Channel3.CustomName,
+		list[headerIndex].Labels.Channel4.CustomName,
+		list[headerIndex].Labels.Channel5.CustomName,
+		list[headerIndex].Labels.Channel6.CustomName,
+		list[headerIndex].Labels.Channel7.CustomName,
+		list[headerIndex].Labels.Channel8.CustomName,
+		list[headerIndex].Labels.Channel9.CustomName,
+		list[headerIndex].Labels.Channel10.CustomName,
+		list[headerIndex].Labels.Channel11.CustomName,
+		list[headerIndex].Labels.Channel12.CustomName,
+		list[headerIndex].Labels.Channel13.CustomName,
+		list[headerIndex].Labels.Channel14.CustomName,
+		list[headerIndex].Labels.Channel15.CustomName,
+		list[headerIndex].Labels.Channel16.CustomName,
+		list[headerIndex].Labels.Channel17.CustomName,
+		list[headerIndex].Labels.Channel18.CustomName,
+	)
+
+	header += "\n"
+
+	_, e = io.WriteString(file, header)
 	if e != nil {
 		msg.WriteToFile(e, "fatal")
 	}
@@ -310,16 +369,17 @@ func savetoDisk(list List, temp, uid string) {
 			}
 			membersString := strings.Join(members, ", ")
 
-			line := fmt.Sprintf("%d\t%s\t%d\t%s\t%.2f\t%d\t%d\t%d\t%s\t",
+			line := fmt.Sprintf("%d\t%s\t%s\t%d\t%s\t%.2f\t%d\t%d\t%d\t%.4f\t",
 				list[i].Number,
 				list[i].Centroid,
+				list[i].Description,
 				len(list[i].Members),
 				membersString,
 				list[i].Coverage,
 				list[i].TotalPeptideNumber,
 				len(list[i].UniqueClusterPeptides),
 				(list[i].TotalPeptideNumber - len(list[i].UniqueClusterPeptides)),
-				list[i].Description)
+				list[i].Intensity)
 
 			v, ok := faMap[list[i].Centroid]
 			if ok {
@@ -334,6 +394,27 @@ func savetoDisk(list List, temp, uid string) {
 					line += item
 				}
 			}
+
+			line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				list[i].Labels.Channel1.Intensity,
+				list[i].Labels.Channel2.Intensity,
+				list[i].Labels.Channel3.Intensity,
+				list[i].Labels.Channel4.Intensity,
+				list[i].Labels.Channel5.Intensity,
+				list[i].Labels.Channel6.Intensity,
+				list[i].Labels.Channel7.Intensity,
+				list[i].Labels.Channel8.Intensity,
+				list[i].Labels.Channel9.Intensity,
+				list[i].Labels.Channel10.Intensity,
+				list[i].Labels.Channel11.Intensity,
+				list[i].Labels.Channel12.Intensity,
+				list[i].Labels.Channel13.Intensity,
+				list[i].Labels.Channel14.Intensity,
+				list[i].Labels.Channel15.Intensity,
+				list[i].Labels.Channel16.Intensity,
+				list[i].Labels.Channel17.Intensity,
+				list[i].Labels.Channel18.Intensity,
+			)
 
 			line += "\n"
 
