@@ -338,15 +338,15 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "")
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 	go func() { defer wg.Done(); filteredPSM.Serialize("psm") }()
 
-	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag, "")
 	go func() { defer wg.Done(); filteredPeptides.Serialize("pep") }()
 
-	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag, "")
 	go func() { defer wg.Done(); filteredIons.Serialize("ion") }()
 	wg.Wait()
 
@@ -396,13 +396,13 @@ func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR 
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
-	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering commonly modified PSMs")
-	filteredDefinedPSM, _ := PepXMLFDRFilter(commonModPSMs, targetFDR, "PSM", decoyTag)
+	filteredDefinedPSM, _ := PepXMLFDRFilter(commonModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering glyco-modified PSMs")
-	filteredAllPSM, _ := PepXMLFDRFilter(glycoModPSMs, targetFDR, "PSM", decoyTag)
+	filteredAllPSM, _ := PepXMLFDRFilter(glycoModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	var combinedFiltered id.PepIDListPtrs
 
@@ -475,13 +475,13 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
-	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering defined modified PSMs")
-	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering all other PSMs")
-	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag, "X")
 
 	var combinedFiltered id.PepIDListPtrs
 

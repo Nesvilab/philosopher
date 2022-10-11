@@ -119,7 +119,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 		uniqPeps := fil.GetUniquePeptides(pepID)
 
 		//filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag, "test")
 		filteredPeptides.Serialize("pep")
 
 	}
