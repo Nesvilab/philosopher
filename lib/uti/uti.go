@@ -45,12 +45,6 @@ func toFixedRound(num float64) int {
 	return int(num + math.Copysign(0.05, num))
 }
 
-// RoundFloat ...
-func RoundFloat(val float64, precision uint) float64 {
-	ratio := math.Pow(10, float64(precision))
-	return math.Round(val*ratio) / ratio
-}
-
 // ParseFloat converts scientific notation values from string format to float64
 func ParseFloat(str string) (float64, error) {
 
