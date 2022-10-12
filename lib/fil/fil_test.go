@@ -116,9 +116,9 @@ func Test_readPepXMLInput(t *testing.T) {
 		{
 			name:  "Testting pepXML reading and formating for the filter",
 			args:  args2{decoyTag: "rev_", psm: 0.01, peptide: 0.01, ion: 0.01},
-			want:  0.1914,
-			want1: 0.723,
-			want2: 0.5155,
+			want:  0.194,
+			want1: 0.7367,
+			want2: 0.5224,
 		},
 	}
 
