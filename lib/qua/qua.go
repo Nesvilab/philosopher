@@ -842,7 +842,14 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 				}
 			}
 
-			if isotopesInt == 0 {
+			if isolationWindowSummedInt < 0 {
+				msg.Custom(errors.New("summed intensity within isolation window is negative, should not happen"), "warning")
+			}
+			if isotopesInt < 0 {
+				msg.Custom(errors.New("isotopes summed intensity is negative, should not happen"), "warning")
+			}
+
+			if isolationWindowSummedInt <= 0 || isotopesInt <= 0 {
 				evi[i].Purity = 0
 			} else {
 				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)
