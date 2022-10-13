@@ -823,7 +823,7 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			var mzRatio []float64
 			for k := 1; k <= 6; k++ {
 				r := float64(k) * (float64(1) / float64(v2.Precursor.ChargeState))
-				mzRatio = append(mzRatio, uti.ToFixed(r, 2))
+				mzRatio = append(mzRatio, uti.Round(r, 5, 2))
 			}
 
 			var isotopePackage = make(map[float64]float64)

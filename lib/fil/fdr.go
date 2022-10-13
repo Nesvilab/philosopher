@@ -10,7 +10,6 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/msg"
-	"philosopher/lib/uti"
 
 	"github.com/sirupsen/logrus"
 )
@@ -483,10 +482,8 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	// proteins with the same score, get the same fdr value.
 	var scoreMap = make(map[float64]float64)
 	for j := (len(list) - 1); j >= 0; j-- {
-		_, ok := scoreMap[list[j].TopPepProb]
-		if !ok {
-			scoreMap[list[j].TopPepProb] = (decoys / targets)
-		}
+
+		scoreMap[list[j].TopPepProb] = float64(decoys) / float64(targets)
 
 		if cla.IsDecoyProtein(list[j], p.DecoyTag) {
 			decoys--
@@ -502,6 +499,13 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 
 	sort.Sort(sort.Reverse(sort.Float64Slice(keys)))
 
+	for i := range keys {
+		if scoreMap[keys[i]] <= targetFDR {
+			minProb = keys[i]
+			calcFDR = scoreMap[keys[i]]
+		}
+	}
+
 	var curProb = 10.0
 	var curScore = 0.0
 	var probArray []float64
@@ -516,13 +520,16 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 
 		probArray = append(probArray, keys[i])
 
-		if uti.Round(scoreMap[keys[i]], 5, 3) <= targetFDR {
+		if scoreMap[keys[i]] <= targetFDR {
+
 			probList[keys[i]] = 0
 			minProb = keys[i]
 			calcFDR = scoreMap[keys[i]]
+
 			if keys[i] < curProb {
 				curProb = keys[i]
 			}
+
 			if scoreMap[keys[i]] > curScore {
 				curScore = scoreMap[keys[i]]
 			}
@@ -534,12 +541,10 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		msg.Custom(errors.New("the protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "error")
 	}
 
-	fmtScore := uti.Round(curScore, 5, 3)
-
 	// for inspections
 	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)
 
-	if curScore < targetFDR && fmtScore != targetFDR && probArray[len(probArray)-1] != curProb {
+	if curScore < targetFDR && probArray[len(probArray)-1] != curProb {
 
 		for i := 0; i <= len(probArray); i++ {
 
@@ -553,12 +558,6 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 				probList[probArray[i+1]] = 0
 				minProb = probArray[i+1]
 				calcFDR = scoreMap[probArray[i+1]]
-				// if probArray[i+1] < curProb {
-				// 	curProb = probArray[i+1]
-				// }
-				// if scoreMap[probArray[i+1]] > curScore {
-				// 	curScore = scoreMap[probArray[i+1]]
-				// }
 				break
 			}
 

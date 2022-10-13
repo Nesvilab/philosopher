@@ -449,12 +449,10 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
-	//psm.Modifications.Index = make(map[string]mod.Modification)
 	psm.AlternativeProteins = make(map[string]int)
 
 	psm.Index = sq.Index
 	psm.SpectrumFile = FileName
-	//psm.Scan = sq.StartScan
 	psm.AssumedCharge = sq.AssumedCharge
 	psm.RetentionTime = sq.RetentionTimeSec
 	psm.IonMobility = sq.IonMobility
@@ -471,20 +469,11 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 	for _, i := range sq.SearchResult.SearchHit {
 
 		psm.HitRank = i.HitRank
-		//psm.PrevAA = string(i.PrevAA)
-		//psm.NextAA = string(i.NextAA)
-		//psm.MissedCleavages = i.MissedCleavages
-		//psm.NumberTolTerm = i.TotalTerm
-		//psm.NumberTotalProteins = i.TotalProteins
-		//psm.TotalNumberIons = i.TotalIons
-		//psm.NumberMatchedIons = i.MatchedIons
-		//psm.IsRejected = i.IsRejected
 
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
 
-		//psm.Massdiff = uti.ToFixed((i.Massdiff - massDeviation), 4)
 		psm.Massdiff = uti.ToFixed(i.Massdiff, 4)
 
 		psm.NumberofMissedCleavages = i.MissedCleavages
@@ -496,12 +485,12 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 				psm.Probability = j.PeptideProphetResult.Probability
 
-				for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
+				// for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
 
-					if k.Name == "massd" {
-						//psm.IsoMassD, _ = strconv.Atoi(k.Value)
-					}
-				}
+				// 	if k.Name == "massd" {
+				// 		//psm.IsoMassD, _ = strconv.Atoi(k.Value)
+				// 	}
+				// }
 			}
 
 			if string(j.Analysis) == "interprophet" {
@@ -557,7 +546,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 		}
 
-		//psm.LocalizationRange = i.PTMResult.LocalizationPeptide
 		if len(i.PTMResult.LocalizationPeptide+i.PTMResult.BestScoreWithPTM+i.PTMResult.ScoreWithoutPTM) != 0 {
 			psm.MSFragerLoc = &MSFraggerLoc{
 				MSFragerLocalization:                 i.PTMResult.LocalizationPeptide,
