@@ -586,7 +586,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 			m.Index = newKey
 			m.Position = i.Position
-			//m.IsobaricMods = make(map[string]float64)
 			pModificationsIndex[newKey] = m
 		} else {
 
@@ -596,7 +595,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 				m.Index = newKey
 				m.Position = i.Position
-				//m.IsobaricMods = make(map[string]float64)
 				pModificationsIndex[newKey] = m
 			}
 
@@ -606,7 +604,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
 				m.Index = newKey
 				m.Position = i.Position
-				//m.IsobaricMods = make(map[string]float64)
 				pModificationsIndex[newKey] = m
 			}
 		}
@@ -619,7 +616,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "N-term"
-			//m.IsobaricMods = make(map[string]float64)
 			pModificationsIndex[key] = m
 		}
 
@@ -631,7 +627,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			if ok {
 				m := v
 				m.AminoAcid = "N-term"
-				//m.IsobaricMods = make(map[string]float64)
 				pModificationsIndex[key] = m
 			}
 		}
@@ -645,7 +640,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		if ok {
 			m := v
 			m.AminoAcid = "C-term"
-			//m.IsobaricMods = make(map[string]float64)
 			pModificationsIndex[key] = m
 		}
 	}
@@ -659,7 +653,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 			Name:     "Unknown",
 			Type:     mod.Observed,
 			MassDiff: p.Massdiff,
-			//IsobaricMods: make(map[string]float64),
 		}
 		pModificationsIndex[key] = m
 	}
@@ -697,7 +690,6 @@ func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 
 		var current string
 		var alt string
-		//var altNTT int
 		var list = make(map[string]int)
 		var isUniProt bool
 
