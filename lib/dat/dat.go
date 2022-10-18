@@ -462,8 +462,15 @@ func (d *Base) RestoreWithPath(p string) {
 
 // reverseSeq returns its argument string reversed rune-wise left to right.
 func reverseSeq(s string) string {
+
+	var index = 0
 	r := []rune(s)
-	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+
+	if strings.HasPrefix(s, "M") {
+		index = 1
+	}
+
+	for i, j := index, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
