@@ -511,7 +511,7 @@ func chargeProfile(p id.PepIDListPtrs, charge uint8, decoyTag string) (t, d int)
 	return t, d
 }
 
-//GetUniquePSMs selects only unique pepetide ions for the given data structure
+// GetUniquePSMs selects only unique pepetide ions for the given data structure
 func GetUniquePSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 	uniqMap := make(map[string]id.PepIDListPtrs)
 
@@ -521,7 +521,7 @@ func GetUniquePSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 	return uniqMap
 }
 
-//getUniquePeptideIons selects only unique pepetide ions for the given data structure
+// getUniquePeptideIons selects only unique pepetide ions for the given data structure
 func getUniquePeptideIons(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 
 	uniqMap := ExtractIonsFromPSMs(p)

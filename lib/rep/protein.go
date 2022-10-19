@@ -42,7 +42,13 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		repModificationsIndex := make(map[string]mod.Modification)
 
 		rep.ProteinName = i.ProteinName
-		rep.Description = i.Description
+
+		if i.ProteinName == i.Description {
+			rep.OriginalHeader = i.ProteinName
+		} else {
+			rep.OriginalHeader = i.OriginalHeader
+		}
+
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
 		rep.Length = i.Length
@@ -167,11 +173,6 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		if len(repModificationsIndex) != 0 {
 			rep.Modifications = mod.Modifications{Index: repModificationsIndex}.ToSlice()
 		}
-
-		// if strings.Contains(rep.ProteinName, "Biognosys") {
-		// 	spew.Dump(rep)
-		// }
-
 	}
 
 	var dtb dat.Base
@@ -183,14 +184,16 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 	// fix the name sand headers and pull database information into protein report
 	for i := range evi.Proteins {
+
 		pe := &evi.Proteins[i]
 
 		for _, j := range dtb.Records {
 
-			desc := strings.Replace(pe.Description, "|", " ", -1)
-
+			//desc := strings.Replace(pe.Description, "|", " ", -1)
 			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (j.Length == pe.Length) && (strings.Contains(j.OriginalHeader, pe.Description) || strings.Contains(j.OriginalHeader, desc)) {
+			//if strings.Contains(j.OriginalHeader, pe.ProteinName) && (j.Length == pe.Length) && (strings.Contains(j.OriginalHeader, pe.Description) || strings.Contains(j.OriginalHeader, desc)) {
+
+			if j.OriginalHeader == pe.OriginalHeader {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 

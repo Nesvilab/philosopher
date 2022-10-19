@@ -37,6 +37,7 @@ type GroupIdentification struct {
 
 // ProteinIdentification struct
 type ProteinIdentification struct {
+	OriginalHeader           string
 	ProteinName              string
 	Description              string
 	GroupSiblingID           string
@@ -143,6 +144,7 @@ func (p *ProtXML) Read(f string) {
 
 			var ptid ProteinIdentification
 
+			ptid.OriginalHeader = string(j.ProteinName) + " " + string(j.Annotation.ProteinDescription)
 			ptid.GroupNumber = i.GroupNumber
 			//ptid.GroupProbability = i.Probability
 			ptid.Probability = i.Probability
