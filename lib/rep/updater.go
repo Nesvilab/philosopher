@@ -229,10 +229,6 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 		// Total
 		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.SpectrumFileName())
 		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-		// for j := range i.MappedProteins {
-		// 	totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
-		// 	totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-		// }
 
 		if i.IsUnique {
 			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.SpectrumFileName())

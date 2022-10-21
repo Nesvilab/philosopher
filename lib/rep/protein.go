@@ -36,19 +36,14 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	for idx, i := range pro {
 
 		rep := &evi.Proteins[idx]
+
+		rep.ProteinName = i.ProteinName
+		rep.Description = i.Description
+		rep.OriginalHeader = i.OriginalHeader
 		rep.SupportingSpectra = make(map[id.SpectrumType]int)
 		rep.TotalPeptideIons = make(map[id.IonFormType]IonEvidence)
 		rep.IndiProtein = make(map[string]struct{})
 		repModificationsIndex := make(map[string]mod.Modification)
-
-		rep.ProteinName = i.ProteinName
-
-		if i.ProteinName == i.Description {
-			rep.OriginalHeader = i.ProteinName
-		} else {
-			rep.OriginalHeader = i.OriginalHeader
-		}
-
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
 		rep.Length = i.Length
@@ -189,11 +184,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 		for _, j := range dtb.Records {
 
-			//desc := strings.Replace(pe.Description, "|", " ", -1)
-			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			//if strings.Contains(j.OriginalHeader, pe.ProteinName) && (j.Length == pe.Length) && (strings.Contains(j.OriginalHeader, pe.Description) || strings.Contains(j.OriginalHeader, desc)) {
+			desc := strings.Replace(pe.Description, "|", " ", -1)
+			ensName := j.PartHeader + " " + desc
 
-			if j.OriginalHeader == pe.OriginalHeader {
+			if (j.OriginalHeader == pe.OriginalHeader) || (ensName == pe.OriginalHeader) {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
@@ -219,6 +213,11 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 						pe.Description = j.ProteinName
 					} else {
 						pe.Description = j.Description
+					}
+
+					// for Ensemble entries without name
+					if len(pe.ProteinName) == 0 {
+						pe.ProteinName = pe.PartHeader
 					}
 
 					// updating the protein ions

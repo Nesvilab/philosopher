@@ -246,6 +246,7 @@ func Run(f met.Data) met.Data {
 
 		e.CalculateProteinCoverage()
 	}
+
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
@@ -279,7 +280,7 @@ func Run(f met.Data) met.Data {
 		"peptides": countPep,
 		"ions":     countIon,
 		"proteins": coutProtein,
-	}).Info("Total report numbers after FDR filtering, and post-processing")
+	}).Info("Final report numbers after FDR filtering, and post-processing")
 	logrus.Info("Saving")
 	e.SerializeGranular()
 
