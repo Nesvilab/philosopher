@@ -144,9 +144,9 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 	for _, i := range p.Groups {
 		for _, j := range i.Proteins {
 			if cla.IsDecoyProtein(j, p.DecoyTag) {
-				decoyMap[string(j.ProteinName)] = j.PeptideIons[0].InitialProbability
+				decoyMap[string(j.ProteinName)] = j.TopPepProb
 			} else {
-				targetMap[string(j.ProteinName)] = j.PeptideIons[0].InitialProbability
+				targetMap[string(j.ProteinName)] = j.TopPepProb
 			}
 		}
 	}
