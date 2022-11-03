@@ -171,6 +171,11 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 
 	// check paired observations
 	for k, v := range targetMap {
+
+		// if strings.Contains(k, "TGM4") {
+		// 	fmt.Println("OK")
+		// }
+
 		iKey := fmt.Sprintf("%s%s", p.DecoyTag, k)
 		vok, ok := decoyMap[iKey]
 		if ok {
@@ -190,6 +195,11 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 	// collect all proteins from every group
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
+
+			// if strings.Contains(p.Groups[i].Proteins[j].ProteinName, "TGM4") {
+			// 	fmt.Println("OK")
+			// }
+
 			v, ok := recordMap[string(p.Groups[i].Proteins[j].ProteinName)]
 			if ok {
 				p.Groups[i].Proteins[j].Picked = v
