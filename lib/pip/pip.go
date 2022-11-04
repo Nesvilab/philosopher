@@ -574,7 +574,7 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		dsAbs, _ := filepath.Abs(i)
 		os.Chdir(dsAbs)
 
-		annotation, _ := filepath.Glob("*_annotation.txt")
+		annotation, _ := filepath.Glob("*annotation.txt")
 		fullAnnotation, _ := filepath.Abs(annotation[0])
 
 		//fullAnnotation := "annotation.txt"
@@ -681,6 +681,10 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false
 				meta.Filter.Seq = false
+			}
+
+			if len(p.Filter.RazorBin) != 0 {
+				meta.Filter.RazorBin = p.Filter.RazorBin
 			}
 
 			meta := fil.Run(meta)
