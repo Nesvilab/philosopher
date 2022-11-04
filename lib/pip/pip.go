@@ -403,6 +403,7 @@ func ProteinProphet(meta met.Data, p Directives, dir string, data []string) met.
 			} else {
 				files = append(files, "interact.pep.xml")
 			}
+			meta.ProteinProphet.Nogroupwts = true
 			proteinprophet.Run(meta, files)
 			meta.Serialize()
 			met.CleanTemp(meta.Temp)
