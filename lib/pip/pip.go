@@ -575,8 +575,7 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		os.Chdir(dsAbs)
 
 		annotation, _ := filepath.Glob("*annotation.txt")
-		fullAnnotation, _ := filepath.Abs(annotation[0])
-
+		//fullAnnotation, _ := filepath.Abs(annotation[0])
 		//fullAnnotation := "annotation.txt"
 
 		// reload the meta data
@@ -586,12 +585,12 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		// 	return meta
 		// }
 
-		logrus.Info("Executing label-based quantification on ", i)
+		logrus.Info("Executing isobaric quantification on ", i)
 
 		meta.Quantify = p.LabelQuant
 		meta.Quantify.Dir = dsAbs
 		meta.Quantify.Format = "mzML"
-		meta.Quantify.Annot = fullAnnotation
+		meta.Quantify.Annot = annotation[0]
 		meta.Quantify.Brand = p.LabelQuant.Brand
 		meta.Quantify.Pex = fmt.Sprintf("%s%sinteract.pep.xml", dsAbs, string(filepath.Separator))
 		meta.Quantify.Tag = "rev_"
