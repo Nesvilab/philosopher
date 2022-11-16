@@ -410,11 +410,12 @@ type BioQuant struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys  bool `yaml:"withDecoys"`
-	MSstats bool `yaml:"msstats"`
-	MZID    bool `yaml:"mzID"`
-	IonMob  bool `yaml:"ionmobility"`
-	Prefix  bool `yaml:"prefix"`
+	Decoys       bool `yaml:"withDecoys"`
+	RemoveContam bool `yaml:"removecontam"`
+	MSstats      bool `yaml:"msstats"`
+	MZID         bool `yaml:"mzID"`
+	IonMob       bool `yaml:"ionmobility"`
+	Prefix       bool `yaml:"prefix"`
 }
 
 // TMTIntegrator options and parameters

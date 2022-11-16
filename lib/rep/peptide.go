@@ -125,8 +125,8 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 }
 
-// MetaPeptideReport report consist on ion reporting
-func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix bool) {
+// PeptideReport report consist on ion reporting
+func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix, removeContam bool) {
 
 	var header string
 	var output string
@@ -148,6 +148,11 @@ func (evi PeptideEvidenceList) MetaPeptideReport(workspace, brand, decoyTag stri
 	// building the printing set tat may or not contain decoys
 	var printSet []*PeptideEvidence
 	for idx, i := range evi {
+
+		if removeContam && (strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_")) {
+			continue
+		}
+
 		if !hasDecoys {
 			if !i.IsDecoy {
 				printSet = append(printSet, &evi[idx])

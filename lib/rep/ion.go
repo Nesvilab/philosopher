@@ -102,8 +102,8 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	sort.Sort(evi.Ions)
 }
 
-// MetaIonReport reports consist on ion reporting
-func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix bool) {
+// IonReport reports consist on ion reporting
+func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasLabels, hasPrefix, removeContam bool) {
 
 	var header string
 	var output string
@@ -125,6 +125,11 @@ func (evi IonEvidenceList) MetaIonReport(workspace, brand, decoyTag string, chan
 	// building the printing set tat may or not contain decoys
 	var printSet []*IonEvidence
 	for idx, i := range evi {
+
+		if removeContam && (strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_")) {
+			continue
+		}
+
 		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
 		if i.Probability > 0 {
 			if !hasDecoys {

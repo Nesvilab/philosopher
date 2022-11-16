@@ -237,8 +237,8 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 }
 
-// MetaProteinReport creates the TSV Protein report
-func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels, hasPrefix bool) {
+// ProteinReport creates the TSV Protein report
+func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels, hasPrefix, removeContam bool) {
 
 	var header string
 	var output string
@@ -260,6 +260,11 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 	// building the printing set tat may or not contain decoys
 	var printSet []*ProteinEvidence
 	for idx, i := range eviProteins {
+
+		if removeContam && (strings.HasPrefix(i.OriginalHeader, "contam_") || strings.HasPrefix(i.OriginalHeader, "Cont_")) {
+			continue
+		}
+
 		if !hasDecoys {
 			if !i.IsDecoy {
 				printSet = append(printSet, &eviProteins[idx])

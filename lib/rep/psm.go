@@ -129,8 +129,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 	sort.Sort(evi.PSM)
 }
 
-// MetaPSMReport report all psms from study that passed the FDR filter
-func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels, hasPrefix bool) {
+// PSMReport report all psms from study that passed the FDR filter
+func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels int, hasDecoys, isComet, hasLoc, hasIonMob, hasLabels, hasPrefix, removeContam bool) {
 
 	var header string
 	var output string
@@ -160,6 +160,10 @@ func (evi PSMEvidenceList) MetaPSMReport(workspace, brand, decoyTag string, chan
 	//var printSet PSMEvidenceList
 	var printSet []*PSMEvidence
 	for i := range evi {
+
+		if removeContam && (strings.HasPrefix(evi[i].Protein, "contam_") || strings.HasPrefix(evi[i].Protein, "Cont_")) {
+			continue
+		}
 
 		if !hasDecoys {
 			if !evi[i].IsDecoy {
