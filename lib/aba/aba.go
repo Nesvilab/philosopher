@@ -49,7 +49,7 @@ func getLabelNames(dataSet, annot string) map[string]string {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		names := strings.Split(scanner.Text(), " ")
+		names := strings.Fields(scanner.Text())
 
 		name := dataSet + " " + names[0]
 

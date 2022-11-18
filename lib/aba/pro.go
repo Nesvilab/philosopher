@@ -2,6 +2,7 @@
 package aba
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -33,7 +34,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 	var database dat.Base
 	var datasets = make(map[string]rep.Evidence)
 
-	var labelList []DataSetLabelNames
+	var labels = make(map[string]string)
 
 	// restore database
 	database = dat.Base{}
@@ -52,18 +53,29 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		var e rep.Evidence
 		e.RestoreGranularWithPath(i)
 
-		var labels DataSetLabelNames
-		labels.LabelName = make(map[string]string)
-
 		// collect interact full file names
 		files, _ := ioutil.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-				labels.Name = annot
 
-				if len(labels.Name) > 0 {
-					labels.LabelName = getLabelNames(i, annot)
+				file, e := os.Open(annot)
+				if e != nil {
+					msg.ReadFile(errors.New("cannot open annotation file"), "error")
+				}
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					names := strings.Fields(scanner.Text())
+
+					name := i + " " + names[0]
+
+					labels[name] = names[1]
+				}
+
+				if e = scanner.Err(); e != nil {
+					msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
 				}
 			}
 		}
@@ -73,8 +85,6 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		if strings.Contains(prjName, string(filepath.Separator)) {
 			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
 		}
-
-		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
 		datasets[prjName] = e
@@ -128,15 +138,15 @@ func proteinLevelAbacus(m met.Data, args []string) {
 	}
 
 	if m.Abacus.Labels {
-		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, true, m.Abacus.Full, labelList)
+		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
 	} else {
-		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, m.Abacus.Full, labelList)
+		saveProteinAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, m.Abacus.Full, labels)
 	}
 
 	if m.Abacus.Reprint {
 		logrus.Info("Creating Reprint reports")
-		saveReprintSpCResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
-		saveReprintIntResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labelList)
+		saveReprintSpCResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labels)
+		saveReprintIntResults(m.Temp, evidences, datasets, names, reprintLabels, m.Abacus.Unique, false, labels)
 	}
 
 }
@@ -353,7 +363,7 @@ func sumProteinIntensities(combined rep.CombinedProteinEvidenceList, datasets ma
 }
 
 // saveProteinAbacusResult creates a single report using 1 or more philosopher result files
-func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasLabels, full bool, labelsList []DataSetLabelNames) {
+func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
 
 	var summTotalSpC = make(map[string]int)
 	var summUniqueSpC = make(map[string]int)
@@ -444,25 +454,17 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 		}
 	}
 
+	chs := [19]string{"126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C", "135N", "135C"}
+
 	if hasLabels {
 		for _, i := range namesList {
-			header += fmt.Sprintf("\t%s 126", i)
-			header += fmt.Sprintf("\t%s 127N", i)
-			header += fmt.Sprintf("\t%s 127C", i)
-			header += fmt.Sprintf("\t%s 128N", i)
-			header += fmt.Sprintf("\t%s 128C", i)
-			header += fmt.Sprintf("\t%s 129N", i)
-			header += fmt.Sprintf("\t%s 129C", i)
-			header += fmt.Sprintf("\t%s 130N", i)
-			header += fmt.Sprintf("\t%s 130C", i)
-			header += fmt.Sprintf("\t%s 131N", i)
-
-			for _, j := range labelsList {
-				if strings.Contains(j.Name, i) {
-					for k, v := range j.LabelName {
-
-						header = strings.Replace(header, k, v, 1)
-					}
+			for _, j := range chs {
+				l := fmt.Sprintf("%s %s", i, j)
+				v, ok := labelsList[l]
+				if ok {
+					header += fmt.Sprintf("\t%s", v)
+				} else {
+					header += fmt.Sprintf("\t%s %s", i, j)
 				}
 			}
 		}
@@ -551,7 +553,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 			if hasLabels {
 				if uniqueOnly {
 					for _, j := range namesList {
-						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 							i.UniqueLabels[j].Channel1.Intensity,
 							i.UniqueLabels[j].Channel2.Intensity,
 							i.UniqueLabels[j].Channel3.Intensity,
@@ -562,11 +564,19 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 							i.UniqueLabels[j].Channel8.Intensity,
 							i.UniqueLabels[j].Channel9.Intensity,
 							i.UniqueLabels[j].Channel10.Intensity,
+							i.UniqueLabels[j].Channel11.Intensity,
+							i.UniqueLabels[j].Channel12.Intensity,
+							i.UniqueLabels[j].Channel13.Intensity,
+							i.UniqueLabels[j].Channel14.Intensity,
+							i.UniqueLabels[j].Channel15.Intensity,
+							i.UniqueLabels[j].Channel16.Intensity,
+							i.UniqueLabels[j].Channel17.Intensity,
+							i.UniqueLabels[j].Channel18.Intensity,
 						)
 					}
 				} else {
 					for _, j := range namesList {
-						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+						line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 							i.URazorLabels[j].Channel1.Intensity,
 							i.URazorLabels[j].Channel2.Intensity,
 							i.URazorLabels[j].Channel3.Intensity,
@@ -577,6 +587,14 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 							i.URazorLabels[j].Channel8.Intensity,
 							i.URazorLabels[j].Channel9.Intensity,
 							i.URazorLabels[j].Channel10.Intensity,
+							i.URazorLabels[j].Channel11.Intensity,
+							i.URazorLabels[j].Channel12.Intensity,
+							i.URazorLabels[j].Channel13.Intensity,
+							i.URazorLabels[j].Channel14.Intensity,
+							i.URazorLabels[j].Channel15.Intensity,
+							i.URazorLabels[j].Channel16.Intensity,
+							i.URazorLabels[j].Channel17.Intensity,
+							i.URazorLabels[j].Channel18.Intensity,
 						)
 					}
 				}
@@ -600,7 +618,7 @@ func saveProteinAbacusResult(session string, evidences rep.CombinedProteinEviden
 }
 
 // saveReprintSpCResults creates a single Spectral Count report using 1 or more philosopher result files using the Reprint format
-func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList map[string]string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreprint.spc.tsv", session, string(filepath.Separator))
@@ -659,7 +677,7 @@ func saveReprintSpCResults(session string, evidences rep.CombinedProteinEvidence
 }
 
 // saveReprintIntResults creates a single Intensity-based report using 1 or more philosopher result files using the Reprint format
-func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func saveReprintIntResults(session string, evidences rep.CombinedProteinEvidenceList, datasets map[string]rep.Evidence, namesList, labelList []string, uniqueOnly, hasTMT bool, labelsList map[string]string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%sreprint.int.tsv", session, string(filepath.Separator))
