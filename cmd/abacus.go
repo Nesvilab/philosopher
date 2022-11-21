@@ -45,6 +45,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
+		abacusCmd.Flags().StringVarP(&m.Abacus.Plex, "plex", "", "10", "number of channels")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Protein, "protein", "", false, "global level protein report")

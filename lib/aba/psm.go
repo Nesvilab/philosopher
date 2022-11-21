@@ -22,7 +22,6 @@ import (
 func psmLevelAbacus(m met.Data, args []string) {
 
 	var names []string
-
 	var labels = make(map[string]string)
 
 	// recover all files
@@ -107,15 +106,15 @@ func psmLevelAbacus(m met.Data, args []string) {
 	}
 
 	if m.Abacus.Labels {
-		savePSMAbacusResult(m.Temp, evidences, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
+		savePSMAbacusResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
 	} else {
-		savePSMAbacusResult(m.Temp, evidences, names, m.Abacus.Unique, false, m.Abacus.Full, labels)
+		savePSMAbacusResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, false, m.Abacus.Full, labels)
 	}
 
 }
 
 // savePSMAbacusResult creates a single report using 1 or more philosopher result files
-func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
+func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_psm.tsv", session, string(filepath.Separator))
@@ -134,7 +133,19 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 		header += fmt.Sprintf("\t%s", i)
 	}
 
-	chs := []string{"126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C", "135N", "135C"}
+	var chs []string
+
+	if plex == "10" {
+		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N")
+	} else if plex == "11" {
+		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C")
+	} else if plex == "16" {
+		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C")
+	} else if plex == "18" {
+		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C", "135N", "135C")
+	} else {
+		msg.Custom(errors.New("unsupported number of labels"), "fatal")
+	}
 
 	if hasLabels {
 		for _, i := range namesList {
@@ -190,27 +201,66 @@ func savePSMAbacusResult(session string, evidences rep.CombinedPSMEvidenceList, 
 		}
 
 		if hasLabels {
-			for _, j := range namesList {
-				line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-					i.Labels[j].Channel1.Intensity,
-					i.Labels[j].Channel2.Intensity,
-					i.Labels[j].Channel3.Intensity,
-					i.Labels[j].Channel4.Intensity,
-					i.Labels[j].Channel5.Intensity,
-					i.Labels[j].Channel6.Intensity,
-					i.Labels[j].Channel7.Intensity,
-					i.Labels[j].Channel8.Intensity,
-					i.Labels[j].Channel9.Intensity,
-					i.Labels[j].Channel10.Intensity,
-					i.Labels[j].Channel11.Intensity,
-					i.Labels[j].Channel12.Intensity,
-					i.Labels[j].Channel13.Intensity,
-					i.Labels[j].Channel14.Intensity,
-					i.Labels[j].Channel15.Intensity,
-					i.Labels[j].Channel16.Intensity,
-					i.Labels[j].Channel17.Intensity,
-					i.Labels[j].Channel18.Intensity,
-				)
+			switch plex {
+			case "10":
+				for _, j := range namesList {
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+						i.Labels[j].Channel1.Intensity,
+						i.Labels[j].Channel2.Intensity,
+						i.Labels[j].Channel3.Intensity,
+						i.Labels[j].Channel4.Intensity,
+						i.Labels[j].Channel5.Intensity,
+						i.Labels[j].Channel6.Intensity,
+						i.Labels[j].Channel7.Intensity,
+						i.Labels[j].Channel8.Intensity,
+						i.Labels[j].Channel9.Intensity,
+						i.Labels[j].Channel10.Intensity,
+					)
+				}
+			case "16":
+				for _, j := range namesList {
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+						i.Labels[j].Channel1.Intensity,
+						i.Labels[j].Channel2.Intensity,
+						i.Labels[j].Channel3.Intensity,
+						i.Labels[j].Channel4.Intensity,
+						i.Labels[j].Channel5.Intensity,
+						i.Labels[j].Channel6.Intensity,
+						i.Labels[j].Channel7.Intensity,
+						i.Labels[j].Channel8.Intensity,
+						i.Labels[j].Channel9.Intensity,
+						i.Labels[j].Channel10.Intensity,
+						i.Labels[j].Channel11.Intensity,
+						i.Labels[j].Channel12.Intensity,
+						i.Labels[j].Channel13.Intensity,
+						i.Labels[j].Channel14.Intensity,
+						i.Labels[j].Channel15.Intensity,
+						i.Labels[j].Channel16.Intensity,
+					)
+				}
+			case "18":
+				for _, j := range namesList {
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+						i.Labels[j].Channel1.Intensity,
+						i.Labels[j].Channel2.Intensity,
+						i.Labels[j].Channel3.Intensity,
+						i.Labels[j].Channel4.Intensity,
+						i.Labels[j].Channel5.Intensity,
+						i.Labels[j].Channel6.Intensity,
+						i.Labels[j].Channel7.Intensity,
+						i.Labels[j].Channel8.Intensity,
+						i.Labels[j].Channel9.Intensity,
+						i.Labels[j].Channel10.Intensity,
+						i.Labels[j].Channel11.Intensity,
+						i.Labels[j].Channel12.Intensity,
+						i.Labels[j].Channel13.Intensity,
+						i.Labels[j].Channel14.Intensity,
+						i.Labels[j].Channel15.Intensity,
+						i.Labels[j].Channel16.Intensity,
+						i.Labels[j].Channel17.Intensity,
+						i.Labels[j].Channel18.Intensity,
+					)
+				}
 			}
 		}
 

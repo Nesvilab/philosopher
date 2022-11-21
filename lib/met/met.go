@@ -390,6 +390,7 @@ type Quantify struct {
 // Abacus options ad parameters
 type Abacus struct {
 	Tag      string  `yaml:"tag"`
+	Plex     string  `yaml:"plex"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
 	Peptide  bool    `yaml:"peptide"`
