@@ -30,7 +30,7 @@ func Test_readPepXMLInput(t *testing.T) {
 		{
 			name:  "Testting pepXML reading and formating for the filter",
 			args:  args1{xmlFile: "interact.pep.xml", decoyTag: "rev_", temp: sys.GetTemp(), models: false, calibratedMass: 0},
-			want:  64406,
+			want:  12615,
 			want1: "MSFragger",
 		},
 	}
@@ -49,48 +49,40 @@ func Test_readPepXMLInput(t *testing.T) {
 				t.Errorf("readPepXMLInput() got1 = %v, want %v", got1, tt.want1)
 			}
 
-			if got[0].Index != uint32(18992) {
-				t.Errorf("Index is incorrect, got %d, want %d", got[0].Index, uint32(18992))
+			if got[0].Index != uint32(25721) {
+				t.Errorf("Index is incorrect, got %d, want %d", got[0].Index, uint32(25721))
 			}
 
-			if got[0].SpectrumFileName().Str() != "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2#interact.pep.xml" {
-				t.Errorf("Spectrum is incorrect, got %s, want %s", got[0].SpectrumFileName().Str(), "b1906_293T_proteinID_01A_QE3_122212.60782.60782.2#interact.pep.xml")
+			if got[0].SpectrumFileName().Str() != "z04397_tc-o238g-setB_MS3.55183.55183.3#interact.pep.xml" {
+				t.Errorf("Spectrum is incorrect, got %s, want %s", got[0].SpectrumFileName().Str(), "z04397_tc-o238g-setB_MS3.55183.55183.3#interact.pep.xml")
 			}
 
-			//if got[0].Scan != 60782 {
-			//	t.Errorf("Scan is incorrect, got %d, want %d", got[0].Scan, 60782)
-			//}
-
-			if got[0].PrecursorNeutralMass != 1429.7663 {
-				t.Errorf("PrecursorNeutralMass is incorrect, got %f, want %f", got[0].PrecursorNeutralMass, 1429.7663)
+			if got[0].PrecursorNeutralMass != 2809.526900 {
+				t.Errorf("PrecursorNeutralMass is incorrect, got %f, want %f", got[0].PrecursorNeutralMass, 2809.526900)
 			}
 
-			if got[0].RetentionTime != 11202.398 {
-				t.Errorf("RetentionTime is incorrect, got %f, want %f", got[0].RetentionTime, 11202.398)
+			if uti.ToFixed(got[0].RetentionTime, 2) != 7708.82 {
+				t.Errorf("RetentionTime is incorrect, got %f, want %f", got[0].RetentionTime, 7708.82)
 			}
 
-			if got[0].Peptide != "LEESADNILSIVK" {
-				t.Errorf("Peptide is incorrect, got %s, want %s", got[0].Peptide, "LEESADNILSIVK")
+			if got[0].Peptide != "INNPAIDTVTLNTVDTDIHSAK" {
+				t.Errorf("Peptide is incorrect, got %s, want %s", got[0].Peptide, "INNPAIDTVTLNTVDTDIHSAK")
 			}
 
 			if uti.ToFixed(got[0].Massdiff, 2) != 0.00 {
 				t.Errorf("Massdiff is incorrect, got %.2f, want %.2f", uti.ToFixed(got[0].Massdiff, 2), 0.00)
 			}
 
-			if got[0].CalcNeutralPepMass != 1429.7664 {
-				t.Errorf("CalcNeutralPepMass is incorrect, got %.2f, want %.2f", got[0].CalcNeutralPepMass, 1429.7664)
+			if got[0].CalcNeutralPepMass != 2809.522700 {
+				t.Errorf("CalcNeutralPepMass is incorrect, got %f, want %f", got[0].CalcNeutralPepMass, 2809.52)
 			}
-
-			//if got[0].NextAA != "Q" {
-			//	t.Errorf("NextAA is incorrect, got %s, want %s", got[0].NextAA, "Q")
-			//}
 
 			if got[0].NumberofMissedCleavages != 0 {
 				t.Errorf("NumberofMissedCleavages is incorrect, got %d, want %d", got[0].NumberofMissedCleavages, 0)
 			}
 
-			if got[0].Protein != "sp|O00287|RFXAP_HUMAN" {
-				t.Errorf("Protein is incorrect, got %s, want %s", got[0].Protein, "sp|O00287|RFXAP_HUMAN")
+			if got[0].Protein != "sp|P32454|APE2_YEAST" {
+				t.Errorf("Protein is incorrect, got %s, want %s", got[0].Protein, "sp|P32454|APE2_YEAST")
 			}
 
 			if got[0].Probability != 1.0000 {
@@ -116,9 +108,9 @@ func Test_readPepXMLInput(t *testing.T) {
 		{
 			name:  "Testting pepXML reading and formating for the filter",
 			args:  args2{decoyTag: "rev_", psm: 0.01, peptide: 0.01, ion: 0.01},
-			want:  0.194,
-			want1: 0.7367,
-			want2: 0.5224,
+			want:  0.820237,
+			want1: 0.837985,
+			want2: 0.824048,
 		},
 	}
 
@@ -157,26 +149,26 @@ func Test_readPepXMLInput(t *testing.T) {
 		{
 			name:  "Testing charge state 2 profile",
 			args:  args3{charge: uint8(2), decoyTag: "rev_"},
-			wantT: 36174,
-			wantD: 457,
+			wantT: 5792,
+			wantD: 209,
 		},
 		{
 			name:  "Testing charge state 3 profile",
 			args:  args3{charge: uint8(3), decoyTag: "rev_"},
-			wantT: 22656,
-			wantD: 317,
+			wantT: 5542,
+			wantD: 195,
 		},
 		{
 			name:  "Testing charge state 4 profile",
 			args:  args3{charge: uint8(4), decoyTag: "rev_"},
-			wantT: 4272,
-			wantD: 88,
+			wantT: 806,
+			wantD: 23,
 		},
 		{
 			name:  "Testing charge state 5 profile",
 			args:  args3{charge: uint8(5), decoyTag: "rev_"},
-			wantT: 432,
-			wantD: 10,
+			wantT: 34,
+			wantD: 9,
 		},
 	}
 
@@ -198,7 +190,7 @@ func Test_readPepXMLInput(t *testing.T) {
 	}{
 		{
 			name: "Testing the generation of Unique PSMs",
-			want: 64406,
+			want: 12615,
 		},
 	}
 
@@ -216,7 +208,7 @@ func Test_readPepXMLInput(t *testing.T) {
 	}{
 		{
 			name: "Testing the generation of Unique Ions",
-			want: 39716,
+			want: 11737,
 		},
 	}
 
@@ -234,7 +226,7 @@ func Test_readPepXMLInput(t *testing.T) {
 	}{
 		{
 			name: "Testing the generation of Unique Peptides",
-			want: 30092,
+			want: 10842,
 		},
 	}
 
@@ -252,7 +244,7 @@ func Test_readPepXMLInput(t *testing.T) {
 	}{
 		{
 			name: "Testing the Ion extraction from PSM",
-			want: 39716,
+			want: 11737,
 		},
 	}
 
@@ -286,7 +278,7 @@ func Test_readProtXMLInput(t *testing.T) {
 		{
 			name: "Testting protXML reading and formating for the filter",
 			args: args1{xmlFile: "interact.prot.xml", decoyTag: "rev_", weight: 1.00},
-			want: 7926,
+			want: 2331,
 		},
 	}
 
@@ -309,8 +301,8 @@ func Test_readProtXMLInput(t *testing.T) {
 	}{
 		{
 			name:  "Testing Protein Profile",
-			wantT: 8018,
-			wantD: 949,
+			wantT: 1922,
+			wantD: 409,
 		},
 	}
 	for _, tt := range test2 {
