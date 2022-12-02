@@ -66,8 +66,8 @@ func TestProtXML_MarkUniquePeptides(t *testing.T) {
 				}
 			}
 
-			if unique != 11180 {
-				t.Errorf("Number of Unque ions in ProtXML is wrong, got %v, want %v", unique, 11180)
+			if unique != 11153 {
+				t.Errorf("Number of Unque ions in ProtXML is wrong, got %v, want %v", unique, 11153)
 			}
 
 			if flag == true {
