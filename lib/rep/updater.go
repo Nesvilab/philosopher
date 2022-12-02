@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"regexp"
 	"strings"
 
 	"philosopher/lib/dat"
@@ -228,10 +229,6 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 		// Total
 		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.SpectrumFileName())
 		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-		// for j := range i.MappedProteins {
-		// 	totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
-		// 	totalPeptides[j] = append(totalPeptides[j], i.Peptide)
-		// }
 
 		if i.IsUnique {
 			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.SpectrumFileName())
@@ -692,3 +689,85 @@ func (evi *Evidence) UpdatePeptideModCount() {
 
 	}
 }
+
+// CalculateProteinCoverage calcualtes the peptide coverage for each protein
+func (evi *Evidence) CalculateProteinCoverage() {
+
+	// https://zetcode.com/golang/regex/
+	// https://go.dev/play/p/9CTgHRm6icK
+
+	replacerIL := strings.NewReplacer("L", "I")
+
+	for p := range evi.Proteins {
+
+		var pep []string
+		evi.Proteins[p].Coverage = -1
+
+		// the original sequence used as template
+		seqA := replacerIL.Replace(evi.Proteins[p].Sequence)
+		// the sequencein rune format
+		seqB := []rune(replacerIL.Replace(evi.Proteins[p].Sequence))
+		// the replaced sequence
+		seqC := ""
+
+		for i := range evi.Proteins[p].TotalPeptides {
+			pep = append(pep, replacerIL.Replace(i))
+		}
+
+		//sort.Sort(sort.Reverse(sort.StringSlice(pep)))
+
+		if len(pep) > 0 {
+			for _, i := range pep {
+
+				re := regexp.MustCompile(i)
+				match := re.FindAllStringIndex(seqA, -1)
+
+				for j := 0; j <= len(match)-1; j++ {
+
+					before := string(seqB[0:match[j][0]])
+					after := string(seqB[match[j][1]:len(seqB)])
+					seqC = before + strings.Repeat("x", len(i)) + after
+				}
+			}
+
+			count := strings.Count(seqC, "x")
+
+			cent := uti.Round((float64(count)/float64(evi.Proteins[p].Length))*100, float64(5), 2)
+
+			evi.Proteins[p].Coverage = float32(cent)
+		} else {
+			evi.Proteins[p].Coverage = float32(0)
+		}
+	}
+}
+
+// func (evi *Evidence) CalculateProteinCoverage() {
+
+// 	// https://zetcode.com/golang/regex/
+
+// 	replacerIL := strings.NewReplacer("L", "I")
+
+// 	for p := range evi.Proteins {
+
+// 		var pep []string
+// 		evi.Proteins[p].Coverage = -1
+
+// 		seq := replacerIL.Replace(evi.Proteins[p].Sequence)
+
+// 		for i := range evi.Proteins[p].TotalPeptides {
+// 			pep = append(pep, i)
+// 		}
+
+// 		sort.Sort(sort.Reverse(sort.StringSlice(pep)))
+
+// 		for _, i := range pep {
+// 			seq = strings.Replace(seq, replacerIL.Replace(i), strings.Repeat("x", len(i)), -1)
+// 		}
+
+// 		count := strings.Count(seq, "x")
+
+// 		cent := uti.Round((float64(count)/float64(evi.Proteins[p].Length))*100, float64(5), 2)
+
+// 		evi.Proteins[p].Coverage = float32(cent)
+// 	}
+// }

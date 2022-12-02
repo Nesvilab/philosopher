@@ -22,6 +22,7 @@ type Record struct {
 	SequenceVersion  string
 	Description      string
 	Sequence         string
+	Class            string
 	Length           int
 	IsDecoy          bool
 	IsContaminant    bool
@@ -35,9 +36,12 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 	// this version accepts ENSEMBL headers from other souces like transcript and gene
 	idReg1 := regexp.MustCompile(`(ENS\w+\.?\d{1,})`)
 	idReg2 := regexp.MustCompile(`(CONTAM\w+_?:?\w+)`)
-	desReg := regexp.MustCompile(`ENS\w+(.*)`)
+	desReg1 := regexp.MustCompile(`.+\|\w+\s(.+)`)
+	desReg2 := regexp.MustCompile(`ENS\w+(.*)`)
 	geneReg := regexp.MustCompile(`ENS\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|\w+\.?\d{0,2}?\|.+?\|.+?\|(.+?)\|`)
 	ensgReg := regexp.MustCompile(`(ENSG\w+\.?\d{1,})`)
+
+	e.Class = "ENSEMBL"
 
 	e.OriginalHeader = k
 
@@ -54,11 +58,16 @@ func ProcessENSEMBL(k, v, decoyTag string) Record {
 	}
 
 	// Description
-	desc := desReg.FindStringSubmatch(k)
+	desc := desReg1.FindStringSubmatch(k)
 	if desc == nil {
-		e.Description = ""
+		desc = desReg2.FindStringSubmatch(k)
+		if desc == nil {
+			e.Description = ""
+		} else {
+			e.Description = desc[1]
+		}
 	} else {
-		e.Description = desc[1]
+		e.Description = desc[0]
 	}
 
 	gene := geneReg.FindStringSubmatch(k)
@@ -116,6 +125,8 @@ func ProcessNCBI(k, v, decoyTag string) Record {
 	orReg := regexp.MustCompile(`\[(.+)\]`)
 	desReg1 := regexp.MustCompile(`\w{2}_\d{1,10}\.?\d{1,2}?\s(.+)\sGN?\[?`)
 	desReg2 := regexp.MustCompile(`\w{2}_\d{1,10}\.?\d{1,2}?(.+)\[.?`)
+
+	e.Class = "NCBI"
 
 	e.OriginalHeader = k
 
@@ -216,6 +227,9 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	orReg2 := regexp.MustCompile(`OS=(.+)(\sGN.+|\sPE.+|\sSV.+)?`)
 
 	part := strings.Split(k, " ")
+
+	e.Class = "UniProtKB"
+
 	e.PartHeader = part[0]
 
 	// ID
@@ -356,6 +370,9 @@ func ProcessUniRef(k, v, decoyTag string) Record {
 
 	// PartHeader
 	part := strings.Split(k, " ")
+
+	e.Class = "UniRef"
+
 	e.PartHeader = part[0]
 
 	// ID
@@ -410,6 +427,8 @@ func ProcessGeneric(k, v, decoyTag string) Record {
 
 	idReg := regexp.MustCompile(`(.*)`)
 
+	e.Class = "Generic"
+
 	// ID
 	idm := idReg.FindStringSubmatch(k)
 	e.ID = idm[1]
@@ -462,6 +481,8 @@ func ProcessTair(k, v, decoyTag string) Record {
 	var e Record
 
 	parts := strings.Split(k, "|")
+
+	e.Class = "Tair"
 
 	// ID
 	e.ID = parts[0]
@@ -521,6 +542,8 @@ func ProcessNextProt(k, v, decoyTag string) Record {
 	var e Record
 
 	parts := strings.Split(k, "|")
+
+	e.Class = "NextProt"
 
 	// ID
 	e.ID = parts[1]

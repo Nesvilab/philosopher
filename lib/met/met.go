@@ -357,6 +357,7 @@ type Filter struct {
 	Seq       bool    `yaml:"sequential"`
 	TwoD      bool    `yaml:"two-dimensional"`
 	Mapmods   bool    `yaml:"mapMods"`
+	Delta     bool    `yaml:"delta"`
 	Inference bool
 }
 
@@ -389,6 +390,7 @@ type Quantify struct {
 // Abacus options ad parameters
 type Abacus struct {
 	Tag      string  `yaml:"tag"`
+	Plex     string  `yaml:"plex"`
 	ProtProb float64 `yaml:"proteinProbability"`
 	PepProb  float64 `yaml:"peptideProbability"`
 	Peptide  bool    `yaml:"peptide"`
@@ -409,10 +411,12 @@ type BioQuant struct {
 
 // Report options and parameters
 type Report struct {
-	Decoys  bool `yaml:"withDecoys"`
-	MSstats bool `yaml:"msstats"`
-	MZID    bool `yaml:"mzID"`
-	IonMob  bool `yaml:"ionmobility"`
+	Decoys       bool `yaml:"withDecoys"`
+	RemoveContam bool `yaml:"removecontam"`
+	MSstats      bool `yaml:"msstats"`
+	MZID         bool `yaml:"mzID"`
+	IonMob       bool `yaml:"ionmobility"`
+	Prefix       bool `yaml:"prefix"`
 }
 
 // TMTIntegrator options and parameters

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -21,6 +22,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 	var protMods = make(map[id.IonFormType][]mod.Modification)
 	var evidenceIons = make(map[id.IonFormType]*IonEvidence)
+
 	for idx, i := range evi.Ions {
 		evidenceIons[i.IonForm()] = &evi.Ions[idx]
 	}
@@ -32,14 +34,16 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 	evi.Proteins = make(ProteinEvidenceList, len(pro))
 	for idx, i := range pro {
+
 		rep := &evi.Proteins[idx]
+
+		rep.ProteinName = i.ProteinName
+		rep.Description = i.Description
+		rep.OriginalHeader = i.OriginalHeader
 		rep.SupportingSpectra = make(map[id.SpectrumType]int)
 		rep.TotalPeptideIons = make(map[id.IonFormType]IonEvidence)
 		rep.IndiProtein = make(map[string]struct{})
 		repModificationsIndex := make(map[string]mod.Modification)
-
-		rep.ProteinName = i.ProteinName
-		rep.Description = i.Description
 		rep.ProteinGroup = i.GroupNumber
 		rep.ProteinSubGroup = i.GroupSiblingID
 		rep.Length = i.Length
@@ -164,11 +168,6 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 		if len(repModificationsIndex) != 0 {
 			rep.Modifications = mod.Modifications{Index: repModificationsIndex}.ToSlice()
 		}
-
-		// if strings.Contains(rep.ProteinName, "Biognosys") {
-		// 	spew.Dump(rep)
-		// }
-
 	}
 
 	var dtb dat.Base
@@ -180,14 +179,15 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 	// fix the name sand headers and pull database information into protein report
 	for i := range evi.Proteins {
+
 		pe := &evi.Proteins[i]
 
 		for _, j := range dtb.Records {
 
-			desc := strings.Replace(j.Description, "|", " ", -1)
+			desc := strings.Replace(pe.Description, "|", " ", -1)
+			ensName := j.PartHeader + " " + desc
 
-			//if strings.Contains(j.OriginalHeader, list[i].ProteinName) && strings.EqualFold(list[i].Description, desc) {
-			if strings.Contains(j.OriginalHeader, pe.ProteinName) && (strings.Contains(j.OriginalHeader, j.Description) || strings.Contains(j.OriginalHeader, desc)) {
+			if (j.OriginalHeader == pe.OriginalHeader) || (ensName == pe.OriginalHeader) {
 
 				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
 
@@ -215,6 +215,11 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 						pe.Description = j.Description
 					}
 
+					// for Ensemble entries without name
+					if len(pe.ProteinName) == 0 {
+						pe.ProteinName = pe.PartHeader
+					}
+
 					// updating the protein ions
 					for _, k := range pe.TotalPeptideIons {
 						k.Protein = j.PartHeader
@@ -232,11 +237,17 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 
 }
 
-// MetaProteinReport creates the TSV Protein report
-func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels bool) {
+// ProteinReport creates the TSV Protein report
+func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag string, channels int, hasDecoys, hasRazor, uniqueOnly, hasLabels, hasPrefix, removeContam bool) {
 
 	var header string
-	output := fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_protein.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%sprotein.tsv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)
@@ -249,6 +260,11 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 	// building the printing set tat may or not contain decoys
 	var printSet []*ProteinEvidence
 	for idx, i := range eviProteins {
+
+		if removeContam && (strings.HasPrefix(i.OriginalHeader, "contam_") || strings.HasPrefix(i.OriginalHeader, "Cont_")) {
+			continue
+		}
+
 		if !hasDecoys {
 			if !i.IsDecoy {
 				printSet = append(printSet, &eviProteins[idx])
@@ -258,84 +274,152 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 		}
 	}
 
-	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tOrganism\tProtein Description\tProtein Existence\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tOrganism\tProtein Description\tProtein Existence\tCoverage\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+
+	var headerIndex int
+	for i := range printSet {
+		if printSet[i].UniqueLabels != nil && len(printSet[i].UniqueLabels.Channel1.Name) > 0 {
+			headerIndex = i
+			break
+		}
+	}
 
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header += "\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+			)
 		case 10:
-			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+			)
 		case 11:
-			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel11.CustomName,
+			)
 		case 16:
-			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel11.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel12.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel13.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel14.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel15.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel16.CustomName,
+			)
 		case 18:
-			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel11.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel12.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel13.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel14.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel15.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel16.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel17.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel18.CustomName,
+			)
 		default:
 			header += ""
 		}
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header += "\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+			)
 		case 8:
-			header += "\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+				header,
+				printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+				printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+			)
 		default:
 			header += ""
 		}
+	} else if brand == "xtag" {
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header,
+			printSet[headerIndex].UniqueLabels.Channel1.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel2.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel3.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel4.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel5.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel6.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel7.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel8.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel9.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel10.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel11.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel12.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel13.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel14.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel15.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel16.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel17.CustomName,
+			printSet[headerIndex].UniqueLabels.Channel18.CustomName,
+		)
 	}
 
 	header += "\n"
-
-	// verify if the structure has labels, if so, replace the original channel names by them.
-	if hasLabels {
-
-		var c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18 string
-
-		for _, i := range printSet {
-			if len(i.UniqueLabels.Channel1.CustomName) >= 1 {
-				c1 = i.UniqueLabels.Channel1.CustomName
-				c2 = i.UniqueLabels.Channel2.CustomName
-				c3 = i.UniqueLabels.Channel3.CustomName
-				c4 = i.UniqueLabels.Channel4.CustomName
-				c5 = i.UniqueLabels.Channel5.CustomName
-				c6 = i.UniqueLabels.Channel6.CustomName
-				c7 = i.UniqueLabels.Channel7.CustomName
-				c8 = i.UniqueLabels.Channel8.CustomName
-				c9 = i.UniqueLabels.Channel9.CustomName
-				c10 = i.UniqueLabels.Channel10.CustomName
-				c11 = i.UniqueLabels.Channel11.CustomName
-				c12 = i.UniqueLabels.Channel12.CustomName
-				c13 = i.UniqueLabels.Channel13.CustomName
-				c14 = i.UniqueLabels.Channel14.CustomName
-				c15 = i.UniqueLabels.Channel15.CustomName
-				c16 = i.UniqueLabels.Channel16.CustomName
-				c17 = i.UniqueLabels.Channel17.CustomName
-				c18 = i.UniqueLabels.Channel18.CustomName
-				break
-			}
-		}
-
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel1.Name, c1, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel2.Name, c2, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel3.Name, c3, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel4.Name, c4, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel5.Name, c5, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel6.Name, c6, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel7.Name, c7, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel8.Name, c8, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel9.Name, c9, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel10.Name, c10, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel11.Name, c11, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel12.Name, c12, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel13.Name, c13, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel14.Name, c14, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel15.Name, c15, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel16.Name, c16, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel17.Name, c17, -1)
-		header = strings.Replace(header, "Channel "+printSet[10].UniqueLabels.Channel18.Name, c18, -1)
-	}
 
 	_, e = io.WriteString(bw, header)
 	if e != nil {
@@ -359,7 +443,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 		var reportIntensities [18]float64
 		if uniqueOnly || !hasRazor {
 			if i.UniqueLabels != nil {
-				reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
+				reportIntensities[headerIndex] = i.UniqueLabels.Channel1.Intensity
 				reportIntensities[1] = i.UniqueLabels.Channel2.Intensity
 				reportIntensities[2] = i.UniqueLabels.Channel3.Intensity
 				reportIntensities[3] = i.UniqueLabels.Channel4.Intensity
@@ -380,7 +464,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			}
 		} else {
 			if i.URazorLabels != nil {
-				reportIntensities[0] = i.URazorLabels.Channel1.Intensity
+				reportIntensities[headerIndex] = i.URazorLabels.Channel1.Intensity
 				reportIntensities[1] = i.URazorLabels.Channel2.Intensity
 				reportIntensities[2] = i.URazorLabels.Channel3.Intensity
 				reportIntensities[3] = i.URazorLabels.Channel4.Intensity
@@ -408,9 +492,9 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		// proteins with almost no evidences, and completely shared with decoys are eliminated from the analysis,
+		// proteins with almost no evidences, and completely shared with decoys are eliminated from the an	alysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.4f\t%.2f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
 			i.PartHeader,             // Protein
 			i.ProteinID,              // Protein ID
 			i.EntryName,              // Entry Name
@@ -419,6 +503,7 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			i.Organism,               // Organism
 			i.Description,            // Description
 			i.ProteinExistence,       // Protein Existence
+			i.Coverage,               // Coverage
 			i.Probability,            // Protein Probability
 			i.TopPepProb,             // Top Peptide Probability
 			len(i.TotalPeptides),     // Total Peptides
@@ -435,90 +520,122 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 			strings.Join(ip, ", "),   // Indistinguishable Proteins
 		)
 
-		switch channels {
-		case 4:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-			)
-		case 6:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[8],
-				reportIntensities[9],
-			)
-		case 8:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-			)
-		case 10:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-			)
-		case 11:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-				reportIntensities[10],
-			)
-		case 16:
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
-				line,
-				reportIntensities[0],
-				reportIntensities[1],
-				reportIntensities[2],
-				reportIntensities[3],
-				reportIntensities[4],
-				reportIntensities[5],
-				reportIntensities[6],
-				reportIntensities[7],
-				reportIntensities[8],
-				reportIntensities[9],
-				reportIntensities[10],
-				reportIntensities[11],
-				reportIntensities[12],
-				reportIntensities[13],
-				reportIntensities[14],
-				reportIntensities[15],
-			)
-		case 18:
+		if brand == "tmt" || brand == "itraq" {
+			switch channels {
+			case 2:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+				)
+			case 4:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+				)
+			case 6:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[8],
+					reportIntensities[9],
+				)
+			case 8:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+				)
+			case 10:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+				)
+			case 11:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+				)
+			case 16:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+					reportIntensities[11],
+					reportIntensities[12],
+					reportIntensities[13],
+					reportIntensities[14],
+					reportIntensities[15],
+				)
+			case 18:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					reportIntensities[headerIndex],
+					reportIntensities[1],
+					reportIntensities[2],
+					reportIntensities[3],
+					reportIntensities[4],
+					reportIntensities[5],
+					reportIntensities[6],
+					reportIntensities[7],
+					reportIntensities[8],
+					reportIntensities[9],
+					reportIntensities[10],
+					reportIntensities[11],
+					reportIntensities[12],
+					reportIntensities[13],
+					reportIntensities[14],
+					reportIntensities[15],
+					reportIntensities[16],
+					reportIntensities[17],
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "xtag" {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
-				reportIntensities[0],
+				reportIntensities[headerIndex],
 				reportIntensities[1],
 				reportIntensities[2],
 				reportIntensities[3],
@@ -537,8 +654,6 @@ func (eviProteins ProteinEvidenceList) MetaProteinReport(workspace, brand, decoy
 				reportIntensities[16],
 				reportIntensities[17],
 			)
-		default:
-			header += ""
 		}
 
 		line += "\n"

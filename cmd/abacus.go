@@ -45,6 +45,7 @@ func init() {
 		m.Restore(sys.Meta())
 
 		abacusCmd.Flags().StringVarP(&m.Abacus.Tag, "tag", "", "rev_", "decoy tag")
+		abacusCmd.Flags().StringVarP(&m.Abacus.Plex, "plex", "", "10", "number of channels")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.ProtProb, "prtProb", "", 0.9, "minimum protein probability")
 		abacusCmd.Flags().Float64VarP(&m.Abacus.PepProb, "pepProb", "", 0.5, "minimum peptide probability")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Protein, "protein", "", false, "global level protein report")
@@ -54,7 +55,7 @@ func init() {
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Unique, "uniqueonly", "", false, "report TMT quantification based on only unique peptides")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Labels, "labels", "", false, "indicates whether the data sets includes TMT labels or not")
 		abacusCmd.Flags().BoolVarP(&m.Abacus.Reprint, "reprint", "", false, "create abacus reports using the Reprint format")
-		abacusCmd.Flags().BoolVarP(&m.Abacus.Full, "full", "", true, "generates combined tables with extra information")
+		abacusCmd.Flags().BoolVarP(&m.Abacus.Full, "full", "", false, "generates combined tables with extra information")
 	}
 
 	RootCmd.AddCommand(abacusCmd)

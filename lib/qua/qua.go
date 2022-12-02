@@ -6,6 +6,7 @@ import (
 	"math"
 	"path/filepath"
 	"philosopher/lib/id"
+	"philosopher/lib/xta"
 	"sort"
 	"strings"
 
@@ -227,6 +228,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = trq.New(plex)
+		} else if brand == "xtag" {
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = xta.New(plex)
 		}
 	}
 
@@ -237,6 +241,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = trq.New(plex)
+		} else if brand == "xtag" {
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = xta.New(plex)
 		}
 	}
 
@@ -255,6 +262,13 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 			*evi.Proteins[i].TotalLabels = trq.New(plex)
 			*evi.Proteins[i].UniqueLabels = trq.New(plex)
 			*evi.Proteins[i].URazorLabels = trq.New(plex)
+		} else if brand == "xtag" {
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = xta.New(plex)
+			*evi.Proteins[i].UniqueLabels = xta.New(plex)
+			*evi.Proteins[i].URazorLabels = xta.New(plex)
 		}
 	}
 
@@ -452,6 +466,115 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel8.CustomName = labelNames["121"]
 			}
 
+		} else if brand == "xtag" {
+
+			if len(labelNames["xTag1"]) < 1 {
+				v2.Channel1.CustomName = "xTag1"
+			} else {
+				v2.Channel1.CustomName = labelNames["xTag1"]
+			}
+
+			if len(labelNames["xTag2"]) < 1 {
+				v2.Channel2.CustomName = "xTag2"
+			} else {
+				v2.Channel2.CustomName = labelNames["xTag2"]
+			}
+
+			if len(labelNames["xTag3"]) < 1 {
+				v2.Channel3.CustomName = "xTag3"
+			} else {
+				v2.Channel3.CustomName = labelNames["xTag3"]
+			}
+
+			if len(labelNames["xTag4"]) < 1 {
+				v2.Channel4.CustomName = "xTag4"
+			} else {
+				v2.Channel4.CustomName = labelNames["xTag4"]
+			}
+
+			if len(labelNames["xTag5"]) < 1 {
+				v2.Channel5.CustomName = "xTag5"
+			} else {
+				v2.Channel5.CustomName = labelNames["xTag5"]
+			}
+
+			if len(labelNames["xTag6"]) < 1 {
+				v2.Channel6.CustomName = "xTag6"
+			} else {
+				v2.Channel6.CustomName = labelNames["xTag6"]
+			}
+
+			if len(labelNames["xTag7"]) < 1 {
+				v2.Channel7.CustomName = "xTag7"
+			} else {
+				v2.Channel7.CustomName = labelNames["xTag7"]
+			}
+
+			if len(labelNames["xTag8"]) < 1 {
+				v2.Channel8.CustomName = "xTag8"
+			} else {
+				v2.Channel8.CustomName = labelNames["xTag8"]
+			}
+
+			if len(labelNames["xTag9"]) < 1 {
+				v2.Channel9.CustomName = "xTag9"
+			} else {
+				v2.Channel9.CustomName = labelNames["xTag9"]
+			}
+
+			if len(labelNames["xTag10"]) < 1 {
+				v2.Channel10.CustomName = "xTag10"
+			} else {
+				v2.Channel10.CustomName = labelNames["xTag10"]
+			}
+
+			if len(labelNames["xTag11"]) < 1 {
+				v2.Channel11.CustomName = "xTag11"
+			} else {
+				v2.Channel11.CustomName = labelNames["xTag11"]
+			}
+
+			if len(labelNames["xTag12"]) < 1 {
+				v2.Channel12.CustomName = "xTag12"
+			} else {
+				v2.Channel12.CustomName = labelNames["xTag12"]
+			}
+
+			if len(labelNames["xTag13"]) < 1 {
+				v2.Channel13.CustomName = "xTag13"
+			} else {
+				v2.Channel13.CustomName = labelNames["xTag13"]
+			}
+
+			if len(labelNames["xTag14"]) < 1 {
+				v2.Channel14.CustomName = "xTag14"
+			} else {
+				v2.Channel14.CustomName = labelNames["xTag14"]
+			}
+
+			if len(labelNames["xTag15"]) < 1 {
+				v2.Channel15.CustomName = "xTag15"
+			} else {
+				v2.Channel15.CustomName = labelNames["xTag15"]
+			}
+
+			if len(labelNames["xTag16"]) < 1 {
+				v2.Channel16.CustomName = "xTag16"
+			} else {
+				v2.Channel16.CustomName = labelNames["xTag16"]
+			}
+
+			if len(labelNames["xTag17"]) < 1 {
+				v2.Channel17.CustomName = "xTag17"
+			} else {
+				v2.Channel17.CustomName = labelNames["xTag17"]
+			}
+
+			if len(labelNames["xTag18"]) < 1 {
+				v2.Channel18.CustomName = "xTag18"
+			} else {
+				v2.Channel18.CustomName = labelNames["xTag18"]
+			}
 		}
 
 		labels[k] = v2
@@ -700,7 +823,7 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			var mzRatio []float64
 			for k := 1; k <= 6; k++ {
 				r := float64(k) * (float64(1) / float64(v2.Precursor.ChargeState))
-				mzRatio = append(mzRatio, uti.ToFixed(r, 2))
+				mzRatio = append(mzRatio, uti.Round(r, 5, 2))
 			}
 
 			var isotopePackage = make(map[float64]float64)
@@ -719,7 +842,14 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 				}
 			}
 
-			if isotopesInt == 0 {
+			if isolationWindowSummedInt < 0 {
+				msg.Custom(errors.New("summed intensity within isolation window is negative, should not happen"), "warning")
+			}
+			if isotopesInt < 0 {
+				msg.Custom(errors.New("isotopes summed intensity is negative, should not happen"), "warning")
+			}
+
+			if isolationWindowSummedInt <= 0 || isotopesInt <= 0 {
 				evi[i].Purity = 0
 			} else {
 				evi[i].Purity = uti.Round((isotopesInt / isolationWindowSummedInt), 5, 2)

@@ -37,6 +37,7 @@ type GroupIdentification struct {
 
 // ProteinIdentification struct
 type ProteinIdentification struct {
+	OriginalHeader           string
 	ProteinName              string
 	Description              string
 	GroupSiblingID           string
@@ -51,9 +52,6 @@ type ProteinIdentification struct {
 	TopPepProb               float64
 	PeptideIons              []PeptideIonIdentification
 	HasRazor                 bool
-	//Confidence             float64
-	//PctSpectrumIDs         float32
-	//GroupProbability       float64
 }
 
 // PeptideIonIdentification struct
@@ -71,9 +69,6 @@ type PeptideIonIdentification struct {
 	IsUnique                 bool
 	Labels                   *iso.Labels
 	Modifications            mod.Modifications
-	//NumberOfInstances       int
-	//SharedParentProteins    int
-	//IsNondegenerateEvidence bool
 }
 type IonFormType struct {
 	Peptide            string
@@ -143,14 +138,13 @@ func (p *ProtXML) Read(f string) {
 
 			var ptid ProteinIdentification
 
+			ptid.OriginalHeader = string(j.ProteinName) + " " + string(j.Annotation.ProteinDescription)
 			ptid.GroupNumber = i.GroupNumber
-			//ptid.GroupProbability = i.Probability
 			ptid.Probability = i.Probability
 			ptid.ProteinName = string(j.ProteinName)
 			ptid.Description = string(j.Annotation.ProteinDescription)
 			ptid.Probability = j.Probability
 			ptid.PercentCoverage = j.PercentCoverage
-			//ptid.PctSpectrumIDs = j.PctSpectrumIDs
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 			ptid.TopPepProb = 0
@@ -181,17 +175,13 @@ func (p *ProtXML) Read(f string) {
 				pepid.Weight = k.Weight
 				pepid.GroupWeight = k.GroupWeight
 				pepid.CalcNeutralPepMass = k.CalcNeutralPepMass
-				//pepid.SharedParentProteins = len(k.PeptideParentProtein)
 				pepid.Modifications.Index = make(map[string]mod.Modification)
-				//pepid.NumberOfInstances = k.NIstances
 				pepid.NumberOfEnzymaticTermini = k.NEnzymaticTermini
 				pepid.Razor = -1
 
 				if strings.EqualFold(string(k.IsNondegenerateEvidence), "Y") || strings.EqualFold(string(k.IsNondegenerateEvidence), "y") {
-					//pepid.IsNondegenerateEvidence = true
 					pepid.IsUnique = true
 				} else {
-					//pepid.IsNondegenerateEvidence = false
 					pepid.IsUnique = false
 				}
 

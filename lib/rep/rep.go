@@ -396,6 +396,33 @@ func (a CombinedPeptideEvidenceList) Len() int           { return len(a) }
 func (a CombinedPeptideEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a CombinedPeptideEvidenceList) Less(i, j int) bool { return a[i].Sequence < a[j].Sequence }
 
+// CombinedPSMEvidence represents all combined PSMs detected
+type CombinedPSMEvidence struct {
+	DataSet            string
+	Source             string
+	Spectrum           string
+	Peptide            string
+	ModifiedPeptide    string
+	Protein            string
+	ProteinDescription string
+	ProteinID          string
+	EntryName          string
+	GeneName           string
+	AssumedCharge      uint8
+	Purity             float64
+	IsUnique           bool
+	IsUsed             bool
+	Intensity          map[string]float64
+	Labels             map[string]iso.Labels
+}
+
+// CombinedPSMEvidenceList is a list of Combined PSM Evidences
+type CombinedPSMEvidenceList []CombinedPSMEvidence
+
+func (a CombinedPSMEvidenceList) Len() int           { return len(a) }
+func (a CombinedPSMEvidenceList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a CombinedPSMEvidenceList) Less(i, j int) bool { return a[i].Spectrum < a[j].Spectrum }
+
 // ModificationEvidence represents the list of modifications and the mod bins
 type ModificationEvidence struct {
 	MassBins []MassBin
@@ -442,6 +469,8 @@ func Run(m met.Data) {
 		isoBrand = "tmt"
 	} else if m.Quantify.Brand == "itraq" {
 		isoBrand = "itraq"
+	} else if m.Quantify.Brand == "xtag" {
+		isoBrand = "xtag"
 	}
 
 	if len(m.Quantify.Plex) > 0 {
@@ -457,25 +486,25 @@ func Run(m met.Data) {
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
-		repoPSM.MetaPSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels)
+		repoPSM.PSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
 	}
 	{
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
-		repoIons.MetaIonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
+		repoIons.IonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
 	}
 	{
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
-		repoPeptides.MetaPeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels)
+		repoPeptides.PeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
 	}
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
 		var repoProteins ProteinEvidenceList
 		RestoreProtein(&repoProteins)
-		repoProteins.MetaProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels)
+		repoProteins.ProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
 		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
 	}
 
@@ -485,7 +514,7 @@ func Run(m met.Data) {
 		if repo.PSM == nil {
 			RestorePSM(&repo.PSM)
 		}
-		repo.ModificationReport(m.Home)
+		repo.ModificationReport(m.Home, m.Report.Prefix)
 
 		if m.PTMProphet.InputFiles != nil || len(m.PTMProphet.InputFiles) > 0 {
 			repo.PSMLocalizationReport(m.Home, m.Filter.Tag, m.Filter.Razor, m.Report.Decoys)
@@ -496,7 +525,7 @@ func Run(m met.Data) {
 
 	// MSstats
 	if m.Report.MSstats {
-		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys)
+		repo.MetaMSstatsReport(m.Home, isoBrand, isoChannels, m.Report.Decoys, m.Report.Prefix)
 	}
 
 	// MzID

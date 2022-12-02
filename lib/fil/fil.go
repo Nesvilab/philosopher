@@ -66,7 +66,7 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR)
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta)
 	_ = psmT
 	_ = pepT
 	_ = ionT
@@ -243,7 +243,10 @@ func Run(f met.Data) met.Data {
 		e.SyncPSMToProteins(f.Filter.Tag)
 
 		e.UpdateNumberOfEnzymaticTermini(f.Filter.Tag)
+
+		e.CalculateProteinCoverage()
 	}
+
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
 
@@ -277,7 +280,7 @@ func Run(f met.Data) met.Data {
 		"peptides": countPep,
 		"ions":     countIon,
 		"proteins": coutProtein,
-	}).Info("Total report numbers after FDR filtering, and post-processing")
+	}).Info("Final report numbers after FDR filtering, and post-processing")
 	logrus.Info("Saving")
 	e.SerializeGranular()
 
@@ -285,7 +288,7 @@ func Run(f met.Data) met.Data {
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64) (float64, float64, float64) {
+func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64, delta bool) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
@@ -336,15 +339,15 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 		"ions":     len(uniqIons),
 	}).Info("Database search results")
 
-	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag)
+	filteredPSM, psmThreshold := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "")
 	wg := sync.WaitGroup{}
 	wg.Add(3)
 	go func() { defer wg.Done(); filteredPSM.Serialize("psm") }()
 
-	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag)
+	filteredPeptides, peptideThreshold := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag, "")
 	go func() { defer wg.Done(); filteredPeptides.Serialize("pep") }()
 
-	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag)
+	filteredIons, ionThreshold := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag, "")
 	go func() { defer wg.Done(); filteredIons.Serialize("ion") }()
 	wg.Wait()
 
@@ -353,7 +356,65 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 		ptmBasedPSMFiltering(uniqPsms, psm, decoyTag, mods)
 	}
 
+	if delta {
+		deltaMassBasedPSMFiltering(uniqPsms, psm, decoyTag)
+	}
+
 	return psmThreshold, peptideThreshold, ionThreshold
+}
+
+func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
+
+	logrus.Info("Separating PSMs based on the delta mass profile")
+
+	// unmodified: delta mass < 1000
+	unModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// common: only the most common PTMs; > 1000 & < 100000
+	commonModPSMs := make(map[string]id.PepIDListPtrs)
+
+	// glyco: all the remaining PTMs including glyco
+	glycoModPSMs := make(map[string]id.PepIDListPtrs)
+
+	for k, v := range uniqPsms {
+
+		var glyco, common bool
+
+		if v[0].Massdiff > 145 {
+			glyco = true
+		} else if v[0].Massdiff >= 3.5 && v[0].Massdiff <= 145 {
+			common = true
+		}
+
+		if glyco && !common {
+			glycoModPSMs[k] = v
+		} else if !glyco && common {
+			commonModPSMs[k] = v
+		} else {
+			unModPSMs[k] = v
+		}
+
+	}
+
+	logrus.Info("Filtering unmodified PSMs")
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
+
+	logrus.Info("Filtering commonly modified PSMs")
+	filteredDefinedPSM, _ := PepXMLFDRFilter(commonModPSMs, targetFDR, "PSM", decoyTag, "")
+
+	logrus.Info("Filtering glyco-modified PSMs")
+	filteredAllPSM, _ := PepXMLFDRFilter(glycoModPSMs, targetFDR, "PSM", decoyTag, "")
+
+	var combinedFiltered id.PepIDListPtrs
+
+	combinedFiltered = append(combinedFiltered, filteredUnmodPSM...)
+
+	combinedFiltered = append(combinedFiltered, filteredDefinedPSM...)
+
+	combinedFiltered = append(combinedFiltered, filteredAllPSM...)
+
+	combinedFiltered.Serialize("psm")
+
 }
 
 func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag, mods string) {
@@ -385,7 +446,12 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 
 			if i.Variable {
 
-				m := fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+				var m string
+				if i.AminoAcid == "N-term" {
+					m = fmt.Sprintf("%s:%.4f", "n", i.MassDiff)
+				} else {
+					m = fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
+				}
 
 				_, ok := modsMap[m]
 				if ok {
@@ -410,13 +476,13 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 	}
 
 	logrus.Info("Filtering unmodified PSMs")
-	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag)
+	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering defined modified PSMs")
-	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag)
+	filteredDefinedPSM, _ := PepXMLFDRFilter(definedModPSMs, targetFDR, "PSM", decoyTag, "")
 
-	logrus.Info("Filtering all modified PSMs")
-	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag)
+	logrus.Info("Filtering all other PSMs")
+	filteredAllPSM, _ := PepXMLFDRFilter(restModPSMs, targetFDR, "PSM", decoyTag, "X")
 
 	var combinedFiltered id.PepIDListPtrs
 
@@ -446,7 +512,7 @@ func chargeProfile(p id.PepIDListPtrs, charge uint8, decoyTag string) (t, d int)
 	return t, d
 }
 
-//GetUniquePSMs selects only unique pepetide ions for the given data structure
+// GetUniquePSMs selects only unique pepetide ions for the given data structure
 func GetUniquePSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 	uniqMap := make(map[string]id.PepIDListPtrs)
 
@@ -456,7 +522,7 @@ func GetUniquePSMs(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 	return uniqMap
 }
 
-//getUniquePeptideIons selects only unique pepetide ions for the given data structure
+// getUniquePeptideIons selects only unique pepetide ions for the given data structure
 func getUniquePeptideIons(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 
 	uniqMap := ExtractIonsFromPSMs(p)

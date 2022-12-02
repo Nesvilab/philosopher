@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path"
 	"path/filepath"
 	"philosopher/lib/mod"
 
@@ -199,10 +200,16 @@ func (evi *Evidence) AssembleModificationReport() {
 }
 
 // ModificationReport ...
-func (evi *Evidence) ModificationReport(workspace string) {
+func (evi *Evidence) ModificationReport(workspace string, hasPrefix bool) {
+
+	var output string
 
 	// create result file
-	output := fmt.Sprintf("%s%smodifications.tsv", workspace, string(filepath.Separator))
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_modifications.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%smodifications.tsv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)

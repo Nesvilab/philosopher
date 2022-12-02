@@ -37,7 +37,7 @@ func TestBase_Fetch(t *testing.T) {
 				TaDeDB:    tt.fields.TaDeDB,
 				Records:   tt.fields.Records,
 			}
-			d.Fetch(tt.args.id, tt.args.temp, tt.args.iso, tt.args.rev)
+			d.Fetch(tt.args.id, "9606", tt.args.temp, tt.args.iso, tt.args.rev)
 		})
 	}
 }
@@ -73,8 +73,8 @@ func TestBase_ProcessDB(t *testing.T) {
 			}
 			d.ProcessDB(tt.args.file, tt.args.decoyTag)
 
-			if len(d.Records) != 20371 {
-				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20371)
+			if len(d.Records) != 20385 {
+				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20383)
 			}
 		})
 	}

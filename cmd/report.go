@@ -41,9 +41,11 @@ func init() {
 		m.Restore(sys.Meta())
 
 		reportCmd.Flags().BoolVarP(&m.Report.Decoys, "decoys", "", false, "add decoy observations to reports")
+		reportCmd.Flags().BoolVarP(&m.Report.RemoveContam, "removecontam", "", false, "remove contaminant sequences from the reports")
 		reportCmd.Flags().BoolVarP(&m.Report.MSstats, "msstats", "", false, "create an output compatible with MSstats")
 		reportCmd.Flags().BoolVarP(&m.Report.MZID, "mzid", "", false, "create a mzID output")
 		reportCmd.Flags().BoolVarP(&m.Report.IonMob, "ionmobility", "", false, "forces the printing of the ion mobility column")
+		reportCmd.Flags().BoolVarP(&m.Report.Prefix, "prefix", "", false, "add the project (folder) name as a prefix to the output files")
 	}
 
 	RootCmd.AddCommand(reportCmd)

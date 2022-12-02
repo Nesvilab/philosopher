@@ -2,6 +2,7 @@
 package aba
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -29,7 +30,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 	var names []string
 	//var xmlFiles []string
 	var datasets = make(map[string]rep.PSMEvidenceList)
-	var labelList []DataSetLabelNames
+	var labels = make(map[string]string)
 
 	// restoring combined file
 	logrus.Info("Processing combined file")
@@ -49,9 +50,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		var evi rep.Evidence
 		rep.RestorePSM(&evi.PSM)
 
-		var labels DataSetLabelNames
-		labels.LabelName = make(map[string]string)
-
 		files, _ := ioutil.ReadDir(i)
 
 		// collect interact full file names
@@ -63,10 +61,24 @@ func peptideLevelAbacus(m met.Data, args []string) {
 			//}
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-				labels.Name = annot
 
-				if len(m.Quantify.Annot) > 0 {
-					labels.LabelName = getLabelNames(annot)
+				file, e := os.Open(annot)
+				if e != nil {
+					msg.ReadFile(errors.New("cannot open annotation file"), "error")
+				}
+				defer file.Close()
+
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					names := strings.Fields(scanner.Text())
+
+					name := i + " " + names[0]
+
+					labels[name] = names[1]
+				}
+
+				if e = scanner.Err(); e != nil {
+					msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
 				}
 			}
 
@@ -78,8 +90,6 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		if strings.Contains(prjName, string(filepath.Separator)) {
 			prjName = strings.Replace(filepath.Base(prjName), string(filepath.Separator), "", -1)
 		}
-
-		labelList = append(labelList, labels)
 
 		// unique list and map of datasets
 		datasets[prjName] = evi.PSM
@@ -98,7 +108,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 	os.Chdir(local)
 
-	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labelList)
+	savePeptideAbacusResult(m.Temp, evidences, datasets, names, m.Abacus.Unique, false, labels)
 
 }
 
@@ -119,7 +129,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 		uniqPeps := fil.GetUniquePeptides(pepID)
 
 		//filteredPSMs, _ := fil.PepXMLFDRFilter(uniqPsms, 0.01, "PSM", a.Tag)
-		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag)
+		filteredPeptides, _ := fil.PepXMLFDRFilter(uniqPeps, 0.01, "Peptide", a.Tag, "test")
 		filteredPeptides.Serialize("pep")
 
 	}
@@ -254,7 +264,7 @@ func SummarizeAttributes(evidences rep.CombinedPeptideEvidenceList, datasets map
 }
 
 // savePeptideAbacusResult creates a single report using 1 or more philosopher result files
-func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, namesList []string, uniqueOnly, hasTMT bool, labelsList []DataSetLabelNames) {
+func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEvidenceList, datasets map[string]rep.PSMEvidenceList, namesList []string, uniqueOnly, hasTMT bool, labelsList map[string]string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_peptide.tsv", session, string(filepath.Separator))

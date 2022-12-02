@@ -2,6 +2,7 @@
 package dat
 
 import (
+	"bufio"
 	"compress/gzip"
 	"errors"
 	"fmt"
@@ -32,9 +33,10 @@ type Base struct {
 	UniProtDB       string
 	CrapDB          string
 	Prefix          string
+	Proteomes       string
 	DownloadedFiles []string
-	TaDeDB          map[string]string
 	Records         []Record
+	TaDeDB          map[string]string
 }
 
 // New constructor
@@ -78,18 +80,26 @@ func Run(m met.Data) met.Data {
 		msg.Custom(errors.New("contaminants are not going to be added to database"), "warning")
 	}
 
+	// bool variable will control the adition fo contaminant tags to contam proteins from the same organism.
+	var ids = make(map[string]string)
+
 	if len(m.Database.Custom) < 1 {
 
 		m.DB = m.Database.Custom
 
 		dbs := strings.Split(m.Database.ID, ",")
 		for _, i := range dbs {
-			logrus.Info("Fetching database ", i)
+
+			organism, proteomeID := GetOrganismID(sys.GetTemp(), i)
+
+			logrus.Info("Fetching ", organism, " database ", i)
 
 			currentTime := time.Now()
 			m.Database.TimeStamp = currentTime.Format("2006.01.02 15:04:05")
 
-			db.Fetch(i, m.Temp, m.Database.Iso, m.Database.Rev)
+			db.Fetch(i, proteomeID, m.Temp, m.Database.Iso, m.Database.Rev)
+
+			ids[proteomeID] = organism
 		}
 
 	} else {
@@ -99,7 +109,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	logrus.Info("Generating the target-decoy database")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
 
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -107,7 +117,7 @@ func Run(m met.Data) met.Data {
 	db.ProcessDB(customDB, m.Database.Tag)
 
 	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -172,9 +182,9 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 }
 
 // Fetch downloads a database file from UniProt
-func (d *Base) Fetch(id, temp string, iso, rev bool) {
+func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 
-	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), id)
+	d.UniProtDB = fmt.Sprintf("%s%s%s.fas", temp, string(filepath.Separator), uniprotID)
 
 	base := "https://rest.uniprot.org/uniprotkb/"
 
@@ -189,14 +199,15 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 	}
 
 	// add the proteome parameter
-	query = fmt.Sprintf("%squery=proteome:%s", query, id)
+	query = fmt.Sprintf("%squery=proteome:%s", query, uniprotID)
 
 	// is reviewed?
 	if rev {
 		query = query + "+AND+reviewed:true"
-	} else {
-		query = query + "+AND+reviewed:false"
 	}
+
+	query = fmt.Sprintf("%s+AND+model_organism:%s", query, proteomeID)
+
 	client := resty.New()
 
 	// HTTP response gets saved into file, similar to curl -o flag
@@ -244,7 +255,7 @@ func (d *Base) Fetch(id, temp string, iso, rev bool) {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
+func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[string]string) {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -270,9 +281,16 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 			crapMap := fas.ParseFile(d.CrapDB)
 
 			for k, v := range crapMap {
+				for key := range ids {
 
-				if cTag && !strings.Contains(k, "_HUMAN") && !strings.Contains(k, "OX=9606") {
-					k = "contam_" + k
+					if cTag {
+						if strings.Contains(k, key) {
+							// Do not add contaminant tags to contam. proteins from the same organism
+						} else {
+							k = "contam_" + k
+						}
+					}
+
 				}
 
 				split := strings.Split(k, "|")
@@ -305,9 +323,9 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool) {
 // Deploy crap file to session folder
 func (d *Base) Deploy(temp string) {
 
-	d.CrapDB = fmt.Sprintf("%s%scrap.fas", temp, string(filepath.Separator))
+	d.CrapDB = fmt.Sprintf("%s%scrap-gpmdb.fas", temp, string(filepath.Separator))
 
-	param, e1 := Asset("crap.fas")
+	param, e1 := Asset("crap-gpmdb.fas")
 	if e1 != nil {
 		msg.WriteFile(e1, "fatal")
 	}
@@ -317,6 +335,39 @@ func (d *Base) Deploy(temp string) {
 		msg.WriteFile(e2, "fatal")
 	}
 
+}
+
+// GetOrganismID maps the UniprotID to organismID
+func GetOrganismID(temp string, uniprotID string) (string, string) {
+
+	var proteomes = make(map[string]string)
+	var organisms = make(map[string]string)
+	proteomeFile := fmt.Sprintf("%s%sproteomes.csv", temp, string(filepath.Separator))
+
+	param, e1 := Asset("proteomes.csv")
+	if e1 != nil {
+		msg.WriteFile(e1, "fatal")
+	}
+
+	e2 := ioutil.WriteFile(proteomeFile, param, sys.FilePermission())
+	if e2 != nil {
+		msg.WriteFile(e2, "fatal")
+	}
+
+	f, e := os.Open(proteomeFile)
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		parts := strings.Split(scanner.Text(), ",")
+		organisms[parts[0]] = parts[1]
+		proteomes[parts[0]] = parts[2]
+	}
+
+	return organisms[uniprotID], proteomes[uniprotID]
 }
 
 // Save fasta file to disk
@@ -411,8 +462,15 @@ func (d *Base) RestoreWithPath(p string) {
 
 // reverseSeq returns its argument string reversed rune-wise left to right.
 func reverseSeq(s string) string {
+
+	var index = 0
 	r := []rune(s)
-	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+
+	if strings.HasPrefix(s, "M") {
+		index = 1
+	}
+
+	for i, j := index, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)

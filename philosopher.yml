@@ -31,7 +31,7 @@ Steps:
   Integrated Reports: no                         # combined analysis of LC-MS/MS results inspired by Abacus
   Integrated Isobaric Quantification: no         # integrates channel abundances from multiple isobaric-tagged samples with TMT-Integrator                        
 
-Database Search:                                 # MSFragger-3.4 & Comet v2019011
+Database Search:                                 # MSFragger-3.5 & Comet v2019011
   protein_database:                              # path to the target-decoy protein database
   decoy_tag: rev_                                # prefix tag used added to decoy sequences
   contaminant_tag: false                         # prefix tag used added to decoy sequences
@@ -40,7 +40,7 @@ Database Search:                                 # MSFragger-3.4 & Comet v201901
     noindex: true                                # skip mzML file indexing
     param:                                       # comet parameter file (default "comet.params.txt")
     extension: mzML                              # format of the spectra file
-  msfragger:                                     # MSFragger v3.3
+  msfragger:                                     # MSFragger v3.5
     path:                                        # path to MSFragger jar
     memory: 8                                    # how much memory in GB to use
     param:                                       # MSFragger parameter file
@@ -267,6 +267,7 @@ Individual Reports:                              # Report
   msstats: false                                 # create an output compatible to MSstats
   withDecoys: false                              # add decoy observations to reports
   mzID: false                                    # create a mzID output
+  prefix: false                                  # add the project (folder) name as a prefix to the output files
             
 Integrated Reports:                              # Abacus
   protein: true                                  # global level protein report
@@ -276,7 +277,7 @@ Integrated Reports:                              # Abacus
   uniqueOnly: false                              # report TMT quantification based on only unique peptides
   reprint: false                                 # create abacus reports using the Reprint format
 
-Integrated Isobaric Quantification:              # TMT-Integrator v3.2.0
+Integrated Isobaric Quantification:              # TMT-Integrator v4.0.0
   path:                                          # path to TMT-Integrator jar
   memory: 6                                      # memory allocation, in Gb
   output:                                        # the location of output files
@@ -304,3 +305,4 @@ Integrated Isobaric Quantification:              # TMT-Integrator v3.2.0
   max_pep_prob_thres: 0                          # the threshold for maximum peptide probability
   min_ntt: 0                                     # minimum allowed number of enzymatic termini
   aggregation_method: 0                          # the aggregation method from the PSM level to the specified level (0: median, 1: weighted-ratio)
+  log2transformed: true                          # report ratio and abundance reports in the log2 scale

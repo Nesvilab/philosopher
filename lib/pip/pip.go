@@ -403,6 +403,7 @@ func ProteinProphet(meta met.Data, p Directives, dir string, data []string) met.
 			} else {
 				files = append(files, "interact.pep.xml")
 			}
+			meta.ProteinProphet.Nogroupwts = true
 			proteinprophet.Run(meta, files)
 			meta.Serialize()
 			met.CleanTemp(meta.Temp)
@@ -573,10 +574,9 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		dsAbs, _ := filepath.Abs(i)
 		os.Chdir(dsAbs)
 
-		//annotation, _ := filepath.Glob("annotation*.txt")
+		annotation, _ := filepath.Glob("*annotation.txt")
 		//fullAnnotation, _ := filepath.Abs(annotation[0])
-
-		fullAnnotation := "annotation.txt"
+		//fullAnnotation := "annotation.txt"
 
 		// reload the meta data
 		meta.Restore(sys.Meta())
@@ -585,12 +585,12 @@ func LabelQuant(meta met.Data, p Directives, dir string, data []string) met.Data
 		// 	return meta
 		// }
 
-		logrus.Info("Executing label-based quantification on ", i)
+		logrus.Info("Executing isobaric quantification on ", i)
 
 		meta.Quantify = p.LabelQuant
 		meta.Quantify.Dir = dsAbs
 		meta.Quantify.Format = "mzML"
-		meta.Quantify.Annot = fullAnnotation
+		meta.Quantify.Annot = annotation[0]
 		meta.Quantify.Brand = p.LabelQuant.Brand
 		meta.Quantify.Pex = fmt.Sprintf("%s%sinteract.pep.xml", dsAbs, string(filepath.Separator))
 		meta.Quantify.Tag = "rev_"
@@ -680,6 +680,10 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 				meta.Filter.Razor = false
 				meta.Filter.TwoD = false
 				meta.Filter.Seq = false
+			}
+
+			if len(p.Filter.RazorBin) != 0 {
+				meta.Filter.RazorBin = p.Filter.RazorBin
 			}
 
 			meta := fil.Run(meta)

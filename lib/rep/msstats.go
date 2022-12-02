@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -13,13 +14,20 @@ import (
 )
 
 // MetaMSstatsReport report all psms from study that passed the FDR filter
-func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys bool) {
+func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, hasDecoys, hasPrefix bool) {
+
 	if evi.PSM == nil {
 		RestorePSM(&evi.PSM)
 	}
 
 	var header string
-	output := fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
+	var output string
+
+	if hasPrefix {
+		output = fmt.Sprintf("%s%s%s_msstats.tsv", workspace, string(filepath.Separator), path.Base(workspace))
+	} else {
+		output = fmt.Sprintf("%s%smsstats.csv", workspace, string(filepath.Separator))
+	}
 
 	// create result file
 	file, e := os.Create(output)
@@ -44,17 +52,30 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 	if brand == "tmt" {
 		switch channels {
+		case 6:
+			header += "\tChannel 126\tChannel 127N\tChannel 128C\tChannel 129N\tChannel 130C\tChannel 131"
 		case 10:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N"
 		case 11:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C"
 		case 16:
-			header += "\tPurity\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
+			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N"
 		case 18:
 			header += "\tChannel 126\tChannel 127N\tChannel 127C\tChannel 128N\tChannel 128C\tChannel 129N\tChannel 129C\tChannel 130N\tChannel 130C\tChannel 131N\tChannel 131C\tChannel 132N\tChannel 132C\tChannel 133N\tChannel 133C\tChannel 134N\tChannel 134C\tChannel 135N"
 		default:
 			header += ""
 		}
+	} else if brand == "itraq" {
+		switch channels {
+		case 4:
+			header += "\tChannel 114\tChannel 115\tChannel 116\tChannel 117"
+		case 8:
+			header += "\tChannel 113\tChannel 114\tChannel 115\tChannel 116\tChannel 117\tChannel 118\tChannel 119\tChannel 121"
+		default:
+			header += ""
+		}
+	} else if brand == "xtag" {
+		header += "\tChannel xTag1\tChannel xTag2\tChannel xTag3\tChannel xTag4\tChannel xTag5\tChannel xTag6\tChannel xTag7\tChannel xTag8\tChannel xTag9\tChannel xTag10\tChannel xTag11\tChannel xTag12\tChannel xTag13\tChannel xTag14\tChannel xTag15\tChannel xTag16\tChannel xTag17\tChannel xTag18"
 	}
 
 	header += "\n"
@@ -88,9 +109,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		if brand == "tmt" {
 			switch channels {
 			case 6:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel5.Intensity,
@@ -99,9 +119,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 					i.Labels.Channel10.Intensity,
 				)
 			case 10:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -114,9 +133,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 					i.Labels.Channel10.Intensity,
 				)
 			case 11:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -130,9 +148,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 					i.Labels.Channel11.Intensity,
 				)
 			case 16:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -151,9 +168,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 					i.Labels.Channel16.Intensity,
 				)
 			case 18:
-				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 					line,
-					i.Purity,
 					i.Labels.Channel1.Intensity,
 					i.Labels.Channel2.Intensity,
 					i.Labels.Channel3.Intensity,
@@ -176,8 +192,54 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 			default:
 				header += ""
 			}
+		} else if brand == "itraq" {
+			switch channels {
+			case 4:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+				)
+			case 8:
+				line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+					line,
+					i.Labels.Channel1.Intensity,
+					i.Labels.Channel2.Intensity,
+					i.Labels.Channel3.Intensity,
+					i.Labels.Channel4.Intensity,
+					i.Labels.Channel5.Intensity,
+					i.Labels.Channel6.Intensity,
+					i.Labels.Channel7.Intensity,
+					i.Labels.Channel8.Intensity,
+				)
+			default:
+				header += ""
+			}
+		} else if brand == "xtag" {
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+				i.Labels.Channel3.Intensity,
+				i.Labels.Channel4.Intensity,
+				i.Labels.Channel5.Intensity,
+				i.Labels.Channel6.Intensity,
+				i.Labels.Channel7.Intensity,
+				i.Labels.Channel8.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
+				i.Labels.Channel11.Intensity,
+				i.Labels.Channel12.Intensity,
+				i.Labels.Channel13.Intensity,
+				i.Labels.Channel14.Intensity,
+				i.Labels.Channel15.Intensity,
+				i.Labels.Channel16.Intensity,
+				i.Labels.Channel17.Intensity,
+				i.Labels.Channel18.Intensity,
+			)
 		}
-
 		line += "\n"
 
 		_, e = io.WriteString(file, line)
