@@ -2,12 +2,14 @@
 - Added  new flag `--removecontam` to the report command to remove contaminants from the reports
 - Added a new combined_psm report to abacus (beta)
 
+
 ### Changed
 - Updated the TMT-Integrator to match with the version v4.0.0
 - Updated the pickedFDR filter
 - The pipeline command now accepts annotation files with prefixes
 - Updated PTMProphet to the latest release
 - Updated the database fetch with the new UniProt API (The new API is still unstable, people might experience hicups with certain cases, specially non-model organisms without reviewed sequences)
+
 
 ### Fixed
 - Contaminant tags are now added to Human sequences as well
