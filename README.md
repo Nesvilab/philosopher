@@ -14,7 +14,7 @@
 
 - Database downloading and formatting.
 
-- Peptide-spectrum matching with Comet.
+- Peptide-spectrum matching with MSFragger and Comet.
 
 - Peptide assignment validation with PeptideProphet.
 

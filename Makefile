@@ -7,6 +7,7 @@ VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
 TAG = v4.6.0
+RC = RC-1
 
 LDFLAGS = -ldflags "-w -s -extldflags -static -X main.version=${TAG} -X main.build=${BUILD}"
 
@@ -49,23 +50,25 @@ test:
 
 .PHONY: rc
 rc:
-	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-RC
-	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-RC
-	mv philosopher-${TAG}-RC ~/bin/
-	mv philosopher-${TAG}-RC.exe ~/bin/
+	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-${RC}
+	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}-${RC}
+	mv philosopher-${TAG}-${RC} ~/bin/
+	mv philosopher-${TAG}-${RC}.exe ~/bin/
 
 .PHONY: linux
 linux:
-	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
+	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}
+	mv philosopher-${TAG} ~/bin/
 
 .PHONY: windows
 windows:
-	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
+	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}
+	mv philosopher-${TAG}-${RC}.exe ~/bin/
 
 .PHONY: all
 all:
-	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher
-	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher
+	env CGO_ENABLED=0 gox -os="linux" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}
+	env CGO_ENABLED=0 gox -os="windows" ${LDFLAGS} -arch=amd64 -output philosopher-${TAG}
 
 .PHONY: push
 push:
@@ -78,4 +81,4 @@ draft:
 
 .PHONY: release
 release:
-	goreleaser --release-notes=Changelog --rm-dist
+	goreleaser --release-notes=Changelog
