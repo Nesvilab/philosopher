@@ -675,9 +675,14 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 	rm.Restore(false)
 
 	for i := range list {
+
 		if v, ok := rm[list[i].Peptide]; ok {
 
-			if list[i].Protein != v.MappedProtein {
+			if len(v.MappedProtein) == 0 && len(list[i].Protein) > 0 {
+
+				v.MappedProtein = list[i].Protein
+
+			} else if list[i].Protein != v.MappedProtein {
 
 				list[i].AlternativeProteins[list[i].Protein]++
 				delete(list[i].AlternativeProteins, v.MappedProtein)
@@ -687,6 +692,7 @@ func correctRazorAssignment(list id.PepIDList) id.PepIDList {
 		}
 	}
 
+	// serialize ?
 	//rm.Serialize()
 
 	return list
