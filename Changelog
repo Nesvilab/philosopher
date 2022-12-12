@@ -6,3 +6,4 @@
 
 ### Fixed
 - Adjusted the msstats file format, added Purity to all plex sizes.
+- Fixed the protein coverage calculations
