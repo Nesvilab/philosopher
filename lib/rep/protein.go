@@ -494,7 +494,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the an	alysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.4f\t%.2f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
 			i.PartHeader,             // Protein
 			i.ProteinID,              // Protein ID
 			i.EntryName,              // Entry Name
