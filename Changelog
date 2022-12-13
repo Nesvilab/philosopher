@@ -2,8 +2,8 @@
 
 
 ### Changed
-
+- Removed the normalization done at the protein level in labelquant
 
 ### Fixed
-- Adjusted the msstats file format, added Purity to all plex sizes.
+- Adjusted the msstats file format, added Purity to all plex sizes
 - Fixed the protein coverage calculations
