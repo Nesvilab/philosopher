@@ -173,6 +173,12 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	evi = rollUpProteins(evi, spectrumMap, phosphoSpectrumMap)
 
+	for _, i := range evi.Proteins {
+		if i.ProteinID == "sp|O13535|YH11B_YEAST" {
+			fmt.Println(i.URazorIntensity)
+		}
+	}
+
 	// normalize to the total protein levels
 	//logrus.Info("Calculating normalized protein levels")
 	//evi = NormToTotalProteins(evi)

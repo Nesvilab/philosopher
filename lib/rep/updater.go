@@ -437,6 +437,14 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
+		// var p string
+		// if evi.PSM[i].Peptide == "GDSLDSVEALIK" {
+		// 	fmt.Println(evi.PSM[i].Peptide)
+		// 	p = replacerIL.Replace(evi.PSM[i].Peptide)
+		// 	fmt.Println(p)
+		// 	fmt.Println(evi.PSM[i].Peptide)
+		// }
+
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
 		evi.PSM[i].EntryName = rec.EntryName
