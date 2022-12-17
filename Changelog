@@ -7,3 +7,4 @@
 ### Fixed
 - Adjusted the msstats file format, added Purity to all plex sizes
 - Fixed the protein coverage calculations
+- Fixed repeated isobaric values that would eventually show up in the protein table.
