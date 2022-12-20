@@ -22,7 +22,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
 
@@ -788,43 +787,31 @@ func (p *PepXML) ReportModels(session, name string) {
 
 func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
-	p, e := plot.New()
+	p := plot.New()
 
-	if e != nil {
+	p.Title.Text = "FVAL" + v
+	p.X.Label.Text = "FVAL"
+	p.Y.Label.Text = "Density"
 
-		msg.Plotter(e, "fatal")
-
-	} else {
-
-		p.Title.Text = "FVAL" + v
-		p.X.Label.Text = "FVAL"
-		p.Y.Label.Text = "Density"
-
-		obsPts := make(plotter.XYs, len(xAxis))
-		posPts := make(plotter.XYs, len(xAxis))
-		negPts := make(plotter.XYs, len(xAxis))
-		for i := range obs {
-			obsPts[i].X = xAxis[i]
-			obsPts[i].Y = obs[i]
-			posPts[i].X = xAxis[i]
-			posPts[i].Y = pos[i]
-			negPts[i].X = xAxis[i]
-			negPts[i].Y = neg[i]
-		}
-
-		e = plotutil.AddLinePoints(p, "Observed", obsPts, "Positive", posPts, "Negative", negPts)
-		if e != nil {
-			panic(e)
-		}
-
-		// Save the plot to a PNG file.
-		if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
-			panic(err)
-		}
-
-		// copy to work directory
-		sys.CopyFile(path, filepath.Base(path))
+	obsPts := make(plotter.XYs, len(xAxis))
+	posPts := make(plotter.XYs, len(xAxis))
+	negPts := make(plotter.XYs, len(xAxis))
+	for i := range obs {
+		obsPts[i].X = xAxis[i]
+		obsPts[i].Y = obs[i]
+		posPts[i].X = xAxis[i]
+		posPts[i].Y = pos[i]
+		negPts[i].X = xAxis[i]
+		negPts[i].Y = neg[i]
 	}
+
+	// Save the plot to a PNG file.
+	if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
+		panic(err)
+	}
+
+	// copy to work directory
+	sys.CopyFile(path, filepath.Base(path))
 
 }
 
