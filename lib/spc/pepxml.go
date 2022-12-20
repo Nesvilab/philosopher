@@ -214,7 +214,7 @@ type SearchHit struct {
 	TotalTerm           uint8                `xml:"num_tol_term,attr"`
 	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
 	IsRejected          uint8                `xml:"is_rejected,attr"`
-	TotalProteins       uint16               `xml:"num_tot_proteins,attr"`
+	TotalProteins       uint32               `xml:"num_tot_proteins,attr"`
 	MatchedIons         uint16               `xml:"num_matched_ions,attr"`
 	TotalIons           uint16               `xml:"tot_num_ions,attr"`
 	MatchedPeptides     uint32               `xml:"num_matched_peptides,attr"`
