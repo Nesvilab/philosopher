@@ -14,6 +14,7 @@ import (
 	"philosopher/lib/inf"
 	"philosopher/lib/met"
 	"philosopher/lib/mod"
+	"philosopher/lib/raz"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
@@ -36,7 +37,7 @@ func Run(f met.Data) met.Data {
 			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
 			sys.CopyFile(f.Filter.RazorBin, rdest)
 
-			var rm RazorMap = make(map[string]RazorCandidate)
+			var rm raz.RazorMap = make(map[string]raz.RazorCandidate)
 			rm.Restore(false)
 			logrus.Info("Fetching razor assignment from: ", f.Filter.RazorBin, ": ", len(rm), " razor groups imported.")
 			_ = rm
@@ -120,33 +121,7 @@ func Run(f met.Data) met.Data {
 
 	}
 
-	// var dtb dat.Base
-	// dtb.Restore()
-	// if len(dtb.Records) < 1 {
-	// 	msg.Custom(errors.New("database annotation not found, interrupting the processing"), "fatal")
-	// }
-
 	os.RemoveAll(sys.PepxmlBin())
-
-	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
-		var psm id.PepIDList
-		psm.Restore("psm")
-		psm = correctRazorAssignment(psm)
-		psm.Serialize("psm")
-		psm = nil
-
-		var pep id.PepIDList
-		pep.Restore("pep")
-		pep = correctRazorAssignment(pep)
-		pep.Serialize("pep")
-		pep = nil
-
-		var ion id.PepIDList
-		ion.Restore("ion")
-		ion = correctRazorAssignment(ion)
-		ion.Serialize("ion")
-		ion = nil
-	}
 
 	logrus.Info("Post processing identifications")
 
@@ -174,58 +149,18 @@ func Run(f met.Data) met.Data {
 
 	logrus.Info("Assigning protein identifications to layers")
 	e.UpdateLayerswithDatabase(f.Filter.Tag)
+
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
 		//e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
 
+	// Apply the razor assignment to all data
 	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
-
-		var razor RazorMap = make(map[string]RazorCandidate)
-		razor.Restore(false)
-
-		for i := range e.PSM {
-
-			for j := range e.PSM[i].MappedProteins {
-				if strings.Contains(j, f.Filter.Tag) {
-					delete(e.PSM[i].MappedProteins, j)
-				}
-			}
-
-			v, ok := razor[e.PSM[i].Peptide]
-
-			if ok {
-				if len(v.MappedProtein) > 0 {
-					if e.PSM[i].Protein != v.MappedProtein {
-						e.PSM[i].MappedProteins[e.PSM[i].Protein]++
-						delete(e.PSM[i].MappedProteins, v.MappedProtein)
-						e.PSM[i].Protein = v.MappedProtein
-					}
-					delete(e.PSM[i].MappedProteins, v.MappedProtein)
-				}
-
-				e.PSM[i].IsURazor = true
-			}
-
-			if e.PSM[i].IsUnique {
-				e.PSM[i].IsURazor = true
-			}
-
-			if len(e.PSM[i].MappedProteins) == 0 {
-				e.PSM[i].IsURazor = true
-				e.PSM[i].IsUnique = true
-
-				e.PSM[i].MappedGenes = make(map[string]struct{})
-			}
-
-			if strings.Contains(e.PSM[i].Protein, f.Filter.Tag) {
-				e.PSM[i].IsDecoy = true
-			}
-		}
-
-		razor = nil
+		e.ApplyRazorAssignment()
 	}
+
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
 		logrus.Info("Processing protein inference")
@@ -233,10 +168,6 @@ func Run(f met.Data) met.Data {
 
 		e.AssembleProteinReport(pro, f.Filter.Weight, f.Filter.Tag)
 		pro = nil
-
-		// Pushes the new ion status from the protein inferece to the other layers, the gene and protein ID
-		// assignment gets corrected in the next function call (UpdateLayerswithDatabase)
-		//e.UpdateIonStatus(f.Filter.Tag)
 
 		logrus.Info("Synchronizing PSMs and proteins")
 

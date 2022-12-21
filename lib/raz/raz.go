@@ -1,4 +1,4 @@
-package fil
+package raz
 
 import (
 	"philosopher/lib/sys"

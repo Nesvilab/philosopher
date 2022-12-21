@@ -10,6 +10,7 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/msg"
+	"philosopher/lib/raz"
 
 	"github.com/sirupsen/logrus"
 )
@@ -203,12 +204,12 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 }
 
 // RazorCandidateMap is a list of razor candidates
-type RazorCandidateMap map[string]RazorCandidate
+//type RazorCandidateMap map[string]RazorCandidate
 
 // RazorFilter classifies peptides as razor
 func RazorFilter(p id.ProtXML) id.ProtXML {
 
-	var r RazorMap = make(map[string]RazorCandidate)
+	var r raz.RazorMap = make(map[string]raz.RazorCandidate)
 	var rList []string
 
 	// perform a test load of the razor assingment, if there's a file, then the assignment is skipped, and the current file used.
@@ -223,7 +224,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					v, ok := r[k.PeptideSequence]
 					if !ok {
 
-						var rc RazorCandidate
+						var rc raz.RazorCandidate
 						rc.Sequence = k.PeptideSequence
 						rc.MappedProteinsW = make(map[string]float64)
 						rc.MappedProteinsGW = make(map[string]float64)
@@ -655,36 +656,6 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	filteredPSM.Serialize("psm")
 	filteredPeptides.Serialize("pep")
 	filteredIons.Serialize("ion")
-}
-
-// correctRazorAssignment updates the razor assignment for the PSMs recovered from the 2D filter
-func correctRazorAssignment(list id.PepIDList) id.PepIDList {
-
-	var rm RazorMap = make(map[string]RazorCandidate)
-	rm.Restore(false)
-
-	for i := range list {
-
-		if v, ok := rm[list[i].Peptide]; ok {
-
-			if len(v.MappedProtein) == 0 && len(list[i].Protein) > 0 {
-
-				v.MappedProtein = list[i].Protein
-
-			} else if list[i].Protein != v.MappedProtein {
-
-				list[i].AlternativeProteins[list[i].Protein]++
-				delete(list[i].AlternativeProteins, v.MappedProtein)
-
-				list[i].Protein = v.MappedProtein
-			}
-		}
-	}
-
-	// serialize ?
-	//rm.Serialize()
-
-	return list
 }
 
 // mirrorProteinList takes a filtered list and regenerate the correspondedn decoys

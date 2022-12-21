@@ -6,6 +6,7 @@ import (
 
 	"philosopher/lib/dat"
 	"philosopher/lib/id"
+	"philosopher/lib/raz"
 	"philosopher/lib/uti"
 )
 
@@ -229,6 +230,10 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 		// Total
 		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.SpectrumFileName())
 		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
+		for j := range i.MappedProteins {
+			totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
+			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
+		}
 
 		if i.IsUnique {
 			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.SpectrumFileName())
@@ -745,4 +750,112 @@ func (evi *Evidence) CalculateProteinCoverage() {
 			evi.Proteins[p].Coverage = float32(0)
 		}
 	}
+}
+
+// ApplyRazorAssignment propagates the razor assignment to the data
+func (evi *Evidence) ApplyRazorAssignment() {
+
+	var razor raz.RazorMap = make(map[string]raz.RazorCandidate)
+	razor.Restore(false)
+
+	for i := range evi.PSM {
+
+		v, ok := razor[evi.PSM[i].Peptide]
+
+		if ok {
+
+			if evi.PSM[i].IsUnique {
+				evi.PSM[i].IsURazor = true
+			}
+
+			if len(v.MappedProtein) == 0 {
+
+				evi.PSM[i].IsURazor = false
+
+			} else {
+
+				evi.PSM[i].IsURazor = true
+
+				// if !evi.PSM[i].IsUnique && evi.PSM[i].Protein == v.MappedProtein {
+				// 	evi.PSM[i].IsURazor = false
+				// } else {
+				// 	evi.PSM[i].IsURazor = true
+				// }
+
+				evi.PSM[i].MappedProteins[evi.PSM[i].Protein]++
+				delete(evi.PSM[i].MappedProteins, v.MappedProtein)
+				evi.PSM[i].Protein = v.MappedProtein
+
+			}
+		}
+	}
+
+	for i := range evi.Ions {
+
+		v, ok := razor[evi.Ions[i].Sequence]
+
+		if ok {
+
+			if evi.Ions[i].IsUnique {
+				evi.Ions[i].IsURazor = true
+			}
+
+			if len(v.MappedProtein) == 0 {
+
+				evi.Ions[i].IsURazor = false
+
+			} else {
+
+				evi.Ions[i].IsURazor = true
+
+				// if !evi.Ions[i].IsUnique && evi.Ions[i].Protein == v.MappedProtein {
+				// 	evi.Ions[i].IsURazor = false
+				// }
+
+				//if evi.Ions[i].Protein != v.MappedProtein {
+				// evi.Ions[i].IsURazor = true
+				//}
+
+				evi.Ions[i].MappedProteins[evi.Ions[i].Protein]++
+				delete(evi.Ions[i].MappedProteins, v.MappedProtein)
+				evi.Ions[i].Protein = v.MappedProtein
+
+			}
+		}
+	}
+
+	for i := range evi.Peptides {
+
+		v, ok := razor[evi.Peptides[i].Sequence]
+
+		if ok {
+
+			if evi.Peptides[i].IsUnique {
+				evi.Peptides[i].IsURazor = true
+			}
+
+			if len(v.MappedProtein) == 0 {
+
+				evi.Peptides[i].IsURazor = false
+
+			} else {
+
+				evi.Peptides[i].IsURazor = true
+
+				// if !evi.Peptides[i].IsUnique && evi.Peptides[i].Protein == v.MappedProtein {
+				// 	evi.Peptides[i].IsURazor = false
+				// }
+
+				//if evi.Peptides[i].Protein != v.MappedProtein {
+				// evi.Peptides[i].IsURazor = true
+				//}
+
+				evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein]++
+				delete(evi.Peptides[i].MappedProteins, v.MappedProtein)
+				evi.Peptides[i].Protein = v.MappedProtein
+
+			}
+		}
+	}
+
 }
