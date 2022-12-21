@@ -206,7 +206,7 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 		query = query + "+AND+reviewed:true"
 	}
 
-	query = fmt.Sprintf("%s+AND+model_organism:%s", query, proteomeID)
+	query = fmt.Sprintf("%s+AND+organism_id:%s", query, proteomeID)
 
 	client := resty.New()
 
