@@ -1,5 +1,6 @@
 ### Added
-
+- Adjusted the peptide-to-protein mapping due to I/L replacement rules
+- Adjusted the protein FDR caclulation rules.
 
 ### Changed
 - Removed the normalization done at the protein level in labelquant

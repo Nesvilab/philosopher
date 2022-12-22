@@ -88,6 +88,8 @@ type PeptideIdentification struct {
 	Rtscore                          float64
 	IonMobility                      float64
 	Intensity                        float64
+	PrevAA                           []byte
+	NextAA                           []byte
 	AlternativeProteins              map[string]int
 	MSFragerLoc                      *MSFraggerLoc
 	PTM                              *PTM
@@ -426,6 +428,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 		psm.NumberofMissedCleavages = i.MissedCleavages
 		psm.NumberOfEnzymaticTermini = i.TotalTerm
+
+		psm.PrevAA = i.PrevAA
+		psm.NextAA = i.NextAA
 
 		for _, j := range i.AnalysisResult {
 

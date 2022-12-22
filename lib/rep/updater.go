@@ -93,12 +93,6 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
 			delete(evi.PSM[i].MappedProteins, rp)
 			evi.PSM[i].Protein = rp
-
-			// if strings.Contains(rp, decoyTag) {
-			// 	evi.PSM[i].IsDecoy = true
-			// } else {
-			// 	evi.PSM[i].IsDecoy = false
-			// }
 		}
 
 		if !evi.PSM[i].IsURazor {
@@ -434,21 +428,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	}
 
 	type prevNextAA struct {
-		prev byte
-		next byte
+		prev string
+		next string
 	}
 	var pepPrevNextAA = make(map[string]prevNextAA)
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
-
-		// var p string
-		// if evi.PSM[i].Peptide == "GDSLDSVEALIK" {
-		// 	fmt.Println(evi.PSM[i].Peptide)
-		// 	p = replacerIL.Replace(evi.PSM[i].Peptide)
-		// 	fmt.Println(p)
-		// 	fmt.Println(evi.PSM[i].Peptide)
-		// }
 
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
@@ -463,26 +449,15 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			}
 		}
 
+		peptide := string(evi.PSM[i].PrevAA) + replacerIL.Replace(evi.PSM[i].Peptide) + string(evi.PSM[i].NextAA)
+
 		// map the peptide to the protein
-		mstart := strings.Index(replacerIL.Replace(rec.Sequence), replacerIL.Replace(evi.PSM[i].Peptide))
+		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
 		mend := mstart + len(evi.PSM[i].Peptide)
 
 		if mstart != -1 {
-			evi.PSM[i].ProteinStart = mstart + 1
-			evi.PSM[i].ProteinEnd = mend
-
-			if (mstart) <= 0 {
-				evi.PSM[i].PrevAA = '-'
-			} else {
-				evi.PSM[i].PrevAA = rec.Sequence[mstart-1]
-			}
-
-			if (mend + 1) >= len(rec.Sequence) {
-				evi.PSM[i].NextAA = '-'
-			} else {
-				evi.PSM[i].NextAA = rec.Sequence[mend]
-			}
-
+			evi.PSM[i].ProteinStart = mstart + 2
+			evi.PSM[i].ProteinEnd = mend + 1
 		}
 
 		pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{evi.PSM[i].PrevAA, evi.PSM[i].NextAA}

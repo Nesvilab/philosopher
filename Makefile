@@ -7,7 +7,7 @@ VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
 TAG = v4.7.0
-RC = RC-5
+RC = RC-6
 
 LDFLAGS = -ldflags "-w -s -extldflags -static -X main.version=${TAG} -X main.build=${BUILD}"
 

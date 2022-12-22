@@ -49,6 +49,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
 		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
+		p.PrevAA = string(i.PrevAA)
+		p.NextAA = string(i.NextAA)
 		p.Protein = i.Protein
 		p.ModifiedPeptide = i.ModifiedPeptide
 		p.AssumedCharge = i.AssumedCharge

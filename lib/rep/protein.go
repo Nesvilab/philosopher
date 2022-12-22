@@ -220,6 +220,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 						pe.ProteinName = pe.PartHeader
 					}
 
+					if pe.Length == 0 {
+						pe.Length = len(j.Sequence)
+					}
+
 					// updating the protein ions
 					for _, k := range pe.TotalPeptideIons {
 						k.Protein = j.PartHeader
