@@ -15,7 +15,6 @@ func TestRawFileParsing(t *testing.T) {
 
 	tes.SetupTestEnv()
 	msd.Read("z04397_tc-o238g-setB_MS3.mzML")
-	tes.ShutDowTestEnv()
 
 }
 
