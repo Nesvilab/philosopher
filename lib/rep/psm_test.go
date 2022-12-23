@@ -9,8 +9,8 @@ func TestPSMEvidenceList_PSMReport(t *testing.T) {
 
 	tes.SetupTestEnv()
 
-	var repoPSM PSMEvidenceList
-	RestorePSM(&repoPSM)
+	//var repoPSM PSMEvidenceList
+	//RestorePSM(&repoPSM)
 
 	type args struct {
 		workspace    string
