@@ -22,7 +22,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
 
@@ -52,57 +51,6 @@ type PepXML4Serialiazation struct {
 	Modifications         mod.Modifications
 	PeptideIdentification PepIDListPtrs
 }
-
-// PeptideIdentificationOld struct
-// type PeptideIdentificationOld struct {
-// 	Spectrum                             string
-// 	SpectrumFile                         string
-// 	Peptide                              string
-// 	Protein                              string
-// 	ModifiedPeptide                      string
-// 	CompensationVoltage                  string
-// 	PrevAA                               string
-// 	NextAA                               string
-// 	LocalizationRange                    string
-// 	MSFragerLocalization                 string
-// 	MSFraggerLocalizationScoreWithPTM    string
-// 	MSFraggerLocalizationScoreWithoutPTM string
-// 	Scan                                 int
-// 	NumberofMissedCleavages              int
-// 	IsoMassD                             int
-// 	AssumedCharge                        uint8
-// 	HitRank                              uint8
-// 	MissedCleavages                      uint8
-// 	NumberTolTerm                        uint8
-// 	NumberOfEnzymaticTermini             uint8
-// 	IsRejected                           uint8
-// 	NumberTotalProteins                  uint16
-// 	TotalNumberIons                      uint16
-// 	NumberMatchedIons                    uint16
-// 	Index                                uint32
-// 	UncalibratedPrecursorNeutralMass     float64
-// 	PrecursorNeutralMass                 float64
-// 	PrecursorExpMass                     float64
-// 	RetentionTime                        float64
-// 	CalcNeutralPepMass                   float64
-// 	Massdiff                             float64
-// 	Probability                          float64
-// 	Expectation                          float64
-// 	Xcorr                                float64
-// 	DeltaCN                              float64
-// 	DeltaCNStar                          float64
-// 	SPScore                              float64
-// 	SPRank                               float64
-// 	Hyperscore                           float64
-// 	Nextscore                            float64
-// 	DiscriminantValue                    float64
-// 	Intensity                            float64
-// 	IonMobility                          float64
-// 	AlternativeProteins                  map[string]int
-// 	LocalizedPTMSites                    map[string]int
-// 	LocalizedPTMMassDiff                 map[string]string
-// 	Modifications                        mod.Modifications
-// }
 
 type SpectrumType struct{ Spectrum, FileName string }
 
@@ -140,6 +88,8 @@ type PeptideIdentification struct {
 	Rtscore                          float64
 	IonMobility                      float64
 	Intensity                        float64
+	PrevAA                           []byte
+	NextAA                           []byte
 	AlternativeProteins              map[string]int
 	MSFragerLoc                      *MSFraggerLoc
 	PTM                              *PTM
@@ -478,6 +428,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 		psm.NumberofMissedCleavages = i.MissedCleavages
 		psm.NumberOfEnzymaticTermini = i.TotalTerm
+
+		psm.PrevAA = i.PrevAA
+		psm.NextAA = i.NextAA
 
 		for _, j := range i.AnalysisResult {
 
@@ -839,43 +792,31 @@ func (p *PepXML) ReportModels(session, name string) {
 
 func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
-	p, e := plot.New()
+	p := plot.New()
 
-	if e != nil {
+	p.Title.Text = "FVAL" + v
+	p.X.Label.Text = "FVAL"
+	p.Y.Label.Text = "Density"
 
-		msg.Plotter(e, "fatal")
-
-	} else {
-
-		p.Title.Text = "FVAL" + v
-		p.X.Label.Text = "FVAL"
-		p.Y.Label.Text = "Density"
-
-		obsPts := make(plotter.XYs, len(xAxis))
-		posPts := make(plotter.XYs, len(xAxis))
-		negPts := make(plotter.XYs, len(xAxis))
-		for i := range obs {
-			obsPts[i].X = xAxis[i]
-			obsPts[i].Y = obs[i]
-			posPts[i].X = xAxis[i]
-			posPts[i].Y = pos[i]
-			negPts[i].X = xAxis[i]
-			negPts[i].Y = neg[i]
-		}
-
-		e = plotutil.AddLinePoints(p, "Observed", obsPts, "Positive", posPts, "Negative", negPts)
-		if e != nil {
-			panic(e)
-		}
-
-		// Save the plot to a PNG file.
-		if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
-			panic(err)
-		}
-
-		// copy to work directory
-		sys.CopyFile(path, filepath.Base(path))
+	obsPts := make(plotter.XYs, len(xAxis))
+	posPts := make(plotter.XYs, len(xAxis))
+	negPts := make(plotter.XYs, len(xAxis))
+	for i := range obs {
+		obsPts[i].X = xAxis[i]
+		obsPts[i].Y = obs[i]
+		posPts[i].X = xAxis[i]
+		posPts[i].Y = pos[i]
+		negPts[i].X = xAxis[i]
+		negPts[i].Y = neg[i]
 	}
+
+	// Save the plot to a PNG file.
+	if err := p.Save(8*vg.Inch, 6*vg.Inch, path); err != nil {
+		panic(err)
+	}
+
+	// copy to work directory
+	sys.CopyFile(path, filepath.Base(path))
 
 }
 

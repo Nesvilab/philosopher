@@ -49,6 +49,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
 		p.NumberOfMissedCleavages = i.NumberofMissedCleavages
 		p.Peptide = i.Peptide
+		p.PrevAA = string(i.PrevAA)
+		p.NextAA = string(i.NextAA)
 		p.Protein = i.Protein
 		p.ModifiedPeptide = i.ModifiedPeptide
 		p.AssumedCharge = i.AssumedCharge
@@ -87,7 +89,9 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		}
 
 		for j := range i.AlternativeProteins {
-			p.MappedProteins[j]++
+			if !strings.Contains(j, decoyTag) {
+				p.MappedProteins[j]++
+			}
 		}
 
 		gn, ok := genes[i.Protein]
@@ -122,6 +126,10 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
 		if redudantMapping == len(i.AlternativeProteins) {
 			p.IsUnique = true
+		}
+
+		if len(p.MappedProteins) > 0 {
+			p.IsUnique = false
 		}
 
 	}

@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 
 	"philosopher/lib/dat"
-	"philosopher/lib/fil"
 	"philosopher/lib/met"
 	"philosopher/lib/msg"
 	"philosopher/lib/qua"
+	"philosopher/lib/raz"
 	"philosopher/lib/rep"
 	"philosopher/lib/sys"
 
@@ -71,7 +71,7 @@ var inspectCmd = &cobra.Command{
 			spew.Dump(o.Intensities)
 
 		case "razor":
-			var o fil.RazorMap
+			var o raz.RazorMap
 
 			target := fmt.Sprintf(".meta%srazor.bin", string(filepath.Separator))
 			sys.Restore(&o, target, false)

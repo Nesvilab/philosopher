@@ -10,6 +10,7 @@ import (
 	"philosopher/lib/cla"
 	"philosopher/lib/id"
 	"philosopher/lib/msg"
+	"philosopher/lib/raz"
 
 	"github.com/sirupsen/logrus"
 )
@@ -203,12 +204,12 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 }
 
 // RazorCandidateMap is a list of razor candidates
-type RazorCandidateMap map[string]RazorCandidate
+//type RazorCandidateMap map[string]RazorCandidate
 
 // RazorFilter classifies peptides as razor
 func RazorFilter(p id.ProtXML) id.ProtXML {
 
-	var r RazorMap = make(map[string]RazorCandidate)
+	var r raz.RazorMap = make(map[string]raz.RazorCandidate)
 	var rList []string
 
 	// perform a test load of the razor assingment, if there's a file, then the assignment is skipped, and the current file used.
@@ -223,7 +224,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					v, ok := r[k.PeptideSequence]
 					if !ok {
 
-						var rc RazorCandidate
+						var rc raz.RazorCandidate
 						rc.Sequence = k.PeptideSequence
 						rc.MappedProteinsW = make(map[string]float64)
 						rc.MappedProteinsGW = make(map[string]float64)
@@ -454,18 +455,16 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 			} else {
 
 				if isPicked {
-					if p.Groups[i].Proteins[j].Probability >= protProb && p.Groups[i].Proteins[j].Picked == 1 {
+					if p.Groups[i].Proteins[j].TopPepProb >= protProb && p.Groups[i].Proteins[j].Picked == 1 {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
 
 				} else {
-					if p.Groups[i].Proteins[j].TopPepProb >= pepProb && p.Groups[i].Proteins[j].Probability >= protProb {
+					if p.Groups[i].Proteins[j].TopPepProb >= pepProb && p.Groups[i].Proteins[j].TopPepProb >= protProb {
 						list = append(list, p.Groups[i].Proteins[j])
 					}
 				}
-
 			}
-
 		}
 	}
 
@@ -482,10 +481,15 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	// from botttom to top, classify every protein block with a given fdr score
 	// the score is only calculates to the first (last) protein in each block
 	// proteins with the same score, get the same fdr value.
-	var scoreMap = make(map[float64]float64)
+	var FDRMap = make(map[float64]float64)
+
 	for j := (len(list) - 1); j >= 0; j-- {
 
-		scoreMap[list[j].TopPepProb] = float64(decoys) / float64(targets)
+		_, ok := FDRMap[list[j].TopPepProb]
+		if !ok {
+			FDRMap[list[j].TopPepProb] = float64(decoys) / float64(targets)
+			//fmt.Println("probability:", list[j].TopPepProb, "targets:", targets, "decoys:", decoys, "Current FDR:", uti.Round(FDRMap[list[j].TopPepProb]*100, 5, 2))
+		}
 
 		if cla.IsDecoyProtein(list[j], p.DecoyTag) {
 			decoys--
@@ -494,90 +498,76 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		}
 	}
 
-	var keys []float64
-	for k := range scoreMap {
-		keys = append(keys, k)
+	var topPepProb []float64
+	for k := range FDRMap {
+		topPepProb = append(topPepProb, k)
 	}
 
-	sort.Sort(sort.Reverse(sort.Float64Slice(keys)))
+	sort.Sort(sort.Reverse(sort.Float64Slice(topPepProb)))
 
-	for i := range keys {
-		if scoreMap[keys[i]] <= targetFDR {
-			minProb = keys[i]
-			calcFDR = scoreMap[keys[i]]
-		}
-	}
-
-	var curProb = 10.0
-	var curScore = 0.0
+	var currentTopPepProb = 10.0
+	var currentFDR = 0.0
 	var probArray []float64
+	var probIndex int
 	var probList = make(map[float64]uint8)
 
-	for i := range keys {
+	for i := range topPepProb {
 
 		// for inspections
-		//f := uti.Round(scoreMap[keys[i]]*100, 5, 2)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f)
-		//fmt.Println(keys[i], "\t", scoreMap[keys[i]], "\t", uti.ToFixed(scoreMap[keys[i]], 4), "\t", f, "\t", targetFDR)
+		// fmt.Println(topPepProb[i], "\t", FDRMap[topPepProb[i]], "\t", uti.ToFixed(FDRMap[topPepProb[i]], 4), "\t", uti.Round(FDRMap[topPepProb[i]]*100, 5, 2))
 
-		probArray = append(probArray, keys[i])
+		probArray = append(probArray, topPepProb[i])
 
-		if scoreMap[keys[i]] <= targetFDR {
+		if FDRMap[topPepProb[i]] <= targetFDR {
 
-			probList[keys[i]] = 0
-			minProb = keys[i]
-			calcFDR = scoreMap[keys[i]]
+			probList[topPepProb[i]] = 0
+			minProb = topPepProb[i]
+			calcFDR = FDRMap[topPepProb[i]]
 
-			if keys[i] < curProb {
-				curProb = keys[i]
+			if topPepProb[i] < currentTopPepProb {
+				currentTopPepProb = topPepProb[i]
+				probIndex = i
 			}
 
-			if scoreMap[keys[i]] > curScore {
-				curScore = scoreMap[keys[i]]
+			if FDRMap[topPepProb[i]] > currentFDR {
+				currentFDR = FDRMap[topPepProb[i]]
 			}
 		}
 
 	}
 
-	if curProb == 10 {
+	if currentTopPepProb == 10 {
 		msg.Custom(errors.New("the protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "error")
 	}
 
-	// for inspections
-	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)
+	// if the current protein block threshold is below the threshold, we look for the next one
+	if currentFDR < targetFDR && probArray[len(probArray)-1] != currentTopPepProb {
 
-	if curScore < targetFDR && probArray[len(probArray)-1] != curProb {
+		// test if the next protein block surpasses the threshold by 10%
+		thresh := currentFDR + (0.01 * currentFDR)
 
-		for i := 0; i <= len(probArray); i++ {
+		if FDRMap[probArray[probIndex+1]] <= thresh {
 
-			if probArray[i] == curProb {
+			probList[probArray[probIndex+1]] = 0
 
-				if i+1 > len(probArray) {
-					msg.Custom(errors.New("the protein FDR filter didn't reach the desired threshold, try a higher threshold using the --prot parameter"), "warning")
-					break
-				}
-
-				probList[probArray[i+1]] = 0
-				minProb = probArray[i+1]
-				calcFDR = scoreMap[probArray[i+1]]
-				break
-			}
+			minProb = probArray[probIndex+1]
+			calcFDR = FDRMap[probArray[probIndex+1]]
 
 		}
-
 	}
 
 	// for inspections
-	//fmt.Println("curscore:", curScore, "\t", "fmtScore:", fmtScore, "\t", "targetfdr:", targetFDR)
+	// fmt.Println("index ", probIndex, probArray[probIndex], "minProb ", minProb, "calcFDR ", calcFDR)
 
-	var cleanlist id.ProtIDList
+	var finalList id.ProtIDList
 	decoys = 0
 	targets = 0
 
 	for i := range list {
-		_, ok := probList[list[i].TopPepProb]
-		if ok {
-			cleanlist = append(cleanlist, list[i])
+		if list[i].TopPepProb >= currentTopPepProb {
+
+			finalList = append(finalList, list[i])
+
 			if cla.IsDecoyProtein(list[i], p.DecoyTag) {
 				decoys++
 			} else {
@@ -593,7 +583,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		"threshold": minProb,
 	}).Info(msg)
 
-	return cleanlist
+	return finalList
 }
 
 // sequentialFDRControl estimates FDR levels by applying a second filter where all
@@ -666,30 +656,6 @@ func twoDFDRFilter(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float6
 	filteredPSM.Serialize("psm")
 	filteredPeptides.Serialize("pep")
 	filteredIons.Serialize("ion")
-}
-
-// correctRazorAssignment updates the razor assignment for the PSMs recovered from the 2D filter
-func correctRazorAssignment(list id.PepIDList) id.PepIDList {
-
-	var rm RazorMap = make(map[string]RazorCandidate)
-	rm.Restore(false)
-
-	for i := range list {
-		if v, ok := rm[list[i].Peptide]; ok {
-
-			if list[i].Protein != v.MappedProtein {
-
-				list[i].AlternativeProteins[list[i].Protein]++
-				delete(list[i].AlternativeProteins, v.MappedProtein)
-
-				list[i].Protein = v.MappedProtein
-			}
-		}
-	}
-
-	//rm.Serialize()
-
-	return list
 }
 
 // mirrorProteinList takes a filtered list and regenerate the correspondedn decoys

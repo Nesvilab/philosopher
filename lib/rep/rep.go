@@ -124,6 +124,8 @@ type PSMEvidence struct {
 	GeneName                         string
 	ModifiedPeptide                  string
 	CompensationVoltage              string
+	PrevAA                           string
+	NextAA                           string
 	ProteinStart                     int
 	ProteinEnd                       int
 	NumberOfEnzymaticTermini         uint8
@@ -151,8 +153,6 @@ type PSMEvidence struct {
 	Intensity                        float64
 	IonMobility                      float64
 	Purity                           float64
-	PrevAA                           byte
-	NextAA                           byte
 	IsDecoy                          bool
 	IsUnique                         bool
 	IsURazor                         bool
@@ -204,10 +204,10 @@ type IonEvidence struct {
 	GeneName                 string
 	EntryName                string
 	ProteinDescription       string
+	PrevAA                   string
+	NextAA                   string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
-	PrevAA                   byte
-	NextAA                   byte
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -252,13 +252,13 @@ type PeptideEvidence struct {
 	GeneName               string
 	EntryName              string
 	ProteinDescription     string
+	PrevAA                 string
+	NextAA                 string
 	Spc                    int
 	ModifiedObservations   int
 	UnModifiedObservations int
 	Intensity              float64
 	Probability            float64
-	PrevAA                 byte
-	NextAA                 byte
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
