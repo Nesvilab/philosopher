@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -431,10 +432,17 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		prev string
 		next string
 	}
+
+	var prevAA string
+	var nextAA string
 	var pepPrevNextAA = make(map[string]prevNextAA)
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
+
+		if evi.PSM[i].Peptide == "ISDDELER" {
+			fmt.Println("")
+		}
 
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
@@ -449,7 +457,21 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			}
 		}
 
-		peptide := string(evi.PSM[i].PrevAA) + replacerIL.Replace(evi.PSM[i].Peptide) + string(evi.PSM[i].NextAA)
+		if evi.PSM[i].PrevAA == "-" {
+			prevAA = ""
+		} else {
+			prevAA = evi.PSM[i].PrevAA
+		}
+
+		if evi.PSM[i].NextAA == "-" {
+			nextAA = ""
+		} else {
+			nextAA = evi.PSM[i].NextAA
+		}
+
+		pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{prevAA, nextAA}
+
+		peptide := replacerIL.Replace(prevAA) + replacerIL.Replace(evi.PSM[i].Peptide) + replacerIL.Replace(nextAA)
 
 		// map the peptide to the protein
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
@@ -460,8 +482,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			evi.PSM[i].ProteinEnd = mend + 1
 		}
 
-		pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{evi.PSM[i].PrevAA, evi.PSM[i].NextAA}
-
+		if evi.PSM[i].Peptide == "ISDDELER" {
+			fmt.Println("")
+		}
 	}
 
 	for i := range evi.Ions {
