@@ -269,8 +269,9 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 	var headerIndex int
 	for i := range printSet {
-		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.Name) > 0 {
+		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.CustomName) > 0 {
 			headerIndex = i
+			//fmt.Println(headerIndex, printSet[i].Labels.Channel1.Name, printSet[i].Labels.Channel1.CustomName)
 			break
 		}
 	}

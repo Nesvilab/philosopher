@@ -440,7 +440,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
-		if evi.PSM[i].Peptide == "ISDDELER" {
+		if evi.PSM[i].Peptide == "SEKPQQEEQEKPQSR" {
 			fmt.Println("")
 		}
 
@@ -457,6 +457,46 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			}
 		}
 
+		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
+
+		if evi.PSM[i].PrevAA != "-" || evi.PSM[i].PrevAA != "" {
+			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+		}
+
+		if evi.PSM[i].NextAA != "-" || evi.PSM[i].NextAA != "" {
+			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+		}
+
+		// map the peptide to the protein
+		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
+		mend := mstart + len(evi.PSM[i].Peptide)
+
+		if mstart != -1 {
+
+			if mstart == 0 {
+				evi.PSM[i].ProteinStart = mstart + 1
+			} else {
+				evi.PSM[i].ProteinStart = mstart + 2
+			}
+
+			evi.PSM[i].ProteinEnd = mend + 1
+
+		} else {
+
+			// if both ends are not found, it means the PSM - protein pair is product of a
+			// protein promotion case. We ignore the current flanking AAs.
+
+			mstart = strings.Index(replacerIL.Replace(rec.Sequence), replacerIL.Replace(evi.PSM[i].Peptide))
+			mend = mstart + len(evi.PSM[i].Peptide)
+
+			evi.PSM[i].ProteinStart = mstart + 1
+			evi.PSM[i].ProteinEnd = mend
+		}
+
+		if evi.PSM[i].Peptide == "SEKPQQEEQEKPQSR" {
+			fmt.Println("")
+		}
+
 		if evi.PSM[i].PrevAA == "-" {
 			prevAA = ""
 		} else {
@@ -470,21 +510,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 
 		pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{prevAA, nextAA}
-
-		peptide := replacerIL.Replace(prevAA) + replacerIL.Replace(evi.PSM[i].Peptide) + replacerIL.Replace(nextAA)
-
-		// map the peptide to the protein
-		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
-		mend := mstart + len(evi.PSM[i].Peptide)
-
-		if mstart != -1 {
-			evi.PSM[i].ProteinStart = mstart + 2
-			evi.PSM[i].ProteinEnd = mend + 1
-		}
-
-		if evi.PSM[i].Peptide == "ISDDELER" {
-			fmt.Println("")
-		}
 	}
 
 	for i := range evi.Ions {

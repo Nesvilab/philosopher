@@ -146,7 +146,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 
 	var headerIndex int
 	for i := range printSet {
-		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.Name) > 0 {
+		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.CustomName) > 0 {
 			headerIndex = i
 			break
 		}
