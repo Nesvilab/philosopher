@@ -90,7 +90,7 @@ type PeptideIdentification struct {
 	Intensity                        float64
 	PrevAA                           []byte
 	NextAA                           []byte
-	AlternativeProteins              map[string]int
+	AlternativeProteins              map[string]string
 	MSFragerLoc                      *MSFraggerLoc
 	PTM                              *PTM
 	Modifications                    mod.ModificationsSlice
@@ -399,7 +399,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
-	psm.AlternativeProteins = make(map[string]int)
+	psm.AlternativeProteins = make(map[string]string)
 
 	psm.Index = sq.Index
 	psm.SpectrumFile = FileName
@@ -462,7 +462,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		}
 
 		for _, j := range i.AlternativeProteins {
-			psm.AlternativeProteins[string(j.Protein)]++
+			psm.AlternativeProteins[string(j.Protein)] = string(j.PepPrevAA) + "#" + string(j.PepNextAA)
 		}
 
 		for _, j := range i.Score {
@@ -643,21 +643,21 @@ func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 
 		var current string
 		var alt string
-		var list = make(map[string]int)
+		var list = make(map[string]string)
 		var isUniProt bool
 
 		if strings.Contains(p.PeptideIdentification[i].Protein, p.DecoyTag) {
 
 			current = p.PeptideIdentification[i].Protein
 
-			for j := range p.PeptideIdentification[i].AlternativeProteins {
+			for k, v := range p.PeptideIdentification[i].AlternativeProteins {
 
-				if strings.Contains(j, "sp|") {
+				if strings.Contains(k, "sp|") {
 					isUniProt = true
 				}
 
-				if !strings.HasPrefix(j, p.DecoyTag) {
-					list[j]++
+				if !strings.HasPrefix(k, p.DecoyTag) {
+					list[k] = v
 				}
 			}
 
@@ -665,40 +665,52 @@ func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 
 		if len(list) > 0 {
 
+			var prevAA string
+			var nextAA string
+
 			// if a Uniprot database is used we give preference to SwissProt proteins
 			if isUniProt {
-				for k := range list {
+				for k, v := range list {
+
+					pna := strings.Split(v, "#")
+
 					if strings.HasPrefix(k, "sp|") {
 						alt = k
+						prevAA = pna[0]
+						nextAA = pna[1]
 						break
 					} else {
 						alt = k
+						prevAA = pna[0]
+						nextAA = pna[1]
 					}
 				}
-				p.PeptideIdentification[i].Protein = alt
-
-				// remove the replaces protein from the alternative proteins list
-				//p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
-				//p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
-				//p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
 
 				// add the replaces current to the list
-				p.PeptideIdentification[i].AlternativeProteins[current]++
+				p.PeptideIdentification[i].AlternativeProteins[current] = string(p.PeptideIdentification[i].PrevAA) + "#" + string(p.PeptideIdentification[i].NextAA)
+
+				p.PeptideIdentification[i].Protein = alt
+				p.PeptideIdentification[i].PrevAA = []byte(prevAA)
+				p.PeptideIdentification[i].NextAA = []byte(nextAA)
 
 			} else {
-				for k := range list {
+				for k, v := range list {
+
+					pna := strings.Split(v, "#")
+
 					alt = k
+					prevAA = pna[0]
+					nextAA = pna[1]
 					break
 				}
-				p.PeptideIdentification[i].Protein = alt
-
-				// remove the replaces protein from the alternative proteins list
-				//p.PeptideIdentification[i].AlternativeProteins[list[alt]] = p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1]
-				//p.PeptideIdentification[i].AlternativeProteins[len(p.PeptideIdentification[i].AlternativeProteins)-1] = ""
-				//p.PeptideIdentification[i].AlternativeProteins = p.PeptideIdentification[i].AlternativeProteins[:len(p.PeptideIdentification[i].AlternativeProteins)-1]
 
 				// add the replaces current to the list
-				p.PeptideIdentification[i].AlternativeProteins[current]++
+				p.PeptideIdentification[i].AlternativeProteins[current] = string(p.PeptideIdentification[i].PrevAA) + "#" + string(p.PeptideIdentification[i].NextAA)
+
+				p.PeptideIdentification[i].Protein = alt
+				p.PeptideIdentification[i].PrevAA = []byte(prevAA)
+				p.PeptideIdentification[i].NextAA = []byte(nextAA)
+
 			}
 
 		}

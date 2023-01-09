@@ -197,7 +197,7 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 
 			if pt != psm[i].Protein {
 
-				psm[i].AlternativeProteins[psm[i].Protein]++
+				psm[i].AlternativeProteins[psm[i].Protein] = string(psm[i].PrevAA) + "#" + string(psm[i].NextAA)
 
 				var toRemove string
 				for j := range psm[i].AlternativeProteins {
@@ -207,7 +207,7 @@ func ProteinInference(psm id.PepIDList) (id.PepIDList, map[string]string, map[st
 					}
 				}
 
-				psm[i].AlternativeProteins[psm[i].Protein]++
+				psm[i].AlternativeProteins[psm[i].Protein] = string(psm[i].PrevAA) + "#" + string(psm[i].NextAA)
 				delete(psm[i].AlternativeProteins, toRemove)
 
 				psm[i].Protein = pt

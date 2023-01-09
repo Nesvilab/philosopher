@@ -1,7 +1,6 @@
 package rep
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -433,16 +432,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		next string
 	}
 
-	var prevAA string
-	var nextAA string
 	var pepPrevNextAA = make(map[string]prevNextAA)
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
-		if evi.PSM[i].Peptide == "SEKPQQEEQEKPQSR" {
-			fmt.Println("")
-		}
+		var prevAA string
+		var nextAA string
 
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
@@ -457,45 +453,30 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			}
 		}
 
+		var adjustStart = 0
+		var adjustEnd = 0
 		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
 
-		if evi.PSM[i].PrevAA != "-" || evi.PSM[i].PrevAA != "" {
+		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
 			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+			adjustStart = +2
 		}
 
-		if evi.PSM[i].NextAA != "-" || evi.PSM[i].NextAA != "" {
+		if evi.PSM[i].PrevAA == "-" && len(evi.PSM[i].PrevAA) == 1 {
+			adjustStart = +1
+		}
+
+		if evi.PSM[i].NextAA != "-" && len(evi.PSM[i].NextAA) == 1 {
 			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+			adjustEnd = -1
 		}
 
 		// map the peptide to the protein
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
 		mend := mstart + len(evi.PSM[i].Peptide)
 
-		if mstart != -1 {
-
-			if mstart == 0 {
-				evi.PSM[i].ProteinStart = mstart + 1
-			} else {
-				evi.PSM[i].ProteinStart = mstart + 2
-			}
-
-			evi.PSM[i].ProteinEnd = mend + 1
-
-		} else {
-
-			// if both ends are not found, it means the PSM - protein pair is product of a
-			// protein promotion case. We ignore the current flanking AAs.
-
-			mstart = strings.Index(replacerIL.Replace(rec.Sequence), replacerIL.Replace(evi.PSM[i].Peptide))
-			mend = mstart + len(evi.PSM[i].Peptide)
-
-			evi.PSM[i].ProteinStart = mstart + 1
-			evi.PSM[i].ProteinEnd = mend
-		}
-
-		if evi.PSM[i].Peptide == "SEKPQQEEQEKPQSR" {
-			fmt.Println("")
-		}
+		evi.PSM[i].ProteinStart = mstart + adjustStart
+		evi.PSM[i].ProteinEnd = mend + adjustEnd
 
 		if evi.PSM[i].PrevAA == "-" {
 			prevAA = ""
