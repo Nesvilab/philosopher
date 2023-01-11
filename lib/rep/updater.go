@@ -427,12 +427,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 	}
 
-	type prevNextAA struct {
-		prev string
-		next string
-	}
-	var pepPrevNextAA = make(map[string]prevNextAA)
-
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
@@ -449,19 +443,30 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 			}
 		}
 
-		peptide := string(evi.PSM[i].PrevAA) + replacerIL.Replace(evi.PSM[i].Peptide) + string(evi.PSM[i].NextAA)
+		var adjustStart = 0
+		var adjustEnd = 0
+		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
+
+		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
+			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+			adjustStart = +2
+		}
+
+		if evi.PSM[i].PrevAA == "-" && len(evi.PSM[i].PrevAA) == 1 {
+			adjustStart = +1
+		}
+
+		if evi.PSM[i].NextAA != "-" && len(evi.PSM[i].NextAA) == 1 {
+			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+			adjustEnd = -1
+		}
 
 		// map the peptide to the protein
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
-		mend := mstart + len(evi.PSM[i].Peptide)
+		mend := mstart + len(peptide)
 
-		if mstart != -1 {
-			evi.PSM[i].ProteinStart = mstart + 2
-			evi.PSM[i].ProteinEnd = mend + 1
-		}
-
-		pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{evi.PSM[i].PrevAA, evi.PSM[i].NextAA}
-
+		evi.PSM[i].ProteinStart = mstart + adjustStart
+		evi.PSM[i].ProteinEnd = mend + adjustEnd
 	}
 
 	for i := range evi.Ions {
@@ -483,9 +488,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Ions[i].MappedGenes[recordMap[k].GeneNames] = struct{}{}
 			}
 		}
-		pnAA := pepPrevNextAA[evi.Ions[i].Sequence]
-		evi.Ions[i].PrevAA = pnAA.prev
-		evi.Ions[i].NextAA = pnAA.next
 	}
 
 	for i := range evi.Peptides {
@@ -506,9 +508,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Peptides[i].MappedGenes[recordMap[k].GeneNames] = struct{}{}
 			}
 		}
-		pnAA := pepPrevNextAA[evi.Peptides[i].Sequence]
-		evi.Peptides[i].PrevAA = pnAA.prev
-		evi.Peptides[i].NextAA = pnAA.next
 	}
 }
 

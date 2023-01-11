@@ -23,12 +23,14 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 	var pepSeqMap = make(map[string]bool) //is this a decoy
 	var pepCSMap = make(map[string][]uint8)
-	var pepInt = make(map[string]float64)
 	var pepProt = make(map[string]string)
-	var spectra = make(map[string][]id.SpectrumType)
 	var mappedGenes = make(map[string][]string)
 	var mappedProts = make(map[string][]string)
+	var pepInt = make(map[string]float64)
 	var bestProb = make(map[string]float64)
+	var prevAA = make(map[string]string)
+	var nextAA = make(map[string]string)
+	var spectra = make(map[string][]id.SpectrumType)
 	var pepMods = make(map[string][]mod.Modification)
 
 	for _, i := range pep {
@@ -42,6 +44,8 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 			pepCSMap[i.Peptide] = append(pepCSMap[i.Peptide], i.AssumedCharge)
 			spectra[i.Peptide] = append(spectra[i.Peptide], i.SpectrumFileName())
 			pepProt[i.Peptide] = i.Protein
+			prevAA[i.Peptide] = i.PrevAA
+			nextAA[i.Peptide] = i.NextAA
 
 			if i.Intensity > pepInt[i.Peptide] {
 				pepInt[i.Peptide] = i.Intensity
@@ -82,6 +86,9 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 		pep.Sequence = k
 
 		pep.Probability = bestProb[k]
+
+		pep.PrevAA = prevAA[k]
+		pep.NextAA = nextAA[k]
 
 		for _, i := range spectra[k] {
 			pep.Spectra[i] = 0
@@ -166,7 +173,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 
 	var headerIndex int
 	for i := range printSet {
-		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.Name) > 0 {
+		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.CustomName) > 0 {
 			headerIndex = i
 			break
 		}

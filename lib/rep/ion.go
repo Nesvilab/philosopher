@@ -53,18 +53,18 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	for idx, i := range ion {
 		pr := &evi.Ions[idx]
 
-		//pr.IonForm() = fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
-
 		pr.Spectra = make(map[id.SpectrumType]int)
 		pr.MappedGenes = make(map[string]struct{})
 		pr.MappedProteins = make(map[string]int)
-		//pr.Modifications.Index = make(map[string]mod.Modification)
-
 		pr.Sequence = i.Peptide
 		pr.ModifiedSequence = i.ModifiedPeptide
 		pr.MZ = uti.Round(((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)), 5, 4)
 		pr.ChargeState = i.AssumedCharge
 		pr.PeptideMass = i.CalcNeutralPepMass
+
+		pr.PrevAA = string(i.PrevAA)
+		pr.NextAA = string(i.NextAA)
+
 		if v, ok := psmIonMap[pr.IonForm()]; ok {
 			for _, j := range v {
 				pr.Spectra[j]++
@@ -92,6 +92,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 			}
 		}
 		pr.Modifications = prModifications.ToSlice()
+
 		// is this bservation a decoy ?
 		if cla.IsDecoyPSM(i, decoyTag) {
 			pr.IsDecoy = true
@@ -146,7 +147,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 
 	var headerIndex int
 	for i := range printSet {
-		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.Name) > 0 {
+		if printSet[i].Labels != nil && len(printSet[i].Labels.Channel1.CustomName) > 0 {
 			headerIndex = i
 			break
 		}
