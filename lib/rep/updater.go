@@ -427,18 +427,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 	}
 
-	// type prevNextAA struct {
-	// 	prev string
-	// 	next string
-	// }
-
-	// var pepPrevNextAA = make(map[string]prevNextAA)
-
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
-
-		//var prevAA string
-		//var nextAA string
 
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
@@ -473,24 +463,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		// map the peptide to the protein
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
-		mend := mstart + len(evi.PSM[i].Peptide)
+		mend := mstart + len(peptide)
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
-
-		// if evi.PSM[i].PrevAA == "-" {
-		// 	prevAA = ""
-		// } else {
-		// 	prevAA = evi.PSM[i].PrevAA
-		// }
-
-		// if evi.PSM[i].NextAA == "-" {
-		// 	nextAA = ""
-		// } else {
-		// 	nextAA = evi.PSM[i].NextAA
-		// }
-
-		//pepPrevNextAA[evi.PSM[i].Peptide] = prevNextAA{prevAA, nextAA}
 	}
 
 	for i := range evi.Ions {
@@ -512,9 +488,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Ions[i].MappedGenes[recordMap[k].GeneNames] = struct{}{}
 			}
 		}
-		// pnAA := pepPrevNextAA[evi.Ions[i].Sequence]
-		// evi.Ions[i].PrevAA = pnAA.prev
-		// evi.Ions[i].NextAA = pnAA.next
 	}
 
 	for i := range evi.Peptides {
@@ -535,9 +508,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 				evi.Peptides[i].MappedGenes[recordMap[k].GeneNames] = struct{}{}
 			}
 		}
-		// pnAA := pepPrevNextAA[evi.Peptides[i].Sequence]
-		// evi.Peptides[i].PrevAA = pnAA.prev
-		// evi.Peptides[i].NextAA = pnAA.next
 	}
 }
 
