@@ -3,13 +3,13 @@
 </p>
 
 [![Release](https://img.shields.io/github/release/nesvilab/philosopher.svg?color=purple&style=for-the-badge)](https://github.com/Nesvilab/philosopher/releases/latest)
-![Golang](https://img.shields.io/badge/Go-1.19.3-blue.svg?style=for-the-badge)
+![Golang](https://img.shields.io/badge/Go-1.19.4-blue.svg?style=for-the-badge)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Nesvilab/philosopher?style=for-the-badge&color=red&logo=appveyor)](https://goreportcard.com/report/github.com/Nesvilab/philosopher)
 ![GitHub](https://img.shields.io/github/license/Nesvilab/philosopher?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Nesvilab/philosopher/go.yml?style=for-the-badge)
 
-#### Philosopher is fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. Philosopher is dependency-free and can analyze both traditional database searches and open searches for post-translational modification (PTM) discovery. 
+#### Philosopher is a fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. Philosopher is dependency-free and can analyze both traditional database searches and open searches for post-translational modification (PTM) discovery. 
 
 - Database downloading and formatting.
 
@@ -36,6 +36,7 @@
 
 - Multi-level detailed reports for peptides, ions, and proteins.
 
+- Support for REPRINT and MSstats.
 
 ## Download
 Download the latest version [here](https://github.com/nesvilab/philosopher/releases/latest).
@@ -61,14 +62,11 @@ If you have any questions or remarks please use the [Discussion board](https://g
 ## How to cite
 da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacheruvu D, Kong AT, Nesvizhskii AI. [Philosopher: a versatile toolkit for shotgun proteomics data analysis](https://doi.org/10.1038/s41592-020-0912-y). Nat Methods. 2020 Sep;17(9):869-870. doi: 10.1038/s41592-020-0912-y. PMID: 32669682; PMCID: PMC7509848.
 
-## About the developers
-[Felipe da Veiga Leprevost](http://prvst.github.io)
+## About the authors, and contributors
+[Felipe da Veiga Leprevost (main author)](http://prvst.github.io)
 
 [Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
 
 [Guo Ci Teo](https://github.com/guoci)
 
 [Alexey Nesvizhskii's research group](http://www.nesvilab.org/)
-
-## License
-GPL 3
