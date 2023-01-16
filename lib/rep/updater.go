@@ -735,7 +735,6 @@ func (evi *Evidence) ApplyRazorAssignment() {
 	for i := range evi.PSM {
 
 		v, ok := razor[evi.PSM[i].Peptide]
-
 		if ok {
 
 			if evi.PSM[i].IsUnique {
@@ -749,12 +748,6 @@ func (evi *Evidence) ApplyRazorAssignment() {
 			} else {
 
 				evi.PSM[i].IsURazor = true
-
-				// if !evi.PSM[i].IsUnique && evi.PSM[i].Protein == v.MappedProtein {
-				// 	evi.PSM[i].IsURazor = false
-				// } else {
-				// 	evi.PSM[i].IsURazor = true
-				// }
 
 				evi.PSM[i].MappedProteins[evi.PSM[i].Protein]++
 				delete(evi.PSM[i].MappedProteins, v.MappedProtein)
@@ -782,14 +775,6 @@ func (evi *Evidence) ApplyRazorAssignment() {
 
 				evi.Ions[i].IsURazor = true
 
-				// if !evi.Ions[i].IsUnique && evi.Ions[i].Protein == v.MappedProtein {
-				// 	evi.Ions[i].IsURazor = false
-				// }
-
-				//if evi.Ions[i].Protein != v.MappedProtein {
-				// evi.Ions[i].IsURazor = true
-				//}
-
 				evi.Ions[i].MappedProteins[evi.Ions[i].Protein]++
 				delete(evi.Ions[i].MappedProteins, v.MappedProtein)
 				evi.Ions[i].Protein = v.MappedProtein
@@ -816,14 +801,6 @@ func (evi *Evidence) ApplyRazorAssignment() {
 
 				evi.Peptides[i].IsURazor = true
 
-				// if !evi.Peptides[i].IsUnique && evi.Peptides[i].Protein == v.MappedProtein {
-				// 	evi.Peptides[i].IsURazor = false
-				// }
-
-				//if evi.Peptides[i].Protein != v.MappedProtein {
-				// evi.Peptides[i].IsURazor = true
-				//}
-
 				evi.Peptides[i].MappedProteins[evi.Peptides[i].Protein]++
 				delete(evi.Peptides[i].MappedProteins, v.MappedProtein)
 				evi.Peptides[i].Protein = v.MappedProtein
@@ -831,5 +808,4 @@ func (evi *Evidence) ApplyRazorAssignment() {
 			}
 		}
 	}
-
 }

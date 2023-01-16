@@ -147,9 +147,6 @@ func Run(f met.Data) met.Data {
 	e.AssemblePeptideReport(pept, f.Filter.Tag)
 	pept = nil
 
-	logrus.Info("Assigning protein identifications to layers")
-	e.UpdateLayerswithDatabase(f.Filter.Tag)
-
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
 		//e.UpdateIonModCount()
@@ -160,6 +157,9 @@ func Run(f met.Data) met.Data {
 	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
 		e.ApplyRazorAssignment()
 	}
+
+	logrus.Info("Assigning protein identifications to layers")
+	e.UpdateLayerswithDatabase(f.Filter.Tag)
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
