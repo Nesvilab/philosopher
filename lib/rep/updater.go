@@ -1,7 +1,6 @@
 package rep
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -773,8 +772,6 @@ func (evi *Evidence) ApplyRazorAssignment() {
 				prevNext := strings.Split(altPrt, "#")
 
 				delete(evi.PSM[i].MappedProteins, v.MappedProtein)
-
-				fmt.Println(v.MappedProtein, prevNext)
 
 				evi.PSM[i].Protein = v.MappedProtein
 
