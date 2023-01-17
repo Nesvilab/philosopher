@@ -56,7 +56,7 @@ func Run(m met.Data) met.Data {
 	var db = New()
 
 	if len(m.Database.ID) == 0 && (len(m.Database.Annot) == 0 || m.Database.Annot == "--contam" || m.Database.Annot == "--prefix") && (len(m.Database.Custom) == 0 || m.Database.Custom == "--contam" || m.Database.Custom == "--prefix") {
-		msg.InputNotFound(errors.New("provide a protein FASTA file or Proteome ID"), "fatal")
+		msg.InputNotFound(errors.New("provide a protein FASTA file or Proteome ID"), "error")
 	}
 
 	if len(m.Database.Annot) > 0 {
@@ -73,7 +73,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	if len(m.Database.ID) < 1 && len(m.Database.Custom) < 1 {
-		msg.InputNotFound(errors.New("you need to provide a taxon ID or a custom FASTA file"), "fatal")
+		msg.InputNotFound(errors.New("you need to provide a taxon ID or a custom FASTA file"), "error")
 	}
 
 	if !m.Database.Crap {
@@ -139,6 +139,11 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 
 		class := Classify(k, decoyTag)
 
+		if strings.Contains(k, "@") {
+			m := "The proteion record [" + k + "] contains an unsupported character: @. Please remove it before running philosopher again"
+			msg.Custom(errors.New(m), "error")
+		}
+
 		if class == "uniprot" {
 
 			db := ProcessUniProtKB(k, v, decoyTag)
@@ -175,7 +180,7 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 			d.Records = append(d.Records, db)
 
 		} else {
-			msg.ParsingFASTA(errors.New(""), "fatal")
+			msg.ParsingFASTA(errors.New(""), "error")
 		}
 	}
 
@@ -241,14 +246,14 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 	// tries to create an output file
 	output, e := os.Create(d.UniProtDB)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create a local database file"), "fatal")
+		msg.WriteFile(errors.New("cannot create a local database file"), "error")
 	}
 	defer output.Close()
 
 	// tries to download data from Uniprot
 	_, e = io.Copy(output, gz)
 	if e != nil {
-		msg.Custom(errors.New("UniProt download failed, please check your connection"), "fatal")
+		msg.Custom(errors.New("UniProt download failed, please check your connection"), "error")
 	}
 
 	d.DownloadedFiles = append(d.DownloadedFiles, d.UniProtDB)
@@ -327,12 +332,12 @@ func (d *Base) Deploy(temp string) {
 
 	param, e1 := Asset("crap-gpmdb.fas")
 	if e1 != nil {
-		msg.WriteFile(e1, "fatal")
+		msg.WriteFile(e1, "error")
 	}
 
 	e2 := ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
 	if e2 != nil {
-		msg.WriteFile(e2, "fatal")
+		msg.WriteFile(e2, "error")
 	}
 
 }
@@ -346,12 +351,12 @@ func GetOrganismID(temp string, uniprotID string) (string, string) {
 
 	param, e1 := Asset("proteomes.csv")
 	if e1 != nil {
-		msg.WriteFile(e1, "fatal")
+		msg.WriteFile(e1, "error")
 	}
 
 	e2 := ioutil.WriteFile(proteomeFile, param, sys.FilePermission())
 	if e2 != nil {
-		msg.WriteFile(e2, "fatal")
+		msg.WriteFile(e2, "error")
 	}
 
 	f, e := os.Open(proteomeFile)
@@ -408,7 +413,7 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 	// create db file
 	file, e := os.Create(workfile)
 	if e != nil {
-		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
+		msg.ReadFile(errors.New("cannot open the database file"), "error")
 	}
 	defer file.Close()
 
@@ -423,7 +428,7 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 		line := i + "\n" + d.TaDeDB[i] + "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteFile(e, "fatal")
+			msg.WriteFile(e, "error")
 		}
 	}
 
@@ -437,12 +442,12 @@ func (d *Base) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		msg.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "error")
 	}
 
 	e = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
 	if e != nil {
-		msg.SerializeFile(e, "fatal")
+		msg.SerializeFile(e, "error")
 	}
 
 }
