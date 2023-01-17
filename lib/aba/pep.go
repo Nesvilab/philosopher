@@ -54,11 +54,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 		// collect interact full file names
 		for _, f := range files {
-			//if strings.Contains(f.Name(), "pep.xml") {
-			//interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-			//absPath, _ := filepath.Abs(interactFile)
-			//xmlFiles = append(xmlFiles, absPath)
-			//}
+
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 

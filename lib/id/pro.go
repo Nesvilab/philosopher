@@ -109,7 +109,7 @@ func (p ProtIDList) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
-// Read ...
+// Read is the mmain function to read prot.xml files
 func (p *ProtXML) Read(f string) {
 
 	var xml spc.ProtXML

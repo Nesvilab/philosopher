@@ -213,13 +213,11 @@ func (p *PepXML) Read(f string) {
 			_, ok := p.Modifications.Index[key]
 			if !ok {
 				m := mod.Modification{
-					Index: key,
-					Type:  mod.Assigned,
-					//MonoIsotopicMass: i.Mass,
+					Index:     key,
+					Type:      mod.Assigned,
 					MassDiff:  uti.ToFixed(i.MassDiff, 4),
 					Variable:  variable,
 					AminoAcid: string(i.AminoAcid),
-					//IsobaricMods: make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -239,15 +237,11 @@ func (p *PepXML) Read(f string) {
 			if !ok {
 
 				m := mod.Modification{
-					Index: key,
-					Type:  mod.Assigned,
-					//MonoIsotopicMass:  i.Mass,
+					Index:     key,
+					Type:      mod.Assigned,
 					MassDiff:  uti.ToFixed(i.MassDiff, 4),
 					Variable:  variable,
 					AminoAcid: fmt.Sprintf("%s-term", i.Terminus),
-					//IsProteinTerminus: string(i.ProteinTerminus),
-					//Terminus:          strings.ToLower(string(i.Terminus)),
-					//IsobaricMods: make(map[string]float64),
 				}
 
 				p.Modifications.Index[key] = m
@@ -438,12 +432,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 				psm.Probability = j.PeptideProphetResult.Probability
 
-				// for _, k := range j.PeptideProphetResult.SearchScoreSummary.Parameter {
-
-				// 	if k.Name == "massd" {
-				// 		//psm.IsoMassD, _ = strconv.Atoi(k.Value)
-				// 	}
-				// }
 			}
 
 			if string(j.Analysis) == "interprophet" {
@@ -475,12 +463,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			} else if string(j.Name) == "deltacn" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.DeltaCN = value
-			} else if string(j.Name) == "deltacnstar" {
-				//value, _ := strconv.ParseFloat(j.Value, 64)
-				//psm.DeltaCNStar = value
-			} else if string(j.Name) == "spscore" {
-				//value, _ := strconv.ParseFloat(j.Value, 64)
-				//psm.SPScore = value
 			} else if string(j.Name) == "sprank" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SPRank = value
@@ -613,27 +595,6 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods m
 		p.Modifications = mod.Modifications{Index: pModificationsIndex}.ToSlice()
 	}
 }
-
-// getMassDeviation calculates the mass deviation for a pepXML file based on the 0 mass difference
-// func getMassDeviation(sq []spc.SpectrumQuery) float64 {
-
-// 	var countZero int
-// 	var massZero float64
-// 	var adjustedMass float64
-
-// 	for _, i := range sq {
-// 		for _, j := range i.SearchResult.SearchHit {
-// 			if math.Abs(j.Massdiff) >= -0.1 && math.Abs(j.Massdiff) <= 0.1 {
-// 				countZero++
-// 				massZero += j.Massdiff
-// 			}
-// 		}
-// 	}
-
-// 	adjustedMass = massZero / float64(countZero)
-
-// 	return adjustedMass
-// }
 
 // PromoteProteinIDs changes the identification in cases where the reference protein is a decoy and
 // the alternative proteins contains target proteins.

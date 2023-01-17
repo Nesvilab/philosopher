@@ -145,7 +145,6 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 	os.Chdir(dir)
 
 	for i := 1; i < len(data); i++ {
-		//source := fmt.Sprintf("%s%s.meta%sdb.bin", data[0], string(filepath.Separator), string(filepath.Separator))
 		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
 
 		// Read all content of src to data
@@ -159,7 +158,6 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 			log.Fatal(e)
 		}
 
-		//meta.Serialize()
 	}
 
 	met.CleanTemp(meta.Temp)
@@ -171,10 +169,6 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 	logrus.Info("Running the Database Search")
-
-	// if meta.Pipeline.Verbose == true {
-	// 	p.DatabaseSearch.MSFragger.ToCmdString()
-	// }
 
 	// reload the meta data
 	meta.Restore(sys.Meta())
@@ -521,9 +515,6 @@ func CombinedProteinList(meta met.Data, p Directives, dir string, data []string)
 
 	if _, err := os.Stat(path.Dir(proBin)); err == nil {
 		os.RemoveAll(path.Dir(proBin))
-		// if e != nil {
-		// 	log.Fatal(e)
-		// }
 	}
 
 	return meta

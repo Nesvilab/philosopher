@@ -87,11 +87,6 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 	}
 	_ = cmd.Wait()
 
-	// if cmd.ProcessState.ExitCode() != 0 {
-	// 	fmt.Println(cmd.Stdout, cmd.Stderr)
-	// 	msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "error")
-	// }
-
 	// collect all resulting files
 	var customOutput []string
 	if params.KeepOld {

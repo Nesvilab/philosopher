@@ -102,6 +102,7 @@ func Run(f met.Data) met.Data {
 	}
 	var pepxml id.PepXML
 	pepxml.Restore()
+
 	// restoring for the modifications
 	e.Mods = pepxml.Modifications
 	e.AssembleSearchParameters(pepxml.SearchParameters)
@@ -149,7 +150,6 @@ func Run(f met.Data) met.Data {
 
 	// evaluate modifications in data set
 	if f.Filter.Mapmods {
-		//e.UpdateIonModCount()
 		e.UpdatePeptideModCount()
 	}
 
@@ -607,9 +607,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 
 			pro.Length = 0
 			pro.PercentCoverage = float32(coverMap[pro.ProteinName])
-			//pro.PctSpectrumIDs = 0.0
-			//pro.GroupProbability = 1.00
-			//pro.Confidence = 1.00
 			pro.HasRazor = true
 
 			if i.Probability > pro.Probability {
@@ -625,9 +622,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 			if !ok {
 				pro.Length = 0
 				pro.PercentCoverage = float32(coverMap[pro.ProteinName])
-				//pro.PctSpectrumIDs = 0.0
-				//pro.GroupProbability = 1.00
-				//pro.Confidence = 1.00
 				pro.HasRazor = false
 
 				if i.Probability > pro.Probability {
@@ -645,7 +639,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 	//var addedIon = make(map[string]uint8)
 	for _, i := range psm {
 
-		//ionForm := fmt.Sprintf("%s#%d#%.4f", i.Peptide, i.AssumedCharge, i.CalcNeutralPepMass)
 		pro := proteinList[i.Protein]
 		razorProtein, ok := razorMap[i.Peptide]
 
@@ -661,8 +654,7 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				Weight:             1,
 				GroupWeight:        0,
 				CalcNeutralPepMass: i.CalcNeutralPepMass,
-				//SharedParentProteins: len(i.AlternativeProteins),
-				Razor: 1,
+				Razor:              1,
 			}
 
 			for j := range i.AlternativeProteins {
@@ -670,17 +662,13 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pro.IndistinguishableProtein = append(pro.IndistinguishableProtein, j)
 			}
 
-			//pep.NumberOfInstances++
-
 			if i.Probability > pep.InitialProbability {
 				pep.InitialProbability = i.Probability
 			}
 
 			if len(i.AlternativeProteins) < 2 {
-				//pep.IsNondegenerateEvidence = true
 				pep.IsUnique = true
 			} else {
-				//pep.IsNondegenerateEvidence = false
 				pep.IsUnique = false
 			}
 
@@ -689,7 +677,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pep.Modifications.Index[k] = v
 			}
 
-			//pro.IndistinguishableProtein = i.AlternativeProteins
 			pro.HasRazor = true
 			pro.PeptideIons = append(pro.PeptideIons, pep)
 
@@ -707,23 +694,16 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				Weight:             0,
 				GroupWeight:        0,
 				CalcNeutralPepMass: i.CalcNeutralPepMass,
-				//SharedParentProteins: len(i.AlternativeProteins),
-				Razor: 0,
+				Razor:              0,
 			}
 
 			if i.Probability > pep.InitialProbability {
 				pep.InitialProbability = i.Probability
 			}
 
-			//pep.PeptideParentProtein = i.AlternativeProteins
-
-			//pep.NumberOfInstances++
-
 			if len(i.AlternativeProteins) < 2 {
-				//pep.IsNondegenerateEvidence = true
 				pep.IsUnique = true
 			} else {
-				//pep.IsNondegenerateEvidence = false
 				pep.IsUnique = false
 			}
 
@@ -732,7 +712,6 @@ func processProteinInferenceIdentifications(psm id.PepIDList, razorMap map[strin
 				pep.Modifications.Index[k] = v
 			}
 
-			//pro.IndistinguishableProtein = i.AlternativeProteins
 			pro.PeptideIons = append(pro.PeptideIons, pep)
 
 			proteinList[i.Protein] = pro
