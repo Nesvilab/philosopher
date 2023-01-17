@@ -96,12 +96,6 @@ func GetLabelNames(annot string) map[string]string {
 		// does the line has at least an iso tag?
 		if len(scanner.Text()) >= 3 {
 
-			// replace tabs and multiple spaces by single space
-			// space := regexp.MustCompile(`\s+`)
-			// line := space.ReplaceAllString(scanner.Text(), " ")
-
-			// names := strings.Split(line, " ")
-
 			names := strings.Fields(scanner.Text())
 			labels[names[0]] = names[1]
 		}
