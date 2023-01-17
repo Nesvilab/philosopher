@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -90,9 +91,17 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 			// decoy by the target but it was removed because in some cases the protein
 			// does not pass the FDR filtering.
 
-			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
+			evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = evi.PSM[i].PrevAA + "#" + evi.PSM[i].NextAA
+
+			// recover prevAA-nextAA
+			altPrt := evi.PSM[i].MappedProteins[rp]
+			prevNext := strings.Split(altPrt, "#")
+
 			delete(evi.PSM[i].MappedProteins, rp)
+
 			evi.PSM[i].Protein = rp
+			evi.PSM[i].PrevAA = prevNext[0]
+			evi.PSM[i].PrevAA = prevNext[1]
 		}
 
 		if !evi.PSM[i].IsURazor {
@@ -106,9 +115,17 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 				// decoy by the target but it was removed because in some cases the protein
 				// does not pass the FDR filtering.
 
-				evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = 0
+				evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = evi.PSM[i].PrevAA + "#" + evi.PSM[i].NextAA
+
+				// recover prevAA-nextAA
+				altPrt := evi.PSM[i].MappedProteins[sp]
+				prevNext := strings.Split(altPrt, "#")
+
 				delete(evi.PSM[i].MappedProteins, sp)
+
 				evi.PSM[i].Protein = sp
+				evi.PSM[i].PrevAA = prevNext[0]
+				evi.PSM[i].PrevAA = prevNext[1]
 
 				if strings.Contains(sp, decoyTag) {
 					evi.PSM[i].IsDecoy = true
@@ -749,9 +766,23 @@ func (evi *Evidence) ApplyRazorAssignment() {
 
 				evi.PSM[i].IsURazor = true
 
-				evi.PSM[i].MappedProteins[evi.PSM[i].Protein]++
+				evi.PSM[i].MappedProteins[evi.PSM[i].Protein] = evi.PSM[i].PrevAA + "#" + evi.PSM[i].NextAA
+
+				// TODO recover prev-next
+				altPrt := evi.PSM[i].MappedProteins[v.MappedProtein]
+				prevNext := strings.Split(altPrt, "#")
+
 				delete(evi.PSM[i].MappedProteins, v.MappedProtein)
+
+				fmt.Println(v.MappedProtein, prevNext)
+
 				evi.PSM[i].Protein = v.MappedProtein
+
+				// to avoid decoys
+				if len(prevNext) > 1 {
+					evi.PSM[i].PrevAA = prevNext[0]
+					evi.PSM[i].NextAA = prevNext[1]
+				}
 
 			}
 		}

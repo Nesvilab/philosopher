@@ -160,7 +160,7 @@ type PSMEvidence struct {
 	MSFraggerLoc                     *id.MSFraggerLoc
 	Labels                           *iso.Labels
 	Modifications                    mod.ModificationsSlice
-	MappedProteins                   map[string]int
+	MappedProteins                   map[string]string
 	MappedGenes                      map[string]struct{}
 }
 

@@ -299,7 +299,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 		list := uti.IOReadDir(xmlFile, "pep.xml")
 
 		if len(list) == 0 {
-			msg.NoParametersFound(errors.New("missing PeptideProphet pepXML files"), "fatal")
+			msg.NoParametersFound(errors.New("missing PeptideProphet pepXML files"), "error")
 		}
 
 		// in case both PeptideProphet and PTMProphet files are present, use
@@ -854,7 +854,7 @@ func (p *PepIDList) Serialize(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
+		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
 	sys.Serialize(p, dest)
 }
@@ -871,7 +871,7 @@ func (p *PepIDListPtrs) Serialize(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
+		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
 	sys.Serialize(p, dest)
 }
@@ -888,7 +888,7 @@ func (p *PepIDList) Restore(level string) {
 	} else if level == "ion" {
 		dest = sys.IonBin()
 	} else {
-		msg.Custom(errors.New("cannot determine binary data class"), "fatal")
+		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
 	sys.Restore(p, dest, false)
 }
