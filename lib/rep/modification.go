@@ -214,7 +214,7 @@ func (evi *Evidence) ModificationReport(workspace string, hasPrefix bool) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("could not create report files"), "error")
+		msg.WriteFile(errors.New("could not create report files"), "fatal")
 	}
 	defer file.Close()
 
@@ -222,7 +222,7 @@ func (evi *Evidence) ModificationReport(workspace string, hasPrefix bool) {
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	for _, i := range evi.Modifications.MassBins {
@@ -236,7 +236,7 @@ func (evi *Evidence) ModificationReport(workspace string, hasPrefix bool) {
 		line += "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 
 	}
@@ -249,7 +249,7 @@ func (evi *Evidence) PlotMassHist() {
 
 	file, e := os.Create(outfile)
 	if e != nil {
-		msg.WriteFile(errors.New("could not create output for delta mass binning"), "fatal")
+		msg.WriteFile(errors.New("could not create output for delta mass binning"), "error")
 	}
 	defer file.Close()
 
@@ -297,7 +297,7 @@ func (evi *Evidence) PlotMassHist() {
 	io.WriteString(file, "</body>")
 
 	if e != nil {
-		msg.Custom(errors.New("there was an error trying to plot the mass distribution"), "fatal")
+		msg.Custom(errors.New("there was an error trying to plot the mass distribution"), "error")
 	}
 
 	// copy to work directory

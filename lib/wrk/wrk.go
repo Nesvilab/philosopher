@@ -27,7 +27,7 @@ func Run(Version, Build, temp string, backup, clean, initialize, nocheck bool) {
 	}
 
 	if (initialize && backup && clean) || (initialize && backup) || (initialize && clean) || (clean && backup) {
-		msg.Custom(errors.New("this command accepts only one parameter"), "fatal")
+		msg.Custom(errors.New("this command accepts only one parameter"), "error")
 	}
 
 	if initialize {
@@ -79,7 +79,7 @@ func Init(version, build, temp string) {
 
 		os.Mkdir(da.MetaDir, sys.FilePermission())
 		if _, e := os.Stat(sys.MetaDir()); os.IsNotExist(e) {
-			msg.CreatingMetaDirectory(e, "fatal")
+			msg.CreatingMetaDirectory(e, "error")
 		}
 
 		if runtime.GOOS == sys.Windows() {
@@ -88,7 +88,7 @@ func Init(version, build, temp string) {
 
 		os.Mkdir(da.Temp, sys.FilePermission())
 		if _, e := os.Stat(da.Temp); os.IsNotExist(e) {
-			msg.LocatingTemDirecotry(e, "fatal")
+			msg.LocatingTemDirecotry(e, "error")
 		}
 
 		da.Serialize()
@@ -107,7 +107,7 @@ func Backup() {
 	}
 
 	if len(m.UUID) < 1 && len(m.Home) < 1 {
-		msg.LocatingMetaDirecotry(errors.New(""), "error")
+		msg.LocatingMetaDirecotry(errors.New(""), "fatal")
 	}
 
 	var name string
@@ -125,7 +125,7 @@ func Backup() {
 
 	e = zip.ArchiveFile(sys.MetaDir(), outFilePath, progress)
 	if e != nil {
-		msg.ArchivingMetaDirecotry(e, "error")
+		msg.ArchivingMetaDirecotry(e, "fatal")
 	}
 
 }

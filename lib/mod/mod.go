@@ -58,12 +58,12 @@ func (m ModificationsSlice) ToMap() Modifications {
 
 // 	b, e := msgpack.Marshal(&m)
 // 	if e != nil {
-// 		msg.MarshalFile(e, "fatal")
+// 		msg.MarshalFile(e, "error")
 // 	}
 
 // 	e = ioutil.WriteFile(sys.EvModificationsBin(), b, sys.FilePermission())
 // 	if e != nil {
-// 		msg.SerializeFile(e, "fatal")
+// 		msg.SerializeFile(e, "error")
 // 	}
 // }
 

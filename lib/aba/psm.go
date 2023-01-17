@@ -43,7 +43,7 @@ func psmLevelAbacus(m met.Data, args []string) {
 
 				file, e := os.Open(annot)
 				if e != nil {
-					msg.ReadFile(errors.New("cannot open annotation file"), "error")
+					msg.ReadFile(errors.New("cannot open annotation file"), "fatal")
 				}
 				defer file.Close()
 
@@ -57,7 +57,7 @@ func psmLevelAbacus(m met.Data, args []string) {
 				}
 
 				if e = scanner.Err(); e != nil {
-					msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
+					msg.Custom(errors.New("the annotation file looks to be empty"), "error")
 				}
 			}
 		}
@@ -122,7 +122,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "error")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -144,7 +144,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 	} else if plex == "18" {
 		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C", "135N")
 	} else {
-		msg.Custom(errors.New("unsupported number of labels"), "fatal")
+		msg.Custom(errors.New("unsupported number of labels"), "error")
 	}
 
 	if hasLabels {
@@ -164,7 +164,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 	header += "\n"
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	for _, i := range evidences {
@@ -267,7 +267,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 	}
 

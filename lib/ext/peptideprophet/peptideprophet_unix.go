@@ -30,6 +30,6 @@ func (p *PeptideProphet) Deploy(distro string) {
 		unix.UnixPeptideProphetParser(p.UnixPeptideProphetParser)
 		p.DefaultPeptideProphetParser = p.UnixPeptideProphetParser
 	} else {
-		msg.UnsupportedDistribution(errors.New(""), "fatal")
+		msg.UnsupportedDistribution(errors.New(""), "error")
 	}
 }

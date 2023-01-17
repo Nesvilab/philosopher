@@ -42,7 +42,7 @@ func Run(m met.Data, args []string) met.Data {
 	m.InterProphet.InputFiles = args
 
 	if len(args) < 1 {
-		msg.NoParametersFound(errors.New("IProphet input files"), "fatal")
+		msg.NoParametersFound(errors.New("IProphet input files"), "error")
 	}
 
 	// deploy the binaries
@@ -90,12 +90,12 @@ func (i InterProphet) Execute(params met.InterProphet, home, temp string, args [
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 	_ = cmd.Wait()
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		msg.ExecutingBinary(errors.New("there was an error with iProphet, please check your parameters and input files"), "fatal")
+		msg.ExecutingBinary(errors.New("there was an error with iProphet, please check your parameters and input files"), "error")
 	}
 
 	// copy to work directory

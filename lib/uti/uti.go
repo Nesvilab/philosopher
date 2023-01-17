@@ -87,7 +87,7 @@ func GetLabelNames(annot string) map[string]string {
 
 	file, e := os.Open(annot)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	defer file.Close()
 
@@ -108,7 +108,7 @@ func GetLabelNames(annot string) map[string]string {
 	}
 
 	if e = scanner.Err(); e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 
 	return labels

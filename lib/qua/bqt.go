@@ -74,18 +74,18 @@ func parseClusterFile(cls, database string) List {
 
 	f, e := os.Open(cls)
 	if e != nil {
-		msg.Custom(errors.New("cannot open cluster file"), "fatal")
+		msg.Custom(errors.New("cannot open cluster file"), "error")
 	}
 	defer f.Close()
 
 	reheader, e1 := regexp.Compile(`^>Cluster\s+(.*)`)
 	if e1 != nil {
-		msg.Custom(errors.New("cannot compile Cluster header regex"), "fatal")
+		msg.Custom(errors.New("cannot compile Cluster header regex"), "error")
 	}
 
 	reseq, e2 := regexp.Compile(`\|(.*)\|.*`)
 	if e2 != nil {
-		msg.Custom(errors.New("cannot compile Cluster description regex"), "fatal")
+		msg.Custom(errors.New("cannot compile Cluster description regex"), "error")
 	}
 
 	scanner := bufio.NewScanner(f)
@@ -98,7 +98,7 @@ func parseClusterFile(cls, database string) List {
 			num := cluster[1]
 			i, e := strconv.Atoi(num)
 			if e != nil {
-				msg.Custom(errors.New("FASTA header not found"), "fatal")
+				msg.Custom(errors.New("FASTA header not found"), "error")
 			}
 			clusterNumber = i
 
@@ -111,7 +111,7 @@ func parseClusterFile(cls, database string) List {
 				centroid := strings.Split(scanner.Text(), "|")
 				//centroid := reseq.FindStringSubmatch(scanner.Text())
 				if len(centroid) < 2 {
-					msg.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "fatal")
+					msg.Custom(errors.New("FASTA file contains non-formatted sequence headers"), "error")
 				}
 				centroidmap[clusterNumber] = centroid[1]
 
@@ -262,28 +262,28 @@ func getFile(getAll bool, resultDir string, organism string) (faMap map[string][
 	// tries to create an output file
 	output, e := os.Create(outfile)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer output.Close()
 
 	// Tries to query data from Uniprot
 	response, e := http.Get(query)
 	if e != nil {
-		msg.Custom(errors.New("could not find the annotation file"), "fatal")
+		msg.Custom(errors.New("could not find the annotation file"), "error")
 	}
 	defer response.Body.Close()
 
 	// Tries to download data from Uniprot
 	_, e = io.Copy(output, response.Body)
 	if e != nil {
-		msg.Custom(errors.New("cannot download the annotation file"), "fatal")
+		msg.Custom(errors.New("cannot download the annotation file"), "error")
 	}
 
 	faMap = make(map[string][]string)
 
 	f, e := os.Open(outfile)
 	if outfile == "" || e != nil {
-		msg.Custom(errors.New("emty or inexisting file"), "fatal")
+		msg.Custom(errors.New("emty or inexisting file"), "error")
 	}
 	defer f.Close()
 
@@ -305,7 +305,7 @@ func savetoDisk(list List, temp, uid string) {
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 
@@ -351,7 +351,7 @@ func savetoDisk(list List, temp, uid string) {
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	var faMap = make(map[string][]string)
@@ -420,7 +420,7 @@ func savetoDisk(list List, temp, uid string) {
 
 			_, e := io.WriteString(file, line)
 			if e != nil {
-				msg.WriteToFile(e, "fatal")
+				msg.WriteToFile(e, "error")
 			}
 		}
 

@@ -39,7 +39,7 @@ func UpdateChecker(v, b string) {
 
 		body, e := ioutil.ReadAll(res.Body)
 		if e != nil {
-			msg.Custom(e, "fatal")
+			msg.Custom(e, "error")
 		}
 
 		var rel Releases

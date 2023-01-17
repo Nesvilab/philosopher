@@ -60,7 +60,7 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 	var sourceList []string
 
 	if p.Brand == "" {
-		msg.NoParametersFound(errors.New("you need to specify a brand type (tmt or itraq)"), "fatal")
+		msg.NoParametersFound(errors.New("you need to specify a brand type (tmt or itraq)"), "error")
 	}
 
 	var evi rep.Evidence
@@ -637,7 +637,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	}
 
 	if remove != 0 && !quantCheckUp {
-		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "fatal")
+		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "error")
 	}
 
 	// 2nd check: best PSM

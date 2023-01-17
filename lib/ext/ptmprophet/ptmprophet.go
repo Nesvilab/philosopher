@@ -83,13 +83,13 @@ func (p *PTMProphet) Execute(params met.PTMProphet, args []string) []string {
 
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 	_ = cmd.Wait()
 
 	// if cmd.ProcessState.ExitCode() != 0 {
 	// 	fmt.Println(cmd.Stdout, cmd.Stderr)
-	// 	msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "fatal")
+	// 	msg.ExecutingBinary(errors.New("there was an error with PTMProphet, please check your parameters and input files"), "error")
 	// }
 
 	// collect all resulting files

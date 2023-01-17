@@ -19,7 +19,7 @@ func ParseFile(filename string) map[string]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		msg.ReadFile(errors.New("cannot open the database file"), "error")
+		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
 	}
 	defer f.Close()
 
@@ -84,7 +84,7 @@ func ParseFastaDescription(filename string) map[string][]string {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
-		msg.ReadFile(errors.New("cannot open FASTA file"), "fatal")
+		msg.ReadFile(errors.New("cannot open FASTA file"), "error")
 	}
 	defer f.Close()
 

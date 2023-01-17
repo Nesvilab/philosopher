@@ -21,6 +21,6 @@ func (p *PTMProphet) Deploy(distro string) {
 		unix.UnixPTMProphetParser(p.UnixPTMProphetParser)
 		p.DefaultPTMProphetParser = p.UnixPTMProphetParser
 	} else {
-		msg.UnsupportedDistribution(errors.New(""), "fatal")
+		msg.UnsupportedDistribution(errors.New(""), "error")
 	}
 }

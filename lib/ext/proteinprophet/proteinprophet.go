@@ -52,7 +52,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pop = New(m.Temp)
 
 	if len(args) < 1 {
-		msg.NoParametersFound(errors.New("missing pep.xml"), "fatal")
+		msg.NoParametersFound(errors.New("missing pep.xml"), "error")
 	}
 
 	// deploy the binaries
@@ -102,12 +102,12 @@ func (p ProteinProphet) Execute(params met.ProteinProphet, home, temp string, ar
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 	_ = cmd.Wait()
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		msg.ExecutingBinary(errors.New("there was an error with ProteinProphet, please check your parameters and input files"), "fatal")
+		msg.ExecutingBinary(errors.New("there was an error with ProteinProphet, please check your parameters and input files"), "error")
 	}
 
 	// copy to work directory

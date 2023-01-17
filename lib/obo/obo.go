@@ -93,7 +93,7 @@ func (m *Onto) Parse() {
 
 	file, e := os.Open(m.OboFile)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	defer file.Close()
 

@@ -213,7 +213,7 @@ func (p *ProtXML) Read(f string) {
 	p.Groups = groups
 
 	if len(groups) == 0 {
-		msg.NoProteinFound(errors.New(""), "fatal")
+		msg.NoProteinFound(errors.New(""), "error")
 	}
 
 }

@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"github.com/vmihailenco/msgpack/v5"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/vmihailenco/msgpack/v5"
 
 	"philosopher/lib/msg"
 )
@@ -28,7 +29,7 @@ func GetHome() string {
 	} else if runtime.GOOS == Linux() {
 		home = os.Getenv("HOME")
 	} else {
-		msg.Custom(errors.New("cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "error")
 	}
 
 	return home
@@ -43,7 +44,7 @@ func GetTemp() string {
 	} else if runtime.GOOS == Linux() {
 		tmp = "/tmp"
 	} else {
-		msg.Custom(errors.New("cannot define your operating system"), "fatal")
+		msg.Custom(errors.New("cannot define your operating system"), "error")
 	}
 
 	return tmp
@@ -53,7 +54,7 @@ func GetTemp() string {
 func VerifyTemp(f string) {
 
 	if _, err := os.Stat(f); os.IsNotExist(err) {
-		msg.Custom(errors.New("cannot find the custom temporary folder"), "fatal")
+		msg.Custom(errors.New("cannot find the custom temporary folder"), "error")
 	}
 
 }
@@ -91,27 +92,27 @@ func CopyFile(from, to string) {
 	// Open original file
 	originalFile, e := os.Open(from)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	defer originalFile.Close()
 
 	// Create new file
 	newFile, e := os.Create(to)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer newFile.Close()
 
 	// Copy the bytes to destination from source
 	_, e = io.Copy(newFile, originalFile)
 	if e != nil {
-		msg.CopyingFile(e, "fatal")
+		msg.CopyingFile(e, "error")
 	}
 
 	// Commit the file contents
 	e = newFile.Sync()
 	if e != nil {
-		msg.Custom(e, "fatal")
+		msg.Custom(e, "error")
 	}
 
 }
@@ -235,7 +236,7 @@ func FilePermission() os.FileMode {
 func Serialize(v interface{}, filename string) {
 	output, e := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, FilePermission())
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 		panic(e)
 	}
 	bo := bufio.NewWriter(output)
@@ -244,12 +245,12 @@ func Serialize(v interface{}, filename string) {
 	err := enc.Encode(&v)
 	errFlush := bo.Flush()
 	if errFlush != nil {
-		msg.MarshalFile(errFlush, "fatal")
+		msg.MarshalFile(errFlush, "error")
 		panic(errFlush)
 	}
 	_ = output.Close()
 	if err != nil {
-		msg.MarshalFile(err, "fatal")
+		msg.MarshalFile(err, "error")
 		panic(err)
 	}
 }
@@ -260,7 +261,7 @@ func Restore(v interface{}, filename string, silent bool) {
 		return
 	}
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 		panic(e)
 	}
 	bi := bufio.NewReader(input)
@@ -272,7 +273,7 @@ func Restore(v interface{}, filename string, silent bool) {
 		panic(errClose)
 	}
 	if err != nil && !silent {
-		msg.DecodeMsgPck(err, "fatal")
+		msg.DecodeMsgPck(err, "error")
 		panic(err)
 	}
 }

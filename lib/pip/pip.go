@@ -83,12 +83,12 @@ func DeployParameterFile(temp string) string {
 
 	param, e := Asset("philosopher.yml")
 	if e != nil {
-		msg.DeployAsset(errors.New("pipeline configuration file"), "fatal")
+		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
 
 	e = ioutil.WriteFile(file, param, sys.FilePermission())
 	if e != nil {
-		msg.DeployAsset(errors.New("pipeline configuration file"), "fatal")
+		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
 
 	return file
@@ -193,7 +193,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 			gobExtC := fmt.Sprintf("*.%s", p.DatabaseSearch.Comet.RawExtension)
 			filesC, e := filepath.Glob(gobExtC)
 			if e != nil {
-				msg.Custom(e, "fatal")
+				msg.Custom(e, "error")
 			}
 
 			if len(filesC) > 0 {
@@ -226,7 +226,7 @@ func DBSearch(meta met.Data, p Directives, dir string, data []string) met.Data {
 			gobExtM := fmt.Sprintf("*.%s", p.DatabaseSearch.MSFragger.Extension)
 			filesM, e := filepath.Glob(gobExtM)
 			if e != nil {
-				msg.Custom(e, "fatal")
+				msg.Custom(e, "error")
 			}
 
 			if len(filesM) > 0 {
@@ -278,7 +278,7 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 				gobExt := fmt.Sprintf("*.%s", p.PeptideProphet.FileExtension)
 				files, e := filepath.Glob(gobExt)
 				if e != nil {
-					msg.Custom(e, "fatal")
+					msg.Custom(e, "error")
 				}
 
 				peptideprophet.Run(meta, files)
@@ -326,7 +326,7 @@ func PeptideProphet(meta met.Data, p Directives, dir string, data []string) met.
 
 			files, e := filepath.Glob(gobExt)
 			if e != nil {
-				msg.Custom(e, "fatal")
+				msg.Custom(e, "error")
 			}
 
 			peptideprophet.Run(meta, files)

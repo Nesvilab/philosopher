@@ -58,7 +58,7 @@ func (p *PepXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	reader := bufio.NewReader(xmlFile)
 	decoder := xml.NewDecoder(reader)
@@ -66,7 +66,7 @@ func (p *PepXML) Parse(f string) {
 
 	var mpa MsmsPipelineAnalysis
 	if e = decoder.Decode(&mpa); e != nil {
-		msg.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "error")
 	}
 	err := xmlFile.Close()
 	if err != nil {
@@ -83,7 +83,7 @@ func (p *ProtXML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	defer xmlFile.Close()
 
@@ -94,7 +94,7 @@ func (p *ProtXML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&ps); e != nil {
-		msg.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "error")
 	}
 
 	p.ProteinSummary = ps

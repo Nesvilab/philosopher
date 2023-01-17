@@ -52,7 +52,7 @@ func Run(m met.Data, args []string) met.Data {
 	var pep = New(m.Temp)
 
 	// if len(m.PeptideProphet.Database) < 1 {
-	// 	msg.Custom(errors.New("You need to provide a protein database"), "fatal")
+	// 	msg.Custom(errors.New("You need to provide a protein database"), "error")
 	// }
 
 	// get the database tag from database command
@@ -165,7 +165,7 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 			cmd.Stderr = os.Stderr
 			e := cmd.Start()
 			if e != nil {
-				msg.ExecutingBinary(e, "fatal")
+				msg.ExecutingBinary(e, "error")
 			}
 			_ = cmd.Wait()
 
@@ -221,18 +221,18 @@ func interactParser(p PeptideProphet, params met.PeptideProphet, home, temp stri
 
 		e := cmd.Start()
 		if e != nil {
-			msg.ExecutingBinary(e, "fatal")
+			msg.ExecutingBinary(e, "error")
 		}
 
 		// out, e := cmd.CombinedOutput()
 		// if e != nil {
-		// 	msg.ExecutingBinary(e, "fatal")
+		// 	msg.ExecutingBinary(e, "error")
 		// }
 
 		_ = cmd.Wait()
 
 		if cmd.ProcessState.ExitCode() != 0 {
-			msg.ExecutingBinary(errors.New("there was an error with PeptideProphet, please check your parameters and input files"), "fatal")
+			msg.ExecutingBinary(errors.New("there was an error with PeptideProphet, please check your parameters and input files"), "error")
 		}
 
 	}
@@ -273,7 +273,7 @@ func refreshParser(p PeptideProphet, file, database, output, temp string) {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 	_ = cmd.Wait()
 }
@@ -447,7 +447,7 @@ func peptideProphet(p PeptideProphet, params met.PeptideProphet, temp, file stri
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 	_ = cmd.Wait()
 

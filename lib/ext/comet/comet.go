@@ -49,7 +49,7 @@ func Run(m met.Data, args []string) met.Data {
 	var cmt = New(m.Temp)
 
 	if len(m.Comet.Param) < 1 || !m.Comet.Print && len(args) < 1 {
-		msg.Comet(errors.New(""), "fatal")
+		msg.Comet(errors.New(""), "error")
 	}
 
 	// deploy the binaries
@@ -69,7 +69,7 @@ func Run(m met.Data, args []string) met.Data {
 	paramAbs, _ := filepath.Abs(m.Comet.Param)
 	binFile, e := ioutil.ReadFile(paramAbs)
 	if e != nil {
-		msg.Custom(e, "fatal")
+		msg.Custom(e, "error")
 	}
 	m.Comet.ParamFile = binFile
 
