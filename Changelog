@@ -2,7 +2,7 @@
 - FASTA header verification for IonQuant
 
 ### Changed
-
+- New version annoucements will happpen for all updates, including minor changes
 
 ### Fixed
 - Fixed an issue that would not udpate PSMs with razor IDs and description
