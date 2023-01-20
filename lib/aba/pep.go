@@ -54,17 +54,13 @@ func peptideLevelAbacus(m met.Data, args []string) {
 
 		// collect interact full file names
 		for _, f := range files {
-			//if strings.Contains(f.Name(), "pep.xml") {
-			//interactFile := fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
-			//absPath, _ := filepath.Abs(interactFile)
-			//xmlFiles = append(xmlFiles, absPath)
-			//}
+
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
 
 				file, e := os.Open(annot)
 				if e != nil {
-					msg.ReadFile(errors.New("cannot open annotation file"), "error")
+					msg.ReadFile(errors.New("cannot open annotation file"), "fatal")
 				}
 				defer file.Close()
 
@@ -78,7 +74,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 				}
 
 				if e = scanner.Err(); e != nil {
-					msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
+					msg.Custom(errors.New("the annotation file looks to be empty"), "error")
 				}
 			}
 
@@ -117,7 +113,7 @@ func processPeptideCombinedFile(a met.Abacus) {
 
 	if _, e := os.Stat("combined.pep.xml"); os.IsNotExist(e) {
 
-		msg.NoParametersFound(errors.New("cannot find the combined.pep.xml file"), "fatal")
+		msg.NoParametersFound(errors.New("cannot find the combined.pep.xml file"), "error")
 
 	} else {
 
@@ -272,7 +268,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "error")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -286,7 +282,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	line += "\n"
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	// organize by group number
@@ -328,7 +324,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		line += "\n"
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 
 	}

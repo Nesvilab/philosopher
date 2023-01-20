@@ -29,6 +29,6 @@ func (p *ProteinProphet) Deploy(distro string) {
 		unix.UnixProteinProphet(p.UnixProteinProphet)
 		p.DefaultProteinProphet = p.UnixProteinProphet
 	} else {
-		msg.UnsupportedDistribution(errors.New(""), "fatal")
+		msg.UnsupportedDistribution(errors.New(""), "error")
 	}
 }

@@ -112,13 +112,6 @@ func TestAminoAcids(t *testing.T) {
 
 }
 
-// func TestProtonMass(t *testing.T) {
-// 	p := Proton
-// 	if p != float64(1.007276) {
-// 		t.Errorf("Proton mass is incorrect, got %f, want %f", p, 1.007276)
-// 	}
-// }
-
 func TestEnzymes(t *testing.T) {
 
 	tes.SetupTestEnv()

@@ -100,7 +100,7 @@ func (p *IndexedMzML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 	defer xmlFile.Close()
 	b, _ := ioutil.ReadAll(xmlFile)
@@ -112,7 +112,7 @@ func (p *IndexedMzML) Parse(f string) {
 	decoder.CharsetReader = charset.NewReader
 
 	if e = decoder.Decode(&mzml); e != nil {
-		msg.DecodeMsgPck(e, "fatal")
+		msg.DecodeMsgPck(e, "error")
 	}
 
 	p.MzML = mzml.MzML
@@ -125,7 +125,7 @@ func (p *MzIdentML) Parse(f string) {
 
 	xmlFile, e := os.Open(f)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 
 	defer xmlFile.Close()
@@ -148,7 +148,7 @@ func (p *MzIdentML) Write() {
 
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 

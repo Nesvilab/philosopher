@@ -22,6 +22,6 @@ func (i *InterProphet) Deploy(distro string) {
 		unix.UnixInterProphetParser(i.UnixInterProphetParser)
 		i.DefaultInterProphetParser = i.UnixInterProphetParser
 	} else {
-		msg.UnsupportedDistribution(errors.New(""), "fatal")
+		msg.UnsupportedDistribution(errors.New(""), "error")
 	}
 }

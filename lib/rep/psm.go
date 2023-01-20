@@ -72,7 +72,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.IonMobility = i.IonMobility
 		p.CompensationVoltage = i.CompensationVoltage
 		p.MappedGenes = make(map[string]struct{})
-		p.MappedProteins = make(map[string]int)
+		p.MappedProteins = make(map[string]string)
 		p.Modifications = i.Modifications
 		p.MSFraggerLoc = i.MSFragerLoc
 		if i.UncalibratedPrecursorNeutralMass > 0 {
@@ -88,9 +88,9 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			p.ModifiedPeptide = ""
 		}
 
-		for j := range i.AlternativeProteins {
+		for j, k := range i.AlternativeProteins {
 			if !strings.Contains(j, decoyTag) {
-				p.MappedProteins[j]++
+				p.MappedProteins[j] = k
 			}
 		}
 
@@ -159,7 +159,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create report file, "+e.Error()), "fatal")
+		msg.WriteFile(errors.New("cannot create report file, "+e.Error()), "error")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -424,7 +424,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 	_, e = io.WriteString(bw, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "error")
 	}
 
 	for _, i := range printSet {
@@ -726,7 +726,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 		_, e = io.WriteString(bw, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 	}
 }
@@ -739,13 +739,13 @@ func (evi *Evidence) PSMLocalizationReport(workspace, decoyTag string, hasRazor,
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 
 	_, e = io.WriteString(file, "Spectrum\tPeptide\tModified Peptide\tCharge\tRetention\tModification\tNumber of Sites\tObserved Mass Localization\n")
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	// building the printing set tat may or not contain decoys
@@ -774,7 +774,7 @@ func (evi *Evidence) PSMLocalizationReport(workspace, decoyTag string, hasRazor,
 				)
 				_, e = io.WriteString(file, line)
 				if e != nil {
-					msg.WriteToFile(e, "fatal")
+					msg.WriteToFile(e, "error")
 				}
 			}
 		}

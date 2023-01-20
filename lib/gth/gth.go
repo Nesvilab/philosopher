@@ -39,7 +39,7 @@ func UpdateChecker(v, b string) {
 
 		body, e := ioutil.ReadAll(res.Body)
 		if e != nil {
-			msg.Custom(e, "fatal")
+			msg.Custom(e, "error")
 		}
 
 		var rel Releases
@@ -50,23 +50,16 @@ func UpdateChecker(v, b string) {
 
 		} else {
 
-			local := strings.Split(v, ".")
-			local[0] = strings.Replace(local[0], "v", "", 1)
+			local := strings.Replace(v, ".", "", -1)
+			local = strings.Replace(local, "v", "", 1)
 
-			remote := strings.Split(rel[0].TagName, ".")
-			remote[0] = strings.Replace(remote[0], "v", "", 1)
+			remote := strings.Replace(rel[0].TagName, ".", "", -1)
+			remote = strings.Replace(remote, "v", "", 1)
 
-			outdatedMajorVersion := remote[0] > local[0]
-			//outdatedMinorVersion := (remote[0] == local[0]) && (remote[1] > local[1])
-			//outdated := outdatedMajorVersion || outdatedMinorVersion
-
-			outdated := outdatedMajorVersion
-
-			if outdated {
+			if remote > local {
 				logrus.Warning("There is a new version of Philosopher available for download: https://github.com/Nesvilab/philosopher/releases")
 			}
 
 		}
 	}
-
 }

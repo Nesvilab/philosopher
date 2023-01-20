@@ -42,7 +42,7 @@ func Run(m met.Data, args []string) met.Data {
 		paramAbs, _ := filepath.Abs(m.MSFragger.Param)
 		binFile, e := ioutil.ReadFile(paramAbs)
 		if e != nil {
-			msg.ReadFile(e, "fatal")
+			msg.ReadFile(e, "error")
 		}
 		m.MSFragger.ParamFile = binFile
 	}
@@ -71,7 +71,7 @@ func (c *MSFragger) Execute(params met.MSFragger, cmdArgs []string) {
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 
 	_ = cmd.Wait()
@@ -100,7 +100,7 @@ func (c *MSFragger) ExecutewithParameter(params met.MSFragger, cmdArgs []string)
 	cmd.Stderr = os.Stderr
 	e := cmd.Start()
 	if e != nil {
-		msg.ExecutingBinary(e, "fatal")
+		msg.ExecutingBinary(e, "error")
 	}
 
 	_ = cmd.Wait()

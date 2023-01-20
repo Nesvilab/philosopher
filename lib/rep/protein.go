@@ -174,7 +174,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	dtb.Restore()
 
 	if len(dtb.Records) < 1 {
-		msg.DatabaseNotFound(errors.New(""), "fatal")
+		msg.DatabaseNotFound(errors.New(""), "error")
 	}
 
 	// fix the name sand headers and pull database information into protein report
@@ -257,7 +257,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create protein report"), "error")
+		msg.WriteFile(errors.New("cannot create protein report"), "fatal")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -427,7 +427,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 
 	_, e = io.WriteString(bw, header)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	for _, i := range printSet {
@@ -664,7 +664,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 
 		_, e = io.WriteString(bw, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 
 	}
@@ -678,7 +678,7 @@ func (eviProteins ProteinEvidenceList) ProteinFastaReport(workspace string, hasD
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -699,7 +699,7 @@ func (eviProteins ProteinEvidenceList) ProteinFastaReport(workspace string, hasD
 		line := ">" + header + "\n" + i.Sequence + "\n"
 		_, e = io.WriteString(bw, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 	}
 }

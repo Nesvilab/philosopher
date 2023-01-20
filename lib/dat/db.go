@@ -282,7 +282,7 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	if strings.Contains(k, "GN=") && (strings.Contains(k, "PE=") || strings.Contains(k, "SV=")) {
 
 		if len(orn) < 2 {
-			msg.ParsingFASTA(errors.New(""), "fatal")
+			msg.ParsingFASTA(errors.New(""), "error")
 		}
 
 		gnReg := regexp.MustCompile(`GN=(.+?)(\s.+)`)

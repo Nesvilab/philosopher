@@ -1,4 +1,8 @@
+### Added
+- FASTA header verification for IonQuant
+
+### Changed
+- New version annoucements will happpen for all updates, including minor changes
+
 ### Fixed
-- Fixed the protein coverage calculations with partially overlapping and subsumed peptides
-- Fixed an issue where peptides would map to multiple locations in the protein after having I/L converted (Needs to be used with MSFragger v3.6.1 or higher)
-- Fixed an issue with report tables having no isobaric labels being reported
+- Fixed an issue that would not udpate PSMs with razor IDs and description

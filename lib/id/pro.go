@@ -109,7 +109,7 @@ func (p ProtIDList) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
-// Read ...
+// Read is the mmain function to read prot.xml files
 func (p *ProtXML) Read(f string) {
 
 	var xml spc.ProtXML
@@ -213,7 +213,7 @@ func (p *ProtXML) Read(f string) {
 	p.Groups = groups
 
 	if len(groups) == 0 {
-		msg.NoProteinFound(errors.New(""), "fatal")
+		msg.NoProteinFound(errors.New(""), "error")
 	}
 
 }

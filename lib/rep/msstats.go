@@ -32,7 +32,7 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create MSstats report"), "error")
+		msg.WriteFile(errors.New("cannot create MSstats report"), "fatal")
 	}
 	defer file.Close()
 
@@ -82,7 +82,7 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "error")
 	}
 
 	for _, i := range printSet {
@@ -252,7 +252,7 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 		_, e = io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("cannot write to MSstats report"), "fatal")
+			msg.WriteToFile(errors.New("cannot write to MSstats report"), "error")
 		}
 	}
 }

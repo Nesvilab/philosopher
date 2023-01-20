@@ -147,7 +147,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("peptide output file"), "fatal")
+		msg.WriteFile(errors.New("peptide output file"), "error")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -319,7 +319,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 	//_, e = io.WriteString(file, header)
 	_, e = io.WriteString(bw, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("cannot print PSM to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print PSM to file"), "error")
 	}
 
 	for _, i := range printSet {
@@ -516,7 +516,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 
 		_, e = io.WriteString(bw, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("cannot print Peptides to file"), "fatal")
+			msg.WriteToFile(errors.New("cannot print Peptides to file"), "error")
 		}
 	}
 }

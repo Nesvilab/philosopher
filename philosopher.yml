@@ -57,7 +57,7 @@ Database Search:                                 # MSFragger-3.5 & Comet v201901
     calibrate_mass: 2                            # 0=Off, 1=On, 2=On and find optimal parameters
     use_all_mods_in_first_search: 0              # use all variable modifications in first search (0 for No, 1 for Yes).
     write_calibrated_mgf: 0                      # write calibrated MS2 scan to a MGF file (0 for No, 1 for Yes)
-    isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 error)
+    isotope_error: 0/1/2                         # 0=off, 0/1/2 (standard C13 "error")
     mass_offsets: 0                              # allow for additional precursor mass window shifts. Multiplexed with isotope_error. mass_offsets = 0/79.966 can be used as a restricted ‘open’ search that looks for unmodified and phosphorylated peptides (on any residue)
     restrict_deltamass_to: all                   # specify amino acids on which delta masses (mass offsets or search modifications) can occur. Allowed values are single letter codes (e.g. ACD), must
     precursor_mass_mode: selected                # one of isolated/selected/corrected.

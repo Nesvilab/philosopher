@@ -118,7 +118,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 	file, e := os.Create(output)
 	bw := bufio.NewWriter(file)
 	if e != nil {
-		msg.WriteFile(errors.New("peptide ion output file"), "fatal")
+		msg.WriteFile(errors.New("peptide ion output file"), "error")
 	}
 	defer file.Close()
 	defer bw.Flush()
@@ -292,7 +292,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 
 	_, e = io.WriteString(bw, header)
 	if e != nil {
-		msg.WriteToFile(errors.New("cannot print Ion to file"), "fatal")
+		msg.WriteToFile(errors.New("cannot print Ion to file"), "error")
 	}
 
 	for _, i := range printSet {
@@ -487,7 +487,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 
 		_, e = io.WriteString(bw, line)
 		if e != nil {
-			msg.WriteToFile(errors.New("cannot print Ions to file"), "fatal")
+			msg.WriteToFile(errors.New("cannot print Ions to file"), "error")
 		}
 	}
 

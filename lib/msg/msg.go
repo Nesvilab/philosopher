@@ -312,9 +312,9 @@ func callLogrus(m, t string) {
 		logrus.Info(m)
 	case "warning":
 		logrus.Warning(m)
-	case "error":
-		logrus.Error(m)
 	case "fatal":
+		logrus.Error(m)
+	case "error":
 		logrus.Error(m)
 		panic(m)
 	default:

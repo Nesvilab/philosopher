@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 package wrk
@@ -16,7 +17,7 @@ func HideFile(filename string) {
 	if !strings.HasPrefix(filepath.Base(filename), ".") {
 		e := os.Rename(filename, "."+filename)
 		if e != nil {
-			msg.Custom(errors.New("cannot hide file"), "error")
+			msg.Custom(errors.New("cannot hide file"), "fatal")
 		}
 	}
 }

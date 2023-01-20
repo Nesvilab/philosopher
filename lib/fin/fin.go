@@ -203,7 +203,7 @@ type RunHeader struct {
 	Unknown34         uint32
 }
 
-//SampleInfo contains some other info
+// SampleInfo contains some other info
 type SampleInfo struct {
 	Unknown1        uint32
 	Unknown2        uint32
@@ -307,7 +307,7 @@ type ScanDataPacket struct {
 	Triplets       []float32
 }
 
-//PeakDescriptor is a struct containing more info about the peaks
+// PeakDescriptor is a struct containing more info about the peaks
 type PeakDescriptor struct {
 	Index  uint16
 	Flags  uint8
@@ -511,7 +511,7 @@ func (rd *RawData) ProcessRaw(f string) {
 
 	file, e := os.Open(f)
 	if e != nil {
-		msg.ReadFile(e, "fatal")
+		msg.ReadFile(e, "error")
 	}
 
 	// Read headers for file version and RunHeader addresses.
@@ -766,7 +766,7 @@ func (data *RunHeader) Retrieve(rs io.ReadSeeker, info RawFileInfo, ver Version)
 	}
 
 	if data.ScantrailerAddr == 0 {
-		msg.Custom(errors.New(""), "fatal")
+		msg.Custom(errors.New(""), "error")
 	}
 
 }
@@ -776,7 +776,7 @@ func (data *InstID) Retrieve(rs io.ReadSeeker, pos uint64, ver Version) {
 	data.Address = readAt(rs, pos, ver, data)
 }
 
-//// Readers
+// // Readers
 func (data *RunHeader) Read(r io.Reader, v Version) {
 
 	binaryread(r, &data.SampleInfo)
@@ -1238,14 +1238,14 @@ func readAt(rs io.ReadSeeker, pos uint64, v Version, data reader) uint64 {
 
 	_, e1 := rs.Seek(int64(pos), 0)
 	if e1 != nil {
-		msg.Custom(errors.New("error seeking file"), "fatal")
+		msg.Custom(errors.New("error seeking file"), "error")
 	}
 
 	data.Read(rs, v)
 
 	spos, e2 := rs.Seek(0, 1)
 	if e2 != nil {
-		msg.Custom(errors.New("error determining position in file"), "fatal")
+		msg.Custom(errors.New("error determining position in file"), "error")
 	}
 
 	return uint64(spos)
@@ -1257,7 +1257,7 @@ func readBetween(rs io.ReadSeeker, begin uint64, end uint64, v Version, data rea
 
 	_, e := rs.Seek(int64(begin), 0)
 	if e != nil {
-		msg.Custom(errors.New("error seeking file"), "fatal")
+		msg.Custom(errors.New("error seeking file"), "error")
 	}
 
 	// may fail because of memory requirements

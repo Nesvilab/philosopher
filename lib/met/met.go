@@ -480,7 +480,7 @@ func CleanTemp(dir string) {
 
 	e := os.RemoveAll(dir)
 	if e != nil {
-		msg.Custom(e, "error")
+		msg.Custom(e, "fatal")
 	}
 }
 
@@ -489,12 +489,12 @@ func (d *Data) Serialize() {
 
 	b, e := msgpack.Marshal(&d)
 	if e != nil {
-		msg.MarshalFile(e, "fatal")
+		msg.MarshalFile(e, "error")
 	}
 
 	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
-		msg.WriteFile(e, "fatal")
+		msg.WriteFile(e, "error")
 	}
 
 }
@@ -524,7 +524,7 @@ func (d *Data) Restore(f string) {
 func (d Data) FunctionInitCheckUp() {
 
 	if len(d.UUID) < 1 && len(d.Home) < 1 {
-		msg.WorkspaceNotFound(errors.New("failed to checkup the initialization"), "fatal")
+		msg.WorkspaceNotFound(errors.New("failed to checkup the initialization"), "error")
 	}
 
 	if _, e := os.Stat(d.Temp); os.IsNotExist(e) && len(d.UUID) > 0 {

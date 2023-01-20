@@ -125,7 +125,7 @@ func (p *MsData) ReadRaw(fileName, f string) {
 
 			siVal1, e := strconv.ParseFloat(parts[5], 64)
 			if e != nil {
-				msg.CastFloatToString(e, "fatal")
+				msg.CastFloatToString(e, "error")
 			} else {
 				spec.Precursor.SelectedIon = siVal1
 				spec.Precursor.TargetIon = siVal1
@@ -133,7 +133,7 @@ func (p *MsData) ReadRaw(fileName, f string) {
 
 			siVal2, e := strconv.ParseFloat(parts[6], 64)
 			if e != nil {
-				msg.CastFloatToString(e, "fatal")
+				msg.CastFloatToString(e, "error")
 			} else {
 				//spec.Precursor.SelectedIonIntensity = siVal2
 				spec.Precursor.TargetIonIntensity = siVal2
@@ -181,7 +181,7 @@ func (p *MsData) ReadRaw(fileName, f string) {
 	}
 
 	if len(spectra) == 0 {
-		msg.NoSpectraFound(errors.New(""), "fatal")
+		msg.NoSpectraFound(errors.New(""), "error")
 	}
 
 	p.Spectra = spectra
@@ -213,7 +213,7 @@ func (p *MsData) Read(f string) {
 	}
 
 	if len(spectra) == 0 {
-		msg.NoSpectraFound(errors.New(""), "fatal")
+		msg.NoSpectraFound(errors.New(""), "error")
 	}
 
 	p.Spectra = spectra
@@ -245,7 +245,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 		if string(j.Accession) == "MS:1000016" {
 			val, e := strconv.ParseFloat(j.Value, 64)
 			if e != nil {
-				msg.CastFloatToString(e, "error")
+				msg.CastFloatToString(e, "fatal")
 			}
 			spec.ScanStartTime = val
 		}
@@ -270,7 +270,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000827" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.TargetIon = val
 			}
@@ -278,7 +278,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000828" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.IsolationWindowLowerOffset = val
 			}
@@ -286,7 +286,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000829" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.IsolationWindowUpperOffset = val
 			}
@@ -297,7 +297,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000744" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.SelectedIon = val
 			}
@@ -305,7 +305,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000041" {
 				val, e := strconv.Atoi(j.Value)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.ChargeState = val
 			}
@@ -313,7 +313,7 @@ func processSpectrum(mzSpec psi.Spectrum) Spectrum {
 			if string(j.Accession) == "MS:1000042" {
 				val, e := strconv.ParseFloat(j.Value, 64)
 				if e != nil {
-					msg.CastFloatToString(e, "fatal")
+					msg.CastFloatToString(e, "error")
 				}
 				spec.Precursor.SelectedIonIntensity = val
 			}
@@ -401,7 +401,7 @@ func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 	if isCompressed == "1" {
 		r, e := zlib.NewReader(b64)
 		if e != nil {
-			msg.ReadingMzMLZlib(e, "error")
+			msg.ReadingMzMLZlib(e, "fatal")
 			var emptyArray []float64
 			emptyArray = append(emptyArray, 0.0)
 			return emptyArray

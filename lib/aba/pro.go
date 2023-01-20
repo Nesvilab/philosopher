@@ -60,7 +60,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 
 				file, e := os.Open(annot)
 				if e != nil {
-					msg.ReadFile(errors.New("cannot open annotation file"), "error")
+					msg.ReadFile(errors.New("cannot open annotation file"), "fatal")
 				}
 				defer file.Close()
 
@@ -74,7 +74,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 				}
 
 				if e = scanner.Err(); e != nil {
-					msg.Custom(errors.New("the annotation file looks to be empty"), "fatal")
+					msg.Custom(errors.New("the annotation file looks to be empty"), "error")
 				}
 			}
 		}
@@ -157,7 +157,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 
 	if _, e := os.Stat("combined.prot.xml"); os.IsNotExist(e) {
 
-		msg.Custom(errors.New("cannot find combined.prot.xml file"), "fatal")
+		msg.Custom(errors.New("cannot find combined.prot.xml file"), "error")
 
 	} else {
 
@@ -409,7 +409,7 @@ func saveProteinAbacusResult(session, plex string, evidences rep.CombinedProtein
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(e, "error")
+		msg.WriteFile(e, "fatal")
 	}
 	defer file.Close()
 
@@ -464,7 +464,7 @@ func saveProteinAbacusResult(session, plex string, evidences rep.CombinedProtein
 	} else if plex == "18" {
 		chs = append(chs, "126", "127N", "127C", "128N", "128C", "129N", "129C", "130N", "130C", "131N", "131C", "132N", "132C", "133N", "133C", "134N", "134C", "135N")
 	} else {
-		msg.Custom(errors.New("unsupported number of labels"), "fatal")
+		msg.Custom(errors.New("unsupported number of labels"), "error")
 	}
 
 	if hasLabels {
@@ -486,7 +486,7 @@ func saveProteinAbacusResult(session, plex string, evidences rep.CombinedProtein
 	header += "\n"
 	_, e = io.WriteString(file, header)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	for _, i := range evidences {
@@ -631,7 +631,7 @@ func saveProteinAbacusResult(session, plex string, evidences rep.CombinedProtein
 			line += "\n"
 			_, e := io.WriteString(file, line)
 			if e != nil {
-				msg.WriteToFile(e, "fatal")
+				msg.WriteToFile(e, "error")
 			}
 
 		}
@@ -651,7 +651,7 @@ func saveReprintSpCResults(session, plex string, evidences rep.CombinedProteinEv
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create reprint SpC report"), "error")
+		msg.WriteFile(errors.New("cannot create reprint SpC report"), "fatal")
 	}
 	defer file.Close()
 
@@ -672,7 +672,7 @@ func saveReprintSpCResults(session, plex string, evidences rep.CombinedProteinEv
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	// organize by group number
@@ -691,7 +691,7 @@ func saveReprintSpCResults(session, plex string, evidences rep.CombinedProteinEv
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 
 	}
@@ -710,7 +710,7 @@ func saveReprintIntResults(session, plex string, evidences rep.CombinedProteinEv
 	// create result file
 	file, e := os.Create(output)
 	if e != nil {
-		msg.WriteFile(errors.New("cannot create reprint Int. report"), "error")
+		msg.WriteFile(errors.New("cannot create reprint Int. report"), "fatal")
 	}
 	defer file.Close()
 
@@ -731,7 +731,7 @@ func saveReprintIntResults(session, plex string, evidences rep.CombinedProteinEv
 
 	_, e = io.WriteString(file, line)
 	if e != nil {
-		msg.WriteToFile(e, "fatal")
+		msg.WriteToFile(e, "error")
 	}
 
 	// organize by group number
@@ -750,7 +750,7 @@ func saveReprintIntResults(session, plex string, evidences rep.CombinedProteinEv
 		line += "\n"
 		_, e := io.WriteString(file, line)
 		if e != nil {
-			msg.WriteToFile(e, "fatal")
+			msg.WriteToFile(e, "error")
 		}
 
 	}
