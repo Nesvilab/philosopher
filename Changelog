@@ -2,7 +2,7 @@
 - Added the protein start and end positions to ions and peptides report.
 
 ### Changed
-
+- Rolledback the FASTA header checking for IonQuant.
 
 ### Fixed
 - updated razor mapping rules to reinforce the decoy tagging of razor proteins.
