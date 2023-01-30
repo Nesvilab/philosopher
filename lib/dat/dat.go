@@ -139,10 +139,10 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 
 		class := Classify(k, decoyTag)
 
-		if strings.Contains(k, "@") {
-			m := "The proteion record [" + k + "] contains an unsupported character: @. Please remove it before running philosopher again"
-			msg.Custom(errors.New(m), "error")
-		}
+		// if strings.Contains(k, "@") {
+		// 	m := "The proteion record [" + k + "] contains an unsupported character: @. Please remove it before running philosopher again"
+		// 	msg.Custom(errors.New(m), "error")
+		// }
 
 		if class == "uniprot" {
 
