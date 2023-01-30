@@ -155,7 +155,7 @@ func Run(f met.Data) met.Data {
 
 	// Apply the razor assignment to all data
 	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
-		e.ApplyRazorAssignment()
+		e.ApplyRazorAssignment(f.Filter.Tag)
 	}
 
 	logrus.Info("Assigning protein identifications to layers")

@@ -743,7 +743,7 @@ func (evi *Evidence) CalculateProteinCoverage() {
 }
 
 // ApplyRazorAssignment propagates the razor assignment to the data
-func (evi *Evidence) ApplyRazorAssignment() {
+func (evi *Evidence) ApplyRazorAssignment(decoyTag string) {
 
 	var razor raz.RazorMap = make(map[string]raz.RazorCandidate)
 	razor.Restore(false)
@@ -783,6 +783,10 @@ func (evi *Evidence) ApplyRazorAssignment() {
 
 			}
 		}
+
+		if strings.HasPrefix(evi.PSM[i].Protein, decoyTag) {
+			evi.PSM[i].IsDecoy = true
+		}
 	}
 
 	for i := range evi.Ions {
@@ -809,6 +813,10 @@ func (evi *Evidence) ApplyRazorAssignment() {
 
 			}
 		}
+
+		if strings.HasPrefix(evi.Ions[i].Protein, decoyTag) {
+			evi.Ions[i].IsDecoy = true
+		}
 	}
 
 	for i := range evi.Peptides {
@@ -834,6 +842,10 @@ func (evi *Evidence) ApplyRazorAssignment() {
 				evi.Peptides[i].Protein = v.MappedProtein
 
 			}
+		}
+
+		if strings.HasPrefix(evi.Peptides[i].Protein, decoyTag) {
+			evi.Peptides[i].IsDecoy = true
 		}
 	}
 }
