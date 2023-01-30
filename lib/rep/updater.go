@@ -443,6 +443,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 	}
 
+	var proteinStart = make(map[string]int)
+	var proteinEnd = make(map[string]int)
+
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
@@ -483,6 +486,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
+
+		proteinStart[evi.PSM[i].Peptide] = evi.PSM[i].ProteinStart
+		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
 	}
 
 	for i := range evi.Ions {
@@ -498,6 +504,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		evi.Ions[i].GeneName = rec.GeneNames
 		evi.Ions[i].ProteinDescription = rec.Description
 
+		evi.Ions[i].ProteinStart = proteinStart[evi.Ions[i].Sequence]
+		evi.Ions[i].ProteinEnd = proteinEnd[evi.Ions[i].Sequence]
+
 		// update mapped genes
 		for k := range evi.Ions[i].MappedProteins {
 			if !strings.Contains(k, decoyTag) {
@@ -512,11 +521,15 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		if evi.Peptides[i].IsDecoy {
 			id = strings.Replace(id, decoyTag, "", 1)
 		}
+
 		rec := recordMap[id]
 		evi.Peptides[i].ProteinID = rec.ID
 		evi.Peptides[i].EntryName = rec.EntryName
 		evi.Peptides[i].GeneName = rec.GeneNames
 		evi.Peptides[i].ProteinDescription = rec.Description
+
+		evi.Peptides[i].ProteinStart = proteinStart[evi.Peptides[i].Sequence]
+		evi.Peptides[i].ProteinEnd = proteinEnd[evi.Peptides[i].Sequence]
 
 		// update mapped genes
 		for k := range evi.Peptides[i].MappedProteins {

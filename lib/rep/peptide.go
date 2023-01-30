@@ -171,7 +171,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 		}
 	}
 
-	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -360,11 +360,13 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			string(i.PrevAA),
 			string(i.NextAA),
 			len(i.Sequence),
+			i.ProteinStart,
+			i.ProteinEnd,
 			strings.Join(cs, ", "),
 			i.Probability,
 			i.Spc,

@@ -1,6 +1,8 @@
 ### Added
+- Added the protein start and end positions to ions and peptides report.
 
 ### Changed
+
 
 ### Fixed
 - updated razor mapping rules to reinforce the decoy tagging of razor proteins.
