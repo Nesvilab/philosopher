@@ -59,9 +59,11 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 				mappedGenes[i.Peptide] = append(mappedGenes[i.Peptide], j)
 			}
 
-			for _, j := range i.Modifications.IndexSlice {
-				pepMods[i.Peptide] = append(pepMods[i.Peptide], j)
-			}
+			pepMods[i.Peptide] = append(pepMods[i.Peptide], i.Modifications.IndexSlice...)
+
+			// for _, j := range i.Modifications.IndexSlice {
+			// 	pepMods[i.Peptide] = append(pepMods[i.Peptide], j)
+			// }
 
 		}
 

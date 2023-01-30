@@ -208,6 +208,8 @@ type IonEvidence struct {
 	NextAA                   string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
+	ProteinStart             int
+	ProteinEnd               int
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -226,9 +228,6 @@ type IonEvidence struct {
 	Spectra                  map[id.SpectrumType]int
 	MappedProteins           map[string]int
 	MappedGenes              map[string]struct{}
-	//IonForm()              string
-	//RetentionTime          string
-
 }
 
 // IonEvidenceList ...
@@ -257,6 +256,8 @@ type PeptideEvidence struct {
 	Spc                    int
 	ModifiedObservations   int
 	UnModifiedObservations int
+	ProteinStart           int
+	ProteinEnd             int
 	Intensity              float64
 	Probability            float64
 	IsUnique               bool

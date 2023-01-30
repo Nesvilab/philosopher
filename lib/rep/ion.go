@@ -43,9 +43,11 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 			psmPtMap[i.IonForm()] = append(psmPtMap[i.IonForm()], j)
 		}
 
-		for _, j := range i.Modifications.IndexSlice {
-			ionMods[i.IonForm()] = append(ionMods[i.IonForm()], j)
-		}
+		ionMods[i.IonForm()] = append(ionMods[i.IonForm()], i.Modifications.IndexSlice...)
+
+		// for _, j := range i.Modifications.IndexSlice {
+		// 	ionMods[i.IonForm()] = append(ionMods[i.IonForm()], j)
+		// }
 
 	}
 
