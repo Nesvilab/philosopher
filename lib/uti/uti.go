@@ -7,9 +7,10 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"philosopher/lib/msg"
 	"strconv"
 	"strings"
+
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // Round serves the rol of the missing math.Round function

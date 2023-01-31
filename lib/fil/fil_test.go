@@ -1,12 +1,13 @@
 package fil
 
 import (
-	"philosopher/lib/id"
-	"philosopher/lib/sys"
-	"philosopher/lib/tes"
-	"philosopher/lib/uti"
 	"reflect"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/tes"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 func Test_readPepXMLInput(t *testing.T) {

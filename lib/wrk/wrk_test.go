@@ -2,9 +2,10 @@ package wrk_test
 
 import (
 	"os"
-	"philosopher/lib/tes"
-	. "philosopher/lib/wrk"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/tes"
+	. "github.com/Nesvilab/philosopher/lib/wrk"
 )
 
 func TestInit(t *testing.T) {

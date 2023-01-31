@@ -1,8 +1,8 @@
 package qua
 
 import (
-	"philosopher/lib/rep"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 // CalculatePeptideCounts counts peptides for proteins

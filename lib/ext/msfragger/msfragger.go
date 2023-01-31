@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // MSFragger represents the tool configuration

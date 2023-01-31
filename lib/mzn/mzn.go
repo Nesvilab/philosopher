@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"strings"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/psi"
+	"github.com/Nesvilab/philosopher/lib/psi"
 
 	"github.com/sirupsen/logrus"
 )

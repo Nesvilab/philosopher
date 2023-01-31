@@ -2,7 +2,7 @@
 package aba
 
 import (
-	"philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/met"
 )
 
 // DataSetLabelNames maps all custom names to each TMT tags

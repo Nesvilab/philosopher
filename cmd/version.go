@@ -2,7 +2,7 @@
 package cmd
 
 import (
-	"philosopher/lib/gth"
+	"github.com/Nesvilab/philosopher/lib/gth"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

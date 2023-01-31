@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // PeptideProphet is the main tool data configuration structure

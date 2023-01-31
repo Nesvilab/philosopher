@@ -2,14 +2,15 @@ package rep
 
 import (
 	"fmt"
-	"philosopher/lib/id"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/psi"
+	"github.com/Nesvilab/philosopher/lib/id"
+
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/psi"
 )
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded

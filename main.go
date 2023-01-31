@@ -1,8 +1,9 @@
 package main
 
 import (
-	"philosopher/cmd"
 	"runtime/debug"
+
+	"github.com/Nesvilab/philosopher/cmd"
 )
 
 var (

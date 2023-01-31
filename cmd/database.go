@@ -4,9 +4,9 @@ package cmd
 import (
 	"os"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/spf13/cobra"
 )

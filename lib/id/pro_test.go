@@ -1,9 +1,10 @@
 package id
 
 import (
-	"philosopher/lib/tes"
 	"strings"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/tes"
 )
 
 func TestProtXML_MarkUniquePeptides(t *testing.T) {

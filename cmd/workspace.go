@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/wrk"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/wrk"
 
 	ga "github.com/jpillora/go-ogle-analytics"
 	"github.com/spf13/cobra"

@@ -13,7 +13,7 @@ import (
 
 	"github.com/vmihailenco/msgpack/v5"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // GetHome returns the user home directory name

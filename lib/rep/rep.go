@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"philosopher/lib/id"
-	"philosopher/lib/iso"
-	"philosopher/lib/met"
-	"philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/mod"
 
 	"github.com/sirupsen/logrus"
 )

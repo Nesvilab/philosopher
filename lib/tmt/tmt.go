@@ -1,7 +1,7 @@
 package tmt
 
 import (
-	"philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/iso"
 )
 
 // New builds a new Labelled spectra object

@@ -4,8 +4,8 @@
 package comet
 
 import (
-	wcomet "philosopher/lib/ext/comet/win"
-	"philosopher/lib/sys"
+	wcomet "github.com/Nesvilab/philosopher/lib/ext/comet/win"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Deploy generates comet binary on workdir bin directory

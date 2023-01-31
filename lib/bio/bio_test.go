@@ -1,9 +1,10 @@
 package bio_test
 
 import (
-	. "philosopher/lib/bio"
-	"philosopher/lib/tes"
 	"testing"
+
+	. "github.com/Nesvilab/philosopher/lib/bio"
+	"github.com/Nesvilab/philosopher/lib/tes"
 )
 
 func TestAminoAcids(t *testing.T) {

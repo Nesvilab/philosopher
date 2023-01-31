@@ -16,11 +16,11 @@ import (
 	"strings"
 	"time"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/fas"
-	"philosopher/lib/met"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/fas"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"

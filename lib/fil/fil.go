@@ -9,14 +9,14 @@ import (
 	"strings"
 	"sync"
 
-	"philosopher/lib/cla"
-	"philosopher/lib/id"
-	"philosopher/lib/inf"
-	"philosopher/lib/met"
-	"philosopher/lib/mod"
-	"philosopher/lib/raz"
-	"philosopher/lib/rep"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/cla"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/inf"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/raz"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )

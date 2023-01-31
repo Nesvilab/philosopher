@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/id"
-	"philosopher/lib/raz"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/raz"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 // PeptideMap struct

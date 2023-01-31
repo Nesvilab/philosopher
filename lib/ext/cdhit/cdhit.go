@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"strconv"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/met"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // CDhit represents the tool configuration

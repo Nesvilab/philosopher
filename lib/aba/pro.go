@@ -12,16 +12,16 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/iso"
-	"philosopher/lib/msg"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/fil"
-	"philosopher/lib/id"
-	"philosopher/lib/met"
-	"philosopher/lib/rep"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/fil"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )

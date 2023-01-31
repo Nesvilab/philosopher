@@ -8,13 +8,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"philosopher/lib/iso"
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/rep"
-	"philosopher/lib/sys"
 	"sort"
 	"strings"
+
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )

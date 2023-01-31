@@ -2,8 +2,9 @@ package trq
 
 import (
 	"errors"
-	"philosopher/lib/iso"
-	"philosopher/lib/msg"
+
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // New builds a new Labelled spectra object

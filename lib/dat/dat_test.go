@@ -1,9 +1,10 @@
 package dat_test
 
 import (
-	. "philosopher/lib/dat"
-	"philosopher/lib/sys"
 	"testing"
+
+	. "github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 func TestBase_Fetch(t *testing.T) {

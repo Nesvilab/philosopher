@@ -3,8 +3,9 @@ package sys_test
 import (
 	"fmt"
 	"path/filepath"
-	"philosopher/lib/sys"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 func TestSysMeta(t *testing.T) {

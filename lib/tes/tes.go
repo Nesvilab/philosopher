@@ -2,7 +2,8 @@ package tes
 
 import (
 	"os"
-	"philosopher/lib/wrk"
+
+	"github.com/Nesvilab/philosopher/lib/wrk"
 )
 
 // SetupTestEnv pre-sets environment directory and meta folder

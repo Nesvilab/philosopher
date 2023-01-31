@@ -12,13 +12,13 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/bio"
-	"philosopher/lib/cla"
-	"philosopher/lib/dat"
-	"philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/bio"
+	"github.com/Nesvilab/philosopher/lib/cla"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/id"
 )
 
 // AssemblePSMReport creates the PSM structure for reporting

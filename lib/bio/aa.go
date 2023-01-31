@@ -3,7 +3,7 @@ package bio
 import (
 	"errors"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // AminoAcid representation

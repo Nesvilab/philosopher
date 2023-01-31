@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // Record is the root of all database parsers

@@ -11,13 +11,13 @@ import (
 	"sync"
 	"time"
 
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/mod"
-	"philosopher/lib/spc"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/spc"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/plot"

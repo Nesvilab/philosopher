@@ -4,8 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // UnixParameterFile deploys Comet parameter file

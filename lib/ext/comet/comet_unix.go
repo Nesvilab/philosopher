@@ -4,7 +4,7 @@
 package comet
 
 import (
-	ucomet "philosopher/lib/ext/comet/unix"
+	ucomet "github.com/Nesvilab/philosopher/lib/ext/comet/unix"
 )
 
 // Deploy generates comet binary on workdir bin directory

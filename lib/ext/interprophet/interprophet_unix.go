@@ -7,9 +7,9 @@ import (
 	"errors"
 	"strings"
 
-	unix "philosopher/lib/ext/interprophet/unix"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	unix "github.com/Nesvilab/philosopher/lib/ext/interprophet/unix"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Deploy generates comet binary on workdir bin directory

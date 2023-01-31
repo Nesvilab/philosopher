@@ -4,9 +4,9 @@ import (
 	"errors"
 	"io/ioutil"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // UnixInterProphetParser accessor

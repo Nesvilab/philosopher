@@ -1,9 +1,10 @@
 package tmt
 
 import (
-	"philosopher/lib/iso"
 	"reflect"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/iso"
 )
 
 func TestNew(t *testing.T) {

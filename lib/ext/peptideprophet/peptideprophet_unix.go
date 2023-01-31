@@ -7,9 +7,9 @@ import (
 	"errors"
 	"strings"
 
-	unix "philosopher/lib/ext/peptideprophet/unix"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	unix "github.com/Nesvilab/philosopher/lib/ext/peptideprophet/unix"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Deploy PeptideProphet binaries on binary directory

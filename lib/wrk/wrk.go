@@ -9,10 +9,10 @@ import (
 	"runtime"
 	"time"
 
-	"philosopher/lib/gth"
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/gth"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/pierrre/archivefile/zip"
 	"github.com/sirupsen/logrus"
