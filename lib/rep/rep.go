@@ -3,6 +3,7 @@ package rep
 import (
 	"fmt"
 	"strconv"
+	"sync"
 
 	"github.com/Nesvilab/philosopher/lib/id"
 	"github.com/Nesvilab/philosopher/lib/iso"
@@ -483,32 +484,43 @@ func Run(m met.Data) {
 	}
 
 	logrus.Info("Creating reports")
-	{
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
 		repoPSM.PSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
-	{
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
 		repoIons.IonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
-	{
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
 		repoPeptides.PeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
+	}()
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
-		var repoProteins ProteinEvidenceList
-		RestoreProtein(&repoProteins)
-		repoProteins.ProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var repoProteins ProteinEvidenceList
+			RestoreProtein(&repoProteins)
+			repoProteins.ProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
+			repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
+		}()
 	}
-
+	wg.Wait()
 	// Modifications
 	repo := New()
 	if len(repo.Modifications.MassBins) > 0 {
