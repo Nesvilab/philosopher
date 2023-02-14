@@ -29,6 +29,7 @@ var filterCmd = &cobra.Command{
 		os.RemoveAll(sys.IonBin())
 		os.RemoveAll(sys.ProBin())
 		os.RemoveAll(sys.PepxmlBin())
+		os.RemoveAll(sys.ProtxmlBin())
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {
@@ -61,7 +62,7 @@ func init() {
 		filterCmd.Flags().StringVarP(&m.Filter.Pox, "protxml", "", "", "protXML file path")
 		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "rev_", "decoy tag")
 		filterCmd.Flags().StringVarP(&m.Filter.Mods, "mods", "", "", "list of modifications for a stratified FDR filtering")
-		filterCmd.Flags().StringVarP(&m.Filter.RazorBin, "razorbin", "", "", "use a custom razor assignment for the filtering")
+		filterCmd.Flags().StringVarP(&m.Filter.ProBin, "probin", "", "", "set a pre-built protein inference for the filtering")
 		filterCmd.Flags().Float64VarP(&m.Filter.IonFDR, "ion", "", 0.01, "peptide ion FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PepFDR, "pep", "", 0.01, "peptide FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PsmFDR, "psm", "", 0.01, "psm FDR level")
@@ -79,6 +80,7 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
 		filterCmd.Flags().MarkHidden("mods")
 		filterCmd.Flags().MarkHidden("delta")
+		filterCmd.Flags().MarkHidden("probin")
 		filterCmd.Flags().MarkHidden("razorbin")
 	}
 

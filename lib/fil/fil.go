@@ -14,7 +14,6 @@ import (
 	"github.com/Nesvilab/philosopher/lib/inf"
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/mod"
-	"github.com/Nesvilab/philosopher/lib/raz"
 	"github.com/Nesvilab/philosopher/lib/rep"
 	"github.com/Nesvilab/philosopher/lib/sys"
 
@@ -28,25 +27,33 @@ func Run(f met.Data) met.Data {
 	var pep id.PepIDList
 	var pro id.ProtIDList
 
-	if len(f.Filter.RazorBin) > 0 {
+	if len(f.Filter.ProBin) > 0 {
 
 		f.Filter.Razor = true
 
-		if _, err := os.Stat(f.Filter.RazorBin); err == nil {
+		if _, err := os.Stat(f.Filter.ProBin); err == nil {
 
-			rdest := fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
-			sys.CopyFile(f.Filter.RazorBin, rdest)
+			p := fmt.Sprintf("%s%s.meta/protxml.bin", f.Filter.ProBin, string(filepath.Separator))
+			r := fmt.Sprintf("%s%s.meta/razor.bin", f.Filter.ProBin, string(filepath.Separator))
 
-			var rm raz.RazorMap = make(map[string]raz.RazorCandidate)
-			rm.Restore(false)
-			logrus.Info("Fetching razor assignment from: ", f.Filter.RazorBin, ": ", len(rm), " razor groups imported.")
-			_ = rm
+			logrus.Info("Fetching protein inference from ", f.Filter.ProBin)
+
+			rdest := fmt.Sprintf("%s%s.meta%sprotxml.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
+			sys.CopyFile(p, rdest)
+
+			rdest = fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
+			sys.CopyFile(r, rdest)
+
+			//var rm raz.RazorMap = make(map[string]raz.RazorCandidate)
+			//rm.Restore(false)
+			//logrus.Info("Fetching razor assignment from: ", f.Filter.ProBin, ": ", len(rm), " razor groups imported.")
+			//_ = rm
 
 		} else if errors.Is(err, os.ErrNotExist) {
 
-			logrus.Warn("razor peptides not found: ", f.Filter.RazorBin, ". Calculating a new assignment")
-			f.Filter.RazorBin = ""
+			logrus.Warn("protein inference not found: ", f.Filter.ProBin)
 
+			f.Filter.ProBin = ""
 		}
 
 	}
@@ -80,6 +87,8 @@ func Run(f met.Data) met.Data {
 
 		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 
+		protXML.Serialize()
+
 		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
 		pro.Restore()
 
@@ -100,6 +109,7 @@ func Run(f met.Data) met.Data {
 			processProteinInferenceIdentifications(pepid, razorMap, coverMap, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Tag)
 		}
 	}
+
 	var pepxml id.PepXML
 	pepxml.Restore()
 
@@ -154,7 +164,7 @@ func Run(f met.Data) met.Data {
 	}
 
 	// Apply the razor assignment to all data
-	if f.Filter.Razor || len(f.Filter.RazorBin) > 0 {
+	if f.Filter.Razor || len(f.Filter.ProBin) > 0 {
 		e.ApplyRazorAssignment(f.Filter.Tag)
 	}
 
@@ -509,7 +519,7 @@ func ReadProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
 
 	protXML.PromoteProteinIDs()
 
-	//protXML.Serialize()
+	protXML.Serialize()
 
 	return protXML
 }

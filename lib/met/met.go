@@ -339,11 +339,12 @@ type PTMProphet struct {
 
 // Filter options and parameters
 type Filter struct {
-	Pex       string  `yaml:"pepxml"`
-	Pox       string  `yaml:"protxml"`
-	Tag       string  `yaml:"tag"`
-	Mods      string  `yaml:"mods"`
-	RazorBin  string  `yaml:"razorbin"`
+	Pex    string `yaml:"pepxml"`
+	Pox    string `yaml:"protxml"`
+	Tag    string `yaml:"tag"`
+	Mods   string `yaml:"mods"`
+	ProBin string `yaml:"probin"`
+	//RazorBin  string  `yaml:"razorbin"`
 	PsmFDR    float64 `yaml:"psmFDR"`
 	PepFDR    float64 `yaml:"peptideFDR"`
 	IonFDR    float64 `yaml:"ionFDR"`

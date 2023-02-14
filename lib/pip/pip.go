@@ -673,8 +673,8 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 				meta.Filter.Seq = false
 			}
 
-			if len(p.Filter.RazorBin) != 0 {
-				meta.Filter.RazorBin = p.Filter.RazorBin
+			if len(p.Filter.ProBin) != 0 {
+				meta.Filter.ProBin = p.Filter.ProBin
 			}
 
 			meta := fil.Run(meta)

@@ -135,6 +135,12 @@ func PepxmlBin() string {
 	return p
 }
 
+// ProtxmlBin file
+func ProtxmlBin() string {
+	p := fmt.Sprintf("%s%sprotxml.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
 // PSMBin file
 func PSMBin() string {
 	p := fmt.Sprintf("%s%spsm.bin", MetaDir(), string(filepath.Separator))

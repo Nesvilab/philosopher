@@ -3,6 +3,7 @@ package id
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,6 +13,7 @@ import (
 	"github.com/Nesvilab/philosopher/lib/iso"
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/Nesvilab/philosopher/lib/mod"
 	"github.com/Nesvilab/philosopher/lib/spc"
@@ -266,6 +268,38 @@ func (p *ProtXML) MarkUniquePeptides(w float64) {
 		}
 	}
 
+}
+
+// Serialize converts the whle structure to a gob file
+func (p *ProtXML) Serialize() {
+
+	b, e := msgpack.Marshal(&p)
+	if e != nil {
+		msg.MarshalFile(e, "fatal")
+	}
+
+	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
+	if e != nil {
+		msg.WriteFile(e, "fatal")
+	}
+
+	return
+}
+
+// Restore reads philosopher results files and restore the data sctructure
+func (p *ProtXML) Restore() {
+
+	b, e := ioutil.ReadFile(sys.ProtxmlBin())
+	if e != nil {
+		msg.ReadFile(e, "fatal")
+	}
+
+	e = msgpack.Unmarshal(b, &p)
+	if e != nil {
+		msg.DecodeMsgPck(e, "fatal")
+	}
+
+	return
 }
 
 // Serialize converts the whle structure to a gob file
