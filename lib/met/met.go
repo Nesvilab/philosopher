@@ -83,6 +83,7 @@ type Database struct {
 	Rev       bool   `yaml:"reviewed"`
 	Iso       bool   `yaml:"isoform"`
 	NoD       bool   `yaml:"nodecoys"`
+	Verbose   bool   `yaml:"verbose"`
 }
 
 // Comet options and parameters

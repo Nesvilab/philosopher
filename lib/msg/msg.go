@@ -2,6 +2,7 @@ package msg
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 )
@@ -314,11 +315,13 @@ func callLogrus(m, t string) {
 		logrus.Warning(m)
 	case "fatal":
 		logrus.Error(m)
+		panic(m)
 	case "error":
 		logrus.Error(m)
-		panic(m)
+		os.Exit(1)
 	default:
 		logrus.Error(m)
+		os.Exit(1)
 	}
 
 }

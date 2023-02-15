@@ -65,7 +65,7 @@ func Run(m met.Data) met.Data {
 
 		m.DB = m.Database.Annot
 
-		db.ProcessDB(m.Database.Annot, m.Database.Tag)
+		db.ProcessDB(m.Database.Annot, m.Database.Tag, m.Database.Verbose)
 
 		db.Serialize()
 
@@ -114,7 +114,7 @@ func Run(m met.Data) met.Data {
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
 
-	db.ProcessDB(customDB, m.Database.Tag)
+	db.ProcessDB(customDB, m.Database.Tag, m.Database.Verbose)
 
 	logrus.Info("Processing decoys")
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
@@ -130,7 +130,7 @@ func Run(m met.Data) met.Data {
 }
 
 // ProcessDB determines the type of sequence and sends it to the appropriate parsing function
-func (d *Base) ProcessDB(file, decoyTag string) {
+func (d *Base) ProcessDB(file, decoyTag string, verbose bool) {
 
 	fastaMap := fas.ParseFile(file)
 	d.FileName = path.Base(file)
@@ -139,10 +139,10 @@ func (d *Base) ProcessDB(file, decoyTag string) {
 
 		class := Classify(k, decoyTag)
 
-		// if strings.Contains(k, "@") {
-		// 	m := "The proteion record [" + k + "] contains an unsupported character: @. Please remove it before running philosopher again"
-		// 	msg.Custom(errors.New(m), "error")
-		// }
+		if verbose {
+			m := fmt.Sprintf("Class: %s  Record: %s", class, k)
+			fmt.Println(m)
+		}
 
 		if class == "uniprot" {
 
@@ -204,14 +204,12 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 	}
 
 	// add the proteome parameter
-	query = fmt.Sprintf("%squery=proteome:%s", query, uniprotID)
+	query = fmt.Sprintf("%squery=(proteome:%s)", query, uniprotID)
 
 	// is reviewed?
 	if rev {
-		query = query + "+AND+reviewed:true"
+		query = query + "+AND+(reviewed:true)"
 	}
-
-	query = fmt.Sprintf("%s+AND+model_organism:%s", query, proteomeID)
 
 	client := resty.New()
 
@@ -225,19 +223,21 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 		Get(query)
 
 	if e != nil {
-		panic(e)
+		msg.DatabaseNotFound(errors.New("cannot reach out UniProt database, are you connected to the Internet?"), "error")
 	}
 
 	file, err := os.Open(f)
 
 	if err != nil {
-		log.Fatal(err)
+		msg.ReadFile(errors.New("cannot open FASTA file, are you connected to the Internet?"), "error")
 	}
 
 	gz, err := gzip.NewReader(file)
 
-	if err != nil {
-		log.Fatal(err)
+	if err != nil && rev {
+		msg.ReadFile(errors.New("please check if your parameters are correct, including the Uniprot ID and if the organism has reviewed sequences"), "error")
+	} else if err != nil {
+		msg.ReadFile(errors.New("please check if your parameters are correct, including the Uniprot ID"), "error")
 	}
 
 	defer file.Close()
