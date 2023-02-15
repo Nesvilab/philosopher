@@ -127,7 +127,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 	}
 	defer file.Close()
 
-	header := "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tCharge\tGene\tProtein\tProtein ID\tEntry Name\tProtein Description\tIs Unique\tQuan Usage\tPurity"
+	header := "Spectrum Name\tSpectrum File\tPeptide\tModified Peptide\tCharge\tGene\tProtein\tProtein ID\tEntry Name\tProtein Description\tIs Unique\tQuan Usage\tPurity"
 
 	// Add Unique+Razor Intensity
 	for _, i := range namesList {
@@ -205,7 +205,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 			switch plex {
 			case "10":
 				for _, j := range namesList {
-					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 						i.Labels[j].Channel1.Intensity,
 						i.Labels[j].Channel2.Intensity,
 						i.Labels[j].Channel3.Intensity,
@@ -220,7 +220,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 				}
 			case "16":
 				for _, j := range namesList {
-					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 						i.Labels[j].Channel1.Intensity,
 						i.Labels[j].Channel2.Intensity,
 						i.Labels[j].Channel3.Intensity,
@@ -241,7 +241,7 @@ func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidence
 				}
 			case "18":
 				for _, j := range namesList {
-					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t",
+					line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 						i.Labels[j].Channel1.Intensity,
 						i.Labels[j].Channel2.Intensity,
 						i.Labels[j].Channel3.Intensity,
