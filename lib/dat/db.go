@@ -2,11 +2,8 @@
 package dat
 
 import (
-	"errors"
 	"regexp"
 	"strings"
-
-	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // Record is the root of all database parsers
@@ -218,28 +215,23 @@ func ProcessNCBI(k, v, decoyTag string) Record {
 func ProcessUniProtKB(k, v, decoyTag string) Record {
 
 	var e Record
-
-	idReg := regexp.MustCompile(`\w+\|(.+?)\|`)
-	enReg := regexp.MustCompile(`\w+\|.+?\|(.+?)\s`)
-	smEnR := regexp.MustCompile(`\w+\|.+?\|(.+)`)
-	pnReg := regexp.MustCompile(`\w+\|.+?\|.+?\s(.+?)OS`)
-	orReg1 := regexp.MustCompile(`OS=(.+?)(\sGN.+|\sPE.+|\sSV.+)`)
-	orReg2 := regexp.MustCompile(`OS=(.+)(\sGN.+|\sPE.+|\sSV.+)?`)
-
-	part := strings.Split(k, " ")
-
 	e.Class = "UniProtKB"
 
+	// Part header
+	part := strings.Split(k, " ")
 	e.PartHeader = part[0]
 
 	// ID
-	idm := idReg.FindStringSubmatch(k)
+	idrx := regexp.MustCompile(`\w+\|(.+?)\|`)
+	idm := idrx.FindStringSubmatch(k)
 	e.ID = idm[1]
 
 	// Entry Name
-	enm := enReg.FindStringSubmatch(k)
+	enrx := regexp.MustCompile(`\w+\|.+?\|(.+?)\s`)
+	enm := enrx.FindStringSubmatch(k)
 	if enm == nil {
-		smEnm := smEnR.FindStringSubmatch(k)
+		smEnRx := regexp.MustCompile(`\w+\|.+?\|(.+)`)
+		smEnm := smEnRx.FindStringSubmatch(k)
 
 		if smEnm == nil {
 			e.EntryName = ""
@@ -252,7 +244,8 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 	}
 
 	// Protein Name
-	pnm := pnReg.FindStringSubmatch(k)
+	pnrx := regexp.MustCompile(`\w+\|.+?\|.+?\s(.+?)OS`)
+	pnm := pnrx.FindStringSubmatch(k)
 	if pnm == nil {
 		e.ProteinName = ""
 		e.ProteinName = ""
@@ -265,31 +258,34 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 
 	// Organism
 	var orn []string
+	orrx1 := regexp.MustCompile(`OS=(.+?)(\sGN.+|\sPE.+|\sSV.+)`)
+	orRx2 := regexp.MustCompile(`OS=(.+)(\sGN.+|\sPE.+|\sSV.+)?`)
+
 	if strings.Contains(k, "GN=") || strings.Contains(k, "PE=") || strings.Contains(k, "SV=") {
-		orn = orReg1.FindStringSubmatch(k)
+		orn = orrx1.FindStringSubmatch(k)
 	} else {
-		orn = orReg2.FindStringSubmatch(k)
+		orn = orRx2.FindStringSubmatch(k)
 	}
 
 	if pnm == nil {
 		e.Organism = ""
 	} else {
-		e.Organism = orn[1]
+		if orn != nil {
+			e.Organism = orn[1]
+		} else {
+			e.Organism = ""
+		}
 	}
 
 	// Gene Names
 	var gnm []string
-	if strings.Contains(k, "GN=") && (strings.Contains(k, "PE=") || strings.Contains(k, "SV=")) {
-
-		if len(orn) < 2 {
-			msg.ParsingFASTA(errors.New(""), "error")
+	geneM1 := regexp.MustCompile(`GN\=(.+?)?\s`)
+	geneM2 := regexp.MustCompile(`GN\=(.+?)?$`)
+	if strings.Contains(k, "GN=") {
+		gnm = geneM1.FindStringSubmatch(k)
+		if len(gnm) < 1 {
+			gnm = geneM2.FindStringSubmatch(k)
 		}
-
-		gnReg := regexp.MustCompile(`GN=(.+?)(\s.+)`)
-		gnm = gnReg.FindStringSubmatch(orn[2])
-	} else if strings.Contains(k, "GN=") {
-		gnReg := regexp.MustCompile(`GN=(.+)$?\s?`)
-		gnm = gnReg.FindStringSubmatch(orn[2])
 	}
 
 	if gnm != nil {
@@ -298,13 +294,14 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 		e.GeneNames = ""
 	}
 
+	peM1 := regexp.MustCompile(`PE\=(\d)?\s`)
+	peM2 := regexp.MustCompile(`PE\=(\d)?$`)
 	var pem []string
-	if strings.Contains(k, "PE=") && strings.Contains(k, "SV=") {
-		gnReg := regexp.MustCompile(`PE=(.+?)(\s.+)`)
-		pem = gnReg.FindStringSubmatch(orn[2])
-	} else if strings.Contains(k, "PE=") {
-		gnReg := regexp.MustCompile(`PE=(.+)$?\s?`)
-		pem = gnReg.FindStringSubmatch(orn[2])
+	if strings.Contains(k, "PE=") {
+		pem = peM1.FindStringSubmatch(k)
+		if len(pem) < 1 {
+			pem = peM2.FindStringSubmatch(k)
+		}
 	}
 
 	if pem != nil {
@@ -319,19 +316,19 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 			e.ProteinExistence = "4:Protein predicted"
 		case "5":
 			e.ProteinExistence = "5:Protein uncertain"
-		}
-	} else {
-		if len(pem) > 0 {
-			e.ProteinExistence = pem[0]
-		} else {
+		default:
 			e.ProteinExistence = ""
 		}
 	}
 
 	var svm []string
-	if strings.Contains(k, "PE=") {
-		svReg := regexp.MustCompile(`SV=(.+)$?\s?`)
-		svm = svReg.FindStringSubmatch(orn[2])
+	svM1 := regexp.MustCompile(`SV\=(\d)?\s`)
+	svM2 := regexp.MustCompile(`SV\=(\d)?$`)
+	if strings.Contains(k, "SV=") {
+		svm = svM1.FindStringSubmatch(orn[2])
+		if len(svm) < 1 {
+			svm = svM2.FindStringSubmatch(k)
+		}
 	}
 
 	if svm != nil {
@@ -353,6 +350,14 @@ func ProcessUniProtKB(k, v, decoyTag string) Record {
 		e.IsContaminant = true
 	} else {
 		e.IsContaminant = false
+	}
+
+	if len(e.ProteinName) == 0 {
+		e.ProteinName = e.EntryName
+	}
+
+	if len(e.Description) == 0 {
+		e.Description = e.EntryName
 	}
 
 	e.OriginalHeader = k

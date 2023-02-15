@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -335,7 +334,7 @@ func (d *Base) Deploy(temp string) {
 		msg.WriteFile(e1, "error")
 	}
 
-	e2 := ioutil.WriteFile(d.CrapDB, param, sys.FilePermission())
+	e2 := os.WriteFile(d.CrapDB, param, sys.FilePermission())
 	if e2 != nil {
 		msg.WriteFile(e2, "error")
 	}
@@ -354,7 +353,7 @@ func GetOrganismID(temp string, uniprotID string) (string, string) {
 		msg.WriteFile(e1, "error")
 	}
 
-	e2 := ioutil.WriteFile(proteomeFile, param, sys.FilePermission())
+	e2 := os.WriteFile(proteomeFile, param, sys.FilePermission())
 	if e2 != nil {
 		msg.WriteFile(e2, "error")
 	}
@@ -445,7 +444,7 @@ func (d *Base) Serialize() {
 		msg.MarshalFile(e, "error")
 	}
 
-	e = ioutil.WriteFile(sys.DBBin(), b, sys.FilePermission())
+	e = os.WriteFile(sys.DBBin(), b, sys.FilePermission())
 	if e != nil {
 		msg.SerializeFile(e, "error")
 	}
