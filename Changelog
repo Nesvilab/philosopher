@@ -3,6 +3,7 @@
 
 ### Changed
 - Rolledback the FASTA header checking for IonQuant.
+- PTMProphet updated to v6.2.0
 
 ### Fixed
 - updated razor mapping rules to reinforce the decoy tagging of razor proteins.
