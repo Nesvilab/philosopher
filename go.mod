@@ -20,7 +20,7 @@ require (
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15 // indirect
-	golang.org/x/image v0.2.0 // indirect
+	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	gonum.org/v1/plot v0.12.0
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
