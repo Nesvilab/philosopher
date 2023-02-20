@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/Nesvilab/philosopher/lib/fas"
 	"github.com/Nesvilab/philosopher/lib/met"
@@ -138,51 +139,56 @@ func (d *Base) ProcessDB(file, decoyTag string, verbose bool) {
 
 		class := Classify(k, decoyTag)
 
-		if verbose {
-			m := fmt.Sprintf("Class: %s  Record: %s", class, k)
-			fmt.Println(m)
-		}
+		ProcessHeader(k, v, class, decoyTag, verbose)
 
-		if class == "uniprot" {
+		// if verbose {
+		// 	m := fmt.Sprintf("Class: %s  Record: %s", class, k)
+		// 	fmt.Println(m)
+		// }
 
-			db := ProcessUniProtKB(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// if class == "uniprot" {
 
-		} else if class == "ncbi" {
+		// 	db := ProcessUniProtKB(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessNCBI(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "ncbi" {
 
-		} else if class == "ensembl" {
+		// 	db := ProcessNCBI(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessENSEMBL(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "ensembl" {
 
-		} else if class == "generic" {
+		// 	db := ProcessENSEMBL(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessGeneric(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "generic" {
 
-		} else if class == "uniref" {
+		// 	db := ProcessGeneric(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessUniRef(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "uniref" {
 
-		} else if class == "tair" {
+		// 	db := ProcessUniRef(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessTair(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "tair" {
 
-		} else if class == "nextprot" {
+		// 	db := ProcessTair(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
 
-			db := ProcessNextProt(k, v, decoyTag)
-			d.Records = append(d.Records, db)
+		// } else if class == "nextprot" {
 
-		} else {
-			msg.ParsingFASTA(errors.New(""), "error")
-		}
+		// 	db := ProcessNextProt(k, v, decoyTag)
+		// 	d.Records = append(d.Records, db)
+
+		// } else {
+		// 	msg.ParsingFASTA(errors.New(""), "error")
+		// }
+
+		spew.Dump()
 	}
 
+	os.Exit(1)
 }
 
 // Fetch downloads a database file from UniProt
