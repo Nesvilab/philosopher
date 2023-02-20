@@ -185,7 +185,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 					CVRef:     "PSI-MS",
 					Accession: "MS:1001088",
 					Name:      "protein description",
-					Value:     i.Description,
+					Value:     i.ProteinName,
 				},
 				{
 					CVRef:     "PSI-MS",

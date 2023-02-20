@@ -230,7 +230,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				list[i].EntryName = j.EntryName
 				list[i].GeneNames = j.GeneNames
 				list[i].Organism = j.Organism
-				list[i].Description = j.Description
+				list[i].Description = j.ProteinName
 				list[i].ProteinExistence = j.ProteinExistence
 				break
 			}

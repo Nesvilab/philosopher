@@ -439,7 +439,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		var dtb dat.Base
 		dtb.Restore()
 		for _, j := range dtb.Records {
-			recordMap[j.PartHeader] = liteRecord{j.ID, j.EntryName, j.GeneNames, strings.TrimSpace(j.Description), j.Sequence}
+			recordMap[j.PartHeader] = liteRecord{j.ID, j.EntryName, j.GeneNames, strings.TrimSpace(j.ProteinName), j.Sequence}
 		}
 	}
 

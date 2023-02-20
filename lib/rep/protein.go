@@ -213,10 +213,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 					}
 
 					// uniprot entries have the description on ProteinName
-					if len(j.Description) < 1 {
+					if len(j.ProteinName) < 1 {
 						pe.Description = j.ProteinName
 					} else {
-						pe.Description = j.Description
+						pe.Description = j.ProteinName
 					}
 
 					// for Ensemble entries without name
