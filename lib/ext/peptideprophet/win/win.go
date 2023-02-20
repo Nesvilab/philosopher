@@ -2,7 +2,7 @@ package peptideprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/sys"
@@ -16,7 +16,7 @@ func WinInteractParser(s string) {
 		msg.DeployAsset(errors.New("InteractParser"), "Cannot read InteractParser bin")
 	} else {
 
-		e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+		e2 := os.WriteFile(s, bin, sys.FilePermission())
 		if e2 != nil {
 			msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
 		}
@@ -33,7 +33,7 @@ func WinRefreshParser(s string) {
 		msg.DeployAsset(errors.New("RefreshParser"), "Cannot read RefreshParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("RefreshParser"), "Cannot deploy RefreshParser")
 	}
@@ -49,7 +49,7 @@ func WinPeptideProphetParser(s string) {
 		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphet bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot deploy PeptideProphet")
 	}
@@ -65,7 +65,7 @@ func Mv(s string) {
 		msg.DeployAsset(errors.New("mv.exe"), "Cannot read mv.exe bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("mv.exe"), "Cannot deploy mv.exe")
 	}
@@ -81,7 +81,7 @@ func LibgccDLL(s string) {
 		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot read LibgccDLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot deploy LibgccDLL")
 	}
@@ -97,7 +97,7 @@ func Zlib1DLL(s string) {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}

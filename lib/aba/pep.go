@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -50,7 +49,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		var evi rep.Evidence
 		rep.RestorePSM(&evi.PSM)
 
-		files, _ := ioutil.ReadDir(i)
+		files, _ := os.ReadDir(i)
 
 		// collect interact full file names
 		for _, f := range files {

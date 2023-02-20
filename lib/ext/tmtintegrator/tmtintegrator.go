@@ -2,7 +2,6 @@ package tmtintegrator
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -40,7 +39,7 @@ func Run(m met.Data, args []string) met.Data {
 		// convert the param file to binary and store it in meta
 		var binFile []byte
 		paramAbs, _ := filepath.Abs(m.TMTIntegrator.Param)
-		binFile, e := ioutil.ReadFile(paramAbs)
+		binFile, e := os.ReadFile(paramAbs)
 		if e != nil {
 			msg.ReadFile(e, "error")
 		}

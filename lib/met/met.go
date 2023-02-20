@@ -3,7 +3,6 @@ package met
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -494,7 +493,7 @@ func (d *Data) Serialize() {
 		msg.MarshalFile(e, "error")
 	}
 
-	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
+	e = os.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
 		msg.WriteFile(e, "error")
 	}
@@ -504,7 +503,7 @@ func (d *Data) Serialize() {
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Data) Restore(f string) {
 
-	b, e1 := ioutil.ReadFile(f)
+	b, e1 := os.ReadFile(f)
 
 	e2 := msgpack.Unmarshal(b, &d)
 

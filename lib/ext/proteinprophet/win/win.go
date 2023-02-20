@@ -2,7 +2,7 @@ package proteinprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/sys"
@@ -16,7 +16,7 @@ func WinBatchCoverage(s string) {
 		msg.DeployAsset(errors.New("batchcoverage"), "Cannot read batchcoverage bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("batchcoverage"), "Cannot deploy batchcoverage")
 	}
@@ -32,7 +32,7 @@ func WinDatabaseParser(s string) {
 		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot read DatabaseParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot deploy DatabaseParser")
 	}
@@ -48,7 +48,7 @@ func WinProteinProphet(s string) {
 		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot read ProteinProphet bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot deploy ProteinProphet")
 	}
@@ -64,7 +64,7 @@ func LibgccDLL(s string) {
 		msg.DeployAsset(errors.New("libgcc_s_dw2"), "Cannot read LibgccDLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, 0755)
+	e2 := os.WriteFile(s, bin, 0755)
 	if e2 != nil {
 		msg.DeployAsset(errors.New("libgcc_s_dw2"), "Cannot deploy LibgccDLL")
 	}
@@ -80,7 +80,7 @@ func Zlib1DLL(s string) {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, 0755)
+	e2 := os.WriteFile(s, bin, 0755)
 	if e2 != nil {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}

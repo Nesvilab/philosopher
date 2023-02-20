@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -53,7 +52,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		e.RestoreGranularWithPath(i)
 
 		// collect interact full file names
-		files, _ := ioutil.ReadDir(i)
+		files, _ := os.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())

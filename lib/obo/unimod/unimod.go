@@ -2,7 +2,7 @@ package obo
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/sys"
@@ -16,7 +16,7 @@ func Deploy(f string) {
 		msg.DeployAsset(errors.New("Unimod"), "Cannot read unimod obo")
 	}
 
-	e2 := ioutil.WriteFile(f, asset, sys.FilePermission())
+	e2 := os.WriteFile(f, asset, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("Unimod"), "Cannot deploy Unimod obo")
 	}

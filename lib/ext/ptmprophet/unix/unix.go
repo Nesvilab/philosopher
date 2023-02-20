@@ -2,7 +2,7 @@ package ptmprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/sys"
@@ -16,7 +16,7 @@ func UnixPTMProphetParser(s string) {
 		msg.DeployAsset(errors.New("PTMProphetParser"), "Cannot read PTMProphetParser binary")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("PTMProphetParser"), "Cannot deploy PTMProphetParser")
 	}

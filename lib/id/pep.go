@@ -113,7 +113,7 @@ type PepIDList []PeptideIdentification
 type PepIDListPtrs []*PeptideIdentification
 
 func ToPepIDListPtrs(p PepIDList) PepIDListPtrs {
-	pptrs := make(PepIDListPtrs, len(p), len(p))
+	pptrs := make(PepIDListPtrs, len(p))
 	for i := range p {
 		pptrs[i] = &p[i]
 	}
@@ -262,7 +262,7 @@ func (p *PepXML) Read(f string) {
 
 		// start processing spectra queries
 		sq := mpa.MsmsRunSummary.SpectrumQuery
-		p.PeptideIdentification = make(PepIDList, len(sq), len(sq))
+		p.PeptideIdentification = make(PepIDList, len(sq))
 		for idx, i := range sq {
 			p.PeptideIdentification[idx] = processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
 		}

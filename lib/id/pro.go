@@ -3,7 +3,6 @@ package id
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -278,18 +277,16 @@ func (p *ProtXML) Serialize() {
 		msg.MarshalFile(e, "fatal")
 	}
 
-	e = ioutil.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
+	e = os.WriteFile(sys.ProtxmlBin(), b, sys.FilePermission())
 	if e != nil {
 		msg.WriteFile(e, "fatal")
 	}
-
-	return
 }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (p *ProtXML) Restore() {
 
-	b, e := ioutil.ReadFile(sys.ProtxmlBin())
+	b, e := os.ReadFile(sys.ProtxmlBin())
 	if e != nil {
 		msg.ReadFile(e, "fatal")
 	}
@@ -298,8 +295,6 @@ func (p *ProtXML) Restore() {
 	if e != nil {
 		msg.DecodeMsgPck(e, "fatal")
 	}
-
-	return
 }
 
 // Serialize converts the whle structure to a gob file

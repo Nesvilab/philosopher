@@ -3,7 +3,6 @@ package pip
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -86,7 +85,7 @@ func DeployParameterFile(temp string) string {
 		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
 
-	e = ioutil.WriteFile(file, param, sys.FilePermission())
+	e = os.WriteFile(file, param, sys.FilePermission())
 	if e != nil {
 		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
@@ -148,12 +147,12 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
 
 		// Read all content of src to data
-		data, e := ioutil.ReadFile(source)
+		data, e := os.ReadFile(source)
 		if e != nil {
 			log.Fatal(e)
 		}
 
-		e = ioutil.WriteFile(destination, data, 0644)
+		e = os.WriteFile(destination, data, 0644)
 		if e != nil {
 			log.Fatal(e)
 		}

@@ -3,7 +3,6 @@ package cmd
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -49,7 +48,7 @@ var pipelineCmd = &cobra.Command{
 
 		file, _ := filepath.Abs(m.Pipeline.Directives)
 
-		y, e := ioutil.ReadFile(file)
+		y, e := os.ReadFile(file)
 		if e != nil {
 			msg.ReadFile(e, "fatal")
 		}
