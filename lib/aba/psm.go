@@ -164,7 +164,7 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 
 	sort.Strings(modList)
 
-	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Protein.Start,Protein.End,Gene,Mapped.Genes,Protein,Protein.ID,Mapped.Proteins,Protein.Description,Is.Unique,Quan.Usage,Purity,Intensity"
+	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Protein.Start,Protein.End,Gene,Mapped.Genes,Protein,Protein.ID,Mapped.Proteins,Protein.Description,Is.Unique,Purity,Intensity"
 
 	if len(modList) > 0 {
 		for _, i := range modList {
@@ -240,7 +240,7 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 
 		line += fmt.Sprintf("%t,", i.IsUnique)
 
-		line += fmt.Sprintf("%t,", i.IsUsed)
+		//line += fmt.Sprintf("%t,", i.IsUsed)
 
 		line += fmt.Sprintf("%.2f,", i.Purity)
 
