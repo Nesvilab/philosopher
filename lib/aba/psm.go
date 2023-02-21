@@ -132,16 +132,16 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 	}
 	defer file.Close()
 
-	header := "Spectrum Name,Spectrum File,Peptide Sequence,Modified Peptide Sequence,Probability,Charge,Gene,Protein,Protein ID,Entry Name,Protein Description,Is Unique,Quan Usage,Purity,Intensity"
+	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Gene,Protein,Protein.ID,Protein.Description,Is.Unique,Quan.Usage,Purity,Intensity"
 
 	if plex == "10" {
-		header = fmt.Sprintf("%s,126,127N,127C,128N,128C,129N,129C,130N,130C,131N", header)
+		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N", header)
 	} else if plex == "11" {
-		header = fmt.Sprintf("%s,126,127N,127C,128N,128C,129N,129C,130N,130C,131N,131C", header)
+		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C", header)
 	} else if plex == "16" {
-		header = fmt.Sprintf("%s,126,127N,127C,128N,128C,129N,129C,130N,130C,131N,131C,132N,132C,133N,133C,134N", header)
+		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 132N,Channel 132C,Channel 133N,Channel 133C,Channel 134N", header)
 	} else if plex == "18" {
-		header = fmt.Sprintf("%s,126,127N,127C,128N,128C,129N,129C,130N,130C,131N,131C,132N,132C,133N,133C,134N,134C,135N", header)
+		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 32N,Channel 132C,Channel 133N,Channel 133C,Channel 134N,Channel 134C,Channel 135N", header)
 	} else {
 		msg.Custom(errors.New("unsupported number of labels"), "error")
 	}
@@ -172,8 +172,6 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 		line += fmt.Sprintf("%s,", i.Protein)
 
 		line += fmt.Sprintf("%s,", i.ProteinID)
-
-		line += fmt.Sprintf("%s,", i.EntryName)
 
 		line += fmt.Sprintf("%s,", i.ProteinDescription)
 
