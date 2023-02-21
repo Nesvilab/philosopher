@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/Nesvilab/philosopher/lib/fas"
 	"github.com/Nesvilab/philosopher/lib/met"
@@ -136,59 +135,9 @@ func (d *Base) ProcessDB(file, decoyTag string, verbose bool) {
 	d.FileName = path.Base(file)
 
 	for k, v := range fastaMap {
-
 		class := Classify(k, decoyTag)
-
-		ProcessHeader(k, v, class, decoyTag, verbose)
-
-		// if verbose {
-		// 	m := fmt.Sprintf("Class: %s  Record: %s", class, k)
-		// 	fmt.Println(m)
-		// }
-
-		// if class == "uniprot" {
-
-		// 	db := ProcessUniProtKB(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "ncbi" {
-
-		// 	db := ProcessNCBI(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "ensembl" {
-
-		// 	db := ProcessENSEMBL(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "generic" {
-
-		// 	db := ProcessGeneric(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "uniref" {
-
-		// 	db := ProcessUniRef(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "tair" {
-
-		// 	db := ProcessTair(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else if class == "nextprot" {
-
-		// 	db := ProcessNextProt(k, v, decoyTag)
-		// 	d.Records = append(d.Records, db)
-
-		// } else {
-		// 	msg.ParsingFASTA(errors.New(""), "error")
-		// }
-
-		spew.Dump()
+		d.Records = append(d.Records, ProcessHeader(k, v, class, decoyTag, verbose))
 	}
-
-	os.Exit(1)
 }
 
 // Fetch downloads a database file from UniProt

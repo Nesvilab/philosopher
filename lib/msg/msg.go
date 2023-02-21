@@ -283,6 +283,15 @@ func ParsingFASTA(e error, t string) {
 
 }
 
+// ParsingFASTAHeader call when trying parse a protein FASTA database
+func ParsingFASTAHeader(e error, t string) {
+
+	m := fmt.Sprintf("Malformed FASTA header. %s", e)
+
+	callLogrus(m, t)
+
+}
+
 // Done call when a process is ready
 func Done() {
 
