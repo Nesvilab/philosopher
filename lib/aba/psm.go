@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/Nesvilab/philosopher/lib/id"
 	"github.com/Nesvilab/philosopher/lib/iso"
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/msg"
@@ -85,6 +86,8 @@ func psmLevelAbacus(m met.Data, args []string) {
 			psm.ModifiedPeptide = j.ModifiedPeptide
 			psm.Probability = j.Probability
 			psm.Protein = j.Protein
+			psm.ProteinStart = j.ProteinStart
+			psm.ProteinEnd = j.ProteinEnd
 			psm.ProteinDescription = strings.Replace(j.ProteinDescription, ",", " ", -1)
 			psm.ProteinID = j.ProteinID
 			psm.EntryName = j.EntryName
@@ -95,6 +98,15 @@ func psmLevelAbacus(m met.Data, args []string) {
 
 			psm.Intensity = j.Intensity
 			psm.NamedIntensity[prjName] = j.Intensity
+
+			psm.MappedProteins = j.MappedProteins
+			psm.MappedGenes = j.MappedGenes
+
+			if j.PTM == nil {
+				psm.PTM = id.PTM{LocalizedPTMSites: map[string]int{}, LocalizedPTMMassDiff: map[string]string{}}
+			} else {
+				psm.PTM = *j.PTM
+			}
 
 			psm.Labels = *j.Labels
 
@@ -122,6 +134,9 @@ func psmLevelAbacus(m met.Data, args []string) {
 // saveMSstatsResult creates a msstats report using 1 or more philosopher result files
 func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
 
+	var modMap = make(map[string]string)
+	var modList []string
+
 	// create result file
 	output := fmt.Sprintf("%s%smsstats.csv", session, string(filepath.Separator))
 
@@ -132,7 +147,30 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 	}
 	defer file.Close()
 
-	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Gene,Protein,Protein.ID,Protein.Description,Is.Unique,Quan.Usage,Purity,Intensity"
+	for _, i := range evidences {
+		for k := range i.PTM.LocalizedPTMMassDiff {
+			_, ok := modMap[k]
+			if !ok {
+				modMap[k] = ""
+			} else {
+				modMap[k] = ""
+			}
+		}
+	}
+
+	for k := range modMap {
+		modList = append(modList, k)
+	}
+
+	sort.Strings(modList)
+
+	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Protein.Start,Protein.End,Gene,Mapped.Genes,Protein,Protein.ID,Mapped.Proteins,Protein.Description,Is.Unique,Quan.Usage,Purity,Intensity"
+
+	if len(modList) > 0 {
+		for _, i := range modList {
+			header += "," + i
+		}
+	}
 
 	if plex == "10" {
 		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N", header)
@@ -154,6 +192,23 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 
 	for _, i := range evidences {
 		var line string
+		var mods string
+
+		var mappedGenes []string
+		for j := range i.MappedGenes {
+			if j != i.GeneName && len(j) > 0 {
+				mappedGenes = append(mappedGenes, j)
+			}
+		}
+		sort.Strings(mappedGenes)
+
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			if j != i.Protein && len(j) > 0 {
+				mappedProteins = append(mappedProteins, j)
+			}
+		}
+		sort.Strings(mappedProteins)
 
 		line += fmt.Sprintf("%s,", i.Spectrum)
 
@@ -167,11 +222,19 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 
 		line += fmt.Sprintf("%d,", i.AssumedCharge)
 
+		line += fmt.Sprintf("%d,", i.ProteinStart)
+
+		line += fmt.Sprintf("%d,", i.ProteinEnd)
+
 		line += fmt.Sprintf("%s,", i.GeneName)
+
+		line += fmt.Sprintf("%s,", strings.Join(mappedGenes, ";"))
 
 		line += fmt.Sprintf("%s,", i.Protein)
 
 		line += fmt.Sprintf("%s,", i.ProteinID)
+
+		line += fmt.Sprintf("%s,", strings.Join(mappedProteins, ";"))
 
 		line += fmt.Sprintf("%s,", i.ProteinDescription)
 
@@ -182,6 +245,14 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 		line += fmt.Sprintf("%.2f,", i.Purity)
 
 		line += fmt.Sprintf("%6.f,", i.Intensity)
+
+		if len(modList) > 0 {
+			for _, j := range modList {
+				mods += fmt.Sprintf("%s,", i.PTM.LocalizedPTMMassDiff[j])
+			}
+		}
+
+		line += mods
 
 		if hasLabels {
 			switch plex {

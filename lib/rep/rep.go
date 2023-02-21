@@ -411,6 +411,8 @@ type CombinedPSMEvidence struct {
 	EntryName          string
 	GeneName           string
 	AssumedCharge      uint8
+	ProteinStart       int
+	ProteinEnd         int
 	Purity             float64
 	Intensity          float64
 	Probability        float64
@@ -418,6 +420,9 @@ type CombinedPSMEvidence struct {
 	IsUsed             bool
 	NamedIntensity     map[string]float64
 	NamedLabels        map[string]iso.Labels
+	MappedProteins     map[string]string
+	MappedGenes        map[string]struct{}
+	PTM                id.PTM
 	Labels             iso.Labels
 }
 
