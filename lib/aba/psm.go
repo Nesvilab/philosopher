@@ -50,11 +50,17 @@ func psmLevelAbacus(m met.Data, args []string) {
 
 				scanner := bufio.NewScanner(file)
 				for scanner.Scan() {
-					names := strings.Fields(scanner.Text())
 
-					name := i + " " + names[0]
+					if len(scanner.Text()) > 3 {
+						names := strings.Fields(scanner.Text())
 
-					labels[name] = names[1]
+						if len(names) <= 1 {
+							msg.Custom(errors.New("the annotation file looks to be empty"), "error")
+						}
+
+						name := i + " " + names[0]
+						labels[name] = names[1]
+					}
 				}
 
 				if e = scanner.Err(); e != nil {
@@ -123,16 +129,16 @@ func psmLevelAbacus(m met.Data, args []string) {
 
 	if m.Abacus.Labels {
 		//savePSMAbacusResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
-		saveMSstatsResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
+		saveMSstatsResult(m.Temp, m.Abacus.Plex, evidences, true)
 	} else {
 		//savePSMAbacusResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, false, m.Abacus.Full, labels)
-		saveMSstatsResult(m.Temp, m.Abacus.Plex, evidences, names, m.Abacus.Unique, true, m.Abacus.Full, labels)
+		saveMSstatsResult(m.Temp, m.Abacus.Plex, evidences, false)
 	}
 
 }
 
 // saveMSstatsResult creates a msstats report using 1 or more philosopher result files
-func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
+func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceList, hasLabels bool) {
 
 	var modMap = make(map[string]string)
 	var modList []string
@@ -240,8 +246,6 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 
 		line += fmt.Sprintf("%t,", i.IsUnique)
 
-		//line += fmt.Sprintf("%t,", i.IsUsed)
-
 		line += fmt.Sprintf("%.2f,", i.Purity)
 
 		line += fmt.Sprintf("%6.f,", i.Intensity)
@@ -324,7 +328,7 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 }
 
 // savePSMAbacusResult creates a single report using 1 or more philosopher result files
-func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidenceList, namesList []string, uniqueOnly, hasLabels, full bool, labelsList map[string]string) {
+func savePSMAbacusResult(session, plex string, evidences rep.CombinedPSMEvidenceList, namesList []string, hasLabels, full bool, labelsList map[string]string) {
 
 	// create result file
 	output := fmt.Sprintf("%s%scombined_psm.tsv", session, string(filepath.Separator))
