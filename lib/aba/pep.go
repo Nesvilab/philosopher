@@ -67,8 +67,11 @@ func peptideLevelAbacus(m met.Data, args []string) {
 				for scanner.Scan() {
 					names := strings.Fields(scanner.Text())
 
-					name := i + " " + names[0]
+					if len(names) <= 1 {
+						msg.Custom(errors.New("the annotation file looks to be empty"), "error")
+					}
 
+					name := i + " " + names[0]
 					labels[name] = names[1]
 				}
 
@@ -142,6 +145,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.PSMEvidenceList, 
 	for _, i := range pep {
 		if !strings.HasPrefix(i.Protein, decoyTag) {
 			var e rep.CombinedPeptideEvidence
+
 			e.Spc = make(map[string]int)
 			e.Intensity = make(map[string]float64)
 			e.AssignedMassDiffs = make(map[string]uint8)
@@ -288,6 +292,12 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	sort.Sort(evidences)
 
 	for _, i := range evidences {
+
+		// incomplete records will existe due to differences between individual validation and iProphet results
+		// ignore them bu checking empty fields
+		if len(i.ChargeStates) == 0 {
+			continue
+		}
 
 		var line string
 
