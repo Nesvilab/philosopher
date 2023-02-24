@@ -114,9 +114,8 @@ func psmLevelAbacus(m met.Data, args []string) {
 				psm.PTM = *j.PTM
 			}
 
-			psm.Labels = *j.Labels
-
 			if j.Labels != nil {
+				psm.Labels = *j.Labels
 				psm.NamedLabels[prjName] = *j.Labels
 				if j.Labels.IsUsed {
 					psm.IsUsed = true
@@ -178,16 +177,18 @@ func saveMSstatsResult(session, plex string, evidences rep.CombinedPSMEvidenceLi
 		}
 	}
 
-	if plex == "10" {
-		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N", header)
-	} else if plex == "11" {
-		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C", header)
-	} else if plex == "16" {
-		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 132N,Channel 132C,Channel 133N,Channel 133C,Channel 134N", header)
-	} else if plex == "18" {
-		header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 32N,Channel 132C,Channel 133N,Channel 133C,Channel 134N,Channel 134C,Channel 135N", header)
-	} else {
-		msg.Custom(errors.New("unsupported number of labels"), "error")
+	if hasLabels {
+		if plex == "10" {
+			header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N", header)
+		} else if plex == "11" {
+			header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C", header)
+		} else if plex == "16" {
+			header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 132N,Channel 132C,Channel 133N,Channel 133C,Channel 134N", header)
+		} else if plex == "18" {
+			header = fmt.Sprintf("%s,Channel 126,Channel 127N,Channel 127C,Channel 128N,Channel 128C,Channel 129N,Channel 129C,Channel 130N,Channel 130C,Channel 131N,Channel 131C,Channel 32N,Channel 132C,Channel 133N,Channel 133C,Channel 134N,Channel 134C,Channel 135N", header)
+		} else {
+			msg.Custom(errors.New("unsupported number of labels"), "error")
+		}
 	}
 
 	header += "\n"
