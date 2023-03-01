@@ -226,28 +226,31 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 
 						var rc raz.RazorCandidate
 						rc.Sequence = k.PeptideSequence
-						rc.MappedProteinsW = make(map[string]float64)
-						rc.MappedProteinsGW = make(map[string]float64)
-						rc.MappedProteinsTNP = make(map[string]int)
-						rc.MappedproteinsSID = make(map[string]string)
+						rc.MappedProteins = make(map[string]raz.MappedProtein)
 
-						rc.MappedProteinsW[j.ProteinName] = k.Weight
-						rc.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-						rc.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-						rc.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
+						rc.MappedProteins[j.ProteinName] = raz.MappedProtein{
+							W:   k.Weight,
+							GW:  k.GroupWeight,
+							TNP: j.TotalNumberPeptides,
+							SID: j.GroupSiblingID,
+						}
 
 						for _, i := range j.IndistinguishableProtein {
-							rc.MappedProteinsW[i] = -1
-							rc.MappedProteinsGW[i] = -1
-							rc.MappedProteinsTNP[i] = -1
-							rc.MappedproteinsSID[i] = "zzz"
+							rc.MappedProteins[i] = raz.MappedProtein{
+								W:   -1,
+								GW:  -1,
+								TNP: -1,
+								SID: "zzz",
+							}
 						}
 
 						for _, i := range k.PeptideParentProtein {
-							rc.MappedProteinsW[i] = -1
-							rc.MappedProteinsGW[i] = -1
-							rc.MappedProteinsTNP[i] = -1
-							rc.MappedproteinsSID[i] = "zzz"
+							rc.MappedProteins[i] = raz.MappedProtein{
+								W:   -1,
+								GW:  -1,
+								TNP: -1,
+								SID: "zzz",
+							}
 						}
 
 						r[k.PeptideSequence] = rc
@@ -256,10 +259,12 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						var c = v
 
 						// doing like this will allow proteins that map to shared peptidesto be considered
-						c.MappedProteinsW[j.ProteinName] = k.Weight
-						c.MappedProteinsGW[j.ProteinName] = k.GroupWeight
-						c.MappedProteinsTNP[j.ProteinName] = j.TotalNumberPeptides
-						c.MappedproteinsSID[j.ProteinName] = j.GroupSiblingID
+						c.MappedProteins[j.ProteinName] = raz.MappedProtein{
+							W:   k.Weight,
+							GW:  k.GroupWeight,
+							TNP: j.TotalNumberPeptides,
+							SID: j.GroupSiblingID,
+						}
 						r[k.PeptideSequence] = c
 
 					}
@@ -279,8 +284,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 		// get the best protein candidate for each peptide sequence and make the razor pair
 		for _, k := range rList {
 			// 1st pass: mark all cases with weight > 0.5
-			for pt, w := range r[k].MappedProteinsW {
-				if w > 0.5 {
+			for pt, w := range r[k].MappedProteins {
+				if w.W > 0.5 {
 					razorPair[k] = pt
 				}
 			}
@@ -299,17 +304,17 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 				var topGWMap = make(map[float64]uint8)
 				var topTNPMap = make(map[int]uint8)
 
-				if len(r[k].MappedProteinsGW) == 1 {
+				if len(r[k].MappedProteins) == 1 {
 
-					for pt := range r[k].MappedProteinsGW {
+					for pt := range r[k].MappedProteins {
 						razorPair[k] = pt
 					}
 
-				} else if len(r[k].MappedProteinsGW) > 1 {
+				} else if len(r[k].MappedProteins) > 1 {
 
-					for pt, tnp := range r[k].MappedProteinsGW {
-						if tnp >= topGW {
-							topGW = tnp
+					for pt, tnp := range r[k].MappedProteins {
+						if tnp.GW >= topGW {
+							topGW = tnp.GW
 							topPT = pt
 							topGWMap[topGW]++
 						}
@@ -326,15 +331,15 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 					} else {
 
 						var tnpList []string
-						for pt := range r[k].MappedProteinsTNP {
+						for pt := range r[k].MappedProteins {
 							tnpList = append(tnpList, pt)
 						}
 
 						sort.Strings(tnpList)
 
 						for _, pt := range tnpList {
-							if r[k].MappedProteinsTNP[pt] >= topTNP {
-								topTNP = r[k].MappedProteinsTNP[pt]
+							if r[k].MappedProteins[pt].TNP >= topTNP {
+								topTNP = r[k].MappedProteins[pt].TNP
 								topPT = pt
 								topTNPMap[topTNP]++
 							}
@@ -348,14 +353,14 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						if !tie {
 
 							var mplist []string
-							for pt := range r[k].MappedProteinsTNP {
+							for pt := range r[k].MappedProteins {
 								mplist = append(mplist, pt)
 							}
 							sort.Strings(mplist)
 
 							for _, pt := range mplist {
-								if r[k].MappedProteinsTNP[pt] >= topCount {
-									topCount = r[k].MappedProteinsTNP[pt]
+								if r[k].MappedProteins[pt].TNP >= topCount {
+									topCount = r[k].MappedProteins[pt].TNP
 									topPT = pt
 								}
 							}
@@ -365,9 +370,8 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 						} else {
 
 							var idList []string
-							for protein, id := range r[k].MappedproteinsSID {
-								id = fmt.Sprintf("%s#%s", id, protein)
-								idList = append(idList, id)
+							for protein, id := range r[k].MappedProteins {
+								idList = append(idList, fmt.Sprintf("%s#%s", id.SID, protein))
 							}
 
 							sort.Strings(idList)
