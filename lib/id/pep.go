@@ -794,14 +794,42 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 }
 
+var serialize_pepxml = false
+var globals_pepxml *PepXML4Serialiazation = nil
+var globals_pepidlist = make(map[string]*PepIDListPtrs)
+
 // Serialize converts the whole structure to a msgpack file
 func (p *PepXML4Serialiazation) Serialize() {
-	sys.Serialize(p, sys.PepxmlBin())
+	if serialize_pepxml {
+		sys.Serialize(p, sys.PepxmlBin())
+	} else {
+		globals_pepxml = p
+	}
 }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (p *PepXML) Restore() {
-	sys.Restore(p, sys.PepxmlBin(), false)
+	if serialize_pepxml {
+		sys.Restore(p, sys.PepxmlBin(), false)
+	} else {
+		tmp := *globals_pepxml
+		*p = PepXML{
+			FileName:              tmp.FileName,
+			SpectraFile:           tmp.SpectraFile,
+			SearchEngine:          tmp.SearchEngine,
+			DecoyTag:              tmp.DecoyTag,
+			Database:              tmp.Database,
+			Prophet:               tmp.Prophet,
+			SearchParameters:      tmp.SearchParameters,
+			Models:                tmp.Models,
+			Modifications:         tmp.Modifications,
+			PeptideIdentification: make(PepIDList, len(tmp.PeptideIdentification)),
+		}
+		for i, v := range tmp.PeptideIdentification {
+			p.PeptideIdentification[i] = *v
+		}
+		globals_pepxml = nil
+	}
 }
 
 // Serialize converts the whle structure to a gob file
@@ -818,7 +846,15 @@ func (p *PepIDList) Serialize(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
-	sys.Serialize(p, dest)
+	if globals_pepidlist == nil {
+		sys.Serialize(p, dest)
+	} else {
+		ret := make(PepIDListPtrs, len(*p))
+		globals_pepidlist[dest] = &ret
+		for i := range *p {
+			ret[i] = &(*p)[i]
+		}
+	}
 }
 
 // Serialize converts the whle structure to a gob file
@@ -835,7 +871,11 @@ func (p *PepIDListPtrs) Serialize(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
-	sys.Serialize(p, dest)
+	if globals_pepidlist == nil {
+		sys.Serialize(p, dest)
+	} else {
+		globals_pepidlist[dest] = p
+	}
 }
 
 // Restore reads philosopher results files and restore the data sctructure
@@ -852,5 +892,14 @@ func (p *PepIDList) Restore(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
-	sys.Restore(p, dest, false)
+	if globals_pepidlist == nil {
+		sys.Restore(p, dest, false)
+	} else {
+		ptrs := *globals_pepidlist[dest]
+		*p = make(PepIDList, len(ptrs))
+		for i, v := range ptrs {
+			(*p)[i] = *v
+		}
+		*globals_pepidlist[dest] = nil
+	}
 }
