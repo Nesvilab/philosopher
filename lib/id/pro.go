@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -82,10 +83,7 @@ func (e IonFormType) Str() string {
 }
 
 func (e PeptideIonIdentification) IonForm() IonFormType {
-	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.CalcNeutralPepMass), 32)
-	if err != nil {
-		panic(err)
-	}
+	t := math.Round(e.CalcNeutralPepMass*1e4) * 1e-4
 	return IonFormType{e.PeptideSequence, float32(t), e.Charge}
 }
 

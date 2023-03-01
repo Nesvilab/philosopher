@@ -41,8 +41,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
 		p := &evi.PSM[idx]
 
-		source := strings.Split(i.Spectrum, ".")
-		p.Source = source[0]
+		p.Source = i.Spectrum[:strings.Index(i.Spectrum, ".")]
 		p.Index = i.Index
 		p.Spectrum = i.Spectrum
 		p.SpectrumFile = i.SpectrumFile

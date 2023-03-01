@@ -2,6 +2,7 @@ package rep
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"sync"
 
@@ -166,18 +167,12 @@ type PSMEvidence struct {
 }
 
 func (e PSMEvidence) IonForm() id.IonFormType {
-	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.CalcNeutralPepMass), 32)
-	if err != nil {
-		panic(err)
-	}
+	t := math.Round(e.CalcNeutralPepMass*1e4) * 1e-4
 	return id.IonFormType{e.Peptide, float32(t), e.AssumedCharge}
 }
 
 func (e IonEvidence) IonForm() id.IonFormType {
-	t, err := strconv.ParseFloat(fmt.Sprintf("%.4f", e.PeptideMass), 32)
-	if err != nil {
-		panic(err)
-	}
+	t := math.Round(e.PeptideMass*1e4) * 1e-4
 	return id.IonFormType{e.Sequence, float32(t), e.ChargeState}
 }
 
@@ -187,7 +182,8 @@ type PSMEvidenceList []PSMEvidence
 func (a PSMEvidenceList) Len() int      { return len(a) }
 func (a PSMEvidenceList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 func (a PSMEvidenceList) Less(i, j int) bool {
-	return a[i].SpectrumFileName().Str() < a[j].SpectrumFileName().Str()
+	return a[i].Spectrum < a[j].Spectrum ||
+		(a[i].Spectrum == a[j].Spectrum && a[i].SpectrumFile < a[j].SpectrumFile)
 }
 
 // RemovePSMByIndex perfomrs a re-slicing by removing an element from a list
