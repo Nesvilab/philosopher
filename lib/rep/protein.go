@@ -182,61 +182,58 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 
 	// fix the name sand headers and pull database information into protein report
+	d := make(map[string]*dat.Record)
+	d2 := make(map[string]*dat.Record)
+	for i, v := range dtb.Records {
+		d[v.OriginalHeader] = &dtb.Records[i]
+		d2[v.PartHeader] = &dtb.Records[i]
+	}
 	for i := range evi.Proteins {
-
 		pe := &evi.Proteins[i]
+		j, found := d[pe.OriginalHeader]
+		if !found {
+			j, found = d2[pe.OriginalHeader[:len(pe.OriginalHeader)-len(pe.Description)-len(" ")]]
+		}
+		if found && j.IsDecoy == pe.IsDecoy {
 
-		for _, j := range dtb.Records {
+			pe.OriginalHeader = j.OriginalHeader
+			pe.PartHeader = j.PartHeader
+			pe.ProteinID = j.ID
+			pe.EntryName = j.EntryName
+			pe.ProteinExistence = j.ProteinExistence
+			pe.GeneNames = j.GeneNames
+			pe.Sequence = j.Sequence
+			pe.ProteinName = j.ProteinName
+			pe.Organism = j.Organism
 
-			desc := strings.Replace(pe.Description, "|", " ", -1)
-			ensName := j.PartHeader + " " + desc
+			// some simple headers might not have a full partheader, so we force them to be
+			// the same as the EntryName
+			if len(pe.PartHeader) == 0 {
+				pe.PartHeader = pe.ProteinName
+				pe.EntryName = pe.ProteinName
+			}
 
-			if (j.OriginalHeader == pe.OriginalHeader) || (ensName == pe.OriginalHeader) {
+			// uniprot entries have the description on ProteinName
+			if len(j.ProteinName) < 1 {
+				pe.Description = j.ProteinName
+			} else {
+				pe.Description = j.ProteinName
+			}
 
-				if (j.IsDecoy && pe.IsDecoy) || (!j.IsDecoy && !pe.IsDecoy) {
+			// for Ensemble entries without name
+			if len(pe.ProteinName) == 0 {
+				pe.ProteinName = pe.PartHeader
+			}
 
-					pe.OriginalHeader = j.OriginalHeader
-					pe.PartHeader = j.PartHeader
-					pe.ProteinID = j.ID
-					pe.EntryName = j.EntryName
-					pe.ProteinExistence = j.ProteinExistence
-					pe.GeneNames = j.GeneNames
-					pe.Sequence = j.Sequence
-					pe.ProteinName = j.ProteinName
-					pe.Organism = j.Organism
+			if pe.Length == 0 {
+				pe.Length = len(j.Sequence)
+			}
 
-					// some simple headers might not have a full partheader, so we force them to be
-					// the same as the EntryName
-					if len(pe.PartHeader) == 0 {
-						pe.PartHeader = pe.ProteinName
-						pe.EntryName = pe.ProteinName
-					}
-
-					// uniprot entries have the description on ProteinName
-					if len(j.ProteinName) < 1 {
-						pe.Description = j.ProteinName
-					} else {
-						pe.Description = j.ProteinName
-					}
-
-					// for Ensemble entries without name
-					if len(pe.ProteinName) == 0 {
-						pe.ProteinName = pe.PartHeader
-					}
-
-					if pe.Length == 0 {
-						pe.Length = len(j.Sequence)
-					}
-
-					// updating the protein ions
-					for _, k := range pe.TotalPeptideIons {
-						k.Protein = j.PartHeader
-						k.ProteinID = j.ID
-						k.GeneName = j.GeneNames
-					}
-
-					break
-				}
+			// updating the protein ions
+			for _, k := range pe.TotalPeptideIons {
+				k.Protein = j.PartHeader
+				k.ProteinID = j.ID
+				k.GeneName = j.GeneNames
 			}
 		}
 	}
