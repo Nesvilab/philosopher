@@ -12,7 +12,7 @@ type PepXML struct {
 
 // MsmsPipelineAnalysis tag
 type MsmsPipelineAnalysis struct {
-	XMLName         xml.Name          `xml:"msms_pipeline_analysis"`
+	//XMLName         xml.Name          `xml:"msms_pipeline_analysis"`
 	Date            []byte            `xml:"date,attr"`
 	SummaryXML      []byte            `xml:"summary_xml,attr"`
 	AnalysisSummary []AnalysisSummary `xml:"analysis_summary"`
@@ -21,86 +21,86 @@ type MsmsPipelineAnalysis struct {
 
 // AnalysisSummary struct
 type AnalysisSummary struct {
-	XMLName               xml.Name              `xml:"analysis_summary"`
-	Analysis              []byte                `xml:"analysis,attr"`
-	Time                  []byte                `xml:"time,attr"`
+	//XMLName               xml.Name              `xml:"analysis_summary"`
+	Analysis []byte `xml:"analysis,attr"`
+	//Time                  []byte                `xml:"time,attr"`
 	PeptideprophetSummary PeptideprophetSummary `xml:"peptideprophet_summary"`
 }
 
 // PeptideprophetSummary struct
 type PeptideprophetSummary struct {
-	XMLName           xml.Name            `xml:"peptideprophet_summary"`
-	Version           []byte              `xml:"version,attr"`
-	Options           []byte              `xml:"options,attr"`
-	MixtureModel      []MixtureModel      `xml:"mixture_model"`
+	//XMLName           xml.Name            `xml:"peptideprophet_summary"`
+	//Version           []byte              `xml:"version,attr"`
+	//Options           []byte              `xml:"options,attr"`
+	//MixtureModel      []MixtureModel      `xml:"mixture_model"`
 	DistributionPoint []DistributionPoint `xml:"distribution_point"`
 }
 
 // DistributionPoint ...
 type DistributionPoint struct {
-	XMLName        xml.Name `xml:"distribution_point"`
-	Fvalue         float64  `xml:"fvalue,attr"`
-	Obs1Distr      float64  `xml:"obs_1_distr,attr"`
-	Model1PosDistr float64  `xml:"model_1_pos_distr,attr"`
-	Model1NegDistr float64  `xml:"model_1_neg_distr,attr"`
-	Obs2Distr      float64  `xml:"obs_2_distr,attr"`
-	Model2PosDistr float64  `xml:"model_2_pos_distr,attr"`
-	Model2NegDistr float64  `xml:"model_2_neg_distr,attr"`
-	Obs3Distr      float64  `xml:"obs_3_distr,attr"`
-	Model3PosDistr float64  `xml:"model_3_pos_distr,attr"`
-	Model3NegDistr float64  `xml:"model_3_neg_distr,attr"`
-	Obs4Distr      float64  `xml:"obs_4_distr,attr"`
-	Model4PosDistr float64  `xml:"model_4_pos_distr,attr"`
-	Model4NegDistr float64  `xml:"model_4_neg_distr,attr"`
-	Obs5Distr      float64  `xml:"obs_5_distr,attr"`
-	Model5PosDistr float64  `xml:"model_5_pos_distr,attr"`
-	Model5NegDistr float64  `xml:"model_5_neg_distr,attr"`
-	Obs6Distr      float64  `xml:"obs_6_distr,attr"`
-	Model6PosDistr float64  `xml:"model_6_pos_distr,attr"`
-	Model6NegDistr float64  `xml:"model_6_neg_distr,attr"`
-	Obs7Distr      float64  `xml:"obs_7_distr,attr"`
-	Model7PosDistr float64  `xml:"model_7_pos_distr,attr"`
-	Model7NegDistr float64  `xml:"model_7_neg_distr,attr"`
+	//XMLName        xml.Name `xml:"distribution_point"`
+	Fvalue         float64 `xml:"fvalue,attr"`
+	Obs1Distr      float64 `xml:"obs_1_distr,attr"`
+	Model1PosDistr float64 `xml:"model_1_pos_distr,attr"`
+	Model1NegDistr float64 `xml:"model_1_neg_distr,attr"`
+	Obs2Distr      float64 `xml:"obs_2_distr,attr"`
+	Model2PosDistr float64 `xml:"model_2_pos_distr,attr"`
+	Model2NegDistr float64 `xml:"model_2_neg_distr,attr"`
+	Obs3Distr      float64 `xml:"obs_3_distr,attr"`
+	Model3PosDistr float64 `xml:"model_3_pos_distr,attr"`
+	Model3NegDistr float64 `xml:"model_3_neg_distr,attr"`
+	Obs4Distr      float64 `xml:"obs_4_distr,attr"`
+	Model4PosDistr float64 `xml:"model_4_pos_distr,attr"`
+	Model4NegDistr float64 `xml:"model_4_neg_distr,attr"`
+	Obs5Distr      float64 `xml:"obs_5_distr,attr"`
+	Model5PosDistr float64 `xml:"model_5_pos_distr,attr"`
+	Model5NegDistr float64 `xml:"model_5_neg_distr,attr"`
+	Obs6Distr      float64 `xml:"obs_6_distr,attr"`
+	Model6PosDistr float64 `xml:"model_6_pos_distr,attr"`
+	Model6NegDistr float64 `xml:"model_6_neg_distr,attr"`
+	Obs7Distr      float64 `xml:"obs_7_distr,attr"`
+	Model7PosDistr float64 `xml:"model_7_pos_distr,attr"`
+	Model7NegDistr float64 `xml:"model_7_neg_distr,attr"`
 }
 
 // MixtureModel struct
 type MixtureModel struct {
-	XMLName            xml.Name       `xml:"mixture_model"`
-	PrecursorIonCharge uint8          `xml:"precursor_ion_charge,attr"`
-	Comments           []byte         `xml:"comments,attr"`
-	PriorProbability   float64        `xml:"prior_probability,attr"`
-	EstTotCorrect      float64        `xml:"est_tot_correct,attr"`
-	TotNumSpectra      float64        `xml:"tot_num_spectra,attr"`
-	NumIterations      float64        `xml:"num_iterations,attr"`
-	Mixturemodel       []Mixturemodel `xml:"mixturemodel"`
+	//XMLName            xml.Name       `xml:"mixture_model"`
+	//PrecursorIonCharge uint8          `xml:"precursor_ion_charge,attr"`
+	//Comments           []byte         `xml:"comments,attr"`
+	//PriorProbability   float64        `xml:"prior_probability,attr"`
+	//EstTotCorrect      float64        `xml:"est_tot_correct,attr"`
+	//TotNumSpectra      float64        `xml:"tot_num_spectra,attr"`
+	//NumIterations      float64        `xml:"num_iterations,attr"`
+	//Mixturemodel       []Mixturemodel `xml:"mixturemodel"`
 }
 
 // Mixturemodel struct
 type Mixturemodel struct {
-	XMLName      xml.Name `xml:"mixturemodel"`
-	Name         []byte   `xml:"name,attr"`
-	PosBandwidth float64  `xml:"pos_bandwidth,attr"`
-	NegBandwidth float64  `xml:"neg_bandwidth,attr"`
-	Point        []Point  `xml:"point"`
+	//XMLName      xml.Name `xml:"mixturemodel"`
+	//Name         []byte   `xml:"name,attr"`
+	//PosBandwidth float64  `xml:"pos_bandwidth,attr"`
+	//NegBandwidth float64  `xml:"neg_bandwidth,attr"`
+	//Point        []Point  `xml:"point"`
 }
 
 // Point struct
 type Point struct {
-	XMLName xml.Name `xml:"point"`
-	Value   float64  `xml:"value,attr"`
-	PosDens float64  `xml:"pos_dens,attr"`
-	NegDens float64  `xml:"neg_dens,attr"`
+	//XMLName xml.Name `xml:"point"`
+	//Value   float64  `xml:"value,attr"`
+	//PosDens float64  `xml:"pos_dens,attr"`
+	//NegDens float64  `xml:"neg_dens,attr"`
 }
 
 // MixturemodelDistribution struct
 type MixturemodelDistribution struct {
-	XMLName xml.Name `xml:"mixturemodel_distribution"`
-	Name    []byte   `xml:"name,attr"`
+	//XMLName xml.Name `xml:"mixturemodel_distribution"`
+	//Name    []byte   `xml:"name,attr"`
 }
 
 // MsmsRunSummary tag
 type MsmsRunSummary struct {
-	XMLName        xml.Name        `xml:"msms_run_summary"`
+	//XMLName        xml.Name        `xml:"msms_run_summary"`
 	BaseName       []byte          `xml:"base_name,attr"`
 	SearchEngine   []byte          `xml:"search_engine,attr"`
 	MsmsRunRummary []byte          `xml:"msms_run_summary,attr"`
@@ -118,9 +118,9 @@ type MsmsRunSummary struct {
 
 // SampleEnzyme tag
 type SampleEnzyme struct {
-	XMLName     xml.Name    `xml:"sample_enzyme"`
-	Name        []byte      `xml:"name,attr"`
-	Specificity Specificity `xml:"specificity"`
+	//XMLName     xml.Name    `xml:"sample_enzyme"`
+	//Name        []byte      `xml:"name,attr"`
+	//Specificity Specificity `xml:"specificity"`
 }
 
 // Specificity tag
@@ -133,7 +133,7 @@ type Specificity struct {
 
 // SearchSummary tag
 type SearchSummary struct {
-	XMLName                   xml.Name                    `xml:"search_summary"`
+	//XMLName                   xml.Name                    `xml:"search_summary"`
 	SearchID                  uint16                      `xml:"search_id,attr"`
 	BaseName                  []byte                      `xml:"base_name,attr"`
 	SearchEngine              []byte                      `xml:"search_engine,attr"`
@@ -154,37 +154,37 @@ type SearchDatabase struct {
 
 // EnzymaticSearchConstraint tag
 type EnzymaticSearchConstraint struct {
-	XMLName                 xml.Name `xml:"enzymatic_search_constraint"`
-	Enzyme                  []byte   `xml:"enzyme,attr"`
-	MaxNumInternalCleavages int8     `xml:"max_num_internal_cleavages,attr"`
-	MinNumTermini           uint8    `xml:"min_number_termini,attr"`
+	//XMLName                 xml.Name `xml:"enzymatic_search_constraint"`
+	//Enzyme                  []byte   `xml:"enzyme,attr"`
+	//MaxNumInternalCleavages int8     `xml:"max_num_internal_cleavages,attr"`
+	//MinNumTermini           uint8    `xml:"min_number_termini,attr"`
 }
 
 // AminoacidModification tag
 type AminoacidModification struct {
-	XMLName   xml.Name `xml:"aminoacid_modification"`
-	AminoAcid []byte   `xml:"aminoacid,attr"`
-	MassDiff  float64  `xml:"massdiff,attr"`
-	Mass      float64  `xml:"mass,attr"`
-	Variable  []byte   `xml:"variable,attr"`
+	//XMLName   xml.Name `xml:"aminoacid_modification"`
+	AminoAcid []byte  `xml:"aminoacid,attr"`
+	MassDiff  float64 `xml:"massdiff,attr"`
+	Mass      float64 `xml:"mass,attr"`
+	Variable  []byte  `xml:"variable,attr"`
 }
 
 // TerminalModification tag
 type TerminalModification struct {
-	XMLName         xml.Name `xml:"terminal_modification"`
-	MassDiff        float64  `xml:"massdiff,attr"`
-	ProteinTerminus []byte   `xml:"protein_terminus,attr"`
-	Mass            float64  `xml:"mass,attr"`
-	Terminus        []byte   `xml:"terminus,attr"`
-	Variable        []byte   `xml:"variable,attr"`
+	//XMLName         xml.Name `xml:"terminal_modification"`
+	MassDiff float64 `xml:"massdiff,attr"`
+	//ProteinTerminus []byte   `xml:"protein_terminus,attr"`
+	Mass     float64 `xml:"mass,attr"`
+	Terminus []byte  `xml:"terminus,attr"`
+	Variable []byte  `xml:"variable,attr"`
 }
 
 // SpectrumQuery tag
 type SpectrumQuery struct {
-	XMLName                          xml.Name     `xml:"spectrum_query"`
-	CompensationVoltage              string       `xml:"compensation_voltage,attr"`
-	Spectrum                         []byte       `xml:"spectrum,attr"`
-	SpectrumNativeID                 []byte       `xml:"spectrumNativeID,attr"`
+	//XMLName                          xml.Name     `xml:"spectrum_query"`
+	CompensationVoltage string `xml:"compensation_voltage,attr"`
+	Spectrum            []byte `xml:"spectrum,attr"`
+	//SpectrumNativeID                 []byte       `xml:"spectrumNativeID,attr"`
 	StartScan                        int          `xml:"start_scan,attr"`
 	EndScan                          int          `xml:"end_scan,attr"`
 	AssumedCharge                    uint8        `xml:"assumed_charge,attr"`
@@ -198,19 +198,19 @@ type SpectrumQuery struct {
 
 // SearchResult tag
 type SearchResult struct {
-	XMLName   xml.Name    `xml:"search_result"`
+	//XMLName   xml.Name    `xml:"search_result"`
 	SearchHit []SearchHit `xml:"search_hit"`
 }
 
 // SearchHit tag
 type SearchHit struct {
-	XMLName             xml.Name             `xml:"search_hit"`
-	HitRank             uint8                `xml:"hit_rank,attr"`
-	Peptide             []byte               `xml:"peptide,attr"`
-	PrevAA              []byte               `xml:"peptide_prev_aa,attr"`
-	NextAA              []byte               `xml:"peptide_next_aa,attr"`
-	Protein             []byte               `xml:"protein,attr"`
-	ProteinDescr        []byte               `xml:"protein_descr,attr"`
+	//XMLName             xml.Name             `xml:"search_hit"`
+	HitRank uint8  `xml:"hit_rank,attr"`
+	Peptide []byte `xml:"peptide,attr"`
+	PrevAA  []byte `xml:"peptide_prev_aa,attr"`
+	NextAA  []byte `xml:"peptide_next_aa,attr"`
+	Protein []byte `xml:"protein,attr"`
+	//ProteinDescr        []byte               `xml:"protein_descr,attr"`
 	TotalTerm           uint8                `xml:"num_tol_term,attr"`
 	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
 	IsRejected          uint8                `xml:"is_rejected,attr"`
@@ -229,43 +229,43 @@ type SearchHit struct {
 
 // AlternativeProtein tag
 type AlternativeProtein struct {
-	XMLName     xml.Name `xml:"alternative_protein"`
-	NumTolTerm  int8     `xml:"num_tol_tem,attr"`
-	Protein     []byte   `xml:"protein,attr"`
-	Description []byte   `xml:"protein_descr,attr"`
-	PepPrevAA   []byte   `xml:"peptide_prev_aa,attr"`
-	PepNextAA   []byte   `xml:"peptide_next_aa,attr"`
+	//XMLName     xml.Name `xml:"alternative_protein"`
+	//NumTolTerm int8   `xml:"num_tol_tem,attr"`
+	Protein []byte `xml:"protein,attr"`
+	//Description []byte   `xml:"protein_descr,attr"`
+	PepPrevAA []byte `xml:"peptide_prev_aa,attr"`
+	PepNextAA []byte `xml:"peptide_next_aa,attr"`
 }
 
 // AnalysisResult tag
 type AnalysisResult struct {
-	XMLName              xml.Name             `xml:"analysis_result"`
+	//XMLName              xml.Name             `xml:"analysis_result"`
 	Analysis             []byte               `xml:"analysis,attr"`
 	PeptideProphetResult PeptideProphetResult `xml:"peptideprophet_result"`
 	InterProphetResult   InterProphetResult   `xml:"interprophet_result"`
 	PTMProphetResult     []PTMProphetResult   `xml:"ptmprophet_result"`
-	SearchScoreSummary   SearchScoreSummary   `xml:"search_score_summary"`
+	//SearchScoreSummary   SearchScoreSummary   `xml:"search_score_summary"`
 }
 
 // PeptideProphetResult tag
 type PeptideProphetResult struct {
-	XMLName            xml.Name           `xml:"peptideprophet_result"`
-	Probability        float64            `xml:"probability,attr"`
-	AllNttProb         []byte             `xml:"all_ntt_prob,attr"`
-	SearchScoreSummary SearchScoreSummary `xml:"search_score_summary"`
+	//XMLName            xml.Name           `xml:"peptideprophet_result"`
+	Probability float64 `xml:"probability,attr"`
+	//AllNttProb         []byte             `xml:"all_ntt_prob,attr"`
+	//SearchScoreSummary SearchScoreSummary `xml:"search_score_summary"`
 }
 
 // InterProphetResult tag
 type InterProphetResult struct {
-	XMLName     xml.Name `xml:"interprophet_result"`
-	Probability float64  `xml:"probability,attr"`
-	AllNttProb  []byte   `xml:"all_ntt_prob,attr"`
+	//XMLName     xml.Name `xml:"interprophet_result"`
+	Probability float64 `xml:"probability,attr"`
+	//AllNttProb  []byte   `xml:"all_ntt_prob,attr"`
 }
 
 // PTMProphetResult tag
 type PTMProphetResult struct {
-	XMLName                 xml.Name                  `xml:"ptmprophet_result"`
-	Prior                   float64                   `xml:"prior,attr"`
+	//XMLName                 xml.Name                  `xml:"ptmprophet_result"`
+	//Prior                   float64                   `xml:"prior,attr"`
 	PTM                     []byte                    `xml:"ptm,attr"`
 	PTMPeptide              []byte                    `xml:"ptm_peptide,attr"`
 	ModAminoAcidProbability []ModAminoAcidProbability `xml:"mod_aminoacid_probability"`
@@ -273,9 +273,9 @@ type PTMProphetResult struct {
 
 // ModAminoAcidProbability tag
 type ModAminoAcidProbability struct {
-	XMLName     xml.Name `xml:"mod_aminoacid_probability"`
-	Position    int      `xml:"position,attr"`
-	Probability float32  `xml:"probability,attr"`
+	//XMLName     xml.Name `xml:"mod_aminoacid_probability"`
+	//Position    int      `xml:"position,attr"`
+	//Probability float32  `xml:"probability,attr"`
 }
 
 // SearchScoreSummary tag
@@ -286,9 +286,9 @@ type SearchScoreSummary struct {
 
 // SearchScore tag
 type SearchScore struct {
-	XMLName xml.Name `xml:"search_score"`
-	Name    []byte   `xml:"name,attr"`
-	Value   string   `xml:"value,attr"`
+	//XMLName xml.Name `xml:"search_score"`
+	Name  []byte `xml:"name,attr"`
+	Value string `xml:"value,attr"`
 }
 
 // ProphetModel tag
@@ -299,10 +299,10 @@ type ProphetModel struct {
 
 // PTMResult tag
 type PTMResult struct {
-	Localization           string `xml:"localization,attr"`
-	BestScoreWithPTM       string `xml:"best_score_with_ptm,attr"`
-	ScoreWithoutPTM        string `xml:"score_without_ptm,attr"`
-	LocalizationPeptide    string `xml:"localization_peptide,attr"`
-	SecondBestScoreWithPTM string `xml:"second_best_score_with_ptm,attr"`
-	PTMMass                string `xml:"ptm_mass,attr"`
+	//Localization           string `xml:"localization,attr"`
+	BestScoreWithPTM    string `xml:"best_score_with_ptm,attr"`
+	ScoreWithoutPTM     string `xml:"score_without_ptm,attr"`
+	LocalizationPeptide string `xml:"localization_peptide,attr"`
+	//SecondBestScoreWithPTM string `xml:"second_best_score_with_ptm,attr"`
+	//PTMMass                string `xml:"ptm_mass,attr"`
 }

@@ -23,20 +23,20 @@ type DataFormat interface {
 
 // Parameter tag
 type Parameter struct {
-	XMLName xml.Name `xml:"parameter"`
-	Name    string   `xml:"name,attr"`
-	Value   string   `xml:"value,attr"`
+	//XMLName xml.Name `xml:"parameter"`
+	Name  string `xml:"name,attr"`
+	Value string `xml:"value,attr"`
 }
 
 // Annotation tag
 type Annotation struct {
-	XMLName            xml.Name `xml:"annotation"`
-	ProteinDescription []byte   `xml:"protein_description,attr"`
+	//XMLName            xml.Name `xml:"annotation"`
+	ProteinDescription []byte `xml:"protein_description,attr"`
 }
 
 // ModificationInfo tag
 type ModificationInfo struct {
-	XMLName          xml.Name           `xml:"modification_info"`
+	//XMLName          xml.Name           `xml:"modification_info"`
 	ModNTermMass     float64            `xml:"mod_nterm_mass,attr"`
 	ModCTermMass     float64            `xml:"mod_cterm_mass,attr"`
 	ModifiedPeptide  []byte             `xml:"modified_peptide,attr"`
@@ -45,9 +45,9 @@ type ModificationInfo struct {
 
 // ModAminoacidMass tag
 type ModAminoacidMass struct {
-	XMLName  xml.Name `xml:"mod_aminoacid_mass"`
-	Position int      `xml:"position,attr"`
-	Mass     float64  `xml:"mass,attr"`
+	//XMLName  xml.Name `xml:"mod_aminoacid_mass"`
+	Position int     `xml:"position,attr"`
+	Mass     float64 `xml:"mass,attr"`
 }
 
 // Parse is the main function for parsing pepxml data
