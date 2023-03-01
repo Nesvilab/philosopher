@@ -70,7 +70,15 @@ func Run(f met.Data) met.Data {
 		f.Filter.TwoD = true
 	}
 
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	var protXML id.ProtXML
+	go func() {
+		defer wg.Done()
+		protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+	}()
 	pepid, searchEngine := id.ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
+	wg.Wait()
 
 	f.SearchEngine = searchEngine
 
@@ -78,16 +86,13 @@ func Run(f met.Data) met.Data {
 	_ = psmT
 	_ = pepT
 	_ = ionT
-
 	if _, err := os.Stat(sys.ProBin()); err == nil {
 
 		pro.Restore()
 
 	} else if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
 
-		protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
-
-		protXML.Serialize()
+		//protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 
 		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
 		pro.Restore()
