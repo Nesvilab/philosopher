@@ -424,6 +424,12 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 	return evi
 }
 
+var replacerIL = strings.NewReplacer("L", "I")
+
+func replaceIL(s string) string {
+	return replacerIL.Replace(s)
+}
+
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
 func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	type liteRecord struct {
@@ -446,7 +452,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 	var proteinStart = make(map[string]int)
 	var proteinEnd = make(map[string]int)
 
-	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
 
 		rec := recordMap[evi.PSM[i].Protein]
@@ -464,10 +469,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		var adjustStart = 0
 		var adjustEnd = 0
-		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
+		peptide := replaceIL(evi.PSM[i].Peptide)
 
 		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
-			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+			peptide = replaceIL(evi.PSM[i].PrevAA) + peptide
 			adjustStart = +2
 		}
 
@@ -476,12 +481,12 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 		}
 
 		if evi.PSM[i].NextAA != "-" && len(evi.PSM[i].NextAA) == 1 {
-			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+			peptide = peptide + replaceIL(evi.PSM[i].NextAA)
 			adjustEnd = -1
 		}
 
 		// map the peptide to the protein
-		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
+		mstart := strings.Index(replaceIL(rec.Sequence), peptide)
 		mend := mstart + len(peptide)
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
@@ -712,21 +717,19 @@ func (evi *Evidence) CalculateProteinCoverage() {
 	// https://zetcode.com/golang/regex/
 	// https://go.dev/play/p/9CTgHRm6icK
 
-	replacerIL := strings.NewReplacer("L", "I")
-
 	for p := range evi.Proteins {
 
 		var pep []string
 		evi.Proteins[p].Coverage = -1
 
 		// the original sequence used as template
-		seqA := replacerIL.Replace(evi.Proteins[p].Sequence)
+		seqA := replaceIL(evi.Proteins[p].Sequence)
 
 		// the replaced sequence
 		seqB := ""
 
 		for i := range evi.Proteins[p].TotalPeptides {
-			pep = append(pep, replacerIL.Replace(i))
+			pep = append(pep, replaceIL(i))
 		}
 
 		if len(pep) > 0 {
