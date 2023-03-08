@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"os"
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
-	"philosopher/lib/wmm"
+
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/wmm"
 
 	"github.com/spf13/cobra"
 )

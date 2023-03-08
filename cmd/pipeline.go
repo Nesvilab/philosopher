@@ -3,15 +3,14 @@ package cmd
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/pip"
-	"philosopher/lib/sla"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/pip"
+	"github.com/Nesvilab/philosopher/lib/sla"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -49,7 +48,7 @@ var pipelineCmd = &cobra.Command{
 
 		file, _ := filepath.Abs(m.Pipeline.Directives)
 
-		y, e := ioutil.ReadFile(file)
+		y, e := os.ReadFile(file)
 		if e != nil {
 			msg.ReadFile(e, "fatal")
 		}

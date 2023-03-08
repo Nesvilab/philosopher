@@ -3,15 +3,14 @@ package comet
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )
@@ -67,7 +66,7 @@ func Run(m met.Data, args []string) met.Data {
 	// convert the param file to binary and store it in meta
 	var binFile []byte
 	paramAbs, _ := filepath.Abs(m.Comet.Param)
-	binFile, e := ioutil.ReadFile(paramAbs)
+	binFile, e := os.ReadFile(paramAbs)
 	if e != nil {
 		msg.Custom(e, "error")
 	}

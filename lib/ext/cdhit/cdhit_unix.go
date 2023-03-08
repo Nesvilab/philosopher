@@ -4,7 +4,7 @@
 package cdhit
 
 import (
-	ucdhit "philosopher/lib/ext/cdhit/unix"
+	ucdhit "github.com/Nesvilab/philosopher/lib/ext/cdhit/unix"
 )
 
 // Deploy generates binaries on workdir

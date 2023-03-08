@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // SerializeGranular converts the whole structure into sevral small gob files

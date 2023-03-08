@@ -1,10 +1,11 @@
 package spc_test
 
 import (
-	. "philosopher/lib/spc"
-	"philosopher/lib/tes"
-	"philosopher/lib/uti"
 	"testing"
+
+	. "github.com/Nesvilab/philosopher/lib/spc"
+	"github.com/Nesvilab/philosopher/lib/tes"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
 	_ "github.com/rogpeppe/go-charset/data"
 )

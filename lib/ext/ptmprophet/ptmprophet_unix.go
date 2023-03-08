@@ -7,9 +7,9 @@ import (
 	"errors"
 	"strings"
 
-	unix "philosopher/lib/ext/ptmprophet/unix"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	unix "github.com/Nesvilab/philosopher/lib/ext/ptmprophet/unix"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Deploy PTMProphet binaries on binary directory

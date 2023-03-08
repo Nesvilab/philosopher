@@ -2,13 +2,12 @@ package msfragger
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // MSFragger represents the tool configuration
@@ -40,7 +39,7 @@ func Run(m met.Data, args []string) met.Data {
 		// convert the param file to binary and store it in meta
 		var binFile []byte
 		paramAbs, _ := filepath.Abs(m.MSFragger.Param)
-		binFile, e := ioutil.ReadFile(paramAbs)
+		binFile, e := os.ReadFile(paramAbs)
 		if e != nil {
 			msg.ReadFile(e, "error")
 		}

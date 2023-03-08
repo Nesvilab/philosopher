@@ -11,10 +11,10 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/id"
-	"philosopher/lib/mod"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // AssembleProteinReport creates the post processed protein strcuture
@@ -28,10 +28,14 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 
 	for _, i := range evi.PSM {
-		for _, j := range i.Modifications.IndexSlice {
-			protMods[i.IonForm()] = append(protMods[i.IonForm()], j)
-		}
+
+		protMods[i.IonForm()] = append(protMods[i.IonForm()], i.Modifications.IndexSlice...)
+
+		// for _, j := range i.Modifications.IndexSlice {
+		// 	protMods[i.IonForm()] = append(protMods[i.IonForm()], j)
+		// }
 	}
+
 	evi.Proteins = make(ProteinEvidenceList, len(pro))
 	for idx, i := range pro {
 
@@ -209,10 +213,10 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 					}
 
 					// uniprot entries have the description on ProteinName
-					if len(j.Description) < 1 {
+					if len(j.ProteinName) < 1 {
 						pe.Description = j.ProteinName
 					} else {
-						pe.Description = j.Description
+						pe.Description = j.ProteinName
 					}
 
 					// for Ensemble entries without name

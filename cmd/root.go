@@ -4,9 +4,9 @@ package cmd
 import (
 	"runtime"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	colorable "github.com/mattn/go-colorable"
 	"github.com/sirupsen/logrus"

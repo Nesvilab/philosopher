@@ -3,31 +3,30 @@ package pip
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
 	"path/filepath"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/ext/interprophet"
-	"philosopher/lib/ext/tmtintegrator"
+	"github.com/Nesvilab/philosopher/lib/ext/interprophet"
+	"github.com/Nesvilab/philosopher/lib/ext/tmtintegrator"
 
-	"philosopher/lib/aba"
-	"philosopher/lib/ext/peptideprophet"
-	"philosopher/lib/ext/proteinprophet"
-	"philosopher/lib/ext/ptmprophet"
-	"philosopher/lib/fil"
-	"philosopher/lib/qua"
-	"philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/aba"
+	"github.com/Nesvilab/philosopher/lib/ext/peptideprophet"
+	"github.com/Nesvilab/philosopher/lib/ext/proteinprophet"
+	"github.com/Nesvilab/philosopher/lib/ext/ptmprophet"
+	"github.com/Nesvilab/philosopher/lib/fil"
+	"github.com/Nesvilab/philosopher/lib/qua"
+	"github.com/Nesvilab/philosopher/lib/rep"
 
-	"philosopher/lib/ext/comet"
-	"philosopher/lib/ext/msfragger"
-	"philosopher/lib/met"
-	"philosopher/lib/sys"
-	"philosopher/lib/wrk"
+	"github.com/Nesvilab/philosopher/lib/ext/comet"
+	"github.com/Nesvilab/philosopher/lib/ext/msfragger"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/wrk"
 
 	"github.com/ryanskidmore/parallel"
 	"github.com/sirupsen/logrus"
@@ -86,7 +85,7 @@ func DeployParameterFile(temp string) string {
 		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
 
-	e = ioutil.WriteFile(file, param, sys.FilePermission())
+	e = os.WriteFile(file, param, sys.FilePermission())
 	if e != nil {
 		msg.DeployAsset(errors.New("pipeline configuration file"), "error")
 	}
@@ -148,12 +147,12 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
 
 		// Read all content of src to data
-		data, e := ioutil.ReadFile(source)
+		data, e := os.ReadFile(source)
 		if e != nil {
 			log.Fatal(e)
 		}
 
-		e = ioutil.WriteFile(destination, data, 0644)
+		e = os.WriteFile(destination, data, 0644)
 		if e != nil {
 			log.Fatal(e)
 		}
@@ -673,8 +672,8 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 				meta.Filter.Seq = false
 			}
 
-			if len(p.Filter.RazorBin) != 0 {
-				meta.Filter.RazorBin = p.Filter.RazorBin
+			if len(p.Filter.ProBin) != 0 {
+				meta.Filter.ProBin = p.Filter.ProBin
 			}
 
 			meta := fil.Run(meta)

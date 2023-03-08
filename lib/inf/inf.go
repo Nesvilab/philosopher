@@ -6,9 +6,9 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/id"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 // Peptide ...

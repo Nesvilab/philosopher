@@ -5,9 +5,9 @@ import (
 	"errors"
 	"os"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/sla"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sla"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/spf13/cobra"
 )

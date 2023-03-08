@@ -4,10 +4,10 @@ package cmd
 import (
 	"os"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/qua"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/qua"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/spf13/cobra"
 )

@@ -3,10 +3,11 @@ package met_test
 import (
 	"os"
 	"path/filepath"
-	"philosopher/lib/met"
-	"philosopher/lib/sys"
 	"runtime"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 var dir string

@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"philosopher/lib/cla"
-	"philosopher/lib/id"
-	"philosopher/lib/msg"
-	"philosopher/lib/raz"
+	"github.com/Nesvilab/philosopher/lib/cla"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/raz"
 
 	"github.com/sirupsen/logrus"
 )

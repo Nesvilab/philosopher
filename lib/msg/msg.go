@@ -2,6 +2,7 @@ package msg
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 )
@@ -282,6 +283,15 @@ func ParsingFASTA(e error, t string) {
 
 }
 
+// ParsingFASTAHeader call when trying parse a protein FASTA database
+func ParsingFASTAHeader(e error, t string) {
+
+	m := fmt.Sprintf("Malformed FASTA header. %s", e)
+
+	callLogrus(m, t)
+
+}
+
 // Done call when a process is ready
 func Done() {
 
@@ -314,11 +324,13 @@ func callLogrus(m, t string) {
 		logrus.Warning(m)
 	case "fatal":
 		logrus.Error(m)
+		panic(m)
 	case "error":
 		logrus.Error(m)
-		panic(m)
+		os.Exit(1)
 	default:
 		logrus.Error(m)
+		os.Exit(1)
 	}
 
 }

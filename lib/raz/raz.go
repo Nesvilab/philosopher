@@ -1,7 +1,7 @@
 package raz
 
 import (
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // RazorCandidate is a peptide sequence to be evaluated as a razor

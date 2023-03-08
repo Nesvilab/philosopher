@@ -13,7 +13,7 @@ import (
 
 	"github.com/vmihailenco/msgpack/v5"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // GetHome returns the user home directory name
@@ -132,6 +132,12 @@ func RawBin() string {
 // PepxmlBin file
 func PepxmlBin() string {
 	p := fmt.Sprintf("%s%spepxml.bin", MetaDir(), string(filepath.Separator))
+	return p
+}
+
+// ProtxmlBin file
+func ProtxmlBin() string {
+	p := fmt.Sprintf("%s%sprotxml.bin", MetaDir(), string(filepath.Separator))
 	return p
 }
 
