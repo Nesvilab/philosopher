@@ -2,11 +2,11 @@ package interprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // UnixInterProphetParser accessor
@@ -17,7 +17,7 @@ func UnixInterProphetParser(s string) {
 		msg.DeployAsset(errors.New("InterProphetParser"), "Cannot read InterProphetParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("InterProphetParser"), "Cannot deploy InterProphetParser")
 	}

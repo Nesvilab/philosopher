@@ -4,16 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"philosopher/lib/id"
-	"philosopher/lib/xta"
 	"strings"
 
-	"philosopher/lib/iso"
-	"philosopher/lib/msg"
-	"philosopher/lib/mzn"
-	"philosopher/lib/rep"
-	"philosopher/lib/tmt"
-	"philosopher/lib/trq"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/xta"
+
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/mzn"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/tmt"
+	"github.com/Nesvilab/philosopher/lib/trq"
 )
 
 const (

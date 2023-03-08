@@ -4,7 +4,7 @@
 package ptmprophet
 
 import (
-	wPeP "philosopher/lib/ext/ptmprophet/win"
+	wPeP "github.com/Nesvilab/philosopher/lib/ext/ptmprophet/win"
 )
 
 // Deploy PTMProphet binaries on binary directory

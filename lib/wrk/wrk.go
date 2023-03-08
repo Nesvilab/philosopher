@@ -3,16 +3,15 @@ package wrk
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"time"
 
-	"philosopher/lib/gth"
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/gth"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/pierrre/archivefile/zip"
 	"github.com/sirupsen/logrus"
@@ -53,7 +52,7 @@ func Init(version, build, temp string) {
 
 	var m met.Data
 
-	b, _ := ioutil.ReadFile(sys.Meta())
+	b, _ := os.ReadFile(sys.Meta())
 
 	msgpack.Unmarshal(b, &m)
 
@@ -101,7 +100,7 @@ func Backup() {
 
 	// this is a soft verification just to see if there is any existing file
 	var m met.Data
-	_, e := ioutil.ReadFile(sys.Meta())
+	_, e := os.ReadFile(sys.Meta())
 	if e != nil {
 		msg.ReadFile(e, "warning")
 	}
@@ -135,7 +134,7 @@ func Clean() {
 
 	// this is a soft verification just to see if there is any existing file
 	var d met.Data
-	_, e := ioutil.ReadFile(sys.Meta())
+	_, e := os.ReadFile(sys.Meta())
 	if e != nil {
 		msg.ReadFile(e, "warning")
 	}

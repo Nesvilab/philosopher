@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	. "philosopher/lib/fas"
-	"philosopher/lib/tes"
 	"reflect"
 	"testing"
+
+	. "github.com/Nesvilab/philosopher/lib/fas"
+	"github.com/Nesvilab/philosopher/lib/tes"
 )
 
 func TestParseFile(t *testing.T) {

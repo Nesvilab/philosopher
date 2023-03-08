@@ -2,10 +2,10 @@ package peptideprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // UnixInteractParser deploys InteractParser
@@ -16,7 +16,7 @@ func UnixInteractParser(s string) {
 		msg.DeployAsset(errors.New("InteractParser"), "Cannot read InteractParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("InteractParser"), "Cannot deploy InteractParser")
 	}
@@ -32,7 +32,7 @@ func UnixRefreshParser(s string) {
 		msg.DeployAsset(errors.New("RefreshParser"), "Cannot read RefreshParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("RefreshParser"), "Cannot deploy RefreshParser")
 	}
@@ -48,7 +48,7 @@ func UnixPeptideProphetParser(s string) {
 		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphetParser bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("PeptideProphetParser"), "Cannot read PeptideProphetParser bin")
 	}

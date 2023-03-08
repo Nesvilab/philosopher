@@ -2,14 +2,15 @@ package rep
 
 import (
 	"fmt"
-	"philosopher/lib/id"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/psi"
+	"github.com/Nesvilab/philosopher/lib/id"
+
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/psi"
 )
 
 // MzIdentMLReport creates a MzIdentML structure to be encoded
@@ -184,7 +185,7 @@ func (e Evidence) MzIdentMLReport(version, database string) {
 					CVRef:     "PSI-MS",
 					Accession: "MS:1001088",
 					Name:      "protein description",
-					Value:     i.Description,
+					Value:     i.ProteinName,
 				},
 				{
 					CVRef:     "PSI-MS",

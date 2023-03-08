@@ -1,9 +1,10 @@
 package uti_test
 
 import (
-	"philosopher/lib/tes"
-	"philosopher/lib/uti"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/tes"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 func TestUti(t *testing.T) {

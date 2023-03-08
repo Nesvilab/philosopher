@@ -6,8 +6,9 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
-	"philosopher/lib/msg"
 	"strings"
+
+	"github.com/Nesvilab/philosopher/lib/msg"
 
 	"github.com/rogpeppe/go-charset/charset"
 

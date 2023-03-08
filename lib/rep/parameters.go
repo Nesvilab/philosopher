@@ -1,7 +1,7 @@
 package rep
 
 import (
-	"philosopher/lib/spc"
+	"github.com/Nesvilab/philosopher/lib/spc"
 )
 
 // AssembleSearchParameters organizes the aprameters defined by the search engine

@@ -1,8 +1,9 @@
 package rep
 
 import (
-	"philosopher/lib/tes"
 	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/tes"
 )
 
 func TestPSMEvidenceList_PSMReport(t *testing.T) {

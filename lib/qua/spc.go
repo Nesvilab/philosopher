@@ -1,8 +1,8 @@
 package qua
 
 import (
-	"philosopher/lib/id"
-	"philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/rep"
 )
 
 // CalculateSpectralCounts add Spc to ions and proteins

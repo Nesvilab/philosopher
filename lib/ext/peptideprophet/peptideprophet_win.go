@@ -4,7 +4,7 @@
 package peptideprophet
 
 import (
-	wPeP "philosopher/lib/ext/peptideprophet/win"
+	wPeP "github.com/Nesvilab/philosopher/lib/ext/peptideprophet/win"
 )
 
 // Deploy PeptideProphet binaries on binary directory

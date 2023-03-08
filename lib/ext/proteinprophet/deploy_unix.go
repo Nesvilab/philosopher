@@ -5,10 +5,11 @@ package proteinprophet
 
 import (
 	"errors"
-	unix "philosopher/lib/ext/proteinprophet/unix"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
 	"strings"
+
+	unix "github.com/Nesvilab/philosopher/lib/ext/proteinprophet/unix"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Deploy generates comet binary on workdir bin directory

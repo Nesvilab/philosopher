@@ -3,11 +3,12 @@ package rep
 import (
 	"fmt"
 	"strconv"
+	"sync"
 
-	"philosopher/lib/id"
-	"philosopher/lib/iso"
-	"philosopher/lib/met"
-	"philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/mod"
 
 	"github.com/sirupsen/logrus"
 )
@@ -208,6 +209,8 @@ type IonEvidence struct {
 	NextAA                   string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
+	ProteinStart             int
+	ProteinEnd               int
 	MZ                       float64
 	PeptideMass              float64
 	PrecursorNeutralMass     float64
@@ -226,9 +229,6 @@ type IonEvidence struct {
 	Spectra                  map[id.SpectrumType]int
 	MappedProteins           map[string]int
 	MappedGenes              map[string]struct{}
-	//IonForm()              string
-	//RetentionTime          string
-
 }
 
 // IonEvidenceList ...
@@ -257,6 +257,8 @@ type PeptideEvidence struct {
 	Spc                    int
 	ModifiedObservations   int
 	UnModifiedObservations int
+	ProteinStart           int
+	ProteinEnd             int
 	Intensity              float64
 	Probability            float64
 	IsUnique               bool
@@ -409,11 +411,19 @@ type CombinedPSMEvidence struct {
 	EntryName          string
 	GeneName           string
 	AssumedCharge      uint8
+	ProteinStart       int
+	ProteinEnd         int
 	Purity             float64
+	Intensity          float64
+	Probability        float64
 	IsUnique           bool
 	IsUsed             bool
-	Intensity          map[string]float64
-	Labels             map[string]iso.Labels
+	NamedIntensity     map[string]float64
+	NamedLabels        map[string]iso.Labels
+	MappedProteins     map[string]string
+	MappedGenes        map[string]struct{}
+	PTM                id.PTM
+	Labels             iso.Labels
 }
 
 // CombinedPSMEvidenceList is a list of Combined PSM Evidences
@@ -482,32 +492,43 @@ func Run(m met.Data) {
 	}
 
 	logrus.Info("Creating reports")
-	{
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		var repoPSM PSMEvidenceList
 		RestorePSM(&repoPSM)
 		// PSM
 		repoPSM.PSMReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, isComet, hasLoc, m.Report.IonMob, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
-	{
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		var repoIons IonEvidenceList
 		RestoreIon(&repoIons)
 		// Ion
 		repoIons.IonReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
-	{
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		// Peptide
 		var repoPeptides PeptideEvidenceList
 		RestorePeptide(&repoPeptides)
 		repoPeptides.PeptideReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-	}
+	}()
 	// Protein
 	if len(m.Filter.Pox) > 0 || m.Filter.Inference {
-		var repoProteins ProteinEvidenceList
-		RestoreProtein(&repoProteins)
-		repoProteins.ProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
-		repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			var repoProteins ProteinEvidenceList
+			RestoreProtein(&repoProteins)
+			repoProteins.ProteinReport(m.Home, isoBrand, m.Database.Tag, isoChannels, m.Report.Decoys, m.Filter.Razor, m.Quantify.Unique, hasLabels, m.Report.Prefix, m.Report.RemoveContam)
+			repoProteins.ProteinFastaReport(m.Home, m.Report.Decoys)
+		}()
 	}
-
+	wg.Wait()
 	// Modifications
 	repo := New()
 	if len(repo.Modifications.MassBins) > 0 {

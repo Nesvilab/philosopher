@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // InterProphet represents the tool configuration

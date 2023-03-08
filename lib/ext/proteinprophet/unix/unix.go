@@ -2,10 +2,10 @@ package proteinprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // UnixBatchCoverage deploys batchcoverage
@@ -16,7 +16,7 @@ func UnixBatchCoverage(s string) {
 		msg.DeployAsset(errors.New("batchcoverage"), "Cannot read batchcoverage bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("batchcoverage"), "Cannot deploy batchcoverage binary")
 	}
@@ -32,7 +32,7 @@ func UnixDatabaseParser(s string) {
 		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot read batchcoverage bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("DatabaseParser"), "Cannot deploy batchcoverage binary")
 	}
@@ -48,7 +48,7 @@ func UnixProteinProphet(s string) {
 		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot read ProteinProphet bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("ProteinProphet"), "Cannot deploy ProteinProphet binary")
 	}

@@ -1,8 +1,9 @@
 ### Added
-- FASTA header verification for IonQuant
+- Added the protein start and end positions to ions and peptides report.
 
 ### Changed
-- New version annoucements will happpen for all updates, including minor changes
+- Rolledback the FASTA header checking for IonQuant.
+- PTMProphet updated to v6.2.0
 
 ### Fixed
-- Fixed an issue that would not udpate PSMs with razor IDs and description
+- updated razor mapping rules to reinforce the decoy tagging of razor proteins.

@@ -3,7 +3,8 @@ package wmm
 import (
 	"fmt"
 	"os"
-	"philosopher/lib/met"
+
+	"github.com/Nesvilab/philosopher/lib/met"
 )
 
 // Run executes the Filter processing

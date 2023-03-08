@@ -3,9 +3,9 @@ package mzn_test
 import (
 	"testing"
 
-	"philosopher/lib/mzn"
-	"philosopher/lib/tes"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/mzn"
+	"github.com/Nesvilab/philosopher/lib/tes"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 var msd mzn.MsData

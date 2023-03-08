@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
 // PTMProphet is the main tool data configuration structure

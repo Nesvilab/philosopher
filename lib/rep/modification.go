@@ -8,13 +8,14 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"philosopher/lib/mod"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/obo"
+	"github.com/Nesvilab/philosopher/lib/mod"
 
-	"philosopher/lib/sys"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/obo"
+
+	"github.com/Nesvilab/philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 // MapMods maps PSMs to modifications based on their mass shifts

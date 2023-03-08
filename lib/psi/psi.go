@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/rogpeppe/go-charset/charset"
 	"github.com/sirupsen/logrus"

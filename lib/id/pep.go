@@ -5,19 +5,20 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/mod"
-	"philosopher/lib/spc"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/spc"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 	"gonum.org/v1/plot"
@@ -112,7 +113,7 @@ type PepIDList []PeptideIdentification
 type PepIDListPtrs []*PeptideIdentification
 
 func ToPepIDListPtrs(p PepIDList) PepIDListPtrs {
-	pptrs := make(PepIDListPtrs, len(p), len(p))
+	pptrs := make(PepIDListPtrs, len(p))
 	for i := range p {
 		pptrs[i] = &p[i]
 	}
@@ -261,7 +262,7 @@ func (p *PepXML) Read(f string) {
 
 		// start processing spectra queries
 		sq := mpa.MsmsRunSummary.SpectrumQuery
-		p.PeptideIdentification = make(PepIDList, len(sq), len(sq))
+		p.PeptideIdentification = make(PepIDList, len(sq))
 		for idx, i := range sq {
 			p.PeptideIdentification[idx] = processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
 		}
@@ -356,7 +357,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 		}
 	}
 	wg := sync.WaitGroup{}
-	parallelism := 6
+	parallelism := runtime.GOMAXPROCS(0)
 	parallelismTokens := make(chan struct{}, parallelism)
 	wg.Add(len(sortedFiles))
 	for idx, i := range sortedFiles {

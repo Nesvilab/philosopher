@@ -2,11 +2,11 @@ package cdhit
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // Unix64 deploys CD-HIT
@@ -17,7 +17,7 @@ func Unix64(unix64 string) {
 		msg.DeployAsset(errors.New("CD-HIT"), "Cannot read CD-HIT obo")
 	}
 
-	e2 := ioutil.WriteFile(unix64, bin, sys.FilePermission())
+	e2 := os.WriteFile(unix64, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("CD-HIT"), "Cannot deploy CD-HIT 64-bit")
 	}

@@ -3,16 +3,15 @@ package met
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"time"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
@@ -83,6 +82,7 @@ type Database struct {
 	Rev       bool   `yaml:"reviewed"`
 	Iso       bool   `yaml:"isoform"`
 	NoD       bool   `yaml:"nodecoys"`
+	Verbose   bool   `yaml:"verbose"`
 }
 
 // Comet options and parameters
@@ -339,11 +339,12 @@ type PTMProphet struct {
 
 // Filter options and parameters
 type Filter struct {
-	Pex       string  `yaml:"pepxml"`
-	Pox       string  `yaml:"protxml"`
-	Tag       string  `yaml:"tag"`
-	Mods      string  `yaml:"mods"`
-	RazorBin  string  `yaml:"razorbin"`
+	Pex    string `yaml:"pepxml"`
+	Pox    string `yaml:"protxml"`
+	Tag    string `yaml:"tag"`
+	Mods   string `yaml:"mods"`
+	ProBin string `yaml:"probin"`
+	//RazorBin  string  `yaml:"razorbin"`
 	PsmFDR    float64 `yaml:"psmFDR"`
 	PepFDR    float64 `yaml:"peptideFDR"`
 	IonFDR    float64 `yaml:"ionFDR"`
@@ -492,7 +493,7 @@ func (d *Data) Serialize() {
 		msg.MarshalFile(e, "error")
 	}
 
-	e = ioutil.WriteFile(sys.Meta(), b, sys.FilePermission())
+	e = os.WriteFile(sys.Meta(), b, sys.FilePermission())
 	if e != nil {
 		msg.WriteFile(e, "error")
 	}
@@ -502,7 +503,7 @@ func (d *Data) Serialize() {
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Data) Restore(f string) {
 
-	b, e1 := ioutil.ReadFile(f)
+	b, e1 := os.ReadFile(f)
 
 	e2 := msgpack.Unmarshal(b, &d)
 

@@ -4,7 +4,7 @@
 package proteinprophet
 
 import (
-	wPoP "philosopher/lib/ext/proteinprophet/win"
+	wPoP "github.com/Nesvilab/philosopher/lib/ext/proteinprophet/win"
 )
 
 // Deploy generates comet binary on workdir bin directory

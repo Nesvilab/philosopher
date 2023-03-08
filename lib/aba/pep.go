@@ -6,20 +6,19 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"philosopher/lib/mod"
 	"sort"
 	"strconv"
 	"strings"
 
-	"philosopher/lib/fil"
-	"philosopher/lib/id"
-	"philosopher/lib/met"
-	"philosopher/lib/msg"
-	"philosopher/lib/rep"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/fil"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )
@@ -50,7 +49,7 @@ func peptideLevelAbacus(m met.Data, args []string) {
 		var evi rep.Evidence
 		rep.RestorePSM(&evi.PSM)
 
-		files, _ := ioutil.ReadDir(i)
+		files, _ := os.ReadDir(i)
 
 		// collect interact full file names
 		for _, f := range files {
@@ -68,8 +67,11 @@ func peptideLevelAbacus(m met.Data, args []string) {
 				for scanner.Scan() {
 					names := strings.Fields(scanner.Text())
 
-					name := i + " " + names[0]
+					if len(names) <= 1 {
+						msg.Custom(errors.New("the annotation file looks to be empty"), "error")
+					}
 
+					name := i + " " + names[0]
 					labels[name] = names[1]
 				}
 
@@ -143,6 +145,7 @@ func collectPeptideDatafromExperiments(datasets map[string]rep.PSMEvidenceList, 
 	for _, i := range pep {
 		if !strings.HasPrefix(i.Protein, decoyTag) {
 			var e rep.CombinedPeptideEvidence
+
 			e.Spc = make(map[string]int)
 			e.Intensity = make(map[string]float64)
 			e.AssignedMassDiffs = make(map[string]uint8)
@@ -289,6 +292,12 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 	sort.Sort(evidences)
 
 	for _, i := range evidences {
+
+		// incomplete records will existe due to differences between individual validation and iProphet results
+		// ignore them bu checking empty fields
+		if len(i.ChargeStates) == 0 {
+			continue
+		}
 
 		var line string
 

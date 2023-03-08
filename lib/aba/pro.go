@@ -6,22 +6,21 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"philosopher/lib/iso"
-	"philosopher/lib/msg"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/iso"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/dat"
-	"philosopher/lib/fil"
-	"philosopher/lib/id"
-	"philosopher/lib/met"
-	"philosopher/lib/rep"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/dat"
+	"github.com/Nesvilab/philosopher/lib/fil"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/met"
+	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
 )
@@ -53,7 +52,7 @@ func proteinLevelAbacus(m met.Data, args []string) {
 		e.RestoreGranularWithPath(i)
 
 		// collect interact full file names
-		files, _ := ioutil.ReadDir(i)
+		files, _ := os.ReadDir(i)
 		for _, f := range files {
 			if strings.Contains(f.Name(), "annotation") {
 				var annot = fmt.Sprintf("%s%s%s", i, string(filepath.Separator), f.Name())
@@ -231,7 +230,7 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				list[i].EntryName = j.EntryName
 				list[i].GeneNames = j.GeneNames
 				list[i].Organism = j.Organism
-				list[i].Description = j.Description
+				list[i].Description = j.ProteinName
 				list[i].ProteinExistence = j.ProteinExistence
 				break
 			}

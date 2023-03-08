@@ -11,13 +11,13 @@ import (
 	"sort"
 	"strings"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/bio"
-	"philosopher/lib/cla"
-	"philosopher/lib/id"
-	"philosopher/lib/mod"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/bio"
+	"github.com/Nesvilab/philosopher/lib/cla"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/mod"
+	"github.com/Nesvilab/philosopher/lib/uti"
 )
 
 // AssembleIonReport reports consist on ion reporting
@@ -43,9 +43,11 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 			psmPtMap[i.IonForm()] = append(psmPtMap[i.IonForm()], j)
 		}
 
-		for _, j := range i.Modifications.IndexSlice {
-			ionMods[i.IonForm()] = append(ionMods[i.IonForm()], j)
-		}
+		ionMods[i.IonForm()] = append(ionMods[i.IonForm()], i.Modifications.IndexSlice...)
+
+		// for _, j := range i.Modifications.IndexSlice {
+		// 	ionMods[i.IonForm()] = append(ionMods[i.IonForm()], j)
+		// }
 
 	}
 
@@ -143,7 +145,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -325,12 +327,14 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			string(i.PrevAA),
 			string(i.NextAA),
 			len(i.Sequence),
+			i.ProteinStart,
+			i.ProteinEnd,
 			i.MZ,
 			i.ChargeState,
 			i.PeptideMass,

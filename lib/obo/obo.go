@@ -9,12 +9,12 @@ import (
 	"strconv"
 	"strings"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/uti"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/uti"
 
-	"philosopher/lib/met"
-	unmd "philosopher/lib/obo/unimod"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/met"
+	unmd "github.com/Nesvilab/philosopher/lib/obo/unimod"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // DataFormat defines different data type from PSI

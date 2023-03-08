@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
-	"philosopher/lib/bio"
-	"philosopher/lib/id"
-	"philosopher/lib/msg"
 	"sort"
 	"strings"
 
-	"philosopher/lib/mzn"
-	"philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/bio"
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/msg"
+
+	"github.com/Nesvilab/philosopher/lib/mzn"
+	"github.com/Nesvilab/philosopher/lib/rep"
 
 	"github.com/sirupsen/logrus"
 )

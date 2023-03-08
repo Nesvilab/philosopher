@@ -4,7 +4,7 @@
 package cdhit
 
 import (
-	wcdhit "philosopher/lib/ext/cdhit/win"
+	wcdhit "github.com/Nesvilab/philosopher/lib/ext/cdhit/win"
 )
 
 // Deploy generates binaries on workdir

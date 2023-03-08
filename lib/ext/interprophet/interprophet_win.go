@@ -4,7 +4,7 @@
 package interprophet
 
 import (
-	wiPr "philosopher/lib/ext/interprophet/win"
+	wiPr "github.com/Nesvilab/philosopher/lib/ext/interprophet/win"
 )
 
 // Deploy generates comet binary on workdir bin directory

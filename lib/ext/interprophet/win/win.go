@@ -2,11 +2,11 @@ package interprophet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // WinInterProphetParser accessor
@@ -17,7 +17,7 @@ func WinInterProphetParser(s string) {
 		msg.DeployAsset(errors.New("InterProphetParser.exe"), "Cannot read InterProphetParser.exe bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("InterProphetParser.exe"), "Cannot deploy InterProphetParser.exe")
 	}
@@ -33,7 +33,7 @@ func LibgccDLL(s string) {
 		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot read LibgccDLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("LibgccDLL"), "Cannot deploy LibgccDLL")
 	}
@@ -49,7 +49,7 @@ func Zlib1DLL(s string) {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot read Zlib1DLL bin")
 	}
 
-	e2 := ioutil.WriteFile(s, bin, sys.FilePermission())
+	e2 := os.WriteFile(s, bin, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("Zlib1DLL"), "Cannot deploy Zlib1DLL")
 	}

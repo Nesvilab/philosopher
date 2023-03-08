@@ -2,10 +2,10 @@ package comet
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 
-	"philosopher/lib/msg"
-	"philosopher/lib/sys"
+	"github.com/Nesvilab/philosopher/lib/msg"
+	"github.com/Nesvilab/philosopher/lib/sys"
 )
 
 // WinParameterFile writes the parameter file to the disk
@@ -16,7 +16,7 @@ func WinParameterFile(winParam string) {
 		msg.DeployAsset(errors.New("comet Parameter File"), "cannot read Comet parameter bin")
 	}
 
-	e2 := ioutil.WriteFile(winParam, param, sys.FilePermission())
+	e2 := os.WriteFile(winParam, param, sys.FilePermission())
 	if e2 != nil {
 		msg.DeployAsset(errors.New("comet Parameter File"), "cannot deploy Comet parameter")
 	}
@@ -30,7 +30,7 @@ func Win32(win32 string) {
 		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot read Comet bin")
 	}
 
-	e = ioutil.WriteFile(win32, bin, sys.FilePermission())
+	e = os.WriteFile(win32, bin, sys.FilePermission())
 	if e != nil {
 		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot deploy Comet")
 	}
@@ -44,7 +44,7 @@ func Win64(win64 string) {
 		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot read Comet bin")
 	}
 
-	e = ioutil.WriteFile(win64, bin, sys.FilePermission())
+	e = os.WriteFile(win64, bin, sys.FilePermission())
 	if e != nil {
 		msg.DeployAsset(errors.New("comet Windows binary file"), "cannot deploy Comet")
 	}
