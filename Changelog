@@ -1,5 +1,6 @@
 ### Added
 - Added the protein start and end positions to ions and peptides report.
+- PrtoXML reading parallelization.
 
 ### Changed
 - Rolledback the FASTA header checking for IonQuant.
