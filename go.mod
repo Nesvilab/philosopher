@@ -16,7 +16,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15 // indirect
-	golang.org/x/image v0.2.0 // indirect
+	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
 	gonum.org/v1/plot v0.12.0
 	gopkg.in/yaml.v2 v2.4.0
