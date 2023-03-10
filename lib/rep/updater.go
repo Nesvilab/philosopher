@@ -709,9 +709,6 @@ func (evi *Evidence) UpdatePeptideModCount() {
 // CalculateProteinCoverage calcualtes the peptide coverage for each protein
 func (evi *Evidence) CalculateProteinCoverage() {
 
-	// https://zetcode.com/golang/regex/
-	// https://go.dev/play/p/9CTgHRm6icK
-
 	replacerIL := strings.NewReplacer("L", "I")
 
 	for p := range evi.Proteins {
