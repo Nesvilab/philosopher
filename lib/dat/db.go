@@ -21,10 +21,10 @@ type Record struct {
 	GeneNames        string
 	ProteinExistence string
 	Sequence         string
-	Class            string
-	Length           int
-	IsDecoy          bool
-	IsContaminant    bool
+	//Class            string
+	//Length           int
+	IsDecoy bool
+	//IsContaminant    bool
 }
 
 // ProcessHeader parses FASTA records looking for individial elements
@@ -32,10 +32,15 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 
 	var r Record
 
-	r.Class = class
+	//r.Class = class
 	r.OriginalHeader = k
-	r.PartHeader = strings.Split(k, " ")[0]
-	r.Length = len(v)
+	idx := strings.Index(k, " ")
+	if idx == -1 {
+		r.PartHeader = k
+	} else {
+		r.PartHeader = k[:idx]
+	}
+	//r.Length = len(v)
 	r.Sequence = v
 
 	if strings.HasPrefix(k, tag) {
@@ -43,7 +48,7 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 	}
 
 	if strings.Contains(k, "contam_") {
-		r.IsContaminant = true
+		//r.IsContaminant = true
 	}
 
 	r.ID = getID(k, class, verb)
