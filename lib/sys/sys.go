@@ -247,7 +247,8 @@ func Serialize(v interface{}, filename string) {
 	}
 	bo := bufio.NewWriter(output)
 	enc := msgpack.NewEncoder(bo)
-	enc.UseInternedStrings(true)
+	enc.UseInternedStrings(false)
+	enc.UseArrayEncodedStructs(true)
 	err := enc.Encode(&v)
 	errFlush := bo.Flush()
 	if errFlush != nil {
@@ -272,7 +273,7 @@ func Restore(v interface{}, filename string, silent bool) {
 	}
 	bi := bufio.NewReader(input)
 	dec := msgpack.NewDecoder(bi)
-	dec.UseInternedStrings(true)
+	dec.UseInternedStrings(false)
 	err := dec.Decode(&v)
 	errClose := input.Close()
 	if errClose != nil {
