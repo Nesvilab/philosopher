@@ -13,39 +13,50 @@ import (
 // ParseFile a fasta file and returns a map with the header as key and sequence as value
 func ParseFile(filename string) map[string]string {
 
-	var fastaHeader string
-	var fastaSeq string
 	var fastaMap = make(map[string]string)
+	fastaSlice := ParseFile2(filename)
+	for _, e := range fastaSlice {
+		fastaMap[e.Header] = e.Seq
+	}
+	return fastaMap
+}
 
 type FastaEntry struct {
 	Header string
 	Seq    string
 }
 
+func ParseFile2(filename string) []FastaEntry {
 
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
 		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
 	}
 	defer f.Close()
+	stat, err := f.Stat()
+	if err != nil {
+		panic(err)
+	}
 
-	reHeader, _ := regexp.Compile("^>(.*)")
+	fastaSlice := make([]FastaEntry, 0, stat.Size()/450)
+
 	scanner := bufio.NewScanner(f)
 
 	for scanner.Scan() {
-		if strings.HasPrefix(scanner.Text(), ">") {
-			header := reHeader.FindStringSubmatch(scanner.Text())
-			fastaHeader = header[1]
-			fastaHeader = strings.Replace(fastaHeader, "\t", " ", -1)
-			fastaMap[fastaHeader] = ""
+		if len(scanner.Bytes()) > 0 && scanner.Bytes()[0] == '>' {
+			line := scanner.Bytes()[1:]
+			for i, e := range line {
+				if e == '\t' {
+					line[i] = ' '
+				}
+			}
+			fastaSlice = append(fastaSlice, FastaEntry{Header: string(line), Seq: ""})
 		} else {
-			fastaSeq = fastaMap[fastaHeader]
-			fastaSeq += scanner.Text()
-			fastaMap[fastaHeader] = fastaSeq
+			fastaSlice[len(fastaSlice)-1].Seq += scanner.Text()
 		}
 	}
 
-	return fastaMap
+	return fastaSlice
 }
 
 // ParseUniProtDescriptionMap parses a UniProt FASTA file and returns a map with ID and DESC

@@ -6,6 +6,7 @@ import (
 	"compress/gzip"
 	"errors"
 	"fmt"
+	"github.com/Nesvilab/philosopher/lib/fas"
 	"io"
 	"log"
 	"os"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 
-	"github.com/Nesvilab/philosopher/lib/fas"
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/sys"
 
