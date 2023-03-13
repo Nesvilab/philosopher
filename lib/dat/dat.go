@@ -9,10 +9,11 @@ import (
 	"io"
 	"log"
 	"os"
-	"path"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
@@ -35,6 +36,9 @@ type Base struct {
 	Proteomes       string
 	DownloadedFiles []string
 	Records         []Record
+	RecordsLen      int
+	NParts          uint
+	PartsLen        []int
 	TaDeDB          map[string]string
 }
 
@@ -64,7 +68,7 @@ func Run(m met.Data) met.Data {
 
 		m.DB = m.Database.Annot
 
-		db.ProcessDB(m.Database.Annot, m.Database.Tag, m.Database.Verbose)
+		db.ProcessDB_and_serialize(m.Database.Annot, m.Database.Tag, m.Database.Verbose)
 
 		db.Serialize()
 
@@ -113,7 +117,7 @@ func Run(m met.Data) met.Data {
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
 
-	db.ProcessDB(customDB, m.Database.Tag, m.Database.Verbose)
+	db.ProcessDB_and_serialize(customDB, m.Database.Tag, m.Database.Verbose)
 
 	logrus.Info("Processing decoys")
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
@@ -128,16 +132,90 @@ func Run(m met.Data) met.Data {
 	return m
 }
 
-// ProcessDB determines the type of sequence and sends it to the appropriate parsing function
-func (d *Base) ProcessDB(file, decoyTag string, verbose bool) {
+// ProcessDB_and_serialize determines the type of sequence and sends it to the appropriate parsing function
+func (d *Base) ProcessDB_and_serialize(filename, decoyTag string, verbose bool) {
+	nproc := runtime.GOMAXPROCS(0)
+	entriesChunk := make(chan []fas.FastaEntry, nproc)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		d.RecordsLen = ParseFile(filename, entriesChunk)
+	}()
+	var entriesChunkRecv <-chan []fas.FastaEntry = entriesChunk
 
-	fastaMap := fas.ParseFile(file)
-	d.FileName = path.Base(file)
-
-	for k, v := range fastaMap {
-		class := Classify(k, decoyTag)
-		d.Records = append(d.Records, ProcessHeader(k, v, class, decoyTag, verbose))
+	wg.Add(nproc)
+	d.NParts = uint(nproc)
+	d.PartsLen = make([]int, nproc)
+	for i := 0; i < nproc; i++ {
+		go func(i int) {
+			defer wg.Done()
+			output, e := os.OpenFile(fmt.Sprintf("%s__%d", sys.DBBin(), i), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, sys.FilePermission())
+			defer func(output *os.File) {
+				err := output.Close()
+				if err != nil {
+					msg.MarshalFile(err, "error")
+					panic(err)
+				}
+			}(output)
+			if e != nil {
+				msg.WriteFile(e, "error")
+				panic(e)
+			}
+			bo := bufio.NewWriter(output)
+			defer func(bo *bufio.Writer) {
+				err := bo.Flush()
+				if err != nil {
+					msg.MarshalFile(err, "error")
+					panic(err)
+				}
+			}(bo)
+			enc := msgpack.NewEncoder(bo)
+			enc.UseInternedStrings(false)
+			enc.UseArrayEncodedStructs(true)
+			for fastaSlice := range entriesChunkRecv {
+				d.PartsLen[i] += len(fastaSlice)
+				for _, e := range fastaSlice {
+					class := Classify(e.Header, decoyTag)
+					enc.Encode(ProcessHeader(e.Header, e.Seq, class, decoyTag, verbose))
+				}
+			}
+		}(i)
 	}
+	wg.Wait()
+}
+func ParseFile(filename string, entriesChunk chan<- []fas.FastaEntry) int {
+
+	f, e := os.Open(filename)
+	if filename == "" || e != nil {
+		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	n_entries := 0
+	const chunk_size = 1 << 14
+	fastaSlice := make([]fas.FastaEntry, 0, chunk_size)
+	for scanner.Scan() {
+		if len(scanner.Bytes()) > 0 && scanner.Bytes()[0] == '>' {
+			line := scanner.Bytes()[1:]
+			for i, e := range line {
+				if e == '\t' {
+					line[i] = ' '
+				}
+			}
+			n_entries++
+			if len(fastaSlice) == chunk_size {
+				entriesChunk <- fastaSlice
+				fastaSlice = make([]fas.FastaEntry, 0, chunk_size)
+			}
+			fastaSlice = append(fastaSlice, fas.FastaEntry{Header: string(line), Seq: ""})
+		} else {
+			fastaSlice[len(fastaSlice)-1].Seq += scanner.Text()
+		}
+	}
+	entriesChunk <- fastaSlice
+	close(entriesChunk)
+	return n_entries
 }
 
 // Fetch downloads a database file from UniProt
@@ -393,22 +471,88 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 
 // Serialize saves to disk a msgpack version of the database data structure
 func (d *Base) Serialize() {
-
-	b, e := msgpack.Marshal(&d)
+	output, e := os.OpenFile(sys.DBBin(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, sys.FilePermission())
+	defer func(output *os.File) {
+		err := output.Close()
+		if err != nil {
+			msg.MarshalFile(err, "error")
+			panic(err)
+		}
+	}(output)
 	if e != nil {
-		msg.MarshalFile(e, "error")
+		msg.WriteFile(e, "error")
+		panic(e)
 	}
-
-	e = os.WriteFile(sys.DBBin(), b, sys.FilePermission())
-	if e != nil {
-		msg.SerializeFile(e, "error")
+	bo := bufio.NewWriter(output)
+	defer func(bo *bufio.Writer) {
+		err := bo.Flush()
+		if err != nil {
+			msg.MarshalFile(err, "error")
+			panic(err)
+		}
+	}(bo)
+	enc := msgpack.NewEncoder(bo)
+	enc.UseInternedStrings(false)
+	enc.UseArrayEncodedStructs(true)
+	err := enc.Encode(&d)
+	bo.Flush()
+	if err != nil {
+		msg.MarshalFile(err, "error")
+		panic(err)
 	}
-
 }
 
 // Restore reads philosopher results files and restore the data sctructure
 func (d *Base) Restore() {
-	sys.Restore(d, sys.DBBin(), false)
+	d.restoreImpl(sys.DBBin())
+}
+
+func (d *Base) restoreImpl(filename string) {
+	input, e := os.Open(filename)
+	if e != nil {
+		msg.ReadFile(e, "error")
+		panic(e)
+	}
+	bi := bufio.NewReader(input)
+	dec := msgpack.NewDecoder(bi)
+	dec.UseInternedStrings(false)
+	err := dec.Decode(&d)
+	errClose := input.Close()
+	if errClose != nil {
+		panic(errClose)
+	}
+	if err != nil {
+		msg.DecodeMsgPck(err, "error")
+		panic(err)
+	}
+	d.Records = make([]Record, d.RecordsLen)
+	var wg sync.WaitGroup
+	wg.Add(int(d.NParts))
+	partsLen_cumsum := make([]int, len(d.PartsLen)+1)
+	for i, e := range d.PartsLen {
+		partsLen_cumsum[i+1] = e + partsLen_cumsum[i]
+	}
+	for i := uint(0); i < d.NParts; i++ {
+		go func(i uint) {
+			defer wg.Done()
+			fn := fmt.Sprintf("%s__%d", filename, i)
+			input, e := os.OpenFile(fn, os.O_RDONLY, sys.FilePermission())
+			if e != nil {
+				msg.ReadFile(e, "error")
+				panic(e)
+			}
+			bi := bufio.NewReader(input)
+			dec := msgpack.NewDecoder(bi)
+			start, end := partsLen_cumsum[i], partsLen_cumsum[i+1]
+			for idx := start; idx < end; idx++ {
+				err := dec.Decode(&d.Records[idx])
+				if err != nil {
+					panic(err)
+				}
+			}
+		}(i)
+	}
+	wg.Wait()
 }
 
 // RestoreWithPath reads philosopher results files and restore the data sctructure
@@ -416,7 +560,7 @@ func (d *Base) RestoreWithPath(p string) {
 
 	path := fmt.Sprintf("%s%s%s", p, string(filepath.Separator), sys.DBBin())
 	path, _ = filepath.Abs(path)
-	sys.Restore(d, path, false)
+	d.restoreImpl(path)
 }
 
 // reverseSeq returns its argument string reversed rune-wise left to right.

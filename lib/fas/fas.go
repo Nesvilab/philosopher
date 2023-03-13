@@ -17,6 +17,12 @@ func ParseFile(filename string) map[string]string {
 	var fastaSeq string
 	var fastaMap = make(map[string]string)
 
+type FastaEntry struct {
+	Header string
+	Seq    string
+}
+
+
 	f, e := os.Open(filename)
 	if filename == "" || e != nil {
 		msg.ReadFile(errors.New("cannot open the database file"), "fatal")
