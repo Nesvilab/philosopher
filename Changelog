@@ -1,10 +1,11 @@
 ### Added
 - Added the protein start and end positions to ions and peptides report.
-- PrtoXML reading parallelization.
+- ProtXML reading parallelization.
 
 ### Changed
-- Rolledback the FASTA header checking for IonQuant.
-- PTMProphet updated to v6.2.0
+- Rolled back the FASTA header checking for IonQuant.
+- PTMProphet was updated to v6.2.0
+- The processing speed, including IO operations received a major upgrade (@guoci)
 
 ### Fixed
-- updated razor mapping rules to reinforce the decoy tagging of razor proteins.
+- Updated razor mapping rules to reinforce the decoy tagging of razor proteins.
