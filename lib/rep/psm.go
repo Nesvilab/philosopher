@@ -223,7 +223,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 	sort.Strings(modList)
 
-	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tPrev AA\tNext AA\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
+	header = "Spectrum\tSpectrum File\tPeptide\tModified Peptide\tExtended Peptide\tPrev AA\tNext AA\tPeptide Length\tCharge\tRetention\tObserved Mass\tCalibrated Observed Mass\tObserved M/Z\tCalibrated Observed M/Z\tCalculated Peptide Mass\tCalculated M/Z\tDelta Mass"
 
 	if isComet {
 		header += "\tXCorr\tDeltaCN\tDeltaCNStar\tSPScore\tSPRank"
@@ -456,11 +456,12 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 			i.Spectrum,
 			i.SpectrumFile,
 			i.Peptide,
 			i.ModifiedPeptide,
+			i.ExtendedPeptide,
 			string(i.PrevAA),
 			string(i.NextAA),
 			len(i.Peptide),

@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -489,6 +490,36 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 		proteinStart[evi.PSM[i].Peptide] = evi.PSM[i].ProteinStart
 		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
+
+		// map the flanking aminoacids
+		flanks := regexp.MustCompile(`(\w{0,10})` + regexp.QuoteMeta(peptide) + `(\w{0,10})`)
+		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
+
+		var left string
+		var right string
+
+		if f != nil {
+
+			match := f[0]
+
+			if len(match) >= 1 && len(match[1]) > 0 {
+				left = fmt.Sprintf("%s.", match[1])
+			} else {
+				left = "."
+			}
+
+			if len(match) >= 2 && len(match[2]) > 0 {
+				right = fmt.Sprintf(".%s", match[2])
+			} else {
+				right = "."
+			}
+
+			evi.PSM[i].ExtendedPeptide = left + evi.PSM[i].Peptide + right
+
+		} else {
+			evi.PSM[i].ExtendedPeptide = "." + evi.PSM[i].Peptide + "."
+		}
+
 	}
 
 	for i := range evi.Ions {

@@ -119,6 +119,7 @@ type PSMEvidence struct {
 	Spectrum                         string
 	SpectrumFile                     string
 	Peptide                          string
+	ExtendedPeptide                  string
 	Protein                          string
 	ProteinDescription               string
 	ProteinID                        string
