@@ -122,9 +122,9 @@ func getGeneName(header, class string, verb bool) (match string) {
 	case "cptac-ensembl":
 		r = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
 	case "ncbi":
-		r = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
+		return ""
 	case "uniprot":
-		r = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
+		r = regexp.MustCompile(`GN\=([[:alnum:]]+)`)
 	case "uniref":
 		return ""
 	case "tair":
@@ -171,7 +171,7 @@ func getOrganism(header, class string, verb bool) (match string) {
 	case "ncbi":
 		r = regexp.MustCompile(`\[(.+)\]$`)
 	case "uniprot":
-		r = regexp.MustCompile(`OS\=(.+?)[OX\=|GN\=|PE\=|$]`)
+		r = regexp.MustCompile(`OS\=(.+?)\s?[OX\=|GN\=|PE\=|$?]`)
 	case "uniref":
 		return ""
 	case "tair":
@@ -215,7 +215,7 @@ func getProteinName(header, class string, verb bool) (match string) {
 	case "ncbi":
 		r = regexp.MustCompile(`\s(.+)\sGN?\[?`)
 	case "uniprot":
-		r = regexp.MustCompile(`\w+\|.+?\|.+?\s(.+?)\s[?OS|?(|?OX|?GN|?PE|?SV]`)
+		r = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
 	case "uniref":
 		r = regexp.MustCompile(`(UniRef\w+)`)
 	case "tair":
