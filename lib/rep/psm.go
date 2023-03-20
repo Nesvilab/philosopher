@@ -17,25 +17,25 @@ import (
 
 	"github.com/Nesvilab/philosopher/lib/bio"
 	"github.com/Nesvilab/philosopher/lib/cla"
-	"github.com/Nesvilab/philosopher/lib/dat"
 	"github.com/Nesvilab/philosopher/lib/id"
 )
 
 // AssemblePSMReport creates the PSM structure for reporting
 func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
-	var genes = make(map[string]string)
-	var ptid = make(map[string]string)
-	{
-		// collect database information
-		var dtb dat.Base
-		dtb.Restore()
+	// var genes = make(map[string]string)
+	// var ptid = make(map[string]string)
+	// {
+	// 	// collect database information
+	// 	var dtb dat.Base
+	// 	dtb.Restore()
 
-		for _, j := range dtb.Records {
-			genes[j.PartHeader] = j.GeneNames
-			ptid[j.PartHeader] = j.ID
-		}
-	}
+	// 	for _, j := range dtb.Records {
+	// 		genes[j.PartHeader] = j.GeneNames
+	// 		ptid[j.PartHeader] = j.ID
+	// 	}
+	// }
+
 	evi.PSM = make(PSMEvidenceList, len(pep))
 	for idx, i := range pep {
 
@@ -93,15 +93,15 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			}
 		}
 
-		gn, ok := genes[i.Protein]
-		if ok {
-			p.GeneName = gn
-		}
+		// gn, ok := genes[i.Protein]
+		// if ok {
+		// 	p.GeneName = gn
+		// }
 
-		id, ok := ptid[i.Protein]
-		if ok {
-			p.ProteinID = id
-		}
+		// id, ok := ptid[i.Protein]
+		// if ok {
+		// 	p.ProteinID = id
+		// }
 
 		// is this bservation a decoy ?
 		if cla.IsDecoyPSM(i, decoyTag) {
