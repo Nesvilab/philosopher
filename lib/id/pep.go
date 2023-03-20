@@ -796,6 +796,7 @@ func printModel(v, path string, xAxis, obs, pos, neg []float64) {
 
 var serialize_pepxml = false
 var globals_pepxml *PepXML4Serialiazation = nil
+var mu = sync.Mutex{}
 var globals_pepidlist = make(map[string]*PepIDListPtrs)
 
 // Serialize converts the whole structure to a msgpack file
@@ -846,6 +847,8 @@ func (p *PepIDList) Serialize(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
+	mu.Lock()
+	defer mu.Unlock()
 	if globals_pepidlist == nil {
 		sys.Serialize(p, dest)
 	} else {
@@ -871,6 +874,8 @@ func (p *PepIDListPtrs) Serialize(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
+	mu.Lock()
+	defer mu.Unlock()
 	if globals_pepidlist == nil {
 		sys.Serialize(p, dest)
 	} else {
@@ -892,6 +897,8 @@ func (p *PepIDList) Restore(level string) {
 	} else {
 		msg.Custom(errors.New("cannot determine binary data class"), "error")
 	}
+	mu.Lock()
+	defer mu.Unlock()
 	if globals_pepidlist == nil {
 		sys.Restore(p, dest, false)
 	} else {
