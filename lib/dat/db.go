@@ -120,7 +120,7 @@ func getProteinExistence(header string, class dbtype, verb bool) (match string) 
 var getGeneName_ensembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
 var getGeneName_cptac_ensembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
 var getGeneName_ncbi = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
-var getGeneName_uniprot = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
+var getGeneName_uniprot = regexp.MustCompile(`GN\=([[:alnum:]]+)`)
 var getGeneName_tair = regexp.MustCompile(`\|\sSymbols\:(.+?)\s\|`)
 
 func getGeneName(header string, class dbtype, verb bool) (match string) {
@@ -170,7 +170,7 @@ func getGeneName(header string, class dbtype, verb bool) (match string) {
 }
 
 var getOrganism_ncbi = regexp.MustCompile(`\[(.+)\]$`)
-var getOrganism_uniprot = regexp.MustCompile(`OS\=(.+?)[OX\=|GN\=|PE\=|$]`)
+var getOrganism_uniprot = regexp.MustCompile(`OS\=(.+?)\s?[OX\=|GN\=|PE\=|$?]`)
 
 func getOrganism(header string, class dbtype, verb bool) (match string) {
 
@@ -218,7 +218,7 @@ func getOrganism(header string, class dbtype, verb bool) (match string) {
 var getProteinName_ensembl = regexp.MustCompile(`description\:(.+)\s?$`)
 var getProteinName_cptac_ensembl = regexp.MustCompile(`ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|(.+)$`)
 var getProteinName_ncbi = regexp.MustCompile(`\s(.+)\sGN?\[?`)
-var getProteinName_uniprot = regexp.MustCompile(`\w+\|.+?\|.+?\s(.+?)\s[?OS|?(|?OX|?GN|?PE|?SV]`)
+var getProteinName_uniprot = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
 var getProteinName_uniref = regexp.MustCompile(`(UniRef\w+)`)
 
 func getProteinName(header string, class dbtype, verb bool) (match string) {
