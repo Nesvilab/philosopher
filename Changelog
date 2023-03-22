@@ -1,11 +1,12 @@
 ### Added
 - Added the protein start and end positions to ions and peptides report.
 - ProtXML reading parallelization.
+- Added a new Extended Peptide column to the PSM report containing the flanking regions of peptides.
 
 ### Changed
 - Rolled back the FASTA header checking for IonQuant.
 - PTMProphet was updated to v6.2.0
-- The processing speed, including IO operations received a major upgrade (@guoci)
+- The processing speed, including IO operations and database reading received a major upgrade (@guoci)
 
 ### Fixed
 - Updated razor mapping rules to reinforce the decoy tagging of razor proteins.
