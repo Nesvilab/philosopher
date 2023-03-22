@@ -499,7 +499,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
 
 		// map the flanking aminoacids
-		flanks := regexp.MustCompile(`(\w{0,10})` + regexp.QuoteMeta(peptide) + `(\w{0,10})`)
+		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(peptide) + `(\w{0,7})`)
 		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 
 		var left string
@@ -510,13 +510,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			match := f[0]
 
 			if len(match) >= 1 && len(match[1]) > 0 {
-				left = fmt.Sprintf("%s.", match[1])
+				left = fmt.Sprintf("%s%s.", match[1], evi.PSM[i].PrevAA)
 			} else {
 				left = "."
 			}
 
 			if len(match) >= 2 && len(match[2]) > 0 {
-				right = fmt.Sprintf(".%s", match[2])
+				right = fmt.Sprintf(".%s%s", match[2], evi.PSM[i].NextAA)
 			} else {
 				right = "."
 			}
@@ -526,7 +526,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		} else {
 			evi.PSM[i].ExtendedPeptide = "." + evi.PSM[i].Peptide + "."
 		}
-
 	}
 
 	for i := range evi.Ions {

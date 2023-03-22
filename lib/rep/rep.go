@@ -169,12 +169,12 @@ type PSMEvidence struct {
 
 func (e PSMEvidence) IonForm() id.IonFormType {
 	t := math.Round(e.CalcNeutralPepMass*1e4) * 1e-4
-	return id.IonFormType{e.Peptide, float32(t), e.AssumedCharge}
+	return id.IonFormType{Peptide: e.Peptide, CalcNeutralPepMass: float32(t), AssumedCharge: e.AssumedCharge}
 }
 
 func (e IonEvidence) IonForm() id.IonFormType {
 	t := math.Round(e.PeptideMass*1e4) * 1e-4
-	return id.IonFormType{e.Sequence, float32(t), e.ChargeState}
+	return id.IonFormType{Peptide: e.Sequence, CalcNeutralPepMass: float32(t), AssumedCharge: e.ChargeState}
 }
 
 // PSMEvidenceList ...
