@@ -116,7 +116,7 @@ func getProteinExistence(header string, class dbtype, verb bool) (match string) 
 var getGeneNameEnsembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
 var getGeneNameCptacEnsembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
 var getGeneNameNcbi = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
-var getGeneNameUniprot = regexp.MustCompile(`GN\=([[:alnum:]]+)`)
+var getGeneNameUniprot = regexp.MustCompile(`GN\=([[:graph:]]+)`)
 var getGeneNameTair = regexp.MustCompile(`\|\sSymbols\:(.+?)\s\|`)
 
 func getGeneName(header string, class dbtype, verb bool) (match string) {
