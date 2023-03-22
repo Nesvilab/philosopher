@@ -1,6 +1,7 @@
 package dat_test
 
 import (
+	"github.com/Nesvilab/philosopher/lib/fas"
 	"testing"
 
 	. "github.com/Nesvilab/philosopher/lib/dat"
@@ -72,9 +73,8 @@ func TestBase_ProcessDB(t *testing.T) {
 				TaDeDB:    tt.fields.TaDeDB,
 				Records:   tt.fields.Records,
 			}
-			d.ProcessDB(tt.args.file, tt.args.decoyTag, false)
-
-			if len(d.Records) != 20407 {
+			len_records := ParseFile(tt.args.file, make(chan<- []fas.FastaEntry, 1024))
+			if len_records != 20407 {
 				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20407)
 			}
 		})

@@ -59,8 +59,7 @@ var inspectCmd = &cobra.Command{
 		case "db":
 			var o dat.Base
 
-			target := fmt.Sprintf(".meta%sdb.bin", string(filepath.Separator))
-			sys.Restore(&o, target, false)
+			o.RestoreWithPath(".")
 			spew.Dump(o.Records)
 
 		case "lfq":
