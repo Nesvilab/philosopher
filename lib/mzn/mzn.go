@@ -391,7 +391,6 @@ func (s *Spectrum) Decode() {
 // readEncoded transforms the binary data into float64 values
 func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 
-	var stream []uint8
 	var floatArray []float64
 
 	b := bytes.NewReader(bin)
@@ -413,31 +412,17 @@ func readEncoded(bin []byte, precision, isCompressed string) []float64 {
 
 	dataArray := bytestream.Bytes()
 
-	var counter int
-
 	if precision == "32" {
-		for i := range dataArray {
-			counter++
-			stream = append(stream, dataArray[i])
-			if counter == 4 {
-				bits := binary.LittleEndian.Uint32(stream)
-				converted := math.Float32frombits(bits)
-				floatArray = append(floatArray, float64(converted))
-				stream = nil
-				counter = 0
-			}
+		for i := 0; i < len(dataArray); i += 4 {
+			bits := binary.LittleEndian.Uint32(dataArray[i : i+4])
+			converted := math.Float32frombits(bits)
+			floatArray = append(floatArray, float64(converted))
 		}
 	} else if precision == "64" {
-		for i := range dataArray {
-			counter++
-			stream = append(stream, dataArray[i])
-			if counter == 8 {
-				bits := binary.LittleEndian.Uint64(stream)
-				converted := math.Float64frombits(bits)
-				floatArray = append(floatArray, float64(converted))
-				stream = nil
-				counter = 0
-			}
+		for i := 0; i < len(dataArray); i += 8 {
+			bits := binary.LittleEndian.Uint64(dataArray[i : i+8])
+			converted := math.Float64frombits(bits)
+			floatArray = append(floatArray, float64(converted))
 		}
 	} else {
 		logrus.Trace("Error trying to define mzML binary precision")
