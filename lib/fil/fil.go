@@ -26,6 +26,7 @@ func Run(f met.Data) met.Data {
 	e := rep.New()
 	var pep id.PepIDList
 	var pro id.ProtIDList
+	var dbBin string
 
 	if len(f.Filter.ProBin) > 0 {
 
@@ -35,6 +36,7 @@ func Run(f met.Data) met.Data {
 
 			p := fmt.Sprintf("%s%s.meta/protxml.bin", f.Filter.ProBin, string(filepath.Separator))
 			r := fmt.Sprintf("%s%s.meta/razor.bin", f.Filter.ProBin, string(filepath.Separator))
+			dbBin = fmt.Sprintf("%s%s", f.Filter.ProBin, string(filepath.Separator))
 
 			logrus.Info("Fetching protein inference from ", f.Filter.ProBin)
 
@@ -43,11 +45,6 @@ func Run(f met.Data) met.Data {
 
 			rdest = fmt.Sprintf("%s%s.meta%srazor.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
 			sys.CopyFile(r, rdest)
-
-			//var rm raz.RazorMap = make(map[string]raz.RazorCandidate)
-			//rm.Restore(false)
-			//logrus.Info("Fetching razor assignment from: ", f.Filter.ProBin, ": ", len(rm), " razor groups imported.")
-			//_ = rm
 
 		} else if errors.Is(err, os.ErrNotExist) {
 
@@ -174,14 +171,16 @@ func Run(f met.Data) met.Data {
 	}
 
 	logrus.Info("Assigning protein identifications to layers")
-	e.UpdateLayerswithDatabase(f.Filter.Tag)
+
+	// object d is for reuising databasee paths
+	e.UpdateLayerswithDatabase(dbBin, f.Filter.Tag)
 
 	if len(f.Filter.Pox) > 0 || f.Filter.Inference {
 
 		logrus.Info("Processing protein inference")
 		pro.Restore()
 
-		e.AssembleProteinReport(pro, f.Filter.Weight, f.Filter.Tag)
+		e.AssembleProteinReport(pro, f.Filter.Weight, dbBin, f.Filter.Tag)
 		pro = nil
 
 		logrus.Info("Synchronizing PSMs and proteins")

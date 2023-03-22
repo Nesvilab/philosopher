@@ -426,7 +426,8 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 }
 
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
-func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
+func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
+
 	type liteRecord struct {
 		ID          string
 		EntryName   string
@@ -438,7 +439,13 @@ func (evi *Evidence) UpdateLayerswithDatabase(decoyTag string) {
 
 	{
 		var dtb dat.Base
-		dtb.Restore()
+
+		if len(dbBin) == 0 {
+			dtb.Restore()
+		} else {
+			dtb.RestoreWithPath(dbBin)
+		}
+
 		for _, j := range dtb.Records {
 			recordMap[j.PartHeader] = liteRecord{j.ID, j.EntryName, j.GeneNames, strings.TrimSpace(j.ProteinName), j.Sequence}
 		}

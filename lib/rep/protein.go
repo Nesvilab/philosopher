@@ -18,7 +18,7 @@ import (
 )
 
 // AssembleProteinReport creates the post processed protein strcuture
-func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, decoyTag string) {
+func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, dbBin, decoyTag string) {
 
 	var protMods = make(map[id.IonFormType][]mod.Modification)
 	var evidenceIons = make(map[id.IonFormType]*IonEvidence)
@@ -175,7 +175,11 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, de
 	}
 
 	var dtb dat.Base
-	dtb.Restore()
+	if len(dbBin) == 0 {
+		dtb.Restore()
+	} else {
+		dtb.RestoreWithPath(dbBin)
+	}
 
 	if len(dtb.Records) < 1 {
 		msg.DatabaseNotFound(errors.New(""), "error")

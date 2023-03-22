@@ -125,7 +125,7 @@ func InitializeWorkspaces(meta met.Data, p Directives, dir, Version, Build strin
 // AnnotateDatabase annotates the database on the first ds, and copy the bin data to the other folders
 func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	var source string
+	//var source string
 
 	// getting inside de the dataset folder
 	dsAbs, _ := filepath.Abs(data[0])
@@ -138,26 +138,26 @@ func AnnotateDatabase(meta met.Data, p Directives, dir string, data []string) me
 	meta.Database.Tag = p.DatabaseSearch.DecoyTag
 	dat.Run(meta)
 	meta.Serialize()
-	source = fmt.Sprintf("%s%s.meta%sdb.bin", dsAbs, string(filepath.Separator), string(filepath.Separator))
+	//source = fmt.Sprintf("%s%s.meta%sdb.bin", dsAbs, string(filepath.Separator), string(filepath.Separator))
 
 	// return to the top level directory
 	os.Chdir(dir)
 
-	for i := 1; i < len(data); i++ {
-		destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
+	// for i := 1; i < len(data); i++ {
+	// 	destination := fmt.Sprintf("%s%s.meta%sdb.bin", data[i], string(filepath.Separator), string(filepath.Separator))
 
-		// Read all content of src to data
-		data, e := os.ReadFile(source)
-		if e != nil {
-			log.Fatal(e)
-		}
+	// 	// Read all content of src to data
+	// 	data, e := os.ReadFile(source)
+	// 	if e != nil {
+	// 		log.Fatal(e)
+	// 	}
 
-		e = os.WriteFile(destination, data, 0644)
-		if e != nil {
-			log.Fatal(e)
-		}
+	// 	e = os.WriteFile(destination, data, 0644)
+	// 	if e != nil {
+	// 		log.Fatal(e)
+	// 	}
 
-	}
+	// }
 
 	met.CleanTemp(meta.Temp)
 
@@ -629,13 +629,12 @@ func BioQuant(meta met.Data, p Directives, dir string, data []string) met.Data {
 // Filter executes the Filter, Quantify and Report commands in tandem
 func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 
-	// this is the virtual home directory where the pipeline is being executed.
-	//vHome := meta.Home
+	top := meta.Home
 
-	for _, i := range data {
+	for i := 0; i < len(data); i++ {
 
 		// getting inside  each dataset folder again
-		dsAbs, _ := filepath.Abs(i)
+		dsAbs, _ := filepath.Abs(data[i])
 		os.Chdir(dsAbs)
 
 		// reload the meta data
@@ -664,7 +663,7 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 			}
 
 			if p.Steps.IntegratedReports == "yes" && len(p.Filter.Pox) == 0 {
-				meta.Filter.Pox = "combined"
+				meta.Filter.Pox = fmt.Sprintf("%s%scombined.prot.xml", top, string(filepath.Separator))
 			} else if p.Steps.IntegratedReports == "no" && !p.Abacus.Protein && len(p.Filter.Pox) == 0 {
 				meta.Filter.Pox = ""
 				meta.Filter.Razor = false
@@ -674,6 +673,10 @@ func Filter(meta met.Data, p Directives, dir string, data []string) met.Data {
 
 			if len(p.Filter.ProBin) != 0 {
 				meta.Filter.ProBin = p.Filter.ProBin
+			}
+
+			if i != 0 {
+				meta.Filter.ProBin = fmt.Sprintf("%s%s%s", top, string(filepath.Separator), data[0])
 			}
 
 			meta := fil.Run(meta)
