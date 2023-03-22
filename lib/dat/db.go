@@ -21,10 +21,7 @@ type Record struct {
 	GeneNames        string
 	ProteinExistence string
 	Sequence         string
-	//Class            string
-	//Length           int
-	IsDecoy bool
-	//IsContaminant    bool
+	IsDecoy          bool
 }
 
 // ProcessHeader parses FASTA records looking for individial elements
@@ -32,7 +29,6 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 
 	var r Record
 
-	//r.Class = class
 	r.OriginalHeader = k
 	idx := strings.Index(k, " ")
 	if idx == -1 {
@@ -40,16 +36,16 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 	} else {
 		r.PartHeader = k[:idx]
 	}
-	//r.Length = len(v)
+
 	r.Sequence = v
 
 	if strings.HasPrefix(k, tag) {
 		r.IsDecoy = true
 	}
 
-	if strings.Contains(k, "contam_") {
-		//r.IsContaminant = true
-	}
+	// if strings.Contains(k, "contam_") {
+	// 	//r.IsContaminant = true
+	// }
 
 	r.ID = getID(k, class, verb)
 	r.EntryName = getEntryName(k, class, verb)
@@ -117,11 +113,11 @@ func getProteinExistence(header string, class dbtype, verb bool) (match string) 
 	}
 }
 
-var getGeneName_ensembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
-var getGeneName_cptac_ensembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
-var getGeneName_ncbi = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
-var getGeneName_uniprot = regexp.MustCompile(`GN\=([[:alnum:]]+)`)
-var getGeneName_tair = regexp.MustCompile(`\|\sSymbols\:(.+?)\s\|`)
+var getGeneNameEnsembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
+var getGeneNameCptacEnsembl = regexp.MustCompile(`(ENSG\d{1,11}\.?\d?\d?)`)
+var getGeneNameNcbi = regexp.MustCompile(`GN\=(.+)\s[\[|OX\=|GN\=|PE\=|$]`)
+var getGeneNameUniprot = regexp.MustCompile(`GN\=([[:alnum:]]+)`)
+var getGeneNameTair = regexp.MustCompile(`\|\sSymbols\:(.+?)\s\|`)
 
 func getGeneName(header string, class dbtype, verb bool) (match string) {
 
@@ -129,17 +125,17 @@ func getGeneName(header string, class dbtype, verb bool) (match string) {
 
 	switch class {
 	case ensembl:
-		r = getGeneName_ensembl
+		r = getGeneNameEnsembl
 	case cptac_ensembl:
-		r = getGeneName_cptac_ensembl
+		r = getGeneNameCptacEnsembl
 	case ncbi:
-		r = getGeneName_ncbi
+		r = getGeneNameNcbi
 	case uniprot:
-		r = getGeneName_uniprot
+		r = getGeneNameUniprot
 	case uniref:
 		return ""
 	case tair:
-		r = getGeneName_tair
+		r = getGeneNameTair
 	case nextprot:
 		s := strings.Split(header, "|")
 		s[2] = strings.TrimLeft(s[2], " ")
@@ -169,8 +165,8 @@ func getGeneName(header string, class dbtype, verb bool) (match string) {
 	return match
 }
 
-var getOrganism_ncbi = regexp.MustCompile(`\[(.+)\]$`)
-var getOrganism_uniprot = regexp.MustCompile(`OS\=(.+?)\s?[OX\=|GN\=|PE\=|$?]`)
+var getOrganismNcbi = regexp.MustCompile(`\[(.+)\]$`)
+var getOrganismUniprot = regexp.MustCompile(`OS\=(.+?)\s?[OX\=|GN\=|PE\=|$?]`)
 
 func getOrganism(header string, class dbtype, verb bool) (match string) {
 
@@ -182,9 +178,9 @@ func getOrganism(header string, class dbtype, verb bool) (match string) {
 	case cptac_ensembl:
 		return ""
 	case ncbi:
-		r = getOrganism_ncbi
+		r = getOrganismNcbi
 	case uniprot:
-		r = getOrganism_uniprot
+		r = getOrganismUniprot
 	case uniref:
 		return ""
 	case tair:
@@ -215,28 +211,27 @@ func getOrganism(header string, class dbtype, verb bool) (match string) {
 	return match
 }
 
-var getProteinName_ensembl = regexp.MustCompile(`description\:(.+)\s?$`)
-var getProteinName_cptac_ensembl = regexp.MustCompile(`ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|(.+)$`)
-var getProteinName_ncbi = regexp.MustCompile(`\s(.+)\sGN?\[?`)
-var getProteinName_uniprot = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
-var getProteinName_uniref = regexp.MustCompile(`(UniRef\w+)`)
+var getProteinNameEnsembl = regexp.MustCompile(`description\:(.+)\s?$`)
+var getProteinNameCptacEnsembl = regexp.MustCompile(`ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|(.+)$`)
+var getProteinNameNcbi = regexp.MustCompile(`\s(.+)\sGN?\[?`)
+var getProteinNameUniprot = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
+var getProteinNameUniref = regexp.MustCompile(`(UniRef\w+)`)
 
 func getProteinName(header string, class dbtype, verb bool) (match string) {
 
 	var r *regexp.Regexp
-	//var reg []string
 
 	switch class {
 	case ensembl:
-		r = getProteinName_ensembl
+		r = getProteinNameEnsembl
 	case cptac_ensembl:
-		r = getProteinName_cptac_ensembl
+		r = getProteinNameCptacEnsembl
 	case ncbi:
-		r = getProteinName_ncbi
+		r = getProteinNameNcbi
 	case uniprot:
-		r = getProteinName_uniprot
+		r = getProteinNameUniprot
 	case uniref:
-		r = getProteinName_uniref
+		r = getProteinNameUniref
 	case tair:
 		s := strings.Split(header, "|")
 		s[2] = strings.TrimLeft(s[2], " ")
@@ -253,10 +248,8 @@ func getProteinName(header string, class dbtype, verb bool) (match string) {
 		return ""
 	}
 
-	//reg := r.FindStringSubmatch(header)
 	reg := r.FindStringSubmatchIndex(header)
 
-	//if reg == nil || len(reg) <= 1 {
 	if reg == nil || len(reg) != 4 {
 
 		if verb {
@@ -267,20 +260,19 @@ func getProteinName(header string, class dbtype, verb bool) (match string) {
 		return ""
 
 	} else {
-		//match = reg[1]
 		match = header[reg[2]:reg[3]]
 	}
 
 	return match
 }
 
-var getEntryName_ensembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getEntryName_cptac_ensembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getEntryName_ncbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
-var getEntryName_uniprot = regexp.MustCompile(`\w+\|.+?\|(.+?)\s`)
-var getEntryName_uniref = regexp.MustCompile(`(UniRef\w+)`)
-var getEntryName_tair = regexp.MustCompile(`^(AT.+)\s\|\sSymbols`)
-var getEntryName_nextprot = regexp.MustCompile(`nxp\|(.+?)\|`)
+var getEntryNameEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getEntryNameCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getEntryNameNcbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
+var getEntryNameUniprot = regexp.MustCompile(`\w+\|.+?\|(.+?)\s`)
+var getEntryNameUniref = regexp.MustCompile(`(UniRef\w+)`)
+var getEntryNameTair = regexp.MustCompile(`^(AT.+)\s\|\sSymbols`)
+var getEntryNameNextprot = regexp.MustCompile(`nxp\|(.+?)\|`)
 
 func getEntryName(header string, class dbtype, verb bool) (match string) {
 
@@ -288,19 +280,19 @@ func getEntryName(header string, class dbtype, verb bool) (match string) {
 
 	switch class {
 	case ensembl:
-		r = getEntryName_ensembl
+		r = getEntryNameEnsembl
 	case cptac_ensembl:
-		r = getEntryName_cptac_ensembl
+		r = getEntryNameCptacEnsembl
 	case ncbi:
-		r = getEntryName_ncbi
+		r = getEntryNameNcbi
 	case uniprot:
-		r = getEntryName_uniprot
+		r = getEntryNameUniprot
 	case uniref:
-		r = getEntryName_uniref
+		r = getEntryNameUniref
 	case tair:
-		r = getEntryName_tair
+		r = getEntryNameTair
 	case nextprot:
-		r = getEntryName_nextprot
+		r = getEntryNameNextprot
 	case generic:
 		return header
 	default:
@@ -325,13 +317,13 @@ func getEntryName(header string, class dbtype, verb bool) (match string) {
 	return match
 }
 
-var getID_ensembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getID_cptac_ensembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getID_ncbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
-var getID_uniprot = regexp.MustCompile(`[sp|tr]\|(.+?)\|`)
-var getID_uniref = regexp.MustCompile(`(UniRef\w+)`)
-var getID_tair = regexp.MustCompile(`^(AT.+)\s\|\sSymbols`)
-var getID_nextprot = regexp.MustCompile(`nxp\|(.+?)\|`)
+var getIDEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getIDCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getIDNcbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
+var getIDUniprot = regexp.MustCompile(`[sp|tr]\|(.+?)\|`)
+var getIDUniref = regexp.MustCompile(`(UniRef\w+)`)
+var getIDTair = regexp.MustCompile(`^(AT.+)\s\|\sSymbols`)
+var getIDNextprot = regexp.MustCompile(`nxp\|(.+?)\|`)
 
 func getID(header string, class dbtype, verb bool) (match string) {
 
@@ -339,19 +331,19 @@ func getID(header string, class dbtype, verb bool) (match string) {
 
 	switch class {
 	case ensembl:
-		r = getID_ensembl
+		r = getIDEnsembl
 	case cptac_ensembl:
-		r = getID_cptac_ensembl
+		r = getIDCptacEnsembl
 	case ncbi:
-		r = getID_ncbi
+		r = getIDNcbi
 	case uniprot:
-		r = getID_uniprot
+		r = getIDUniprot
 	case uniref:
-		r = getID_uniref
+		r = getIDUniref
 	case tair:
-		r = getID_tair
+		r = getIDTair
 	case nextprot:
-		r = getID_nextprot
+		r = getIDNextprot
 	case generic:
 		return header
 	default:
