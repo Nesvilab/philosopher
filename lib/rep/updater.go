@@ -516,7 +516,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 
 			if len(match) >= 2 && len(match[2]) > 0 {
-				right = fmt.Sprintf(".%s%s", match[2], evi.PSM[i].NextAA)
+				right = fmt.Sprintf(".%s%s", evi.PSM[i].NextAA, match[2])
 			} else {
 				right = "."
 			}
