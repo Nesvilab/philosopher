@@ -23,10 +23,12 @@ import (
 // AssemblePSMReport creates the PSM structure for reporting
 func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 
-	evi.PSM = make(PSMEvidenceList, len(pep))
-	for idx, i := range pep {
+	psmBuffer := make(PSMEvidenceList, len(pep))
 
-		p := &evi.PSM[idx]
+	for idx := 0; idx < len(pep); idx++ {
+
+		i := pep[idx]
+		p := &psmBuffer[idx]
 
 		p.Source = i.Spectrum[:strings.Index(i.Spectrum, ".")]
 		p.Index = i.Index
@@ -61,6 +63,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.MappedProteins = make(map[string]string)
 		p.Modifications = i.Modifications
 		p.MSFraggerLoc = i.MSFragerLoc
+
 		if i.UncalibratedPrecursorNeutralMass > 0 {
 			p.PrecursorNeutralMass = float64(i.PrecursorNeutralMass)
 			p.UncalibratedPrecursorNeutralMass = float64(i.UncalibratedPrecursorNeutralMass)
@@ -109,6 +112,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		}
 
 	}
+
+	evi.PSM = psmBuffer
 
 	sort.Sort(evi.PSM)
 }

@@ -28,12 +28,7 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, db
 	}
 
 	for _, i := range evi.PSM {
-
 		protMods[i.IonForm()] = append(protMods[i.IonForm()], i.Modifications.IndexSlice...)
-
-		// for _, j := range i.Modifications.IndexSlice {
-		// 	protMods[i.IonForm()] = append(protMods[i.IonForm()], j)
-		// }
 	}
 
 	evi.Proteins = make(ProteinEvidenceList, len(pro))

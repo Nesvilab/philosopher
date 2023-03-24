@@ -21,6 +21,7 @@ type Record struct {
 	GeneNames        string
 	ProteinExistence string
 	Sequence         string
+	Class            dbtype
 	IsDecoy          bool
 }
 
@@ -43,10 +44,7 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 		r.IsDecoy = true
 	}
 
-	// if strings.Contains(k, "contam_") {
-	// 	//r.IsContaminant = true
-	// }
-
+	r.Class = class
 	r.ID = getID(k, class, verb)
 	r.EntryName = getEntryName(k, class, verb)
 	r.ProteinName = getProteinName(k, class, verb)
@@ -213,7 +211,7 @@ func getOrganism(header string, class dbtype, verb bool) (match string) {
 
 var getProteinNameEnsembl = regexp.MustCompile(`description\:(.+)\s?$`)
 var getProteinNameCptacEnsembl = regexp.MustCompile(`ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|ENS[P|T|G]\d{1,11}\|(.+)$`)
-var getProteinNameNcbi = regexp.MustCompile(`\s(.+)\sGN?\[?`)
+var getProteinNameNcbi = regexp.MustCompile(`[[:graph:]]\s(.+)`)
 var getProteinNameUniprot = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
 var getProteinNameUniref = regexp.MustCompile(`(UniRef\w+)`)
 
@@ -352,7 +350,7 @@ func getID(header string, class dbtype, verb bool) (match string) {
 
 	reg := r.FindStringSubmatchIndex(header)
 
-	if reg == nil || len(reg) != 4 {
+	if reg == nil {
 
 		if verb {
 			m := fmt.Sprintf("[protein ID]\n%s", header)

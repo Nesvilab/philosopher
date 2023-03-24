@@ -528,27 +528,35 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		}
 	}
 
-	for i := range evi.Ions {
-
-		id := evi.Ions[i].Protein
-		if evi.Ions[i].IsDecoy {
+	for i, ion := range evi.Ions {
+		id := ion.Protein
+		if ion.IsDecoy {
 			id = strings.Replace(id, decoyTag, "", 1)
 		}
-		rec := recordMap[id]
 
-		evi.Ions[i].ProteinID = rec.ID
-		evi.Ions[i].EntryName = rec.EntryName
-		evi.Ions[i].GeneName = rec.GeneNames
-		evi.Ions[i].ProteinDescription = rec.Description
+		rec, ok := recordMap[id]
+		if !ok {
+			// handle error: record not found in map
+			continue
+		}
 
-		evi.Ions[i].ProteinStart = proteinStart[evi.Ions[i].Sequence]
-		evi.Ions[i].ProteinEnd = proteinEnd[evi.Ions[i].Sequence]
+		tmp := &evi.Ions[i]
+
+		tmp.ProteinID = rec.ID
+		tmp.EntryName = rec.EntryName
+		tmp.GeneName = rec.GeneNames
+		tmp.ProteinDescription = rec.Description
+
+		tmp.ProteinStart, tmp.ProteinEnd = proteinStart[tmp.Sequence], proteinEnd[tmp.Sequence]
 
 		// update mapped genes
-		for k := range evi.Ions[i].MappedProteins {
-			if !strings.Contains(k, decoyTag) {
-				evi.Ions[i].MappedGenes[recordMap[k].GeneNames] = struct{}{}
+		for k := range ion.MappedProteins {
+			if strings.Contains(k, decoyTag) {
+				continue
 			}
+
+			geneName := recordMap[k].GeneNames
+			tmp.MappedGenes[geneName] = struct{}{}
 		}
 	}
 
@@ -565,8 +573,12 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		evi.Peptides[i].GeneName = rec.GeneNames
 		evi.Peptides[i].ProteinDescription = rec.Description
 
-		evi.Peptides[i].ProteinStart = proteinStart[evi.Peptides[i].Sequence]
-		evi.Peptides[i].ProteinEnd = proteinEnd[evi.Peptides[i].Sequence]
+		if seq, ok := proteinStart[evi.Peptides[i].Sequence]; ok {
+			evi.Peptides[i].ProteinStart = seq
+		}
+		if seq, ok := proteinEnd[evi.Peptides[i].Sequence]; ok {
+			evi.Peptides[i].ProteinEnd = seq
+		}
 
 		// update mapped genes
 		for k := range evi.Peptides[i].MappedProteins {
@@ -575,6 +587,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 		}
 	}
+
 }
 
 // UpdateSupportingSpectra pushes back from PSM to Protein the new supporting spectra from razor results
