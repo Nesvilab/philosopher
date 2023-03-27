@@ -7,9 +7,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
-	"github.com/Nesvilab/philosopher/lib/bio"
 	"github.com/Nesvilab/philosopher/lib/msg"
 )
 
@@ -20,8 +20,9 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		RestorePSM(&evi.PSM)
 	}
 
-	var header string
 	var output string
+	var modMap = make(map[string]string)
+	var modList []string
 
 	if hasPrefix {
 		output = fmt.Sprintf("%s%s%s_msstats.tsv", workspace, string(filepath.Separator), path.Base(workspace))
@@ -46,9 +47,32 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		} else {
 			printSet = append(printSet, i)
 		}
+
+		if i.PTM != nil {
+			for k := range i.PTM.LocalizedPTMMassDiff {
+				_, ok := modMap[k]
+				if !ok {
+					modMap[k] = ""
+				} else {
+					modMap[k] = ""
+				}
+			}
+		}
 	}
 
-	header = "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Charge,Calculated.MZ,PeptideProphet.Probability,Intensity,Is.Unique,Gene,Protein.Accessions,Modifications"
+	for k := range modMap {
+		modList = append(modList, k)
+	}
+
+	sort.Strings(modList)
+
+	header := "Spectrum.Name,Spectrum.File,Peptide.Sequence,Modified.Peptide.Sequence,Probability,Charge,Protein.Start,Protein.End,Gene,Mapped.Genes,Protein,Protein.ID,Mapped.Proteins,Protein.Description,Is.Unique,Purity,Intensity"
+
+	if len(modList) > 0 {
+		for _, i := range modList {
+			header += "," + i
+		}
+	}
 
 	if brand == "tmt" {
 		switch channels {
@@ -87,24 +111,54 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 
 	for _, i := range printSet {
 
+		var mods string
+
 		var fileName string
 		parts := strings.Split(i.Spectrum, ".")
-		fileName = fmt.Sprintf("%s.raw", parts[0])
+		fileName = fmt.Sprintf("%s.mzML", parts[0])
 
-		line := fmt.Sprintf("%s,%s,%s,%s,%d,%.4f,%.4f,%.4f,%t,%s,%s,%s",
+		var mappedGenes []string
+		for j := range i.MappedGenes {
+			mappedGenes = append(mappedGenes, strings.Replace(j, ",", ";", -1))
+		}
+
+		var mappedProteins []string
+		for j := range i.MappedProteins {
+			mappedProteins = append(mappedProteins, j)
+		}
+
+		line := fmt.Sprintf("%s,%s,%s,%s,%.4f,%d,%d,%d,%s,%s,%s,%s,%s,%s,%t,%.4f,%.6f",
 			i.Spectrum,
 			fileName,
 			i.Peptide,
 			i.ModifiedPeptide,
-			i.AssumedCharge,
-			((i.CalcNeutralPepMass + (float64(i.AssumedCharge) * bio.Proton)) / float64(i.AssumedCharge)),
 			i.Probability,
-			i.Intensity,
-			i.IsUnique,
-			i.GeneName,
+			i.AssumedCharge,
+			i.ProteinStart,
+			i.ProteinEnd,
+			strings.Replace(i.GeneName, ",", "-", -1),
+			strings.Join(mappedGenes, ";"),
 			i.Protein,
-			"",
+			i.ProteinID,
+			strings.Join(mappedProteins, ";"),
+			strings.Replace(i.ProteinDescription, ",", "-", -1),
+			i.IsUnique,
+			i.Purity,
+			i.Intensity,
 		)
+
+		if len(modList) > 0 {
+
+			line += ","
+
+			for _, j := range modList {
+				if i.PTM != nil {
+					mods += fmt.Sprintf("%s,", i.PTM.LocalizedPTMMassDiff[j])
+				}
+			}
+		}
+
+		line += mods
 
 		if brand == "tmt" {
 			switch channels {
