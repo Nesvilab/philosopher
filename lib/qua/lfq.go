@@ -163,6 +163,7 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		}
 	}
 
+	var puritySum float64
 	for i := range evi.PSM {
 		partName := strings.Split(evi.PSM[i].Spectrum, ".")
 		_, ok := spectra[partName[0]]
@@ -177,7 +178,12 @@ func peakIntensity(evi rep.Evidence, dir, format string, rTWin, pTWin, tol float
 		v, ok := psmMap[evi.PSM[i].SpectrumFileName()]
 		if ok {
 			evi.PSM[i].Purity = v.Purity
+			puritySum += v.Purity
 		}
+	}
+
+	if puritySum == 0 {
+		msg.Custom(errors.New("could not calculate the precursor purity score"), "warning")
 
 	}
 

@@ -126,7 +126,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	var modMap = make(map[string]string)
 	var modList []string
 	var hasCompVolt bool
-	var hasPurity bool
+	//var hasPurity bool
 	var hasSpectralSim bool
 	var hasRtScore bool
 
@@ -181,9 +181,9 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			hasIonMob = true
 		}
 
-		if evi[i].Purity > 0 {
-			hasPurity = true
-		}
+		// if evi[i].Purity > 0 {
+		// 	hasPurity = true
+		// }
 
 		if evi[i].MSFraggerLoc != nil && len(evi[i].MSFraggerLoc.MSFragerLocalization) > 0 {
 			hasLoc = true
@@ -242,9 +242,9 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		header += "\tCompensation Voltage"
 	}
 
-	if hasPurity {
-		header += "\tPurity"
-	}
+	//if hasPurity {
+	header += "\tPurity"
+	//}
 
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -543,12 +543,12 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			)
 		}
 
-		if hasPurity {
-			line = fmt.Sprintf("%s\t%.2f",
-				line,
-				i.Purity,
-			)
-		}
+		//if hasPurity {
+		line = fmt.Sprintf("%s\t%.2f",
+			line,
+			i.Purity,
+		)
+		//}
 
 		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
