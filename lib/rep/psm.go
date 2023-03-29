@@ -63,6 +63,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.MappedProteins = make(map[string]string)
 		p.Modifications = i.Modifications
 		p.MSFraggerLoc = i.MSFragerLoc
+		p.Class = i.Class
 
 		if i.UncalibratedPrecursorNeutralMass > 0 {
 			p.PrecursorNeutralMass = float64(i.PrecursorNeutralMass)
@@ -126,7 +127,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	var modMap = make(map[string]string)
 	var modList []string
 	var hasCompVolt bool
-	//var hasPurity bool
+	var hasClass bool
 	var hasSpectralSim bool
 	var hasRtScore bool
 
@@ -181,9 +182,9 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			hasIonMob = true
 		}
 
-		// if evi[i].Purity > 0 {
-		// 	hasPurity = true
-		// }
+		if len(evi[i].Class) > 0 {
+			hasClass = true
+		}
 
 		if evi[i].MSFraggerLoc != nil && len(evi[i].MSFraggerLoc.MSFragerLocalization) > 0 {
 			hasLoc = true
@@ -221,6 +222,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
 
+	if hasClass {
+		header += "\tClass"
+	}
+
 	if len(modList) > 0 {
 		for _, i := range modList {
 			if strings.Contains(i, "STY:79.966331") {
@@ -242,9 +247,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		header += "\tCompensation Voltage"
 	}
 
-	//if hasPurity {
 	header += "\tPurity"
-	//}
 
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -497,6 +500,13 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
 		)
+
+		if hasClass {
+			line = fmt.Sprintf("%s\t%s",
+				line,
+				i.Class,
+			)
+		}
 
 		if len(modList) > 0 {
 			for _, j := range modList {

@@ -68,6 +68,7 @@ type PeptideIdentification struct {
 	Protein                          string
 	ModifiedPeptide                  string
 	CompensationVoltage              string
+	Class                            string
 	AssumedCharge                    uint8
 	HitRank                          uint8
 	NumberOfEnzymaticTermini         uint8
@@ -426,6 +427,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 		psm.PrevAA = i.PrevAA
 		psm.NextAA = i.NextAA
+
+		psm.Class = string(i.Class)
 
 		for _, j := range i.AnalysisResult {
 

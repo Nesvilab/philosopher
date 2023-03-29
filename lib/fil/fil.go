@@ -79,7 +79,7 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta)
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta, f.Filter.Class)
 	_ = psmT
 	_ = pepT
 	_ = ionT
@@ -233,7 +233,7 @@ func Run(f met.Data) met.Data {
 }
 
 // processPeptideIdentifications reads and process pepXML
-func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64, delta bool) (float64, float64, float64) {
+func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, psm, peptide, ion float64, delta, class bool) (float64, float64, float64) {
 
 	// report charge profile
 	var t, d int
@@ -305,8 +305,111 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 		deltaMassBasedPSMFiltering(uniqPsms, psm, decoyTag)
 	}
 
+	if class {
+		classBasedPSMFiltering(uniqPsms, psm, decoyTag)
+	}
+
 	return psmThreshold, peptideThreshold, ionThreshold
 }
+
+// classBasedPSMFiltering applies FDR filtering on PSMs based on the class
+func classBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
+
+	logrus.Info("Separating PSMs based on class")
+
+	var classes []string
+	classMap := make(map[string][]id.PepIDListPtrs)
+
+	for _, v := range uniqPsms {
+		classMap[v[0].Class] = append(classMap[v[0].Class], v)
+	}
+
+	uniqueKeys := make(map[string]bool)
+	for key := range classMap {
+		if !uniqueKeys[key] {
+			uniqueKeys[key] = true
+			classes = append(classes, key)
+		}
+	}
+
+	sort.Strings(classes)
+
+	var combinedFiltered id.PepIDListPtrs
+
+	for i := 0; i < len(classes); i++ {
+
+		psms := make(map[string]id.PepIDListPtrs)
+
+		for _, v := range classMap[classes[i]] {
+			psms[v[0].Spectrum] = v
+		}
+
+		logrus.Info("Filtering class ", classes[i])
+		filteredPSMs, _ := PepXMLFDRFilter(psms, targetFDR, "PSM", decoyTag, "")
+
+		combinedFiltered = append(combinedFiltered, filteredPSMs...)
+
+	}
+
+	combinedFiltered.Serialize("psm")
+}
+
+// func classBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
+
+// 	logrus.Info("Separating PSMs based on class")
+
+// 	var classes []string
+// 	classMap := make(map[string][]id.PepIDListPtrs)
+
+// 	for _, v := range uniqPsms {
+// 		classMap[v[0].Class] = append(classMap[v[0].Class], v)
+// 	}
+
+// 	uniqueKeys := make(map[string]bool)
+// 	for key := range classMap {
+// 		if !uniqueKeys[key] {
+// 			uniqueKeys[key] = true
+// 			classes = append(classes, key)
+// 		}
+// 	}
+
+// 	sort.Strings(classes)
+
+// 	var combinedFiltered *id.PepIDListPtrs = new(id.PepIDListPtrs)
+
+// 	var wg sync.WaitGroup
+// 	results := make(chan id.PepIDListPtrs, len(classes))
+
+// 	for i := 0; i < len(classes); i++ {
+// 		wg.Add(1)
+
+// 		go func(class string) {
+// 			defer wg.Done()
+
+// 			psms := make(map[string]id.PepIDListPtrs)
+
+// 			for _, v := range classMap[class] {
+// 				psms[v[0].Spectrum] = v
+// 			}
+
+// 			logrus.Info("Filtering class ", class)
+// 			filteredPSMs, _ := PepXMLFDRFilter(psms, targetFDR, "PSM", decoyTag, "")
+
+// 			results <- filteredPSMs
+// 		}(classes[i])
+// 	}
+
+// 	go func() {
+// 		wg.Wait()
+// 		close(results)
+// 	}()
+
+// 	for filteredPSMs := range results {
+// 		*combinedFiltered = append(*combinedFiltered, filteredPSMs...)
+// 	}
+
+// 	combinedFiltered.Serialize("psm")
+// }
 
 func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
 

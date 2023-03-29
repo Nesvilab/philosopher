@@ -129,6 +129,7 @@ type PSMEvidence struct {
 	CompensationVoltage              string
 	PrevAA                           string
 	NextAA                           string
+	Class                            string
 	ProteinStart                     int
 	ProteinEnd                       int
 	NumberOfEnzymaticTermini         uint8
