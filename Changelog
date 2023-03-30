@@ -2,6 +2,7 @@
 - Added the protein start and end positions to ions and peptides report.
 - ProtXML reading parallelization.
 - Added a new Extended Peptide column to the PSM report containing the flanking regions of peptides.
+- Class-bsed FDR scoring capabilities that will rely on the fdr_group passed by MSFragger.
 
 ### Changed
 - Rolled back the FASTA header checking for IonQuant.
