@@ -79,7 +79,7 @@ func Run(f met.Data) met.Data {
 
 	f.SearchEngine = searchEngine
 
-	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta, f.Filter.Class)
+	psmT, pepT, ionT := processPeptideIdentifications(pepid, f.Filter.Tag, f.Filter.Mods, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Delta, f.Filter.Group)
 	_ = psmT
 	_ = pepT
 	_ = ionT
