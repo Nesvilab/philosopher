@@ -359,7 +359,7 @@ type Filter struct {
 	Mapmods   bool    `yaml:"mapMods"`
 	Delta     bool    `yaml:"delta"`
 	Inference bool    `yaml:"delta"`
-	Class     bool    `yaml:"class"`
+	Group     bool    `yaml:"group"`
 }
 
 // Quantify options and parameters
