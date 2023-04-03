@@ -72,7 +72,7 @@ func Run(f met.Data) met.Data {
 	var protXML id.ProtXML
 	go func() {
 		defer wg.Done()
-		if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
+		if len(f.Filter.Pox) > 0 {
 			protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 		}
 	}()
