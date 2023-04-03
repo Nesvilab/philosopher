@@ -72,7 +72,9 @@ func Run(f met.Data) met.Data {
 	var protXML id.ProtXML
 	go func() {
 		defer wg.Done()
-		protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+		if len(f.Filter.Pox) > 0 && !strings.EqualFold(f.Filter.Pox, "combined") {
+			protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+		}
 	}()
 	pepid, searchEngine := id.ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
 	wg.Wait()
