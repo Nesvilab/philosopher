@@ -30,6 +30,9 @@ var filterCmd = &cobra.Command{
 		os.RemoveAll(sys.ProBin())
 		os.RemoveAll(sys.PepxmlBin())
 		os.RemoveAll(sys.ProtxmlBin())
+		os.RemoveAll(sys.RazorBin())
+
+		m.Quantify = met.Quantify{}
 
 		// check file existence
 		if len(m.Filter.Pex) < 1 {
