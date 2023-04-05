@@ -472,6 +472,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 
 		var adjustStart = 0
 		var adjustEnd = 0
+
+		evi.PSM[i].Peptide = replacerIL.Replace(evi.PSM[i].Peptide)
+		evi.PSM[i].ModifiedPeptide = replacerIL.Replace(evi.PSM[i].ModifiedPeptide)
 		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
 
 		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
@@ -540,6 +543,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			continue
 		}
 
+		evi.Ions[i].Sequence = replacerIL.Replace(evi.Ions[i].Sequence)
+		evi.Ions[i].ModifiedSequence = replacerIL.Replace(evi.Ions[i].ModifiedSequence)
+
 		tmp := &evi.Ions[i]
 
 		tmp.ProteinID = rec.ID
@@ -572,6 +578,8 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		evi.Peptides[i].EntryName = rec.EntryName
 		evi.Peptides[i].GeneName = rec.GeneNames
 		evi.Peptides[i].ProteinDescription = rec.Description
+
+		evi.Peptides[i].Sequence = replacerIL.Replace(evi.Peptides[i].Sequence)
 
 		if seq, ok := proteinStart[evi.Peptides[i].Sequence]; ok {
 			evi.Peptides[i].ProteinStart = seq
