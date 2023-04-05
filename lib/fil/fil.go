@@ -317,7 +317,7 @@ func processPeptideIdentifications(p id.PepIDListPtrs, decoyTag, mods string, ps
 // classBasedPSMFiltering applies FDR filtering on PSMs based on the class
 func classBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float64, decoyTag string) {
 
-	logrus.Info("Separating PSMs based on class")
+	logrus.Info("Separating PSMs based on group")
 
 	var classes []string
 	classMap := make(map[string][]id.PepIDListPtrs)
@@ -346,7 +346,7 @@ func classBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR floa
 			psms[v[0].Spectrum] = v
 		}
 
-		logrus.Info("Filtering class ", classes[i])
+		logrus.Info("Filtering group ", classes[i])
 		filteredPSMs, _ := PepXMLFDRFilter(psms, targetFDR, "PSM", decoyTag, "")
 
 		combinedFiltered = append(combinedFiltered, filteredPSMs...)
