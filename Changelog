@@ -6,11 +6,12 @@
 
 ### Changed
 - Rolled back the FASTA header checking for IonQuant.
+- Improved the FASTA header detection and parsing.
 - PTMProphet was updated to v6.2.0.
 - The processing speed, including IO operations and database reading received a major upgrade (@guoci).
-- The purity collumn will be always visible in the PSM table.
+- The purity column will always be visible in the PSM table.
 - Updated the MSstats report for individual data sets.
-- All reports will now use the I/L replaced peptide sequences insterad of the ones reported by the search engine.
+- All reports will now use the I/L replaced peptide sequences instead of the ones reported by the search engine.
 
 ### Fixed
-- Updated razor mapping rules to reinforce the decoy tagging of razor proteins.
+- Updated razor mapping rules to reinforce classifying decoy razor proteins.
