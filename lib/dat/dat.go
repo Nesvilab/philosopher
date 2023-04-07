@@ -69,7 +69,7 @@ func Run(m met.Data) met.Data {
 
 		m.DB = m.Database.Annot
 
-		db.ProcessDB_and_serialize(m.Database.Annot, m.Database.Tag, m.Database.Verbose)
+		db.ProcessDBAndSerialize(m.Database.Annot, m.Database.Tag, m.Database.Verbose)
 
 		db.Serialize()
 
@@ -94,7 +94,7 @@ func Run(m met.Data) met.Data {
 		dbs := strings.Split(m.Database.ID, ",")
 		for _, i := range dbs {
 
-			organism, proteomeID := GetOrganismID(sys.GetTemp(), i)
+			organism, proteomeID := GetOrganismID(m.Temp, i)
 
 			logrus.Info("Fetching ", organism, " database ", i)
 
@@ -118,7 +118,7 @@ func Run(m met.Data) met.Data {
 	logrus.Info("Creating file")
 	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
 
-	db.ProcessDB_and_serialize(customDB, m.Database.Tag, m.Database.Verbose)
+	db.ProcessDBAndSerialize(customDB, m.Database.Tag, m.Database.Verbose)
 
 	logrus.Info("Processing decoys")
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
@@ -134,7 +134,7 @@ func Run(m met.Data) met.Data {
 }
 
 // ProcessDB_and_serialize determines the type of sequence and sends it to the appropriate parsing function
-func (d *Base) ProcessDB_and_serialize(filename, decoyTag string, verbose bool) {
+func (d *Base) ProcessDBAndSerialize(filename, decoyTag string, verbose bool) {
 	nproc := runtime.GOMAXPROCS(0)
 	entriesChunk := make(chan []fas.FastaEntry, nproc)
 	var wg sync.WaitGroup
@@ -381,6 +381,8 @@ func GetOrganismID(temp string, uniprotID string) (string, string) {
 	var proteomes = make(map[string]string)
 	var organisms = make(map[string]string)
 	proteomeFile := fmt.Sprintf("%s%sproteomes.csv", temp, string(filepath.Separator))
+
+	fmt.Println(proteomeFile)
 
 	param, e1 := Asset("proteomes.csv")
 	if e1 != nil {
