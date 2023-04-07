@@ -60,17 +60,17 @@ func (evi *Evidence) UpdateIonStatus(decoyTag string) {
 	var uniquePeptides = make(map[string]string)
 	var razorPeptides = make(map[string]string)
 
-	for _, i := range evi.Proteins {
-		for _, j := range i.TotalPeptideIons {
+	for i := 0; i < len(evi.Proteins); i++ {
+		for _, j := range evi.Proteins[i].TotalPeptideIons {
 
 			if j.IsUnique {
 				uniqueIons[j.IonForm()] = true
-				uniquePeptides[j.Sequence] = i.PartHeader
+				uniquePeptides[j.Sequence] = evi.Proteins[i].PartHeader
 			}
 
 			if j.IsURazor {
-				razorIons[j.IonForm()] = i.PartHeader
-				razorPeptides[j.Sequence] = i.PartHeader
+				razorIons[j.IonForm()] = evi.Proteins[i].PartHeader
+				razorPeptides[j.Sequence] = evi.Proteins[i].PartHeader
 			}
 		}
 	}
@@ -196,24 +196,24 @@ func (evi *Evidence) UpdateIonModCount() {
 	var ModIons = make(map[id.IonFormType]int)
 	var UnModIons = make(map[id.IonFormType]int)
 
-	for _, i := range evi.Ions {
-		AllIons[i.IonForm()] = struct{}{}
-		ModIons[i.IonForm()] = 0
-		UnModIons[i.IonForm()] = 0
+	for i := 0; i < len(evi.Ions); i++ {
+		AllIons[evi.Ions[i].IonForm()] = struct{}{}
+		ModIons[evi.Ions[i].IonForm()] = 0
+		UnModIons[evi.Ions[i].IonForm()] = 0
 	}
 
 	// range over PSMs looking for modified and not modified evidences
 	// if they exist on the ions map, get the numbers
-	for _, i := range evi.PSM {
+	for i := 0; i < len(evi.PSM); i++ {
 
 		// check the map
-		_, ok := AllIons[i.IonForm()]
+		_, ok := AllIons[evi.PSM[i].IonForm()]
 		if ok {
 
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				UnModIons[i.IonForm()]++
+			if evi.PSM[i].Massdiff >= -0.99 && evi.PSM[i].Massdiff <= 0.99 {
+				UnModIons[evi.PSM[i].IonForm()]++
 			} else {
-				ModIons[i.IonForm()]++
+				ModIons[evi.PSM[i].IonForm()]++
 			}
 
 		}
@@ -222,6 +222,7 @@ func (evi *Evidence) UpdateIonModCount() {
 
 // SyncPSMToProteins forces the synchronization between the filtered proteins, and the remaining structures.
 func (evi *Evidence) SyncPSMToProteins(decoy string) {
+
 	var totalSpc = make(map[string][]id.SpectrumType, len(evi.PSM))
 	var uniqueSpc = make(map[string][]id.SpectrumType, len(evi.PSM))
 	var razorSpc = make(map[string][]id.SpectrumType, len(evi.PSM))
@@ -232,28 +233,29 @@ func (evi *Evidence) SyncPSMToProteins(decoy string) {
 
 	var proteinIndex = make(map[string]struct{})
 
-	for _, i := range evi.Proteins {
-		proteinIndex[i.PartHeader] = struct{}{}
+	for i := 0; i < len(evi.Proteins); i++ {
+		proteinIndex[evi.Proteins[i].PartHeader] = struct{}{}
 	}
 
-	for _, i := range evi.PSM {
+	for i := 0; i < len(evi.PSM); i++ {
 
 		// Total
-		totalSpc[i.Protein] = append(totalSpc[i.Protein], i.SpectrumFileName())
-		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Peptide)
-		for j := range i.MappedProteins {
-			totalSpc[j] = append(totalSpc[j], i.SpectrumFileName())
-			totalPeptides[j] = append(totalPeptides[j], i.Peptide)
+		totalSpc[evi.PSM[i].Protein] = append(totalSpc[evi.PSM[i].Protein], evi.PSM[i].SpectrumFileName())
+		totalPeptides[evi.PSM[i].Protein] = append(totalPeptides[evi.PSM[i].Protein], evi.PSM[i].Peptide)
+
+		for j := range evi.PSM[i].MappedProteins {
+			totalSpc[j] = append(totalSpc[j], evi.PSM[i].SpectrumFileName())
+			totalPeptides[j] = append(totalPeptides[j], evi.PSM[i].Peptide)
 		}
 
-		if i.IsUnique {
-			uniqueSpc[i.Protein] = append(uniqueSpc[i.Protein], i.SpectrumFileName())
-			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Peptide)
+		if evi.PSM[i].IsUnique {
+			uniqueSpc[evi.PSM[i].Protein] = append(uniqueSpc[evi.PSM[i].Protein], evi.PSM[i].SpectrumFileName())
+			uniquePeptides[evi.PSM[i].Protein] = append(uniquePeptides[evi.PSM[i].Protein], evi.PSM[i].Peptide)
 		}
 
-		if i.IsURazor {
-			razorSpc[i.Protein] = append(razorSpc[i.Protein], i.SpectrumFileName())
-			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Peptide)
+		if evi.PSM[i].IsURazor {
+			razorSpc[evi.PSM[i].Protein] = append(razorSpc[evi.PSM[i].Protein], evi.PSM[i].SpectrumFileName())
+			razorPeptides[evi.PSM[i].Protein] = append(razorPeptides[evi.PSM[i].Protein], evi.PSM[i].Peptide)
 		}
 	}
 
@@ -370,9 +372,9 @@ func (evi Evidence) SyncPSMToPeptides(decoy string) Evidence {
 
 	var spectra = make(map[string][]id.SpectrumType)
 
-	for _, i := range evi.PSM {
-		if !i.IsDecoy {
-			spectra[i.Peptide] = append(spectra[i.Peptide], i.SpectrumFileName())
+	for i := 0; i < len(evi.PSM); i++ {
+		if !evi.PSM[i].IsDecoy {
+			spectra[evi.PSM[i].Peptide] = append(spectra[evi.PSM[i].Peptide], evi.PSM[i].SpectrumFileName())
 		}
 	}
 
@@ -401,9 +403,9 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 
 	var spectra = make(map[id.IonFormType][]id.SpectrumType)
 
-	for _, i := range evi.PSM {
-		if !i.IsDecoy {
-			spectra[i.IonForm()] = append(spectra[i.IonForm()], i.SpectrumFileName())
+	for i := 0; i < len(evi.PSM); i++ {
+		if !evi.PSM[i].IsDecoy {
+			spectra[evi.PSM[i].IonForm()] = append(spectra[evi.PSM[i].IonForm()], evi.PSM[i].SpectrumFileName())
 		}
 	}
 
@@ -602,41 +604,41 @@ func (evi *Evidence) UpdateSupportingSpectra() {
 	var uniquePeptides = make(map[string][]string)
 	var razorPeptides = make(map[string][]string)
 
-	for _, i := range evi.PSM {
+	for i := 0; i < len(evi.PSM); i++ {
 
-		_, ok := ptSupSpec[i.Protein]
+		_, ok := ptSupSpec[evi.PSM[i].Protein]
 		if !ok {
-			ptSupSpec[i.Protein] = append(ptSupSpec[i.Protein], i.SpectrumFileName())
+			ptSupSpec[evi.PSM[i].Protein] = append(ptSupSpec[evi.PSM[i].Protein], evi.PSM[i].SpectrumFileName())
 		}
 
-		if i.IsUnique {
-			_, ok := uniqueSpec[i.IonForm()]
+		if evi.PSM[i].IsUnique {
+			_, ok := uniqueSpec[evi.PSM[i].IonForm()]
 			if !ok {
-				uniqueSpec[i.IonForm()] = append(uniqueSpec[i.IonForm()], i.SpectrumFileName())
+				uniqueSpec[evi.PSM[i].IonForm()] = append(uniqueSpec[evi.PSM[i].IonForm()], evi.PSM[i].SpectrumFileName())
 			}
 		}
 
-		if i.IsURazor {
-			_, ok := razorSpec[i.IonForm()]
+		if evi.PSM[i].IsURazor {
+			_, ok := razorSpec[evi.PSM[i].IonForm()]
 			if !ok {
-				razorSpec[i.IonForm()] = append(razorSpec[i.IonForm()], i.SpectrumFileName())
+				razorSpec[evi.PSM[i].IonForm()] = append(razorSpec[evi.PSM[i].IonForm()], evi.PSM[i].SpectrumFileName())
 			}
 		}
 	}
 
-	for _, i := range evi.Peptides {
+	for i := 0; i < len(evi.Peptides); i++ {
 
-		totalPeptides[i.Protein] = append(totalPeptides[i.Protein], i.Sequence)
-		for j := range i.MappedProteins {
-			totalPeptides[j] = append(totalPeptides[j], i.Sequence)
+		totalPeptides[evi.Peptides[i].Protein] = append(totalPeptides[evi.Peptides[i].Protein], evi.Peptides[i].Sequence)
+		for j := range evi.Peptides[i].MappedProteins {
+			totalPeptides[j] = append(totalPeptides[j], evi.Peptides[i].Sequence)
 		}
 
-		if i.IsUnique {
-			uniquePeptides[i.Protein] = append(uniquePeptides[i.Protein], i.Sequence)
+		if evi.Peptides[i].IsUnique {
+			uniquePeptides[evi.Peptides[i].Protein] = append(uniquePeptides[evi.Peptides[i].Protein], evi.Peptides[i].Sequence)
 		}
 
-		if i.IsURazor {
-			razorPeptides[i.Protein] = append(razorPeptides[i.Protein], i.Sequence)
+		if evi.Peptides[i].IsURazor {
+			razorPeptides[evi.Peptides[i].Protein] = append(razorPeptides[evi.Peptides[i].Protein], evi.Peptides[i].Sequence)
 		}
 	}
 
@@ -720,23 +722,23 @@ func (evi *Evidence) UpdatePeptideModCount() {
 	var mod = make(map[string]int)
 	var unmod = make(map[string]int)
 
-	for _, i := range evi.Peptides {
-		all[i.Sequence] = 0
-		mod[i.Sequence] = 0
-		unmod[i.Sequence] = 0
+	for i := 0; i < len(evi.Peptides); i++ {
+		all[evi.Peptides[i].Sequence] = 0
+		mod[evi.Peptides[i].Sequence] = 0
+		unmod[evi.Peptides[i].Sequence] = 0
 	}
 
 	// range over PSMs looking for modified and not modified evidences
 	// if they exist on the ions map, get the numbers
-	for _, i := range evi.PSM {
+	for i := 0; i < len(evi.PSM); i++ {
 
-		_, ok := all[i.Peptide]
+		_, ok := all[evi.PSM[i].Peptide]
 		if ok {
 
-			if i.Massdiff >= -0.99 && i.Massdiff <= 0.99 {
-				unmod[i.Peptide]++
+			if evi.PSM[i].Massdiff >= -0.99 && evi.PSM[i].Massdiff <= 0.99 {
+				unmod[evi.PSM[i].Peptide]++
 			} else {
-				mod[i.Peptide]++
+				mod[evi.PSM[i].Peptide]++
 			}
 
 		}
