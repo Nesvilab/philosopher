@@ -435,8 +435,8 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		sort.Strings(obs)
 
 		// append decoy tags on the gene and proteinID names
-		if i.IsDecoy {
-			i.ProteinID = decoyTag + i.ProteinID
+		if i.IsDecoy || strings.HasPrefix(i.Protein, decoyTag) {
+			i.ProteinID = fmt.Sprintf("%s%s", decoyTag, i.ProteinID)
 			i.GeneName = decoyTag + i.GeneName
 			i.EntryName = decoyTag + i.EntryName
 		}

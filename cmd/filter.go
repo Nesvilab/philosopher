@@ -85,7 +85,6 @@ func init() {
 		filterCmd.Flags().MarkHidden("mods")
 		filterCmd.Flags().MarkHidden("delta")
 		filterCmd.Flags().MarkHidden("probin")
-		filterCmd.Flags().MarkHidden("razorbin")
 	}
 
 	RootCmd.AddCommand(filterCmd)

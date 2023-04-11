@@ -465,6 +465,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		evi.PSM[i].GeneName = rec.GeneNames
 		evi.PSM[i].ProteinDescription = rec.Description
 
+		// ensure the assignment is a decoy
+		if strings.HasPrefix(evi.PSM[i].Protein, decoyTag) {
+			evi.PSM[i].IsDecoy = true
+		}
+
 		// update mapped genes
 		for k := range evi.PSM[i].MappedProteins {
 			if !strings.Contains(k, decoyTag) {
@@ -550,6 +555,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		tmp.GeneName = rec.GeneNames
 		tmp.ProteinDescription = rec.Description
 
+		// ensure the assignment is a decoy
+		if strings.HasPrefix(evi.Ions[i].Protein, decoyTag) {
+			evi.Ions[i].IsDecoy = true
+		}
+
 		tmp.ProteinStart, tmp.ProteinEnd = proteinStart[tmp.Sequence], proteinEnd[tmp.Sequence]
 
 		// update mapped genes
@@ -575,6 +585,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		evi.Peptides[i].EntryName = rec.EntryName
 		evi.Peptides[i].GeneName = rec.GeneNames
 		evi.Peptides[i].ProteinDescription = rec.Description
+
+		// ensure the assignment is a decoy
+		if strings.HasPrefix(evi.Peptides[i].Protein, decoyTag) {
+			evi.Peptides[i].IsDecoy = true
+		}
 
 		if seq, ok := proteinStart[evi.Peptides[i].Sequence]; ok {
 			evi.Peptides[i].ProteinStart = seq

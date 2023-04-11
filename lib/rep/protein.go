@@ -490,7 +490,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 		}
 
 		// append decoy tags on the gene and proteinID names
-		if i.IsDecoy {
+		if i.IsDecoy || strings.HasPrefix(i.ProteinName, decoyTag) {
 			i.ProteinID = decoyTag + i.ProteinID
 			i.GeneNames = decoyTag + i.GeneNames
 			i.EntryName = decoyTag + i.EntryName
