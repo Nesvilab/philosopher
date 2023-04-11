@@ -63,6 +63,8 @@ func Run(m met.Data) met.Data {
 		msg.InputNotFound(errors.New("provide a protein FASTA file or Proteome ID"), "error")
 	}
 
+	db.Prefix = m.Database.Tag
+
 	if len(m.Database.Annot) > 0 {
 
 		logrus.Info("Annotating the database")
@@ -125,8 +127,6 @@ func Run(m met.Data) met.Data {
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
-
-	db.Prefix = m.Database.Tag
 
 	db.Serialize()
 

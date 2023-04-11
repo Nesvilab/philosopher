@@ -10,14 +10,12 @@ import (
 	"sync"
 
 	"github.com/Nesvilab/philosopher/lib/cla"
-	"github.com/Nesvilab/philosopher/lib/dat"
 	"github.com/Nesvilab/philosopher/lib/id"
 	"github.com/Nesvilab/philosopher/lib/inf"
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/mod"
 	"github.com/Nesvilab/philosopher/lib/rep"
 	"github.com/Nesvilab/philosopher/lib/sys"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/sirupsen/logrus"
 )
@@ -40,16 +38,6 @@ func Run(f met.Data) met.Data {
 			r := fmt.Sprintf("%s%s.meta/razor.bin", f.Filter.ProBin, string(filepath.Separator))
 			dbBin = fmt.Sprintf("%s%s", f.Filter.ProBin, string(filepath.Separator))
 
-			var dtb dat.Base
-			dtb.RestoreWithPath(dbBin)
-
-			spew.Dump(dtb)
-			os.Exit(1)
-
-			f.Database.Tag = dtb.Prefix
-			fmt.Println(f.Database.Tag)
-			f.Serialize()
-
 			logrus.Info("Fetching protein inference from ", f.Filter.ProBin)
 
 			rdest := fmt.Sprintf("%s%s.meta%sprotxml.bin", f.Home, string(filepath.Separator), string(filepath.Separator))
@@ -65,11 +53,6 @@ func Run(f met.Data) met.Data {
 			f.Filter.ProBin = ""
 		}
 
-	}
-
-	// get the database tag from database command
-	if len(f.Filter.Tag) == 0 {
-		f.Filter.Tag = f.Database.Tag
 	}
 
 	logrus.Info("Processing peptide identification files")

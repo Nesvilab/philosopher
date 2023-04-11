@@ -14,3 +14,4 @@
 
 ### Fixed
 - Updated razor mapping rules to reinforce classifying decoy razor proteins.
+- Fixed a problem where protein names and genes would not be tagged with the decoy tag.
