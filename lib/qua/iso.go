@@ -7,14 +7,14 @@ import (
 	"strings"
 
 	"github.com/Nesvilab/philosopher/lib/id"
-	"github.com/Nesvilab/philosopher/lib/xta"
-
 	"github.com/Nesvilab/philosopher/lib/iso"
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/mzn"
 	"github.com/Nesvilab/philosopher/lib/rep"
+	"github.com/Nesvilab/philosopher/lib/scl"
 	"github.com/Nesvilab/philosopher/lib/tmt"
 	"github.com/Nesvilab/philosopher/lib/trq"
+	"github.com/Nesvilab/philosopher/lib/xta"
 )
 
 const (
@@ -36,6 +36,8 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 				labelData = tmt.New(plex)
 			} else if brand == "itraq" {
 				labelData = trq.New(plex)
+			} else if brand == "sclip" {
+				labelData = scl.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
 			}
@@ -157,7 +159,7 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if brand != "xtag" && i.Mz.DecodedStream[j] > 137 {
+				if brand != "sclip" && i.Mz.DecodedStream[j] > 137 {
 					break
 				} else if i.Mz.DecodedStream[j] > 450 {
 					break
@@ -310,7 +312,7 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if brand != "xtag" && i.Mz.DecodedStream[j] > 137 {
+				if brand != "sclip" && i.Mz.DecodedStream[j] > 137 {
 					break
 				} else if i.Mz.DecodedStream[j] > 450 {
 					break

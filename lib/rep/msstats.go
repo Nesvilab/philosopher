@@ -102,6 +102,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		default:
 			header += ""
 		}
+	} else if brand == "sclip" {
+		header += ",Channel sCLIP1,Channel sCLIP2,Channel sCLIP3,Channel sCLIPv4,Channel sCLIP5,Channel sCLIP6,Channel sCLIP7,Channel sCLIP8,Channel sCLIP9,Channel sCLIP10,Channel sCLIP11,Channel sCLIP12,Channel sCLIP13,Channel sCLIP14,Channel sCLIP15,Channel sCLIP16,Channel sCLIP17,Channel sCLIP18"
 	} else if brand == "xtag" {
 		header += ",Channel xTag1,Channel xTag2,Channel xTag3,Channel xTag4,Channel xTag5,Channel xTag6,Channel xTag7,Channel xTag8,Channel xTag9,Channel xTag10,Channel xTag11,Channel xTag12,Channel xTag13,Channel xTag14,Channel xTag15,Channel xTag16,Channel xTag17,Channel xTag18"
 	}

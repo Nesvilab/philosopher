@@ -68,7 +68,7 @@ func init() {
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Annot, "annot", "", "", "annotation file with custom names for the TMT channels")
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Plex, "plex", "", "", "number of reporter ion channels")
 		labelquantCmd.Flags().StringVarP(&m.Quantify.Dir, "dir", "", "", "folder path containing the raw files")
-		labelquantCmd.Flags().StringVarP(&m.Quantify.Brand, "brand", "", "", "isobaric labeling brand (tmt, itraq)")
+		labelquantCmd.Flags().StringVarP(&m.Quantify.Brand, "brand", "", "", "isobaric labeling brand (tmt, itraq, sCLIP)")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Tol, "tol", "", 20, "m/z tolerance in ppm")
 		labelquantCmd.Flags().IntVarP(&m.Quantify.Level, "level", "", 2, "ms level for the quantification")
 		labelquantCmd.Flags().Float64VarP(&m.Quantify.Purity, "purity", "", 0.5, "ion purity threshold")

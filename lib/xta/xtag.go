@@ -28,23 +28,23 @@ func New(plex string) iso.Labels {
 	o.Channel17.Name = "xTag17"
 	o.Channel18.Name = "xTag18"
 
-	o.Channel1.Mz = 114.1277
-	o.Channel2.Mz = 118.1528
-	o.Channel3.Mz = 173.1284
-	o.Channel4.Mz = 184.1076
-	o.Channel5.Mz = 229.1910
-	o.Channel6.Mz = 244.1292
-	o.Channel7.Mz = 245.1325
-	o.Channel8.Mz = 272.1612
-	o.Channel9.Mz = 300.1918
-	o.Channel10.Mz = 301.1888
-	o.Channel11.Mz = 301.1951
-	o.Channel12.Mz = 302.1922
-	o.Channel13.Mz = 302.1960
-	o.Channel14.Mz = 302.1985
-	o.Channel15.Mz = 328.2231
-	o.Channel16.Mz = 384.2612
-	o.Channel17.Mz = 412.2674
+	o.Channel1.Mz = 0
+	o.Channel2.Mz = 0
+	o.Channel3.Mz = 0
+	o.Channel4.Mz = 0
+	o.Channel5.Mz = 0
+	o.Channel6.Mz = 0
+	o.Channel7.Mz = 0
+	o.Channel8.Mz = 0
+	o.Channel9.Mz = 0
+	o.Channel10.Mz = 0
+	o.Channel11.Mz = 0
+	o.Channel12.Mz = 0
+	o.Channel13.Mz = 0
+	o.Channel14.Mz = 0
+	o.Channel15.Mz = 0
+	o.Channel16.Mz = 0
+	o.Channel17.Mz = 0
 	o.Channel18.Mz = 0
 
 	return o

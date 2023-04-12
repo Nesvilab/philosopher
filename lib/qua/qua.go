@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/scl"
 	"github.com/Nesvilab/philosopher/lib/xta"
 
 	"github.com/Nesvilab/philosopher/lib/iso"
@@ -229,6 +230,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = trq.New(plex)
+		} else if brand == "sclip" {
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = scl.New(plex)
 		} else if brand == "xtag" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = xta.New(plex)
@@ -242,6 +246,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "itraq" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = trq.New(plex)
+		} else if brand == "sclip" {
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = scl.New(plex)
 		} else if brand == "xtag" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = xta.New(plex)
@@ -263,6 +270,13 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 			*evi.Proteins[i].TotalLabels = trq.New(plex)
 			*evi.Proteins[i].UniqueLabels = trq.New(plex)
 			*evi.Proteins[i].URazorLabels = trq.New(plex)
+		} else if brand == "sclip" {
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = scl.New(plex)
+			*evi.Proteins[i].UniqueLabels = scl.New(plex)
+			*evi.Proteins[i].URazorLabels = scl.New(plex)
 		} else if brand == "xtag" {
 			evi.Proteins[i].TotalLabels = &iso.Labels{}
 			evi.Proteins[i].UniqueLabels = &iso.Labels{}
@@ -465,6 +479,116 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel8.CustomName = "121"
 			} else {
 				v2.Channel8.CustomName = labelNames["121"]
+			}
+
+		} else if brand == "sclip" {
+
+			if len(labelNames["sCLIP1"]) < 1 {
+				v2.Channel1.CustomName = "sCLIP1"
+			} else {
+				v2.Channel1.CustomName = labelNames["sCLIP1"]
+			}
+
+			if len(labelNames["sCLIP2"]) < 1 {
+				v2.Channel2.CustomName = "sCLIP2"
+			} else {
+				v2.Channel2.CustomName = labelNames["sCLIP2"]
+			}
+
+			if len(labelNames["sCLIP3"]) < 1 {
+				v2.Channel3.CustomName = "sCLIP3"
+			} else {
+				v2.Channel3.CustomName = labelNames["sCLIP3"]
+			}
+
+			if len(labelNames["sCLIP4"]) < 1 {
+				v2.Channel4.CustomName = "sCLIP4"
+			} else {
+				v2.Channel4.CustomName = labelNames["sCLIP4"]
+			}
+
+			if len(labelNames["sCLIP5"]) < 1 {
+				v2.Channel5.CustomName = "sCLIP5"
+			} else {
+				v2.Channel5.CustomName = labelNames["sCLIP5"]
+			}
+
+			if len(labelNames["sCLIP6"]) < 1 {
+				v2.Channel6.CustomName = "sCLIP6"
+			} else {
+				v2.Channel6.CustomName = labelNames["sCLIP6"]
+			}
+
+			if len(labelNames["sCLIP7"]) < 1 {
+				v2.Channel7.CustomName = "sCLIP7"
+			} else {
+				v2.Channel7.CustomName = labelNames["sCLIP7"]
+			}
+
+			if len(labelNames["sCLIP8"]) < 1 {
+				v2.Channel8.CustomName = "sCLIP8"
+			} else {
+				v2.Channel8.CustomName = labelNames["sCLIP8"]
+			}
+
+			if len(labelNames["sCLIP9"]) < 1 {
+				v2.Channel9.CustomName = "sCLIP9"
+			} else {
+				v2.Channel9.CustomName = labelNames["sCLIP9"]
+			}
+
+			if len(labelNames["sCLIP10"]) < 1 {
+				v2.Channel10.CustomName = "sCLIP10"
+			} else {
+				v2.Channel10.CustomName = labelNames["sCLIP10"]
+			}
+
+			if len(labelNames["sCLIP11"]) < 1 {
+				v2.Channel11.CustomName = "sCLIP11"
+			} else {
+				v2.Channel11.CustomName = labelNames["sCLIP11"]
+			}
+
+			if len(labelNames["sCLIP12"]) < 1 {
+				v2.Channel12.CustomName = "sCLIP12"
+			} else {
+				v2.Channel12.CustomName = labelNames["sCLIP12"]
+			}
+
+			if len(labelNames["sCLIP13"]) < 1 {
+				v2.Channel13.CustomName = "sCLIP13"
+			} else {
+				v2.Channel13.CustomName = labelNames["sCLIP13"]
+			}
+
+			if len(labelNames["sCLIP14"]) < 1 {
+				v2.Channel14.CustomName = "sCLIP14"
+			} else {
+				v2.Channel14.CustomName = labelNames["sCLIP14"]
+			}
+
+			if len(labelNames["sCLIP15"]) < 1 {
+				v2.Channel15.CustomName = "sCLIP15"
+			} else {
+				v2.Channel15.CustomName = labelNames["sCLIP15"]
+			}
+
+			if len(labelNames["sCLIP16"]) < 1 {
+				v2.Channel16.CustomName = "sCLIP16"
+			} else {
+				v2.Channel16.CustomName = labelNames["sCLIP16"]
+			}
+
+			if len(labelNames["sCLIP17"]) < 1 {
+				v2.Channel17.CustomName = "sCLIP17"
+			} else {
+				v2.Channel17.CustomName = labelNames["sCLIP17"]
+			}
+
+			if len(labelNames["sCLIP18"]) < 1 {
+				v2.Channel18.CustomName = "sCLIP18"
+			} else {
+				v2.Channel18.CustomName = labelNames["sCLIP18"]
 			}
 
 		} else if brand == "xtag" {

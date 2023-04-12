@@ -3,6 +3,7 @@
 - ProtXML reading parallelization.
 - Added a new Extended Peptide column to the PSM report containing the flanking regions of peptides.
 - Group-based FDR scoring capabilities that will rely on the fdr_group passed by MSFragger.
+- Support for sCLIP isobaric tags.
 
 ### Changed
 - Rolled back the FASTA header checking for IonQuant.
