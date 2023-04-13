@@ -506,6 +506,23 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		proteinStart[evi.PSM[i].Peptide] = evi.PSM[i].ProteinStart
 		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
 
+		// {
+		// 	proteinStart[evi.PSM[i].Peptide] = mstart
+		// 	proteinEnd[evi.PSM[i].Peptide] = mend
+
+		// 	seq := recordMap[evi.PSM[i].Protein].Sequence
+
+		// 	fmt.Println(evi.PSM[i].Peptide)
+		// 	fmt.Println(peptide)
+
+		// 	fmt.Println(mstart)
+
+		// 	mapPep := seq[mstart:mend]
+		// 	fmt.Println(mapPep)
+
+		// 	fmt.Println("")
+		// }
+
 		// map the flanking aminoacids
 		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(peptide) + `(\w{0,7})`)
 		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
