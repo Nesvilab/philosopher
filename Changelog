@@ -2,7 +2,7 @@
 - Added the protein start and end positions to ions and peptides report.
 - ProtXML reading parallelization.
 - Added a new Extended Peptide column to the PSM report containing the flanking regions of peptides.
-- Group-based FDR scoring capabilities that will rely on the fdr_group passed by MSFragger.
+- Group-based FDR scoring capabilities that will rely on the group passed by MSFragger.
 - Support for sCLIP isobaric tags.
 
 ### Changed

@@ -141,7 +141,7 @@ type SearchHit struct {
 	PrevAA              []byte               `xml:"peptide_prev_aa,attr"`
 	NextAA              []byte               `xml:"peptide_next_aa,attr"`
 	Protein             []byte               `xml:"protein,attr"`
-	Class               []byte               `xml:"fdr_group,attr"`
+	Class               []byte               `xml:"group,attr"`
 	TotalTerm           uint8                `xml:"num_tol_term,attr"`
 	MissedCleavages     uint8                `xml:"num_missed_cleavages,attr"`
 	IsRejected          uint8                `xml:"is_rejected,attr"`

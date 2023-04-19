@@ -81,7 +81,7 @@ func init() {
 		filterCmd.Flags().BoolVarP(&m.Filter.Picked, "picked", "", false, "apply the picked FDR algorithm before the protein scoring")
 		filterCmd.Flags().BoolVarP(&m.Filter.Mapmods, "mapmods", "", false, "map modifications")
 		filterCmd.Flags().BoolVarP(&m.Filter.Inference, "inference", "", false, "extremely fast and efficient protein inference compatible with 2D and Sequential filters")
-		filterCmd.Flags().BoolVarP(&m.Filter.Group, "group", "", false, "use the fdr_group label to filter the data")
+		filterCmd.Flags().BoolVarP(&m.Filter.Group, "group", "", false, "use the group label to filter the data")
 		filterCmd.Flags().MarkHidden("mods")
 		filterCmd.Flags().MarkHidden("delta")
 		filterCmd.Flags().MarkHidden("probin")
