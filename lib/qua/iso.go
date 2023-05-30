@@ -159,7 +159,7 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if brand != "sclip" && i.Mz.DecodedStream[j] > 137 {
+				if brand != "sclip" && brand != "xtag" && i.Mz.DecodedStream[j] > 137 {
 					break
 				} else if i.Mz.DecodedStream[j] > 450 {
 					break
@@ -312,7 +312,7 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 					}
 				}
 
-				if brand != "sclip" && i.Mz.DecodedStream[j] > 137 {
+				if brand != "sclip" && brand != "xtag" && i.Mz.DecodedStream[j] > 137 {
 					break
 				} else if i.Mz.DecodedStream[j] > 450 {
 					break
