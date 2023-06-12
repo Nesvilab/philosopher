@@ -358,7 +358,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 		}
 	}
 	wg := sync.WaitGroup{}
-	parallelism := runtime.GOMAXPROCS(0) - 1
+	parallelism := runtime.GOMAXPROCS(0)
 	parallelismTokens := make(chan struct{}, parallelism)
 	wg.Add(len(sortedFiles))
 	for idx, i := range sortedFiles {
