@@ -394,7 +394,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 		header += "\tQuan Usage"
 
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
 			printSet[headerIndex].Labels.Channel1.CustomName,
 			printSet[headerIndex].Labels.Channel2.CustomName,
@@ -414,6 +414,20 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			printSet[headerIndex].Labels.Channel16.CustomName,
 			printSet[headerIndex].Labels.Channel17.CustomName,
 			printSet[headerIndex].Labels.Channel18.CustomName,
+			printSet[headerIndex].Labels.Channel19.CustomName,
+			printSet[headerIndex].Labels.Channel20.CustomName,
+			printSet[headerIndex].Labels.Channel21.CustomName,
+			printSet[headerIndex].Labels.Channel22.CustomName,
+			printSet[headerIndex].Labels.Channel23.CustomName,
+			printSet[headerIndex].Labels.Channel24.CustomName,
+			printSet[headerIndex].Labels.Channel25.CustomName,
+			printSet[headerIndex].Labels.Channel26.CustomName,
+			printSet[headerIndex].Labels.Channel27.CustomName,
+			printSet[headerIndex].Labels.Channel28.CustomName,
+			printSet[headerIndex].Labels.Channel29.CustomName,
+			printSet[headerIndex].Labels.Channel30.CustomName,
+			printSet[headerIndex].Labels.Channel31.CustomName,
+			printSet[headerIndex].Labels.Channel32.CustomName,
 		)
 	}
 
@@ -715,7 +729,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 				i.Labels.Channel6.Intensity,
 			)
 		} else if brand == "xtag" {
-			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				i.Labels.IsUsed,
 				i.Labels.Channel1.Intensity,
@@ -736,6 +750,20 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 				i.Labels.Channel16.Intensity,
 				i.Labels.Channel17.Intensity,
 				i.Labels.Channel18.Intensity,
+				i.Labels.Channel19.Intensity,
+				i.Labels.Channel20.Intensity,
+				i.Labels.Channel21.Intensity,
+				i.Labels.Channel22.Intensity,
+				i.Labels.Channel23.Intensity,
+				i.Labels.Channel24.Intensity,
+				i.Labels.Channel25.Intensity,
+				i.Labels.Channel26.Intensity,
+				i.Labels.Channel27.Intensity,
+				i.Labels.Channel28.Intensity,
+				i.Labels.Channel29.Intensity,
+				i.Labels.Channel30.Intensity,
+				i.Labels.Channel31.Intensity,
+				i.Labels.Channel32.Intensity,
 			)
 		}
 		line += "\n"

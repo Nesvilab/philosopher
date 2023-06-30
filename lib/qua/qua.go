@@ -628,6 +628,91 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 			} else {
 				v2.Channel18.CustomName = labelNames["xTag18"]
 			}
+
+			if len(labelNames["xTag19"]) < 1 {
+				v2.Channel19.CustomName = "xTag19"
+			} else {
+				v2.Channel19.CustomName = labelNames["xTag19"]
+			}
+
+			if len(labelNames["xTag20"]) < 1 {
+				v2.Channel20.CustomName = "xTag20"
+			} else {
+				v2.Channel20.CustomName = labelNames["xTag20"]
+			}
+
+			if len(labelNames["xTag21"]) < 1 {
+				v2.Channel21.CustomName = "xTag21"
+			} else {
+				v2.Channel21.CustomName = labelNames["xTag21"]
+			}
+
+			if len(labelNames["xTag22"]) < 1 {
+				v2.Channel22.CustomName = "xTag22"
+			} else {
+				v2.Channel22.CustomName = labelNames["xTag22"]
+			}
+
+			if len(labelNames["xTag23"]) < 1 {
+				v2.Channel23.CustomName = "xTag23"
+			} else {
+				v2.Channel23.CustomName = labelNames["xTag23"]
+			}
+
+			if len(labelNames["xTag24"]) < 1 {
+				v2.Channel24.CustomName = "xTag24"
+			} else {
+				v2.Channel24.CustomName = labelNames["xTag24"]
+			}
+
+			if len(labelNames["xTag25"]) < 1 {
+				v2.Channel25.CustomName = "xTag25"
+			} else {
+				v2.Channel25.CustomName = labelNames["xTag25"]
+			}
+
+			if len(labelNames["xTag26"]) < 1 {
+				v2.Channel26.CustomName = "xTag26"
+			} else {
+				v2.Channel26.CustomName = labelNames["xTag26"]
+			}
+
+			if len(labelNames["xTag27"]) < 1 {
+				v2.Channel27.CustomName = "xTag27"
+			} else {
+				v2.Channel27.CustomName = labelNames["xTag27"]
+			}
+
+			if len(labelNames["xTag28"]) < 1 {
+				v2.Channel28.CustomName = "xTag28"
+			} else {
+				v2.Channel28.CustomName = labelNames["xTag28"]
+			}
+
+			if len(labelNames["xTag29"]) < 1 {
+				v2.Channel29.CustomName = "xTag29"
+			} else {
+				v2.Channel29.CustomName = labelNames["xTag29"]
+			}
+
+			if len(labelNames["xTag30"]) < 1 {
+				v2.Channel30.CustomName = "xTag30"
+			} else {
+				v2.Channel30.CustomName = labelNames["xTag30"]
+			}
+
+			if len(labelNames["xTag31"]) < 1 {
+				v2.Channel31.CustomName = "xTag31"
+			} else {
+				v2.Channel31.CustomName = labelNames["xTag31"]
+			}
+
+			if len(labelNames["xTag32"]) < 1 {
+				v2.Channel32.CustomName = "xTag32"
+			} else {
+				v2.Channel32.CustomName = labelNames["xTag32"]
+			}
+
 		}
 
 		labels[k] = v2
@@ -680,7 +765,21 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 				i.Labels.Channel15.Intensity +
 				i.Labels.Channel16.Intensity +
 				i.Labels.Channel17.Intensity +
-				i.Labels.Channel18.Intensity
+				i.Labels.Channel18.Intensity +
+				i.Labels.Channel19.Intensity +
+				i.Labels.Channel20.Intensity +
+				i.Labels.Channel21.Intensity +
+				i.Labels.Channel22.Intensity +
+				i.Labels.Channel23.Intensity +
+				i.Labels.Channel24.Intensity +
+				i.Labels.Channel25.Intensity +
+				i.Labels.Channel26.Intensity +
+				i.Labels.Channel27.Intensity +
+				i.Labels.Channel28.Intensity +
+				i.Labels.Channel29.Intensity +
+				i.Labels.Channel30.Intensity +
+				i.Labels.Channel31.Intensity +
+				i.Labels.Channel32.Intensity
 			psmLabelSumList = append(psmLabelSumList, Pair{i.SpectrumFileName(), sum})
 
 			if sum > 0 {
@@ -729,7 +828,21 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 						i.Labels.Channel15.Intensity +
 						i.Labels.Channel16.Intensity +
 						i.Labels.Channel17.Intensity +
-						i.Labels.Channel18.Intensity
+						i.Labels.Channel18.Intensity +
+						i.Labels.Channel19.Intensity +
+						i.Labels.Channel20.Intensity +
+						i.Labels.Channel21.Intensity +
+						i.Labels.Channel22.Intensity +
+						i.Labels.Channel23.Intensity +
+						i.Labels.Channel24.Intensity +
+						i.Labels.Channel25.Intensity +
+						i.Labels.Channel26.Intensity +
+						i.Labels.Channel27.Intensity +
+						i.Labels.Channel28.Intensity +
+						i.Labels.Channel29.Intensity +
+						i.Labels.Channel30.Intensity +
+						i.Labels.Channel31.Intensity +
+						i.Labels.Channel32.Intensity
 
 					if tmtSum > bestPSMInt {
 						bestPSM = i.SpectrumFileName()
