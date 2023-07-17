@@ -3,6 +3,7 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"github.com/Nesvilab/philosopher/lib/xta"
 	"math"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/Nesvilab/philosopher/lib/scl"
 	"github.com/Nesvilab/philosopher/lib/tmt"
 	"github.com/Nesvilab/philosopher/lib/trq"
-	"github.com/Nesvilab/philosopher/lib/xta"
+	"github.com/Nesvilab/philosopher/lib/xta2"
 )
 
 const (
@@ -40,6 +41,8 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 				labelData = scl.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
+			} else if brand == "xtag2" {
+				labelData = xta2.New(plex)
 			}
 
 			// left-pad the spectrum scan
@@ -275,6 +278,8 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 				labelData = trq.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
+			} else if brand == "xtag" {
+				labelData = xta2.New(plex)
 			}
 
 			// left-pad the spectrum scan
