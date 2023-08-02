@@ -134,14 +134,16 @@ func Clean() {
 
 	// this is a soft verification just to see if there is any existing file
 	var d met.Data
-	_, e := os.ReadFile(sys.Meta())
-	if e != nil {
-		msg.ReadFile(e, "warning")
-	}
 
-	e = os.RemoveAll(sys.MetaDir())
-	if e != nil {
-		msg.DeletingMetaDirecotry(e, "warning")
+	_, e := os.Stat(sys.Meta())
+	if e == nil {
+		_, e := os.ReadFile(sys.Meta())
+		if e == nil {
+			e = os.RemoveAll(sys.MetaDir())
+			if e != nil {
+				msg.DeletingMetaDirecotry(e, "warning")
+			}
+		}
 	}
 
 	if len(d.Temp) > 0 {
