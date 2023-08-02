@@ -231,10 +231,14 @@ func getProteinName(header string, class dbtype, verb bool) (match string) {
 	case uniref:
 		r = getProteinNameUniref
 	case tair:
-		s := strings.Split(header, "|")
-		s[2] = strings.TrimLeft(s[2], " ")
-		s[2] = strings.TrimRight(s[2], " ")
-		return s[2]
+		if strings.Contains(header, "|") {
+			s := strings.Split(header, "|")
+			s[2] = strings.TrimLeft(s[2], " ")
+			s[2] = strings.TrimRight(s[2], " ")
+			return s[2]
+		} else {
+			return header
+		}
 	case nextprot:
 		s := strings.Split(header, "|")
 		s[3] = strings.TrimLeft(s[3], " ")

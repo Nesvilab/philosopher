@@ -118,17 +118,7 @@ func Run(m met.Data) met.Data {
 	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
 
 	logrus.Info("Creating file")
-	customDB := db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
-
-	db.ProcessDBAndSerialize(customDB, m.Database.Tag, m.Database.Verbose)
-
-	logrus.Info("Processing decoys")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
-
-	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
-
-	db.Serialize()
 
 	return m
 }
@@ -340,6 +330,11 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[
 				db[k] = v
 			}
 
+			e := os.Remove(fmt.Sprintf("%s%scrap-gpmdb.fas", temp, string(filepath.Separator)))
+			if e != nil {
+				msg.Custom(errors.New("Failed to delete crap-gpmdb.fas"), "error")
+			}
+
 		}
 
 		for h, s := range db {
@@ -442,11 +437,10 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 		baseName = baseName + "-contam"
 	}
 
-	workfile := fmt.Sprintf("%s%s-%s.fas", temp, baseName, base)
 	outfile := fmt.Sprintf("%s%s-%s.fas", home, baseName, base)
-
+	//msg.Custom(errors.New(fmt.Sprintln("target-decoy database outfile: ", outfile)), "info")
 	// create db file
-	file, e := os.Create(workfile)
+	file, e := os.Create(outfile)
 	if e != nil {
 		msg.ReadFile(errors.New("cannot open the database file"), "error")
 	}
@@ -466,8 +460,6 @@ func (d *Base) Save(home, temp, ids, tag string, isRev, hasIso, noD, Crap bool) 
 			msg.WriteFile(e, "error")
 		}
 	}
-
-	sys.CopyFile(workfile, outfile)
 
 	return outfile
 }
