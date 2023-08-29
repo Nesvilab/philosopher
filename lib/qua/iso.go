@@ -276,9 +276,11 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 				labelData = tmt.New(plex)
 			} else if brand == "itraq" {
 				labelData = trq.New(plex)
+			} else if brand == "sclip" {
+				labelData = scl.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
-			} else if brand == "xtag" {
+			} else if brand == "xtag2" {
 				labelData = xta2.New(plex)
 			}
 
