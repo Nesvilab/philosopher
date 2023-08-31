@@ -40,3 +40,10 @@ dist/
 
 #test
 test/wrksp/.meta/
+
+# idea
+*.idea
+
+# outputs
+*.exe
+*-RC*

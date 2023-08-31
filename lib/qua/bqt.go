@@ -325,7 +325,7 @@ func savetoDisk(list List, temp, uid string) {
 		}
 	}
 
-	header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+	header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 		header,
 		list[headerIndex].Labels.Channel1.CustomName,
 		list[headerIndex].Labels.Channel2.CustomName,
@@ -345,6 +345,20 @@ func savetoDisk(list List, temp, uid string) {
 		list[headerIndex].Labels.Channel16.CustomName,
 		list[headerIndex].Labels.Channel17.CustomName,
 		list[headerIndex].Labels.Channel18.CustomName,
+		list[headerIndex].Labels.Channel19.CustomName,
+		list[headerIndex].Labels.Channel20.CustomName,
+		list[headerIndex].Labels.Channel21.CustomName,
+		list[headerIndex].Labels.Channel22.CustomName,
+		list[headerIndex].Labels.Channel23.CustomName,
+		list[headerIndex].Labels.Channel24.CustomName,
+		list[headerIndex].Labels.Channel25.CustomName,
+		list[headerIndex].Labels.Channel26.CustomName,
+		list[headerIndex].Labels.Channel27.CustomName,
+		list[headerIndex].Labels.Channel28.CustomName,
+		list[headerIndex].Labels.Channel29.CustomName,
+		list[headerIndex].Labels.Channel30.CustomName,
+		list[headerIndex].Labels.Channel31.CustomName,
+		list[headerIndex].Labels.Channel32.CustomName,
 	)
 
 	header += "\n"
@@ -395,7 +409,7 @@ func savetoDisk(list List, temp, uid string) {
 				}
 			}
 
-			line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line += fmt.Sprintf("%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				list[i].Labels.Channel1.Intensity,
 				list[i].Labels.Channel2.Intensity,
 				list[i].Labels.Channel3.Intensity,
@@ -414,6 +428,20 @@ func savetoDisk(list List, temp, uid string) {
 				list[i].Labels.Channel16.Intensity,
 				list[i].Labels.Channel17.Intensity,
 				list[i].Labels.Channel18.Intensity,
+				list[i].Labels.Channel19.Intensity,
+				list[i].Labels.Channel20.Intensity,
+				list[i].Labels.Channel21.Intensity,
+				list[i].Labels.Channel22.Intensity,
+				list[i].Labels.Channel23.Intensity,
+				list[i].Labels.Channel24.Intensity,
+				list[i].Labels.Channel25.Intensity,
+				list[i].Labels.Channel26.Intensity,
+				list[i].Labels.Channel27.Intensity,
+				list[i].Labels.Channel28.Intensity,
+				list[i].Labels.Channel29.Intensity,
+				list[i].Labels.Channel30.Intensity,
+				list[i].Labels.Channel31.Intensity,
+				list[i].Labels.Channel32.Intensity,
 			)
 
 			line += "\n"

@@ -105,7 +105,9 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 	} else if brand == "sclip" {
 		header += ",Channel sCLIP1,Channel sCLIP2,Channel sCLIP3,Channel sCLIPv4,Channel sCLIP5,Channel sCLIP6"
 	} else if brand == "xtag" {
-		header += ",Channel xTag1,Channel xTag2,Channel xTag3,Channel xTag4,Channel xTag5,Channel xTag6,Channel xTag7,Channel xTag8,Channel xTag9,Channel xTag10,Channel xTag11,Channel xTag12,Channel xTag13,Channel xTag14,Channel xTag15,Channel xTag16,Channel xTag17,Channel xTag18"
+		header += ",Channel xTag1,Channel xTag2,Channel xTag3,Channel xTag4,Channel xTag5,Channel xTag6,Channel xTag7,Channel xTag8,Channel xTag9,Channel xTag10,Channel xTag11,Channel xTag12,Channel xTag13,Channel xTag14,Channel xTag15,Channel xTag16,Channel xTag17,Channel xTag19,Channel xTag20,Channel xTag21,Channel xTag22,Channel xTag23,Channel xTag24,Channel xTag25,Channel xTag26,Channel xTag27,Channel xTag28,Channel xTag29,Channel xTag30,Channel xTag31,Channel xTag32"
+	} else if brand == "xtag2" {
+		header += ",Channel xTag1,Channel xTag2,Channel xTag3,Channel xTag4,Channel xTag5,Channel xTag6,Channel xTag7,Channel xTag8,Channel xTag9,Channel xTag10,Channel xTag11,Channel xTag12,Channel xTag13,Channel xTag14,Channel xTag15,Channel xTag16,Channel xTag17,Channel xTag19,Channel xTag20,Channel xTag21,Channel xTag22,Channel xTag23,Channel xTag24,Channel xTag25,Channel xTag26,Channel xTag27,Channel xTag28,Channel xTag29"
 	}
 
 	header += "\n"

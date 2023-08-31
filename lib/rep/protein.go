@@ -410,7 +410,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 			printSet[headerIndex].URazorLabels.Channel6.CustomName,
 		)
 	} else if brand == "xtag" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
 			printSet[headerIndex].URazorLabels.Channel1.CustomName,
 			printSet[headerIndex].URazorLabels.Channel2.CustomName,
@@ -430,6 +430,56 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 			printSet[headerIndex].URazorLabels.Channel16.CustomName,
 			printSet[headerIndex].URazorLabels.Channel17.CustomName,
 			printSet[headerIndex].URazorLabels.Channel18.CustomName,
+			printSet[headerIndex].URazorLabels.Channel19.CustomName,
+			printSet[headerIndex].URazorLabels.Channel20.CustomName,
+			printSet[headerIndex].URazorLabels.Channel21.CustomName,
+			printSet[headerIndex].URazorLabels.Channel22.CustomName,
+			printSet[headerIndex].URazorLabels.Channel23.CustomName,
+			printSet[headerIndex].URazorLabels.Channel24.CustomName,
+			printSet[headerIndex].URazorLabels.Channel25.CustomName,
+			printSet[headerIndex].URazorLabels.Channel26.CustomName,
+			printSet[headerIndex].URazorLabels.Channel27.CustomName,
+			printSet[headerIndex].URazorLabels.Channel28.CustomName,
+			printSet[headerIndex].URazorLabels.Channel29.CustomName,
+			printSet[headerIndex].URazorLabels.Channel30.CustomName,
+			printSet[headerIndex].URazorLabels.Channel31.CustomName,
+			printSet[headerIndex].URazorLabels.Channel32.CustomName,
+		)
+	} else if brand == "xtag2" {
+
+		header += "\tQuan Usage"
+
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header,
+			printSet[headerIndex].URazorLabels.Channel1.CustomName,
+			printSet[headerIndex].URazorLabels.Channel2.CustomName,
+			printSet[headerIndex].URazorLabels.Channel3.CustomName,
+			printSet[headerIndex].URazorLabels.Channel4.CustomName,
+			printSet[headerIndex].URazorLabels.Channel5.CustomName,
+			printSet[headerIndex].URazorLabels.Channel6.CustomName,
+			printSet[headerIndex].URazorLabels.Channel7.CustomName,
+			printSet[headerIndex].URazorLabels.Channel8.CustomName,
+			printSet[headerIndex].URazorLabels.Channel9.CustomName,
+			printSet[headerIndex].URazorLabels.Channel10.CustomName,
+			printSet[headerIndex].URazorLabels.Channel11.CustomName,
+			printSet[headerIndex].URazorLabels.Channel12.CustomName,
+			printSet[headerIndex].URazorLabels.Channel13.CustomName,
+			printSet[headerIndex].URazorLabels.Channel14.CustomName,
+			printSet[headerIndex].URazorLabels.Channel15.CustomName,
+			printSet[headerIndex].URazorLabels.Channel16.CustomName,
+			printSet[headerIndex].URazorLabels.Channel17.CustomName,
+			printSet[headerIndex].URazorLabels.Channel18.CustomName,
+			printSet[headerIndex].URazorLabels.Channel19.CustomName,
+			printSet[headerIndex].URazorLabels.Channel20.CustomName,
+			printSet[headerIndex].URazorLabels.Channel21.CustomName,
+			printSet[headerIndex].URazorLabels.Channel22.CustomName,
+			printSet[headerIndex].URazorLabels.Channel23.CustomName,
+			printSet[headerIndex].URazorLabels.Channel24.CustomName,
+			printSet[headerIndex].URazorLabels.Channel25.CustomName,
+			printSet[headerIndex].URazorLabels.Channel26.CustomName,
+			printSet[headerIndex].URazorLabels.Channel27.CustomName,
+			printSet[headerIndex].URazorLabels.Channel28.CustomName,
+			printSet[headerIndex].URazorLabels.Channel29.CustomName,
 		)
 	}
 
@@ -454,7 +504,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 		sort.Strings(ip)
 
 		// change between Unique+Razor and Unique only based on parameter defined on labelquant
-		var reportIntensities [18]float64
+		var reportIntensities [32]float64
 		if uniqueOnly || !hasRazor {
 			if i.UniqueLabels != nil {
 				reportIntensities[0] = i.UniqueLabels.Channel1.Intensity
@@ -475,6 +525,20 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 				reportIntensities[15] = i.UniqueLabels.Channel16.Intensity
 				reportIntensities[16] = i.UniqueLabels.Channel17.Intensity
 				reportIntensities[17] = i.UniqueLabels.Channel18.Intensity
+				reportIntensities[18] = i.UniqueLabels.Channel19.Intensity
+				reportIntensities[19] = i.UniqueLabels.Channel20.Intensity
+				reportIntensities[20] = i.UniqueLabels.Channel21.Intensity
+				reportIntensities[21] = i.UniqueLabels.Channel22.Intensity
+				reportIntensities[22] = i.UniqueLabels.Channel23.Intensity
+				reportIntensities[23] = i.UniqueLabels.Channel24.Intensity
+				reportIntensities[24] = i.UniqueLabels.Channel25.Intensity
+				reportIntensities[25] = i.UniqueLabels.Channel26.Intensity
+				reportIntensities[26] = i.UniqueLabels.Channel27.Intensity
+				reportIntensities[27] = i.UniqueLabels.Channel28.Intensity
+				reportIntensities[28] = i.UniqueLabels.Channel29.Intensity
+				reportIntensities[29] = i.UniqueLabels.Channel30.Intensity
+				reportIntensities[30] = i.UniqueLabels.Channel31.Intensity
+				reportIntensities[31] = i.UniqueLabels.Channel32.Intensity
 			}
 		} else {
 			if i.URazorLabels != nil {
@@ -496,6 +560,20 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 				reportIntensities[15] = i.URazorLabels.Channel16.Intensity
 				reportIntensities[16] = i.URazorLabels.Channel17.Intensity
 				reportIntensities[17] = i.URazorLabels.Channel18.Intensity
+				reportIntensities[18] = i.URazorLabels.Channel19.Intensity
+				reportIntensities[19] = i.URazorLabels.Channel20.Intensity
+				reportIntensities[20] = i.URazorLabels.Channel21.Intensity
+				reportIntensities[21] = i.URazorLabels.Channel22.Intensity
+				reportIntensities[22] = i.URazorLabels.Channel23.Intensity
+				reportIntensities[23] = i.URazorLabels.Channel24.Intensity
+				reportIntensities[24] = i.URazorLabels.Channel25.Intensity
+				reportIntensities[25] = i.URazorLabels.Channel26.Intensity
+				reportIntensities[26] = i.URazorLabels.Channel27.Intensity
+				reportIntensities[27] = i.URazorLabels.Channel28.Intensity
+				reportIntensities[28] = i.URazorLabels.Channel29.Intensity
+				reportIntensities[29] = i.URazorLabels.Channel30.Intensity
+				reportIntensities[30] = i.URazorLabels.Channel31.Intensity
+				reportIntensities[31] = i.URazorLabels.Channel32.Intensity
 			}
 		}
 
@@ -657,7 +735,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 				reportIntensities[5],
 			)
 		} else if brand == "xtag" {
-			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
 				line,
 				reportIntensities[0],
 				reportIntensities[1],
@@ -677,6 +755,53 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 				reportIntensities[15],
 				reportIntensities[16],
 				reportIntensities[17],
+				reportIntensities[18],
+				reportIntensities[19],
+				reportIntensities[20],
+				reportIntensities[21],
+				reportIntensities[22],
+				reportIntensities[23],
+				reportIntensities[24],
+				reportIntensities[25],
+				reportIntensities[26],
+				reportIntensities[27],
+				reportIntensities[28],
+				reportIntensities[29],
+				reportIntensities[30],
+				reportIntensities[31],
+			)
+		} else if brand == "xtag2" {
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				reportIntensities[10],
+				reportIntensities[11],
+				reportIntensities[12],
+				reportIntensities[13],
+				reportIntensities[14],
+				reportIntensities[15],
+				reportIntensities[16],
+				reportIntensities[17],
+				reportIntensities[18],
+				reportIntensities[19],
+				reportIntensities[20],
+				reportIntensities[21],
+				reportIntensities[22],
+				reportIntensities[23],
+				reportIntensities[24],
+				reportIntensities[25],
+				reportIntensities[26],
+				reportIntensities[27],
+				reportIntensities[28],
 			)
 		}
 
