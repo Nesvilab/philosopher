@@ -60,6 +60,7 @@ type ProteinIdentification struct {
 type PeptideIonIdentification struct {
 	PeptideSequence          string
 	ModifiedPeptide          string
+	PeptideLength            int
 	PeptideParentProtein     []string
 	Razor                    int
 	NumberOfEnzymaticTermini uint8
@@ -109,7 +110,11 @@ func (p ProtIDList) Swap(i, j int) {
 }
 
 // Read is the mmain function to read prot.xml files
-func (p *ProtXML) Read(f string) {
+func (p *ProtXML) Read(f string, minPepLen ...int) {
+	pepLen := 7
+	if len(minPepLen) > 0 {
+		pepLen = minPepLen[0]
+	}
 
 	var xml spc.ProtXML
 	xml.Parse(f)
@@ -169,6 +174,7 @@ func (p *ProtXML) Read(f string) {
 
 				pepid.PeptideSequence = string(k.PeptideSequence)
 				pepid.ModifiedPeptide = string(k.ModificationInfo.ModifiedPeptide)
+				pepid.PeptideLength = len([]rune(pepid.PeptideSequence))
 				pepid.Charge = k.Charge
 				pepid.InitialProbability = k.InitialProbability
 				pepid.Weight = k.Weight
@@ -192,7 +198,7 @@ func (p *ProtXML) Read(f string) {
 				ptid.PeptideIons = append(ptid.PeptideIons, pepid)
 
 				// get hte highest initial probability from all peptides
-				if pepid.InitialProbability > ptid.TopPepProb {
+				if (pepid.PeptideLength > pepLen) && (pepid.InitialProbability > ptid.TopPepProb) {
 					ptid.TopPepProb = pepid.InitialProbability
 				}
 

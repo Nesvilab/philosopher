@@ -360,6 +360,7 @@ type Filter struct {
 	Delta     bool    `yaml:"delta"`
 	Inference bool    `yaml:"delta"`
 	Group     bool    `yaml:"group"`
+	MinPepLen int     `yaml:"minPepLen"`
 }
 
 // Quantify options and parameters

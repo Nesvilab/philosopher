@@ -67,6 +67,7 @@ type PeptideIdentification struct {
 	Peptide                          string
 	Protein                          string
 	ModifiedPeptide                  string
+	PeptideLength                    uint8
 	CompensationVoltage              string
 	Class                            string
 	AssumedCharge                    uint8
@@ -419,6 +420,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		psm.Peptide = string(i.Peptide)
 		psm.Protein = string(i.Protein)
 		psm.CalcNeutralPepMass = i.CalcNeutralPepMass
+		psm.PeptideLength = uint8(len([]rune(psm.Peptide)))
 
 		psm.Massdiff = uti.ToFixed(i.Massdiff, 4)
 

@@ -85,6 +85,7 @@ func init() {
 		filterCmd.Flags().MarkHidden("mods")
 		filterCmd.Flags().MarkHidden("delta")
 		filterCmd.Flags().MarkHidden("probin")
+		filterCmd.Flags().IntVarP(&m.Filter.MinPepLen, "minPepLen", "", 7, "minimum peptide length criterion for protein probability assignment")
 	}
 
 	RootCmd.AddCommand(filterCmd)

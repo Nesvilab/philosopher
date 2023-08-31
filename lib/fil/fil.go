@@ -68,7 +68,7 @@ func Run(f met.Data) met.Data {
 	go func() {
 		defer wg.Done()
 		if len(f.Filter.Pox) > 0 {
-			protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
+			protXML = ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight, f.Filter.MinPepLen)
 		}
 	}()
 	pepid, searchEngine := id.ReadPepXMLInput(f.Filter.Pex, f.Filter.Tag, f.Temp, f.Filter.Model)
@@ -611,11 +611,16 @@ func GetUniquePeptides(p id.PepIDListPtrs) map[string]id.PepIDListPtrs {
 }
 
 // ReadProtXMLInput reads one or more fies and organize the data into PSM list
-func ReadProtXMLInput(xmlFile, decoyTag string, weight float64) id.ProtXML {
+func ReadProtXMLInput(xmlFile, decoyTag string, weight float64, minPepLen ...int) id.ProtXML {
+
+	pepLen := 7
+	if len(minPepLen) > 0 {
+		pepLen = minPepLen[0]
+	}
 
 	var protXML id.ProtXML
 
-	protXML.Read(xmlFile)
+	protXML.Read(xmlFile, pepLen)
 
 	protXML.DecoyTag = decoyTag
 
