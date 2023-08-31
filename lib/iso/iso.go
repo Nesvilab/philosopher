@@ -26,6 +26,20 @@ type Labels struct {
 	Channel16     Channel16
 	Channel17     Channel17
 	Channel18     Channel18
+	Channel19     Channel19
+	Channel20     Channel20
+	Channel21     Channel21
+	Channel22     Channel22
+	Channel23     Channel23
+	Channel24     Channel24
+	Channel25     Channel25
+	Channel26     Channel26
+	Channel27     Channel27
+	Channel28     Channel28
+	Channel29     Channel29
+	Channel30     Channel30
+	Channel31     Channel31
+	Channel32     Channel32
 }
 
 // LabeledSpectra is a list of spectra lables
@@ -169,6 +183,104 @@ type Channel17 struct {
 
 // Channel18 TMT
 type Channel18 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel19 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel20 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel21 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel22 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel23 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel24 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel25 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel26 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel27 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel28 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel29 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel30 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel31 struct {
+	Name       string
+	CustomName string
+	Mz         float64
+	Intensity  float64
+}
+
+type Channel32 struct {
 	Name       string
 	CustomName string
 	Mz         float64
