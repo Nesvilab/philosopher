@@ -893,6 +893,9 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	// 1st check: Purity the score and the Probability levels
 	for _, i := range evi.PSM {
 		if i.Probability >= probability && i.Purity >= purity {
+			if strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_") || i.IsDecoy {
+				continue
+			}
 
 			spectrumMap[i.SpectrumFileName()] = *i.Labels
 			bestMap[i.SpectrumFileName()] = 0
@@ -1052,7 +1055,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 		}
 	}
 
-	logrus.Info("Removing ", len(toDelete), " PSMs from isobaric quantification")
+	logrus.Info("Removing ", len(evi.PSM)-len(spectrumMap), " PSMs from isobaric quantification")
 	for i := range toDeletePhospho {
 		delete(phosphoSpectrumMap, i)
 	}
