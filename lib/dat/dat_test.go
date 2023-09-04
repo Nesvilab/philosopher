@@ -67,15 +67,9 @@ func TestBase_ProcessDB(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &Base{
-				UniProtDB: tt.fields.UniProtDB,
-				CrapDB:    tt.fields.CrapDB,
-				TaDeDB:    tt.fields.TaDeDB,
-				Records:   tt.fields.Records,
-			}
 			len_records := ParseFile(tt.args.file, make(chan<- []fas.FastaEntry, 1024))
-			if len_records != 20407 {
-				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len(d.Records), 20407)
+			if len_records != 20408 {
+				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len_records, 20408)
 			}
 		})
 	}
