@@ -1429,987 +1429,988 @@ func rollUpProteins(evi rep.Evidence, spectrumMap map[id.SpectrumType]iso.Labels
 		evi.Proteins[j].URazorLabels = &iso.Labels{}
 
 		for _, k := range evi.Proteins[j].TotalPeptideIons {
-			for l := range k.Spectra {
-
-				i, ok := spectrumMap[l]
-				if ok {
-					//evi.Proteins[j].TotalLabels = &iso.Labels{}
-					evi.Proteins[j].TotalLabels.Channel1.Name = i.Channel1.Name
-					evi.Proteins[j].TotalLabels.Channel1.CustomName = i.Channel1.CustomName
-					evi.Proteins[j].TotalLabels.Channel1.Mz = i.Channel1.Mz
-					evi.Proteins[j].TotalLabels.Channel1.Intensity += i.Channel1.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel2.Name = i.Channel2.Name
-					evi.Proteins[j].TotalLabels.Channel2.CustomName = i.Channel2.CustomName
-					evi.Proteins[j].TotalLabels.Channel2.Mz = i.Channel2.Mz
-					evi.Proteins[j].TotalLabels.Channel2.Intensity += i.Channel2.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel3.Name = i.Channel3.Name
-					evi.Proteins[j].TotalLabels.Channel3.CustomName = i.Channel3.CustomName
-					evi.Proteins[j].TotalLabels.Channel3.Mz = i.Channel3.Mz
-					evi.Proteins[j].TotalLabels.Channel3.Intensity += i.Channel3.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel4.Name = i.Channel4.Name
-					evi.Proteins[j].TotalLabels.Channel4.CustomName = i.Channel4.CustomName
-					evi.Proteins[j].TotalLabels.Channel4.Mz = i.Channel4.Mz
-					evi.Proteins[j].TotalLabels.Channel4.Intensity += i.Channel4.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel5.Name = i.Channel5.Name
-					evi.Proteins[j].TotalLabels.Channel5.CustomName = i.Channel5.CustomName
-					evi.Proteins[j].TotalLabels.Channel5.Mz = i.Channel5.Mz
-					evi.Proteins[j].TotalLabels.Channel5.Intensity += i.Channel5.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel6.Name = i.Channel6.Name
-					evi.Proteins[j].TotalLabels.Channel6.CustomName = i.Channel6.CustomName
-					evi.Proteins[j].TotalLabels.Channel6.Mz = i.Channel6.Mz
-					evi.Proteins[j].TotalLabels.Channel6.Intensity += i.Channel6.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel7.Name = i.Channel7.Name
-					evi.Proteins[j].TotalLabels.Channel7.CustomName = i.Channel7.CustomName
-					evi.Proteins[j].TotalLabels.Channel7.Mz = i.Channel7.Mz
-					evi.Proteins[j].TotalLabels.Channel7.Intensity += i.Channel7.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel8.Name = i.Channel8.Name
-					evi.Proteins[j].TotalLabels.Channel8.CustomName = i.Channel8.CustomName
-					evi.Proteins[j].TotalLabels.Channel8.Mz = i.Channel8.Mz
-					evi.Proteins[j].TotalLabels.Channel8.Intensity += i.Channel8.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel9.Name = i.Channel9.Name
-					evi.Proteins[j].TotalLabels.Channel9.CustomName = i.Channel9.CustomName
-					evi.Proteins[j].TotalLabels.Channel9.Mz = i.Channel9.Mz
-					evi.Proteins[j].TotalLabels.Channel9.Intensity += i.Channel9.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel10.Name = i.Channel10.Name
-					evi.Proteins[j].TotalLabels.Channel10.CustomName = i.Channel10.CustomName
-					evi.Proteins[j].TotalLabels.Channel10.Mz = i.Channel10.Mz
-					evi.Proteins[j].TotalLabels.Channel10.Intensity += i.Channel10.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel11.Name = i.Channel11.Name
-					evi.Proteins[j].TotalLabels.Channel11.CustomName = i.Channel11.CustomName
-					evi.Proteins[j].TotalLabels.Channel11.Mz = i.Channel11.Mz
-					evi.Proteins[j].TotalLabels.Channel11.Intensity += i.Channel11.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel12.Name = i.Channel12.Name
-					evi.Proteins[j].TotalLabels.Channel12.CustomName = i.Channel12.CustomName
-					evi.Proteins[j].TotalLabels.Channel12.Mz = i.Channel12.Mz
-					evi.Proteins[j].TotalLabels.Channel12.Intensity += i.Channel12.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel13.Name = i.Channel13.Name
-					evi.Proteins[j].TotalLabels.Channel13.CustomName = i.Channel13.CustomName
-					evi.Proteins[j].TotalLabels.Channel13.Mz = i.Channel13.Mz
-					evi.Proteins[j].TotalLabels.Channel13.Intensity += i.Channel13.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel14.Name = i.Channel14.Name
-					evi.Proteins[j].TotalLabels.Channel14.CustomName = i.Channel14.CustomName
-					evi.Proteins[j].TotalLabels.Channel14.Mz = i.Channel14.Mz
-					evi.Proteins[j].TotalLabels.Channel14.Intensity += i.Channel14.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel15.Name = i.Channel15.Name
-					evi.Proteins[j].TotalLabels.Channel15.CustomName = i.Channel15.CustomName
-					evi.Proteins[j].TotalLabels.Channel15.Mz = i.Channel15.Mz
-					evi.Proteins[j].TotalLabels.Channel15.Intensity += i.Channel15.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel16.Name = i.Channel16.Name
-					evi.Proteins[j].TotalLabels.Channel16.CustomName = i.Channel16.CustomName
-					evi.Proteins[j].TotalLabels.Channel16.Mz = i.Channel16.Mz
-					evi.Proteins[j].TotalLabels.Channel16.Intensity += i.Channel16.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel17.Name = i.Channel17.Name
-					evi.Proteins[j].TotalLabels.Channel17.CustomName = i.Channel17.CustomName
-					evi.Proteins[j].TotalLabels.Channel17.Mz = i.Channel17.Mz
-					evi.Proteins[j].TotalLabels.Channel17.Intensity += i.Channel17.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel18.Name = i.Channel18.Name
-					evi.Proteins[j].TotalLabels.Channel18.CustomName = i.Channel18.CustomName
-					evi.Proteins[j].TotalLabels.Channel18.Mz = i.Channel18.Mz
-					evi.Proteins[j].TotalLabels.Channel18.Intensity += i.Channel18.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel19.Name = i.Channel19.Name
-					evi.Proteins[j].TotalLabels.Channel19.CustomName = i.Channel19.CustomName
-					evi.Proteins[j].TotalLabels.Channel19.Mz = i.Channel19.Mz
-					evi.Proteins[j].TotalLabels.Channel19.Intensity += i.Channel19.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel20.Name = i.Channel20.Name
-					evi.Proteins[j].TotalLabels.Channel20.CustomName = i.Channel20.CustomName
-					evi.Proteins[j].TotalLabels.Channel20.Mz = i.Channel20.Mz
-					evi.Proteins[j].TotalLabels.Channel20.Intensity += i.Channel20.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel21.Name = i.Channel21.Name
-					evi.Proteins[j].TotalLabels.Channel21.CustomName = i.Channel21.CustomName
-					evi.Proteins[j].TotalLabels.Channel21.Mz = i.Channel21.Mz
-					evi.Proteins[j].TotalLabels.Channel21.Intensity += i.Channel21.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel22.Name = i.Channel22.Name
-					evi.Proteins[j].TotalLabels.Channel22.CustomName = i.Channel22.CustomName
-					evi.Proteins[j].TotalLabels.Channel22.Mz = i.Channel22.Mz
-					evi.Proteins[j].TotalLabels.Channel22.Intensity += i.Channel22.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel23.Name = i.Channel23.Name
-					evi.Proteins[j].TotalLabels.Channel23.CustomName = i.Channel23.CustomName
-					evi.Proteins[j].TotalLabels.Channel23.Mz = i.Channel23.Mz
-					evi.Proteins[j].TotalLabels.Channel23.Intensity += i.Channel23.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel24.Name = i.Channel24.Name
-					evi.Proteins[j].TotalLabels.Channel24.CustomName = i.Channel24.CustomName
-					evi.Proteins[j].TotalLabels.Channel24.Mz = i.Channel24.Mz
-					evi.Proteins[j].TotalLabels.Channel24.Intensity += i.Channel24.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel25.Name = i.Channel25.Name
-					evi.Proteins[j].TotalLabels.Channel25.CustomName = i.Channel25.CustomName
-					evi.Proteins[j].TotalLabels.Channel25.Mz = i.Channel25.Mz
-					evi.Proteins[j].TotalLabels.Channel25.Intensity += i.Channel25.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel26.Name = i.Channel26.Name
-					evi.Proteins[j].TotalLabels.Channel26.CustomName = i.Channel26.CustomName
-					evi.Proteins[j].TotalLabels.Channel26.Mz = i.Channel26.Mz
-					evi.Proteins[j].TotalLabels.Channel26.Intensity += i.Channel26.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel27.Name = i.Channel27.Name
-					evi.Proteins[j].TotalLabels.Channel27.CustomName = i.Channel27.CustomName
-					evi.Proteins[j].TotalLabels.Channel27.Mz = i.Channel27.Mz
-					evi.Proteins[j].TotalLabels.Channel27.Intensity += i.Channel27.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel28.Name = i.Channel28.Name
-					evi.Proteins[j].TotalLabels.Channel28.CustomName = i.Channel28.CustomName
-					evi.Proteins[j].TotalLabels.Channel28.Mz = i.Channel28.Mz
-					evi.Proteins[j].TotalLabels.Channel28.Intensity += i.Channel28.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel29.Name = i.Channel29.Name
-					evi.Proteins[j].TotalLabels.Channel29.CustomName = i.Channel29.CustomName
-					evi.Proteins[j].TotalLabels.Channel29.Mz = i.Channel29.Mz
-					evi.Proteins[j].TotalLabels.Channel29.Intensity += i.Channel29.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel30.Name = i.Channel30.Name
-					evi.Proteins[j].TotalLabels.Channel30.CustomName = i.Channel30.CustomName
-					evi.Proteins[j].TotalLabels.Channel30.Mz = i.Channel30.Mz
-					evi.Proteins[j].TotalLabels.Channel30.Intensity += i.Channel30.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel31.Name = i.Channel31.Name
-					evi.Proteins[j].TotalLabels.Channel31.CustomName = i.Channel31.CustomName
-					evi.Proteins[j].TotalLabels.Channel31.Mz = i.Channel31.Mz
-					evi.Proteins[j].TotalLabels.Channel31.Intensity += i.Channel31.Intensity
-
-					evi.Proteins[j].TotalLabels.Channel32.Name = i.Channel32.Name
-					evi.Proteins[j].TotalLabels.Channel32.CustomName = i.Channel32.CustomName
-					evi.Proteins[j].TotalLabels.Channel32.Mz = i.Channel32.Mz
-					evi.Proteins[j].TotalLabels.Channel32.Intensity += i.Channel32.Intensity
-
-					//if k.IsNondegenerateEvidence {
-					if k.IsUnique {
-						//evi.Proteins[j].UniqueLabels = &iso.Labels{}
-						evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
-						evi.Proteins[j].UniqueLabels.Channel1.CustomName = i.Channel1.CustomName
-						evi.Proteins[j].UniqueLabels.Channel1.Mz = i.Channel1.Mz
-						evi.Proteins[j].UniqueLabels.Channel1.Intensity += i.Channel1.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel2.Name = i.Channel2.Name
-						evi.Proteins[j].UniqueLabels.Channel2.CustomName = i.Channel2.CustomName
-						evi.Proteins[j].UniqueLabels.Channel2.Mz = i.Channel2.Mz
-						evi.Proteins[j].UniqueLabels.Channel2.Intensity += i.Channel2.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel3.Name = i.Channel3.Name
-						evi.Proteins[j].UniqueLabels.Channel3.CustomName = i.Channel3.CustomName
-						evi.Proteins[j].UniqueLabels.Channel3.Mz = i.Channel3.Mz
-						evi.Proteins[j].UniqueLabels.Channel3.Intensity += i.Channel3.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel4.Name = i.Channel4.Name
-						evi.Proteins[j].UniqueLabels.Channel4.CustomName = i.Channel4.CustomName
-						evi.Proteins[j].UniqueLabels.Channel4.Mz = i.Channel4.Mz
-						evi.Proteins[j].UniqueLabels.Channel4.Intensity += i.Channel4.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel5.Name = i.Channel5.Name
-						evi.Proteins[j].UniqueLabels.Channel5.CustomName = i.Channel5.CustomName
-						evi.Proteins[j].UniqueLabels.Channel5.Mz = i.Channel5.Mz
-						evi.Proteins[j].UniqueLabels.Channel5.Intensity += i.Channel5.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel6.Name = i.Channel6.Name
-						evi.Proteins[j].UniqueLabels.Channel6.CustomName = i.Channel6.CustomName
-						evi.Proteins[j].UniqueLabels.Channel6.Mz = i.Channel6.Mz
-						evi.Proteins[j].UniqueLabels.Channel6.Intensity += i.Channel6.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel7.Name = i.Channel7.Name
-						evi.Proteins[j].UniqueLabels.Channel7.CustomName = i.Channel7.CustomName
-						evi.Proteins[j].UniqueLabels.Channel7.Mz = i.Channel7.Mz
-						evi.Proteins[j].UniqueLabels.Channel7.Intensity += i.Channel7.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel8.Name = i.Channel8.Name
-						evi.Proteins[j].UniqueLabels.Channel8.CustomName = i.Channel8.CustomName
-						evi.Proteins[j].UniqueLabels.Channel8.Mz = i.Channel8.Mz
-						evi.Proteins[j].UniqueLabels.Channel8.Intensity += i.Channel8.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel9.Name = i.Channel9.Name
-						evi.Proteins[j].UniqueLabels.Channel9.CustomName = i.Channel9.CustomName
-						evi.Proteins[j].UniqueLabels.Channel9.Mz = i.Channel9.Mz
-						evi.Proteins[j].UniqueLabels.Channel9.Intensity += i.Channel9.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel10.Name = i.Channel10.Name
-						evi.Proteins[j].UniqueLabels.Channel10.CustomName = i.Channel10.CustomName
-						evi.Proteins[j].UniqueLabels.Channel10.Mz = i.Channel10.Mz
-						evi.Proteins[j].UniqueLabels.Channel10.Intensity += i.Channel10.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel11.Name = i.Channel11.Name
-						evi.Proteins[j].UniqueLabels.Channel11.CustomName = i.Channel11.CustomName
-						evi.Proteins[j].UniqueLabels.Channel11.Mz = i.Channel11.Mz
-						evi.Proteins[j].UniqueLabels.Channel11.Intensity += i.Channel11.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel12.Name = i.Channel12.Name
-						evi.Proteins[j].UniqueLabels.Channel12.CustomName = i.Channel12.CustomName
-						evi.Proteins[j].UniqueLabels.Channel12.Mz = i.Channel12.Mz
-						evi.Proteins[j].UniqueLabels.Channel12.Intensity += i.Channel12.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel13.Name = i.Channel13.Name
-						evi.Proteins[j].UniqueLabels.Channel13.CustomName = i.Channel13.CustomName
-						evi.Proteins[j].UniqueLabels.Channel13.Mz = i.Channel13.Mz
-						evi.Proteins[j].UniqueLabels.Channel13.Intensity += i.Channel13.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel14.Name = i.Channel14.Name
-						evi.Proteins[j].UniqueLabels.Channel14.CustomName = i.Channel14.CustomName
-						evi.Proteins[j].UniqueLabels.Channel14.Mz = i.Channel14.Mz
-						evi.Proteins[j].UniqueLabels.Channel14.Intensity += i.Channel14.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel15.Name = i.Channel15.Name
-						evi.Proteins[j].UniqueLabels.Channel15.CustomName = i.Channel15.CustomName
-						evi.Proteins[j].UniqueLabels.Channel15.Mz = i.Channel15.Mz
-						evi.Proteins[j].UniqueLabels.Channel15.Intensity += i.Channel15.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel16.Name = i.Channel16.Name
-						evi.Proteins[j].UniqueLabels.Channel16.CustomName = i.Channel16.CustomName
-						evi.Proteins[j].UniqueLabels.Channel16.Mz = i.Channel16.Mz
-						evi.Proteins[j].UniqueLabels.Channel16.Intensity += i.Channel16.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel17.Name = i.Channel17.Name
-						evi.Proteins[j].UniqueLabels.Channel17.CustomName = i.Channel17.CustomName
-						evi.Proteins[j].UniqueLabels.Channel17.Mz = i.Channel17.Mz
-						evi.Proteins[j].UniqueLabels.Channel17.Intensity += i.Channel17.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel18.Name = i.Channel18.Name
-						evi.Proteins[j].UniqueLabels.Channel18.CustomName = i.Channel18.CustomName
-						evi.Proteins[j].UniqueLabels.Channel18.Mz = i.Channel18.Mz
-						evi.Proteins[j].UniqueLabels.Channel18.Intensity += i.Channel18.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel19.Name = i.Channel19.Name
-						evi.Proteins[j].UniqueLabels.Channel19.CustomName = i.Channel19.CustomName
-						evi.Proteins[j].UniqueLabels.Channel19.Mz = i.Channel19.Mz
-						evi.Proteins[j].UniqueLabels.Channel19.Intensity += i.Channel19.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel20.Name = i.Channel20.Name
-						evi.Proteins[j].UniqueLabels.Channel20.CustomName = i.Channel20.CustomName
-						evi.Proteins[j].UniqueLabels.Channel20.Mz = i.Channel20.Mz
-						evi.Proteins[j].UniqueLabels.Channel20.Intensity += i.Channel20.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel21.Name = i.Channel21.Name
-						evi.Proteins[j].UniqueLabels.Channel21.CustomName = i.Channel21.CustomName
-						evi.Proteins[j].UniqueLabels.Channel21.Mz = i.Channel21.Mz
-						evi.Proteins[j].UniqueLabels.Channel21.Intensity += i.Channel21.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel22.Name = i.Channel22.Name
-						evi.Proteins[j].UniqueLabels.Channel22.CustomName = i.Channel22.CustomName
-						evi.Proteins[j].UniqueLabels.Channel22.Mz = i.Channel22.Mz
-						evi.Proteins[j].UniqueLabels.Channel22.Intensity += i.Channel22.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel23.Name = i.Channel23.Name
-						evi.Proteins[j].UniqueLabels.Channel23.CustomName = i.Channel23.CustomName
-						evi.Proteins[j].UniqueLabels.Channel23.Mz = i.Channel23.Mz
-						evi.Proteins[j].UniqueLabels.Channel23.Intensity += i.Channel23.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel24.Name = i.Channel24.Name
-						evi.Proteins[j].UniqueLabels.Channel24.CustomName = i.Channel24.CustomName
-						evi.Proteins[j].UniqueLabels.Channel24.Mz = i.Channel24.Mz
-						evi.Proteins[j].UniqueLabels.Channel24.Intensity += i.Channel24.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel25.Name = i.Channel25.Name
-						evi.Proteins[j].UniqueLabels.Channel25.CustomName = i.Channel25.CustomName
-						evi.Proteins[j].UniqueLabels.Channel25.Mz = i.Channel25.Mz
-						evi.Proteins[j].UniqueLabels.Channel25.Intensity += i.Channel25.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel26.Name = i.Channel26.Name
-						evi.Proteins[j].UniqueLabels.Channel26.CustomName = i.Channel26.CustomName
-						evi.Proteins[j].UniqueLabels.Channel26.Mz = i.Channel26.Mz
-						evi.Proteins[j].UniqueLabels.Channel26.Intensity += i.Channel26.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel27.Name = i.Channel27.Name
-						evi.Proteins[j].UniqueLabels.Channel27.CustomName = i.Channel27.CustomName
-						evi.Proteins[j].UniqueLabels.Channel27.Mz = i.Channel27.Mz
-						evi.Proteins[j].UniqueLabels.Channel27.Intensity += i.Channel27.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel28.Name = i.Channel28.Name
-						evi.Proteins[j].UniqueLabels.Channel28.CustomName = i.Channel28.CustomName
-						evi.Proteins[j].UniqueLabels.Channel28.Mz = i.Channel28.Mz
-						evi.Proteins[j].UniqueLabels.Channel28.Intensity += i.Channel28.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel29.Name = i.Channel29.Name
-						evi.Proteins[j].UniqueLabels.Channel29.CustomName = i.Channel29.CustomName
-						evi.Proteins[j].UniqueLabels.Channel29.Mz = i.Channel29.Mz
-						evi.Proteins[j].UniqueLabels.Channel29.Intensity += i.Channel29.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel30.Name = i.Channel30.Name
-						evi.Proteins[j].UniqueLabels.Channel30.CustomName = i.Channel30.CustomName
-						evi.Proteins[j].UniqueLabels.Channel30.Mz = i.Channel30.Mz
-						evi.Proteins[j].UniqueLabels.Channel30.Intensity += i.Channel30.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel31.Name = i.Channel31.Name
-						evi.Proteins[j].UniqueLabels.Channel31.CustomName = i.Channel31.CustomName
-						evi.Proteins[j].UniqueLabels.Channel31.Mz = i.Channel31.Mz
-						evi.Proteins[j].UniqueLabels.Channel31.Intensity += i.Channel31.Intensity
-
-						evi.Proteins[j].UniqueLabels.Channel32.Name = i.Channel32.Name
-						evi.Proteins[j].UniqueLabels.Channel32.CustomName = i.Channel32.CustomName
-						evi.Proteins[j].UniqueLabels.Channel32.Mz = i.Channel32.Mz
-						evi.Proteins[j].UniqueLabels.Channel32.Intensity += i.Channel32.Intensity
+			if k.Protein == evi.Proteins[j].PartHeader {
+				for l := range k.Spectra {
+
+					i, ok := spectrumMap[l]
+					if ok {
+						//evi.Proteins[j].TotalLabels = &iso.Labels{}
+						evi.Proteins[j].TotalLabels.Channel1.Name = i.Channel1.Name
+						evi.Proteins[j].TotalLabels.Channel1.CustomName = i.Channel1.CustomName
+						evi.Proteins[j].TotalLabels.Channel1.Mz = i.Channel1.Mz
+						evi.Proteins[j].TotalLabels.Channel1.Intensity += i.Channel1.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel2.Name = i.Channel2.Name
+						evi.Proteins[j].TotalLabels.Channel2.CustomName = i.Channel2.CustomName
+						evi.Proteins[j].TotalLabels.Channel2.Mz = i.Channel2.Mz
+						evi.Proteins[j].TotalLabels.Channel2.Intensity += i.Channel2.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel3.Name = i.Channel3.Name
+						evi.Proteins[j].TotalLabels.Channel3.CustomName = i.Channel3.CustomName
+						evi.Proteins[j].TotalLabels.Channel3.Mz = i.Channel3.Mz
+						evi.Proteins[j].TotalLabels.Channel3.Intensity += i.Channel3.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel4.Name = i.Channel4.Name
+						evi.Proteins[j].TotalLabels.Channel4.CustomName = i.Channel4.CustomName
+						evi.Proteins[j].TotalLabels.Channel4.Mz = i.Channel4.Mz
+						evi.Proteins[j].TotalLabels.Channel4.Intensity += i.Channel4.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel5.Name = i.Channel5.Name
+						evi.Proteins[j].TotalLabels.Channel5.CustomName = i.Channel5.CustomName
+						evi.Proteins[j].TotalLabels.Channel5.Mz = i.Channel5.Mz
+						evi.Proteins[j].TotalLabels.Channel5.Intensity += i.Channel5.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel6.Name = i.Channel6.Name
+						evi.Proteins[j].TotalLabels.Channel6.CustomName = i.Channel6.CustomName
+						evi.Proteins[j].TotalLabels.Channel6.Mz = i.Channel6.Mz
+						evi.Proteins[j].TotalLabels.Channel6.Intensity += i.Channel6.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel7.Name = i.Channel7.Name
+						evi.Proteins[j].TotalLabels.Channel7.CustomName = i.Channel7.CustomName
+						evi.Proteins[j].TotalLabels.Channel7.Mz = i.Channel7.Mz
+						evi.Proteins[j].TotalLabels.Channel7.Intensity += i.Channel7.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel8.Name = i.Channel8.Name
+						evi.Proteins[j].TotalLabels.Channel8.CustomName = i.Channel8.CustomName
+						evi.Proteins[j].TotalLabels.Channel8.Mz = i.Channel8.Mz
+						evi.Proteins[j].TotalLabels.Channel8.Intensity += i.Channel8.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel9.Name = i.Channel9.Name
+						evi.Proteins[j].TotalLabels.Channel9.CustomName = i.Channel9.CustomName
+						evi.Proteins[j].TotalLabels.Channel9.Mz = i.Channel9.Mz
+						evi.Proteins[j].TotalLabels.Channel9.Intensity += i.Channel9.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel10.Name = i.Channel10.Name
+						evi.Proteins[j].TotalLabels.Channel10.CustomName = i.Channel10.CustomName
+						evi.Proteins[j].TotalLabels.Channel10.Mz = i.Channel10.Mz
+						evi.Proteins[j].TotalLabels.Channel10.Intensity += i.Channel10.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel11.Name = i.Channel11.Name
+						evi.Proteins[j].TotalLabels.Channel11.CustomName = i.Channel11.CustomName
+						evi.Proteins[j].TotalLabels.Channel11.Mz = i.Channel11.Mz
+						evi.Proteins[j].TotalLabels.Channel11.Intensity += i.Channel11.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel12.Name = i.Channel12.Name
+						evi.Proteins[j].TotalLabels.Channel12.CustomName = i.Channel12.CustomName
+						evi.Proteins[j].TotalLabels.Channel12.Mz = i.Channel12.Mz
+						evi.Proteins[j].TotalLabels.Channel12.Intensity += i.Channel12.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel13.Name = i.Channel13.Name
+						evi.Proteins[j].TotalLabels.Channel13.CustomName = i.Channel13.CustomName
+						evi.Proteins[j].TotalLabels.Channel13.Mz = i.Channel13.Mz
+						evi.Proteins[j].TotalLabels.Channel13.Intensity += i.Channel13.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel14.Name = i.Channel14.Name
+						evi.Proteins[j].TotalLabels.Channel14.CustomName = i.Channel14.CustomName
+						evi.Proteins[j].TotalLabels.Channel14.Mz = i.Channel14.Mz
+						evi.Proteins[j].TotalLabels.Channel14.Intensity += i.Channel14.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel15.Name = i.Channel15.Name
+						evi.Proteins[j].TotalLabels.Channel15.CustomName = i.Channel15.CustomName
+						evi.Proteins[j].TotalLabels.Channel15.Mz = i.Channel15.Mz
+						evi.Proteins[j].TotalLabels.Channel15.Intensity += i.Channel15.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel16.Name = i.Channel16.Name
+						evi.Proteins[j].TotalLabels.Channel16.CustomName = i.Channel16.CustomName
+						evi.Proteins[j].TotalLabels.Channel16.Mz = i.Channel16.Mz
+						evi.Proteins[j].TotalLabels.Channel16.Intensity += i.Channel16.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].TotalLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].TotalLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].TotalLabels.Channel17.Intensity += i.Channel17.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].TotalLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].TotalLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].TotalLabels.Channel18.Intensity += i.Channel18.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel19.Name = i.Channel19.Name
+						evi.Proteins[j].TotalLabels.Channel19.CustomName = i.Channel19.CustomName
+						evi.Proteins[j].TotalLabels.Channel19.Mz = i.Channel19.Mz
+						evi.Proteins[j].TotalLabels.Channel19.Intensity += i.Channel19.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel20.Name = i.Channel20.Name
+						evi.Proteins[j].TotalLabels.Channel20.CustomName = i.Channel20.CustomName
+						evi.Proteins[j].TotalLabels.Channel20.Mz = i.Channel20.Mz
+						evi.Proteins[j].TotalLabels.Channel20.Intensity += i.Channel20.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel21.Name = i.Channel21.Name
+						evi.Proteins[j].TotalLabels.Channel21.CustomName = i.Channel21.CustomName
+						evi.Proteins[j].TotalLabels.Channel21.Mz = i.Channel21.Mz
+						evi.Proteins[j].TotalLabels.Channel21.Intensity += i.Channel21.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel22.Name = i.Channel22.Name
+						evi.Proteins[j].TotalLabels.Channel22.CustomName = i.Channel22.CustomName
+						evi.Proteins[j].TotalLabels.Channel22.Mz = i.Channel22.Mz
+						evi.Proteins[j].TotalLabels.Channel22.Intensity += i.Channel22.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel23.Name = i.Channel23.Name
+						evi.Proteins[j].TotalLabels.Channel23.CustomName = i.Channel23.CustomName
+						evi.Proteins[j].TotalLabels.Channel23.Mz = i.Channel23.Mz
+						evi.Proteins[j].TotalLabels.Channel23.Intensity += i.Channel23.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel24.Name = i.Channel24.Name
+						evi.Proteins[j].TotalLabels.Channel24.CustomName = i.Channel24.CustomName
+						evi.Proteins[j].TotalLabels.Channel24.Mz = i.Channel24.Mz
+						evi.Proteins[j].TotalLabels.Channel24.Intensity += i.Channel24.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel25.Name = i.Channel25.Name
+						evi.Proteins[j].TotalLabels.Channel25.CustomName = i.Channel25.CustomName
+						evi.Proteins[j].TotalLabels.Channel25.Mz = i.Channel25.Mz
+						evi.Proteins[j].TotalLabels.Channel25.Intensity += i.Channel25.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel26.Name = i.Channel26.Name
+						evi.Proteins[j].TotalLabels.Channel26.CustomName = i.Channel26.CustomName
+						evi.Proteins[j].TotalLabels.Channel26.Mz = i.Channel26.Mz
+						evi.Proteins[j].TotalLabels.Channel26.Intensity += i.Channel26.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel27.Name = i.Channel27.Name
+						evi.Proteins[j].TotalLabels.Channel27.CustomName = i.Channel27.CustomName
+						evi.Proteins[j].TotalLabels.Channel27.Mz = i.Channel27.Mz
+						evi.Proteins[j].TotalLabels.Channel27.Intensity += i.Channel27.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel28.Name = i.Channel28.Name
+						evi.Proteins[j].TotalLabels.Channel28.CustomName = i.Channel28.CustomName
+						evi.Proteins[j].TotalLabels.Channel28.Mz = i.Channel28.Mz
+						evi.Proteins[j].TotalLabels.Channel28.Intensity += i.Channel28.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel29.Name = i.Channel29.Name
+						evi.Proteins[j].TotalLabels.Channel29.CustomName = i.Channel29.CustomName
+						evi.Proteins[j].TotalLabels.Channel29.Mz = i.Channel29.Mz
+						evi.Proteins[j].TotalLabels.Channel29.Intensity += i.Channel29.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel30.Name = i.Channel30.Name
+						evi.Proteins[j].TotalLabels.Channel30.CustomName = i.Channel30.CustomName
+						evi.Proteins[j].TotalLabels.Channel30.Mz = i.Channel30.Mz
+						evi.Proteins[j].TotalLabels.Channel30.Intensity += i.Channel30.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel31.Name = i.Channel31.Name
+						evi.Proteins[j].TotalLabels.Channel31.CustomName = i.Channel31.CustomName
+						evi.Proteins[j].TotalLabels.Channel31.Mz = i.Channel31.Mz
+						evi.Proteins[j].TotalLabels.Channel31.Intensity += i.Channel31.Intensity
+
+						evi.Proteins[j].TotalLabels.Channel32.Name = i.Channel32.Name
+						evi.Proteins[j].TotalLabels.Channel32.CustomName = i.Channel32.CustomName
+						evi.Proteins[j].TotalLabels.Channel32.Mz = i.Channel32.Mz
+						evi.Proteins[j].TotalLabels.Channel32.Intensity += i.Channel32.Intensity
+
+						//if k.IsNondegenerateEvidence {
+						if k.IsUnique {
+							//evi.Proteins[j].UniqueLabels = &iso.Labels{}
+							evi.Proteins[j].UniqueLabels.Channel1.Name = i.Channel1.Name
+							evi.Proteins[j].UniqueLabels.Channel1.CustomName = i.Channel1.CustomName
+							evi.Proteins[j].UniqueLabels.Channel1.Mz = i.Channel1.Mz
+							evi.Proteins[j].UniqueLabels.Channel1.Intensity += i.Channel1.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel2.Name = i.Channel2.Name
+							evi.Proteins[j].UniqueLabels.Channel2.CustomName = i.Channel2.CustomName
+							evi.Proteins[j].UniqueLabels.Channel2.Mz = i.Channel2.Mz
+							evi.Proteins[j].UniqueLabels.Channel2.Intensity += i.Channel2.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel3.Name = i.Channel3.Name
+							evi.Proteins[j].UniqueLabels.Channel3.CustomName = i.Channel3.CustomName
+							evi.Proteins[j].UniqueLabels.Channel3.Mz = i.Channel3.Mz
+							evi.Proteins[j].UniqueLabels.Channel3.Intensity += i.Channel3.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel4.Name = i.Channel4.Name
+							evi.Proteins[j].UniqueLabels.Channel4.CustomName = i.Channel4.CustomName
+							evi.Proteins[j].UniqueLabels.Channel4.Mz = i.Channel4.Mz
+							evi.Proteins[j].UniqueLabels.Channel4.Intensity += i.Channel4.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel5.Name = i.Channel5.Name
+							evi.Proteins[j].UniqueLabels.Channel5.CustomName = i.Channel5.CustomName
+							evi.Proteins[j].UniqueLabels.Channel5.Mz = i.Channel5.Mz
+							evi.Proteins[j].UniqueLabels.Channel5.Intensity += i.Channel5.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel6.Name = i.Channel6.Name
+							evi.Proteins[j].UniqueLabels.Channel6.CustomName = i.Channel6.CustomName
+							evi.Proteins[j].UniqueLabels.Channel6.Mz = i.Channel6.Mz
+							evi.Proteins[j].UniqueLabels.Channel6.Intensity += i.Channel6.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel7.Name = i.Channel7.Name
+							evi.Proteins[j].UniqueLabels.Channel7.CustomName = i.Channel7.CustomName
+							evi.Proteins[j].UniqueLabels.Channel7.Mz = i.Channel7.Mz
+							evi.Proteins[j].UniqueLabels.Channel7.Intensity += i.Channel7.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel8.Name = i.Channel8.Name
+							evi.Proteins[j].UniqueLabels.Channel8.CustomName = i.Channel8.CustomName
+							evi.Proteins[j].UniqueLabels.Channel8.Mz = i.Channel8.Mz
+							evi.Proteins[j].UniqueLabels.Channel8.Intensity += i.Channel8.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel9.Name = i.Channel9.Name
+							evi.Proteins[j].UniqueLabels.Channel9.CustomName = i.Channel9.CustomName
+							evi.Proteins[j].UniqueLabels.Channel9.Mz = i.Channel9.Mz
+							evi.Proteins[j].UniqueLabels.Channel9.Intensity += i.Channel9.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel10.Name = i.Channel10.Name
+							evi.Proteins[j].UniqueLabels.Channel10.CustomName = i.Channel10.CustomName
+							evi.Proteins[j].UniqueLabels.Channel10.Mz = i.Channel10.Mz
+							evi.Proteins[j].UniqueLabels.Channel10.Intensity += i.Channel10.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel11.Name = i.Channel11.Name
+							evi.Proteins[j].UniqueLabels.Channel11.CustomName = i.Channel11.CustomName
+							evi.Proteins[j].UniqueLabels.Channel11.Mz = i.Channel11.Mz
+							evi.Proteins[j].UniqueLabels.Channel11.Intensity += i.Channel11.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel12.Name = i.Channel12.Name
+							evi.Proteins[j].UniqueLabels.Channel12.CustomName = i.Channel12.CustomName
+							evi.Proteins[j].UniqueLabels.Channel12.Mz = i.Channel12.Mz
+							evi.Proteins[j].UniqueLabels.Channel12.Intensity += i.Channel12.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel13.Name = i.Channel13.Name
+							evi.Proteins[j].UniqueLabels.Channel13.CustomName = i.Channel13.CustomName
+							evi.Proteins[j].UniqueLabels.Channel13.Mz = i.Channel13.Mz
+							evi.Proteins[j].UniqueLabels.Channel13.Intensity += i.Channel13.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel14.Name = i.Channel14.Name
+							evi.Proteins[j].UniqueLabels.Channel14.CustomName = i.Channel14.CustomName
+							evi.Proteins[j].UniqueLabels.Channel14.Mz = i.Channel14.Mz
+							evi.Proteins[j].UniqueLabels.Channel14.Intensity += i.Channel14.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel15.Name = i.Channel15.Name
+							evi.Proteins[j].UniqueLabels.Channel15.CustomName = i.Channel15.CustomName
+							evi.Proteins[j].UniqueLabels.Channel15.Mz = i.Channel15.Mz
+							evi.Proteins[j].UniqueLabels.Channel15.Intensity += i.Channel15.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel16.Name = i.Channel16.Name
+							evi.Proteins[j].UniqueLabels.Channel16.CustomName = i.Channel16.CustomName
+							evi.Proteins[j].UniqueLabels.Channel16.Mz = i.Channel16.Mz
+							evi.Proteins[j].UniqueLabels.Channel16.Intensity += i.Channel16.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel17.Name = i.Channel17.Name
+							evi.Proteins[j].UniqueLabels.Channel17.CustomName = i.Channel17.CustomName
+							evi.Proteins[j].UniqueLabels.Channel17.Mz = i.Channel17.Mz
+							evi.Proteins[j].UniqueLabels.Channel17.Intensity += i.Channel17.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel18.Name = i.Channel18.Name
+							evi.Proteins[j].UniqueLabels.Channel18.CustomName = i.Channel18.CustomName
+							evi.Proteins[j].UniqueLabels.Channel18.Mz = i.Channel18.Mz
+							evi.Proteins[j].UniqueLabels.Channel18.Intensity += i.Channel18.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel19.Name = i.Channel19.Name
+							evi.Proteins[j].UniqueLabels.Channel19.CustomName = i.Channel19.CustomName
+							evi.Proteins[j].UniqueLabels.Channel19.Mz = i.Channel19.Mz
+							evi.Proteins[j].UniqueLabels.Channel19.Intensity += i.Channel19.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel20.Name = i.Channel20.Name
+							evi.Proteins[j].UniqueLabels.Channel20.CustomName = i.Channel20.CustomName
+							evi.Proteins[j].UniqueLabels.Channel20.Mz = i.Channel20.Mz
+							evi.Proteins[j].UniqueLabels.Channel20.Intensity += i.Channel20.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel21.Name = i.Channel21.Name
+							evi.Proteins[j].UniqueLabels.Channel21.CustomName = i.Channel21.CustomName
+							evi.Proteins[j].UniqueLabels.Channel21.Mz = i.Channel21.Mz
+							evi.Proteins[j].UniqueLabels.Channel21.Intensity += i.Channel21.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel22.Name = i.Channel22.Name
+							evi.Proteins[j].UniqueLabels.Channel22.CustomName = i.Channel22.CustomName
+							evi.Proteins[j].UniqueLabels.Channel22.Mz = i.Channel22.Mz
+							evi.Proteins[j].UniqueLabels.Channel22.Intensity += i.Channel22.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel23.Name = i.Channel23.Name
+							evi.Proteins[j].UniqueLabels.Channel23.CustomName = i.Channel23.CustomName
+							evi.Proteins[j].UniqueLabels.Channel23.Mz = i.Channel23.Mz
+							evi.Proteins[j].UniqueLabels.Channel23.Intensity += i.Channel23.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel24.Name = i.Channel24.Name
+							evi.Proteins[j].UniqueLabels.Channel24.CustomName = i.Channel24.CustomName
+							evi.Proteins[j].UniqueLabels.Channel24.Mz = i.Channel24.Mz
+							evi.Proteins[j].UniqueLabels.Channel24.Intensity += i.Channel24.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel25.Name = i.Channel25.Name
+							evi.Proteins[j].UniqueLabels.Channel25.CustomName = i.Channel25.CustomName
+							evi.Proteins[j].UniqueLabels.Channel25.Mz = i.Channel25.Mz
+							evi.Proteins[j].UniqueLabels.Channel25.Intensity += i.Channel25.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel26.Name = i.Channel26.Name
+							evi.Proteins[j].UniqueLabels.Channel26.CustomName = i.Channel26.CustomName
+							evi.Proteins[j].UniqueLabels.Channel26.Mz = i.Channel26.Mz
+							evi.Proteins[j].UniqueLabels.Channel26.Intensity += i.Channel26.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel27.Name = i.Channel27.Name
+							evi.Proteins[j].UniqueLabels.Channel27.CustomName = i.Channel27.CustomName
+							evi.Proteins[j].UniqueLabels.Channel27.Mz = i.Channel27.Mz
+							evi.Proteins[j].UniqueLabels.Channel27.Intensity += i.Channel27.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel28.Name = i.Channel28.Name
+							evi.Proteins[j].UniqueLabels.Channel28.CustomName = i.Channel28.CustomName
+							evi.Proteins[j].UniqueLabels.Channel28.Mz = i.Channel28.Mz
+							evi.Proteins[j].UniqueLabels.Channel28.Intensity += i.Channel28.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel29.Name = i.Channel29.Name
+							evi.Proteins[j].UniqueLabels.Channel29.CustomName = i.Channel29.CustomName
+							evi.Proteins[j].UniqueLabels.Channel29.Mz = i.Channel29.Mz
+							evi.Proteins[j].UniqueLabels.Channel29.Intensity += i.Channel29.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel30.Name = i.Channel30.Name
+							evi.Proteins[j].UniqueLabels.Channel30.CustomName = i.Channel30.CustomName
+							evi.Proteins[j].UniqueLabels.Channel30.Mz = i.Channel30.Mz
+							evi.Proteins[j].UniqueLabels.Channel30.Intensity += i.Channel30.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel31.Name = i.Channel31.Name
+							evi.Proteins[j].UniqueLabels.Channel31.CustomName = i.Channel31.CustomName
+							evi.Proteins[j].UniqueLabels.Channel31.Mz = i.Channel31.Mz
+							evi.Proteins[j].UniqueLabels.Channel31.Intensity += i.Channel31.Intensity
+
+							evi.Proteins[j].UniqueLabels.Channel32.Name = i.Channel32.Name
+							evi.Proteins[j].UniqueLabels.Channel32.CustomName = i.Channel32.CustomName
+							evi.Proteins[j].UniqueLabels.Channel32.Mz = i.Channel32.Mz
+							evi.Proteins[j].UniqueLabels.Channel32.Intensity += i.Channel32.Intensity
+						}
+
+						if k.IsURazor {
+							//evi.Proteins[j].URazorLabels = &iso.Labels{}
+							evi.Proteins[j].URazorLabels.Channel1.Name = i.Channel1.Name
+							evi.Proteins[j].URazorLabels.Channel1.CustomName = i.Channel1.CustomName
+							evi.Proteins[j].URazorLabels.Channel1.Mz = i.Channel1.Mz
+							evi.Proteins[j].URazorLabels.Channel1.Intensity += i.Channel1.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel2.Name = i.Channel2.Name
+							evi.Proteins[j].URazorLabels.Channel2.CustomName = i.Channel2.CustomName
+							evi.Proteins[j].URazorLabels.Channel2.Mz = i.Channel2.Mz
+							evi.Proteins[j].URazorLabels.Channel2.Intensity += i.Channel2.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel3.Name = i.Channel3.Name
+							evi.Proteins[j].URazorLabels.Channel3.CustomName = i.Channel3.CustomName
+							evi.Proteins[j].URazorLabels.Channel3.Mz = i.Channel3.Mz
+							evi.Proteins[j].URazorLabels.Channel3.Intensity += i.Channel3.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel4.Name = i.Channel4.Name
+							evi.Proteins[j].URazorLabels.Channel4.CustomName = i.Channel4.CustomName
+							evi.Proteins[j].URazorLabels.Channel4.Mz = i.Channel4.Mz
+							evi.Proteins[j].URazorLabels.Channel4.Intensity += i.Channel4.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel5.Name = i.Channel5.Name
+							evi.Proteins[j].URazorLabels.Channel5.CustomName = i.Channel5.CustomName
+							evi.Proteins[j].URazorLabels.Channel5.Mz = i.Channel5.Mz
+							evi.Proteins[j].URazorLabels.Channel5.Intensity += i.Channel5.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel6.Name = i.Channel6.Name
+							evi.Proteins[j].URazorLabels.Channel6.CustomName = i.Channel6.CustomName
+							evi.Proteins[j].URazorLabels.Channel6.Mz = i.Channel6.Mz
+							evi.Proteins[j].URazorLabels.Channel6.Intensity += i.Channel6.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel7.Name = i.Channel7.Name
+							evi.Proteins[j].URazorLabels.Channel7.CustomName = i.Channel7.CustomName
+							evi.Proteins[j].URazorLabels.Channel7.Mz = i.Channel7.Mz
+							evi.Proteins[j].URazorLabels.Channel7.Intensity += i.Channel7.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel8.Name = i.Channel8.Name
+							evi.Proteins[j].URazorLabels.Channel8.CustomName = i.Channel8.CustomName
+							evi.Proteins[j].URazorLabels.Channel8.Mz = i.Channel8.Mz
+							evi.Proteins[j].URazorLabels.Channel8.Intensity += i.Channel8.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel9.Name = i.Channel9.Name
+							evi.Proteins[j].URazorLabels.Channel9.CustomName = i.Channel9.CustomName
+							evi.Proteins[j].URazorLabels.Channel9.Mz = i.Channel9.Mz
+							evi.Proteins[j].URazorLabels.Channel9.Intensity += i.Channel9.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel10.Name = i.Channel10.Name
+							evi.Proteins[j].URazorLabels.Channel10.CustomName = i.Channel10.CustomName
+							evi.Proteins[j].URazorLabels.Channel10.Mz = i.Channel10.Mz
+							evi.Proteins[j].URazorLabels.Channel10.Intensity += i.Channel10.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel11.Name = i.Channel11.Name
+							evi.Proteins[j].URazorLabels.Channel11.CustomName = i.Channel11.CustomName
+							evi.Proteins[j].URazorLabels.Channel11.Mz = i.Channel11.Mz
+							evi.Proteins[j].URazorLabels.Channel11.Intensity += i.Channel11.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel12.Name = i.Channel12.Name
+							evi.Proteins[j].URazorLabels.Channel12.CustomName = i.Channel12.CustomName
+							evi.Proteins[j].URazorLabels.Channel12.Mz = i.Channel12.Mz
+							evi.Proteins[j].URazorLabels.Channel12.Intensity += i.Channel12.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel13.Name = i.Channel13.Name
+							evi.Proteins[j].URazorLabels.Channel13.CustomName = i.Channel13.CustomName
+							evi.Proteins[j].URazorLabels.Channel13.Mz = i.Channel13.Mz
+							evi.Proteins[j].URazorLabels.Channel13.Intensity += i.Channel13.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel14.Name = i.Channel14.Name
+							evi.Proteins[j].URazorLabels.Channel14.CustomName = i.Channel14.CustomName
+							evi.Proteins[j].URazorLabels.Channel14.Mz = i.Channel14.Mz
+							evi.Proteins[j].URazorLabels.Channel14.Intensity += i.Channel14.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel15.Name = i.Channel15.Name
+							evi.Proteins[j].URazorLabels.Channel15.CustomName = i.Channel15.CustomName
+							evi.Proteins[j].URazorLabels.Channel15.Mz = i.Channel15.Mz
+							evi.Proteins[j].URazorLabels.Channel15.Intensity += i.Channel15.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel16.Name = i.Channel16.Name
+							evi.Proteins[j].URazorLabels.Channel16.CustomName = i.Channel16.CustomName
+							evi.Proteins[j].URazorLabels.Channel16.Mz = i.Channel16.Mz
+							evi.Proteins[j].URazorLabels.Channel16.Intensity += i.Channel16.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel17.Name = i.Channel17.Name
+							evi.Proteins[j].URazorLabels.Channel17.CustomName = i.Channel17.CustomName
+							evi.Proteins[j].URazorLabels.Channel17.Mz = i.Channel17.Mz
+							evi.Proteins[j].URazorLabels.Channel17.Intensity += i.Channel17.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel18.Name = i.Channel18.Name
+							evi.Proteins[j].URazorLabels.Channel18.CustomName = i.Channel18.CustomName
+							evi.Proteins[j].URazorLabels.Channel18.Mz = i.Channel18.Mz
+							evi.Proteins[j].URazorLabels.Channel18.Intensity += i.Channel18.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel19.Name = i.Channel19.Name
+							evi.Proteins[j].URazorLabels.Channel19.CustomName = i.Channel19.CustomName
+							evi.Proteins[j].URazorLabels.Channel19.Mz = i.Channel19.Mz
+							evi.Proteins[j].URazorLabels.Channel19.Intensity += i.Channel19.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel20.Name = i.Channel20.Name
+							evi.Proteins[j].URazorLabels.Channel20.CustomName = i.Channel20.CustomName
+							evi.Proteins[j].URazorLabels.Channel20.Mz = i.Channel20.Mz
+							evi.Proteins[j].URazorLabels.Channel20.Intensity += i.Channel20.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel21.Name = i.Channel21.Name
+							evi.Proteins[j].URazorLabels.Channel21.CustomName = i.Channel21.CustomName
+							evi.Proteins[j].URazorLabels.Channel21.Mz = i.Channel21.Mz
+							evi.Proteins[j].URazorLabels.Channel21.Intensity += i.Channel21.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel22.Name = i.Channel22.Name
+							evi.Proteins[j].URazorLabels.Channel22.CustomName = i.Channel22.CustomName
+							evi.Proteins[j].URazorLabels.Channel22.Mz = i.Channel22.Mz
+							evi.Proteins[j].URazorLabels.Channel22.Intensity += i.Channel22.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel23.Name = i.Channel23.Name
+							evi.Proteins[j].URazorLabels.Channel23.CustomName = i.Channel23.CustomName
+							evi.Proteins[j].URazorLabels.Channel23.Mz = i.Channel23.Mz
+							evi.Proteins[j].URazorLabels.Channel23.Intensity += i.Channel23.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel24.Name = i.Channel24.Name
+							evi.Proteins[j].URazorLabels.Channel24.CustomName = i.Channel24.CustomName
+							evi.Proteins[j].URazorLabels.Channel24.Mz = i.Channel24.Mz
+							evi.Proteins[j].URazorLabels.Channel24.Intensity += i.Channel24.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel25.Name = i.Channel25.Name
+							evi.Proteins[j].URazorLabels.Channel25.CustomName = i.Channel25.CustomName
+							evi.Proteins[j].URazorLabels.Channel25.Mz = i.Channel25.Mz
+							evi.Proteins[j].URazorLabels.Channel25.Intensity += i.Channel25.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel26.Name = i.Channel26.Name
+							evi.Proteins[j].URazorLabels.Channel26.CustomName = i.Channel26.CustomName
+							evi.Proteins[j].URazorLabels.Channel26.Mz = i.Channel26.Mz
+							evi.Proteins[j].URazorLabels.Channel26.Intensity += i.Channel26.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel27.Name = i.Channel27.Name
+							evi.Proteins[j].URazorLabels.Channel27.CustomName = i.Channel27.CustomName
+							evi.Proteins[j].URazorLabels.Channel27.Mz = i.Channel27.Mz
+							evi.Proteins[j].URazorLabels.Channel27.Intensity += i.Channel27.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel28.Name = i.Channel28.Name
+							evi.Proteins[j].URazorLabels.Channel28.CustomName = i.Channel28.CustomName
+							evi.Proteins[j].URazorLabels.Channel28.Mz = i.Channel28.Mz
+							evi.Proteins[j].URazorLabels.Channel28.Intensity += i.Channel28.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel29.Name = i.Channel29.Name
+							evi.Proteins[j].URazorLabels.Channel29.CustomName = i.Channel29.CustomName
+							evi.Proteins[j].URazorLabels.Channel29.Mz = i.Channel29.Mz
+							evi.Proteins[j].URazorLabels.Channel29.Intensity += i.Channel29.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel30.Name = i.Channel30.Name
+							evi.Proteins[j].URazorLabels.Channel30.CustomName = i.Channel30.CustomName
+							evi.Proteins[j].URazorLabels.Channel30.Mz = i.Channel30.Mz
+							evi.Proteins[j].URazorLabels.Channel30.Intensity += i.Channel30.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel31.Name = i.Channel31.Name
+							evi.Proteins[j].URazorLabels.Channel31.CustomName = i.Channel31.CustomName
+							evi.Proteins[j].URazorLabels.Channel31.Mz = i.Channel31.Mz
+							evi.Proteins[j].URazorLabels.Channel31.Intensity += i.Channel31.Intensity
+
+							evi.Proteins[j].URazorLabels.Channel32.Name = i.Channel32.Name
+							evi.Proteins[j].URazorLabels.Channel32.CustomName = i.Channel32.CustomName
+							evi.Proteins[j].URazorLabels.Channel32.Mz = i.Channel32.Mz
+							evi.Proteins[j].URazorLabels.Channel32.Intensity += i.Channel32.Intensity
+						}
 					}
 
-					if k.IsURazor {
-						//evi.Proteins[j].URazorLabels = &iso.Labels{}
-						evi.Proteins[j].URazorLabels.Channel1.Name = i.Channel1.Name
-						evi.Proteins[j].URazorLabels.Channel1.CustomName = i.Channel1.CustomName
-						evi.Proteins[j].URazorLabels.Channel1.Mz = i.Channel1.Mz
-						evi.Proteins[j].URazorLabels.Channel1.Intensity += i.Channel1.Intensity
+					i, ok = phosphoSpectrumMap[l]
+					if ok {
+						evi.Proteins[j].PhosphoTotalLabels.Channel1.Name = i.Channel1.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel1.CustomName = i.Channel1.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel1.Mz = i.Channel1.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel1.Intensity += i.Channel1.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel2.Name = i.Channel2.Name
-						evi.Proteins[j].URazorLabels.Channel2.CustomName = i.Channel2.CustomName
-						evi.Proteins[j].URazorLabels.Channel2.Mz = i.Channel2.Mz
-						evi.Proteins[j].URazorLabels.Channel2.Intensity += i.Channel2.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel2.Name = i.Channel2.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel2.CustomName = i.Channel2.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel2.Mz = i.Channel2.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel2.Intensity += i.Channel2.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel3.Name = i.Channel3.Name
-						evi.Proteins[j].URazorLabels.Channel3.CustomName = i.Channel3.CustomName
-						evi.Proteins[j].URazorLabels.Channel3.Mz = i.Channel3.Mz
-						evi.Proteins[j].URazorLabels.Channel3.Intensity += i.Channel3.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel3.Name = i.Channel3.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel3.CustomName = i.Channel3.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel3.Mz = i.Channel3.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel3.Intensity += i.Channel3.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel4.Name = i.Channel4.Name
-						evi.Proteins[j].URazorLabels.Channel4.CustomName = i.Channel4.CustomName
-						evi.Proteins[j].URazorLabels.Channel4.Mz = i.Channel4.Mz
-						evi.Proteins[j].URazorLabels.Channel4.Intensity += i.Channel4.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel4.Name = i.Channel4.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel4.CustomName = i.Channel4.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel4.Mz = i.Channel4.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel4.Intensity += i.Channel4.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel5.Name = i.Channel5.Name
-						evi.Proteins[j].URazorLabels.Channel5.CustomName = i.Channel5.CustomName
-						evi.Proteins[j].URazorLabels.Channel5.Mz = i.Channel5.Mz
-						evi.Proteins[j].URazorLabels.Channel5.Intensity += i.Channel5.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel5.Name = i.Channel5.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel5.CustomName = i.Channel5.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel5.Mz = i.Channel5.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel5.Intensity += i.Channel5.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel6.Name = i.Channel6.Name
-						evi.Proteins[j].URazorLabels.Channel6.CustomName = i.Channel6.CustomName
-						evi.Proteins[j].URazorLabels.Channel6.Mz = i.Channel6.Mz
-						evi.Proteins[j].URazorLabels.Channel6.Intensity += i.Channel6.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel6.Name = i.Channel6.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel6.CustomName = i.Channel6.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel6.Mz = i.Channel6.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel6.Intensity += i.Channel6.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel7.Name = i.Channel7.Name
-						evi.Proteins[j].URazorLabels.Channel7.CustomName = i.Channel7.CustomName
-						evi.Proteins[j].URazorLabels.Channel7.Mz = i.Channel7.Mz
-						evi.Proteins[j].URazorLabels.Channel7.Intensity += i.Channel7.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel7.Name = i.Channel7.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel7.CustomName = i.Channel7.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel7.Mz = i.Channel7.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel7.Intensity += i.Channel7.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel8.Name = i.Channel8.Name
-						evi.Proteins[j].URazorLabels.Channel8.CustomName = i.Channel8.CustomName
-						evi.Proteins[j].URazorLabels.Channel8.Mz = i.Channel8.Mz
-						evi.Proteins[j].URazorLabels.Channel8.Intensity += i.Channel8.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel8.Name = i.Channel8.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel8.CustomName = i.Channel8.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel8.Mz = i.Channel8.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel8.Intensity += i.Channel8.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel9.Name = i.Channel9.Name
-						evi.Proteins[j].URazorLabels.Channel9.CustomName = i.Channel9.CustomName
-						evi.Proteins[j].URazorLabels.Channel9.Mz = i.Channel9.Mz
-						evi.Proteins[j].URazorLabels.Channel9.Intensity += i.Channel9.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel9.Name = i.Channel9.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel9.CustomName = i.Channel9.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel9.Mz = i.Channel9.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel9.Intensity += i.Channel9.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel10.Name = i.Channel10.Name
-						evi.Proteins[j].URazorLabels.Channel10.CustomName = i.Channel10.CustomName
-						evi.Proteins[j].URazorLabels.Channel10.Mz = i.Channel10.Mz
-						evi.Proteins[j].URazorLabels.Channel10.Intensity += i.Channel10.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel10.Name = i.Channel10.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel10.CustomName = i.Channel10.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel10.Mz = i.Channel10.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel10.Intensity += i.Channel10.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel11.Name = i.Channel11.Name
-						evi.Proteins[j].URazorLabels.Channel11.CustomName = i.Channel11.CustomName
-						evi.Proteins[j].URazorLabels.Channel11.Mz = i.Channel11.Mz
-						evi.Proteins[j].URazorLabels.Channel11.Intensity += i.Channel11.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel11.Name = i.Channel11.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel11.CustomName = i.Channel11.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel11.Mz = i.Channel11.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel11.Intensity += i.Channel11.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel12.Name = i.Channel12.Name
-						evi.Proteins[j].URazorLabels.Channel12.CustomName = i.Channel12.CustomName
-						evi.Proteins[j].URazorLabels.Channel12.Mz = i.Channel12.Mz
-						evi.Proteins[j].URazorLabels.Channel12.Intensity += i.Channel12.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel12.Name = i.Channel12.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel12.CustomName = i.Channel12.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel12.Mz = i.Channel12.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel12.Intensity += i.Channel12.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel13.Name = i.Channel13.Name
-						evi.Proteins[j].URazorLabels.Channel13.CustomName = i.Channel13.CustomName
-						evi.Proteins[j].URazorLabels.Channel13.Mz = i.Channel13.Mz
-						evi.Proteins[j].URazorLabels.Channel13.Intensity += i.Channel13.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel13.Name = i.Channel13.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel13.CustomName = i.Channel13.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel13.Mz = i.Channel13.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel13.Intensity += i.Channel13.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel14.Name = i.Channel14.Name
-						evi.Proteins[j].URazorLabels.Channel14.CustomName = i.Channel14.CustomName
-						evi.Proteins[j].URazorLabels.Channel14.Mz = i.Channel14.Mz
-						evi.Proteins[j].URazorLabels.Channel14.Intensity += i.Channel14.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel14.Name = i.Channel14.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel14.CustomName = i.Channel14.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel14.Mz = i.Channel14.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel14.Intensity += i.Channel14.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel15.Name = i.Channel15.Name
-						evi.Proteins[j].URazorLabels.Channel15.CustomName = i.Channel15.CustomName
-						evi.Proteins[j].URazorLabels.Channel15.Mz = i.Channel15.Mz
-						evi.Proteins[j].URazorLabels.Channel15.Intensity += i.Channel15.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel15.Name = i.Channel15.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel15.CustomName = i.Channel15.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel15.Mz = i.Channel15.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel15.Intensity += i.Channel15.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel16.Name = i.Channel16.Name
-						evi.Proteins[j].URazorLabels.Channel16.CustomName = i.Channel16.CustomName
-						evi.Proteins[j].URazorLabels.Channel16.Mz = i.Channel16.Mz
-						evi.Proteins[j].URazorLabels.Channel16.Intensity += i.Channel16.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel16.Name = i.Channel16.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel16.CustomName = i.Channel16.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel16.Mz = i.Channel16.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel16.Intensity += i.Channel16.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel17.Name = i.Channel17.Name
-						evi.Proteins[j].URazorLabels.Channel17.CustomName = i.Channel17.CustomName
-						evi.Proteins[j].URazorLabels.Channel17.Mz = i.Channel17.Mz
-						evi.Proteins[j].URazorLabels.Channel17.Intensity += i.Channel17.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel17.Name = i.Channel17.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel17.CustomName = i.Channel17.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel17.Mz = i.Channel17.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel17.Intensity += i.Channel17.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel18.Name = i.Channel18.Name
-						evi.Proteins[j].URazorLabels.Channel18.CustomName = i.Channel18.CustomName
-						evi.Proteins[j].URazorLabels.Channel18.Mz = i.Channel18.Mz
-						evi.Proteins[j].URazorLabels.Channel18.Intensity += i.Channel18.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel18.Name = i.Channel18.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel18.CustomName = i.Channel18.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel18.Mz = i.Channel18.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel18.Intensity += i.Channel18.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel19.Name = i.Channel19.Name
-						evi.Proteins[j].URazorLabels.Channel19.CustomName = i.Channel19.CustomName
-						evi.Proteins[j].URazorLabels.Channel19.Mz = i.Channel19.Mz
-						evi.Proteins[j].URazorLabels.Channel19.Intensity += i.Channel19.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel19.Name = i.Channel19.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel19.CustomName = i.Channel19.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel19.Mz = i.Channel19.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel19.Intensity += i.Channel19.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel20.Name = i.Channel20.Name
-						evi.Proteins[j].URazorLabels.Channel20.CustomName = i.Channel20.CustomName
-						evi.Proteins[j].URazorLabels.Channel20.Mz = i.Channel20.Mz
-						evi.Proteins[j].URazorLabels.Channel20.Intensity += i.Channel20.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel20.Name = i.Channel20.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel20.CustomName = i.Channel20.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel20.Mz = i.Channel20.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel20.Intensity += i.Channel20.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel21.Name = i.Channel21.Name
-						evi.Proteins[j].URazorLabels.Channel21.CustomName = i.Channel21.CustomName
-						evi.Proteins[j].URazorLabels.Channel21.Mz = i.Channel21.Mz
-						evi.Proteins[j].URazorLabels.Channel21.Intensity += i.Channel21.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel21.Name = i.Channel21.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel21.CustomName = i.Channel21.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel21.Mz = i.Channel21.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel21.Intensity += i.Channel21.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel22.Name = i.Channel22.Name
-						evi.Proteins[j].URazorLabels.Channel22.CustomName = i.Channel22.CustomName
-						evi.Proteins[j].URazorLabels.Channel22.Mz = i.Channel22.Mz
-						evi.Proteins[j].URazorLabels.Channel22.Intensity += i.Channel22.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel22.Name = i.Channel22.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel22.CustomName = i.Channel22.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel22.Mz = i.Channel22.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel22.Intensity += i.Channel22.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel23.Name = i.Channel23.Name
-						evi.Proteins[j].URazorLabels.Channel23.CustomName = i.Channel23.CustomName
-						evi.Proteins[j].URazorLabels.Channel23.Mz = i.Channel23.Mz
-						evi.Proteins[j].URazorLabels.Channel23.Intensity += i.Channel23.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel23.Name = i.Channel23.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel23.CustomName = i.Channel23.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel23.Mz = i.Channel23.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel23.Intensity += i.Channel23.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel24.Name = i.Channel24.Name
-						evi.Proteins[j].URazorLabels.Channel24.CustomName = i.Channel24.CustomName
-						evi.Proteins[j].URazorLabels.Channel24.Mz = i.Channel24.Mz
-						evi.Proteins[j].URazorLabels.Channel24.Intensity += i.Channel24.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel24.Name = i.Channel24.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel24.CustomName = i.Channel24.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel24.Mz = i.Channel24.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel24.Intensity += i.Channel24.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel25.Name = i.Channel25.Name
-						evi.Proteins[j].URazorLabels.Channel25.CustomName = i.Channel25.CustomName
-						evi.Proteins[j].URazorLabels.Channel25.Mz = i.Channel25.Mz
-						evi.Proteins[j].URazorLabels.Channel25.Intensity += i.Channel25.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel25.Name = i.Channel25.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel25.CustomName = i.Channel25.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel25.Mz = i.Channel25.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel25.Intensity += i.Channel25.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel26.Name = i.Channel26.Name
-						evi.Proteins[j].URazorLabels.Channel26.CustomName = i.Channel26.CustomName
-						evi.Proteins[j].URazorLabels.Channel26.Mz = i.Channel26.Mz
-						evi.Proteins[j].URazorLabels.Channel26.Intensity += i.Channel26.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel26.Name = i.Channel26.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel26.CustomName = i.Channel26.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel26.Mz = i.Channel26.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel26.Intensity += i.Channel26.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel27.Name = i.Channel27.Name
-						evi.Proteins[j].URazorLabels.Channel27.CustomName = i.Channel27.CustomName
-						evi.Proteins[j].URazorLabels.Channel27.Mz = i.Channel27.Mz
-						evi.Proteins[j].URazorLabels.Channel27.Intensity += i.Channel27.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel27.Name = i.Channel27.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel27.CustomName = i.Channel27.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel27.Mz = i.Channel27.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel27.Intensity += i.Channel27.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel28.Name = i.Channel28.Name
-						evi.Proteins[j].URazorLabels.Channel28.CustomName = i.Channel28.CustomName
-						evi.Proteins[j].URazorLabels.Channel28.Mz = i.Channel28.Mz
-						evi.Proteins[j].URazorLabels.Channel28.Intensity += i.Channel28.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel28.Name = i.Channel28.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel28.CustomName = i.Channel28.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel28.Mz = i.Channel28.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel28.Intensity += i.Channel28.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel29.Name = i.Channel29.Name
-						evi.Proteins[j].URazorLabels.Channel29.CustomName = i.Channel29.CustomName
-						evi.Proteins[j].URazorLabels.Channel29.Mz = i.Channel29.Mz
-						evi.Proteins[j].URazorLabels.Channel29.Intensity += i.Channel29.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel29.Name = i.Channel29.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel29.CustomName = i.Channel29.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel29.Mz = i.Channel29.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel29.Intensity += i.Channel29.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel30.Name = i.Channel30.Name
-						evi.Proteins[j].URazorLabels.Channel30.CustomName = i.Channel30.CustomName
-						evi.Proteins[j].URazorLabels.Channel30.Mz = i.Channel30.Mz
-						evi.Proteins[j].URazorLabels.Channel30.Intensity += i.Channel30.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel30.Name = i.Channel30.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel30.CustomName = i.Channel30.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel30.Mz = i.Channel30.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel30.Intensity += i.Channel30.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel31.Name = i.Channel31.Name
-						evi.Proteins[j].URazorLabels.Channel31.CustomName = i.Channel31.CustomName
-						evi.Proteins[j].URazorLabels.Channel31.Mz = i.Channel31.Mz
-						evi.Proteins[j].URazorLabels.Channel31.Intensity += i.Channel31.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel31.Name = i.Channel31.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel31.CustomName = i.Channel31.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel31.Mz = i.Channel31.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel31.Intensity += i.Channel31.Intensity
 
-						evi.Proteins[j].URazorLabels.Channel32.Name = i.Channel32.Name
-						evi.Proteins[j].URazorLabels.Channel32.CustomName = i.Channel32.CustomName
-						evi.Proteins[j].URazorLabels.Channel32.Mz = i.Channel32.Mz
-						evi.Proteins[j].URazorLabels.Channel32.Intensity += i.Channel32.Intensity
+						evi.Proteins[j].PhosphoTotalLabels.Channel32.Name = i.Channel32.Name
+						evi.Proteins[j].PhosphoTotalLabels.Channel32.CustomName = i.Channel32.CustomName
+						evi.Proteins[j].PhosphoTotalLabels.Channel32.Mz = i.Channel32.Mz
+						evi.Proteins[j].PhosphoTotalLabels.Channel32.Intensity += i.Channel32.Intensity
+
+						//if k.IsNondegenerateEvidence {
+						if k.IsUnique {
+							evi.Proteins[j].PhosphoUniqueLabels.Channel1.Name = i.Channel1.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel1.CustomName = i.Channel1.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel1.Mz = i.Channel1.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel1.Intensity += i.Channel1.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel2.Name = i.Channel2.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel2.CustomName = i.Channel2.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel2.Mz = i.Channel2.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel2.Intensity += i.Channel2.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel3.Name = i.Channel3.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel3.CustomName = i.Channel3.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel3.Mz = i.Channel3.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel3.Intensity += i.Channel3.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel4.Name = i.Channel4.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel4.CustomName = i.Channel4.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel4.Mz = i.Channel4.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel4.Intensity += i.Channel4.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel5.Name = i.Channel5.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel5.CustomName = i.Channel5.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel5.Mz = i.Channel5.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel5.Intensity += i.Channel5.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel6.Name = i.Channel6.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel6.CustomName = i.Channel6.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel6.Mz = i.Channel6.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel6.Intensity += i.Channel6.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel7.Name = i.Channel7.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel7.CustomName = i.Channel7.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel7.Mz = i.Channel7.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel7.Intensity += i.Channel7.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel8.Name = i.Channel8.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel8.CustomName = i.Channel8.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel8.Mz = i.Channel8.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel8.Intensity += i.Channel8.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel9.Name = i.Channel9.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel9.CustomName = i.Channel9.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel9.Mz = i.Channel9.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel9.Intensity += i.Channel9.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel10.Name = i.Channel10.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel10.CustomName = i.Channel10.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel10.Mz = i.Channel10.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel10.Intensity += i.Channel10.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel11.Name = i.Channel11.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel11.CustomName = i.Channel11.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel11.Mz = i.Channel11.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel11.Intensity += i.Channel11.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel12.Name = i.Channel12.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel12.CustomName = i.Channel12.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel12.Mz = i.Channel12.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel12.Intensity += i.Channel12.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel13.Name = i.Channel13.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel13.CustomName = i.Channel13.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel13.Mz = i.Channel13.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel13.Intensity += i.Channel13.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel14.Name = i.Channel14.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel14.CustomName = i.Channel14.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel14.Mz = i.Channel14.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel14.Intensity += i.Channel14.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel15.Name = i.Channel15.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel15.CustomName = i.Channel15.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel15.Mz = i.Channel15.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel15.Intensity += i.Channel15.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel16.Name = i.Channel16.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel16.CustomName = i.Channel16.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel16.Mz = i.Channel16.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel16.Intensity += i.Channel16.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel17.Name = i.Channel17.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel17.CustomName = i.Channel17.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel17.Mz = i.Channel17.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel17.Intensity += i.Channel17.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel18.Name = i.Channel18.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel18.CustomName = i.Channel18.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel18.Mz = i.Channel18.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel18.Intensity += i.Channel18.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel19.Name = i.Channel19.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel19.CustomName = i.Channel19.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel19.Mz = i.Channel19.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel19.Intensity += i.Channel19.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel20.Name = i.Channel20.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel20.CustomName = i.Channel20.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel20.Mz = i.Channel20.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel20.Intensity += i.Channel20.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel21.Name = i.Channel21.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel21.CustomName = i.Channel21.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel21.Mz = i.Channel21.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel21.Intensity += i.Channel21.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel22.Name = i.Channel22.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel22.CustomName = i.Channel22.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel22.Mz = i.Channel22.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel22.Intensity += i.Channel22.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel23.Name = i.Channel23.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel23.CustomName = i.Channel23.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel23.Mz = i.Channel23.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel23.Intensity += i.Channel23.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel24.Name = i.Channel24.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel24.CustomName = i.Channel24.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel24.Mz = i.Channel24.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel24.Intensity += i.Channel24.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel25.Name = i.Channel25.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel25.CustomName = i.Channel25.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel25.Mz = i.Channel25.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel25.Intensity += i.Channel25.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel26.Name = i.Channel26.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel26.CustomName = i.Channel26.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel26.Mz = i.Channel26.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel26.Intensity += i.Channel26.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel27.Name = i.Channel27.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel27.CustomName = i.Channel27.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel27.Mz = i.Channel27.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel27.Intensity += i.Channel27.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel28.Name = i.Channel28.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel28.CustomName = i.Channel28.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel28.Mz = i.Channel28.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel28.Intensity += i.Channel28.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel29.Name = i.Channel29.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel29.CustomName = i.Channel29.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel29.Mz = i.Channel29.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel29.Intensity += i.Channel29.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel30.Name = i.Channel30.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel30.CustomName = i.Channel30.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel30.Mz = i.Channel30.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel30.Intensity += i.Channel30.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel31.Name = i.Channel31.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel31.CustomName = i.Channel31.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel31.Mz = i.Channel31.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel31.Intensity += i.Channel31.Intensity
+
+							evi.Proteins[j].PhosphoUniqueLabels.Channel32.Name = i.Channel32.Name
+							evi.Proteins[j].PhosphoUniqueLabels.Channel32.CustomName = i.Channel32.CustomName
+							evi.Proteins[j].PhosphoUniqueLabels.Channel32.Mz = i.Channel32.Mz
+							evi.Proteins[j].PhosphoUniqueLabels.Channel32.Intensity += i.Channel32.Intensity
+						}
+
+						if k.IsURazor {
+							evi.Proteins[j].PhosphoURazorLabels.Channel1.Name = i.Channel1.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel1.CustomName = i.Channel1.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel1.Mz = i.Channel1.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel1.Intensity += i.Channel1.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel2.Name = i.Channel2.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel2.CustomName = i.Channel2.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel2.Mz = i.Channel2.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel2.Intensity += i.Channel2.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel3.Name = i.Channel3.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel3.CustomName = i.Channel3.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel3.Mz = i.Channel3.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel3.Intensity += i.Channel3.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel4.Name = i.Channel4.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel4.CustomName = i.Channel4.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel4.Mz = i.Channel4.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel4.Intensity += i.Channel4.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel5.Name = i.Channel5.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel5.CustomName = i.Channel5.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel5.Mz = i.Channel5.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel5.Intensity += i.Channel5.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel6.Name = i.Channel6.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel6.CustomName = i.Channel6.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel6.Mz = i.Channel6.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel6.Intensity += i.Channel6.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel7.Name = i.Channel7.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel7.CustomName = i.Channel7.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel7.Mz = i.Channel7.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel7.Intensity += i.Channel7.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel8.Name = i.Channel8.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel8.CustomName = i.Channel8.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel8.Mz = i.Channel8.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel8.Intensity += i.Channel8.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel9.Name = i.Channel9.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel9.CustomName = i.Channel9.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel9.Mz = i.Channel9.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel9.Intensity += i.Channel9.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel10.Name = i.Channel10.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel10.CustomName = i.Channel10.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel10.Mz = i.Channel10.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel10.Intensity += i.Channel10.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel11.Name = i.Channel11.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel11.CustomName = i.Channel11.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel11.Mz = i.Channel11.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel11.Intensity += i.Channel11.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel12.Name = i.Channel12.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel12.CustomName = i.Channel12.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel12.Mz = i.Channel12.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel12.Intensity += i.Channel12.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel13.Name = i.Channel13.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel13.CustomName = i.Channel13.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel13.Mz = i.Channel13.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel13.Intensity += i.Channel13.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel14.Name = i.Channel14.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel14.CustomName = i.Channel14.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel14.Mz = i.Channel14.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel14.Intensity += i.Channel14.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel15.Name = i.Channel15.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel15.CustomName = i.Channel15.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel15.Mz = i.Channel15.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel15.Intensity += i.Channel15.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel16.Name = i.Channel16.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel16.CustomName = i.Channel16.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel16.Mz = i.Channel16.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel16.Intensity += i.Channel16.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel17.Name = i.Channel17.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel17.CustomName = i.Channel17.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel17.Mz = i.Channel17.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel17.Intensity += i.Channel17.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel18.Name = i.Channel18.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel18.CustomName = i.Channel18.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel18.Mz = i.Channel18.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel18.Intensity += i.Channel18.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel19.Name = i.Channel19.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel19.CustomName = i.Channel19.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel19.Mz = i.Channel19.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel19.Intensity += i.Channel19.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel20.Name = i.Channel20.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel20.CustomName = i.Channel20.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel20.Mz = i.Channel20.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel20.Intensity += i.Channel20.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel21.Name = i.Channel21.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel21.CustomName = i.Channel21.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel21.Mz = i.Channel21.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel21.Intensity += i.Channel21.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel22.Name = i.Channel22.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel22.CustomName = i.Channel22.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel22.Mz = i.Channel22.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel22.Intensity += i.Channel22.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel23.Name = i.Channel23.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel23.CustomName = i.Channel23.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel23.Mz = i.Channel23.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel23.Intensity += i.Channel23.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel24.Name = i.Channel24.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel24.CustomName = i.Channel24.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel24.Mz = i.Channel24.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel24.Intensity += i.Channel24.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel25.Name = i.Channel25.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel25.CustomName = i.Channel25.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel25.Mz = i.Channel25.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel25.Intensity += i.Channel25.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel26.Name = i.Channel26.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel26.CustomName = i.Channel26.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel26.Mz = i.Channel26.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel26.Intensity += i.Channel26.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel27.Name = i.Channel27.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel27.CustomName = i.Channel27.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel27.Mz = i.Channel27.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel27.Intensity += i.Channel27.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel28.Name = i.Channel28.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel28.CustomName = i.Channel28.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel28.Mz = i.Channel28.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel28.Intensity += i.Channel28.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel29.Name = i.Channel29.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel29.CustomName = i.Channel29.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel29.Mz = i.Channel29.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel29.Intensity += i.Channel29.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel30.Name = i.Channel30.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel30.CustomName = i.Channel30.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel30.Mz = i.Channel30.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel30.Intensity += i.Channel30.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel31.Name = i.Channel31.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel31.CustomName = i.Channel31.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel31.Mz = i.Channel31.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel31.Intensity += i.Channel31.Intensity
+
+							evi.Proteins[j].PhosphoURazorLabels.Channel32.Name = i.Channel32.Name
+							evi.Proteins[j].PhosphoURazorLabels.Channel32.CustomName = i.Channel32.CustomName
+							evi.Proteins[j].PhosphoURazorLabels.Channel32.Mz = i.Channel32.Mz
+							evi.Proteins[j].PhosphoURazorLabels.Channel32.Intensity += i.Channel32.Intensity
+						}
 					}
 				}
-
-				i, ok = phosphoSpectrumMap[l]
-				if ok {
-					evi.Proteins[j].PhosphoTotalLabels.Channel1.Name = i.Channel1.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel1.CustomName = i.Channel1.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel1.Mz = i.Channel1.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel1.Intensity += i.Channel1.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel2.Name = i.Channel2.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel2.CustomName = i.Channel2.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel2.Mz = i.Channel2.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel2.Intensity += i.Channel2.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel3.Name = i.Channel3.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel3.CustomName = i.Channel3.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel3.Mz = i.Channel3.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel3.Intensity += i.Channel3.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel4.Name = i.Channel4.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel4.CustomName = i.Channel4.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel4.Mz = i.Channel4.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel4.Intensity += i.Channel4.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel5.Name = i.Channel5.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel5.CustomName = i.Channel5.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel5.Mz = i.Channel5.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel5.Intensity += i.Channel5.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel6.Name = i.Channel6.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel6.CustomName = i.Channel6.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel6.Mz = i.Channel6.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel6.Intensity += i.Channel6.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel7.Name = i.Channel7.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel7.CustomName = i.Channel7.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel7.Mz = i.Channel7.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel7.Intensity += i.Channel7.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel8.Name = i.Channel8.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel8.CustomName = i.Channel8.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel8.Mz = i.Channel8.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel8.Intensity += i.Channel8.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel9.Name = i.Channel9.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel9.CustomName = i.Channel9.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel9.Mz = i.Channel9.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel9.Intensity += i.Channel9.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel10.Name = i.Channel10.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel10.CustomName = i.Channel10.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel10.Mz = i.Channel10.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel10.Intensity += i.Channel10.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel11.Name = i.Channel11.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel11.CustomName = i.Channel11.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel11.Mz = i.Channel11.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel11.Intensity += i.Channel11.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel12.Name = i.Channel12.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel12.CustomName = i.Channel12.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel12.Mz = i.Channel12.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel12.Intensity += i.Channel12.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel13.Name = i.Channel13.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel13.CustomName = i.Channel13.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel13.Mz = i.Channel13.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel13.Intensity += i.Channel13.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel14.Name = i.Channel14.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel14.CustomName = i.Channel14.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel14.Mz = i.Channel14.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel14.Intensity += i.Channel14.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel15.Name = i.Channel15.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel15.CustomName = i.Channel15.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel15.Mz = i.Channel15.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel15.Intensity += i.Channel15.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel16.Name = i.Channel16.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel16.CustomName = i.Channel16.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel16.Mz = i.Channel16.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel16.Intensity += i.Channel16.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel17.Name = i.Channel17.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel17.CustomName = i.Channel17.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel17.Mz = i.Channel17.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel17.Intensity += i.Channel17.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel18.Name = i.Channel18.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel18.CustomName = i.Channel18.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel18.Mz = i.Channel18.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel18.Intensity += i.Channel18.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel19.Name = i.Channel19.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel19.CustomName = i.Channel19.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel19.Mz = i.Channel19.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel19.Intensity += i.Channel19.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel20.Name = i.Channel20.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel20.CustomName = i.Channel20.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel20.Mz = i.Channel20.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel20.Intensity += i.Channel20.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel21.Name = i.Channel21.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel21.CustomName = i.Channel21.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel21.Mz = i.Channel21.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel21.Intensity += i.Channel21.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel22.Name = i.Channel22.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel22.CustomName = i.Channel22.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel22.Mz = i.Channel22.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel22.Intensity += i.Channel22.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel23.Name = i.Channel23.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel23.CustomName = i.Channel23.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel23.Mz = i.Channel23.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel23.Intensity += i.Channel23.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel24.Name = i.Channel24.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel24.CustomName = i.Channel24.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel24.Mz = i.Channel24.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel24.Intensity += i.Channel24.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel25.Name = i.Channel25.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel25.CustomName = i.Channel25.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel25.Mz = i.Channel25.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel25.Intensity += i.Channel25.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel26.Name = i.Channel26.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel26.CustomName = i.Channel26.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel26.Mz = i.Channel26.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel26.Intensity += i.Channel26.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel27.Name = i.Channel27.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel27.CustomName = i.Channel27.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel27.Mz = i.Channel27.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel27.Intensity += i.Channel27.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel28.Name = i.Channel28.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel28.CustomName = i.Channel28.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel28.Mz = i.Channel28.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel28.Intensity += i.Channel28.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel29.Name = i.Channel29.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel29.CustomName = i.Channel29.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel29.Mz = i.Channel29.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel29.Intensity += i.Channel29.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel30.Name = i.Channel30.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel30.CustomName = i.Channel30.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel30.Mz = i.Channel30.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel30.Intensity += i.Channel30.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel31.Name = i.Channel31.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel31.CustomName = i.Channel31.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel31.Mz = i.Channel31.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel31.Intensity += i.Channel31.Intensity
-
-					evi.Proteins[j].PhosphoTotalLabels.Channel32.Name = i.Channel32.Name
-					evi.Proteins[j].PhosphoTotalLabels.Channel32.CustomName = i.Channel32.CustomName
-					evi.Proteins[j].PhosphoTotalLabels.Channel32.Mz = i.Channel32.Mz
-					evi.Proteins[j].PhosphoTotalLabels.Channel32.Intensity += i.Channel32.Intensity
-
-					//if k.IsNondegenerateEvidence {
-					if k.IsUnique {
-						evi.Proteins[j].PhosphoUniqueLabels.Channel1.Name = i.Channel1.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel1.CustomName = i.Channel1.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel1.Mz = i.Channel1.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel1.Intensity += i.Channel1.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel2.Name = i.Channel2.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel2.CustomName = i.Channel2.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel2.Mz = i.Channel2.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel2.Intensity += i.Channel2.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel3.Name = i.Channel3.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel3.CustomName = i.Channel3.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel3.Mz = i.Channel3.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel3.Intensity += i.Channel3.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel4.Name = i.Channel4.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel4.CustomName = i.Channel4.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel4.Mz = i.Channel4.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel4.Intensity += i.Channel4.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel5.Name = i.Channel5.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel5.CustomName = i.Channel5.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel5.Mz = i.Channel5.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel5.Intensity += i.Channel5.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel6.Name = i.Channel6.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel6.CustomName = i.Channel6.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel6.Mz = i.Channel6.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel6.Intensity += i.Channel6.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel7.Name = i.Channel7.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel7.CustomName = i.Channel7.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel7.Mz = i.Channel7.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel7.Intensity += i.Channel7.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel8.Name = i.Channel8.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel8.CustomName = i.Channel8.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel8.Mz = i.Channel8.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel8.Intensity += i.Channel8.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel9.Name = i.Channel9.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel9.CustomName = i.Channel9.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel9.Mz = i.Channel9.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel9.Intensity += i.Channel9.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel10.Name = i.Channel10.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel10.CustomName = i.Channel10.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel10.Mz = i.Channel10.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel10.Intensity += i.Channel10.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel11.Name = i.Channel11.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel11.CustomName = i.Channel11.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel11.Mz = i.Channel11.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel11.Intensity += i.Channel11.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel12.Name = i.Channel12.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel12.CustomName = i.Channel12.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel12.Mz = i.Channel12.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel12.Intensity += i.Channel12.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel13.Name = i.Channel13.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel13.CustomName = i.Channel13.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel13.Mz = i.Channel13.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel13.Intensity += i.Channel13.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel14.Name = i.Channel14.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel14.CustomName = i.Channel14.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel14.Mz = i.Channel14.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel14.Intensity += i.Channel14.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel15.Name = i.Channel15.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel15.CustomName = i.Channel15.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel15.Mz = i.Channel15.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel15.Intensity += i.Channel15.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel16.Name = i.Channel16.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel16.CustomName = i.Channel16.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel16.Mz = i.Channel16.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel16.Intensity += i.Channel16.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Name = i.Channel17.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel17.CustomName = i.Channel17.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Mz = i.Channel17.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel17.Intensity += i.Channel17.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Name = i.Channel18.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel18.CustomName = i.Channel18.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Mz = i.Channel18.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel18.Intensity += i.Channel18.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel19.Name = i.Channel19.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel19.CustomName = i.Channel19.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel19.Mz = i.Channel19.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel19.Intensity += i.Channel19.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel20.Name = i.Channel20.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel20.CustomName = i.Channel20.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel20.Mz = i.Channel20.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel20.Intensity += i.Channel20.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel21.Name = i.Channel21.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel21.CustomName = i.Channel21.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel21.Mz = i.Channel21.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel21.Intensity += i.Channel21.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel22.Name = i.Channel22.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel22.CustomName = i.Channel22.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel22.Mz = i.Channel22.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel22.Intensity += i.Channel22.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel23.Name = i.Channel23.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel23.CustomName = i.Channel23.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel23.Mz = i.Channel23.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel23.Intensity += i.Channel23.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel24.Name = i.Channel24.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel24.CustomName = i.Channel24.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel24.Mz = i.Channel24.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel24.Intensity += i.Channel24.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel25.Name = i.Channel25.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel25.CustomName = i.Channel25.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel25.Mz = i.Channel25.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel25.Intensity += i.Channel25.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel26.Name = i.Channel26.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel26.CustomName = i.Channel26.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel26.Mz = i.Channel26.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel26.Intensity += i.Channel26.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel27.Name = i.Channel27.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel27.CustomName = i.Channel27.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel27.Mz = i.Channel27.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel27.Intensity += i.Channel27.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel28.Name = i.Channel28.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel28.CustomName = i.Channel28.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel28.Mz = i.Channel28.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel28.Intensity += i.Channel28.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel29.Name = i.Channel29.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel29.CustomName = i.Channel29.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel29.Mz = i.Channel29.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel29.Intensity += i.Channel29.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel30.Name = i.Channel30.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel30.CustomName = i.Channel30.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel30.Mz = i.Channel30.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel30.Intensity += i.Channel30.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel31.Name = i.Channel31.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel31.CustomName = i.Channel31.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel31.Mz = i.Channel31.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel31.Intensity += i.Channel31.Intensity
-
-						evi.Proteins[j].PhosphoUniqueLabels.Channel32.Name = i.Channel32.Name
-						evi.Proteins[j].PhosphoUniqueLabels.Channel32.CustomName = i.Channel32.CustomName
-						evi.Proteins[j].PhosphoUniqueLabels.Channel32.Mz = i.Channel32.Mz
-						evi.Proteins[j].PhosphoUniqueLabels.Channel32.Intensity += i.Channel32.Intensity
-					}
-
-					if k.IsURazor {
-						evi.Proteins[j].PhosphoURazorLabels.Channel1.Name = i.Channel1.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel1.CustomName = i.Channel1.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel1.Mz = i.Channel1.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel1.Intensity += i.Channel1.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel2.Name = i.Channel2.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel2.CustomName = i.Channel2.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel2.Mz = i.Channel2.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel2.Intensity += i.Channel2.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel3.Name = i.Channel3.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel3.CustomName = i.Channel3.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel3.Mz = i.Channel3.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel3.Intensity += i.Channel3.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel4.Name = i.Channel4.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel4.CustomName = i.Channel4.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel4.Mz = i.Channel4.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel4.Intensity += i.Channel4.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel5.Name = i.Channel5.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel5.CustomName = i.Channel5.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel5.Mz = i.Channel5.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel5.Intensity += i.Channel5.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel6.Name = i.Channel6.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel6.CustomName = i.Channel6.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel6.Mz = i.Channel6.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel6.Intensity += i.Channel6.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel7.Name = i.Channel7.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel7.CustomName = i.Channel7.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel7.Mz = i.Channel7.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel7.Intensity += i.Channel7.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel8.Name = i.Channel8.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel8.CustomName = i.Channel8.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel8.Mz = i.Channel8.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel8.Intensity += i.Channel8.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel9.Name = i.Channel9.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel9.CustomName = i.Channel9.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel9.Mz = i.Channel9.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel9.Intensity += i.Channel9.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel10.Name = i.Channel10.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel10.CustomName = i.Channel10.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel10.Mz = i.Channel10.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel10.Intensity += i.Channel10.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel11.Name = i.Channel11.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel11.CustomName = i.Channel11.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel11.Mz = i.Channel11.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel11.Intensity += i.Channel11.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel12.Name = i.Channel12.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel12.CustomName = i.Channel12.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel12.Mz = i.Channel12.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel12.Intensity += i.Channel12.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel13.Name = i.Channel13.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel13.CustomName = i.Channel13.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel13.Mz = i.Channel13.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel13.Intensity += i.Channel13.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel14.Name = i.Channel14.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel14.CustomName = i.Channel14.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel14.Mz = i.Channel14.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel14.Intensity += i.Channel14.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel15.Name = i.Channel15.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel15.CustomName = i.Channel15.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel15.Mz = i.Channel15.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel15.Intensity += i.Channel15.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel16.Name = i.Channel16.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel16.CustomName = i.Channel16.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel16.Mz = i.Channel16.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel16.Intensity += i.Channel16.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel17.Name = i.Channel17.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel17.CustomName = i.Channel17.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel17.Mz = i.Channel17.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel17.Intensity += i.Channel17.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel18.Name = i.Channel18.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel18.CustomName = i.Channel18.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel18.Mz = i.Channel18.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel18.Intensity += i.Channel18.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel19.Name = i.Channel19.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel19.CustomName = i.Channel19.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel19.Mz = i.Channel19.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel19.Intensity += i.Channel19.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel20.Name = i.Channel20.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel20.CustomName = i.Channel20.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel20.Mz = i.Channel20.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel20.Intensity += i.Channel20.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel21.Name = i.Channel21.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel21.CustomName = i.Channel21.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel21.Mz = i.Channel21.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel21.Intensity += i.Channel21.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel22.Name = i.Channel22.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel22.CustomName = i.Channel22.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel22.Mz = i.Channel22.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel22.Intensity += i.Channel22.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel23.Name = i.Channel23.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel23.CustomName = i.Channel23.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel23.Mz = i.Channel23.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel23.Intensity += i.Channel23.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel24.Name = i.Channel24.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel24.CustomName = i.Channel24.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel24.Mz = i.Channel24.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel24.Intensity += i.Channel24.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel25.Name = i.Channel25.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel25.CustomName = i.Channel25.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel25.Mz = i.Channel25.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel25.Intensity += i.Channel25.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel26.Name = i.Channel26.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel26.CustomName = i.Channel26.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel26.Mz = i.Channel26.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel26.Intensity += i.Channel26.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel27.Name = i.Channel27.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel27.CustomName = i.Channel27.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel27.Mz = i.Channel27.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel27.Intensity += i.Channel27.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel28.Name = i.Channel28.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel28.CustomName = i.Channel28.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel28.Mz = i.Channel28.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel28.Intensity += i.Channel28.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel29.Name = i.Channel29.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel29.CustomName = i.Channel29.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel29.Mz = i.Channel29.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel29.Intensity += i.Channel29.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel30.Name = i.Channel30.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel30.CustomName = i.Channel30.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel30.Mz = i.Channel30.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel30.Intensity += i.Channel30.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel31.Name = i.Channel31.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel31.CustomName = i.Channel31.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel31.Mz = i.Channel31.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel31.Intensity += i.Channel31.Intensity
-
-						evi.Proteins[j].PhosphoURazorLabels.Channel32.Name = i.Channel32.Name
-						evi.Proteins[j].PhosphoURazorLabels.Channel32.CustomName = i.Channel32.CustomName
-						evi.Proteins[j].PhosphoURazorLabels.Channel32.Mz = i.Channel32.Mz
-						evi.Proteins[j].PhosphoURazorLabels.Channel32.Intensity += i.Channel32.Intensity
-					}
-				}
-
 			}
 		}
 	}
