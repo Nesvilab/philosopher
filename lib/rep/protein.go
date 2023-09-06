@@ -409,6 +409,26 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 			printSet[headerIndex].URazorLabels.Channel5.CustomName,
 			printSet[headerIndex].URazorLabels.Channel6.CustomName,
 		)
+	} else if brand == "ibt" {
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header,
+			printSet[headerIndex].URazorLabels.Channel1.CustomName,
+			printSet[headerIndex].URazorLabels.Channel2.CustomName,
+			printSet[headerIndex].URazorLabels.Channel3.CustomName,
+			printSet[headerIndex].URazorLabels.Channel4.CustomName,
+			printSet[headerIndex].URazorLabels.Channel5.CustomName,
+			printSet[headerIndex].URazorLabels.Channel6.CustomName,
+			printSet[headerIndex].URazorLabels.Channel7.CustomName,
+			printSet[headerIndex].URazorLabels.Channel8.CustomName,
+			printSet[headerIndex].URazorLabels.Channel9.CustomName,
+			printSet[headerIndex].URazorLabels.Channel10.CustomName,
+			printSet[headerIndex].URazorLabels.Channel11.CustomName,
+			printSet[headerIndex].URazorLabels.Channel12.CustomName,
+			printSet[headerIndex].URazorLabels.Channel13.CustomName,
+			printSet[headerIndex].URazorLabels.Channel14.CustomName,
+			printSet[headerIndex].URazorLabels.Channel15.CustomName,
+			printSet[headerIndex].URazorLabels.Channel16.CustomName,
+		)
 	} else if brand == "xtag" {
 		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			header,
@@ -733,6 +753,26 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 				reportIntensities[3],
 				reportIntensities[4],
 				reportIntensities[5],
+			)
+		} else if brand == "ibt" {
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				reportIntensities[0],
+				reportIntensities[1],
+				reportIntensities[2],
+				reportIntensities[3],
+				reportIntensities[4],
+				reportIntensities[5],
+				reportIntensities[6],
+				reportIntensities[7],
+				reportIntensities[8],
+				reportIntensities[9],
+				reportIntensities[10],
+				reportIntensities[11],
+				reportIntensities[12],
+				reportIntensities[13],
+				reportIntensities[14],
+				reportIntensities[15],
 			)
 		} else if brand == "xtag" {
 			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
