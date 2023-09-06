@@ -892,10 +892,7 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 
 	// 1st check: Purity the score and the Probability levels
 	for _, i := range evi.PSM {
-		if i.Probability >= probability && i.Purity >= purity {
-			if strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_") || i.IsDecoy {
-				continue
-			}
+		if i.Probability >= probability && i.Purity >= purity && !(i.IsDecoy) {
 
 			spectrumMap[i.SpectrumFileName()] = *i.Labels
 			bestMap[i.SpectrumFileName()] = 0
