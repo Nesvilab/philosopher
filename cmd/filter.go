@@ -66,6 +66,7 @@ func init() {
 		filterCmd.Flags().StringVarP(&m.Filter.Tag, "tag", "", "rev_", "decoy tag")
 		filterCmd.Flags().StringVarP(&m.Filter.Mods, "mods", "", "", "list of modifications for a stratified FDR filtering")
 		filterCmd.Flags().StringVarP(&m.Filter.ProBin, "probin", "", "", "set a pre-built protein inference for the filtering")
+		filterCmd.Flags().StringVarP(&m.Filter.DbBin, "dbbin", "", "", "set path to a pre-built db.bin")
 		filterCmd.Flags().Float64VarP(&m.Filter.IonFDR, "ion", "", 0.01, "peptide ion FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PepFDR, "pep", "", 0.01, "peptide FDR level")
 		filterCmd.Flags().Float64VarP(&m.Filter.PsmFDR, "psm", "", 0.01, "psm FDR level")
@@ -85,6 +86,7 @@ func init() {
 		filterCmd.Flags().MarkHidden("mods")
 		filterCmd.Flags().MarkHidden("delta")
 		filterCmd.Flags().MarkHidden("probin")
+		filterCmd.Flags().MarkHidden("dbbin")
 		filterCmd.Flags().IntVarP(&m.Filter.MinPepLen, "minPepLen", "", 7, "minimum peptide length criterion for protein probability assignment")
 	}
 

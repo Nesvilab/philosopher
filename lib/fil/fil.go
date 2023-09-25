@@ -26,7 +26,14 @@ func Run(f met.Data) met.Data {
 	e := rep.New()
 	var pep id.PepIDList
 	var pro id.ProtIDList
-	var dbBin string
+	dbBin := f.Filter.DbBin
+
+	if len(dbBin) == 0 {
+		currentDir, err := os.Getwd()
+		if err == nil {
+			dbBin = currentDir
+		}
+	}
 
 	if len(f.Filter.ProBin) > 0 {
 
@@ -36,7 +43,6 @@ func Run(f met.Data) met.Data {
 
 			p := fmt.Sprintf("%s%s.meta/protxml.bin", f.Filter.ProBin, string(filepath.Separator))
 			r := fmt.Sprintf("%s%s.meta/razor.bin", f.Filter.ProBin, string(filepath.Separator))
-			dbBin = fmt.Sprintf("%s%s", f.Filter.ProBin, string(filepath.Separator))
 
 			logrus.Info("Fetching protein inference from ", f.Filter.ProBin)
 
