@@ -479,6 +479,8 @@ func Run(m met.Data) {
 		isoBrand = "itraq"
 	} else if m.Quantify.Brand == "sclip" {
 		isoBrand = "sclip"
+	} else if m.Quantify.Brand == "ibt" {
+		isoBrand = "ibt"
 	} else if m.Quantify.Brand == "xtag" {
 		isoBrand = "xtag"
 	} else if m.Quantify.Brand == "xtag2" {
