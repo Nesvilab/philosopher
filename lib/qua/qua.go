@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -46,6 +47,11 @@ func RunLabelFreeQuantification(p met.Quantify) {
 	var evi rep.Evidence
 	evi.RestoreGranular()
 
+	if len(evi.PSM) < 1 || len(evi.Ions) < 1 {
+		msg.QuantifyingData(errors.New("the PSM list is empty."), "warning")
+		os.Exit(0)
+	}
+
 	evi = peakIntensity(evi, p.Dir, p.Format, p.RTWin, p.PTWin, p.Tol, p.Isolated, p.Raw, p.Faims)
 
 	evi = calculateIntensities(evi)
@@ -67,6 +73,11 @@ func RunIsobaricLabelQuantification(p met.Quantify, mods bool) met.Quantify {
 
 	var evi rep.Evidence
 	evi.RestoreGranular()
+
+	if len(evi.PSM) < 1 || len(evi.Ions) < 1 {
+		msg.QuantifyingData(errors.New("the PSM list is empty."), "warning")
+		os.Exit(0)
+	}
 
 	// removed all calculated defined values from before
 	evi = cleanPreviousData(evi, p.Brand, p.Plex)
