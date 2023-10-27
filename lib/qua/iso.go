@@ -3,6 +3,7 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"github.com/Nesvilab/philosopher/lib/ibt"
 	"github.com/Nesvilab/philosopher/lib/xta"
 	"math"
 	"strings"
@@ -39,6 +40,8 @@ func prepareLabelStructureWithMS2(dir, format, brand, plex string, tol float64, 
 				labelData = trq.New(plex)
 			} else if brand == "sclip" {
 				labelData = scl.New(plex)
+			} else if brand == "ibt" {
+				labelData = ibt.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
 			} else if brand == "xtag2" {
@@ -278,6 +281,8 @@ func prepareLabelStructureWithMS3(dir, format, brand, plex string, tol float64, 
 				labelData = trq.New(plex)
 			} else if brand == "sclip" {
 				labelData = scl.New(plex)
+			} else if brand == "ibt" {
+				labelData = ibt.New(plex)
 			} else if brand == "xtag" {
 				labelData = xta.New(plex)
 			} else if brand == "xtag2" {

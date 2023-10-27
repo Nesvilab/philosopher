@@ -390,6 +390,29 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			printSet[headerIndex].Labels.Channel5.CustomName,
 			printSet[headerIndex].Labels.Channel6.CustomName,
 		)
+	} else if brand == "ibt" {
+
+		header += "\tQuan Usage"
+
+		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header,
+			printSet[headerIndex].Labels.Channel1.CustomName,
+			printSet[headerIndex].Labels.Channel2.CustomName,
+			printSet[headerIndex].Labels.Channel3.CustomName,
+			printSet[headerIndex].Labels.Channel4.CustomName,
+			printSet[headerIndex].Labels.Channel5.CustomName,
+			printSet[headerIndex].Labels.Channel6.CustomName,
+			printSet[headerIndex].Labels.Channel7.CustomName,
+			printSet[headerIndex].Labels.Channel8.CustomName,
+			printSet[headerIndex].Labels.Channel9.CustomName,
+			printSet[headerIndex].Labels.Channel10.CustomName,
+			printSet[headerIndex].Labels.Channel11.CustomName,
+			printSet[headerIndex].Labels.Channel12.CustomName,
+			printSet[headerIndex].Labels.Channel13.CustomName,
+			printSet[headerIndex].Labels.Channel14.CustomName,
+			printSet[headerIndex].Labels.Channel15.CustomName,
+			printSet[headerIndex].Labels.Channel16.CustomName,
+		)
 	} else if brand == "xtag" {
 
 		header += "\tQuan Usage"
@@ -763,6 +786,26 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 				i.Labels.Channel4.Intensity,
 				i.Labels.Channel5.Intensity,
 				i.Labels.Channel6.Intensity,
+			)
+		} else if brand == "ibt" {
+			line = fmt.Sprintf("%s\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",
+				line,
+				i.Labels.Channel1.Intensity,
+				i.Labels.Channel2.Intensity,
+				i.Labels.Channel3.Intensity,
+				i.Labels.Channel4.Intensity,
+				i.Labels.Channel5.Intensity,
+				i.Labels.Channel6.Intensity,
+				i.Labels.Channel7.Intensity,
+				i.Labels.Channel8.Intensity,
+				i.Labels.Channel9.Intensity,
+				i.Labels.Channel10.Intensity,
+				i.Labels.Channel11.Intensity,
+				i.Labels.Channel12.Intensity,
+				i.Labels.Channel13.Intensity,
+				i.Labels.Channel14.Intensity,
+				i.Labels.Channel15.Intensity,
+				i.Labels.Channel16.Intensity,
 			)
 		} else if brand == "xtag" {
 			line = fmt.Sprintf("%s\t%t\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f\t%.4f",

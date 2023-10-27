@@ -3,6 +3,7 @@ package qua
 import (
 	"errors"
 	"fmt"
+	"github.com/Nesvilab/philosopher/lib/ibt"
 	"math"
 	"os"
 	"path/filepath"
@@ -244,6 +245,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "sclip" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = scl.New(plex)
+		} else if brand == "ibt" {
+			evi.PSM[i].Labels = &iso.Labels{}
+			*evi.PSM[i].Labels = ibt.New(plex)
 		} else if brand == "xtag" {
 			evi.PSM[i].Labels = &iso.Labels{}
 			*evi.PSM[i].Labels = xta.New(plex)
@@ -263,6 +267,9 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 		} else if brand == "sclip" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = scl.New(plex)
+		} else if brand == "ibt" {
+			evi.Ions[i].Labels = &iso.Labels{}
+			*evi.Ions[i].Labels = ibt.New(plex)
 		} else if brand == "xtag" {
 			evi.Ions[i].Labels = &iso.Labels{}
 			*evi.Ions[i].Labels = xta.New(plex)
@@ -294,6 +301,13 @@ func cleanPreviousData(evi rep.Evidence, brand, plex string) rep.Evidence {
 			*evi.Proteins[i].TotalLabels = scl.New(plex)
 			*evi.Proteins[i].UniqueLabels = scl.New(plex)
 			*evi.Proteins[i].URazorLabels = scl.New(plex)
+		} else if brand == "ibt" {
+			evi.Proteins[i].TotalLabels = &iso.Labels{}
+			evi.Proteins[i].UniqueLabels = &iso.Labels{}
+			evi.Proteins[i].URazorLabels = &iso.Labels{}
+			*evi.Proteins[i].TotalLabels = ibt.New(plex)
+			*evi.Proteins[i].UniqueLabels = ibt.New(plex)
+			*evi.Proteins[i].URazorLabels = ibt.New(plex)
 		} else if brand == "xtag" {
 			evi.Proteins[i].TotalLabels = &iso.Labels{}
 			evi.Proteins[i].UniqueLabels = &iso.Labels{}
@@ -541,6 +555,104 @@ func assignLabelNames(labels map[string]iso.Labels, labelNames map[string]string
 				v2.Channel6.CustomName = "sCLIP6"
 			} else {
 				v2.Channel6.CustomName = labelNames["sCLIP6"]
+			}
+
+		} else if brand == "ibt" {
+
+			if len(labelNames["114"]) < 1 {
+				v2.Channel1.CustomName = "114"
+			} else {
+				v2.Channel1.CustomName = labelNames["114"]
+			}
+
+			if len(labelNames["115N"]) < 1 {
+				v2.Channel2.CustomName = "115N"
+			} else {
+				v2.Channel2.CustomName = labelNames["115N"]
+			}
+
+			if len(labelNames["115C"]) < 1 {
+				v2.Channel3.CustomName = "115C"
+			} else {
+				v2.Channel3.CustomName = labelNames["115C"]
+			}
+
+			if len(labelNames["116N"]) < 1 {
+				v2.Channel4.CustomName = "116N"
+			} else {
+				v2.Channel4.CustomName = labelNames["116N"]
+			}
+
+			if len(labelNames["116C"]) < 1 {
+				v2.Channel5.CustomName = "116C"
+			} else {
+				v2.Channel5.CustomName = labelNames["116C"]
+			}
+
+			if len(labelNames["117N"]) < 1 {
+				v2.Channel6.CustomName = "117N"
+			} else {
+				v2.Channel6.CustomName = labelNames["117N"]
+			}
+
+			if len(labelNames["117C"]) < 1 {
+				v2.Channel7.CustomName = "117C"
+			} else {
+				v2.Channel7.CustomName = labelNames["117C"]
+			}
+
+			if len(labelNames["118N"]) < 1 {
+				v2.Channel8.CustomName = "118N"
+			} else {
+				v2.Channel8.CustomName = labelNames["118N"]
+			}
+
+			if len(labelNames["118C"]) < 1 {
+				v2.Channel9.CustomName = "118C"
+			} else {
+				v2.Channel9.CustomName = labelNames["118C"]
+			}
+
+			if len(labelNames["119N"]) < 1 {
+				v2.Channel10.CustomName = "119N"
+			} else {
+				v2.Channel10.CustomName = labelNames["119N"]
+			}
+
+			if len(labelNames["119C"]) < 1 {
+				v2.Channel11.CustomName = "119C"
+			} else {
+				v2.Channel11.CustomName = labelNames["119C"]
+			}
+
+			if len(labelNames["120N"]) < 1 {
+				v2.Channel12.CustomName = "120N"
+			} else {
+				v2.Channel12.CustomName = labelNames["120N"]
+			}
+
+			if len(labelNames["120C"]) < 1 {
+				v2.Channel13.CustomName = "120C"
+			} else {
+				v2.Channel13.CustomName = labelNames["120C"]
+			}
+
+			if len(labelNames["121N"]) < 1 {
+				v2.Channel14.CustomName = "121N"
+			} else {
+				v2.Channel14.CustomName = labelNames["121N"]
+			}
+
+			if len(labelNames["121C"]) < 1 {
+				v2.Channel15.CustomName = "121C"
+			} else {
+				v2.Channel15.CustomName = labelNames["121C"]
+			}
+
+			if len(labelNames["122"]) < 1 {
+				v2.Channel16.CustomName = "122"
+			} else {
+				v2.Channel16.CustomName = labelNames["122"]
 			}
 
 		} else if brand == "xtag" {
