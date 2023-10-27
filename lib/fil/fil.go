@@ -94,7 +94,7 @@ func Run(f met.Data) met.Data {
 
 		//protXML := ReadProtXMLInput(f.Filter.Pox, f.Filter.Tag, f.Filter.Weight)
 
-		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag)
+		ProcessProteinIdentifications(protXML, f.Filter.PtFDR, f.Filter.PepFDR, f.Filter.ProtProb, f.Filter.Picked, f.Filter.Razor, false, f.Filter.Tag, f.Filter.MinPepLen)
 		pro.Restore()
 
 	} else {
@@ -641,7 +641,7 @@ func ReadProtXMLInput(xmlFile, decoyTag string, weight float64, minPepLen ...int
 
 // ProcessProteinIdentifications checks if pickedFDR ar razor options should be applied to given data set, if they do,
 // the inputed protXML data is processed before filtered.
-func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, isCombined bool, decoyTag string) string {
+func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float64, isPicked, isRazor, isCombined bool, decoyTag string, minPepLen ...int) string {
 
 	var pid id.ProtIDList
 
@@ -658,8 +658,12 @@ func ProcessProteinIdentifications(p id.ProtXML, ptFDR, pepProb, protProb float6
 	}
 
 	// applies razor algorithm
+	pepLen := 7
+	if len(minPepLen) > 0 {
+		pepLen = minPepLen[0]
+	}
 	if isRazor {
-		p = RazorFilter(p)
+		p = RazorFilter(p, pepLen)
 	}
 
 	// run the FDR filter for proteins

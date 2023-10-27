@@ -207,7 +207,11 @@ func PickedFDR(p id.ProtXML) id.ProtXML {
 //type RazorCandidateMap map[string]RazorCandidate
 
 // RazorFilter classifies peptides as razor
-func RazorFilter(p id.ProtXML) id.ProtXML {
+func RazorFilter(p id.ProtXML, minPepLen ...int) id.ProtXML {
+	pepLen := 7
+	if len(minPepLen) > 0 {
+		pepLen = minPepLen[0]
+	}
 
 	var r raz.RazorMap = make(map[string]raz.RazorCandidate)
 	var rList []string
@@ -418,7 +422,7 @@ func RazorFilter(p id.ProtXML) id.ProtXML {
 			for k := range p.Groups[i].Proteins[j].PeptideIons {
 
 				if p.Groups[i].Proteins[j].PeptideIons[k].Razor == 1 || p.Groups[i].Proteins[j].PeptideIons[k].IsUnique {
-					if p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r {
+					if (p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability > r) && (p.Groups[i].Proteins[j].PeptideIons[k].PeptideLength >= pepLen) {
 						r = p.Groups[i].Proteins[j].PeptideIons[k].InitialProbability
 					}
 				}

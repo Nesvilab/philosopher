@@ -198,7 +198,7 @@ func (p *ProtXML) Read(f string, minPepLen ...int) {
 				ptid.PeptideIons = append(ptid.PeptideIons, pepid)
 
 				// get hte highest initial probability from all peptides
-				if (pepid.PeptideLength > pepLen) && (pepid.InitialProbability > ptid.TopPepProb) {
+				if (pepid.PeptideLength >= pepLen) && (pepid.InitialProbability > ptid.TopPepProb) {
 					ptid.TopPepProb = pepid.InitialProbability
 				}
 

@@ -233,7 +233,7 @@ func calculateIntensities(e rep.Evidence) rep.Evidence {
 	logrus.Info("Assigning intensities to data layers")
 
 	if len(e.PSM) < 1 || len(e.Ions) < 1 {
-		msg.QuantifyingData(errors.New("the PSM list is enpty"), "error")
+		msg.QuantifyingData(errors.New("the PSM list is empty"), "error")
 	}
 
 	var peptideIntMap = make(map[string]float64)
