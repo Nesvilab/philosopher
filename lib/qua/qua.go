@@ -1073,7 +1073,8 @@ func classification(evi rep.Evidence, mods, best bool, remove, purity, probabili
 	}
 
 	if remove != 0 && !quantCheckUp {
-		msg.NoParametersFound(errors.New("no reporter ions found. Check your MS level, or update msconvert"), "error")
+		remove = 0
+		msg.Custom(errors.New("there are no non-zero intensities. Set 'removelow' to 0"), "warning")
 	}
 
 	// 2nd check: best PSM
