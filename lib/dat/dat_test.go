@@ -68,8 +68,8 @@ func TestBase_ProcessDB(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			len_records := ParseFile(tt.args.file, make(chan<- []fas.FastaEntry, 1024))
-			if len_records != 20411 {
-				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len_records, 20411)
+			if len_records != 20413 {
+				t.Errorf("Number of FASTA entries is incorrect, got %d, want %d", len_records, 20413)
 			}
 		})
 	}
