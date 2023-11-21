@@ -1272,19 +1272,17 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 
 			// create the list of mz differences for each peak
 			var mzRatio []float64
-			for k := 1; k <= 6; k++ {
+			for k := 0; k <= 6; k++ {
 				r := float64(k) * 1.0033548378 / float64(v2.Precursor.ChargeState)
 				mzRatio = append(mzRatio, r)
 			}
 
-			isotopesInt := v2.Precursor.TargetIonIntensity
+			isotopesInt := 0.0
 
 			for k, v := range ions {
 				for _, m := range mzRatio {
 					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.025) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.025) {
-						if v != v2.Precursor.TargetIonIntensity {
-							isotopesInt += v
-						}
+						isotopesInt += v
 						break
 					}
 				}
