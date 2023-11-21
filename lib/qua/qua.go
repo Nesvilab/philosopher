@@ -1277,15 +1277,12 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 				mzRatio = append(mzRatio, uti.Round(r, 5, 2))
 			}
 
-			var isotopePackage = make(map[float64]float64)
-			isotopePackage[v2.Precursor.TargetIon] = v2.Precursor.TargetIonIntensity
 			isotopesInt := v2.Precursor.TargetIonIntensity
 
 			for k, v := range ions {
 				for _, m := range mzRatio {
 					if math.Abs(v2.Precursor.TargetIon-k) <= (m+0.025) && math.Abs(v2.Precursor.TargetIon-k) >= (m-0.025) {
 						if v != v2.Precursor.TargetIonIntensity {
-							isotopePackage[k] = v
 							isotopesInt += v
 						}
 						break
