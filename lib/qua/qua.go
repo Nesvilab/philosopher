@@ -1264,7 +1264,7 @@ func calculateIonPurity(d, f string, mz mzn.MsData, evi []rep.PSMEvidence) []rep
 			var isolationWindowSummedInt float64
 
 			for k := range v1.Mz.DecodedStream {
-				if v1.Mz.DecodedStream[k] >= (v2.Precursor.TargetIon-v2.Precursor.IsolationWindowUpperOffset) && v1.Mz.DecodedStream[k] <= (v2.Precursor.TargetIon+v2.Precursor.IsolationWindowUpperOffset) {
+				if v1.Mz.DecodedStream[k] >= (v2.Precursor.TargetIon-v2.Precursor.IsolationWindowLowerOffset) && v1.Mz.DecodedStream[k] <= (v2.Precursor.TargetIon+v2.Precursor.IsolationWindowUpperOffset) {
 					ions[v1.Mz.DecodedStream[k]] = v1.Intensity.DecodedStream[k]
 					isolationWindowSummedInt += v1.Intensity.DecodedStream[k]
 				}
