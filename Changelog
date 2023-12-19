@@ -1,18 +1,18 @@
 ### Added
-- Added the protein start and end positions to ions and peptides report.
-- ProtXML reading parallelization.
-- Added a new Extended Peptide column to the PSM report containing the flanking regions of peptides.
-- Group-based FDR scoring capabilities that will rely on the group passed by MSFragger.
-- Support for sCLIP isobaric tags.
+- Supported IBT-16 isobaric tag
+- Extended support for up to 32 isobaric labels.
+- Added the 'minPepLen' control option for protein probability assignment
+- Added the dbbin option to resue the prebuilt db.bin file
 
 ### Changed
-- Rolled back the FASTA header checking for IonQuant.
-- Improved the FASTA header detection and parsing.
-- PTMProphet was updated to v6.2.0.
-- The processing speed, including IO operations and database reading received a major upgrade (@guoci).
-- The purity column will always be visible in the PSM table.
-- Updated the MSstats report for individual data sets.
+- Used unique+razor peptides only for PSM-protein level roll up
+- For plex with 0 PSMs, let philosopher print a waring and exit normally
+- Excluded decoys from protein quantification (protein.tsv)
+- Removed the warning message for running 'workspace --clean' in a clean direcotry
 
 ### Fixed
-- Updated razor mapping rules to reinforce classifying decoy razor proteins.
-- Fixed a problem where protein names and genes would not be tagged with the decoy tag.
+- Fixed a problem occurring when parsing custom database with headers starting with '>AT'
+- Fixed a bug related to summed intensites in protein.tsv
+- Fixed a bug causing empty intensities in msstats.tsv related with multiplex TMT11 data.
+- Fixed a creash when there are non-zero TMT intensities and removelow > 0
+- Updated the purity calculation
