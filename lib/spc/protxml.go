@@ -62,7 +62,7 @@ type Protein struct {
 	ProteinName                     []byte                     `xml:"protein_name,attr"`
 	UniqueStrippedPeptides          []byte                     `xml:"unique_stripped_peptides,attr"`
 	GroupSiblingID                  []byte                     `xml:"group_sibling_id,attr"`
-	NumberIndistinguishableProteins int16                      `xml:"n_indistinguishable_proteins,attr"`
+	NumberIndistinguishableProteins int32                      `xml:"n_indistinguishable_proteins,attr"`
 	TotalNumberPeptides             int                        `xml:"total_number_peptides,attr"`
 	TotalNumberIndPeptides          int                        `xml:"total_number_distinct_peptides,attr"`
 	PercentCoverage                 float32                    `xml:"percent_coverage,attr"`
