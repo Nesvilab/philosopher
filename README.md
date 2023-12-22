@@ -62,11 +62,5 @@ If you have any questions or remarks please use the [Discussion board](https://g
 ## How to cite
 da Veiga Leprevost F, Haynes SE, Avtonomov DM, Chang HY, Shanmugam AK, Mellacheruvu D, Kong AT, Nesvizhskii AI. [Philosopher: a versatile toolkit for shotgun proteomics data analysis](https://doi.org/10.1038/s41592-020-0912-y). Nat Methods. 2020 Sep;17(9):869-870. doi: 10.1038/s41592-020-0912-y. PMID: 32669682; PMCID: PMC7509848.
 
-## About the authors, and contributors
-[Felipe da Veiga Leprevost (main author)](http://prvst.github.io)
-
-[Sarah Haynes](https://scholar.google.com/citations?user=HtRSUKkAAAAJ&hl=en)
-
-[Guo Ci Teo](https://github.com/guoci)
-
+## About the authors
 [Alexey Nesvizhskii's research group](http://www.nesvilab.org/)
