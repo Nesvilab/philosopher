@@ -219,4 +219,5 @@ type PTMResult struct {
 	BestScoreWithPTM    string `xml:"best_score_with_ptm,attr"`
 	ScoreWithoutPTM     string `xml:"score_without_ptm,attr"`
 	LocalizationPeptide string `xml:"localization_peptide,attr"`
+	LocalizationScores  string `xml:"localization_scores,attr"`
 }

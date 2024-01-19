@@ -108,6 +108,7 @@ type MSFraggerLoc struct {
 	MSFragerLocalization                 string
 	MSFraggerLocalizationScoreWithPTM    string
 	MSFraggerLocalizationScoreWithoutPTM string
+	MSFraggerLocalizationScores          string
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -491,7 +492,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			psm.MSFragerLoc = &MSFraggerLoc{
 				MSFragerLocalization:                 i.PTMResult.LocalizationPeptide,
 				MSFraggerLocalizationScoreWithPTM:    i.PTMResult.BestScoreWithPTM,
-				MSFraggerLocalizationScoreWithoutPTM: i.PTMResult.ScoreWithoutPTM}
+				MSFraggerLocalizationScoreWithoutPTM: i.PTMResult.ScoreWithoutPTM,
+				MSFraggerLocalizationScores:          i.PTMResult.LocalizationScores}
 		}
 
 		// to be able to accept multiple entries with the same spectrum name, we fuse the
