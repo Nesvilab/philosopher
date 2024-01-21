@@ -105,11 +105,16 @@ type PTM struct {
 }
 
 type MSFraggerLoc struct {
-	MSFragerLocalization                 string
-	MSFraggerLocalizationScoreWithPTM    string
-	MSFraggerLocalizationScoreWithoutPTM string
-	MSFraggerLocalizationScores          string
-	MSFraggerScoreAll                    string
+	MSFragerLocalization                        string
+	MSFraggerLocalizationScoreWithPTM           string
+	MSFraggerLocalizationSecondScoreWithPTM     string
+	MSFraggerLocalizationScoreWithoutPTM        string
+	MSFraggerLocalizationScores                 string
+	MSFraggerScoreAll                           string
+	MSFraggerLocalizationScoreWithPTMIons       string
+	MSFraggerLocalizationSecondScoreWithPTMIons string
+	MSFraggerLocalizationScoreWithoutPTMIons    string
+	MSFraggerScoreAllIons                       string
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -491,11 +496,17 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 
 		if len(i.PTMResult.LocalizationPeptide+i.PTMResult.BestScoreWithPTM+i.PTMResult.ScoreWithoutPTM) != 0 {
 			psm.MSFragerLoc = &MSFraggerLoc{
-				MSFragerLocalization:                 i.PTMResult.LocalizationPeptide,
-				MSFraggerLocalizationScoreWithPTM:    i.PTMResult.BestScoreWithPTM,
-				MSFraggerLocalizationScoreWithoutPTM: i.PTMResult.ScoreWithoutPTM,
-				MSFraggerLocalizationScores:          i.PTMResult.LocalizationScores,
-				MSFraggerScoreAll:                    i.PTMResult.ScoreAll}
+				MSFragerLocalization:                        i.PTMResult.LocalizationPeptide,
+				MSFraggerLocalizationScoreWithPTM:           i.PTMResult.BestScoreWithPTM,
+				MSFraggerLocalizationSecondScoreWithPTM:     i.PTMResult.SecondBestScoreWithPTM,
+				MSFraggerLocalizationScoreWithoutPTM:        i.PTMResult.ScoreWithoutPTM,
+				MSFraggerLocalizationScores:                 i.PTMResult.LocalizationScores,
+				MSFraggerScoreAll:                           i.PTMResult.ScoreAll,
+				MSFraggerLocalizationScoreWithPTMIons:       i.PTMResult.BestScoreWithPTMIons,
+				MSFraggerLocalizationSecondScoreWithPTMIons: i.PTMResult.SecondBestScoreWithPTMIons,
+				MSFraggerLocalizationScoreWithoutPTMIons:    i.PTMResult.ScoreWithoutPTMIons,
+				MSFraggerScoreAllIons:                       i.PTMResult.ScoreAllIons,
+			}
 		}
 
 		// to be able to accept multiple entries with the same spectrum name, we fuse the
