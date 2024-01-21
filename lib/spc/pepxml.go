@@ -226,4 +226,6 @@ type PTMResult struct {
 	LocalizationScores         string `xml:"localization_scores,attr"`
 	ScoreAll                   string `xml:"score_all,attr"`
 	ScoreAllIons               string `xml:"score_all_matched_ions,attr"`
+	ScoreOnlyShifted           string `xml:"score_only_shifted,attr"`
+	ScoreOnlyShiftedIons       string `xml:"score_only_shifted_matched_ions,attr"`
 }
