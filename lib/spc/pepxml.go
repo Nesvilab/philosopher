@@ -216,9 +216,14 @@ type ProphetModel struct {
 
 // PTMResult tag
 type PTMResult struct {
-	BestScoreWithPTM    string `xml:"best_score_with_ptm,attr"`
-	ScoreWithoutPTM     string `xml:"score_without_ptm,attr"`
-	LocalizationPeptide string `xml:"localization_peptide,attr"`
-	LocalizationScores  string `xml:"localization_scores,attr"`
-	ScoreAll            string `xml:"score_all,attr"`
+	BestScoreWithPTM           string `xml:"best_score_with_ptm,attr"`
+	BestScoreWithPTMIons       string `xml:"best_score_with_ptm_matched_ions,attr"`
+	SecondBestScoreWithPTM     string `xml:"second_best_score_with_ptm,attr"`
+	SecondBestScoreWithPTMIons string `xml:"second_best_score_with_ptm_matched_ions,attr"`
+	ScoreWithoutPTM            string `xml:"score_without_ptm,attr"`
+	ScoreWithoutPTMIons        string `xml:"score_without_ptm_matched_ions,attr"`
+	LocalizationPeptide        string `xml:"localization_peptide,attr"`
+	LocalizationScores         string `xml:"localization_scores,attr"`
+	ScoreAll                   string `xml:"score_all,attr"`
+	ScoreAllIons               string `xml:"score_all_matched_ions,attr"`
 }
