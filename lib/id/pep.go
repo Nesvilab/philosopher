@@ -111,10 +111,12 @@ type MSFraggerLoc struct {
 	MSFraggerLocalizationScoreWithoutPTM        string
 	MSFraggerLocalizationScores                 string
 	MSFraggerScoreAll                           string
+	MSFraggerScoreOnlyShifted                   string
 	MSFraggerLocalizationScoreWithPTMIons       string
 	MSFraggerLocalizationSecondScoreWithPTMIons string
 	MSFraggerLocalizationScoreWithoutPTMIons    string
 	MSFraggerScoreAllIons                       string
+	MSFraggerScoreOnlyShiftedIons               string
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -502,10 +504,12 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 				MSFraggerLocalizationScoreWithoutPTM:        i.PTMResult.ScoreWithoutPTM,
 				MSFraggerLocalizationScores:                 i.PTMResult.LocalizationScores,
 				MSFraggerScoreAll:                           i.PTMResult.ScoreAll,
+				MSFraggerScoreOnlyShifted:                   i.PTMResult.ScoreOnlyShifted,
 				MSFraggerLocalizationScoreWithPTMIons:       i.PTMResult.BestScoreWithPTMIons,
 				MSFraggerLocalizationSecondScoreWithPTMIons: i.PTMResult.SecondBestScoreWithPTMIons,
 				MSFraggerLocalizationScoreWithoutPTMIons:    i.PTMResult.ScoreWithoutPTMIons,
 				MSFraggerScoreAllIons:                       i.PTMResult.ScoreAllIons,
+				MSFraggerScoreOnlyShiftedIons:               i.PTMResult.ScoreOnlyShiftedIons,
 			}
 		}
 
