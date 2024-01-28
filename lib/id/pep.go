@@ -112,6 +112,7 @@ type MSFraggerLoc struct {
 	MSFraggerLocalizationScores                 string
 	MSFraggerScoreAll                           string
 	MSFraggerScoreOnlyShifted                   string
+	MSFraggerBestScoreOnlyShifted               string
 	MSFraggerLocalizationScoreWithPTMIons       string
 	MSFraggerLocalizationSecondScoreWithPTMIons string
 	MSFraggerLocalizationScoreWithoutPTMIons    string
@@ -505,6 +506,7 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 				MSFraggerLocalizationScores:                 i.PTMResult.LocalizationScores,
 				MSFraggerScoreAll:                           i.PTMResult.ScoreAll,
 				MSFraggerScoreOnlyShifted:                   i.PTMResult.ScoreOnlyShifted,
+				MSFraggerBestScoreOnlyShifted:               i.PTMResult.BestScoreOnlyShifted,
 				MSFraggerLocalizationScoreWithPTMIons:       i.PTMResult.BestScoreWithPTMIons,
 				MSFraggerLocalizationSecondScoreWithPTMIons: i.PTMResult.SecondBestScoreWithPTMIons,
 				MSFraggerLocalizationScoreWithoutPTMIons:    i.PTMResult.ScoreWithoutPTMIons,

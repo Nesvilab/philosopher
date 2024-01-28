@@ -236,7 +236,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	}
 
 	if hasLoc {
-		header += "\tMSFragger Localization\tBest Score with Delta Mass\tBest Matched Ions with Delta Mass\tSecond Best Score with Delta Mass\tSecond Best Matched Ions with Delta Mass\tBest Score without Delta Mass\tMatched Ions without Delta mass\tLocalization Scores\tScore All\tMatched Ions All\tScore Delta Mass Only\tMatched Ions Delta Mass Only"
+		header += "\tMSFragger Localization\tBest Score with Delta Mass\tBest Matched Ions with Delta Mass\tSecond Best Score with Delta Mass\tSecond Best Matched Ions with Delta Mass\tBest Score without Delta Mass\tMatched Ions without Delta mass\tLocalization Scores\tScore All\tMatched Ions All\tScore Delta Mass Only\tMatched Ions Delta Mass Only\tBest Score Delta Mass Only"
 	}
 
 	if hasIonMob {
@@ -618,7 +618,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			if MSFraggerLoc == nil {
 				MSFraggerLoc = &id.MSFraggerLoc{}
 			}
-			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				line,
 				MSFraggerLoc.MSFragerLocalization,
 				MSFraggerLoc.MSFraggerLocalizationScoreWithPTM,
@@ -631,7 +631,8 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 				MSFraggerLoc.MSFraggerScoreAll,
 				MSFraggerLoc.MSFraggerScoreAllIons,
 				MSFraggerLoc.MSFraggerScoreOnlyShifted,
-				MSFraggerLoc.MSFraggerScoreOnlyShiftedIons)
+				MSFraggerLoc.MSFraggerScoreOnlyShiftedIons,
+				MSFraggerLoc.MSFraggerBestScoreOnlyShifted)
 		}
 
 		if hasIonMob {

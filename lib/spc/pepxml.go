@@ -228,4 +228,5 @@ type PTMResult struct {
 	ScoreAllIons               string `xml:"score_all_matched_ions,attr"`
 	ScoreOnlyShifted           string `xml:"score_only_shifted,attr"`
 	ScoreOnlyShiftedIons       string `xml:"score_only_shifted_matched_ions,attr"`
+	BestScoreOnlyShifted       string `xml:"best_score_only_shifted,attr"`
 }
