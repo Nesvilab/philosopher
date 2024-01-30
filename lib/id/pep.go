@@ -105,19 +105,18 @@ type PTM struct {
 }
 
 type MSFraggerLoc struct {
-	MSFragerLocalization                        string
-	MSFraggerLocalizationScoreWithPTM           string
-	MSFraggerLocalizationSecondScoreWithPTM     string
-	MSFraggerLocalizationScoreWithoutPTM        string
-	MSFraggerLocalizationScores                 string
-	MSFraggerScoreAll                           string
-	MSFraggerScoreOnlyShifted                   string
-	MSFraggerBestScoreOnlyShifted               string
-	MSFraggerLocalizationScoreWithPTMIons       string
-	MSFraggerLocalizationSecondScoreWithPTMIons string
-	MSFraggerLocalizationScoreWithoutPTMIons    string
-	MSFraggerScoreAllIons                       string
-	MSFraggerScoreOnlyShiftedIons               string
+	LocalizationPeptide      string
+	ScoreBestPosition        string
+	ScoreSecondBestPosition  string
+	ScoreAllUnshifted        string
+	PositionScores           string
+	ScoreShiftedAllPositions string
+	ScoreShiftedBestPosition string
+	IonsShiftedBestPosition  string
+	IonsBestPosition         string
+	IonsSecondBestPosition   string
+	IonsAllUnshifted         string
+	IonsShiftedAllPositioins string
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -497,21 +496,20 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			}
 		}
 
-		if len(i.PTMResult.LocalizationPeptide+i.PTMResult.BestScoreWithPTM+i.PTMResult.ScoreWithoutPTM) != 0 {
+		if len(i.PTMResult.LocalizationPeptide+i.PTMResult.ScoreBestPosition+i.PTMResult.ScoreAllUnshifted) != 0 {
 			psm.MSFragerLoc = &MSFraggerLoc{
-				MSFragerLocalization:                        i.PTMResult.LocalizationPeptide,
-				MSFraggerLocalizationScoreWithPTM:           i.PTMResult.BestScoreWithPTM,
-				MSFraggerLocalizationSecondScoreWithPTM:     i.PTMResult.SecondBestScoreWithPTM,
-				MSFraggerLocalizationScoreWithoutPTM:        i.PTMResult.ScoreWithoutPTM,
-				MSFraggerLocalizationScores:                 i.PTMResult.LocalizationScores,
-				MSFraggerScoreAll:                           i.PTMResult.ScoreAll,
-				MSFraggerScoreOnlyShifted:                   i.PTMResult.ScoreOnlyShifted,
-				MSFraggerBestScoreOnlyShifted:               i.PTMResult.BestScoreOnlyShifted,
-				MSFraggerLocalizationScoreWithPTMIons:       i.PTMResult.BestScoreWithPTMIons,
-				MSFraggerLocalizationSecondScoreWithPTMIons: i.PTMResult.SecondBestScoreWithPTMIons,
-				MSFraggerLocalizationScoreWithoutPTMIons:    i.PTMResult.ScoreWithoutPTMIons,
-				MSFraggerScoreAllIons:                       i.PTMResult.ScoreAllIons,
-				MSFraggerScoreOnlyShiftedIons:               i.PTMResult.ScoreOnlyShiftedIons,
+				LocalizationPeptide:      i.PTMResult.LocalizationPeptide,
+				ScoreBestPosition:        i.PTMResult.ScoreBestPosition,
+				ScoreSecondBestPosition:  i.PTMResult.ScoreSecondBestPosition,
+				ScoreAllUnshifted:        i.PTMResult.ScoreAllUnshifted,
+				PositionScores:           i.PTMResult.PositionScores,
+				ScoreShiftedAllPositions: i.PTMResult.ScoreShiftedAllPositions,
+				ScoreShiftedBestPosition: i.PTMResult.ScoreShiftedBestPosition,
+				IonsShiftedBestPosition:  i.PTMResult.IonsShiftedBestPosition,
+				IonsBestPosition:         i.PTMResult.IonsBestPosition,
+				IonsSecondBestPosition:   i.PTMResult.IonsSecondBestPosition,
+				IonsAllUnshifted:         i.PTMResult.IonsAllUnshifted,
+				IonsShiftedAllPositioins: i.PTMResult.IonsShiftedAllPositions,
 			}
 		}
 

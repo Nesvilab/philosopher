@@ -186,7 +186,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			hasClass = true
 		}
 
-		if evi[i].MSFraggerLoc != nil && len(evi[i].MSFraggerLoc.MSFragerLocalization) > 0 {
+		if evi[i].MSFraggerLoc != nil && len(evi[i].MSFraggerLoc.LocalizationPeptide) > 0 {
 			hasLoc = true
 		}
 
@@ -236,7 +236,18 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	}
 
 	if hasLoc {
-		header += "\tMSFragger Localization\tBest Score with Delta Mass\tBest Matched Ions with Delta Mass\tSecond Best Score with Delta Mass\tSecond Best Matched Ions with Delta Mass\tBest Score without Delta Mass\tMatched Ions without Delta mass\tLocalization Scores\tScore All\tMatched Ions All\tScore Delta Mass Only\tMatched Ions Delta Mass Only\tBest Score Delta Mass Only"
+		header += "\tMSFragger Localization" +
+			"\tPosition Scores" +
+			"\tScore Best Position" +
+			"\tIons Best Position" +
+			"\tScore Second Best Position" +
+			"\tIons Second Best Position" +
+			"\tScore All Unshifted" +
+			"\tIons All Unshifted" +
+			"\tScore Shifted Best Position" +
+			"\tIons Shifted Best Position" +
+			"\tScore Shifted All Positions" +
+			"\tIonS Shifted All Positions"
 	}
 
 	if hasIonMob {
@@ -618,21 +629,20 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			if MSFraggerLoc == nil {
 				MSFraggerLoc = &id.MSFraggerLoc{}
 			}
-			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				line,
-				MSFraggerLoc.MSFragerLocalization,
-				MSFraggerLoc.MSFraggerLocalizationScoreWithPTM,
-				MSFraggerLoc.MSFraggerLocalizationScoreWithPTMIons,
-				MSFraggerLoc.MSFraggerLocalizationSecondScoreWithPTM,
-				MSFraggerLoc.MSFraggerLocalizationSecondScoreWithPTMIons,
-				MSFraggerLoc.MSFraggerLocalizationScoreWithoutPTM,
-				MSFraggerLoc.MSFraggerLocalizationScoreWithoutPTMIons,
-				MSFraggerLoc.MSFraggerLocalizationScores,
-				MSFraggerLoc.MSFraggerScoreAll,
-				MSFraggerLoc.MSFraggerScoreAllIons,
-				MSFraggerLoc.MSFraggerScoreOnlyShifted,
-				MSFraggerLoc.MSFraggerScoreOnlyShiftedIons,
-				MSFraggerLoc.MSFraggerBestScoreOnlyShifted)
+				MSFraggerLoc.LocalizationPeptide,
+				MSFraggerLoc.PositionScores,
+				MSFraggerLoc.ScoreBestPosition,
+				MSFraggerLoc.IonsBestPosition,
+				MSFraggerLoc.ScoreSecondBestPosition,
+				MSFraggerLoc.IonsSecondBestPosition,
+				MSFraggerLoc.ScoreAllUnshifted,
+				MSFraggerLoc.IonsAllUnshifted,
+				MSFraggerLoc.ScoreShiftedBestPosition,
+				MSFraggerLoc.IonsShiftedBestPosition,
+				MSFraggerLoc.ScoreShiftedAllPositions,
+				MSFraggerLoc.IonsShiftedAllPositioins)
 		}
 
 		if hasIonMob {

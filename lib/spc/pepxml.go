@@ -216,17 +216,16 @@ type ProphetModel struct {
 
 // PTMResult tag
 type PTMResult struct {
-	BestScoreWithPTM           string `xml:"best_score_with_ptm,attr"`
-	BestScoreWithPTMIons       string `xml:"best_score_with_ptm_matched_ions,attr"`
-	SecondBestScoreWithPTM     string `xml:"second_best_score_with_ptm,attr"`
-	SecondBestScoreWithPTMIons string `xml:"second_best_score_with_ptm_matched_ions,attr"`
-	ScoreWithoutPTM            string `xml:"score_without_ptm,attr"`
-	ScoreWithoutPTMIons        string `xml:"score_without_ptm_matched_ions,attr"`
-	LocalizationPeptide        string `xml:"localization_peptide,attr"`
-	LocalizationScores         string `xml:"localization_scores,attr"`
-	ScoreAll                   string `xml:"score_all,attr"`
-	ScoreAllIons               string `xml:"score_all_matched_ions,attr"`
-	ScoreOnlyShifted           string `xml:"score_only_shifted,attr"`
-	ScoreOnlyShiftedIons       string `xml:"score_only_shifted_matched_ions,attr"`
-	BestScoreOnlyShifted       string `xml:"best_score_only_shifted,attr"`
+	ScoreBestPosition        string `xml:"score_best_position,attr"`
+	IonsBestPosition         string `xml:"ions_best_position,attr"`
+	ScoreSecondBestPosition  string `xml:"score_second_best_position,attr"`
+	IonsSecondBestPosition   string `xml:"ions_second_best_position,attr"`
+	ScoreAllUnshifted        string `xml:"score_all_unshifted,attr"`
+	IonsAllUnshifted         string `xml:"ions_all_unshifted,attr"`
+	LocalizationPeptide      string `xml:"localization_peptide,attr"`
+	PositionScores           string `xml:"position_scores,attr"`
+	ScoreShiftedAllPositions string `xml:"score_shifted_all_positions,attr"`
+	IonsShiftedAllPositions  string `xml:"ions_shifted_all_positions,attr"`
+	ScoreShiftedBestPosition string `xml:"score_shifted_best_position,attr"`
+	IonsShiftedBestPosition  string `xml:"ions_shifted_best_position,attr"`
 }
