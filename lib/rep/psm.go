@@ -238,7 +238,6 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	if hasLoc {
 		header += "\tMSFragger Localization" +
 			"\tPosition Scores" +
-			"\tBest Position" +
 			"\tScore Best Position" +
 			"\tIons Best Position" +
 			"\tScore Second Best Position" +
@@ -630,11 +629,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			if MSFraggerLoc == nil {
 				MSFraggerLoc = &id.MSFraggerLoc{}
 			}
-			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			line = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 				line,
 				MSFraggerLoc.LocalizationPeptide,
 				MSFraggerLoc.PositionScores,
-				MSFraggerLoc.BestPosition,
 				MSFraggerLoc.ScoreBestPosition,
 				MSFraggerLoc.IonsBestPosition,
 				MSFraggerLoc.ScoreSecondBestPosition,

@@ -117,7 +117,6 @@ type MSFraggerLoc struct {
 	IonsSecondBestPosition   string
 	IonsAllUnshifted         string
 	IonsShiftedAllPositioins string
-	BestPosition             string
 }
 
 // PepIDList is a list of PeptideSpectrumMatch
@@ -511,7 +510,6 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 				IonsSecondBestPosition:   i.PTMResult.IonsSecondBestPosition,
 				IonsAllUnshifted:         i.PTMResult.IonsAllUnshifted,
 				IonsShiftedAllPositioins: i.PTMResult.IonsShiftedAllPositions,
-				BestPosition:             i.PTMResult.BestPosition,
 			}
 		}
 
