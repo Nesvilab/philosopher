@@ -249,7 +249,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			"\tScore Shifted Best Position" +
 			"\tIons Shifted Best Position" +
 			"\tScore Shifted All Positions" +
-			"\tIonS Shifted All Positions"
+			"\tIons Shifted All Positions"
 	}
 
 	if hasIonMob {
