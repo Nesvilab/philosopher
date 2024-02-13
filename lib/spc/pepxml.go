@@ -228,4 +228,6 @@ type PTMResult struct {
 	IonsShiftedAllPositions  string `xml:"ions_shifted_all_positions,attr"`
 	ScoreShiftedBestPosition string `xml:"score_shifted_best_position,attr"`
 	IonsShiftedBestPosition  string `xml:"ions_shifted_best_position,attr"`
+	ShiftedOnlyScores        string `xml:"shifted_only_position_scores,attr"`
+	ShiftedOnlyIons          string `xml:"shifted_only_position_ions,attr"`
 }
