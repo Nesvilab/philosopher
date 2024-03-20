@@ -43,10 +43,10 @@ func init() {
 	fmt := new(logrus.TextFormatter)
 	fmt.TimestampFormat = "15:04:05"
 	fmt.FullTimestamp = true
-	fmt.DisableColors = false
+	fmt.DisableColors = true
 
 	if runtime.GOOS == sys.Windows() {
-		fmt.ForceColors = true
+		fmt.DisableColors = true
 		logrus.SetOutput(colorable.NewColorableStdout())
 	}
 
