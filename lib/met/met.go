@@ -483,7 +483,7 @@ func CleanTemp(dir string) {
 
 	e := os.RemoveAll(dir)
 	if e != nil {
-		msg.Custom(e, "fatal")
+		msg.Custom(e, "warning")
 	}
 }
 
