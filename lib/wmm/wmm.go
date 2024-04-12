@@ -82,7 +82,7 @@ func writePhilosopher(f met.Filter, q met.Quantify, text string) string {
 	either as a unique peptide to a particular protein group or assigned as a razor peptide to a single protein group that had the most peptide evidence. The protein groups
 	assembled by ProteinProphet (Nesvizhskii et al., 2003) were filtered to 1% protein-level False Discovery Rate (FDR) using the chosen FDR target-decoy strategy and the best
 	peptide approach (allowing both unique and razor peptides) and applying the picked FDR strategy (Savitski et al., 2015). In each TMT 10-plex, the PSM lists were filtered
-	using a stringent, sequential FDR strategy, retaining only those PSMs with PeptideProphet probability of 0.9 or higher (which in these data corresponded to less than 1% PSM-level FDR)
+	using a stringent, sequential FDR strategy, retaining only those PSMs with probability of 0.9 or higher (which in these data corresponded to less than 1% PSM-level FDR)
 	and mapped to proteins that also passed the global 1% protein-level FDR filter. For each PSM that passed these filters, MS1 intensity of the corresponding precursor-ion
 	was extracted using the Philosopher label-free quantification module based on the moFF method (Argentini et al., 2016) (using 10 p.p.m mass tolerance and 0.4 min retention
 	time window for extracted ion chromatogram peak tracing). In addition, for all PSMs corresponding to a TMT-labeled peptide, ten TMT reporter ion intensities were extracted from the MS/MS

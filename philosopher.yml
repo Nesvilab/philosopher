@@ -215,7 +215,7 @@ Protein Inference:                               # ProteinProphet v5.2
   iprophet: false                                # input is from iProphet
   logprobs: false                                # use the log of the probabilities in the Confidence calculations
   maxppmdiff: 20                                 # maximum peptide mass difference in PPM (default 20)
-  minprob: 0.05                                  # peptideProphet probabilty threshold (default 0.05)
+  minprob: 0.05                                  # probabilty threshold (default 0.05)
   mufactor: 1                                    # fudge factor to scale MU calculation (default 1)
   nogroupwts: false                              # check peptide's Protein weight against the threshold (default: check peptide's Protein Group weight against threshold)
   nonsp: false                                   # do not use NSP model

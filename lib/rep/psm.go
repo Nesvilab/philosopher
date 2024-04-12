@@ -220,7 +220,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		header += "\tRTScore"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tPeptideProphet Probability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tProbability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
 
 	if hasClass {
 		header += "\tClass"

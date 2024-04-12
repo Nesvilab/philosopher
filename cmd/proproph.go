@@ -50,7 +50,7 @@ func init() {
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.NonSP, "nonsp", "", false, "do not use NSP model")
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Subgroups, "subgroups", "", false, "do not use NOGROUPS")
 		proprophCmd.Flags().IntVarP(&m.ProteinProphet.Minindep, "minindep", "", 0, "minimum percentage of independent peptides required for a protein")
-		proprophCmd.Flags().Float64VarP(&m.ProteinProphet.Minprob, "minprob", "", 0.05, "PeptideProphet probability threshold")
+		proprophCmd.Flags().Float64VarP(&m.ProteinProphet.Minprob, "minprob", "", 0.05, "probability threshold")
 		proprophCmd.Flags().IntVarP(&m.ProteinProphet.Maxppmdiff, "maxppmdiff", "", 2000000, "maximum peptide mass difference in ppm")
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Accuracy, "accuracy", "", false, "equivalent to --minprob 0")
 		proprophCmd.Flags().BoolVarP(&m.ProteinProphet.Normprotlen, "normprotlen", "", false, "normalize NSP using protein length")
