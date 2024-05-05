@@ -9,11 +9,9 @@
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Nesvilab/philosopher/go.yml?style=for-the-badge)
 
-#### Philosopher is a fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. Philosopher is dependency-free and can analyze both traditional database searches and open searches for post-translational modification (PTM) discovery. 
+#### Philosopher is a fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. It is also a depencency-free wraper of Trans-Proteomic Pipeline (PeptideProphet, iProphet, PTMProphet, and ProteinProphet).
 
 - Database downloading and formatting.
-
-- Peptide-spectrum matching with MSFragger and Comet.
 
 - Peptide assignment validation with PeptideProphet.
 
@@ -32,25 +30,13 @@
 
 - Label-based quantification using TMT and iTRAQ.
 
-- Quantification based on functional protein groups.
-
 - Multi-level detailed reports for peptides, ions, and proteins.
 
 - Support for REPRINT and MSstats.
 
-## Download
-Download the latest version [here](https://github.com/nesvilab/philosopher/releases/latest).
-
 
 ## How to Use
-- [Philosopher basics](https://github.com/Nesvilab/philosopher/wiki/Philosopher-Basics) - general usage information
-- [Preparing protein databases](https://github.com/Nesvilab/philosopher/wiki/How-to-Prepare-a-Protein-Database) - download and format sequences
-- [Simple data analysis](https://github.com/Nesvilab/philosopher/wiki/Simple-Data-Analysis) - basic step-by-step tutorial
-- [Using pipeline for TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Pipeline-mode-for-TMT-analysis) - pipeline analysis of a large data set
-- [Step-by-step TMT analysis](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-TMT-analysis) - step-by-step tutorial for isobaric quantification of a small data set
-- [Open search analysis](https://github.com/Nesvilab/philosopher/wiki/Open-Search-Analysis) - step-by-step tutorial for open searches
-- [Step-by-step analysis with Comet](https://github.com/Nesvilab/philosopher/wiki/Step-by-step-analysis-with-Comet) - step-by-step tutorial with Comet search
-- [Protein-protein interaction analysis](https://github.com/Nesvilab/philosopher/wiki/REPRINT-Analysis) - analyze AP-MS data for downstream use with REPRINT
+Philosopher is part of [FragPipe](https://fragpipe.nesvilab.org/) which has a user-friendly GUI.
 
 ## Documentation
 See the [documentation](https://github.com/Nesvilab/philosopher/wiki/Home) for more details about the available commands.
