@@ -430,7 +430,6 @@ func deltaMassBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR 
 	for k, v := range uniqPsms {
 
 		var glyco, common bool
-
 		if v[0].Massdiff > 145 {
 			glyco = true
 		} else if v[0].Massdiff >= 3.5 && v[0].Massdiff <= 145 {
@@ -511,21 +510,24 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 					other = true
 				}
 
+			} else {
+				if len(v[0].ModifiedPeptide) > 0 && !defined {
+					other = true
+				}
 			}
 		}
 
-		if other && defined {
+		if other && defined { //67
 			restModPSMs[k] = v
-		} else if other && !defined {
+		} else if other && !defined { //1430
 			restModPSMs[k] = v
-		} else if !other && defined {
+		} else if !other && defined { //2202
 			definedModPSMs[k] = v
 		} else {
 			unModPSMs[k] = v
 		}
 
 	}
-
 	logrus.Info("Filtering unmodified PSMs")
 	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
 
