@@ -359,7 +359,7 @@ type Filter struct {
 	TwoD      bool    `yaml:"two-dimensional"`
 	Mapmods   bool    `yaml:"mapMods"`
 	Delta     bool    `yaml:"delta"`
-	Inference bool    `yaml:"delta"`
+	Inference bool    `yaml:"inference"`
 	Group     bool    `yaml:"group"`
 	MinPepLen int     `yaml:"minPepLen"`
 }
