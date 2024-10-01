@@ -56,6 +56,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Nextscore = i.Nextscore
 		p.SpectralSim = i.SpectralSim
 		p.Rtscore = i.Rtscore
+		p.IMscore = i.IMscore
 		p.Intensity = i.Intensity
 		p.IonMobility = i.IonMobility
 		p.CompensationVoltage = i.CompensationVoltage
@@ -130,6 +131,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	var hasClass bool
 	var hasSpectralSim bool
 	var hasRtScore bool
+	var hasIMScore bool
 
 	if hasPrefix {
 		output = fmt.Sprintf("%s%s%s_psm.tsv", workspace, string(filepath.Separator), path.Base(workspace))
@@ -198,6 +200,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			hasRtScore = true
 		}
 
+		if evi[i].IMscore != 0 {
+			hasIMScore = true
+		}
+
 	}
 
 	for k := range modMap {
@@ -218,6 +224,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 	if hasRtScore {
 		header += "\tRTScore"
+	}
+
+	if hasIMScore {
+		header += "\tIMScore"
 	}
 
 	header += "\tExpectation\tHyperscore\tNextscore\tProbability\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
@@ -584,6 +594,13 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			line = fmt.Sprintf("%s\t%.4f",
 				line,
 				i.Rtscore,
+			)
+		}
+
+		if hasIMScore {
+			line = fmt.Sprintf("%s\t%.4f",
+				line,
+				i.IMscore,
 			)
 		}
 

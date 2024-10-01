@@ -89,6 +89,7 @@ type PeptideIdentification struct {
 	Nextscore                        float64
 	SpectralSim                      float64
 	Rtscore                          float64
+	IMscore                          float64
 	IonMobility                      float64
 	Intensity                        float64
 	PrevAA                           []byte
@@ -497,6 +498,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			} else if string(j.Name) == "rtscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Rtscore = value
+			} else if string(j.Name) == "imscore" {
+				value, _ := strconv.ParseFloat(j.Value, 64)
+				psm.IMscore = value
 			}
 		}
 

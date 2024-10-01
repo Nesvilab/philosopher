@@ -154,6 +154,7 @@ type PSMEvidence struct {
 	Nextscore                        float64
 	SpectralSim                      float64
 	Rtscore                          float64
+	IMscore                          float64
 	Intensity                        float64
 	IonMobility                      float64
 	Purity                           float64
