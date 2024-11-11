@@ -268,8 +268,8 @@ func getProteinName(header string, class dbtype, verb bool) (match string) {
 	return match
 }
 
-var getEntryNameEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getEntryNameCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getEntryNameEnsembl = regexp.MustCompile(`(ENSP\w+\.?[^|])`)
+var getEntryNameCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?[^|])`)
 var getEntryNameNcbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
 var getEntryNameUniprot = regexp.MustCompile(`\w+\|.+?\|(.+?)\s`)
 var getEntryNameUniref = regexp.MustCompile(`(UniRef\w+)`)
@@ -319,8 +319,8 @@ func getEntryName(header string, class dbtype, verb bool) (match string) {
 	return match
 }
 
-var getIDEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
-var getIDCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?\d{1,})`)
+var getIDEnsembl = regexp.MustCompile(`(ENSP\w+\.?[^|])`)
+var getIDCptacEnsembl = regexp.MustCompile(`(ENSP\w+\.?[^|])`)
 var getIDNcbi = regexp.MustCompile(`(\w{2}_\d{1,10}\.?(\d{1,2})?)`)
 var getIDUniprot = regexp.MustCompile(`[sp|tr]\|(.+?)\|`)
 var getIDUniref = regexp.MustCompile(`(UniRef\w+)`)
