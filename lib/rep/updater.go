@@ -453,8 +453,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		}
 	}
 
-	var proteinStart = make(map[string]int)
-	var proteinEnd = make(map[string]int)
+	type peptideData struct {
+		Start int // Peptide start position in the protein
+		End   int // Peptide end position in the protein
+	}
+	var updatedPeptideData = make(map[string]peptideData)
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
@@ -477,54 +480,37 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 		}
 
+		// The flanking amino acids are added to the peptide, in order to map it properly to the protein
+		// by also considering the enzymatic cleavage rules. The extended peptide is then used to find
+		// its start and end indices in the protein (mstart, mend). Finally, for reporting the real
+		// peptide start and end positions the indices need to be adjusted, taking into account the
+		// flanking amino acids that were added to the peptide, as well as the zero-based indexing.
 		var adjustStart = 0
 		var adjustEnd = 0
 
-		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
-
+		extendedPeptide := replacerIL.Replace(evi.PSM[i].Peptide)
 		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
-			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+			extendedPeptide = replacerIL.Replace(evi.PSM[i].PrevAA) + extendedPeptide
 			adjustStart = +2
 		}
-
 		if evi.PSM[i].PrevAA == "-" && len(evi.PSM[i].PrevAA) == 1 {
 			adjustStart = +1
 		}
-
 		if evi.PSM[i].NextAA != "-" && len(evi.PSM[i].NextAA) == 1 {
-			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+			extendedPeptide = extendedPeptide + replacerIL.Replace(evi.PSM[i].NextAA)
 			adjustEnd = -1
 		}
 
-		// map the peptide to the protein
-		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
-		mend := mstart + len(peptide)
+		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions
+		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
+		mend := mstart + len(extendedPeptide)
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
-
-		proteinStart[evi.PSM[i].Peptide] = evi.PSM[i].ProteinStart
-		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
-
-		// {
-		// 	proteinStart[evi.PSM[i].Peptide] = mstart
-		// 	proteinEnd[evi.PSM[i].Peptide] = mend
-
-		// 	seq := recordMap[evi.PSM[i].Protein].Sequence
-
-		// 	fmt.Println(evi.PSM[i].Peptide)
-		// 	fmt.Println(peptide)
-
-		// 	fmt.Println(mstart)
-
-		// 	mapPep := seq[mstart:mend]
-		// 	fmt.Println(mapPep)
-
-		// 	fmt.Println("")
-		// }
+		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd}
 
 		// map the flanking aminoacids
-		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(peptide) + `(\w{0,7})`)
+		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,7})`)
 		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 
 		var left string
@@ -577,8 +563,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			evi.Ions[i].IsDecoy = true
 		}
 
-		tmp.ProteinStart, tmp.ProteinEnd = proteinStart[tmp.Sequence], proteinEnd[tmp.Sequence]
-
 		// update mapped genes
 		for k := range ion.MappedProteins {
 			if strings.Contains(k, decoyTag) {
@@ -588,6 +572,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			geneName := recordMap[k].GeneNames
 			tmp.MappedGenes[geneName] = struct{}{}
 		}
+
+		// update start and positions with correct values derived from the protein database
+		peptideData := updatedPeptideData[evi.Ions[i].Sequence]
+		tmp.ProteinStart, tmp.ProteinEnd = peptideData.Start, peptideData.End
 	}
 
 	for i := range evi.Peptides {
@@ -608,11 +596,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			evi.Peptides[i].IsDecoy = true
 		}
 
-		if seq, ok := proteinStart[evi.Peptides[i].Sequence]; ok {
-			evi.Peptides[i].ProteinStart = seq
-		}
-		if seq, ok := proteinEnd[evi.Peptides[i].Sequence]; ok {
-			evi.Peptides[i].ProteinEnd = seq
+		if peptideData, ok := updatedPeptideData[evi.Peptides[i].Sequence]; ok {
+			evi.Peptides[i].ProteinStart = peptideData.Start
+			evi.Peptides[i].ProteinEnd = peptideData.End
 		}
 
 		// update mapped genes
