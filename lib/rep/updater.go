@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -454,8 +455,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 	}
 
 	type peptideData struct {
-		Start int // Peptide start position in the protein
-		End   int // Peptide end position in the protein
+		Start    int    // Peptide start position in the protein
+		End      int    // Peptide end position in the protein
+		Sequence string // Peptide sequence as observed in the protein
 	}
 	var updatedPeptideData = make(map[string]peptideData)
 
@@ -501,13 +503,21 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			adjustEnd = -1
 		}
 
-		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions
+		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions, replace the
+		// peptide and modifiedPeptide sequences with the observed sequence from the protein record
+		// to fix a potential I/L mixup issue.
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 		mend := mstart + len(extendedPeptide)
+		sequenceAsObservedInProtein := rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
+		newModifiedPeptide, updateModifiedPeptideErr := updateModifiedSequence(evi.PSM[i].Peptide, evi.PSM[i].ModifiedPeptide, sequenceAsObservedInProtein)
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
-		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd}
+		evi.PSM[i].Peptide = sequenceAsObservedInProtein
+		if updateModifiedPeptideErr == nil {
+			evi.PSM[i].ModifiedPeptide = newModifiedPeptide
+		}
+		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd, sequenceAsObservedInProtein}
 
 		// map the flanking aminoacids
 		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,7})`)
@@ -573,9 +583,14 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			tmp.MappedGenes[geneName] = struct{}{}
 		}
 
-		// update start and positions with correct values derived from the protein database
+		// update start and positions, sequence and modified sequence with correct values derived from the protein database
 		peptideData := updatedPeptideData[evi.Ions[i].Sequence]
 		tmp.ProteinStart, tmp.ProteinEnd = peptideData.Start, peptideData.End
+		newModifiedSequence, updateModifiedSequenceErr := updateModifiedSequence(tmp.Sequence, tmp.ModifiedSequence, peptideData.Sequence)
+		tmp.Sequence = peptideData.Sequence
+		if updateModifiedSequenceErr == nil {
+			tmp.ModifiedSequence = newModifiedSequence
+		}
 	}
 
 	for i := range evi.Peptides {
@@ -599,6 +614,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		if peptideData, ok := updatedPeptideData[evi.Peptides[i].Sequence]; ok {
 			evi.Peptides[i].ProteinStart = peptideData.Start
 			evi.Peptides[i].ProteinEnd = peptideData.End
+			evi.Peptides[i].Sequence = peptideData.Sequence
 		}
 
 		// update mapped genes
@@ -929,4 +945,47 @@ func (evi *Evidence) ApplyRazorAssignment(decoyTag string) {
 			evi.Peptides[i].IsDecoy = true
 		}
 	}
+}
+
+// Replaces the amino acid sequence of a modified sequence with the updated sequence
+// Used to fix I and L amino acids being mixed up in modified sequences after using PromoteProteinIDs()
+// Returns an empty string when the modifiedOriginalSequence is an empty string
+func updateModifiedSequence(originalSequence string, modifiedOriginalSequence string, updatedSequence string) (string, error) {
+	// test that the original sequence has the same length as updated sequence, otherwise return an error
+	if len(originalSequence) != len(updatedSequence) {
+		return "", errors.New("originalSequence and updatedSequence must have the same length")
+	}
+
+	// Find positions of modification tags, i.e. all pairs of "[" and "]" along with their modification strings
+	var modPositions []int
+	var modificationTags []string
+	for i := 0; i < len(modifiedOriginalSequence); i++ {
+		if modifiedOriginalSequence[i] == '[' {
+			start := i
+			for j := i; j < len(modifiedOriginalSequence); j++ {
+				if modifiedOriginalSequence[j] == ']' {
+					modPositions = append(modPositions, start)
+					modificationTags = append(modificationTags, modifiedOriginalSequence[start:j+1])
+					i = j
+					break
+				}
+			}
+		}
+	}
+
+	// Remove all pairs of "[" and "]" along with their modification string
+	modifiedSequenceWithoutModTags := modifiedOriginalSequence
+	for _, content := range modificationTags {
+		modifiedSequenceWithoutModTags = strings.Replace(modifiedSequenceWithoutModTags, content, "", 1)
+	}
+
+	// Replace originalSequence with updatedSequence
+	observedModifiedSequence := strings.Replace(modifiedSequenceWithoutModTags, originalSequence, updatedSequence, 1)
+
+	// Add the modification tags back at the right modPositions
+	for i, pos := range modPositions {
+		observedModifiedSequence = observedModifiedSequence[:pos] + modificationTags[i] + observedModifiedSequence[pos:]
+	}
+
+	return observedModifiedSequence, nil
 }
