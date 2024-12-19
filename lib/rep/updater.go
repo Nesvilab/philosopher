@@ -1,6 +1,7 @@
 package rep
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -453,8 +454,12 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		}
 	}
 
-	var proteinStart = make(map[string]int)
-	var proteinEnd = make(map[string]int)
+	type peptideData struct {
+		Start    int    // Peptide start position in the protein
+		End      int    // Peptide end position in the protein
+		Sequence string // Peptide sequence as observed in the protein
+	}
+	var updatedPeptideData = make(map[string]peptideData)
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
@@ -477,54 +482,45 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 		}
 
+		// The flanking amino acids are added to the peptide, in order to map it properly to the protein
+		// by also considering the enzymatic cleavage rules. The extended peptide is then used to find
+		// its start and end indices in the protein (mstart, mend). Finally, for reporting the real
+		// peptide start and end positions the indices need to be adjusted, taking into account the
+		// flanking amino acids that were added to the peptide, as well as the zero-based indexing.
 		var adjustStart = 0
 		var adjustEnd = 0
 
-		peptide := replacerIL.Replace(evi.PSM[i].Peptide)
-
+		extendedPeptide := replacerIL.Replace(evi.PSM[i].Peptide)
 		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
-			peptide = replacerIL.Replace(evi.PSM[i].PrevAA) + peptide
+			extendedPeptide = replacerIL.Replace(evi.PSM[i].PrevAA) + extendedPeptide
 			adjustStart = +2
 		}
-
 		if evi.PSM[i].PrevAA == "-" && len(evi.PSM[i].PrevAA) == 1 {
 			adjustStart = +1
 		}
-
 		if evi.PSM[i].NextAA != "-" && len(evi.PSM[i].NextAA) == 1 {
-			peptide = peptide + replacerIL.Replace(evi.PSM[i].NextAA)
+			extendedPeptide = extendedPeptide + replacerIL.Replace(evi.PSM[i].NextAA)
 			adjustEnd = -1
 		}
 
-		// map the peptide to the protein
-		mstart := strings.Index(replacerIL.Replace(rec.Sequence), peptide)
-		mend := mstart + len(peptide)
+		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions, replace the
+		// peptide and modifiedPeptide sequences with the observed sequence from the protein record
+		// to fix a potential I/L mixup issue.
+		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
+		mend := mstart + len(extendedPeptide)
+		sequenceAsObservedInProtein := rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
+		newModifiedPeptide, updateModifiedPeptideErr := updateModifiedSequence(evi.PSM[i].Peptide, evi.PSM[i].ModifiedPeptide, sequenceAsObservedInProtein)
 
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
-
-		proteinStart[evi.PSM[i].Peptide] = evi.PSM[i].ProteinStart
-		proteinEnd[evi.PSM[i].Peptide] = evi.PSM[i].ProteinEnd
-
-		// {
-		// 	proteinStart[evi.PSM[i].Peptide] = mstart
-		// 	proteinEnd[evi.PSM[i].Peptide] = mend
-
-		// 	seq := recordMap[evi.PSM[i].Protein].Sequence
-
-		// 	fmt.Println(evi.PSM[i].Peptide)
-		// 	fmt.Println(peptide)
-
-		// 	fmt.Println(mstart)
-
-		// 	mapPep := seq[mstart:mend]
-		// 	fmt.Println(mapPep)
-
-		// 	fmt.Println("")
-		// }
+		evi.PSM[i].Peptide = sequenceAsObservedInProtein
+		if updateModifiedPeptideErr == nil {
+			evi.PSM[i].ModifiedPeptide = newModifiedPeptide
+		}
+		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd, sequenceAsObservedInProtein}
 
 		// map the flanking aminoacids
-		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(peptide) + `(\w{0,7})`)
+		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,7})`)
 		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 
 		var left string
@@ -577,8 +573,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			evi.Ions[i].IsDecoy = true
 		}
 
-		tmp.ProteinStart, tmp.ProteinEnd = proteinStart[tmp.Sequence], proteinEnd[tmp.Sequence]
-
 		// update mapped genes
 		for k := range ion.MappedProteins {
 			if strings.Contains(k, decoyTag) {
@@ -587,6 +581,15 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 
 			geneName := recordMap[k].GeneNames
 			tmp.MappedGenes[geneName] = struct{}{}
+		}
+
+		// update start and positions, sequence and modified sequence with correct values derived from the protein database
+		peptideData := updatedPeptideData[evi.Ions[i].Sequence]
+		tmp.ProteinStart, tmp.ProteinEnd = peptideData.Start, peptideData.End
+		newModifiedSequence, updateModifiedSequenceErr := updateModifiedSequence(tmp.Sequence, tmp.ModifiedSequence, peptideData.Sequence)
+		tmp.Sequence = peptideData.Sequence
+		if updateModifiedSequenceErr == nil {
+			tmp.ModifiedSequence = newModifiedSequence
 		}
 	}
 
@@ -608,11 +611,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			evi.Peptides[i].IsDecoy = true
 		}
 
-		if seq, ok := proteinStart[evi.Peptides[i].Sequence]; ok {
-			evi.Peptides[i].ProteinStart = seq
-		}
-		if seq, ok := proteinEnd[evi.Peptides[i].Sequence]; ok {
-			evi.Peptides[i].ProteinEnd = seq
+		if peptideData, ok := updatedPeptideData[evi.Peptides[i].Sequence]; ok {
+			evi.Peptides[i].ProteinStart = peptideData.Start
+			evi.Peptides[i].ProteinEnd = peptideData.End
+			evi.Peptides[i].Sequence = peptideData.Sequence
 		}
 
 		// update mapped genes
@@ -943,4 +945,47 @@ func (evi *Evidence) ApplyRazorAssignment(decoyTag string) {
 			evi.Peptides[i].IsDecoy = true
 		}
 	}
+}
+
+// Replaces the amino acid sequence of a modified sequence with the updated sequence
+// Used to fix I and L amino acids being mixed up in modified sequences after using PromoteProteinIDs()
+// Returns an empty string when the modifiedOriginalSequence is an empty string
+func updateModifiedSequence(originalSequence string, modifiedOriginalSequence string, updatedSequence string) (string, error) {
+	// test that the original sequence has the same length as updated sequence, otherwise return an error
+	if len(originalSequence) != len(updatedSequence) {
+		return "", errors.New("originalSequence and updatedSequence must have the same length")
+	}
+
+	// Find positions of modification tags, i.e. all pairs of "[" and "]" along with their modification strings
+	var modPositions []int
+	var modificationTags []string
+	for i := 0; i < len(modifiedOriginalSequence); i++ {
+		if modifiedOriginalSequence[i] == '[' {
+			start := i
+			for j := i; j < len(modifiedOriginalSequence); j++ {
+				if modifiedOriginalSequence[j] == ']' {
+					modPositions = append(modPositions, start)
+					modificationTags = append(modificationTags, modifiedOriginalSequence[start:j+1])
+					i = j
+					break
+				}
+			}
+		}
+	}
+
+	// Remove all pairs of "[" and "]" along with their modification string
+	modifiedSequenceWithoutModTags := modifiedOriginalSequence
+	for _, content := range modificationTags {
+		modifiedSequenceWithoutModTags = strings.Replace(modifiedSequenceWithoutModTags, content, "", 1)
+	}
+
+	// Replace originalSequence with updatedSequence
+	observedModifiedSequence := strings.Replace(modifiedSequenceWithoutModTags, originalSequence, updatedSequence, 1)
+
+	// Add the modification tags back at the right modPositions
+	for i, pos := range modPositions {
+		observedModifiedSequence = observedModifiedSequence[:pos] + modificationTags[i] + observedModifiedSequence[pos:]
+	}
+
+	return observedModifiedSequence, nil
 }
