@@ -158,7 +158,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 	if brand == "tmt" {
 		switch channels {
 		case 6:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -168,7 +168,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 				printSet[headerIndex].Labels.Channel10.CustomName,
 			)
 		case 10:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -182,7 +182,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 				printSet[headerIndex].Labels.Channel10.CustomName,
 			)
 		case 11:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -197,7 +197,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 				printSet[headerIndex].Labels.Channel11.CustomName,
 			)
 		case 16:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -217,7 +217,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 				printSet[headerIndex].Labels.Channel16.CustomName,
 			)
 		case 18:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -244,7 +244,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 	} else if brand == "itraq" {
 		switch channels {
 		case 4:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -252,7 +252,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 				printSet[headerIndex].Labels.Channel4.CustomName,
 			)
 		case 8:
-			header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 				header,
 				printSet[headerIndex].Labels.Channel1.CustomName,
 				printSet[headerIndex].Labels.Channel2.CustomName,
@@ -267,7 +267,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			header += ""
 		}
 	} else if brand == "sclip" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 			header,
 			printSet[headerIndex].Labels.Channel1.CustomName,
 			printSet[headerIndex].Labels.Channel2.CustomName,
@@ -277,7 +277,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			printSet[headerIndex].Labels.Channel6.CustomName,
 		)
 	} else if brand == "ibt" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 			header,
 			printSet[headerIndex].Labels.Channel1.CustomName,
 			printSet[headerIndex].Labels.Channel2.CustomName,
@@ -297,7 +297,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			printSet[headerIndex].Labels.Channel16.CustomName,
 		)
 	} else if brand == "xtag" {
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 			header,
 			printSet[headerIndex].Labels.Channel1.CustomName,
 			printSet[headerIndex].Labels.Channel2.CustomName,
@@ -336,7 +336,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 
 		header += "\tQuan Usage"
 
-		header = fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		header = fmt.Sprintf("%s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s\tIntensity %s",
 			header,
 			printSet[headerIndex].Labels.Channel1.CustomName,
 			printSet[headerIndex].Labels.Channel2.CustomName,
