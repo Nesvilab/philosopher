@@ -506,11 +506,29 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions, replace the
 		// peptide and modifiedPeptide sequences with the observed sequence from the protein record
 		// to fix a potential I/L mixup issue.
+		var sequenceAsObservedInProtein = ""
+		// map the flanking aminoacids
+		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,7})`)
+		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 		mend := mstart + len(extendedPeptide)
-		sequenceAsObservedInProtein := rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
+		var isSwitched = false
+		if mstart != -1 {
+			sequenceAsObservedInProtein = rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
+		} else {
+			// mstart = -1 indicates that the protein and the mapped protein were switched during razor assignment, here 8 flanking amino acids are sliced on both sides to keep consistency
+			fmt.Sprintf("spectrum: %s", evi.PSM[i].Spectrum)
+			isSwitched = true
+			extendedPeptide = replacerIL.Replace(evi.PSM[i].Peptide)
+			mstart = strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
+			mend = mstart + len(extendedPeptide)
+			sequenceAsObservedInProtein = rec.Sequence[mstart:mend]
+			adjustStart = 1
+			adjustEnd = 0
+			flanks = regexp.MustCompile(`(\w{0,8})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,8})`)
+			f = flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
+		}
 		newModifiedPeptide, updateModifiedPeptideErr := updateModifiedSequence(evi.PSM[i].Peptide, evi.PSM[i].ModifiedPeptide, sequenceAsObservedInProtein)
-
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
 		evi.PSM[i].Peptide = sequenceAsObservedInProtein
@@ -518,10 +536,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			evi.PSM[i].ModifiedPeptide = newModifiedPeptide
 		}
 		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd, sequenceAsObservedInProtein}
-
-		// map the flanking aminoacids
-		flanks := regexp.MustCompile(`(\w{0,7})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,7})`)
-		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 
 		var left string
 		var right string
@@ -531,13 +545,21 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			match := f[0]
 
 			if len(match) >= 1 && len(match[1]) > 0 {
-				left = fmt.Sprintf("%s%s.", match[1], evi.PSM[i].PrevAA)
+				if isSwitched {
+					left = fmt.Sprintf("%s.", match[1])
+				} else {
+					left = fmt.Sprintf("%s%s.", match[1], evi.PSM[i].PrevAA)
+				}
 			} else {
 				left = "."
 			}
 
 			if len(match) >= 2 && len(match[2]) > 0 {
-				right = fmt.Sprintf(".%s%s", evi.PSM[i].NextAA, match[2])
+				if isSwitched {
+					right = fmt.Sprintf(".%s", match[2])
+				} else {
+					right = fmt.Sprintf(".%s%s", evi.PSM[i].NextAA, match[2])
+				}
 			} else {
 				right = "."
 			}
@@ -846,7 +868,6 @@ func (evi *Evidence) ApplyRazorAssignment(decoyTag string) {
 	razor.Restore(false)
 
 	for i := range evi.PSM {
-
 		v, ok := razor[evi.PSM[i].Peptide]
 		if ok {
 
