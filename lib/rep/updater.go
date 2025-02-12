@@ -2,7 +2,6 @@ package rep
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -463,7 +462,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 
 	replacerIL := strings.NewReplacer("L", "I")
 	for i := range evi.PSM {
-
 		rec := recordMap[evi.PSM[i].Protein]
 		evi.PSM[i].ProteinID = rec.ID
 		evi.PSM[i].EntryName = rec.EntryName
@@ -490,6 +488,7 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		var adjustStart = 0
 		var adjustEnd = 0
 
+		evi.PSM[i].ExtendedPeptide = evi.PSM[i].PrevAA + "." + evi.PSM[i].Peptide + "." + evi.PSM[i].NextAA
 		extendedPeptide := replacerIL.Replace(evi.PSM[i].Peptide)
 		if evi.PSM[i].PrevAA != "-" && len(evi.PSM[i].PrevAA) == 1 {
 			extendedPeptide = replacerIL.Replace(evi.PSM[i].PrevAA) + extendedPeptide
@@ -512,18 +511,29 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		f := flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 		mend := mstart + len(extendedPeptide)
-		var isSwitched = false
 		if mstart != -1 {
 			sequenceAsObservedInProtein = rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
 		} else {
 			// mstart = -1 indicates that the protein and the mapped protein were switched during razor assignment, here 8 flanking amino acids are sliced on both sides to keep consistency
-			fmt.Sprintf("spectrum: %s", evi.PSM[i].Spectrum)
-			isSwitched = true
+			// for the long run, should fix the prevAA and nextAA at the very start when reading data from pep.xml
 			extendedPeptide = replacerIL.Replace(evi.PSM[i].Peptide)
 			mstart = strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 			mend = mstart + len(extendedPeptide)
 			sequenceAsObservedInProtein = rec.Sequence[mstart:mend]
-			adjustStart = 1
+			// reset PrevAA, NextAA, and ExtendedPeptide for PSM with protein reassignment occurred
+			if mstart > 0 {
+				evi.PSM[i].PrevAA = string(rec.Sequence[mstart-1])
+			} else {
+				evi.PSM[i].PrevAA = "-"
+			}
+			if mend < (len(rec.Sequence) - 1) {
+				evi.PSM[i].NextAA = string(rec.Sequence[mend])
+			} else {
+				evi.PSM[i].NextAA = "-"
+			}
+			evi.PSM[i].ExtendedPeptide = "." + evi.PSM[i].Peptide + "."
+
+			adjustStart = 1 // protein start in 1-based index
 			adjustEnd = 0
 			flanks = regexp.MustCompile(`(\w{0,8})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,8})`)
 			f = flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
@@ -545,29 +555,14 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			match := f[0]
 
 			if len(match) >= 1 && len(match[1]) > 0 {
-				if isSwitched {
-					left = fmt.Sprintf("%s.", match[1])
-				} else {
-					left = fmt.Sprintf("%s%s.", match[1], evi.PSM[i].PrevAA)
-				}
-			} else {
-				left = "."
+				left = rec.Sequence[(mstart - len(match[1])):mstart] // extract flanking sequences from protein to address previous I/L replacement during string matching
 			}
 
 			if len(match) >= 2 && len(match[2]) > 0 {
-				if isSwitched {
-					right = fmt.Sprintf(".%s", match[2])
-				} else {
-					right = fmt.Sprintf(".%s%s", evi.PSM[i].NextAA, match[2])
-				}
-			} else {
-				right = "."
+				right = rec.Sequence[mend:(mend + len(match[2]))] // extract flanking sequences from protein to address previous I/L replacement during string matching
 			}
 
-			evi.PSM[i].ExtendedPeptide = left + evi.PSM[i].Peptide + right
-
-		} else {
-			evi.PSM[i].ExtendedPeptide = "." + evi.PSM[i].Peptide + "."
+			evi.PSM[i].ExtendedPeptide = left + evi.PSM[i].ExtendedPeptide + right
 		}
 	}
 
