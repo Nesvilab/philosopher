@@ -2,9 +2,9 @@ package rep
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/Nesvilab/philosopher/lib/dat"
 	"github.com/Nesvilab/philosopher/lib/id"
@@ -488,9 +488,6 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		// flanking amino acids that were added to the peptide, as well as the zero-based indexing.
 		var adjustStart = 0
 		var adjustEnd = 0
-		if evi.PSM[i].Spectrum == "R1-Cisplatin1-HCD-25.16072.16072.3" {
-			fmt.Println("R1-Cisplatin1-HCD-25.16072.16072.3")
-		}
 
 		evi.PSM[i].ExtendedPeptide = evi.PSM[i].PrevAA + "." + evi.PSM[i].Peptide + "." + evi.PSM[i].NextAA
 		extendedPeptide := replacerIL.Replace(evi.PSM[i].Peptide)
@@ -548,6 +545,14 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		evi.PSM[i].Peptide = sequenceAsObservedInProtein
 		if updateModifiedPeptideErr == nil {
 			evi.PSM[i].ModifiedPeptide = newModifiedPeptide
+		}
+		if evi.PSM[i].PTM != nil {
+			if !strings.Contains(evi.PSM[i].ExtendedPeptide, evi.PSM[i].Peptide) {
+				for k, v := range evi.PSM[i].PTM.LocalizedPTMMassDiff {
+					newPTMLocSequence := updatePTMLocalizationSequence(v, evi.PSM[i].Peptide)
+					evi.PSM[i].PTM.LocalizedPTMMassDiff[k] = newPTMLocSequence
+				}
+			}
 		}
 		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd, sequenceAsObservedInProtein}
 
@@ -1012,4 +1017,19 @@ func updateModifiedSequence(originalSequence string, modifiedOriginalSequence st
 	}
 
 	return observedModifiedSequence, nil
+}
+
+func updatePTMLocalizationSequence(ptmLocalizationSequence string, updatedSequence string) string {
+	newPtmLocalization := []rune(ptmLocalizationSequence)
+	seqIndex := 0 // track position in the peptide sequence
+	for i := range newPtmLocalization {
+		if unicode.IsLetter(newPtmLocalization[i]) { // replace letter characters only
+			newPtmLocalization[i] = rune(updatedSequence[seqIndex])
+			seqIndex++
+			if seqIndex >= len(updatedSequence) {
+				break
+			}
+		}
+	}
+	return string(newPtmLocalization)
 }
