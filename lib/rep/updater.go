@@ -2,6 +2,7 @@ package rep
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -487,6 +488,9 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		// flanking amino acids that were added to the peptide, as well as the zero-based indexing.
 		var adjustStart = 0
 		var adjustEnd = 0
+		if evi.PSM[i].Spectrum == "R1-Cisplatin1-HCD-25.16072.16072.3" {
+			fmt.Println("R1-Cisplatin1-HCD-25.16072.16072.3")
+		}
 
 		evi.PSM[i].ExtendedPeptide = evi.PSM[i].PrevAA + "." + evi.PSM[i].Peptide + "." + evi.PSM[i].NextAA
 		extendedPeptide := replacerIL.Replace(evi.PSM[i].Peptide)
@@ -563,6 +567,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 
 			evi.PSM[i].ExtendedPeptide = left + evi.PSM[i].ExtendedPeptide + right
+			if !strings.Contains(evi.PSM[i].ExtendedPeptide, evi.PSM[i].Peptide) {
+				parts := strings.Split(evi.PSM[i].ExtendedPeptide, ".")
+				evi.PSM[i].ExtendedPeptide = parts[0] + "." + evi.PSM[i].Peptide + "." + parts[2]
+			}
 		}
 	}
 
