@@ -3,12 +3,6 @@ package fil
 import (
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
-	"sort"
-	"strings"
-	"sync"
-
 	"github.com/Nesvilab/philosopher/lib/cla"
 	"github.com/Nesvilab/philosopher/lib/id"
 	"github.com/Nesvilab/philosopher/lib/inf"
@@ -16,6 +10,11 @@ import (
 	"github.com/Nesvilab/philosopher/lib/mod"
 	"github.com/Nesvilab/philosopher/lib/rep"
 	"github.com/Nesvilab/philosopher/lib/sys"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -470,7 +469,6 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 				} else {
 					m = fmt.Sprintf("%s:%.4f", i.AminoAcid, i.MassDiff)
 				}
-
 				_, ok := modsMap[m]
 				if ok {
 					defined = true
@@ -478,10 +476,6 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 					other = true
 				}
 
-			} else {
-				if len(v[0].ModifiedPeptide) > 0 && !defined {
-					other = true
-				}
 			}
 		}
 
@@ -494,7 +488,7 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 		}
 
 	}
-	logrus.Info("Filtering unmodified PSMs")
+	logrus.Info("Filtering unmodified and fixed-mod-only PSMs")
 	filteredUnmodPSM, _ := PepXMLFDRFilter(unModPSMs, targetFDR, "PSM", decoyTag, "")
 
 	logrus.Info("Filtering defined modified PSMs")
