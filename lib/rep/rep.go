@@ -159,7 +159,7 @@ type PSMEvidence struct {
 	IonMobility                      float64
 	Purity                           float64
 	IsDecoy                          bool
-	IsContam                         bool
+	IsContaminant                    bool
 	IsUnique                         bool
 	IsURazor                         bool
 	PTM                              *id.PTM
@@ -223,6 +223,7 @@ type IonEvidence struct {
 	IsUnique                 bool
 	IsURazor                 bool
 	IsDecoy                  bool
+	IsContaminant            bool
 	Labels                   *iso.Labels
 	PhosphoLabels            *iso.Labels
 	Modifications            mod.ModificationsSlice
@@ -264,6 +265,7 @@ type PeptideEvidence struct {
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
+	IsContaminant          bool
 	ChargeState            map[uint8]uint8
 	Spectra                map[id.SpectrumType]uint8
 	MappedProteins         map[string]int

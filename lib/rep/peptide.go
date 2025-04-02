@@ -158,8 +158,11 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 	var printSet []*PeptideEvidence
 	for idx, i := range evi {
 
-		if removeContam && (strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_")) {
-			continue
+		if strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_") || strings.HasPrefix(i.Protein, "rev_contam_") {
+			evi[idx].IsContaminant = true
+			if removeContam {
+				continue
+			}
 		}
 
 		if !hasDecoys {
@@ -171,7 +174,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 		}
 	}
 
-	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -440,7 +443,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			string(i.PrevAA),
 			string(i.NextAA),
@@ -453,6 +456,8 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
+			i.IsDecoy,
+			i.IsContaminant,
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,

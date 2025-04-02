@@ -155,7 +155,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 
 		// is this observation a contaminant protein?
 		if strings.HasPrefix(evi[i].Protein, "contam_") || strings.HasPrefix(evi[i].Protein, "Cont_") {
-			evi[i].IsContam = true
+			evi[i].IsContaminant = true
 			if removeContam {
 				continue
 			}
@@ -698,7 +698,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		line = fmt.Sprintf("%s\t%t\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
 			i.IsDecoy,
-			i.IsContam,
+			i.IsContaminant,
 			i.IsUnique,
 			i.Protein,
 			i.ProteinID,

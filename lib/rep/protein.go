@@ -265,8 +265,11 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 	var printSet []*ProteinEvidence
 	for idx, i := range eviProteins {
 
-		if removeContam && (strings.HasPrefix(i.OriginalHeader, "contam_") || strings.HasPrefix(i.OriginalHeader, "Cont_")) {
-			continue
+		if strings.HasPrefix(i.OriginalHeader, "contam_") || strings.HasPrefix(i.OriginalHeader, "Cont_") || strings.HasPrefix(i.OriginalHeader, "rev_contam_") {
+			eviProteins[idx].IsContaminant = true
+			if removeContam {
+				continue
+			}
 		}
 
 		if !hasDecoys {
@@ -278,7 +281,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 		}
 	}
 
-	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tOrganism\tProtein Description\tProtein Existence\tCoverage\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tIs Decoy\tIs Contaminant\tOrganism\tProtein Description\tProtein Existence\tCoverage\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -606,12 +609,14 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the an	alysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%t\t%t\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
 			i.PartHeader,             // Protein
 			i.ProteinID,              // Protein ID
 			i.EntryName,              // Entry Name
 			i.GeneNames,              // Genes
 			i.Length,                 // Length
+			i.IsDecoy,                // Is Decoy
+			i.IsContaminant,          // Is Contaminant
 			i.Organism,               // Organism
 			i.Description,            // Description
 			i.ProteinExistence,       // Protein Existence

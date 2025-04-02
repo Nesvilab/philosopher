@@ -129,8 +129,11 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 	var printSet []*IonEvidence
 	for idx, i := range evi {
 
-		if removeContam && (strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_")) {
-			continue
+		if strings.HasPrefix(i.Protein, "contam_") || strings.HasPrefix(i.Protein, "Cont_") || strings.HasPrefix(i.Protein, "rev_contam_") {
+			evi[idx].IsContaminant = true
+			if removeContam {
+				continue
+			}
 		}
 
 		// This inclusion is necessary to avoid unexistent observations from being included after using the filter --mods options
@@ -145,7 +148,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -407,7 +410,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			string(i.PrevAA),
@@ -424,6 +427,8 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.Intensity,
 			strings.Join(assL, ", "),
 			strings.Join(obs, ", "),
+			i.IsDecoy,
+			i.IsContaminant,
 			i.Protein,
 			i.ProteinID,
 			i.EntryName,
