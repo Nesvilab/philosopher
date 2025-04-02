@@ -159,6 +159,7 @@ type PSMEvidence struct {
 	IonMobility                      float64
 	Purity                           float64
 	IsDecoy                          bool
+	IsContam                         bool
 	IsUnique                         bool
 	IsURazor                         bool
 	PTM                              *id.PTM

@@ -85,7 +85,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 			}
 		}
 
-		// is this bservation a decoy ?
+		// is this observation a decoy ?
 		if cla.IsDecoyPSM(i, decoyTag) {
 			p.IsDecoy = true
 		}
@@ -153,8 +153,12 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	var printSet []*PSMEvidence
 	for i := range evi {
 
-		if removeContam && (strings.HasPrefix(evi[i].Protein, "contam_") || strings.HasPrefix(evi[i].Protein, "Cont_")) {
-			continue
+		// is this observation a contaminant protein?
+		if strings.HasPrefix(evi[i].Protein, "contam_") || strings.HasPrefix(evi[i].Protein, "Cont_") {
+			evi[i].IsContam = true
+			if removeContam {
+				continue
+			}
 		}
 
 		if !hasDecoys {
@@ -272,7 +276,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		header += "\tCompensation Voltage"
 	}
 
-	header += "\tPurity"
+	header += "\tPurity\tIs Decoy\tIs Contaminant"
 
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -691,8 +695,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		)
 		//}
 
-		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%t\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			line,
+			i.IsDecoy,
+			i.IsContam,
 			i.IsUnique,
 			i.Protein,
 			i.ProteinID,
