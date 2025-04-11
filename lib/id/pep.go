@@ -3,6 +3,7 @@ package id
 import (
 	"errors"
 	"fmt"
+	"math"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -98,6 +99,7 @@ type PeptideIdentification struct {
 	MSFragerLoc                      *MSFraggerLoc
 	PTM                              *PTM
 	Modifications                    mod.ModificationsSlice
+	Qvalue                           float64
 }
 
 type PTM struct {
@@ -532,6 +534,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		psm.Spectrum = string(sq.Spectrum)
 
 		psm.mapModsFromPepXML(i.ModificationInfo, mods)
+
+		psm.Qvalue = math.NaN()
 	}
 
 	return psm

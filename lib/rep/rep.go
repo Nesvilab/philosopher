@@ -144,6 +144,7 @@ type PSMEvidence struct {
 	RawMassdiff                      float64
 	Massdiff                         float64
 	Probability                      float64
+	Qvalue                           float64
 	Expectation                      float64
 	Xcorr                            float64
 	DeltaCN                          float64
@@ -218,6 +219,7 @@ type IonEvidence struct {
 	GroupWeight              float64
 	Intensity                float64
 	Probability              float64
+	Qvalue                   float64
 	Expectation              float64
 	SummedLabelIntensity     float64
 	IsUnique                 bool
@@ -262,6 +264,7 @@ type PeptideEvidence struct {
 	ProteinEnd             int
 	Intensity              float64
 	Probability            float64
+	Qvalue                 float64
 	IsUnique               bool
 	IsURazor               bool
 	IsDecoy                bool
@@ -312,7 +315,9 @@ type ProteinEvidence struct {
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
 	Probability            float64
+	Qvalue                 float64
 	TopPepProb             float64
+	TopPepQvalue           float64
 	IsDecoy                bool
 	IsContaminant          bool
 	SupportingSpectra      map[id.SpectrumType]int

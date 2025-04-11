@@ -19,96 +19,46 @@ import (
 func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level, decoyTag, debug string) (id.PepIDListPtrs, float64) {
 
 	//var msg string
-	var targets uint
-	var decoys uint
 	var calcFDR float64
 	var list id.PepIDListPtrs
-	var peplist id.PepIDListPtrs
 	var minProb float64 = 10
 
+	// move all entries from map to list for psm, peptide, and ion
 	if strings.EqualFold(level, "PSM") {
-
-		// move all entries to list and count the number of targets and decoys
 		for _, i := range input {
 			for _, j := range i {
-				if cla.IsDecoyPSM(*j, decoyTag) {
-					decoys++
-				} else {
-					targets++
-				}
 				list = append(list, j)
 			}
 		}
-
 	} else if strings.EqualFold(level, "Peptide") {
-
-		// 0 index means the one with highest score
+		// 0 index means the one with the highest score
 		for _, i := range input {
-			peplist = append(peplist, i[0])
+			list = append(list, i[0])
 		}
-
-		for i := range peplist {
-			if cla.IsDecoyPSM(*peplist[i], decoyTag) {
-				decoys++
-			} else {
-				targets++
-			}
-			list = append(list, peplist[i])
-		}
-
 	} else if strings.EqualFold(level, "Ion") {
-
-		// 0 index means the one with highest score
+		// 0 index means the one with the highest score
 		for _, i := range input {
-			peplist = append(peplist, i[0])
+			list = append(list, i[0])
 		}
-
-		for i := range peplist {
-			if cla.IsDecoyPSM(*peplist[i], decoyTag) {
-				decoys++
-			} else {
-				targets++
-			}
-			list = append(list, peplist[i])
-		}
-
 	}
 
-	sort.Sort(list)
+	// compute pepID qvalues using Probability and add them to the list, the resulting list is sorted by Probability in descending order
+	computePepIDQvalue(list, decoyTag)
 
-	var scoreMap = make(map[float64]float64)
-
+	// determine the minimal Probability that satisfying the FDR threshold
 	limit := (len(list) - 1)
 
-	for j := limit; j >= 0; j-- {
-
-		scoreMap[list[j].Probability] = float64(decoys) / float64(targets)
-
-		if cla.IsDecoyPSM(*list[j], decoyTag) {
-			decoys--
-		} else {
-			targets--
-		}
-
-	}
-
-	var keys []float64
-	for k := range scoreMap {
-		keys = append(keys, k)
-	}
-
-	sort.Sort(sort.Reverse(sort.Float64Slice(keys)))
-
-	for i := range keys {
-		if scoreMap[keys[i]] <= targetFDR {
-			minProb = keys[i]
-			calcFDR = scoreMap[keys[i]]
+	for j := 0; j < limit; j++ {
+		if list[j].Qvalue <= targetFDR {
+			minProb = list[j].Probability
+			calcFDR = list[j].Qvalue
 		}
 	}
 
+	// retain only qualified ones to list
 	cleanlist := make(id.PepIDListPtrs, 0)
-	decoys = 0
-	targets = 0
+	decoys := 0
+	targets := 0
 
 	for i := range list {
 		if list[i].Probability >= minProb {
@@ -123,6 +73,7 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 	}
 
+	// print basic info
 	msg := fmt.Sprintf("Converged to %.2f %% FDR with %d %ss", calcFDR*100, targets, level)
 	logrus.WithFields(logrus.Fields{
 		"decoy":     decoys,
@@ -131,6 +82,48 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 	}).Info(msg)
 
 	return cleanlist, minProb
+}
+
+func computePepIDQvalue(list id.PepIDListPtrs, decoyTag string) {
+
+	var targets uint
+	var decoys uint
+
+	// sort input list by Probability in descending order
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Probability > list[j].Probability
+	})
+
+	// create a Probability-to-FDR map so all pept IDs with the same score share the same FDR/Qvalue
+	var probFDRMap = make(map[float64]float64)
+	limit := len(list)
+
+	for i := 0; i < limit; i++ {
+		pepID := list[i]
+
+		if cla.IsDecoyPSM(*pepID, decoyTag) {
+			decoys++
+		} else {
+			targets++
+		}
+
+		fdr := float64(decoys) / float64(targets)
+		if _, exists := probFDRMap[pepID.Probability]; !exists {
+			probFDRMap[pepID.Probability] = fdr
+		}
+	}
+
+	// iterative over Probability from lowest to highest, assigning each Qvalue as the smallest FDR
+	minFDR := probFDRMap[list[limit-1].Probability]
+	list[limit-1].Qvalue = minFDR
+
+	for i := limit - 2; i >= 0; i-- {
+		if probFDRMap[list[i].Probability] < minFDR {
+			minFDR = probFDRMap[list[i].Probability]
+		}
+		list[i].Qvalue = minFDR
+	}
+
 }
 
 // PickedFDR employs the picked FDR strategy
@@ -444,7 +437,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	var calcFDR float64
 	var minProb float64 = 10
 
-	// collect all proteins from every group
+	// collect all proteins from every group into a list
 	for i := range p.Groups {
 		for j := range p.Groups[i].Proteins {
 
@@ -476,36 +469,13 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		}
 	}
 
-	for i := range list {
-		if cla.IsDecoyProtein(list[i], p.DecoyTag) {
-			decoys++
-		} else {
-			targets++
-		}
-	}
+	// compute protein qvalues using Probability and add them to the list
+	computeProteinQvalue(list, p.DecoyTag)
 
-	sort.Sort(&list)
+	// compute top pep qvalues using TopPepProb and add them to the list
+	FDRMap := computeTopPeptQvalue(list, p.DecoyTag)
 
-	// from botttom to top, classify every protein block with a given fdr score
-	// the score is only calculates to the first (last) protein in each block
-	// proteins with the same score, get the same fdr value.
-	var FDRMap = make(map[float64]float64)
-
-	for j := (len(list) - 1); j >= 0; j-- {
-
-		_, ok := FDRMap[list[j].TopPepProb]
-		if !ok {
-			FDRMap[list[j].TopPepProb] = float64(decoys) / float64(targets)
-			//fmt.Println("probability:", list[j].TopPepProb, "targets:", targets, "decoys:", decoys, "Current FDR:", uti.Round(FDRMap[list[j].TopPepProb]*100, 5, 2))
-		}
-
-		if cla.IsDecoyProtein(list[j], p.DecoyTag) {
-			decoys--
-		} else {
-			targets--
-		}
-	}
-
+	// determine the minimal TopPepProb corresponding to the target FDR
 	var topPepProb []float64
 	for k := range FDRMap {
 		topPepProb = append(topPepProb, k)
@@ -567,6 +537,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	// for inspections
 	// fmt.Println("index ", probIndex, probArray[probIndex], "minProb ", minProb, "calcFDR ", calcFDR)
 
+	// retain only the qualified protein identifications
 	var finalList id.ProtIDList
 	decoys = 0
 	targets = 0
@@ -592,6 +563,102 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	}).Info(msg)
 
 	return finalList
+}
+
+func computeProteinQvalue(list id.ProtIDList, decoyTag string) {
+
+	var targets float64
+	var decoys float64
+
+	// sort protein list by protein probability in descending order
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Probability > list[j].Probability
+	})
+
+	// create a Probability-to-FDR map so all prot IDs with the same score share the same FDR/Qvalue
+	var probFDRMap = make(map[float64]float64)
+
+	// compute FDR and put it to probFDRMap
+	limit := len(list)
+	for i := 0; i < limit; i++ {
+		protID := list[i]
+
+		if cla.IsDecoyProtein(list[i], decoyTag) {
+			decoys++
+		} else {
+			targets++
+		}
+
+		fdr := float64(decoys) / float64(targets)
+		if _, exists := probFDRMap[protID.Probability]; !exists {
+			probFDRMap[protID.Probability] = fdr
+		}
+	}
+
+	// create a Probability-to-Qvalue map, FDRMap (key: Probability, value: Qvalue)
+	minFDR := probFDRMap[list[limit-1].Probability]
+	list[limit-1].Qvalue = minFDR
+
+	for i := limit - 2; i >= 0; i-- {
+		if probFDRMap[list[i].Probability] < minFDR {
+			minFDR = probFDRMap[list[i].Probability]
+		}
+
+		list[i].Qvalue = minFDR
+	}
+}
+
+func computeTopPeptQvalue(list id.ProtIDList, decoyTag string) map[float64]float64 {
+
+	var targets float64
+	var decoys float64
+
+	// sort protein list by TopPepProb in descending order
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].TopPepProb > list[j].TopPepProb
+	})
+
+	// create a TopPepProb-to-FDR map so all prot IDs with the same score share the same FDR/Qvalue
+	var probFDRMap = make(map[float64]float64)
+
+	// compute FDR and put it to probFDRMap
+	limit := len(list)
+	for i := 0; i < limit; i++ {
+		protID := list[i]
+
+		if cla.IsDecoyProtein(list[i], decoyTag) {
+			decoys++
+		} else {
+			targets++
+		}
+
+		fdr := float64(decoys) / float64(targets)
+		if _, exists := probFDRMap[protID.TopPepProb]; !exists {
+			probFDRMap[protID.TopPepProb] = fdr
+		}
+	}
+
+	// create a TopPepProb-to-Qvalue map, FDRMap (key: TopPepProb, value: Qvalue)
+	minFDR := probFDRMap[list[limit-1].TopPepProb]
+	list[limit-1].TopPepQvalue = minFDR
+
+	var FDRMap = make(map[float64]float64)
+	FDRMap[list[limit-1].TopPepProb] = probFDRMap[list[limit-1].TopPepProb]
+
+	for i := limit - 2; i >= 0; i-- {
+		if probFDRMap[list[i].TopPepProb] < minFDR {
+			minFDR = probFDRMap[list[i].TopPepProb]
+		}
+		list[i].TopPepQvalue = minFDR
+
+		_, ok := FDRMap[list[i].TopPepProb]
+		if !ok {
+			FDRMap[list[i].TopPepProb] = list[i].TopPepQvalue
+		}
+
+	}
+
+	return FDRMap
 }
 
 // sequentialFDRControl estimates FDR levels by applying a second filter where all

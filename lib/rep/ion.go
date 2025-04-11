@@ -26,6 +26,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 	var psmPtMap = make(map[id.IonFormType][]string)
 	var psmIonMap = make(map[id.IonFormType][]id.SpectrumType)
 	var bestProb = make(map[id.IonFormType]float64)
+	var bestQvalue = make(map[id.IonFormType]float64)
 
 	var ionMods = make(map[id.IonFormType][]mod.Modification)
 
@@ -37,6 +38,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 
 		if i.Probability > bestProb[i.IonForm()] {
 			bestProb[i.IonForm()] = i.Probability
+			bestQvalue[i.IonForm()] = i.Qvalue
 		}
 
 		for j := range i.MappedProteins {
@@ -79,6 +81,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.MappedProteins[i.Protein] = 0
 		pr.Modifications = i.Modifications
 		pr.Probability = bestProb[pr.IonForm()]
+		pr.Qvalue = bestQvalue[pr.IonForm()]
 
 		// get the mapped proteins
 		for _, j := range psmPtMap[pr.IonForm()] {
@@ -148,7 +151,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tQvalue\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -410,7 +413,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%d\t%.4f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%.14f\t%d\t%.4f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			string(i.PrevAA),
@@ -422,6 +425,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.ChargeState,
 			i.PeptideMass,
 			i.Probability,
+			i.Qvalue,
 			i.Expectation,
 			len(i.Spectra),
 			i.Intensity,

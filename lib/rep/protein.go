@@ -49,7 +49,9 @@ func (evi *Evidence) AssembleProteinReport(pro id.ProtIDList, weight float64, db
 		rep.Coverage = i.PercentCoverage
 		rep.UniqueStrippedPeptides = len(i.UniqueStrippedPeptides)
 		rep.Probability = i.Probability
+		rep.Qvalue = i.Qvalue
 		rep.TopPepProb = i.TopPepProb
+		rep.TopPepQvalue = i.TopPepQvalue
 
 		rep.TotalPeptides = make(map[string]int)
 		rep.UniquePeptides = make(map[string]int)
@@ -281,7 +283,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 		}
 	}
 
-	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tIs Decoy\tIs Contaminant\tOrganism\tProtein Description\tProtein Existence\tCoverage\tProtein Probability\tTop Peptide Probability\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
+	header = "Protein\tProtein ID\tEntry Name\tGene\tLength\tIs Decoy\tIs Contaminant\tOrganism\tProtein Description\tProtein Existence\tCoverage\tProtein Probability\tProtein Qvalue\tTop Peptide Probability\tTop Peptide Qvalue\tTotal Peptides\tUnique Peptides\tRazor Peptides\tTotal Spectral Count\tUnique Spectral Count\tRazor Spectral Count\tTotal Intensity\tUnique Intensity\tRazor Intensity\tRazor Assigned Modifications\tRazor Observed Modifications\tIndistinguishable Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -609,7 +611,7 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 
 		// proteins with almost no evidences, and completely shared with decoys are eliminated from the an	alysis,
 		// in most cases proteins with one small peptide shared with a decoy
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%t\t%t\t%s\t%s\t%s\t%.2f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%t\t%t\t%s\t%s\t%s\t%.2f\t%.4f\t%.14f\t%.4f\t%.14f\t%d\t%d\t%d\t%d\t%d\t%d\t%6.f\t%6.f\t%6.f\t%s\t%s\t%s",
 			i.PartHeader,             // Protein
 			i.ProteinID,              // Protein ID
 			i.EntryName,              // Entry Name
@@ -622,7 +624,9 @@ func (eviProteins ProteinEvidenceList) ProteinReport(workspace, brand, decoyTag 
 			i.ProteinExistence,       // Protein Existence
 			i.Coverage,               // Coverage
 			i.Probability,            // Protein Probability
+			i.Qvalue,                 // Protein Qvalue
 			i.TopPepProb,             // Top Peptide Probability
+			i.TopPepQvalue,           // Top Peptide Qvalue
 			len(i.TotalPeptides),     // Total Peptides
 			len(i.UniquePeptides),    // Unique Peptides
 			len(i.URazorPeptides),    // Razor Peptides

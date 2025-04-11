@@ -28,6 +28,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 	var mappedProts = make(map[string][]string)
 	var pepInt = make(map[string]float64)
 	var bestProb = make(map[string]float64)
+	var bestQvalue = make(map[string]float64)
 	var prevAA = make(map[string]string)
 	var nextAA = make(map[string]string)
 	var spectra = make(map[string][]id.SpectrumType)
@@ -69,6 +70,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 		if i.Probability > bestProb[i.Peptide] {
 			bestProb[i.Peptide] = i.Probability
+			bestQvalue[i.Peptide] = i.Qvalue
 		}
 
 	}
@@ -88,6 +90,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 		pep.Sequence = k
 
 		pep.Probability = bestProb[k]
+		pep.Qvalue = bestQvalue[k]
 
 		pep.PrevAA = prevAA[k]
 		pep.NextAA = nextAA[k]
@@ -174,7 +177,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 		}
 	}
 
-	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tCharges\tProbability\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tCharges\tProbability\tQvalue\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -443,7 +446,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%d\t%f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%.14f\t%d\t%f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			string(i.PrevAA),
 			string(i.NextAA),
@@ -452,6 +455,7 @@ func (evi PeptideEvidenceList) PeptideReport(workspace, brand, decoyTag string, 
 			i.ProteinEnd,
 			strings.Join(cs, ", "),
 			i.Probability,
+			i.Qvalue,
 			i.Spc,
 			i.Intensity,
 			strings.Join(assL, ", "),
