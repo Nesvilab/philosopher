@@ -315,9 +315,8 @@ type ProteinEvidence struct {
 	UniqueIntensity        float64
 	URazorIntensity        float64 // Unique + razor
 	Probability            float64
-	Qvalue                 float64
 	TopPepProb             float64
-	TopPepQvalue           float64
+	Qvalue                 float64
 	IsDecoy                bool
 	IsContaminant          bool
 	SupportingSpectra      map[id.SpectrumType]int

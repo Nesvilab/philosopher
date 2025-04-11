@@ -469,11 +469,8 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 		}
 	}
 
-	// compute protein qvalues using Probability and add them to the list
-	computeProteinQvalue(list, p.DecoyTag)
-
-	// compute top pep qvalues using TopPepProb and add them to the list
-	FDRMap := computeTopPeptQvalue(list, p.DecoyTag)
+	// compute top protein qvalues using TopPepProb and add them to the list
+	FDRMap := computeProteinQvalue(list, p.DecoyTag)
 
 	// determine the minimal TopPepProb corresponding to the target FDR
 	var topPepProb []float64
@@ -565,50 +562,7 @@ func ProtXMLFilter(p id.ProtXML, targetFDR, pepProb, protProb float64, isPicked,
 	return finalList
 }
 
-func computeProteinQvalue(list id.ProtIDList, decoyTag string) {
-
-	var targets float64
-	var decoys float64
-
-	// sort protein list by protein probability in descending order
-	sort.Slice(list, func(i, j int) bool {
-		return list[i].Probability > list[j].Probability
-	})
-
-	// create a Probability-to-FDR map so all prot IDs with the same score share the same FDR/Qvalue
-	var probFDRMap = make(map[float64]float64)
-
-	// compute FDR and put it to probFDRMap
-	limit := len(list)
-	for i := 0; i < limit; i++ {
-		protID := list[i]
-
-		if cla.IsDecoyProtein(list[i], decoyTag) {
-			decoys++
-		} else {
-			targets++
-		}
-
-		fdr := float64(decoys) / float64(targets)
-		if _, exists := probFDRMap[protID.Probability]; !exists {
-			probFDRMap[protID.Probability] = fdr
-		}
-	}
-
-	// create a Probability-to-Qvalue map, FDRMap (key: Probability, value: Qvalue)
-	minFDR := probFDRMap[list[limit-1].Probability]
-	list[limit-1].Qvalue = minFDR
-
-	for i := limit - 2; i >= 0; i-- {
-		if probFDRMap[list[i].Probability] < minFDR {
-			minFDR = probFDRMap[list[i].Probability]
-		}
-
-		list[i].Qvalue = minFDR
-	}
-}
-
-func computeTopPeptQvalue(list id.ProtIDList, decoyTag string) map[float64]float64 {
+func computeProteinQvalue(list id.ProtIDList, decoyTag string) map[float64]float64 {
 
 	var targets float64
 	var decoys float64
@@ -640,7 +594,7 @@ func computeTopPeptQvalue(list id.ProtIDList, decoyTag string) map[float64]float
 
 	// create a TopPepProb-to-Qvalue map, FDRMap (key: TopPepProb, value: Qvalue)
 	minFDR := probFDRMap[list[limit-1].TopPepProb]
-	list[limit-1].TopPepQvalue = minFDR
+	list[limit-1].Qvalue = minFDR
 
 	var FDRMap = make(map[float64]float64)
 	FDRMap[list[limit-1].TopPepProb] = probFDRMap[list[limit-1].TopPepProb]
@@ -649,11 +603,11 @@ func computeTopPeptQvalue(list id.ProtIDList, decoyTag string) map[float64]float
 		if probFDRMap[list[i].TopPepProb] < minFDR {
 			minFDR = probFDRMap[list[i].TopPepProb]
 		}
-		list[i].TopPepQvalue = minFDR
+		list[i].Qvalue = minFDR
 
 		_, ok := FDRMap[list[i].TopPepProb]
 		if !ok {
-			FDRMap[list[i].TopPepProb] = list[i].TopPepQvalue
+			FDRMap[list[i].TopPepProb] = list[i].Qvalue
 		}
 
 	}

@@ -51,9 +51,8 @@ type ProteinIdentification struct {
 	TotalNumberPeptides      int
 	PercentCoverage          float32
 	Probability              float64
-	Qvalue                   float64
 	TopPepProb               float64
-	TopPepQvalue             float64
+	Qvalue                   float64
 	PeptideIons              []PeptideIonIdentification
 	HasRazor                 bool
 }
@@ -150,12 +149,11 @@ func (p *ProtXML) Read(f string, minPepLen ...int) {
 			ptid.ProteinName = string(j.ProteinName)
 			ptid.Description = string(j.Annotation.ProteinDescription)
 			ptid.Probability = j.Probability
-			ptid.Qvalue = math.NaN()
 			ptid.PercentCoverage = j.PercentCoverage
 			ptid.GroupSiblingID = string(j.GroupSiblingID)
 			ptid.TotalNumberPeptides = j.TotalNumberPeptides
 			ptid.TopPepProb = 0
-			ptid.TopPepQvalue = math.NaN()
+			ptid.Qvalue = math.NaN()
 
 			if strings.EqualFold(j.Parameter.Name, "prot_length") {
 				l, e := strconv.Atoi(j.Parameter.Value)
