@@ -70,7 +70,7 @@ func (evi *Evidence) AssemblePeptideReport(pep id.PepIDList, decoyTag string) {
 
 		if i.Probability > bestProb[i.Peptide] {
 			bestProb[i.Peptide] = i.Probability
-			bestQvalue[i.Peptide] = i.Qvalue
+			bestQvalue[i.Peptide] = i.PeptideQvalue
 		}
 
 	}

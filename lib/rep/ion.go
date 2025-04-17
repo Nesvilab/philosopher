@@ -38,7 +38,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 
 		if i.Probability > bestProb[i.IonForm()] {
 			bestProb[i.IonForm()] = i.Probability
-			bestQvalue[i.IonForm()] = i.Qvalue
+			bestQvalue[i.IonForm()] = i.IonQvalue
 		}
 
 		for j := range i.MappedProteins {

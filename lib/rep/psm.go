@@ -49,6 +49,8 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.PTM = i.PTM
 		p.Probability = i.Probability
 		p.Qvalue = i.Qvalue
+		p.PeptideQvalue = i.PeptideQvalue
+		p.IonQvalue = i.IonQvalue
 		p.Expectation = i.Expectation
 		p.Xcorr = i.Xcorr
 		p.DeltaCN = i.DeltaCN

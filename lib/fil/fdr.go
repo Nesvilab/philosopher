@@ -3,6 +3,7 @@ package fil
 import (
 	"errors"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"sync"
@@ -43,15 +44,30 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 	}
 
 	// compute pepID qvalues using Probability and add them to the list, the resulting list is sorted by Probability in descending order
-	computePepIDQvalue(list, decoyTag)
+	computePepIDQvalue(list, level, decoyTag)
 
 	// determine the minimal Probability that satisfying the FDR threshold
 	limit := (len(list) - 1)
 
+	// retrieve extract q-value based on level and determine minProb
+	getQvalue := func(item *id.PeptideIdentification, level string) float64 {
+		switch level {
+		case "PSM":
+			return item.Qvalue
+		case "Peptide":
+			return item.PeptideQvalue
+		case "Ion":
+			return item.IonQvalue
+		default:
+			return math.NaN() // fallback if unknown level
+		}
+	}
+
 	for j := 0; j < limit; j++ {
-		if list[j].Qvalue <= targetFDR {
+		qval := getQvalue(list[j], level)
+		if qval <= targetFDR {
 			minProb = list[j].Probability
-			calcFDR = list[j].Qvalue
+			calcFDR = qval
 		}
 	}
 
@@ -84,7 +100,7 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 	return cleanlist, minProb
 }
 
-func computePepIDQvalue(list id.PepIDListPtrs, decoyTag string) {
+func computePepIDQvalue(list id.PepIDListPtrs, level, decoyTag string) {
 
 	var targets uint
 	var decoys uint
@@ -115,13 +131,26 @@ func computePepIDQvalue(list id.PepIDListPtrs, decoyTag string) {
 
 	// iterative over Probability from lowest to highest, assigning each Qvalue as the smallest FDR
 	minFDR := probFDRMap[list[limit-1].Probability]
-	list[limit-1].Qvalue = minFDR
+
+	assignQvalue := func(i int, val float64) {
+		switch strings.ToLower(level) {
+		case "psm":
+			list[i].Qvalue = val
+		case "peptide":
+			list[i].PeptideQvalue = val
+		case "ion":
+			list[i].IonQvalue = val
+		}
+	}
+
+	assignQvalue(limit-1, minFDR)
 
 	for i := limit - 2; i >= 0; i-- {
-		if probFDRMap[list[i].Probability] < minFDR {
-			minFDR = probFDRMap[list[i].Probability]
+		fdr := probFDRMap[list[i].Probability]
+		if fdr < minFDR {
+			minFDR = fdr
 		}
-		list[i].Qvalue = minFDR
+		assignQvalue(i, minFDR)
 	}
 
 }

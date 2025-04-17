@@ -100,6 +100,8 @@ type PeptideIdentification struct {
 	PTM                              *PTM
 	Modifications                    mod.ModificationsSlice
 	Qvalue                           float64
+	PeptideQvalue                    float64
+	IonQvalue                        float64
 }
 
 type PTM struct {

@@ -145,6 +145,8 @@ type PSMEvidence struct {
 	Massdiff                         float64
 	Probability                      float64
 	Qvalue                           float64
+	PeptideQvalue                    float64
+	IonQvalue                        float64
 	Expectation                      float64
 	Xcorr                            float64
 	DeltaCN                          float64
