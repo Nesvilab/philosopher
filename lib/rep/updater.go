@@ -513,6 +513,15 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		mstart := strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 		mend := mstart + len(extendedPeptide)
 		if mstart != -1 {
+			// deal with rare cases where a single amino acid is duplicated many many times, like LLLLLLLLLLLLLLLLLLLLLLLGPGWR
+			if len(f[0][1]) == 7 && strings.Contains(extendedPeptide, f[0][1]) {
+				// update flanks informtion
+				if evi.PSM[i].PrevAA == "-" {
+					f[0][1] = ""
+					f[0][2] = f[0][0][mstart:len(extendedPeptide)]
+				}
+			}
+
 			sequenceAsObservedInProtein = rec.Sequence[mstart+adjustStart-1 : mend+adjustEnd]
 		} else {
 			// mstart = -1 indicates that the protein and the mapped protein were switched during razor assignment, here 8 flanking amino acids are sliced on both sides to keep consistency
