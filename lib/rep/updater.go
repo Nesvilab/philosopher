@@ -514,11 +514,14 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 		mend := mstart + len(extendedPeptide)
 		if mstart != -1 {
 			// deal with rare cases where a single amino acid is duplicated many many times, like LLLLLLLLLLLLLLLLLLLLLLLGPGWR
-			if len(f[0][1]) == 7 && strings.Contains(extendedPeptide, f[0][1]) {
-				// update flanks informtion
-				if evi.PSM[i].PrevAA == "-" {
-					f[0][1] = ""
-					f[0][2] = f[0][0][mstart:len(extendedPeptide)]
+			if len(f[0][1]) > 0 && strings.Contains(extendedPeptide, f[0][1]) {
+				firstchar := string(extendedPeptide[0])
+				if strings.Repeat(firstchar, len(f[0][1])) == f[0][1] {
+					// update flanks informtion
+					if evi.PSM[i].PrevAA == "-" {
+						f[0][1] = ""
+						f[0][2] = f[0][0][mstart:len(extendedPeptide)]
+					}
 				}
 			}
 
