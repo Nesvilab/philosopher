@@ -212,6 +212,7 @@ type IonEvidence struct {
 	NextAA                   string
 	ChargeState              uint8
 	NumberOfEnzymaticTermini uint8
+	Class                    string
 	ProteinStart             int
 	ProteinEnd               int
 	MZ                       float64
@@ -262,6 +263,7 @@ type PeptideEvidence struct {
 	Spc                    int
 	ModifiedObservations   int
 	UnModifiedObservations int
+	Class                  string
 	ProteinStart           int
 	ProteinEnd             int
 	Intensity              float64

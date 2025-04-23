@@ -77,6 +77,7 @@ func (evi *Evidence) AssembleIonReport(ion id.PepIDList, decoyTag string) {
 		pr.PrecursorNeutralMass = i.PrecursorNeutralMass
 		pr.Expectation = i.Expectation
 		pr.NumberOfEnzymaticTermini = i.NumberOfEnzymaticTermini
+		pr.Class = i.Class
 		pr.Protein = i.Protein
 		pr.MappedProteins[i.Protein] = 0
 		pr.Modifications = i.Modifications
@@ -151,7 +152,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 		}
 	}
 
-	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tM/Z\tCharge\tObserved Mass\tProbability\tQvalue\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
+	header = "Peptide Sequence\tModified Sequence\tPrev AA\tNext AA\tPeptide Length\tProtein Start\tProtein End\tClass\tM/Z\tCharge\tObserved Mass\tProbability\tQvalue\tExpectation\tSpectral Count\tIntensity\tAssigned Modifications\tObserved Modifications\tIs Decoy\tIs Contaminant\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
 	var headerIndex int
 	for i := range printSet {
@@ -413,7 +414,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			i.EntryName = decoyTag + i.EntryName
 		}
 
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%.14f\t%d\t%.4f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\t%d\t%d\t%d\t%s\t%.4f\t%d\t%.4f\t%.4f\t%.14f\t%.14f\t%d\t%.4f\t%s\t%s\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
 			i.Sequence,
 			i.ModifiedSequence,
 			string(i.PrevAA),
@@ -421,6 +422,7 @@ func (evi IonEvidenceList) IonReport(workspace, brand, decoyTag string, channels
 			len(i.Sequence),
 			i.ProteinStart,
 			i.ProteinEnd,
+			i.Class,
 			i.MZ,
 			i.ChargeState,
 			i.PeptideMass,
