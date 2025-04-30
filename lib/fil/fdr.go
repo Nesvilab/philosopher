@@ -43,32 +43,35 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 	}
 
-	// compute pepID qvalues using Probability and add them to the list, the resulting list is sorted by Probability in descending order
-	computePepIDQvalue(list, level, decoyTag)
+	if len(list) > 0 {
+		// compute pepID qvalues using Probability and add them to the list, the resulting list is sorted by Probability in descending order
+		computePepIDQvalue(list, level, decoyTag)
 
-	// determine the minimal Probability that satisfying the FDR threshold
-	limit := (len(list) - 1)
+		// determine the minimal Probability that satisfying the FDR threshold
+		limit := (len(list) - 1)
 
-	// retrieve extract q-value based on level and determine minProb
-	getQvalue := func(item *id.PeptideIdentification, level string) float64 {
-		switch level {
-		case "PSM":
-			return item.Qvalue
-		case "Peptide":
-			return item.PeptideQvalue
-		case "Ion":
-			return item.IonQvalue
-		default:
-			return math.NaN() // fallback if unknown level
+		// retrieve extract q-value based on level and determine minProb
+		getQvalue := func(item *id.PeptideIdentification, level string) float64 {
+			switch level {
+			case "PSM":
+				return item.Qvalue
+			case "Peptide":
+				return item.PeptideQvalue
+			case "Ion":
+				return item.IonQvalue
+			default:
+				return math.NaN() // fallback if unknown level
+			}
 		}
-	}
 
-	for j := 0; j < limit; j++ {
-		qval := getQvalue(list[j], level)
-		if qval <= targetFDR {
-			minProb = list[j].Probability
-			calcFDR = qval
+		for j := 0; j < limit; j++ {
+			qval := getQvalue(list[j], level)
+			if qval <= targetFDR {
+				minProb = list[j].Probability
+				calcFDR = qval
+			}
 		}
+
 	}
 
 	// retain only qualified ones to list
