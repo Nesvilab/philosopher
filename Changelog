@@ -1,18 +1,9 @@
-### Added
-- Supported IBT-16 isobaric tag
-- Extended support for up to 32 isobaric labels.
-- Added the 'minPepLen' control option for protein probability assignment
-- Added the dbbin option to resue the prebuilt db.bin file
+Release notes for Philosopher v5.1.1
 
-### Changed
-- Used unique+razor peptides only for PSM-protein level roll up
-- For plex with 0 PSMs, let philosopher print a warning and exit normally
-- Excluded decoys from protein quantification (protein.tsv)
-- Removed the warning message for running 'workspace --clean' in a clean direcotry
-
-### Fixed
-- Fixed a problem occurring when parsing custom database with headers starting with '>AT'
-- Fixed a bug related to summed intensites in protein.tsv
-- Fixed a bug causing empty intensities in msstats.tsv related with multiplex TMT11 data.
-- Fixed a crash when there are non-zero TMT intensities and removelow > 0
-- Updated the purity calculation
+- Add group FDR filtering support for peptide- and ion-level.
+- Add 'Intensity', 'Resolution', and 'SNR' to psm.tsv for isobaric labeling data.
+- Propagate various columns to psm/ion/peptide/protein reports, including 'IMScore', 'Class', 'Is Decoy', 'Is Contaminant' and 'Qvalue'.
+- Fix the issue with peptide I/L substitution after razor assignment, thanks to David Hollenstein.
+- Fix bugs in peptide-to-protein mapping when locating peptides within proteins.
+- Fix a bug with PTM localization.
+- Fix bugs with PTM group FDR filtering.
