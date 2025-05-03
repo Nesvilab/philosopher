@@ -479,9 +479,9 @@ func ptmBasedPSMFiltering(uniqPsms map[string]id.PepIDListPtrs, targetFDR float6
 			}
 		}
 
-		if defined {
+		if defined && !other {
 			definedModPSMs[k] = v
-		} else if other && !defined {
+		} else if other {
 			restModPSMs[k] = v
 		} else {
 			unModPSMs[k] = v
