@@ -2,7 +2,10 @@ package rep
 
 import (
 	"errors"
+	"fmt"
+	"github.com/Nesvilab/philosopher/lib/mod"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -553,9 +556,16 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			flanks = regexp.MustCompile(`(\w{0,8})` + regexp.QuoteMeta(extendedPeptide) + `(\w{0,8})`)
 			f = flanks.FindAllStringSubmatch(replacerIL.Replace(rec.Sequence), -1)
 		}
+
 		newModifiedPeptide, updateModifiedPeptideErr := updateModifiedSequence(evi.PSM[i].Peptide, evi.PSM[i].ModifiedPeptide, sequenceAsObservedInProtein)
 		evi.PSM[i].ProteinStart = mstart + adjustStart
 		evi.PSM[i].ProteinEnd = mend + adjustEnd
+
+		var hasILsubstitution bool = false
+		if evi.PSM[i].Peptide != sequenceAsObservedInProtein {
+			hasILsubstitution = true
+		}
+
 		evi.PSM[i].Peptide = sequenceAsObservedInProtein
 		if updateModifiedPeptideErr == nil {
 			evi.PSM[i].ModifiedPeptide = newModifiedPeptide
@@ -569,6 +579,10 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			}
 		}
 		updatedPeptideData[evi.PSM[i].Peptide] = peptideData{evi.PSM[i].ProteinStart, evi.PSM[i].ProteinEnd, sequenceAsObservedInProtein}
+
+		if hasILsubstitution {
+			evi.PSM[i] = updateAssignedModificationsAndMSFraggerLoc(evi.PSM[i], evi.PSM[i].Peptide)
+		}
 
 		var left string
 		var right string
@@ -1046,4 +1060,85 @@ func updatePTMLocalizationSequence(ptmLocalizationSequence string, updatedSequen
 		}
 	}
 	return string(newPtmLocalization)
+}
+
+func updateAssignedModificationsAndMSFraggerLoc(eviPSMi PSMEvidence, peptideSequence string) PSMEvidence {
+
+	originalAssignedModList := eviPSMi.Modifications.IndexSlice
+
+	var updatedAssignedModList []mod.Modification
+	posAaMap := make(map[int]string)
+	var updateMSFraggerLoc bool
+
+	// extract peptide position and modified amino acid
+	for i := range originalAssignedModList {
+		modInfo := originalAssignedModList[i]
+
+		if modInfo.Variable {
+			aa := modInfo.AminoAcid
+			pos := modInfo.Position
+
+			if pos > 0 {
+				newAA := string(peptideSequence[pos-1 : pos-1+len(aa)])
+
+				if newAA != aa {
+					modInfo.AminoAcid = newAA
+					modInfo.Index = newAA + modInfo.Index[1:]
+
+					posAaMap[pos] = newAA
+					updateMSFraggerLoc = true
+				}
+			}
+		}
+
+		updatedAssignedModList = append(updatedAssignedModList, modInfo)
+	}
+	eviPSMi.Modifications.IndexSlice = updatedAssignedModList
+
+	if updateMSFraggerLoc && eviPSMi.MSFraggerLoc != nil {
+		msfragLoc := eviPSMi.MSFraggerLoc
+
+		re := regexp.MustCompile(`\d+$`)
+		bestPos, _ := strconv.Atoi(re.FindString(msfragLoc.BestPositions))
+
+		for pos, newAA := range posAaMap {
+			locPeptide := msfragLoc.LocalizationPeptide
+			msfragLoc.LocalizationPeptide = locPeptide[:pos-1] + strings.ToLower(newAA) + locPeptide[pos-1+len(newAA):]
+
+			msfragLoc.PositionScores = updateMSFraggerLocScores(msfragLoc.PositionScores, pos-1, newAA)
+			msfragLoc.ShiftedOnlyScores = updateMSFraggerLocScores(msfragLoc.ShiftedOnlyScores, pos-1, newAA)
+			msfragLoc.ShiftedOnlyIons = updateMSFraggerLocScores(msfragLoc.ShiftedOnlyIons, pos-1, newAA)
+
+			if bestPos == pos {
+				msfragLoc.BestPositions = fmt.Sprintf("%s%d", newAA, pos)
+			}
+		}
+
+		eviPSMi.MSFraggerLoc = msfragLoc
+	}
+
+	return eviPSMi
+}
+
+func updateMSFraggerLocScores(scoreSeq string, pos int, newAA string) string {
+
+	blocks := strings.Split(scoreSeq, ")")
+
+	for i := range blocks {
+		if blocks[i] == "" {
+			continue
+		}
+		blocks[i] += ")"
+	}
+
+	if pos < len(blocks) {
+		block := blocks[pos]
+		if len(block) > 1 {
+			blocks[pos] = newAA + block[1:]
+		}
+	}
+
+	newScoreSeq := strings.Join(blocks, "")
+
+	return newScoreSeq
 }
