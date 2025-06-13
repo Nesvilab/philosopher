@@ -1051,7 +1051,7 @@ func updatePTMLocalizationSequence(ptmLocalizationSequence string, updatedSequen
 	newPtmLocalization := []rune(ptmLocalizationSequence)
 	seqIndex := 0 // track position in the peptide sequence
 	for i := range newPtmLocalization {
-		if unicode.IsLetter(newPtmLocalization[i]) { // replace letter characters only
+		if unicode.IsLetter(newPtmLocalization[i]) && unicode.IsUpper(newPtmLocalization[i]) { // replace letter characters only and distinguish N-term modification (lowercase n)
 			newPtmLocalization[i] = rune(updatedSequence[seqIndex])
 			seqIndex++
 			if seqIndex >= len(updatedSequence) {
@@ -1059,6 +1059,7 @@ func updatePTMLocalizationSequence(ptmLocalizationSequence string, updatedSequen
 			}
 		}
 	}
+	//fmt.Println(updatedSequence, ptmLocalizationSequence, string(newPtmLocalization))
 	return string(newPtmLocalization)
 }
 
