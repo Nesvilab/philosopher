@@ -46,6 +46,7 @@ func init() {
 		databaseCmd.Flags().BoolVarP(&m.Database.Rev, "reviewed", "", false, "use only reviwed sequences from Swiss-Prot")
 		databaseCmd.Flags().BoolVarP(&m.Database.Iso, "isoform", "", false, "add isoform sequences")
 		databaseCmd.Flags().BoolVarP(&m.Database.NoD, "nodecoys", "", false, "don't add decoys to the database")
+		databaseCmd.Flags().Int8VarP(&m.Database.DecoyMode, "decoymode", "", 0, "define the decoy generating mode, 0: revere sequence (default), 1:reverse and shift KR, 2:reverse and swap Kr")
 		databaseCmd.Flags().BoolVarP(&m.Database.Verbose, "verbose", "", false, "debug the sequence classification for each FASTA record")
 	}
 

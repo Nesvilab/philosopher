@@ -82,6 +82,7 @@ type Database struct {
 	Rev       bool   `yaml:"reviewed"`
 	Iso       bool   `yaml:"isoform"`
 	NoD       bool   `yaml:"nodecoys"`
+	DecoyMode int8   `yaml:"decoymode"`
 	Verbose   bool   `yaml:"verbose"`
 }
 

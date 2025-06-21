@@ -115,7 +115,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	logrus.Info("Generating the target-decoy database")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, ids)
+	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, m.Database.DecoyMode, ids)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -283,7 +283,7 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[string]string) {
+func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, decoyMode int8, ids map[string]string) {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -342,9 +342,18 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, ids map[
 			th := ">" + h
 			d.TaDeDB[th] = s
 
+			var revSeq string
 			if !noD {
 				dh := ">" + tag + h
-				d.TaDeDB[dh] = reverseSeq(s)
+				switch decoyMode {
+				case 1:
+					revSeq = ReverseWithShiftKR(s)
+				case 2:
+					revSeq = ReverseAndSwapKR(s)
+				default:
+					revSeq = reverseSeq(s)
+				}
+				d.TaDeDB[dh] = revSeq
 			}
 
 		}
@@ -572,4 +581,72 @@ func reverseSeq(s string) string {
 		r[i], r[j] = r[j], r[i]
 	}
 	return string(r)
+}
+
+// Reverse the whole sequence (keep the first M unchanged), and shift K or R one position to the right.
+func ReverseWithShiftKR(s string) string {
+
+	var index = 0
+	r := []rune(s)
+	n := len(s)
+
+	out := make([]rune, n)
+
+	if strings.HasPrefix(s, "M") {
+		index = 1
+		out[0] = 'M'
+	}
+
+	ptrPos := n - 1
+	for i := index; i < n; i++ {
+		c := r[i]
+		// handle the edge case that the K or R is at the end of the sequence - no need to shift.
+		if (c == 'K' || c == 'R') && ptrPos < n-1 {
+			out[ptrPos] = out[ptrPos+1]
+			out[ptrPos+1] = c
+		} else {
+			out[ptrPos] = c
+		}
+		ptrPos--
+	}
+
+	return string(out)
+}
+
+// Reverse the whole sequence (keep the first M unchanged) and swap K to R and swap R to K
+func ReverseAndSwapKR(s string) string {
+
+	var index = 0
+	r := []rune(s)
+	n := len(s)
+
+	if strings.HasPrefix(s, "M") {
+		index = 1
+	}
+
+	out := make([]rune, n)
+
+	if index > 0 {
+		out[0] = r[0] // preserve the first letter 'M'
+		for i := 1; i < n; i++ {
+			out[n-i] = swapRK(r[i])
+		}
+	} else {
+		for i := 0; i < n; i++ {
+			out[n-1-i] = swapRK(r[i])
+		}
+	}
+
+	return string(out)
+}
+
+func swapRK(c rune) rune {
+	switch c {
+	case 'R':
+		return 'K'
+	case 'K':
+		return 'R'
+	default:
+		return c
+	}
 }
