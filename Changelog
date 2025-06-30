@@ -1,3 +1,8 @@
+Release notes for Philosopher v5.1.2
+
+- Fix bugs related to I/L substitution replacement
+
+
 Release notes for Philosopher v5.1.1
 
 - Add group FDR filtering support for peptide- and ion-level.
