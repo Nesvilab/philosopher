@@ -3,6 +3,7 @@ package fas
 import (
 	"bufio"
 	"errors"
+	"log"
 	"os"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
@@ -40,6 +41,11 @@ func ParseFile2(filename string) []FastaEntry {
 
 	scanner := bufio.NewScanner(f)
 
+	// increase buffer size to handle long FASTA headers
+	const maxLineSize = 1024 * 1024 // 1MB
+	buf := make([]byte, maxLineSize)
+	scanner.Buffer(buf, maxLineSize)
+
 	for scanner.Scan() {
 		if len(scanner.Bytes()) > 0 && scanner.Bytes()[0] == '>' {
 			line := scanner.Bytes()[1:]
@@ -52,6 +58,11 @@ func ParseFile2(filename string) []FastaEntry {
 		} else {
 			fastaSlice[len(fastaSlice)-1].Seq += scanner.Text()
 		}
+	}
+
+	// check for scann error after loop in case the actual header length exceeds the maxLineSize
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("Scanner error: %v", err)
 	}
 
 	return fastaSlice
