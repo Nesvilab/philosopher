@@ -361,7 +361,7 @@ func getID(header string, class dbtype, verb bool) (match string) {
 			msg.ParsingFASTAHeader(errors.New(m), "warning")
 		}
 
-		return ""
+		return header
 
 	} else {
 		match = header[reg[2]:reg[3]]
