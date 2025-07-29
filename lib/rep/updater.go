@@ -592,7 +592,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			match := f[0]
 
 			if len(match) >= 1 && len(match[1]) > 0 {
-				left = rec.Sequence[(mstart - len(match[1])):mstart] // extract flanking sequences from protein to address previous I/L replacement during string matching
+				leftStart := mstart - len(match[1])
+				if leftStart < 0 {
+					leftStart = 0
+				}
+				left = rec.Sequence[leftStart:mstart] // extract flanking sequences from protein to address previous I/L replacement during string matching
 			}
 
 			if len(match) >= 2 && len(match[2]) > 0 {
