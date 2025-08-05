@@ -214,6 +214,7 @@ var getProteinNameCptacEnsembl = regexp.MustCompile(`ENS[P|T|G]\d{1,11}\|ENS[P|T
 var getProteinNameNcbi = regexp.MustCompile(`[[:graph:]]\s(.+)`)
 var getProteinNameUniprot = regexp.MustCompile(`[[:alnum:]]+\_[[:alnum:]]+\s(.+?)\s[[:upper:]][[:upper:]]\=.+`)
 var getProteinNameUniref = regexp.MustCompile(`(UniRef\w+)`)
+var getProteinNameTair = regexp.MustCompile(`^AT.+\s\|\sSymbols:[^\|]+\s\|\s([^\|]+)\s\|.*`)
 
 func getProteinName(header string, class dbtype, verb bool) (match string) {
 
@@ -231,14 +232,7 @@ func getProteinName(header string, class dbtype, verb bool) (match string) {
 	case uniref:
 		r = getProteinNameUniref
 	case tair:
-		if strings.Contains(header, "|") {
-			s := strings.Split(header, "|")
-			s[2] = strings.TrimLeft(s[2], " ")
-			s[2] = strings.TrimRight(s[2], " ")
-			return s[2]
-		} else {
-			return header
-		}
+		r = getProteinNameTair
 	case nextprot:
 		s := strings.Split(header, "|")
 		s[3] = strings.TrimLeft(s[3], " ")
@@ -409,7 +403,12 @@ func Classify(s, decoyTag string) dbtype {
 	} else if strings.HasPrefix(seq, "UniRef") {
 		return uniref
 	} else if strings.HasPrefix(seq, "AT") {
-		return tair
+		r := regexp.MustCompile(`^AT.+\s\|\sSymbols:[^\|]+\s\|\s[^\|]+\s\|.*`)
+		if r.MatchString(seq) {
+			return tair
+		} else {
+			return generic
+		}
 	} else if strings.HasPrefix(seq, "nxp") {
 		return nextprot
 	}
