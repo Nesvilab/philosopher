@@ -688,7 +688,7 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, psmT, peptid
 
 	wg := sync.WaitGroup{}
 	wg.Add(3)
-	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "", psmT)
+	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "", 0)
 	go func() { defer wg.Done(); filteredPSM.Serialize("psm") }()
 	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag, "", peptideT)
 	go func() { defer wg.Done(); filteredPeptides.Serialize("pep") }()
