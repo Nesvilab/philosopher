@@ -125,7 +125,7 @@ func Run(f met.Data) met.Data {
 		// sequential analysis
 		// filtered psm list and filtered prot list
 		pep.Restore("psm")
-		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, f.Filter.PepFDR, f.Filter.IonFDR, f.Filter.Tag)
+		sequentialFDRControl(pep, pro, f.Filter.PsmFDR, psmT, f.Filter.PepFDR, pepT, f.Filter.IonFDR, ionT, f.Filter.Tag)
 		pep = nil
 
 	} else if f.Filter.TwoD {

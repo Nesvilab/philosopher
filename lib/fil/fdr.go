@@ -17,7 +17,9 @@ import (
 )
 
 // PepXMLFDRFilter processes and calculates the FDR at the PSM, Ion or Peptide level
-func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level, decoyTag, debug string) (id.PepIDListPtrs, float64) {
+// targetProbOpt (optional): minimum Probability bound, used for sequential FDR filtering.
+// If targetProbOpt is provided (e.g., 0.96), only entries with Probability >= targetProb are considered when determining the threshold.
+func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level, decoyTag, debug string, targetProbOpt ...float64) (id.PepIDListPtrs, float64) {
 
 	//var msg string
 	var calcFDR float64
@@ -43,6 +45,12 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 	}
 
+	// Optional minimum probability bound (sequential behavior).
+	minProbBound := math.Inf(-1)
+	if len(targetProbOpt) > 0 {
+		minProbBound = targetProbOpt[0]
+	}
+
 	if len(list) > 0 {
 		// compute pepID qvalues using Probability and add them to the list, the resulting list is sorted by Probability in descending order
 		computePepIDQvalue(list, level, decoyTag)
@@ -65,6 +73,10 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 		}
 
 		for j := 0; j < limit; j++ {
+			if list[j].Probability < minProbBound {
+				break // early break as list is sorted by Probability descending order
+			}
+
 			qval := getQvalue(list[j], level)
 			if qval <= targetFDR {
 				minProb = list[j].Probability
@@ -93,12 +105,20 @@ func PepXMLFDRFilter(input map[string]id.PepIDListPtrs, targetFDR float64, level
 	}
 
 	// print basic info
-	msg := fmt.Sprintf("Converged to %.2f %% FDR with %d %ss", calcFDR*100, targets, level)
-	logrus.WithFields(logrus.Fields{
-		"decoy":     decoys,
-		"total":     (targets + decoys),
-		"threshold": minProb,
-	}).Info(msg)
+	if minProbBound < 0 {
+		msg := fmt.Sprintf("Converged to %.2f %% FDR with %d %ss", calcFDR*100, targets, level)
+		logrus.WithFields(logrus.Fields{
+			"decoy":     decoys,
+			"total":     (targets + decoys),
+			"threshold": minProb,
+		}).Info(msg)
+	} else {
+		logrus.WithFields(logrus.Fields{
+			"decoy":     decoys,
+			"total":     (targets + decoys),
+			"threshold": minProb,
+		}).Info(fmt.Sprintf("%d %ss", targets, level))
+	}
 
 	return cleanlist, minProb
 }
@@ -649,7 +669,7 @@ func computeProteinQvalue(list id.ProtIDList, decoyTag string) map[float64]float
 
 // sequentialFDRControl estimates FDR levels by applying a second filter where all
 // proteins from the protein filtered list are matched against filtered PSMs
-func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion float64, decoyTag string) {
+func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, psmT, peptide, peptideT, ion, ionT float64, decoyTag string) {
 
 	extPep := extractPSMfromPepXML("sequential", pep, pro)
 
@@ -668,11 +688,11 @@ func sequentialFDRControl(pep id.PepIDList, pro id.ProtIDList, psm, peptide, ion
 
 	wg := sync.WaitGroup{}
 	wg.Add(3)
-	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "")
+	filteredPSM, _ := PepXMLFDRFilter(uniqPsms, psm, "PSM", decoyTag, "", psmT)
 	go func() { defer wg.Done(); filteredPSM.Serialize("psm") }()
-	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag, "")
+	filteredPeptides, _ := PepXMLFDRFilter(uniqPeps, peptide, "Peptide", decoyTag, "", peptideT)
 	go func() { defer wg.Done(); filteredPeptides.Serialize("pep") }()
-	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag, "")
+	filteredIons, _ := PepXMLFDRFilter(uniqIons, ion, "Ion", decoyTag, "", ionT)
 	go func() { defer wg.Done(); filteredIons.Serialize("ion") }()
 	wg.Wait()
 
