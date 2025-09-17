@@ -43,15 +43,9 @@ github.com/go-resty/resty/v2
 ## explicit
 github.com/golang/freetype/raster
 github.com/golang/freetype/truetype
-# github.com/gorilla/websocket v1.5.0
-## explicit; go 1.12
-github.com/gorilla/websocket
 # github.com/inconshreveable/mousetrap v1.1.0
 ## explicit; go 1.18
 github.com/inconshreveable/mousetrap
-# github.com/jpillora/go-ogle-analytics v0.0.0-20161213085824-14b04e0594ef
-## explicit
-github.com/jpillora/go-ogle-analytics
 # github.com/kr/pretty v0.3.1
 ## explicit; go 1.12
 # github.com/mattn/go-colorable v0.1.13
@@ -60,18 +54,11 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.18
 ## explicit; go 1.15
 github.com/mattn/go-isatty
-# github.com/nlopes/slack v0.6.0
-## explicit
-github.com/nlopes/slack
-github.com/nlopes/slack/internal/errorsx
-github.com/nlopes/slack/internal/timex
-github.com/nlopes/slack/slackutilsx
 # github.com/pierrre/archivefile v0.0.0-20170218184037-e2d100bc74f5
 ## explicit
 github.com/pierrre/archivefile/zip
 # github.com/pkg/errors v0.9.1
 ## explicit
-github.com/pkg/errors
 # github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31
 ## explicit
 github.com/rogpeppe/go-charset/charset

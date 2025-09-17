@@ -9,7 +9,6 @@ import (
 	"github.com/Nesvilab/philosopher/lib/met"
 	"github.com/Nesvilab/philosopher/lib/msg"
 	"github.com/Nesvilab/philosopher/lib/pip"
-	"github.com/Nesvilab/philosopher/lib/sla"
 	"github.com/Nesvilab/philosopher/lib/sys"
 
 	"github.com/sirupsen/logrus"
@@ -135,10 +134,6 @@ var pipelineCmd = &cobra.Command{
 
 		// Backup and Clean
 		//pip.BackupAndClean(meta, p, dir, Version, Build, args)
-
-		if len(p.SlackToken) > 0 {
-			sla.Run("Philosopher", p.SlackToken, "Philosopher pipeline is done", p.SlackChannel, p.SlackUserID)
-		}
 
 		met.CleanTemp(meta.Temp)
 

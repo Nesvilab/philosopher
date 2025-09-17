@@ -13,11 +13,6 @@
 # Usage:
 # philosopher pipeline --config <this_configuration_file> [list_of_data_set_folders]
 
-analytics: true                                  # reports when a workspace is created for usage statistics
-slackToken:                                      # specify the Slack API token (how to generate a token: https://api.slack.com/legacy/custom-integrations/legacy-tokens)
-slackChannel:                                    # specify the channel name, or
-slackUserID:                                     # specify a user ID for a direct message
-
 Steps:
   Database Search: yes                           # peptide to spectrum matching with Comet or MSFragger
   Peptide Validation: no                         # peptide assignment validation with PeptideProphet

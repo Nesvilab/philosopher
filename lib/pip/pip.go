@@ -34,9 +34,6 @@ import (
 
 // Directives contains the instructions to run a pipeline
 type Directives struct {
-	SlackToken     string             `yaml:"Slack Token"`
-	SlackChannel   string             `yaml:"Slack Channel"`
-	SlackUserID    string             `yaml:"Slack User ID"`
 	Steps          Steps              `yaml:"Steps"`
 	DatabaseSearch DatabaseSearch     `yaml:"Database Search"`
 	PeptideProphet met.PeptideProphet `yaml:"Peptide Validation"`
