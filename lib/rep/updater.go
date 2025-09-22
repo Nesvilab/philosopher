@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Nesvilab/philosopher/lib/mod"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -506,6 +507,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			adjustEnd = -1
 		}
 
+		if len(rec.Sequence) == 0 {
+			fmt.Printf("Error: %s is not in the database\n", evi.PSM[i].Protein)
+			os.Exit(1)
+		}
+
 		// Map the peptide to the protein, update ProteinStart and ProteinEnd positions, replace the
 		// peptide and modifiedPeptide sequences with the observed sequence from the protein record
 		// to fix a potential I/L mixup issue.
@@ -537,6 +543,11 @@ func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 			extendedPeptide = replacerIL.Replace(evi.PSM[i].Peptide)
 			mstart = strings.Index(replacerIL.Replace(rec.Sequence), extendedPeptide)
 			mend = mstart + len(extendedPeptide)
+			if mstart == -1 && len(rec.Sequence) > 0 {
+				fmt.Printf("Error: Peptide '%s' was assigned to %s that is not in the database", evi.PSM[i].Peptide, evi.PSM[i].Protein)
+				os.Exit(1)
+			}
+
 			sequenceAsObservedInProtein = rec.Sequence[mstart:mend]
 			// reset PrevAA, NextAA, and ExtendedPeptide for PSM with protein reassignment occurred
 			if mstart > 0 {
