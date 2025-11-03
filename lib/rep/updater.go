@@ -432,6 +432,44 @@ func (evi Evidence) SyncPSMToPeptideIons(decoy string) Evidence {
 	return evi
 }
 
+func (evi Evidence) RemoveNonRazorProteinsNotPresentInPsms(decoy string) Evidence {
+
+	var totalProteins = make(map[string]struct{}, len(evi.Proteins))
+
+	for i := 0; i < len(evi.PSM); i++ {
+		if evi.PSM[i].IsDecoy {
+			continue
+		}
+		totalProteins[evi.PSM[i].Protein] = struct{}{}
+		if len(evi.PSM[i].MappedProteins) > 0 {
+			for m := range evi.PSM[i].MappedProteins {
+				totalProteins[m] = struct{}{}
+			}
+		}
+	}
+
+	var rmList []int
+	for idx, i := range evi.Proteins {
+		if strings.Contains(i.PartHeader, decoy) {
+			continue
+		}
+
+		if _, ok := totalProteins[i.PartHeader]; !ok {
+			//fmt.Println("Skipping missing protein:", i.PartHeader, idx)
+			rmList = append(rmList, idx)
+			continue
+		}
+	}
+
+	for _, idx := range rmList {
+		if idx >= 0 && idx < len(evi.Proteins) {
+			evi.Proteins = append(evi.Proteins[:idx], evi.Proteins[idx+1:]...)
+		}
+	}
+
+	return evi
+}
+
 // UpdateLayerswithDatabase will fix the protein and gene assignments based on the database data
 func (evi *Evidence) UpdateLayerswithDatabase(dbBin, decoyTag string) {
 
