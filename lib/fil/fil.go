@@ -196,6 +196,7 @@ func Run(f met.Data) met.Data {
 
 	e = e.SyncPSMToPeptides(f.Filter.Tag)
 	e = e.SyncPSMToPeptideIons(f.Filter.Tag)
+	e = e.RemoveNonRazorProteinsNotPresentInPsms(f.Filter.Tag)
 
 	var countPSM, countPep, countIon, coutProtein int
 	for _, i := range e.PSM {
@@ -368,7 +369,15 @@ func classBasedFiltering(input map[string]id.PepIDListPtrs, targetFDR float64, l
 			case "Ion":
 				entryKey = fmt.Sprintf("%s#%d#%.4f", v[0].Peptide, v[0].AssumedCharge, v[0].CalcNeutralPepMass)
 			}
-			currGrpIDList[entryKey] = v
+
+			if exist, ok := currGrpIDList[entryKey]; ok {
+				// For DDA+ and DIA searches, a spectrum may have multiple peptide hits in rank1, rank2, ... pep.xml file, add all to the value list.
+				// key already exists, then append to existing slice
+				currGrpIDList[entryKey] = append(exist, v...)
+			} else {
+				// spectrum key does not exist then create new entry
+				currGrpIDList[entryKey] = v
+			}
 		}
 
 		logrus.Info("Filtering group ", classes[i])
