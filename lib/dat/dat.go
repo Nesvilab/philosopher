@@ -115,7 +115,7 @@ func Run(m met.Data) met.Data {
 	}
 
 	logrus.Info("Generating the target-decoy database")
-	db.Create(m.Temp, m.Database.Add, m.Database.Enz, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, m.Database.DecoyMode, ids)
+	db.Create(m.Temp, m.Database.Add, m.Database.Tag, m.Database.Crap, m.Database.NoD, m.Database.CrapTag, m.Database.DecoyMode)
 
 	logrus.Info("Creating file")
 	db.Save(m.Home, m.Temp, m.Database.ID, m.Database.Tag, m.Database.Rev, m.Database.Iso, m.Database.NoD, m.Database.Crap)
@@ -283,7 +283,7 @@ func (d *Base) Fetch(uniprotID, proteomeID, temp string, iso, rev bool) {
 }
 
 // Create processes the given fasta file and add decoy sequences
-func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, decoyMode int8, ids map[string]string) {
+func (d *Base) Create(temp, add, tag string, crap, noD, cTag bool, decoyMode int8) {
 
 	d.TaDeDB = make(map[string]string)
 
@@ -301,33 +301,52 @@ func (d *Base) Create(temp, add, enz, tag string, crap, noD, cTag bool, decoyMod
 		}
 
 		// adding contaminants to database before reversion
-		// repeated entries are removed and substituted by contaminants
+		// For each contaminant protein, do not add it as a contaminant if it already exists in the target database.
 		if crap {
 
 			d.Deploy(temp)
 
 			crapMap := fas.ParseFile(d.CrapDB)
 
-			for k, v := range crapMap {
-				for key := range ids {
-
-					if cTag {
-						if strings.Contains(k, key) {
-							// Do not add contaminant tags to contam. proteins from the same organism
+			extractProteinID := func(s string) (string, bool) {
+				i1 := -1
+				for i := 0; i < len(s); i++ {
+					if s[i] == '|' {
+						if i1 < 0 {
+							i1 = i
 						} else {
-							k = "contam_" + k
+							return s[i1+1 : i], true
 						}
 					}
+				}
+				return "", false
+			}
 
+			// initiate ID-protein mapping of current db entries
+			idMap := make(map[string]struct{}, len(db))
+
+			for key := range db {
+				keyToCheck := key
+				if g, ok := extractProteinID(key); ok {
+					keyToCheck = g
+				}
+				idMap[keyToCheck] = struct{}{}
+			}
+
+			for k, v := range crapMap {
+				keyToCheck := k
+				if g, ok := extractProteinID(k); ok {
+					keyToCheck = g
 				}
 
-				split := strings.Split(k, "|")
-				for i := range db {
-					if strings.Contains(i, split[1]) {
-						delete(db, i)
+				// for each contaminant sequence, check if it exists in the target database
+				if _, exists := idMap[keyToCheck]; !exists {
+					if cTag {
+						k = "contam_" + k
 					}
+					db[k] = v
+					idMap[keyToCheck] = struct{}{}
 				}
-				db[k] = v
 			}
 
 			e := os.Remove(fmt.Sprintf("%s%scrap-gpmdb.fas", temp, string(filepath.Separator)))
