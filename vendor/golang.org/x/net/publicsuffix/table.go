@@ -4,7 +4,7 @@ package publicsuffix
 
 import _ "embed"
 
-const version = "publicsuffix.org's public_suffix_list.dat, git revision e248cbc92a527a166454afe9914c4c1b4253893f (2022-11-15T18:02:38Z)"
+const version = "publicsuffix.org's public_suffix_list.dat, git revision 2c960dac3d39ba521eb5db9da192968f5be0aded (2025-03-18T07:22:13Z)"
 
 const (
 	nodesBits           = 40
@@ -26,7 +26,7 @@ const (
 )
 
 // numTLD is the number of top level domains.
-const numTLD = 1494
+const numTLD = 1454
 
 // text is the combined text of all labels.
 //
@@ -63,8 +63,8 @@ var nodes uint40String
 //go:embed data/children
 var children uint32String
 
-// max children 718 (capacity 1023)
-// max text offset 32976 (capacity 65535)
-// max text length 36 (capacity 63)
-// max hi 9656 (capacity 16383)
-// max lo 9651 (capacity 16383)
+// max children 870 (capacity 1023)
+// max text offset 31785 (capacity 65535)
+// max text length 31 (capacity 63)
+// max hi 10100 (capacity 16383)
+// max lo 10095 (capacity 16383)
