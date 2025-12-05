@@ -12,7 +12,7 @@ require (
 	github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31
 	github.com/ryanskidmore/parallel v0.0.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.1
 	github.com/spf13/cobra v1.6.1
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
