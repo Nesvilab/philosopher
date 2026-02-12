@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Nesvilab/philosopher/lib/msg"
 )
@@ -56,7 +57,7 @@ func ParseFile2(filename string) []FastaEntry {
 			}
 			fastaSlice = append(fastaSlice, FastaEntry{Header: string(line), Seq: ""})
 		} else {
-			fastaSlice[len(fastaSlice)-1].Seq += scanner.Text()
+			fastaSlice[len(fastaSlice)-1].Seq += strings.TrimSpace(scanner.Text())
 		}
 	}
 
