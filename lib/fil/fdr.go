@@ -128,12 +128,34 @@ func computePepIDQvalue(list id.PepIDListPtrs, level, decoyTag string) {
 	var targets uint
 	var decoys uint
 
-	// sort input list by Probability in descending order
+	// Sort by Probability descending. A deterministic secondary key on ties
+	// guarantees reproducible ordering: Go's sort.Slice is not stable and the
+	// input list is built from map iteration, so without a tie-breaker the
+	// within-tier order (and therefore the FDR bookkeeping below) can differ
+	// between runs on identical input.
 	sort.Slice(list, func(i, j int) bool {
-		return list[i].Probability > list[j].Probability
+		if list[i].Probability != list[j].Probability {
+			return list[i].Probability > list[j].Probability
+		}
+		si := list[i].SpectrumFileName().Str()
+		sj := list[j].SpectrumFileName().Str()
+		if si != sj {
+			return si < sj
+		}
+		if list[i].Peptide != list[j].Peptide {
+			return list[i].Peptide < list[j].Peptide
+		}
+		if list[i].AssumedCharge != list[j].AssumedCharge {
+			return list[i].AssumedCharge < list[j].AssumedCharge
+		}
+		return list[i].Protein < list[j].Protein
 	})
 
-	// create a Probability-to-FDR map so all pept IDs with the same score share the same FDR/Qvalue
+	// Build the Probability -> FDR map using cumulative counts at the END of
+	// each probability tier (i.e. counts over ALL entries with Probability
+	// >= p). Recording the value at the last position of the tier, rather
+	// than the first, makes the FDR invariant to the relative order of tied
+	// entries and matches the standard "FDR at threshold p" definition.
 	var probFDRMap = make(map[float64]float64)
 	limit := len(list)
 
@@ -146,9 +168,12 @@ func computePepIDQvalue(list id.PepIDListPtrs, level, decoyTag string) {
 			targets++
 		}
 
-		fdr := float64(decoys) / float64(targets)
-		if _, exists := probFDRMap[pepID.Probability]; !exists {
-			probFDRMap[pepID.Probability] = fdr
+		if i == limit-1 || list[i+1].Probability != pepID.Probability {
+			if targets > 0 {
+				probFDRMap[pepID.Probability] = float64(decoys) / float64(targets)
+			} else {
+				probFDRMap[pepID.Probability] = 1
+			}
 		}
 	}
 
@@ -619,12 +644,22 @@ func computeProteinQvalue(list id.ProtIDList, decoyTag string) map[float64]float
 	var targets float64
 	var decoys float64
 
-	// sort protein list by TopPepProb in descending order
+	// Sort by TopPepProb descending with a deterministic secondary key on
+	// ties (ProteinName). Without the tie-breaker, Go's non-stable sort and
+	// upstream map iteration would randomize the order of equally-scored
+	// entries, causing non-reproducible FDR values below.
 	sort.Slice(list, func(i, j int) bool {
-		return list[i].TopPepProb > list[j].TopPepProb
+		if list[i].TopPepProb != list[j].TopPepProb {
+			return list[i].TopPepProb > list[j].TopPepProb
+		}
+		return list[i].ProteinName < list[j].ProteinName
 	})
 
-	// create a TopPepProb-to-FDR map so all prot IDs with the same score share the same FDR/Qvalue
+	// Build the TopPepProb -> FDR map using cumulative counts at the END of
+	// each probability tier (i.e. counts over ALL entries with TopPepProb
+	// >= p). Recording the value at the last position of the tier, rather
+	// than the first, makes the FDR invariant to the relative order of tied
+	// entries.
 	var probFDRMap = make(map[float64]float64)
 
 	// compute FDR and put it to probFDRMap
@@ -638,9 +673,12 @@ func computeProteinQvalue(list id.ProtIDList, decoyTag string) map[float64]float
 			targets++
 		}
 
-		fdr := float64(decoys) / float64(targets)
-		if _, exists := probFDRMap[protID.TopPepProb]; !exists {
-			probFDRMap[protID.TopPepProb] = fdr
+		if i == limit-1 || list[i+1].TopPepProb != protID.TopPepProb {
+			if targets > 0 {
+				probFDRMap[protID.TopPepProb] = decoys / targets
+			} else {
+				probFDRMap[protID.TopPepProb] = 1
+			}
 		}
 	}
 
