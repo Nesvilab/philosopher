@@ -1,6 +1,6 @@
 module github.com/Nesvilab/philosopher
 
-go 1.20
+go 1.25.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1
@@ -14,8 +14,8 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29 // indirect
-	golang.org/x/image v0.6.0 // indirect
-	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/image v0.38.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	gonum.org/v1/plot v0.12.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -30,11 +30,10 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
