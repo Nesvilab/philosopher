@@ -57,8 +57,6 @@ github.com/mattn/go-isatty
 # github.com/pierrre/archivefile v0.0.0-20170218184037-e2d100bc74f5
 ## explicit
 github.com/pierrre/archivefile/zip
-# github.com/pkg/errors v0.9.1
-## explicit
 # github.com/rogpeppe/go-charset v0.0.0-20190617161244-0dc95cdf6f31
 ## explicit
 github.com/rogpeppe/go-charset/charset
@@ -91,8 +89,8 @@ github.com/vmihailenco/tagparser/v2/internal
 github.com/vmihailenco/tagparser/v2/internal/parser
 # golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 ## explicit; go 1.18
-# golang.org/x/image v0.6.0
-## explicit; go 1.12
+# golang.org/x/image v0.38.0
+## explicit; go 1.25.0
 golang.org/x/image/ccitt
 golang.org/x/image/draw
 golang.org/x/image/font
@@ -108,15 +106,15 @@ golang.org/x/image/math/fixed
 golang.org/x/image/tiff
 golang.org/x/image/tiff/lzw
 golang.org/x/image/vector
-# golang.org/x/net v0.33.0
-## explicit; go 1.18
+# golang.org/x/net v0.38.0
+## explicit; go 1.23.0
 golang.org/x/net/publicsuffix
-# golang.org/x/sys v0.28.0
-## explicit; go 1.18
+# golang.org/x/sys v0.31.0
+## explicit; go 1.23.0
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.21.0
-## explicit; go 1.18
+# golang.org/x/text v0.35.0
+## explicit; go 1.25.0
 golang.org/x/text/encoding
 golang.org/x/text/encoding/charmap
 golang.org/x/text/encoding/internal
