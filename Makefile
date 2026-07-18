@@ -7,7 +7,7 @@ VERSION = $(shell date +%Y%m%d)
 BUILD = $(shell  date +%Y%m%d%H%M)
 
 TAG = v5.1.3
-RC = RC11
+RC = RC12
 
 LDFLAGS = -ldflags "-w -s -extldflags -static -X main.version=${TAG} -X main.build=${BUILD}"
 
@@ -74,7 +74,7 @@ all:
 push:
 	git tag -a ${TAG} -m "Philosopher ${TAG}"
 	git push origin master -f --tags
-	
+
 .PHONY: draft
 draft:
 	goreleaser --skip-publish --snapshot --release-notes=Changelog
