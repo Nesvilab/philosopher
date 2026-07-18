@@ -57,6 +57,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.SPRank = i.SPRank
 		p.Hyperscore = i.Hyperscore
 		p.Nextscore = i.Nextscore
+		p.BCS = i.BCS
 		p.SpectralSim = i.SpectralSim
 		p.Rtscore = i.Rtscore
 		p.IMscore = i.IMscore
@@ -237,7 +238,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		header += "\tIMScore"
 	}
 
-	header += "\tExpectation\tHyperscore\tNextscore\tProbability\tQvalue\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
+	header += "\tExpectation\tHyperscore\tNextscore\tBCS\tProbability\tQvalue\tNumber of Enzymatic Termini\tNumber of Missed Cleavages\tProtein Start\tProtein End\tIntensity\tAssigned Modifications\tObserved Modifications"
 
 	if hasClass {
 		header += "\tClass"
@@ -611,11 +612,12 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			)
 		}
 
-		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%.4f\t%.14f\t%d\t%d\t%d\t%d\t%.4f\t%s\t%s",
+		line = fmt.Sprintf("%s\t%.14f\t%.4f\t%.4f\t%d\t%.4f\t%.14f\t%d\t%d\t%d\t%d\t%.4f\t%s\t%s",
 			line,
 			i.Expectation,
 			i.Hyperscore,
 			i.Nextscore,
+			i.BCS,
 			i.Probability,
 			i.Qvalue,
 			i.NumberOfEnzymaticTermini,

@@ -88,6 +88,7 @@ type PeptideIdentification struct {
 	SPRank                           float64
 	Hyperscore                       float64
 	Nextscore                        float64
+	BCS                              int
 	SpectralSim                      float64
 	Rtscore                          float64
 	IMscore                          float64
@@ -496,6 +497,9 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 			} else if string(j.Name) == "nextscore" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.Nextscore = value
+			} else if string(j.Name) == "bcs" {
+				value, _ := strconv.Atoi(j.Value)
+				psm.BCS = value
 			} else if string(j.Name) == "spectralsim" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SpectralSim = value

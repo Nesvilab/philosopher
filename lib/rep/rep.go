@@ -155,6 +155,7 @@ type PSMEvidence struct {
 	SPRank                           float64
 	Hyperscore                       float64
 	Nextscore                        float64
+	BCS                              int
 	SpectralSim                      float64
 	Rtscore                          float64
 	IMscore                          float64
