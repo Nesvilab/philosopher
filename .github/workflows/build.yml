@@ -1,0 +1,81 @@
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.goos }}/${{ matrix.goarch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            ext: ''
+          - goos: windows
+            goarch: amd64
+            ext: '.exe'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Unzip embedded bindata
+        run: |
+          unzip -o lib/dat/bindata.go.zip -d lib/dat/
+          unzip -o lib/ext/cdhit/unix/bindata.go.zip -d lib/ext/cdhit/unix/
+          unzip -o lib/ext/cdhit/win/bindata.go.zip -d lib/ext/cdhit/win/
+          unzip -o lib/ext/comet/unix/bindata.go.zip -d lib/ext/comet/unix/
+          unzip -o lib/ext/comet/win/bindata.go.zip -d lib/ext/comet/win/
+          unzip -o lib/ext/interprophet/unix/bindata.go.zip -d lib/ext/interprophet/unix/
+          unzip -o lib/ext/interprophet/win/bindata.go.zip -d lib/ext/interprophet/win/
+          unzip -o lib/ext/peptideprophet/unix/bindata.go.zip -d lib/ext/peptideprophet/unix/
+          unzip -o lib/ext/peptideprophet/win/bindata.go.zip -d lib/ext/peptideprophet/win/
+          unzip -o lib/ext/proteinprophet/unix/bindata.go.zip -d lib/ext/proteinprophet/unix/
+          unzip -o lib/ext/proteinprophet/win/bindata.go.zip -d lib/ext/proteinprophet/win/
+          unzip -o lib/ext/ptmprophet/unix/bindata.go.zip -d lib/ext/ptmprophet/unix/
+          unzip -o lib/ext/ptmprophet/win/bindata.go.zip -d lib/ext/ptmprophet/win/
+          unzip -o lib/obo/unimod/bindata.go.zip -d lib/obo/unimod/
+          unzip -o lib/pip/bindata.go.zip -d lib/pip/
+
+      - name: Build
+        id: build
+        env:
+          CGO_ENABLED: '0'
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          # Single source of truth: read the release version (TAG) and
+          # release candidate (RC) straight from the Makefile.
+          TAG=$(sed -n 's/^TAG[[:space:]]*=[[:space:]]*//p' Makefile | head -1 | tr -d '[:space:]')
+          RC=$(sed -n 's/^RC[[:space:]]*=[[:space:]]*//p' Makefile | head -1 | tr -d '[:space:]')
+          if [ -n "${RC}" ]; then RELEASE="${TAG}-${RC}"; else RELEASE="${TAG}"; fi
+          BUILD=$(date +%Y%m%d%H%M)
+          OUTPUT="philosopher-${RELEASE}${{ matrix.ext }}"
+          echo "Building ${OUTPUT} (version=${TAG}, build=${BUILD})"
+          go build -trimpath \
+            -ldflags "-w -s -X main.version=${TAG} -X main.build=${BUILD}" \
+            -o "${OUTPUT}" main.go
+          ls -lh "${OUTPUT}"
+          echo "output=${OUTPUT}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.build.outputs.output }}
+          path: ${{ steps.build.outputs.output }}
+          if-no-files-found: error
