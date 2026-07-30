@@ -369,6 +369,8 @@ func (d *Base) Create(temp, add, tag string, crap, noD, cTag bool, decoyMode int
 					revSeq = ReverseWithShiftKR(s)
 				case 2:
 					revSeq = ReverseAndSwapKR(s)
+				case 3:
+					revSeq = ReverseKeepKR(s)
 				default:
 					revSeq = reverseSeq(s)
 				}
@@ -667,5 +669,52 @@ func swapRK(c rune) rune {
 		return 'R'
 	default:
 		return c
+	}
+}
+
+// ReverseKeepKR reverses the residues within each K/R-delimited segment while
+// keeping every K and R at its original position (and keeping a leading M
+// unchanged). After in silico digestion with trypsin every decoy peptide still
+// ends in K or R, so the decoys keep the same cleavage-site layout, the same
+// missed-cleavage structure, and the same terminal-residue distribution as the
+// targets.
+//
+// This is the only mode that is safe for peptide-level databases, where each
+// FASTA entry is a single peptide and the search uses a no-cleavage enzyme, as
+// done in entrapment benchmarks. There, modes 0-2 move the C-terminal K/R away
+// from the C-terminus because no digestion step follows the reversal to restore
+// it, so every decoy becomes non-tryptic and loses target-decoy competition.
+func ReverseKeepKR(s string) string {
+
+	r := []rune(s)
+	n := len(r)
+	out := make([]rune, n)
+
+	var start int
+	if n > 0 && r[0] == 'M' {
+		out[0] = 'M'
+		start = 1
+	}
+
+	segStart := start
+	for i := start; i < n; i++ {
+		if r[i] == 'K' || r[i] == 'R' {
+			out[i] = r[i]
+			reverseInto(out[segStart:i], r[segStart:i])
+			segStart = i + 1
+		}
+	}
+
+	// trailing segment, when the sequence does not end in a cleavage residue
+	reverseInto(out[segStart:n], r[segStart:n])
+
+	return string(out)
+}
+
+// reverseInto writes src into dst in reverse order. len(dst) must equal len(src).
+func reverseInto(dst, src []rune) {
+	n := len(src)
+	for i := 0; i < n; i++ {
+		dst[n-1-i] = src[i]
 	}
 }
