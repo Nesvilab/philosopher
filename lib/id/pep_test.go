@@ -394,3 +394,111 @@ func TestProcessSpectrumQuery_MSFraggerSearchScores(t *testing.T) {
 		})
 	}
 }
+
+// twoHitSpectrumQueryTemplate is an MSFragger spectrum_query with two search hits. The two %s
+// slots receive the search_score elements of hit 1 and hit 2.
+const twoHitSpectrumQueryTemplate = `<spectrum_query spectrum="a.00002.00002.2" start_scan="2" end_scan="2" precursor_neutral_mass="800.4" assumed_charge="2" index="2" retention_time_sec="61.0">
+  <search_result>
+    <search_hit hit_rank="1" peptide="PEPTIDE" peptide_prev_aa="K" peptide_next_aa="K" protein="sp|P1|TEST" num_tot_proteins="1" num_matched_ions="8" tot_num_ions="12" calc_neutral_pep_mass="800.4" massdiff="0.0" num_tol_term="1" num_missed_cleavages="0" num_matched_peptides="3">
+      %s
+    </search_hit>
+    <search_hit hit_rank="2" peptide="TIDEKA" peptide_prev_aa="P" peptide_next_aa="K" protein="sp|P1|TEST" num_tot_proteins="1" num_matched_ions="6" tot_num_ions="10" calc_neutral_pep_mass="800.4" massdiff="0.0" num_tol_term="1" num_missed_cleavages="0" num_matched_peptides="3">
+      %s
+    </search_hit>
+  </search_result>
+</spectrum_query>`
+
+func TestProcessSpectrumQuery_ISFParentScores(t *testing.T) {
+
+	tests := []struct {
+		name                 string
+		scores               string
+		wantISFParentPeptide string
+	}{
+		{
+			name: "isf parent peptide is the modified peptide read from the search scores",
+			scores: `<search_score name="hyperscore" value="20.5"/>
+      <search_score name="bcs" value="5"/>
+      <search_score name="fI_nterm" value="0.1234"/>
+      <search_score name="isf_parent_peptide" value="n[42.0106]PEPTM[15.9949]IDEK"/>
+      <search_score name="isf_parent_charge" value="2"/>
+      <search_score name="isf_apex_rt_delta" value="0.0123"/>`,
+			wantISFParentPeptide: "n[42.0106]PEPTM[15.9949]IDEK",
+		},
+		{
+			name: "isf parent peptide without modifications is read as is",
+			scores: `<search_score name="hyperscore" value="20.5"/>
+      <search_score name="isf_parent_peptide" value="PEPTIDEK"/>
+      <search_score name="isf_parent_charge" value="3"/>
+      <search_score name="isf_apex_rt_delta" value="-0.0500"/>`,
+			wantISFParentPeptide: "PEPTIDEK",
+		},
+		{
+			name: "stale isf_parent_modified_peptide score alone is ignored",
+			scores: `<search_score name="hyperscore" value="20.5"/>
+      <search_score name="isf_parent_modified_peptide" value="n[42.0106]PEPTM[15.9949]IDEK"/>`,
+			wantISFParentPeptide: "",
+		},
+		{
+			name: "hit without isf scores has an empty parent",
+			scores: `<search_score name="hyperscore" value="20.5"/>
+      <search_score name="bcs" value="5"/>`,
+			wantISFParentPeptide: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			psm := parseSpectrumQuery(t, tt.scores)
+
+			if psm.ISFParentPeptide != tt.wantISFParentPeptide {
+				t.Errorf("ISFParentPeptide = %q, want %q", psm.ISFParentPeptide, tt.wantISFParentPeptide)
+			}
+		})
+	}
+}
+
+func TestProcessSpectrumQuery_ISFParentScoresAreResetPerHit(t *testing.T) {
+
+	isfScores := `<search_score name="hyperscore" value="20.5"/>
+      <search_score name="isf_parent_peptide" value="PEPTM[15.9949]IDEK"/>
+      <search_score name="isf_parent_charge" value="2"/>
+      <search_score name="isf_apex_rt_delta" value="0.0123"/>`
+	plainScores := `<search_score name="hyperscore" value="10.5"/>`
+
+	tests := []struct {
+		name                 string
+		firstHitScores       string
+		lastHitScores        string
+		wantISFParentPeptide string
+	}{
+		{
+			name:                 "isf parent of an earlier hit does not leak into a later non-isf hit",
+			firstHitScores:       isfScores,
+			lastHitScores:        plainScores,
+			wantISFParentPeptide: "",
+		},
+		{
+			name:                 "isf parent of the last hit is kept",
+			firstHitScores:       plainScores,
+			lastHitScores:        isfScores,
+			wantISFParentPeptide: "PEPTM[15.9949]IDEK",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var sq spc.SpectrumQuery
+			raw := fmt.Sprintf(twoHitSpectrumQueryTemplate, tt.firstHitScores, tt.lastHitScores)
+			if err := xml.Unmarshal([]byte(raw), &sq); err != nil {
+				t.Fatalf("unmarshal spectrum_query: %v", err)
+			}
+
+			psm := processSpectrumQuery(sq, mod.Modifications{}, "rev_", "a.pepXML")
+
+			if psm.ISFParentPeptide != tt.wantISFParentPeptide {
+				t.Errorf("ISFParentPeptide = %q, want %q", psm.ISFParentPeptide, tt.wantISFParentPeptide)
+			}
+		})
+	}
+}

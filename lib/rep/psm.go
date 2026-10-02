@@ -59,6 +59,7 @@ func (evi *Evidence) AssemblePSMReport(pep id.PepIDList, decoyTag string) {
 		p.Nextscore = i.Nextscore
 		p.BCS = i.BCS
 		p.FINterm = i.FINterm
+		p.ISFParentPeptide = i.ISFParentPeptide
 		p.SpectralSim = i.SpectralSim
 		p.Rtscore = i.Rtscore
 		p.IMscore = i.IMscore
@@ -137,6 +138,7 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	var hasSpectralSim bool
 	var hasRtScore bool
 	var hasIMScore bool
+	var hasISF bool
 
 	if hasPrefix {
 		output = fmt.Sprintf("%s%s%s_psm.tsv", workspace, string(filepath.Separator), path.Base(workspace))
@@ -213,6 +215,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 			hasIMScore = true
 		}
 
+		if evi[i].IsInSourceFragment() {
+			hasISF = true
+		}
+
 	}
 
 	for k := range modMap {
@@ -282,6 +288,10 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 	}
 
 	header += "\tPurity\tIs Decoy\tIs Contaminant"
+
+	if hasISF {
+		header += "\tIs In-Source Fragmented Peptide\tParent Peptide"
+	}
 
 	header += "\tIs Unique\tProtein\tProtein ID\tEntry Name\tGene\tProtein Description\tMapped Genes\tMapped Proteins"
 
@@ -703,10 +713,22 @@ func (evi PSMEvidenceList) PSMReport(workspace, brand, decoyTag string, channels
 		)
 		//}
 
-		line = fmt.Sprintf("%s\t%t\t%t\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+		line = fmt.Sprintf("%s\t%t\t%t",
 			line,
 			i.IsDecoy,
 			i.IsContaminant,
+		)
+
+		if hasISF {
+			line = fmt.Sprintf("%s\t%t\t%s",
+				line,
+				i.IsInSourceFragment(),
+				i.ISFParentPeptide,
+			)
+		}
+
+		line = fmt.Sprintf("%s\t%t\t%s\t%s\t%s\t%s\t%s\t%s\t%s",
+			line,
 			i.IsUnique,
 			i.Protein,
 			i.ProteinID,

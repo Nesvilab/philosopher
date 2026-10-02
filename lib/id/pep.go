@@ -90,6 +90,7 @@ type PeptideIdentification struct {
 	Nextscore                        float64
 	BCS                              int
 	FINterm                          float64
+	ISFParentPeptide                 string // modified peptide of the in-source fragment parent, in MSFragger pin notation
 	SpectralSim                      float64
 	Rtscore                          float64
 	IMscore                          float64
@@ -480,6 +481,10 @@ func processSpectrumQuery(sq spc.SpectrumQuery, declared declaredModifications, 
 			psm.AlternativeProteins[string(j.Protein)] = string(j.PepPrevAA) + "#" + string(j.PepNextAA)
 		}
 
+		// the PSM is overwritten by every search hit, so the in-source fragment parent of an
+		// earlier hit must not leak into a later hit that is not an in-source fragment
+		psm.ISFParentPeptide = ""
+
 		for _, j := range i.Score {
 			if string(j.Name) == "expect" {
 				eValue, _ := uti.ParseFloat(j.Value)
@@ -505,6 +510,8 @@ func processSpectrumQuery(sq spc.SpectrumQuery, declared declaredModifications, 
 			} else if string(j.Name) == "fI_nterm" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.FINterm = value
+			} else if string(j.Name) == "isf_parent_peptide" {
+				psm.ISFParentPeptide = j.Value
 			} else if string(j.Name) == "spectralsim" {
 				value, _ := strconv.ParseFloat(j.Value, 64)
 				psm.SpectralSim = value

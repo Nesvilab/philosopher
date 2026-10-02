@@ -157,6 +157,7 @@ type PSMEvidence struct {
 	Nextscore                        float64
 	BCS                              int
 	FINterm                          float64
+	ISFParentPeptide                 string // modified peptide of the in-source fragment parent, in MSFragger pin notation
 	SpectralSim                      float64
 	Rtscore                          float64
 	IMscore                          float64
@@ -173,6 +174,11 @@ type PSMEvidence struct {
 	Modifications                    mod.ModificationsSlice
 	MappedProteins                   map[string]string
 	MappedGenes                      map[string]struct{}
+}
+
+// IsInSourceFragment tells whether MSFragger reported this PSM as an in-source fragment of a co-eluting parent peptide
+func (e PSMEvidence) IsInSourceFragment() bool {
+	return len(e.ISFParentPeptide) > 0
 }
 
 func (e PSMEvidence) IonForm() id.IonFormType {
