@@ -52,7 +52,8 @@ func (evi *Evidence) MapMods() {
 			}
 		}
 
-		if gap < (1e-6 * ppm * mass) {
+		// the tolerance must not go negative for a mass loss, or no loss would ever be annotated
+		if gap < (1e-6 * ppm * math.Abs(mass)) {
 			modMap[mass] = obo
 		} else {
 			delete(modMap, mass)

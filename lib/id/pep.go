@@ -285,8 +285,9 @@ func (p *PepXML) Read(f string) {
 		// start processing spectra queries
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		p.PeptideIdentification = make(PepIDList, len(sq))
+		declared := newDeclaredModifications(p.Modifications)
 		for idx, i := range sq {
-			p.PeptideIdentification[idx] = processSpectrumQuery(i, p.Modifications, p.DecoyTag, p.FileName)
+			p.PeptideIdentification[idx] = processSpectrumQuery(i, declared, p.DecoyTag, p.FileName)
 		}
 
 		p.Prophet = string(mpa.AnalysisSummary[0].Analysis)
@@ -413,7 +414,7 @@ func ReadPepXMLInput(xmlFile, decoyTag, temp string, models bool) (PepIDListPtrs
 	return pepXML.PeptideIdentification, searchEngine
 }
 
-func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag, FileName string) PeptideIdentification {
+func processSpectrumQuery(sq spc.SpectrumQuery, declared declaredModifications, decoyTag, FileName string) PeptideIdentification {
 
 	var psm PeptideIdentification
 	psm.AlternativeProteins = make(map[string]string)
@@ -543,108 +544,12 @@ func processSpectrumQuery(sq spc.SpectrumQuery, mods mod.Modifications, decoyTag
 		//psm.Spectrum = fmt.Sprintf("%s#%s", psm.Spectrum, FileName)
 		psm.Spectrum = string(sq.Spectrum)
 
-		psm.mapModsFromPepXML(i.ModificationInfo, mods)
+		psm.mapModsFromPepXML(i.ModificationInfo, declared)
 
 		psm.Qvalue = math.NaN()
 	}
 
 	return psm
-}
-
-// mapModsFromPepXML receives a pepXML struct with modifications and adds them to the given struct
-func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, mods mod.Modifications) {
-
-	p.ModifiedPeptide = string(m.ModifiedPeptide)
-	pModificationsIndex := make(map[string]mod.Modification)
-	for _, i := range m.ModAminoacidMass {
-
-		aa := strings.Split(p.Peptide, "")
-		key := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass)
-
-		// This is related to a rounding issue that prevents the correct mapping between
-		// PTMProphet and MSFragger masses
-		keyPlus := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass+0.0001)
-		keyMinus := fmt.Sprintf("%s#%.4f", aa[i.Position-1], i.Mass-0.0001)
-
-		v, ok := mods.Index[key]
-		if ok {
-			m := v
-			newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
-			m.Index = newKey
-			m.Position = i.Position
-			pModificationsIndex[newKey] = m
-		} else {
-
-			v, ok = mods.Index[keyPlus]
-			if ok {
-				m := v
-				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
-				m.Index = newKey
-				m.Position = i.Position
-				pModificationsIndex[newKey] = m
-			}
-
-			v, ok = mods.Index[keyMinus]
-			if ok {
-				m := v
-				newKey := fmt.Sprintf("%s#%d#%.4f", aa[i.Position-1], i.Position, i.Mass)
-				m.Index = newKey
-				m.Position = i.Position
-				pModificationsIndex[newKey] = m
-			}
-		}
-	}
-
-	// n-terminal modifications
-	if m.ModNTermMass != 0 {
-		key := fmt.Sprintf("N-term#%.4f", m.ModNTermMass)
-		v, ok := mods.Index[key]
-		if ok {
-			m := v
-			m.AminoAcid = "N-term"
-			pModificationsIndex[key] = m
-		}
-
-		// this rule was added because PTMProphet is changing the mod_nterm_mass
-		// in the PSM to something that does not exists in the header table.
-		if strings.Contains(key, "305") {
-			key = "N-term#305.2150"
-			v, ok := mods.Index[key]
-			if ok {
-				m := v
-				m.AminoAcid = "N-term"
-				pModificationsIndex[key] = m
-			}
-		}
-
-	}
-
-	// c-terminal modifications
-	if m.ModCTermMass != 0 {
-		key := fmt.Sprintf("C-term#%.4f", m.ModCTermMass)
-		v, ok := mods.Index[key]
-		if ok {
-			m := v
-			m.AminoAcid = "C-term"
-			pModificationsIndex[key] = m
-		}
-	}
-
-	// if isotopicCorr >= 0.036386 || isotopicCorr <= -0.036386 {
-	key := fmt.Sprintf("%.4f", p.Massdiff)
-	_, ok := pModificationsIndex[key]
-	if !ok {
-		m := mod.Modification{
-			Index:    key,
-			Name:     "Unknown",
-			Type:     mod.Observed,
-			MassDiff: p.Massdiff,
-		}
-		pModificationsIndex[key] = m
-	}
-	if len(pModificationsIndex) != 0 {
-		p.Modifications = mod.Modifications{Index: pModificationsIndex}.ToSlice()
-	}
 }
 
 // PromoteProteinIDs changes the identification in cases where the reference protein is a decoy and

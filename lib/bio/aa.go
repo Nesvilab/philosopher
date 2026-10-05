@@ -36,9 +36,9 @@ func New(name string) AminoAcid {
 	case "Cysteine":
 		aa = AminoAcid{Code: "C", ShortName: "Cys", Name: "Cysteine", MonoIsotopeMass: 103.009184505, AverageMass: 103.1429}
 	case "Glutamine":
-		aa = AminoAcid{Code: "E", ShortName: "Glu", Name: "Glutamine", MonoIsotopeMass: 129.042593135, AverageMass: 129.11398}
+		aa = AminoAcid{Code: "Q", ShortName: "Gln", Name: "Glutamine", MonoIsotopeMass: 128.058577540, AverageMass: 128.12922}
 	case "Glutamic Acid":
-		aa = AminoAcid{Code: "Q", ShortName: "Gln", Name: "Glutamic Acid", MonoIsotopeMass: 128.058577540, AverageMass: 128.12922}
+		aa = AminoAcid{Code: "E", ShortName: "Glu", Name: "Glutamic Acid", MonoIsotopeMass: 129.042593135, AverageMass: 129.11398}
 	case "Glycine":
 		aa = AminoAcid{Code: "G", ShortName: "Gly", Name: "Glycine", MonoIsotopeMass: 57.021463735, AverageMass: 57.05132}
 	case "Histidine":
@@ -71,4 +71,27 @@ func New(name string) AminoAcid {
 	}
 
 	return aa
+}
+
+// residueNames are the names New accepts, in one-letter code order A..Y.
+var residueNames = []string{
+	"Alanine", "Cysteine", "Aspartic Acid", "Glutamic Acid", "Phenylalanine", "Glycine", "Histidine",
+	"Isoleucine", "Lysine", "Leucine", "Methionine", "Asparagine", "Proline", "Glutamine", "Arginine",
+	"Serine", "Threonine", "Valine", "Tryptophan", "Tyrosine",
+}
+
+var residuesByCode = func() map[string]AminoAcid {
+	byCode := make(map[string]AminoAcid, len(residueNames))
+	for _, name := range residueNames {
+		aa := New(name)
+		byCode[aa.Code] = aa
+	}
+	return byCode
+}()
+
+// MonoIsotopeMassByCode returns the monoisotopic residue mass of a one-letter amino acid code. The
+// second value is false for a code that is not one of the twenty standard residues.
+func MonoIsotopeMassByCode(code string) (float64, bool) {
+	aa, ok := residuesByCode[code]
+	return aa.MonoIsotopeMass, ok
 }
