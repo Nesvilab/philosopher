@@ -494,7 +494,7 @@ func TestProcessSpectrumQuery_ISFParentScoresAreResetPerHit(t *testing.T) {
 				t.Fatalf("unmarshal spectrum_query: %v", err)
 			}
 
-			psm := processSpectrumQuery(sq, mod.Modifications{}, "rev_", "a.pepXML")
+			psm := processSpectrumQuery(sq, newDeclaredModifications(mod.Modifications{}), "rev_", "a.pepXML")
 
 			if psm.ISFParentPeptide != tt.wantISFParentPeptide {
 				t.Errorf("ISFParentPeptide = %q, want %q", psm.ISFParentPeptide, tt.wantISFParentPeptide)
