@@ -592,11 +592,17 @@ func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 			var prevAA string
 			var nextAA string
 
+			names := make([]string, 0, len(list))
+			for k := range list {
+				names = append(names, k)
+			}
+			sort.Strings(names)
+
 			// if a Uniprot database is used we give preference to SwissProt proteins
 			if isUniProt {
-				for k, v := range list {
+				for _, k := range names {
 
-					pna := strings.Split(v, "#")
+					pna := strings.Split(list[k], "#")
 
 					if strings.HasPrefix(k, "sp|") {
 						alt = k
@@ -618,9 +624,9 @@ func (p *PepXML4Serialiazation) PromoteProteinIDs() {
 				p.PeptideIdentification[i].NextAA = []byte(nextAA)
 
 			} else {
-				for k, v := range list {
+				for _, k := range names {
 
-					pna := strings.Split(v, "#")
+					pna := strings.Split(list[k], "#")
 
 					alt = k
 					prevAA = pna[0]
