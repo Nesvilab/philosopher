@@ -286,7 +286,7 @@ func (p *PepXML) Read(f string) {
 		// start processing spectra queries
 		sq := mpa.MsmsRunSummary.SpectrumQuery
 		p.PeptideIdentification = make(PepIDList, len(sq))
-		declared := newDeclaredModifications(p.Modifications)
+		declared := newDeclaredModifications(p.Modifications, p.SearchEngine)
 		for idx, i := range sq {
 			p.PeptideIdentification[idx] = processSpectrumQuery(i, declared, p.DecoyTag, p.FileName)
 		}

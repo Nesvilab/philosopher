@@ -29,7 +29,7 @@ func parseSpectrumQuery(t *testing.T, scores string) PeptideIdentification {
 		t.Fatalf("unmarshal spectrum_query: %v", err)
 	}
 
-	return processSpectrumQuery(sq, newDeclaredModifications(mod.Modifications{}), "rev_", "a.pepXML")
+	return processSpectrumQuery(sq, newDeclaredModifications(mod.Modifications{}, ""), "rev_", "a.pepXML")
 }
 
 // searchSummaryMods is a header table as MSFragger declares it: fixed carbamidomethyl on C, a -43.0058
@@ -97,6 +97,7 @@ func TestMapModsFromPepXML(t *testing.T) {
 		mods    func() mod.Modifications
 		info    spc.ModificationInfo
 		want    []string
+		engine  string
 	}{
 		{
 			// MSFragger writes the offset as a second mod_aminoacid_mass at the carbamidomethyl site whose
@@ -243,6 +244,27 @@ func TestMapModsFromPepXML(t *testing.T) {
 			},
 			want: nil,
 		},
+		{
+			// MSFragger sums a delta placed on a fixed-modified residue with the fixed modification.
+			name:    "an undeclared mass on a fixed-modified residue is the whole mass of the site",
+			peptide: "PEPCK",
+			info:    spc.ModificationInfo{ModAminoacidMass: []spc.ModAminoacidMass{{Position: 4, Mass: 174.04630}}},
+			want:    []string{"4C:71.0371:true"},
+		},
+		{
+			name:    "an undeclared mass on a fixed-modified terminus is the whole mass of the site",
+			peptide: "PEPTIDEK",
+			mods:    tmtSearchSummaryMods("N-term#305.2150"),
+			info:    spc.ModificationInfo{ModNTermMass: 319.23058}, // H + TMTpro 304.2071 + methyl 14.01565
+			want:    []string{"N-term:318.2228:true"},
+		},
+		{
+			name:    "an undeclared C-terminal mass from MSFragger is derived over the hydroxyl and the proton it includes",
+			peptide: "PEPTIDEK",
+			info:    spc.ModificationInfo{ModCTermMass: 34.00492}, // oxidation 15.9949 + OH + proton
+			want:    []string{"C-term:15.9949:true"},
+			engine:  "MSFragger",
+		},
 	}
 
 	for _, tt := range tests {
@@ -252,7 +274,7 @@ func TestMapModsFromPepXML(t *testing.T) {
 				mods = tt.mods
 			}
 			p := PeptideIdentification{Peptide: tt.peptide, Massdiff: 22.9714}
-			p.mapModsFromPepXML(tt.info, newDeclaredModifications(mods()))
+			p.mapModsFromPepXML(tt.info, newDeclaredModifications(mods(), tt.engine))
 
 			if got := assignedMods(p); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("assigned modifications = %v, want %v", got, tt.want)
@@ -269,7 +291,7 @@ func TestMapModsFromPepXML_TMTNTerm(t *testing.T) {
 	want := []string{"8K:304.2071:false", "N-term:304.2071:false"}
 
 	for _, key := range []string{"N-term#305.2150", "N-term#305.2149"} {
-		declared := newDeclaredModifications(tmtSearchSummaryMods(key)())
+		declared := newDeclaredModifications(tmtSearchSummaryMods(key)(), "")
 
 		for _, mass := range []float64{305.2150, 305.2149, 305.2151, 305.2140, 305.2290} {
 			p := PeptideIdentification{Peptide: "PEPTIDEK"}
@@ -288,7 +310,7 @@ func TestMapModsFromPepXML_TMTNTerm(t *testing.T) {
 func TestMapModsFromPepXML_ObservedMassDiff(t *testing.T) {
 
 	p := PeptideIdentification{Peptide: "PEPTIDEK", Massdiff: 22.9714}
-	p.mapModsFromPepXML(spc.ModificationInfo{}, newDeclaredModifications(searchSummaryMods()))
+	p.mapModsFromPepXML(spc.ModificationInfo{}, newDeclaredModifications(searchSummaryMods(), ""))
 
 	var observed []string
 	for _, m := range p.Modifications.IndexSlice {
@@ -306,7 +328,7 @@ func TestMapModsFromPepXML_ObservedMassDiff(t *testing.T) {
 // with: for a modification stacked on a fixed one the two differ by the fixed delta.
 func TestDeclaredModifications_FindDeclared(t *testing.T) {
 
-	declared := newDeclaredModifications(searchSummaryMods())
+	declared := newDeclaredModifications(searchSummaryMods(), "")
 
 	tests := []struct {
 		site string
@@ -494,7 +516,7 @@ func TestProcessSpectrumQuery_ISFParentScoresAreResetPerHit(t *testing.T) {
 				t.Fatalf("unmarshal spectrum_query: %v", err)
 			}
 
-			psm := processSpectrumQuery(sq, newDeclaredModifications(mod.Modifications{}), "rev_", "a.pepXML")
+			psm := processSpectrumQuery(sq, newDeclaredModifications(mod.Modifications{}, ""), "rev_", "a.pepXML")
 
 			if psm.ISFParentPeptide != tt.wantISFParentPeptide {
 				t.Errorf("ISFParentPeptide = %q, want %q", psm.ISFParentPeptide, tt.wantISFParentPeptide)

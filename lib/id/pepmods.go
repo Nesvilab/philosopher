@@ -14,10 +14,12 @@ import (
 )
 
 // Monoisotopic masses of what an unmodified terminus carries: the N-terminal hydrogen and the
-// C-terminal hydroxyl. MSFragger's mod_nterm_mass and mod_cterm_mass include them.
+// C-terminal hydroxyl. MSFragger's mod_nterm_mass and mod_cterm_mass include them, and its
+// mod_cterm_mass also includes a proton.
 const (
 	nTermHydrogenMass = 1.00782503207
 	cTermHydroxylMass = 17.00273965
+	protonMass        = 1.00727646688
 )
 
 // declaredMassTolerance is how far, in Da, a pepXML mass may sit from the mass a search summary line
@@ -47,22 +49,27 @@ type declaredEntry struct {
 }
 
 // declaredModifications is the search summary table indexed for the lookups made per PSM: the entries
-// of each site sorted by the mass the header states, the summed fixed delta of each site, and every
-// declared delta. Sites compare case-insensitively ("N-term", "n-term").
+// of each site sorted by the mass the header states, and every declared delta. Sites compare
+// case-insensitively ("N-term", "n-term").
 type declaredModifications struct {
 	index  map[string]mod.Modification
 	bySite map[string][]declaredEntry
-	fixed  map[string]float64
 	deltas []float64
+
+	// cTermGroupMass is what an unmodified C-terminus adds to the search engine's mod_cterm_mass.
+	cTermGroupMass float64
 }
 
 // newDeclaredModifications indexes a search summary table once per pepXML file.
-func newDeclaredModifications(mods mod.Modifications) declaredModifications {
+func newDeclaredModifications(mods mod.Modifications, searchEngine string) declaredModifications {
 
 	d := declaredModifications{
 		index:  mods.Index,
 		bySite: make(map[string][]declaredEntry),
-		fixed:  make(map[string]float64),
+	}
+	d.cTermGroupMass = cTermHydroxylMass
+	if searchEngine == "MSFragger" {
+		d.cTermGroupMass += protonMass
 	}
 
 	for _, v := range mods.Index {
@@ -71,9 +78,6 @@ func newDeclaredModifications(mods mod.Modifications) declaredModifications {
 			d.bySite[site] = append(d.bySite[site], declaredEntry{mass: mass, m: v})
 		} else {
 			logrus.Debugf("modification %q states no mass in its key and is matched by exact key only", v.Index)
-		}
-		if !v.Variable {
-			d.fixed[site] += v.MassDiff
 		}
 		d.deltas = append(d.deltas, v.MassDiff)
 	}
@@ -126,7 +130,7 @@ func (p *PeptideIdentification) mapModsFromPepXML(m spc.ModificationInfo, declar
 	}
 
 	if m.ModCTermMass != 0 {
-		if v, ok := declared.terminalModification("C-term", m.ModCTermMass, cTermHydroxylMass); ok {
+		if v, ok := declared.terminalModification("C-term", m.ModCTermMass, declared.cTermGroupMass); ok {
 			index[v.Index] = v
 		}
 	}
@@ -174,7 +178,7 @@ func (d declaredModifications) terminalModification(terminus string, mass float6
 		v, ok = d.legacyTMTProNTerm(mass)
 	}
 	if !ok {
-		if v, ok = d.derivedModification(terminus, mass, mass-groupMass-d.fixedMassDiff(terminus)); !ok {
+		if v, ok = d.derivedModification(terminus, mass, mass-groupMass); !ok {
 			logrus.Debugf("dropping %s modification mass %.4f: only the terminal group", terminus, mass)
 			return mod.Modification{}, false
 		}
@@ -228,15 +232,11 @@ func (d declaredModifications) nearest(site string, mass float64, bound float64)
 	return best, found
 }
 
-// fixedMassDiff is the total delta of the fixed modifications declared for a residue or terminus.
-func (d declaredModifications) fixedMassDiff(site string) float64 {
-	return d.fixed[siteKey(site)]
-}
-
 // deriveResidueModification builds the modification for a mod_aminoacid_mass entry the search summary
-// does not declare. Its mass is residue + fixed modifications + delta. When the same position also
-// carries a declared entry, e.g. the fixed carbamidomethyl under a mass offset, that entry's mass is
-// the more precise base; otherwise the base is the residue plus its declared fixed modifications.
+// does not declare. When the same position also carries a declared entry, e.g. the fixed
+// carbamidomethyl under a mass offset in older MSFragger output, the delta is taken over that entry's
+// mass; otherwise over the residue, so the delta is the whole modification mass of the site, which is
+// how MSFragger sums a delta with the fixed modification of its residue.
 func (d declaredModifications) deriveResidueModification(residue string, mass float64, position int, entries []spc.ModAminoacidMass) (mod.Modification, bool) {
 
 	base, ok := d.declaredMassAtPosition(residue, position, mass, entries)
@@ -245,18 +245,22 @@ func (d declaredModifications) deriveResidueModification(residue string, mass fl
 		if !known {
 			return mod.Modification{}, false
 		}
-		base = residueMass + d.fixedMassDiff(residue)
+		base = residueMass
 	}
 	return d.derivedModification(residue, mass, mass-base)
 }
 
 // derivedModification builds the modification for a site mass the search summary does not declare,
-// from the delta between that mass and its base. A delta too small to be a modification is drift: the
+// from the delta between that mass and its base. A mass within minModificationDelta of a fixed
+// modification is that modification, drifted. A delta too small to be a modification is drift too: the
 // mass is read as the declared modification nearest to it within minModificationDelta, or as nothing.
 // A real delta the summary declares on another site takes the declared value, so one mass offset
 // reads the same on every residue it lands on.
 func (d declaredModifications) derivedModification(site string, mass float64, delta float64) (mod.Modification, bool) {
 
+	if v, ok := d.nearest(site, mass, minModificationDelta); ok && !v.Variable {
+		return v, true
+	}
 	if math.Abs(delta) < minModificationDelta {
 		return d.nearest(site, mass, minModificationDelta)
 	}
