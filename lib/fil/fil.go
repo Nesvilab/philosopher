@@ -915,8 +915,10 @@ func extractPSMfromPepXML(filter string, peplist id.PepIDList, pro id.ProtIDList
 
 	}
 
-	for _, v := range filterMap {
-		output = append(output, v)
+	for idx := range peplist {
+		if filterMap[peplist[idx].SpectrumFileName()] == &peplist[idx] {
+			output = append(output, &peplist[idx])
+		}
 	}
 
 	return output

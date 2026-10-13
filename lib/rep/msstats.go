@@ -134,6 +134,8 @@ func (evi Evidence) MetaMSstatsReport(workspace, brand string, channels int, has
 		for j := range i.MappedProteins {
 			mappedProteins = append(mappedProteins, j)
 		}
+		sort.Strings(mappedGenes)
+		sort.Strings(mappedProteins)
 
 		line := fmt.Sprintf("%s,%s,%s,%s,%.4f,%d,%d,%d,%s,%s,%s,%s,%s,%s,%t,%.4f,%.6f",
 			i.Spectrum,
