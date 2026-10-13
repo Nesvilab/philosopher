@@ -7,7 +7,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Nesvilab/philosopher?style=for-the-badge&color=red&logo=appveyor)](https://goreportcard.com/report/github.com/Nesvilab/philosopher)
 ![GitHub](https://img.shields.io/github/license/Nesvilab/philosopher?style=for-the-badge)
 ![](https://img.shields.io/github/downloads/Nesvilab/philosopher/total.svg?color=red&style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Nesvilab/philosopher/go.yml?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Nesvilab/philosopher/build.yml?style=for-the-badge)
 
 #### Philosopher is a fast, easy-to-use, scalable, and versatile data analysis software for mass spectrometry-based proteomics. It is also a depencency-free wraper of Trans-Proteomic Pipeline (PeptideProphet, iProphet, PTMProphet, and ProteinProphet).
 
