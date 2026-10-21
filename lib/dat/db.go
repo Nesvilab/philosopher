@@ -55,7 +55,7 @@ func ProcessHeader(k, v string, class dbtype, tag string, verb bool) Record {
 	return r
 }
 
-var getProteinExistence_uniprot = regexp.MustCompile(`PE\=(.+)\s[\[|OX\=|GN\=|SV\=|$]`)
+var getProteinExistence_uniprot = regexp.MustCompile(`\sPE\=(\d+)(?:\s|$)`)
 
 func getProteinExistence(header string, class dbtype, verb bool) (match string) {
 

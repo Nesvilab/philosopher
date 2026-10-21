@@ -108,3 +108,50 @@ func TestBase_Deploy(t *testing.T) {
 		})
 	}
 }
+
+func TestProcessHeader_ProteinExistence(t *testing.T) {
+	tests := []struct {
+		name   string
+		header string
+		want   string
+	}{
+		{
+			name:   "PE before SV",
+			header: "sp|P04637|P53_HUMAN Cellular tumor antigen p53 OS=Homo sapiens OX=9606 GN=TP53 PE=1 SV=4",
+			want:   "1:Experimental evidence at protein level",
+		},
+		{
+			name:   "PE at the end",
+			header: "sp|fragnovo1|FRAGNOVO_1 peptide 1 from FragNovo PE=2",
+			want:   "2:Experimental evidence at transcript level",
+		},
+		{
+			name:   "PE followed by OX and GN",
+			header: "tr|A0A024R161|A0A024R161_HUMAN Guanine nucleotide-binding protein subunit gamma OS=Homo sapiens PE=3 OX=9606 GN=DNAJC25-GNG10",
+			want:   "3:Protein inferred from homology",
+		},
+		{
+			name:   "TYPE lookalike",
+			header: "sp|fragnovo1|FRAGNOVO_1 peptide 1 from FragNovo TYPE=3 SV=1",
+			want:   "",
+		},
+		{
+			name:   "no PE",
+			header: "sp|P04637|P53_HUMAN Cellular tumor antigen p53 OS=Homo sapiens OX=9606 GN=TP53 SV=4",
+			want:   "",
+		},
+		{
+			name:   "unknown PE level",
+			header: "sp|P04637|P53_HUMAN Cellular tumor antigen p53 OS=Homo sapiens OX=9606 GN=TP53 PE=9 SV=4",
+			want:   "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := ProcessHeader(tt.header, "", Classify(tt.header, "rev_"), "rev_", false)
+			if r.ProteinExistence != tt.want {
+				t.Errorf("ProteinExistence = %q, want %q", r.ProteinExistence, tt.want)
+			}
+		})
+	}
+}
