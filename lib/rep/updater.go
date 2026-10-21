@@ -448,24 +448,19 @@ func (evi Evidence) RemoveNonRazorProteinsNotPresentInPsms(decoy string) Evidenc
 		}
 	}
 
-	var rmList []int
-	for idx, i := range evi.Proteins {
-		if strings.Contains(i.PartHeader, decoy) {
-			continue
+	var proteins = make(ProteinEvidenceList, 0, len(evi.Proteins))
+	for _, i := range evi.Proteins {
+		if !strings.Contains(i.PartHeader, decoy) {
+			if _, ok := totalProteins[i.PartHeader]; !ok {
+				//fmt.Println("Skipping missing protein:", i.PartHeader)
+				continue
+			}
 		}
 
-		if _, ok := totalProteins[i.PartHeader]; !ok {
-			//fmt.Println("Skipping missing protein:", i.PartHeader, idx)
-			rmList = append(rmList, idx)
-			continue
-		}
+		proteins = append(proteins, i)
 	}
 
-	for _, idx := range rmList {
-		if idx >= 0 && idx < len(evi.Proteins) {
-			evi.Proteins = append(evi.Proteins[:idx], evi.Proteins[idx+1:]...)
-		}
-	}
+	evi.Proteins = proteins
 
 	return evi
 }
