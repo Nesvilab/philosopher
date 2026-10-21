@@ -1,11 +1,68 @@
 package id
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/Nesvilab/philosopher/lib/tes"
 )
+
+func TestProtXML_PromoteProteinIDs(t *testing.T) {
+
+	p := ProtXML{
+		DecoyTag: "rev_",
+		Groups: GroupList{
+			{
+				Proteins: ProtIDList{
+					{
+						OriginalHeader:           "rev_sp|P00001|X_HUMAN decoy of X",
+						ProteinName:              "rev_sp|P00001|X_HUMAN",
+						Description:              "decoy of X",
+						IndistinguishableProtein: []string{"tr|Q00002|Y_HUMAN", "sp|P00003|Z_HUMAN"},
+						Length:                   120,
+					},
+					{
+						OriginalHeader:           "sp|P00004|W_HUMAN Protein W",
+						ProteinName:              "sp|P00004|W_HUMAN",
+						Description:              "Protein W",
+						IndistinguishableProtein: []string{"rev_sp|P00005|V_HUMAN"},
+						Length:                   80,
+					},
+				},
+			},
+		},
+	}
+
+	p.PromoteProteinIDs()
+
+	promoted := p.Groups[0].Proteins[0]
+
+	if promoted.ProteinName != "sp|P00003|Z_HUMAN" {
+		t.Errorf("ProteinName = %q, want %q", promoted.ProteinName, "sp|P00003|Z_HUMAN")
+	}
+
+	// the decoy takes the promoted protein's place among the indistinguishable proteins
+	wantIndi := []string{"tr|Q00002|Y_HUMAN", "rev_sp|P00001|X_HUMAN"}
+	if !reflect.DeepEqual(promoted.IndistinguishableProtein, wantIndi) {
+		t.Errorf("IndistinguishableProtein = %q, want %q", promoted.IndistinguishableProtein, wantIndi)
+	}
+
+	// the decoy's header, description and length are dropped; the header is the one Read builds for a
+	// protein without annotation (TestAssembleProteinReport_PromotedProtein resolves it in lib/rep)
+	if promoted.OriginalHeader != "sp|P00003|Z_HUMAN " || promoted.Description != "" || promoted.Length != 0 {
+		t.Errorf("OriginalHeader, Description, Length = %q, %q, %d, want %q, %q, 0",
+			promoted.OriginalHeader, promoted.Description, promoted.Length, "sp|P00003|Z_HUMAN ", "")
+	}
+
+	// a target representative is left as it is
+	target := p.Groups[0].Proteins[1]
+	if target.ProteinName != "sp|P00004|W_HUMAN" || target.OriginalHeader != "sp|P00004|W_HUMAN Protein W" ||
+		target.Description != "Protein W" || target.Length != 80 ||
+		!reflect.DeepEqual(target.IndistinguishableProtein, []string{"rev_sp|P00005|V_HUMAN"}) {
+		t.Errorf("target representative changed: %+v", target)
+	}
+}
 
 func TestProtXML_MarkUniquePeptides(t *testing.T) {
 

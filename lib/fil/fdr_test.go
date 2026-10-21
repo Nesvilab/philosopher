@@ -1,5 +1,66 @@
 package fil
 
+import (
+	"os"
+	"testing"
+
+	"github.com/Nesvilab/philosopher/lib/id"
+	"github.com/Nesvilab/philosopher/lib/sys"
+)
+
+// A decoy representative promoted to a target among its indistinguishable proteins keeps the razor peptides
+// of its group. RazorFilter keeps its assignment in the workspace, so the test runs inside a fresh one.
+func TestRazorFilter_PromotedProtein(t *testing.T) {
+
+	t.Chdir(t.TempDir())
+	os.Mkdir(sys.MetaDir(), sys.FilePermission())
+
+	p := id.ProtXML{
+		DecoyTag: "rev_",
+		Groups: id.GroupList{
+			{
+				Proteins: id.ProtIDList{
+					{
+						ProteinName:              "rev_sp|P00001|X_HUMAN",
+						IndistinguishableProtein: []string{"tr|Q00002|Y_HUMAN", "sp|P00003|Z_HUMAN"},
+						TotalNumberPeptides:      2,
+						GroupSiblingID:           "a",
+						PeptideIons: []id.PeptideIonIdentification{
+							{PeptideSequence: "ONLYHEREPEPK", Weight: 1, GroupWeight: 1},
+							{PeptideSequence: "SHAREDPEPK", Weight: 0.5, GroupWeight: 0.5, PeptideParentProtein: []string{"sp|Q00006|Q_HUMAN"}},
+						},
+					},
+				},
+			},
+			{
+				Proteins: id.ProtIDList{
+					{
+						ProteinName:         "sp|Q00006|Q_HUMAN",
+						TotalNumberPeptides: 1,
+						GroupSiblingID:      "a",
+						PeptideIons: []id.PeptideIonIdentification{
+							{PeptideSequence: "SHAREDPEPK", Weight: 0.5, GroupWeight: 0.5, PeptideParentProtein: []string{"sp|P00003|Z_HUMAN"}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	p.PromoteProteinIDs()
+	p = RazorFilter(p)
+
+	promoted := p.Groups[0].Proteins[0]
+	for _, i := range promoted.PeptideIons {
+		if i.Razor != 1 {
+			t.Errorf("%s is not razor to %s", i.PeptideSequence, promoted.ProteinName)
+		}
+	}
+	if !promoted.HasRazor {
+		t.Errorf("%s has no razor peptide", promoted.ProteinName)
+	}
+}
+
 // func TestPepXMLFDRFilter(t *testing.T) {
 
 // 	tes.SetupTestEnv()

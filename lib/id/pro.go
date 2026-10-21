@@ -252,7 +252,21 @@ func (p *ProtXML) PromoteProteinIDs() {
 						ref = list[i]
 					}
 				}
+
+				// the decoy takes the promoted protein's place among the indistinguishable proteins
+				for k := range p.Groups[i].Proteins[j].IndistinguishableProtein {
+					if p.Groups[i].Proteins[j].IndistinguishableProtein[k] == ref {
+						p.Groups[i].Proteins[j].IndistinguishableProtein[k] = p.Groups[i].Proteins[j].ProteinName
+						break
+					}
+				}
+
+				// the decoy's header, description and length do not belong to ref; reset the header as Read builds
+				// it for a protein without annotation, so the reports resolve ref to its own database record
 				p.Groups[i].Proteins[j].ProteinName = ref
+				p.Groups[i].Proteins[j].OriginalHeader = ref + " "
+				p.Groups[i].Proteins[j].Description = ""
+				p.Groups[i].Proteins[j].Length = 0
 			}
 
 		}

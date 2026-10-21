@@ -232,6 +232,9 @@ func processProteinCombinedFile(a met.Abacus, database dat.Base) rep.CombinedPro
 				list[i].Organism = j.Organism
 				list[i].Description = j.ProteinName
 				list[i].ProteinExistence = j.ProteinExistence
+				if list[i].Length == 0 {
+					list[i].Length = len(j.Sequence)
+				}
 				break
 			}
 		}
