@@ -307,6 +307,7 @@ func savePeptideAbacusResult(session string, evidences rep.CombinedPeptideEviden
 		for j := range i.ChargeStates {
 			c = append(c, strconv.Itoa(int(j)))
 		}
+		sort.Strings(c)
 		line += fmt.Sprintf("%s\t", strings.Join(c, ","))
 
 		line += fmt.Sprintf("%f\t", i.BestPSM)
